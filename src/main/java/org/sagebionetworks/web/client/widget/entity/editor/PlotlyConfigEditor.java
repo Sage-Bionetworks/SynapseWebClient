@@ -292,10 +292,10 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 			}
 		}
 		
-		List<String> availableYColumnNames = new ArrayList<String>(allAvailableColumnNames);
-		availableYColumnNames.removeAll(yColumnsList);
-		availableYColumnNames.remove(xColumnName);
-		view.setAvailableColumns(availableYColumnNames);
+		List<String> availableColumnNames = new ArrayList<String>(allAvailableColumnNames);
+		availableColumnNames.removeAll(yColumnsList);
+		availableColumnNames.remove(xColumnName);
+		view.setAvailableColumns(availableColumnNames);
 		view.resetSelectedYColumn();
 		view.setXAxisColumnName(xColumnName);
 	}

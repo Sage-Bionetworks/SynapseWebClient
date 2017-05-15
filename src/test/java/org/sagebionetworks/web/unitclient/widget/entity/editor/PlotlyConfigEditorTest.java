@@ -15,7 +15,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -54,8 +56,13 @@ public class PlotlyConfigEditorTest {
 	ColumnModel mockXColumnModel;
 	@Mock
 	ColumnModel mockYColumnModel;
+	@Mock
+	ColumnModel mockY2ColumnModel;
+	@Captor
+	ArgumentCaptor<List<String>> availableColumnNamesCaptor;
 	public static String X_COLUMN_NAME = "x Column";
 	public static String Y_COLUMN_NAME = "y column";
+	public static String Y2_COLUMN_NAME = "y2 column";
 	
 	@Before
 	public void setup(){
@@ -65,6 +72,7 @@ public class PlotlyConfigEditorTest {
 		AsyncMockStubber.callSuccessWith(columnModels).when(mockSynapseClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
 		when(mockXColumnModel.getName()).thenReturn(X_COLUMN_NAME);
 		when(mockYColumnModel.getName()).thenReturn(Y_COLUMN_NAME);
+		when(mockY2ColumnModel.getName()).thenReturn(Y2_COLUMN_NAME);
 	}
 	
 	@Test
@@ -194,6 +202,57 @@ public class PlotlyConfigEditorTest {
 		assertEquals(xAxisLabel, params.get(X_AXIS_TITLE));
 		assertEquals(yAxisLabel, params.get(Y_AXIS_TITLE));
 		assertEquals(GraphType.SCATTER.toString(), params.get(TYPE));
+	}
+	
+	@Test
+	public void testSetTableIdFailure() {
+		Exception ex = new Exception();
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
+		editor.setTableId("syn2222");
+		InOrder order = Mockito.inOrder(mockSynAlert);
+		order.verify(mockSynAlert).clear();
+		order.verify(mockSynAlert).handleException(ex);
+	}
+	
+	@Test
+	public void testAvailableColumns() {
+		columnModels.add(mockXColumnModel);
+		columnModels.add(mockYColumnModel);
+		columnModels.add(mockY2ColumnModel);
+		Map<String, String> params = new HashMap<>();
+		WikiPageKey wikiKey = null;
+		DialogCallback callback = null;
+		editor.configure(wikiKey, params, callback);
+		verify(mockSynapseClient, never()).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
+		
+		// no columns defined, so it will pick the first column from the column models as the x column, and leave the rest for the available columns
+		editor.setTableId("syn2222");
+		verify(mockSynapseClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
+		verify(mockView).setAvailableColumns(availableColumnNamesCaptor.capture());
+		List<String> availableColumnNames = availableColumnNamesCaptor.getValue();
+		assertEquals(2, availableColumnNames.size());
+		assertTrue(availableColumnNames.contains(Y_COLUMN_NAME));
+		assertTrue(availableColumnNames.contains(Y2_COLUMN_NAME));
+		verify(mockView).setXAxisColumnName(X_COLUMN_NAME);
+		
+		//change the x-column to the second column (Y_COLUMN_NAME)
+		reset(mockView);
+		when(mockView.getXAxisColumnName()).thenReturn(Y_COLUMN_NAME);
+		editor.onXColumnChanged();
+		verify(mockView).setAvailableColumns(availableColumnNamesCaptor.capture());
+		availableColumnNames = availableColumnNamesCaptor.getValue();
+		assertEquals(2, availableColumnNames.size());
+		assertTrue(availableColumnNames.contains(X_COLUMN_NAME));
+		assertTrue(availableColumnNames.contains(Y2_COLUMN_NAME));
+		
+		//add the y2 column to the y list
+		reset(mockView);
+		when(mockView.getXAxisColumnName()).thenReturn(Y_COLUMN_NAME);
+		editor.onAddYColumn(Y2_COLUMN_NAME);
+		verify(mockView).setAvailableColumns(availableColumnNamesCaptor.capture());
+		availableColumnNames = availableColumnNamesCaptor.getValue();
+		assertEquals(1, availableColumnNames.size());
+		assertTrue(availableColumnNames.contains(X_COLUMN_NAME));
 	}
 	
 	@Test
