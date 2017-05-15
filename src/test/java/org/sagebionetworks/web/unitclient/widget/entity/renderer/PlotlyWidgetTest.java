@@ -19,6 +19,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -71,6 +72,12 @@ public class PlotlyWidgetTest {
 	SelectColumn mockY1Column;
 	@Mock
 	SelectColumn mockY2Column;
+	@Captor
+	ArgumentCaptor<PlotlyTrace[]> plotlyTraceArrayCaptor;
+	@Mock
+	AsynchronousJobStatus mockAsynchronousJobStatus;
+	@Captor
+	ArgumentCaptor<String> stringCaptor;
 	
 	Map<String, String> params;
 	public static final String X_COLUMN_NAME = "x";
@@ -135,7 +142,7 @@ public class PlotlyWidgetTest {
 		
 		widget.configure(pageKey, params, null, null);
 		
-		//verify
+		//verify query params, and plot configuration based on results
 		verify(mockView).setTitle(plotTitle);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
@@ -156,7 +163,43 @@ public class PlotlyWidgetTest {
 		//verify offset updated
 		request = queryBundleRequestCaptor.getValue();
 		assertEquals(LIMIT, request.getQuery().getOffset());
+		
+		String progressMessage = "processing result x/y";
+		when(mockAsynchronousJobStatus.getProgressMessage()).thenReturn(progressMessage);
+		jobTrackerCallbackCaptor.getValue().onUpdate(mockAsynchronousJobStatus);
+		verify(mockView, times(2)).setLoadingMessage(stringCaptor.capture());
+		String loadingMessage = stringCaptor.getValue();
+		assertTrue(loadingMessage.contains(progressMessage));
+		assertTrue(loadingMessage.contains(LIMIT.toString()));
+		
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
-		verify(mockView).showChart(eq(xAxisLabel), eq(yAxisLabel), any(PlotlyTrace[].class), anyString());
+		verify(mockView).showChart(eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()));
+		PlotlyTrace[] traceArray = plotlyTraceArrayCaptor.getValue();
+		assertTrue(traceArray.length > 0);
+		assertEquals(type.toString().toLowerCase(), traceArray[0].getType());
 	}
+	
+	@Test
+	public void testTrackerStates() {
+		GraphType type = GraphType.SCATTER;
+		params.put(TYPE, type.toString());
+		WikiPageKey pageKey = null;
+		widget.configure(pageKey, params, null, null);
+		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
+		UpdatingAsynchProgressHandler progressHandler = jobTrackerCallbackCaptor.getValue();
+		
+		when(mockView.isAttached()).thenReturn(true);
+		assertTrue(progressHandler.isAttached());
+		when(mockView.isAttached()).thenReturn(false);
+		assertFalse(progressHandler.isAttached());
+		
+		Exception error = new Exception();
+		progressHandler.onFailure(error);
+		verify(mockSynAlert).handleException(error);
+		
+		progressHandler.onCancel();
+		verify(mockView, times(2)).clearChart();
+		verify(mockView).setLoadingVisible(false);
+	}
+	
 }

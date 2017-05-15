@@ -38,4 +38,8 @@ public class PlotlyTrace {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	public String getType() {
+		return type;
+	}
 }
