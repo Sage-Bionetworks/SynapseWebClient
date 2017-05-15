@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.SelectColumn;
+import org.sagebionetworks.web.client.ArrayUtils;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.plotly.PlotlyTrace;
@@ -179,36 +180,19 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	}
 	
 	public void showGraph() {
-		String[] xData = getStringArray(graphData.remove(xAxisColumnName));
+		String[] xData = ArrayUtils.getStringArray(graphData.remove(xAxisColumnName));
 		PlotlyTrace[] plotlyGraphData = new PlotlyTrace[graphData.size()];
 		int i = 0;
 		for (String columnName : graphData.keySet()) {
 			plotlyGraphData[i] = new PlotlyTrace();
 			plotlyGraphData[i].setX(xData);
-			double[] yData = getDoubleArray(graphData.get(columnName));
+			double[] yData = ArrayUtils.getDoubleArray(graphData.get(columnName));
 			plotlyGraphData[i].setY(yData);
 			plotlyGraphData[i].setType(graphType);
 			plotlyGraphData[i].setName(columnName);
 			i++;
 		}
 		view.showChart(xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase());
-	}
-	
-	public double[] getDoubleArray(List<String> l) {
-		double[] d = new double[l.size()];
-		for (int i = 0; i < l.size(); i++) {
-			d[i] = Double.valueOf(l.get(i));
-		}
-		return d;
-	}
-	
-
-	public String[] getStringArray(List<String> l) {
-		String[] d = new String[l.size()];
-		for (int i = 0; i < l.size(); i++) {
-			d[i] = l.get(i);
-		}
-		return d;
 	}
 	
 	@Override

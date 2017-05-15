@@ -65,7 +65,7 @@
 				</b:InputGroup>
 			</b:FormGroup>
 			<bh:Div ui:field="showHideAdvancedButtonContainer" />
-			<bh:Div ui:field="advancedUI" visible="false">
+			<bh:Div ui:field="advancedUI" visible="false" addStyleNames="margin-top-10">
 				<b:FormGroup>
 					<b:FormLabel>WHERE/GROUP BY clause</b:FormLabel>
 					<b:TextBox placeholder="where x>2 group by y" ui:field="advancedClause" />

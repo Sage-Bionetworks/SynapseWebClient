@@ -56,16 +56,19 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	boolean isAdvancedVisible;
 	public static final String SHOW = "Show Advanced";
 	public static final String HIDE = "Hide Advanced";
+	Button showHideAdvancedButton;
+	
 	@Inject
 	public PlotlyConfigEditor(final PlotlyConfigView view, 
 			EntityFinder finder,
 			SynapseAlert synAlert,
 			SynapseClientAsync synapseClient,
-			final Button showHideAdvancedButton) {
+			Button showHideAdvancedButton) {
 		this.view = view;
 		this.finder = finder;
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
+		this.showHideAdvancedButton = showHideAdvancedButton;
 		view.add(finder);
 		view.setSynAlert(synAlert);
 		view.setPresenter(this);
@@ -79,14 +82,20 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		showHideAdvancedButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				isAdvancedVisible = !isAdvancedVisible;
-				String buttonText = isAdvancedVisible ? HIDE : SHOW;
-				showHideAdvancedButton.setText(buttonText);
-				showHideAdvancedButton.setIcon(isAdvancedVisible ? IconType.TOGGLE_DOWN : IconType.TOGGLE_RIGHT);
-				view.setAdvancedUIVisible(isAdvancedVisible);
+				// toggle
+				setAdvancedModeVisible(!isAdvancedVisible);
 			}
 		});
 	}
+	
+	public void setAdvancedModeVisible(boolean visible) {
+		isAdvancedVisible = visible;
+		String buttonText = isAdvancedVisible ? HIDE : SHOW;
+		showHideAdvancedButton.setText(buttonText);
+		showHideAdvancedButton.setIcon(isAdvancedVisible ? IconType.TOGGLE_DOWN : IconType.TOGGLE_RIGHT);
+		view.setAdvancedUIVisible(isAdvancedVisible);
+	}
+	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		yColumnsList.clear();
@@ -94,7 +103,9 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		if (descriptor.containsKey(TABLE_QUERY_KEY)) {
 			sql = descriptor.get(TABLE_QUERY_KEY);
 			setTableId(QueryBundleUtils.getTableIdFromSql(sql));
-			view.setAdvancedClause(getAdvancedClauseFromQuery(sql));
+			String advancedClause = getAdvancedClauseFromQuery(sql);
+			setAdvancedModeVisible(DisplayUtils.isDefined(advancedClause));
+			view.setAdvancedClause(advancedClause);	
 		}
 		if (descriptor.containsKey(TITLE)) {
 			view.setTitle(descriptor.get(TITLE));
@@ -137,22 +148,6 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		return null;
 	}
 	
-	public static String getAdvancedClauseFromQuery(String query) {
-		if(query == null){
-			return null;
-		}
-		String lowercaseQuery = query.toLowerCase();
-		int whereIndex = lowercaseQuery.indexOf("where");
-		if (whereIndex > -1) {
-			return query.substring(whereIndex);
-		} 
-		int groupByIndex = lowercaseQuery.indexOf("group by");
-		if (groupByIndex > -1) {
-			return query.substring(groupByIndex);	
-		}
-		return "";
-	}
-	
 	/**
 	 * Get the y columns from a query string
 	 * @param query
@@ -165,8 +160,31 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		MatchResult matcher = Y_COLUMNS_PATTERN.exec(query);
 		if(matcher != null){
 			if (matcher.getGroupCount() > 1) {
-				return matcher.getGroup(2).split(",");
+				String[] yColumns = matcher.getGroup(2).split(",");
+				// clean up result (in place)
+				if (yColumns != null && yColumns.length > 0) {
+					for (int i = 0; i < yColumns.length; i++) {
+						yColumns[i] = unquote(yColumns[i]);
+					}
+				}
+				return yColumns;
 			}
+		}
+		return null;
+	}
+	
+	public static String getAdvancedClauseFromQuery(String query) {
+		if(query == null){
+			return null;
+		}
+		String lowercaseQuery = query.toLowerCase();
+		int whereIndex = lowercaseQuery.indexOf("where");
+		if (whereIndex > -1) {
+			return query.substring(whereIndex);
+		} 
+		int groupByIndex = lowercaseQuery.indexOf("group by");
+		if (groupByIndex > -1) {
+			return query.substring(groupByIndex);	
 		}
 		return null;
 	}
@@ -268,7 +286,6 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	}
 	
 	public void refreshAvailableColumnNames() {
-		xColumnName = view.getXAxisColumnName();
 		if (allAvailableColumnNames.size() > 0) {
 			if (!DisplayUtils.isDefined(xColumnName) || !allAvailableColumnNames.contains(xColumnName)) {
 				xColumnName = allAvailableColumnNames.get(0);
@@ -316,6 +333,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	
 	@Override
 	public void onXColumnChanged() {
+		xColumnName = view.getXAxisColumnName();
 		refreshAvailableColumnNames();
 	}
 }

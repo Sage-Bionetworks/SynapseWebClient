@@ -1,0 +1,161 @@
+package org.sagebionetworks.web.unitclient.widget.entity.editor;
+
+import static org.junit.Assert.*;
+import static org.mockito.Mockito.*;
+import static org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor.*;
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.plotly.BarMode;
+import org.sagebionetworks.web.client.plotly.GraphType;
+import org.sagebionetworks.web.client.widget.Button;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
+import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigView;
+import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
+public class PlotlyConfigEditorTest {
+		
+	PlotlyConfigEditor editor;
+	@Mock
+	PlotlyConfigView mockView;
+	
+	@Mock
+	EntityFinder mockFinder;
+	@Mock
+	SynapseAlert mockSynAlert;
+	@Mock
+	SynapseClientAsync mockSynapseClient;
+	@Mock
+	Button mockShowHideAdvancedButton;
+	@Captor
+	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
+	List<ColumnModel> columnModels;
+	@Mock
+	ColumnModel mockXColumnModel;
+	@Mock
+	ColumnModel mockYColumnModel;
+	public static String X_COLUMN_NAME = "x Column";
+	public static String Y_COLUMN_NAME = "y column";
+	
+	@Before
+	public void setup(){
+		MockitoAnnotations.initMocks(this);
+		editor = new PlotlyConfigEditor(mockView, mockFinder, mockSynAlert, mockSynapseClient, mockShowHideAdvancedButton);
+		columnModels = new ArrayList<ColumnModel>();
+		AsyncMockStubber.callSuccessWith(columnModels).when(mockSynapseClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
+		when(mockXColumnModel.getName()).thenReturn(X_COLUMN_NAME);
+		when(mockYColumnModel.getName()).thenReturn(Y_COLUMN_NAME);
+	}
+	
+	@Test
+	public void testConstruction() {
+		verify(mockView).add(mockFinder);
+		verify(mockView).setSynAlert(mockSynAlert);
+		verify(mockView).setPresenter(editor);
+		verify(mockView).setShowHideButton(mockShowHideAdvancedButton);
+		
+		verify(mockView).setAdvancedUIVisible(false);
+		verify(mockView, never()).setAdvancedUIVisible(true);
+		verify(mockShowHideAdvancedButton).setText(SHOW);
+		verify(mockShowHideAdvancedButton).setIcon(IconType.TOGGLE_RIGHT);
+		
+		//test showHideAdvancedButton, simulate click
+		verify(mockShowHideAdvancedButton).addClickHandler(clickHandlerCaptor.capture());
+		clickHandlerCaptor.getValue().onClick(null);
+		verify(mockView).setAdvancedUIVisible(true);
+		verify(mockShowHideAdvancedButton).setText(HIDE);
+		verify(mockShowHideAdvancedButton).setIcon(IconType.TOGGLE_DOWN);
+	}
+	
+	@Test
+	public void testConfigure() {
+		// verifies that params are reflected in view.  also tests basic sql parsing
+		String tableSynId = "syn987";
+		String advancedClause = "where \"x Column\" > 2 group by \'y column\'";
+		String sql = "select \"" + X_COLUMN_NAME + "\", \'" + Y_COLUMN_NAME + "\' from " + tableSynId + " " + advancedClause;
+		
+		columnModels.add(mockXColumnModel);
+		columnModels.add(mockYColumnModel);
+		
+		String plotTitle = "My Plot";
+		GraphType type = GraphType.BAR;
+		BarMode barMode = BarMode.STACK;
+		String xAxisTitle = "X";
+		String yAxisTitle = "Y";
+		
+		Map<String, String> params = new HashMap<>();
+		params.put(TABLE_QUERY_KEY, sql);
+		params.put(TITLE, plotTitle);
+		params.put(X_AXIS_TITLE, xAxisTitle);
+		params.put(Y_AXIS_TITLE, yAxisTitle);
+		params.put(TYPE, type.name());
+		params.put(BAR_MODE, barMode.name());
+		
+		WikiPageKey wikiKey = null;
+		DialogCallback callback = null;
+		editor.configure(wikiKey, params, callback);
+		
+		verify(mockView).setTableSynId(tableSynId);
+		verify(mockView, atLeastOnce()).setXAxisColumnName(X_COLUMN_NAME);
+		verify(mockView).addYAxisColumn(Y_COLUMN_NAME);
+		verify(mockView).setGraphType(type);
+		verify(mockView).setBarMode(barMode);
+		verify(mockView).setAdvancedClause(advancedClause);
+		verify(mockView).setAdvancedUIVisible(true);
+	}
+	
+	@Test
+	public void testGetXColumnFromSql() {
+		assertNull(getXColumnFromSql("X_column from missing_select"));
+		assertNull(getXColumnFromSql(null));
+		assertNull(getXColumnFromSql("SELECT x FROM syn2")); // graph requires more than one column
+		assertEquals("MY_x_column", getXColumnFromSql("SeLeCt MY_x_column, y1, y2 FrOM syn2"));
+		assertEquals("x column", getXColumnFromSql("SELECT \'x column\', y1, y2 from syn1"));
+		assertEquals("x column", getXColumnFromSql("SELECT \"x column\", y1, y2 from syn1"));
+	}
+	
+	@Test
+	public void testGetYColumnsFromSql() {
+		assertNull(getYColumnsFromSql("select missing_from, y"));
+		assertNull(getYColumnsFromSql(null));
+		assertNull(getYColumnsFromSql("SELECT x FROM syn2")); // graph requires more than one column
+		assertArrayEquals(new String[]{"y1"}, getYColumnsFromSql("SeLeCt MY_x_column, y1 FrOM syn2"));
+		assertArrayEquals(new String[]{"y1 Column", "y2 COLUMN"},  getYColumnsFromSql("SELECT \'x column\', \'y1 Column\',  \"   y2 COLUMN\" from syn1"));
+	}
+	
+	@Test
+	public void testGetAdvancedClauseFromQuery() {
+		assertNull(getAdvancedClauseFromQuery("select missing_from, y"));
+		assertNull(getAdvancedClauseFromQuery(null));
+		assertNull(getAdvancedClauseFromQuery("select x, y from syn1"));
+		assertEquals("where x>2", getAdvancedClauseFromQuery("select x, y from syn1 where x>2"));
+		assertEquals("GrOUP BY x", getAdvancedClauseFromQuery("select x from syn1 GrOUP BY x"));
+		assertEquals("where x>2 group by x", getAdvancedClauseFromQuery("select x from syn1 where x>2 group by x"));
+	}
+	
+	@Test
+	public void testAsWidget() {
+		editor.asWidget();
+		verify(mockView).asWidget();
+	}
+}
