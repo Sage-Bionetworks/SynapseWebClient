@@ -215,13 +215,8 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	}
 	
 	@Override
-	public void setTableSynId(String value) {
+	public void setTableName(String value) {
 		tableViewSynId.setValue(value);
-	}
-
-	@Override
-	public String getTableSynId() {
-		return tableViewSynId.getValue();
 	}
 	
 	@Override

@@ -14,6 +14,7 @@ import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -54,6 +55,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	String sql;
 	List<String> allAvailableColumnNames;
 	boolean isAdvancedVisible;
+	String tableSynapseId;
 	public static final String SHOW = "Show Advanced";
 	public static final String HIDE = "Hide Advanced";
 	Button showHideAdvancedButton;
@@ -231,7 +233,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 			}
 		}
 		sql.append(" from ");
-		sql.append(view.getTableSynId());
+		sql.append(tableSynapseId);
 		String advancedClause = view.getAdvancedClause();
 		if (DisplayUtils.isDefined(advancedClause)) {
 			sql.append(" ");
@@ -257,7 +259,19 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	
 	public void setTableId(String synId) {
 		synAlert.clear();
-		view.setTableSynId(synId);
+		this.tableSynapseId = synId;
+		view.setTableName("");
+		synapseClient.getEntity(tableSynapseId, new AsyncCallback<Entity>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setTableName(caught.getMessage());
+			}
+			
+			public void onSuccess(Entity result) {
+				view.setTableName(result.getName());
+			};
+		});
+		
 		// get the columns
 		synapseClient.getColumnModelsForTableEntity(synId, new AsyncCallback<List<ColumnModel>>() {
 			@Override

@@ -24,8 +24,7 @@ public interface PlotlyConfigView extends IsWidget {
 	BarMode getBarMode();
 	void clearYAxisColumns();
 	void addYAxisColumn(String yColumnName);
-	void setTableSynId(String value);
-	String getTableSynId();
+	void setTableName(String value);
 	void setXAxisColumnName(String value);
 	String getXAxisColumnName();
 	void setBarModeVisible(boolean visible);

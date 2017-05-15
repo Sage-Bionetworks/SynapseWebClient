@@ -19,6 +19,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -68,6 +69,9 @@ public class PlotlyConfigEditorTest {
 	public static String X_COLUMN_NAME = "x Column";
 	public static String Y_COLUMN_NAME = "y column";
 	public static String Y2_COLUMN_NAME = "y2 column";
+	@Mock
+	Entity mockTableEntity;
+	public static String TABLE_NAME = "my table to plot";
 	
 	@Before
 	public void setup(){
@@ -78,6 +82,8 @@ public class PlotlyConfigEditorTest {
 		when(mockXColumnModel.getName()).thenReturn(X_COLUMN_NAME);
 		when(mockYColumnModel.getName()).thenReturn(Y_COLUMN_NAME);
 		when(mockY2ColumnModel.getName()).thenReturn(Y2_COLUMN_NAME);
+		AsyncMockStubber.callSuccessWith(mockTableEntity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		when(mockTableEntity.getName()).thenReturn(TABLE_NAME);
 	}
 	
 	@Test
@@ -128,7 +134,7 @@ public class PlotlyConfigEditorTest {
 		DialogCallback callback = null;
 		editor.configure(wikiKey, params, callback);
 		
-		verify(mockView).setTableSynId(tableSynId);
+		verify(mockView).setTableName(TABLE_NAME);
 		verify(mockView, atLeastOnce()).setXAxisColumnName(X_COLUMN_NAME);
 		verify(mockView).addYAxisColumn(Y_COLUMN_NAME);
 		verify(mockView).setGraphType(type);
@@ -183,7 +189,6 @@ public class PlotlyConfigEditorTest {
 		columnModels.add(mockYColumnModel);
 		when(mockView.getXAxisColumnName()).thenReturn(newX);
 		
-		when(mockView.getTableSynId()).thenReturn(newSynId);
 		editor.setTableId(newSynId);
 		editor.onXColumnChanged();
 		editor.onAddYColumn(newY1);
@@ -277,6 +282,6 @@ public class PlotlyConfigEditorTest {
 		r.setTargetId(newTableId);
 		callback.onSelected(r);
 		verify(mockFinder).hide();
-		verify(mockView).setTableSynId(newTableId);
+		verify(mockSynapseClient).getEntity(eq(newTableId), any(AsyncCallback.class));
 	}
 }
