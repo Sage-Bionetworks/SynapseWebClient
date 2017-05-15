@@ -154,6 +154,49 @@ public class PlotlyConfigEditorTest {
 	}
 	
 	@Test
+	public void testUpdateDescriptorFromView() {
+		Map<String, String> params = new HashMap<>();
+		WikiPageKey wikiKey = null;
+		DialogCallback callback = null;
+		editor.configure(wikiKey, params, callback);
+
+		// simulate table selected, x column selected, and y column added
+		String newSynId = "syn999999";
+		String newX = "new X";
+		String newY1 = "new Y1";
+		when(mockXColumnModel.getName()).thenReturn(newX);
+		when(mockYColumnModel.getName()).thenReturn(newY1);
+		columnModels.add(mockXColumnModel);
+		columnModels.add(mockYColumnModel);
+		when(mockView.getXAxisColumnName()).thenReturn(newX);
+		
+		when(mockView.getTableSynId()).thenReturn(newSynId);
+		editor.setTableId(newSynId);
+		editor.onXColumnChanged();
+		editor.onAddYColumn(newY1);
+		
+		String advancedClause = "WHERE x>1 GROUP BY X";
+		when(mockView.getAdvancedClause()).thenReturn(advancedClause);
+		String title = "my plot title";
+		when(mockView.getTitle()).thenReturn(title);
+		String xAxisLabel = "a X axis";
+		when(mockView.getXAxisLabel()).thenReturn(xAxisLabel);
+		String yAxisLabel = "a Y axis";
+		when(mockView.getYAxisLabel()).thenReturn(yAxisLabel);
+		GraphType type = GraphType.SCATTER;
+		when(mockView.getGraphType()).thenReturn(type);
+		
+		editor.updateDescriptorFromView();
+		
+		//verify
+		assertEquals("select \"new X\", \"new Y1\" from syn999999 " + advancedClause, params.get(TABLE_QUERY_KEY));
+		assertEquals(title, params.get(TITLE));
+		assertEquals(xAxisLabel, params.get(X_AXIS_TITLE));
+		assertEquals(yAxisLabel, params.get(Y_AXIS_TITLE));
+		assertEquals(GraphType.SCATTER.toString(), params.get(TYPE));
+	}
+	
+	@Test
 	public void testAsWidget() {
 		editor.asWidget();
 		verify(mockView).asWidget();

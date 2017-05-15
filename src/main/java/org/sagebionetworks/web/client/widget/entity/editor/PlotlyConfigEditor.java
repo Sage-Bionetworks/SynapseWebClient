@@ -220,14 +220,14 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		StringBuilder sql = new StringBuilder();
 		sql.append("select \"");
 		sql.append(xColumnName);
-		sql.append("\",");
+		sql.append("\", ");
 		for (Iterator iterator = yColumnsList.iterator(); iterator.hasNext();) {
 			String col = (String) iterator.next();
 			sql.append("\"");
 			sql.append(col);
 			sql.append("\"");
 			if (iterator.hasNext()) {
-				sql.append(",");
+				sql.append(", ");
 			}
 		}
 		sql.append(" from ");
