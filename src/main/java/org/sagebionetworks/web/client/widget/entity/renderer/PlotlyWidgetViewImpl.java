@@ -82,7 +82,8 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		var layout = {
 		  title: title,
 		  xaxis: { title: xTitle },
-		  yaxis: { title: yTitle }
+		  yaxis: { title: yTitle },
+		  barmode: barMode
 		};
 		
 		$wnd.Plotly.plot(el, xyData, layout);
