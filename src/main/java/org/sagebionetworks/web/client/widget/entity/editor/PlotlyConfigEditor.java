@@ -217,8 +217,12 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		String sql = getSql();
 		descriptor.put(TABLE_QUERY_KEY, sql);
 		descriptor.put(TITLE, view.getTitle());
-		descriptor.put(X_AXIS_TITLE, view.getXAxisLabel());
-		descriptor.put(Y_AXIS_TITLE, view.getYAxisLabel());
+		if (DisplayUtils.isDefined(view.getXAxisLabel())) {
+			descriptor.put(X_AXIS_TITLE, view.getXAxisLabel());
+		}
+		if (DisplayUtils.isDefined(view.getYAxisLabel())) {
+			descriptor.put(Y_AXIS_TITLE, view.getYAxisLabel());
+		}
 		descriptor.put(TYPE, view.getGraphType().toString());
 		if (GraphType.BAR.equals(view.getGraphType())) {
 			descriptor.put(BAR_MODE, view.getBarMode().toString());	
