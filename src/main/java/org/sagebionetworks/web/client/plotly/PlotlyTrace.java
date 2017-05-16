@@ -11,7 +11,7 @@ public class PlotlyTrace {
 	String x[];
 	
 	@JsProperty
-	double y[];
+	String y[];
 	
 	@JsProperty
 	String type;
@@ -30,7 +30,7 @@ public class PlotlyTrace {
 	}
 	
 	@JsIgnore
-	public void setY(double[] y) {
+	public void setY(String[] y) {
 		this.y = y;
 	}
 	
@@ -39,6 +39,7 @@ public class PlotlyTrace {
 		this.name = name;
 	}
 	
+	@JsIgnore
 	public String getType() {
 		return type;
 	}

@@ -193,7 +193,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			for (String columnName : graphData.keySet()) {
 				plotlyGraphData[i] = new PlotlyTrace();
 				plotlyGraphData[i].setX(xData);
-				double[] yData = ArrayUtils.getDoubleArray(graphData.get(columnName));
+				String[] yData = ArrayUtils.getStringArray(graphData.get(columnName));
 				plotlyGraphData[i].setY(yData);
 				plotlyGraphData[i].setType(graphType);
 				plotlyGraphData[i].setName(columnName);

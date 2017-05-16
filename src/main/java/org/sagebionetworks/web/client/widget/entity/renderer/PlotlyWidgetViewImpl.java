@@ -30,7 +30,6 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	Text loadingMessage;
 	@UiField
 	Heading plotTitle;
-	
 	Widget w;
 	Presenter presenter;
 	HandlerRegistration resizeHandler;
@@ -77,22 +76,30 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	@Override
 	public void showChart(String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode) {
 		chartContainer.clear();
-		_showChart(chartContainer.getElement(), xTitle, yTitle, xyData, barMode);
+		_showChart(chartContainer.getElement(), xyData, barMode, xTitle, yTitle);
 	}
 	
-	private static native void _showChart(Element el, String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode) /*-{
+	private static native void _showChart(Element el, PlotlyTrace[] xyData, String barMode, String xTitle, String yTitle) /*-{
 		var layout = {
+		  barmode: barMode,
+		  title: 'Plot Title',
 		  xaxis: {
-		    title: xTitle
+		    title: 'x Axis',
+		    titlefont: {
+		      family: 'Courier New, monospace',
+		      size: 18,
+		      color: '#7f7f7f'
+		    }
 		  },
 		  yaxis: {
-		    title: yTitle
-		  },
-		  barmode: barMode,
-		  margin: { t: 0 },
-		  autosize: true
+		    title: 'y Axis',
+		    titlefont: {
+		      family: 'Courier New, monospace',
+		      size: 18,
+		      color: '#7f7f7f'
+		    }
+		  }
 		};
-		
 		$wnd.Plotly.plot(el, 
 			xyData, 
 			layout);
