@@ -92,6 +92,7 @@ public class WidgetConstants {
 	public static final String TEAM_MEMBERS_FRIENDLY_NAME ="Team Members";
 	
 	public static final String TEAM_MEMBER_COUNT_CONTENT_TYPE = "teammembercount";
+	public static final String GRAPH_CONTENT_TYPE = "graph";
 	
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
@@ -219,4 +220,10 @@ public class WidgetConstants {
 	public static final String TABLE_LIMIT_KEY = "limit";
 	public static final String TABLE_OFFSET_KEY = "offset";
 	public static final String TABLE_QUERY_KEY = "query";
+	
+	public static final String TITLE = "title";
+	public static final String X_AXIS_TITLE = "xtitle";
+	public static final String Y_AXIS_TITLE = "ytitle";
+	public static final String TYPE = "type";
+	public static final String BAR_MODE = "barmode";
 }

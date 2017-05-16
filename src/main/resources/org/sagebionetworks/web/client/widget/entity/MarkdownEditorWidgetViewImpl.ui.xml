@@ -48,6 +48,7 @@
 					    <b:AnchorListItem ui:field="bookmarkLink" text="Bookmark" />
 					    <b:AnchorListItem ui:field="challengeParticipantsLink" text="Challenge Participants List" />
 					    <b:AnchorListItem ui:field="challengeTeamsLink" text="Challenge Teams List" />
+					    <b:AnchorListItem ui:field="graphLink" icon="BAR_CHART" text="Simple Plot" />
 					    <b:AnchorListItem ui:field="cytoscapeJsLink" text="Cytoscape JS Graph" />
 					    <b:AnchorListItem ui:field="externalWebsiteLink" text="External Website" />
 					    <b:AnchorListItem ui:field="registerChallengeTeamLink" text="Register Challenge Team Button" />

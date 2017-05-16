@@ -350,6 +350,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigView;
@@ -402,6 +404,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.IFrameWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.IFrameWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
@@ -1457,5 +1461,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(LockAccessRequirementWidgetView.class).to(LockAccessRequirementWidgetViewImpl.class);
 		bind(ImageUploadView.class).to(ImageUploadViewImpl.class);
 		bind(RevokeUserAccessModalView.class).to(RevokeUserAccessModalViewImpl.class);
+		bind(PlotlyWidgetView.class).to(PlotlyWidgetViewImpl.class);
+		bind(PlotlyConfigView.class).to(PlotlyConfigViewImpl.class);
 	}
 }
