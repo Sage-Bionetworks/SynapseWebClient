@@ -28,8 +28,6 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	Div loadingUI;
 	@UiField
 	Text loadingMessage;
-	@UiField
-	Heading plotTitle;
 	Widget w;
 	Presenter presenter;
 	HandlerRegistration resizeHandler;
@@ -74,35 +72,20 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	}-*/;
 	
 	@Override
-	public void showChart(String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode) {
+	public void showChart(String title, String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode) {
 		chartContainer.clear();
-		_showChart(chartContainer.getElement(), xyData, barMode, xTitle, yTitle);
+		_showChart(chartContainer.getElement(), xyData, barMode, title, xTitle, yTitle);
+		_resize(chartContainer.getElement());
 	}
 	
-	private static native void _showChart(Element el, PlotlyTrace[] xyData, String barMode, String xTitle, String yTitle) /*-{
+	private static native void _showChart(Element el, PlotlyTrace[] xyData, String barMode, String title, String xTitle, String yTitle) /*-{
 		var layout = {
-		  barmode: barMode,
-		  title: 'Plot Title',
-		  xaxis: {
-		    title: 'x Axis',
-		    titlefont: {
-		      family: 'Courier New, monospace',
-		      size: 18,
-		      color: '#7f7f7f'
-		    }
-		  },
-		  yaxis: {
-		    title: 'y Axis',
-		    titlefont: {
-		      family: 'Courier New, monospace',
-		      size: 18,
-		      color: '#7f7f7f'
-		    }
-		  }
+		  title: title,
+		  xaxis: { title: xTitle },
+		  yaxis: { title: yTitle }
 		};
-		$wnd.Plotly.plot(el, 
-			xyData, 
-			layout);
+		
+		$wnd.Plotly.plot(el, xyData, layout);
 	}-*/;
 
 	@Override
@@ -116,9 +99,5 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	@Override
 	public boolean isAttached() {
 		return w.isAttached();
-	}
-	@Override
-	public void setTitle(String title) {
-		plotTitle.setText(title);
 	}
 }

@@ -10,8 +10,6 @@
 			<g:Image styleName="displayInline margin-right-5" resource='{sageImageBundle.loading16}' />
 			<bh:Text ui:field="loadingMessage"></bh:Text>
 		</bh:Div>
-		<b:Heading ui:field="plotTitle" size="H4" alignment="CENTER"/>
-		
 		<bh:Div>
 			<bh:Div ui:field="chartContainer" />
 		</bh:Div>

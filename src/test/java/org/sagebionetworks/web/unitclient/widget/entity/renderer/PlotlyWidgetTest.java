@@ -139,7 +139,6 @@ public class PlotlyWidgetTest {
 		widget.configure(pageKey, params, null, null);
 		
 		//verify query params, and plot configuration based on results
-		verify(mockView).setTitle(plotTitle);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		//check query
@@ -151,7 +150,7 @@ public class PlotlyWidgetTest {
 		// complete first page load
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView, never()).showChart(anyString(), anyString(), any(PlotlyTrace[].class), anyString());
+		verify(mockView, never()).showChart(eq(plotTitle), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
 		
 		//test final page
 		rows.clear();
@@ -169,7 +168,7 @@ public class PlotlyWidgetTest {
 		assertTrue(loadingMessage.contains(LIMIT.toString()));
 		
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
-		verify(mockView).showChart(eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()));
+		verify(mockView).showChart(eq(plotTitle), eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()));
 		PlotlyTrace[] traceArray = plotlyTraceArrayCaptor.getValue();
 		assertTrue(traceArray.length > 0);
 		assertEquals(type.toString().toLowerCase(), traceArray[0].getType());

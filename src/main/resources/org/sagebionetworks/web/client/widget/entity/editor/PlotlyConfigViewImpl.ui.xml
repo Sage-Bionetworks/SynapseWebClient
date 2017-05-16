@@ -25,11 +25,12 @@
 				<b:FormLabel>Title</b:FormLabel>
 				<b:TextBox ui:field="titleField" />
 			</b:FormGroup>
-			<b:FormGroup>
+			<!-- The xaxis and yaxis layout params are not being respected in the renderer, so hiding input for now -->
+			<b:FormGroup visible="false">
 				<b:FormLabel>X-Axis Label</b:FormLabel>
 				<b:TextBox ui:field="xAxisLabel" />
 			</b:FormGroup>
-			<b:FormGroup>
+			<b:FormGroup visible="false">
 				<b:FormLabel>Y-Axis Label</b:FormLabel>
 				<b:TextBox ui:field="yAxisLabel" />
 			</b:FormGroup>

@@ -85,7 +85,6 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		xAxisColumnName = null;
 		sql = descriptor.get(TABLE_QUERY_KEY);
 		title = descriptor.get(TITLE);
-		view.setTitle(title);
 		xTitle = descriptor.get(X_AXIS_TITLE);
 		yTitle = descriptor.get(Y_AXIS_TITLE);
 		graphType = GraphType.valueOf(descriptor.get(TYPE));
@@ -199,7 +198,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 				plotlyGraphData[i].setName(columnName);
 				i++;
 			}
-			view.showChart(xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase());
+			view.showChart(title, xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase());
 		} catch (Throwable ex) {
 			synAlert.showError("Error showing plot: " + ex.getMessage());
 		}
