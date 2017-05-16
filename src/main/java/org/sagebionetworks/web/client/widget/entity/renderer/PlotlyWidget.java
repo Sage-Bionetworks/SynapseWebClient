@@ -119,6 +119,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		jobTracker.startAndTrack(AsynchType.TableQuery, qbr, AsynchronousProgressWidget.WAIT_MS, new UpdatingAsynchProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
+				onCancel();
 				synAlert.handleException(failure);
 			}
 

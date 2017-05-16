@@ -176,7 +176,7 @@ public class PlotlyWidgetTest {
 	}
 	
 	@Test
-	public void testTrackerStates() {
+	public void testTrackerOnCancel() {
 		GraphType type = GraphType.SCATTER;
 		params.put(TYPE, type.toString());
 		WikiPageKey pageKey = null;
@@ -184,18 +184,31 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		UpdatingAsynchProgressHandler progressHandler = jobTrackerCallbackCaptor.getValue();
 		
+		//also verify attachment state is based on view
 		when(mockView.isAttached()).thenReturn(true);
 		assertTrue(progressHandler.isAttached());
 		when(mockView.isAttached()).thenReturn(false);
 		assertFalse(progressHandler.isAttached());
 		
-		Exception error = new Exception();
-		progressHandler.onFailure(error);
-		verify(mockSynAlert).handleException(error);
-		
 		progressHandler.onCancel();
 		verify(mockView, times(2)).clearChart();
 		verify(mockView).setLoadingVisible(false);
+	}
+	
+	@Test
+	public void testTrackerOnFailure() {
+		GraphType type = GraphType.SCATTER;
+		params.put(TYPE, type.toString());
+		WikiPageKey pageKey = null;
+		widget.configure(pageKey, params, null, null);
+		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
+		UpdatingAsynchProgressHandler progressHandler = jobTrackerCallbackCaptor.getValue();
+		
+		Exception error = new Exception();
+		progressHandler.onFailure(error);
+		verify(mockView, times(2)).clearChart();
+		verify(mockView).setLoadingVisible(false);
+		verify(mockSynAlert).handleException(error);
 	}
 	
 }

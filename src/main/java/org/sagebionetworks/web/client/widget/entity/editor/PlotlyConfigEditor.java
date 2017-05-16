@@ -205,6 +205,13 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	
 	@Override
 	public void updateDescriptorFromView() {
+		if (yColumnsList.isEmpty()) {
+			throw new IllegalArgumentException("Please select at least one y data column.");
+		}
+		if (!DisplayUtils.isDefined(xColumnName)) {
+			throw new IllegalArgumentException("Please define the x data column.");
+		}
+		
 		//update widget descriptor from the view
 		descriptor.clear();
 		String sql = getSql();
