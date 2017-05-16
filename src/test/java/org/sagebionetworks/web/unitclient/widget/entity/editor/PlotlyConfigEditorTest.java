@@ -213,6 +213,15 @@ public class PlotlyConfigEditorTest {
 		assertEquals(yAxisLabel, params.get(Y_AXIS_TITLE));
 		assertEquals(GraphType.SCATTER.toString(), params.get(TYPE));
 	}
+	@Test (expected=IllegalArgumentException.class)
+	public void testUpdateDescriptorFromViewFailure() {
+		Map<String, String> params = new HashMap<>();
+		WikiPageKey wikiKey = null;
+		DialogCallback callback = null;
+		editor.configure(wikiKey, params, callback);
+		
+		editor.updateDescriptorFromView();
+	}
 	
 	@Test
 	public void testSetTableIdFailure() {

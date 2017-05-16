@@ -25,11 +25,12 @@
 				<b:FormLabel>Title</b:FormLabel>
 				<b:TextBox ui:field="titleField" />
 			</b:FormGroup>
-			<b:FormGroup>
+			<!-- The xaxis and yaxis layout params are not being respected in the renderer, so hiding input for now -->
+			<b:FormGroup visible="false">
 				<b:FormLabel>X-Axis Label</b:FormLabel>
 				<b:TextBox ui:field="xAxisLabel" />
 			</b:FormGroup>
-			<b:FormGroup>
+			<b:FormGroup visible="false">
 				<b:FormLabel>Y-Axis Label</b:FormLabel>
 				<b:TextBox ui:field="yAxisLabel" />
 			</b:FormGroup>
@@ -43,7 +44,7 @@
 				</b:InputGroup>
 			</b:FormGroup>
 			<b:FormGroup>
-				<b:FormLabel>Select X Axis Column</b:FormLabel>
+				<b:FormLabel>Select X Data Column</b:FormLabel>
 				<b:InputGroup>
 				<bh:Div>
 					<b:ButtonGroup>
@@ -54,7 +55,7 @@
 				</b:InputGroup>
 			</b:FormGroup>
 			<b:FormGroup>
-				<b:FormLabel>Select Y Axis Column(s)</b:FormLabel>
+				<b:FormLabel>Select Y Data Column(s)</b:FormLabel>
 				<b:InputGroup>
 					<bh:Div ui:field="yAxisColumnsContainer"/>
 					<bh:Div>
@@ -67,8 +68,8 @@
 			<bh:Div ui:field="showHideAdvancedButtonContainer" />
 			<bh:Div ui:field="advancedUI" visible="false" addStyleNames="margin-top-10">
 				<b:FormGroup>
-					<b:FormLabel>WHERE/GROUP BY clause</b:FormLabel>
-					<b:TextBox placeholder="where x>2 group by y" ui:field="advancedClause" />
+					<b:FormLabel>WHERE Clause</b:FormLabel>
+					<b:TextBox placeholder="where x>2" ui:field="advancedClause" />
 				</b:FormGroup>
 			</bh:Div>
 		</b:FieldSet>

@@ -85,7 +85,6 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		xAxisColumnName = null;
 		sql = descriptor.get(TABLE_QUERY_KEY);
 		title = descriptor.get(TITLE);
-		view.setTitle(title);
 		xTitle = descriptor.get(X_AXIS_TITLE);
 		yTitle = descriptor.get(Y_AXIS_TITLE);
 		graphType = GraphType.valueOf(descriptor.get(TYPE));
@@ -119,6 +118,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		jobTracker.startAndTrack(AsynchType.TableQuery, qbr, AsynchronousProgressWidget.WAIT_MS, new UpdatingAsynchProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
+				onCancel();
 				synAlert.handleException(failure);
 			}
 
@@ -192,13 +192,13 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			for (String columnName : graphData.keySet()) {
 				plotlyGraphData[i] = new PlotlyTrace();
 				plotlyGraphData[i].setX(xData);
-				double[] yData = ArrayUtils.getDoubleArray(graphData.get(columnName));
+				String[] yData = ArrayUtils.getStringArray(graphData.get(columnName));
 				plotlyGraphData[i].setY(yData);
 				plotlyGraphData[i].setType(graphType);
 				plotlyGraphData[i].setName(columnName);
 				i++;
 			}
-			view.showChart(xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase());
+			view.showChart(title, xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase());
 		} catch (Throwable ex) {
 			synAlert.showError("Error showing plot: " + ex.getMessage());
 		}
