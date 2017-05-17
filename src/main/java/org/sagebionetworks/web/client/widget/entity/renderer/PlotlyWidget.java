@@ -6,7 +6,7 @@ import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
-
+import static org.sagebionetworks.web.client.ClientProperties.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.ArrayUtils;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.plotly.PlotlyTrace;
+import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
@@ -33,6 +34,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -59,14 +61,17 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	public static final Long LIMIT = 150L;
 	Map<String, List<String>> graphData;
 	String xAxisColumnName;
+	private ResourceLoader resourceLoader;
 	
 	@Inject
 	public PlotlyWidget(PlotlyWidgetView view,
 			SynapseAlert synAlert,
-			AsynchronousJobTracker jobTracker) {
+			AsynchronousJobTracker jobTracker,
+			ResourceLoader resourceLoader) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.jobTracker = jobTracker;
+		this.resourceLoader = resourceLoader;
 		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
 	}
@@ -185,6 +190,22 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	}
 	
 	public void showChart() {
+		AsyncCallback<Void> initializedCallback = new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				showChart();
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		};
+		
+		if (!resourceLoader.isLoaded(PLOTLY_JS)) {
+			resourceLoader.requires(PLOTLY_JS, initializedCallback);
+			return;
+		}
+		
 		try {
 			String[] xData = ArrayUtils.getStringArray(graphData.remove(xAxisColumnName));
 			PlotlyTrace[] plotlyGraphData = new PlotlyTrace[graphData.size()];
