@@ -6,7 +6,7 @@ import static org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEd
 import static org.sagebionetworks.web.shared.WidgetConstants.*;
 import static org.mockito.Matchers.*;
 import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.*;
-
+import static org.sagebionetworks.web.client.ClientProperties.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -25,9 +25,13 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.plotly.PlotlyTrace;
+import org.sagebionetworks.web.client.presenter.HomePresenter;
+import org.sagebionetworks.web.client.resources.ResourceLoader;
+import org.sagebionetworks.web.client.resources.WebResource;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
@@ -36,6 +40,9 @@ import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetView;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
+
 
 public class PlotlyWidgetTest {
 	PlotlyWidget widget;
@@ -57,6 +64,8 @@ public class PlotlyWidgetTest {
 	RowSet mockRowSet;
 	@Mock
 	Row mockRow;
+	@Mock
+	ResourceLoader mockResourceLoader;
 	
 	List<SelectColumn> selectColumns;
 	List<Row> rows;
@@ -74,7 +83,8 @@ public class PlotlyWidgetTest {
 	AsynchronousJobStatus mockAsynchronousJobStatus;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
-	
+	@Captor
+	ArgumentCaptor<AsyncCallback> webResourceLoadedCallbackCaptor;
 	Map<String, String> params;
 	public static final String X_COLUMN_NAME = "x";
 	public static final String Y1_COLUMN_NAME = "y1";
@@ -83,7 +93,7 @@ public class PlotlyWidgetTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		widget = new PlotlyWidget(mockView, mockSynAlert, mockJobTracker);
+		widget = new PlotlyWidget(mockView, mockSynAlert, mockJobTracker, mockResourceLoader);
 		params = new HashMap<>();
 		selectColumns = new ArrayList<>();
 		rows = new ArrayList<>();
@@ -97,6 +107,7 @@ public class PlotlyWidgetTest {
 		when(mockY1Column.getName()).thenReturn(Y1_COLUMN_NAME);
 		when(mockY2Column.getName()).thenReturn(Y1_COLUMN_NAME);
 		when(mockRow.getValues()).thenReturn(rowValues);
+		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(true);
 	}
 	
 	@Test
@@ -209,5 +220,33 @@ public class PlotlyWidgetTest {
 		verify(mockView).setLoadingVisible(false);
 		verify(mockSynAlert).handleException(error);
 	}
+	
+	@Test
+	public void testLazyLoadPlotlyJS() throws JSONObjectAdapterException {
+		GraphType type = GraphType.SCATTER;
+		params.put(TYPE, type.toString());
+		WikiPageKey pageKey = null;
+		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(false);
+		widget.configure(pageKey, params, null, null);
+		
+		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
+		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
+		
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
+		
+		verify(mockResourceLoader).isLoaded(eq(PLOTLY_JS));
+		verify(mockResourceLoader).requires(eq(PLOTLY_JS), webResourceLoadedCallbackCaptor.capture());
+		
+		AsyncCallback callback = webResourceLoadedCallbackCaptor.getValue();
+		Exception ex = new Exception();
+		callback.onFailure(ex);
+		verify(mockSynAlert).handleException(ex);
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
+		
+		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(true);
+		callback.onSuccess(null);
+		verify(mockView).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
+	}	
+
 	
 }
