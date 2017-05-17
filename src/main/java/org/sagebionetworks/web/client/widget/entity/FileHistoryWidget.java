@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -76,8 +77,8 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	}
 
 	private void editCurrentVersionInfo(Entity entity, String version, String comment) {
-		if (entity instanceof Versionable) {
-			final Versionable vb = (Versionable)entity;
+		if (entity instanceof VersionableEntity) {
+			final VersionableEntity vb = (VersionableEntity)entity;
 			if (version != null && version.equals(vb.getVersionLabel()) &&
 				comment != null && comment.equals(vb.getVersionComment())) {
 				view.showInfo("Version Info Unchanged", "You didn't change anything about the version info.");
@@ -184,7 +185,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		preflightController.checkUploadToEntity(bundle, new Callback() {
 			@Override
 			public void invoke() {
-				final Versionable vb = (Versionable)bundle.getEntity();
+				final VersionableEntity vb = (VersionableEntity)bundle.getEntity();
 				view.showEditVersionInfo(vb.getVersionLabel(), vb.getVersionComment());
 			}
 		});
