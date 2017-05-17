@@ -29,6 +29,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -60,7 +61,7 @@ public class FileHistoryWidgetTest {
 	JiraURLHelper mockJiraURLHelper;
 	PreflightController mockPreflightController;
 	FileHistoryWidget fileHistoryWidget;
-	Versionable vb;
+	VersionableEntity vb;
 	String entityId = "syn123";
 	EntityBundle bundle;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
@@ -169,7 +170,7 @@ public class FileHistoryWidgetTest {
 		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
 		ArgumentCaptor<Entity> entityCaptor = ArgumentCaptor.forClass(Entity.class);
 		verify(mockSynapseClient).updateEntity(entityCaptor.capture(), (AsyncCallback<Entity>) any());
-		Versionable capturedEntity = (Versionable)entityCaptor.getValue();
+		VersionableEntity capturedEntity = (VersionableEntity)entityCaptor.getValue();
 		assertEquals(testComment, capturedEntity.getVersionComment());
 		assertEquals(testLabel, capturedEntity.getVersionLabel());
 	}

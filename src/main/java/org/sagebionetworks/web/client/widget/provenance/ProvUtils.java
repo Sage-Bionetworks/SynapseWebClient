@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
@@ -188,9 +189,9 @@ public class ProvUtils {
 			map.put("Name", entity.getName());
 		}
 		
-		if(entity instanceof Versionable) {
+		if(entity instanceof VersionableEntity) {
 			order.add("Version");
-			map.put("Version", DisplayUtils.getVersionDisplay((Versionable)entity));
+			map.put("Version", DisplayUtils.getVersionDisplay((VersionableEntity)entity));
 		}
 		order.add("Modified By");
 		map.put("Modified By", modifiedBy);

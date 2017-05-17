@@ -43,7 +43,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.schema.FORMAT;
@@ -73,7 +73,6 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style;
@@ -706,7 +705,7 @@ public class DisplayUtils {
 		return t;
 	}
 	
-	public static String getVersionDisplay(Versionable versionable) {		
+	public static String getVersionDisplay(VersionableEntity versionable) {		
 		String version = "";
 		if(versionable == null || versionable.getVersionNumber() == null) return version;
 
