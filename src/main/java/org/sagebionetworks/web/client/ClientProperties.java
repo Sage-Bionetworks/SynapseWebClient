@@ -39,7 +39,7 @@ public class ClientProperties {
 	 * JavaScript WebResources
 	 */
 	public static final WebResource MATHJAX_LOADER_JS = new WebResource("js/mathjax-loader.js", ResourceType.JAVASCRIPT);
-	public static final WebResource MATHJAX_JS = new WebResource("https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=default", ResourceType.JAVASCRIPT);
+	public static final WebResource MATHJAX_JS = new WebResource("https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=default", ResourceType.JAVASCRIPT);
 	public static final WebResource TWITTER_JS = new WebResource("https://platform.twitter.com/widgets.js", ResourceType.JAVASCRIPT);
 	public static final WebResource PLOTLY_JS = new WebResource("https://cdn.plot.ly/plotly-1.27.0.min.js", ResourceType.JAVASCRIPT);
 	public static final String QUERY_SERVICE_PREFIX = "/query?query=";
