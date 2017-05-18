@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.ClientProperties.AWS_SDK_JS;
 
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -43,31 +44,35 @@ public class AwsSdk {
 	public void upload(final String key,
 			JavaScriptObject file,
 			String contentType,
-			JavaScriptObject s3
+			JavaScriptObject s3,
+			S3DirectUploadHandler callback
 			) {
-		_upload(key, file, contentType, s3);
+		_upload(key, file, contentType, s3, callback);
 	}
 	
 	private static native void _upload(
 			String key,
 			JavaScriptObject file,
 			String contentType,
-			JavaScriptObject s3) /*-{
+			JavaScriptObject s3,
+			S3DirectUploadHandler callback) /*-{
 		var params = {
 	        Key: key,
-	        ContentType: file.type,
+	        ContentType: contentType,
 	        Body: file,
 	        ACL: 'bucket-owner-full-control'
 	    };
 
 		s3.upload(params).on('httpUploadProgress', function(evt) {
-				console.log("Uploaded :: " + parseInt((evt.loaded * 100) / evt.total)+'%');
+				// report progress
+				callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::updateProgress(D)(evt.loaded/evt.total);
 			}).send(function(err, data) {
 				if (err) {
-					results.innerHTML = 'ERROR: ' + err;
+					//error
+					callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::uploadFailed(Ljava/lang/String;)(err);
 				} else {
-					alert("File uploaded successfully.");
-					listObjs();
+					//success
+					callback.@org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler::uploadSuccess()();
 				}
 			});
 	}-*/;

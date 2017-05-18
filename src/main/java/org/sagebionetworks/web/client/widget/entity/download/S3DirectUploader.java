@@ -6,10 +6,13 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.*;
 
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
+import org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
+import com.google.gwt.i18n.client.NumberFormat;
 import com.google.inject.Inject;
 
 /**
@@ -17,7 +20,7 @@ import com.google.inject.Inject;
  * @author jayhodgson
  *
  */
-public class S3DirectUploader {
+public class S3DirectUploader implements S3DirectUploadHandler {
 	AwsSdk awsSdk;
 	SynapseJSNIUtils synapseJsniUtils;
 	String accessKeyId;
@@ -25,15 +28,51 @@ public class S3DirectUploader {
 	String bucketName;
 	String endpoint;
 	JavaScriptObject s3;
+	String fileName; 
+	String contentType; 
+	JavaScriptObject blob; 
+	ProgressingFileUploadHandler handler; 
+	Long storageLocationId;
+	HasAttachHandlers view;
 	GWTWrapper gwt;
+	NumberFormat percentFormat;
+	SynapseClientAsync synapseClient;
 	
 	@Inject
 	public S3DirectUploader(AwsSdk awsSdk, 
 			SynapseJSNIUtils synapseJsniUtils,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			SynapseClientAsync synapseClient) {
 		this.awsSdk = awsSdk;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.gwt = gwt;
+		this.synapseClient = synapseClient;
+		this.percentFormat = gwt.getNumberFormat("##");
+	}
+	
+	@Override
+	public void updateProgress(double currentProgress) {
+		if (handler != null && view.isAttached()) {
+			String progressText = percentFormat.format(currentProgress) + "%";
+			handler.updateProgress(currentProgress, progressText, null);
+		}
+	}
+	
+	@Override
+	public void uploadFailed(String error) {
+		if (handler != null && view.isAttached()) {
+			handler.uploadFailed(error);
+		}
+	}
+	
+	@Override
+	public void uploadSuccess() {
+		if (handler != null && view.isAttached()) {
+			//success!
+			//TODO: create a new file handle and tell the handler about the new handle
+//			synapseClient.createS3FileHandle();
+//			handler.uploadSuccess(fileHandleId);
+		}
 	}
 	
 	public void configure(
@@ -62,21 +101,30 @@ public class S3DirectUploader {
 	}
 	
 	public void uploadFile(
-			final String fileName, 
-			final String contentType, 
-			final JavaScriptObject blob, 
-			final ProgressingFileUploadHandler handler, 
-			final Long storageLocationId, 
-			final HasAttachHandlers view) {
+			String fileName, 
+			String contentType, 
+			JavaScriptObject blob, 
+			ProgressingFileUploadHandler handler, 
+			Long storageLocationId, 
+			HasAttachHandlers view) {
+		this.fileName = fileName;
+		this.contentType = contentType;
+		this.blob = blob;
+		this.handler = handler;
+		this.storageLocationId = storageLocationId;
+		this.view = view;
 		// on final success, create new file handle and send the id back (via the handler)
 		awsSdk.getS3(accessKeyId, secretAccessKey, bucketName, endpoint, new CallbackP<JavaScriptObject>() {
 			@Override
 			public void invoke(JavaScriptObject s3) {
 				// attempt the upload
-				awsSdk.upload(gwt.getUniqueElementId() + "/" + fileName, blob, contentType, s3);
+				upload();
 			}
 		});
-		handler.uploadSuccess(newFileHandleId);
-		
+	}
+	
+	private void upload() {
+		String key = fileName + "-" + gwt.getUniqueElementId();
+		awsSdk.upload(key, blob, contentType, s3, this);
 	}
 }
