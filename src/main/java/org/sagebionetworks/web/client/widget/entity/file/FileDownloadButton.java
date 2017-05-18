@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -20,6 +21,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
@@ -52,6 +54,9 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	GWTWrapper gwt;
 	CookieProvider cookies;
 	boolean isHidingClientHelp = false;
+	AwsSdk awsSdk;
+	PopupUtilsView popupUtilsView;
+	
 	@Inject
 	public FileDownloadButton(FileDownloadButtonView view, 
 			SynapseClientAsync synapseClient, 
@@ -64,7 +69,9 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 			AuthenticationController authController,
 			SynapseJSNIUtils jsniUtils,
 			GWTWrapper gwt,
-			CookieProvider cookies) {
+			CookieProvider cookies,
+			AwsSdk awsSdk,
+			PopupUtilsView popupUtilsView) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.licensedDownloader = licensedDownloader;
@@ -77,6 +84,8 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		this.jsniUtils = jsniUtils;
 		this.gwt = gwt;
 		this.cookies = cookies;
+		this.awsSdk = awsSdk;
+		this.popupUtilsView = popupUtilsView;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
 		licensedDownloader.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
@@ -120,24 +129,29 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 				view.setLicensedDownloadLinkVisible(true);
 			}
 		} else {
-			String directDownloadUrl = getDirectDownloadUrl();
-			if (directDownloadUrl != null) {
-				//special case, if this starts with sftp proxy, then handle
-				String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
-				if (directDownloadUrl.startsWith(sftpProxy)) {
-					view.setAuthorizedDirectDownloadLinkVisible(true);
-					loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
-					FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
-					String url = ((ExternalFileHandle) fileHandle).getExternalURL();
-					queryForSftpLoginInstructions(url);
-				} else {
-					view.setDirectDownloadLink(directDownloadUrl);
-					view.setDirectDownloadLinkVisible(true);
-					if (!isHidingClientHelp) {
-						view.setClientsHelpVisible(true);	
+//			if (isS3DirectDownload) {
+				//TODO:
+//				view.setLicensedDownloadLinkVisible(true);
+//			} else {
+				String directDownloadUrl = getDirectDownloadUrl();
+				if (directDownloadUrl != null) {
+					//special case, if this starts with sftp proxy, then handle
+					String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
+					if (directDownloadUrl.startsWith(sftpProxy)) {
+						view.setAuthorizedDirectDownloadLinkVisible(true);
+						loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
+						FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
+						String url = ((ExternalFileHandle) fileHandle).getExternalURL();
+						queryForSftpLoginInstructions(url);
+					} else {
+						view.setDirectDownloadLink(directDownloadUrl);
+						view.setDirectDownloadLinkVisible(true);
+						if (!isHidingClientHelp) {
+							view.setClientsHelpVisible(true);	
+						}
 					}
 				}
-			}
+//			}
 		}
 		
 		FileClientsHelp clientsHelp = ginInjector.getFileClientsHelp();
@@ -215,7 +229,14 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	
 	@Override
 	public void onLicensedDownloadClick() {
-		licensedDownloader.onDownloadButtonClicked();
+//		if (isS3DirectDownload) {
+//			//TODO: ask for credentials, use bucket/endpoint info from storage location (from file handle??)
+//			awsSdk.getS3(accessKeyId, secretAccessKey, bucketName, endpoint, s3Callback);	
+//			String presignedUrl = awsSdk.getPresignedURL(key, bucketName, s3);
+//			popupUtilsView.openInNewWindow(presignedUrl);
+//		} else {
+			licensedDownloader.onDownloadButtonClicked();
+//		}
 	}
 	
 	@Override

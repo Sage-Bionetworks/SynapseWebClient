@@ -21,16 +21,16 @@ public class AwsSdk {
 	public AwsSdk(ResourceLoader resourceLoader) {
 		this.resourceLoader = resourceLoader;
 	}
-	
+
 	public void init(final AsyncCallback<Void> callback) {
-		
+
 		if (!resourceLoader.isLoaded(AWS_SDK_JS)) {
 			resourceLoader.requires(AWS_SDK_JS, callback);
 		} else {
 			callback.onSuccess(null);
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param key target object key (in bucket)
@@ -49,7 +49,7 @@ public class AwsSdk {
 			) {
 		_upload(key, file, contentType, s3, callback);
 	}
-	
+
 	private static native void _upload(
 			String key,
 			JavaScriptObject file,
@@ -76,7 +76,28 @@ public class AwsSdk {
 				}
 			});
 	}-*/;
-	
+
+	public String getPresignedURL(String key,
+			String bucketName,
+			JavaScriptObject s3
+			) {
+		return _getPresignedURL(key, bucketName, s3);
+	}
+
+	private static native String _getPresignedURL(
+			String key,
+			String bucketName,
+			JavaScriptObject s3) 
+	/*-{
+		var params = {
+			Bucket: bucketName,
+	        Key: key,
+	        Expires: 20
+	    };
+		return s3.getSignedUrl('getObject', params);
+	}-*/;
+
+
 	public void getS3(
 			final String accessKeyId, 
 			final String secretAccessKey,
@@ -89,10 +110,10 @@ public class AwsSdk {
 				JavaScriptObject s3 = _getS3(accessKeyId, secretAccessKey, bucketName, endpoint);
 				s3Callback.invoke(s3);
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
-				
+
 			}
 		});
 	}
