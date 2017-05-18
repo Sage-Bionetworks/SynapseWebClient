@@ -79,7 +79,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private String currentExternalUploadUrl;
 	private ClientLogger logger;
 	private Long storageLocationId;
-
+	private S3DirectUploader s3DirectUploader;
+	
 	@Inject
 	public Uploader(
 			UploaderView view, 			
@@ -89,7 +90,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			AuthenticationController authenticationController,
 			MultipartUploader multiPartUploader,
 			GlobalApplicationState globalAppState,
-			ClientLogger logger
+			ClientLogger logger,
+			S3DirectUploader s3DirectUploader
 			) {
 	
 		this.view = view;		
@@ -100,6 +102,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.authenticationController = authenticationController;
 		this.globalAppState = globalAppState;
 		this.multiPartUploader = multiPartUploader;
+		this.s3DirectUploader = s3DirectUploader;
 		this.logger = logger;
 		view.setPresenter(this);
 		clearHandlers();
@@ -446,7 +449,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	private void directUploadStep2(String fileName) {
-		this.multiPartUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);
+		//TODO: use S3 direct uploader
+//		if (isDirectS3Download) {
+//			s3DirectUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);
+//		} else {
+			this.multiPartUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);	
+//		}
 	}
 
 	private void handleCancelledFileUpload() {

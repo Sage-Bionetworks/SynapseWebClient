@@ -7,6 +7,7 @@ import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl
 
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler;
 
