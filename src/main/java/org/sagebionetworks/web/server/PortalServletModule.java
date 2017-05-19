@@ -23,7 +23,6 @@ import org.sagebionetworks.web.server.servlet.JiraClientImpl;
 import org.sagebionetworks.web.server.servlet.JiraJavaClient;
 import org.sagebionetworks.web.server.servlet.JiraJavaClientImpl;
 import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
-import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.MultipartFileUploadClientImpl;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
@@ -108,10 +107,6 @@ public class PortalServletModule extends ServletModule {
 		// setup the layout service
 		bind(LayoutServiceImpl.class).in(Singleton.class);
 		serve("/Portal/layout").with(LayoutServiceImpl.class);
-		
-		// Setup the License service mapping
-		bind(LicenseServiceImpl.class).in(Singleton.class);
-		serve("/Portal/license").with(LicenseServiceImpl.class);
 		
 		// Setup the User Account service mapping
 		bind(UserAccountServiceImpl.class).in(Singleton.class);
