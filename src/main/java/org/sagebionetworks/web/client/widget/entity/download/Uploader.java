@@ -249,7 +249,18 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 								banner += "/" + externalUploadDestination.getBaseKey();
 						}
 						updateS3UploadBannerView(banner);
-
+					//TODO: support new direct to s3(-like) storage
+//					} else if (uploadDestinations.get(0) instanceof S3DirectUploadDestination) {
+//						S3DirectUploadDestination externalUploadDestination = (S3DirectUploadDestination) uploadDestinations.get(0);
+//						storageLocationId = externalUploadDestination.getStorageLocationId();
+//						currentUploadType = externalUploadDestination.getUploadType();
+//						String banner = externalUploadDestination.getBanner();
+//						if (!DisplayUtils.isDefined(banner)) {
+//							banner = "Uploading to " + externalUploadDestination.getEndpoint();
+//							if (externalUploadDestination.getBaseKey() != null)
+//								banner += "/" + externalUploadDestination.getBaseKey();
+//						}
+//						view.showUploadingToS3DirectStorage(endpoint, banner);
 					} else {
 						//unsupported upload destination type
 						onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported upload destination: " + uploadDestinations.get(0).getClass().getName()));
@@ -450,7 +461,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	private void directUploadStep2(String fileName) {
 		//TODO: use S3 direct uploader
+		
 //		if (isDirectS3Download) {
+//			s3DirectUploader.configure(view.getS3DirectAccessKey(), view.getS3DirectSecretKey(), bucketName, endpoint);
 //			s3DirectUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);
 //		} else {
 			this.multiPartUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);	
