@@ -1,14 +1,19 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.entity.download.AwsLoginView;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.ButtonElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -41,14 +46,24 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 	ButtonElement authorizedDownloadButton;
 	@UiField
 	ButtonElement licensedDownloadButton;
+	@UiField
+	Modal s3DirectLoginDialog;
+	@UiField
+	Div s3DirectLoginDialogBody;
+	@UiField
+	Button s3DirectLoginDialogButton;
+	
+	AwsLoginView awsLoginView;
+	
 	boolean isExtraSmall;
 	interface FileDownloadButtonViewImplUiBinder extends UiBinder<Widget, FileDownloadButtonViewImpl> {}
 
 	private static FileDownloadButtonViewImplUiBinder uiBinder = GWT.create(FileDownloadButtonViewImplUiBinder.class);
 	Widget widget;
 	@Inject
-	public FileDownloadButtonViewImpl() {
+	public FileDownloadButtonViewImpl(AwsLoginView awsLoginWidget) {
 		widget = uiBinder.createAndBindUi(this);
+		this.awsLoginView = awsLoginWidget;
 		ClickHandler licensedDownloadClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -57,6 +72,7 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 				presenter.onLicensedDownloadClick();
 			}
 		};
+		s3DirectLoginDialogBody.add(awsLoginView);
 		licensedDownloadLink.addClickHandler(licensedDownloadClickHandler);
 		licensedDownloadLink2.addClickHandler(licensedDownloadClickHandler);
 		
@@ -69,6 +85,12 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 		authorizedDirectDownloadLink.addClickHandler(authorizedDirectDownloadClickHandler);
 		authorizedDirectDownloadLink2.addClickHandler(authorizedDirectDownloadClickHandler);
 		isExtraSmall = false;
+		s3DirectLoginDialogButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onS3DirectDownloadClicked(awsLoginView.getAccessKey(), awsLoginView.getSecretKey());
+			}
+		});
 	}
 	
 	@Override
@@ -147,5 +169,11 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 		directDownloadButton.addClassName(size.getCssName());
 		authorizedDownloadButton.addClassName(size.getCssName());
 		licensedDownloadButton.addClassName(size.getCssName());
+	}
+	@Override
+	public void showS3DirectLoginDialog(String endpoint) {
+		awsLoginView.clear();
+		awsLoginView.setEndpoint(SafeHtmlUtils.htmlEscape(endpoint));
+		s3DirectLoginDialog.show();
 	}
 }

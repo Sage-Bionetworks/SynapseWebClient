@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
@@ -29,6 +30,7 @@ import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownload
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FormPanel;
@@ -231,12 +233,22 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	public void onLicensedDownloadClick() {
 //		if (isS3DirectDownload) {
 //			//TODO: ask for credentials, use bucket/endpoint info from storage location (from file handle??)
-//			awsSdk.getS3(accessKeyId, secretAccessKey, bucketName, endpoint, s3Callback);	
-//			String presignedUrl = awsSdk.getPresignedURL(key, bucketName, s3);
-//			popupUtilsView.openInNewWindow(presignedUrl);
+//			view.showS3DirectLoginDialog(endpoint);
 //		} else {
 			licensedDownloader.onDownloadButtonClicked();
 //		}
+	}
+	
+	@Override
+	public void onS3DirectDownloadClicked(String accessKeyId, String secretAccessKey) {
+		CallbackP<JavaScriptObject> s3Callback = new CallbackP<JavaScriptObject>() {
+			@Override
+			public void invoke(JavaScriptObject s3) {
+//				String presignedUrl = awsSdk.getPresignedURL(key, bucketName, s3);
+//				popupUtilsView.openInNewWindow(presignedUrl);
+			}
+		};
+//		awsSdk.getS3(accessKeyId, secretAccessKey, bucketName, endpoint, s3Callback);	
 	}
 	
 	@Override

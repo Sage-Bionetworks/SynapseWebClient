@@ -17,6 +17,7 @@ public interface FileDownloadButtonView extends IsWidget {
 	void setSynAlert(IsWidget w);
 	void setFileClientsHelp(IsWidget w);
 	void setButtonSize(ButtonSize size);
+	void showS3DirectLoginDialog(String endpoint);
 	/**
 	 * Presenter interface
 	 */
@@ -25,5 +26,6 @@ public interface FileDownloadButtonView extends IsWidget {
 		void queryForSftpLoginInstructions(String directDownloadUrl);
 		void onLicensedDownloadClick();
 		void onAuthorizedDirectDownloadClicked();
+		void onS3DirectDownloadClicked(String accessKey, String secretKey);
 	}
 }
