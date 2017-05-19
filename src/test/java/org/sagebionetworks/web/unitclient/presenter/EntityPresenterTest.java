@@ -250,35 +250,6 @@ public class EntityPresenterTest {
 	}
 	
 	@Test
-	public void testFilterToDownloadARs() {
-		List<AccessRequirement> unfilteredARs = new ArrayList<AccessRequirement>();
-		List<AccessRequirement> unfilteredUnmetARs = new ArrayList<AccessRequirement>();
-		List<AccessRequirement> expectedFilteredARs = new ArrayList<AccessRequirement>();
-		List<AccessRequirement> expectedFilteredUnmetARs = new ArrayList<AccessRequirement>();
-		
-		unfilteredARs.add(createNewAR(ACCESS_TYPE.UPLOAD));
-		unfilteredUnmetARs.add(createNewAR(ACCESS_TYPE.UPLOAD));
-		
-		AccessRequirement ar = createNewAR(ACCESS_TYPE.DOWNLOAD);
-		unfilteredARs.add(ar);
-		expectedFilteredARs.add(ar);
-		
-		ar = createNewAR(ACCESS_TYPE.DOWNLOAD);
-		unfilteredUnmetARs.add(ar);
-		expectedFilteredUnmetARs.add(ar);
-		
-		unfilteredARs.add(createNewAR(ACCESS_TYPE.SUBMIT));
-		unfilteredUnmetARs.add(createNewAR(ACCESS_TYPE.SUBMIT));
-		
-		eb.setAccessRequirements(unfilteredARs);
-		eb.setUnmetAccessRequirements(unfilteredUnmetARs);
-		EntityPresenter.filterToDownloadARs(eb);
-		
-		assertEquals(expectedFilteredARs, eb.getAccessRequirements());
-		assertEquals(expectedFilteredUnmetARs, eb.getUnmetAccessRequirements());
-	}
-	
-	@Test
 	public void testShow403() {
 		entityPresenter.setEntityId("123");
 		entityPresenter.show403();

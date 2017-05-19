@@ -199,7 +199,7 @@ public class RestrictionWidgetTest {
 		verify(mockView).showShowLink();
 		
 		widget.linkClicked();
-		verify(mockPlaceChanger).goTo(any(AccessRequirementsPlace.class));
+		verify(mockView).open(anyString());
 	}
 	@Test
 	public void testConfigureLoggedInOpen() {
@@ -340,6 +340,6 @@ public class RestrictionWidgetTest {
 		
 		widget.changeClicked();
 		verifyIsACTMember(true);
-		verify(mockPlaceChanger).goTo(any(AccessRequirementsPlace.class));
+		verify(mockView).open(anyString());
 	}
 }

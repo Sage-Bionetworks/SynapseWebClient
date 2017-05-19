@@ -1,12 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -17,7 +12,6 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
@@ -114,7 +108,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	String enityTypeDisplay;
 	boolean isUserAuthenticated;
 	boolean isCurrentVersion;
-	List<ACTAccessRequirement> actRequirements;
 	ActionMenuWidget actionMenu;
 	EntityUpdatedHandler entityUpdateHandler;
 	UploadDialogWidget uploader;
@@ -145,7 +138,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.authenticationController = authenticationController;
 		this.cookies = cookies;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
-		this.actRequirements = new ArrayList<ACTAccessRequirement>();
 	}
 	
 	private ApproveUserAccessModal getApproveUserAccessModal() {
@@ -338,31 +330,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
 		actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, false);	
 		actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
-		List<AccessRequirement> requirements = entityBundle.getAccessRequirements();
-		for (AccessRequirement ar : requirements) {
-			if (ar instanceof ACTAccessRequirement) {
-				actRequirements.add((ACTAccessRequirement) ar);
-			}
-		}
 		if (authenticationController.isLoggedIn()) {
-			
-			getUserProfileClient().getMyOwnUserBundle(IS_ACT_MEMBER_MASK, new AsyncCallback<UserBundle>() {
+			isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
 				@Override
-				public void onSuccess(UserBundle userBundle) {
-					if (userBundle.getIsACTMember() && actRequirements.size() > 0) {
-						actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
-						actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);	
-					}
+				public void invoke(Boolean isACT) {
+					actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
+					actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);
 				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
-				}
-			});	
+			});
 		}
 	}
-	
 
 	private void configureManageAccessRequirements() {
 		actionMenu.setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, false);
@@ -829,7 +806,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onApproveUserAccess() {
-		getApproveUserAccessModal().configure(actRequirements, entityBundle);
+		getApproveUserAccessModal().configure(entityBundle);
 		getApproveUserAccessModal().show();
 	}
 	

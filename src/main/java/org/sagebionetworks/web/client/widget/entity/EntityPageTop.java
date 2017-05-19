@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.repo.model.EntityBundle.ACL;
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.DOI;
@@ -9,7 +8,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
-import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.CHALLENGE;
 import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.DISCUSSION;
 import static org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog.DOCKER;
@@ -213,7 +211,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     public void configureProject() {
     	view.setLoadingVisible(true);
     	hideTabs();
-    	int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA | ACL;
+    	int mask = ENTITY | ANNOTATIONS | PERMISSIONS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA | ACL;
 		projectBundle = null;
 		projectBundleLoadError = null;
 		view.setProjectInformationVisible(false);
