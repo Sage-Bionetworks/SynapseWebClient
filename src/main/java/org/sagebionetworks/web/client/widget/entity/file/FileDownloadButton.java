@@ -23,7 +23,6 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
-import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloader;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -41,7 +40,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	private EntityBundle entityBundle;
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseClientAsync synapseClient;
-	private LicensedDownloader licensedDownloader;
 	private LoginModalWidget loginModalWidget;
 	private GlobalApplicationState globalAppState;
 	private SynapseAlert synAlert;
@@ -55,7 +53,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	@Inject
 	public FileDownloadButton(FileDownloadButtonView view, 
 			SynapseClientAsync synapseClient, 
-			LicensedDownloader licensedDownloader, 
 			LoginModalWidget loginModalWidget,
 			GlobalApplicationState globalAppState,
 			SynapseAlert synAlert,
@@ -67,7 +64,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 			CookieProvider cookies) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.licensedDownloader = licensedDownloader;
 		this.loginModalWidget = loginModalWidget;
 		this.globalAppState = globalAppState;
 		this.synAlert = synAlert;
@@ -79,12 +75,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		this.cookies = cookies;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
-		licensedDownloader.setEntityUpdatedHandler(new EntityUpdatedHandler() {			
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				fireEntityUpdatedEvent(event);
-			}
-		});
 		loginModalWidget.setPrimaryButtonText(DisplayConstants.BUTTON_DOWNLOAD);
 	}
 	
@@ -111,14 +101,8 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 			view.setDirectDownloadLinkVisible(true);
 		} else if (restrictionInformation.getHasUnmetAccessRequirement()) {
 			// if in alpha, send to access requirements
-			if (DisplayUtils.isInTestWebsite(cookies)) {
-				view.setDirectDownloadLink(ACCESS_REQUIREMENTS_LINK+bundle.getEntity().getId());
-				view.setDirectDownloadLinkVisible(true);
-			} else {
-				// else, use licensed downloader
-				licensedDownloader.configure(entityBundle);
-				view.setLicensedDownloadLinkVisible(true);
-			}
+			view.setDirectDownloadLink(ACCESS_REQUIREMENTS_LINK+bundle.getEntity().getId());
+			view.setDirectDownloadLinkVisible(true);
 		} else {
 			String directDownloadUrl = getDirectDownloadUrl();
 			if (directDownloadUrl != null) {
@@ -215,7 +199,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	
 	@Override
 	public void onLicensedDownloadClick() {
-		licensedDownloader.onDownloadButtonClicked();
+		//will be re-using for any js handling of download (s3 direct download, for example!)
 	}
 	
 	@Override
