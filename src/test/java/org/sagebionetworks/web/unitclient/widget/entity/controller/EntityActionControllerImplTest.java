@@ -10,15 +10,17 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_FOLDER_EXPLANATION;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.EDIT_WIKI_PREFIX;
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.IS_ACT_MEMBER_MASK;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.RENAME_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
@@ -41,7 +43,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
@@ -110,8 +111,6 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-
-import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.*;
 
 public class EntityActionControllerImplTest {
 
@@ -609,62 +608,10 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
-	public void testConfigureApproveUserAccessOnFailure() {
-		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
-		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
-		userBundleCaptor.getValue().onFailure(mockThrowable);
-		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
-		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
-		verify(mockActionMenu, times(0)).setActionVisible(Action.APPROVE_USER_ACCESS, true);
-		verify(mockActionMenu, times(0)).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
-		verify(mockView).showErrorMessage(any(String.class));
-	}
-	
-	@Test
-	public void testConfigureApproveUserAccessNoAccessReq() {
-		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
-		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
-		userBundleCaptor.getValue().onSuccess(mockUserBundle);
-		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
-		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
-		verify(mockActionMenu, times(0)).setActionVisible(Action.APPROVE_USER_ACCESS, true);
-		verify(mockActionMenu, times(0)).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
-	}
-	
-	@Test
-	public void testConfigureApproveUserAccessACTUser() {
-		accessReqs.add(new ACTAccessRequirement());
-		entityBundle.setAccessRequirements(accessReqs);
-		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
-		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
-		when(mockUserBundle.getIsACTMember()).thenReturn(true);
-		userBundleCaptor.getValue().onSuccess(mockUserBundle);
-		InOrder inOrder = inOrder(mockActionMenu);
-		inOrder.verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
-		inOrder.verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
-		inOrder.verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, true);
-		inOrder.verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
-	}
-	
-	@Test
-	public void testConfigureApproveUserAccessNonACTUser() {
-		accessReqs.add(new ACTAccessRequirement());
-		entityBundle.setAccessRequirements(accessReqs);
-		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
-		verify(mockUserProfileClient).getMyOwnUserBundle(eq(IS_ACT_MEMBER_MASK), userBundleCaptor.capture());
-		when(mockUserBundle.getIsACTMember()).thenReturn(false);
-		userBundleCaptor.getValue().onSuccess(mockUserBundle);
-		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
-		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
-		verify(mockActionMenu, times(0)).setActionVisible(Action.APPROVE_USER_ACCESS, true);
-		verify(mockActionMenu, times(0)).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
-	}
-	
-	@Test
 	public void testOnSelectApproveUserAccess(){
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		controller.onAction(Action.APPROVE_USER_ACCESS);
-		verify(mockApproveUserAccessModal).configure(new LinkedList<ACTAccessRequirement>(), entityBundle);
+		verify(mockApproveUserAccessModal).configure(entityBundle);
 		verify(mockApproveUserAccessModal).show();
 	}
 	
@@ -1567,18 +1514,30 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, false);
 		verify(mockActionMenu).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, false);
 		verify(mockActionMenu).setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, controller);
+		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
+		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, false);
 		
 		verify(mockActionMenu, never()).setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, true);
 		verify(mockActionMenu, never()).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
-		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
-		CallbackP<Boolean> isACTCallback = callbackPCaptor.getValue();
-		isACTCallback.invoke(false);
+		verify(mockIsACTMemberAsyncHandler, atLeastOnce()).isACTMember(callbackPCaptor.capture());
+		List<CallbackP<Boolean>> isACTCallbacks = callbackPCaptor.getAllValues();
+		for (CallbackP<Boolean> isACTCallback : isACTCallbacks) {
+			isACTCallback.invoke(false);	
+		}
+		
 		verify(mockActionMenu, never()).setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, true);
 		verify(mockActionMenu, never()).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+		verify(mockActionMenu, never()).setActionVisible(Action.APPROVE_USER_ACCESS, true);
+		verify(mockActionMenu, never()).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
 		
-		isACTCallback.invoke(true);
+		for (CallbackP<Boolean> isACTCallback : isACTCallbacks) {
+			isACTCallback.invoke(true);	
+		}
+		
 		verify(mockActionMenu).setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, true);
 		verify(mockActionMenu).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, true);
+		verify(mockActionMenu).setActionEnabled(Action.APPROVE_USER_ACCESS, true);
 	}
 	
 	@Test

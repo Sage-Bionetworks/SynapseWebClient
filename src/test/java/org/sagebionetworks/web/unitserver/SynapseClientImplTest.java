@@ -1,9 +1,23 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
@@ -12,7 +26,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
-import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -96,9 +109,6 @@ import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
@@ -141,7 +151,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
-import org.sagebionetworks.repo.model.wiki.WikiHeader;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -149,7 +158,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.util.SerializationUtils;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
 import org.sagebionetworks.web.server.servlet.NotificationTokenType;
@@ -405,8 +413,7 @@ public class SynapseClientImplTest {
 		accessRequirements.add(createAccessRequirement(ACCESS_TYPE.DOWNLOAD));
 
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH
-				| HAS_CHILDREN | ACCESS_REQUIREMENTS
-				| UNMET_ACCESS_REQUIREMENTS;
+				| HAS_CHILDREN;
 		int emptyMask = 0;
 		EntityBundle bundle = new EntityBundle();
 		bundle.setEntity(entity);
@@ -592,8 +599,7 @@ public class SynapseClientImplTest {
 	public void testGetEntityBundleAll() throws RestServiceException {
 		// Make sure we can get all parts of the bundel
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH
-				| HAS_CHILDREN | ACCESS_REQUIREMENTS
-				| UNMET_ACCESS_REQUIREMENTS;
+				| HAS_CHILDREN;
 		EntityBundle bundle = synapseClient.getEntityBundle(entityId, mask);
 		assertNotNull(bundle);
 		// We should have all of the strings
@@ -602,8 +608,6 @@ public class SynapseClientImplTest {
 		assertNotNull(bundle.getPath());
 		assertNotNull(bundle.getPermissions());
 		assertNotNull(bundle.getHasChildren());
-		assertNotNull(bundle.getAccessRequirements());
-		assertNotNull(bundle.getUnmetAccessRequirements());
 	}
 
 	@Test
@@ -618,8 +622,6 @@ public class SynapseClientImplTest {
 		assertNull(bundle.getPath());
 		assertNull(bundle.getPermissions());
 		assertNull(bundle.getHasChildren());
-		assertNull(bundle.getAccessRequirements());
-		assertNull(bundle.getUnmetAccessRequirements());
 	}
 
 	@Test(expected = IllegalArgumentException.class)

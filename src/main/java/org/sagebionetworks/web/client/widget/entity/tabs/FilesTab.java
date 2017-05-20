@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.DOI;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
@@ -10,7 +9,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.FILE_NAME;
 import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
-import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import java.util.Map;
 
@@ -258,7 +256,7 @@ public class FilesTab {
 		shownVersionNumber = versionNumber;
 		currentEntityId = entityId;
 		synAlert.clear();
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME;
 		AsyncCallback<EntityBundlePlus> ebpCallback = new AsyncCallback<EntityBundlePlus> () {
 
 			@Override
@@ -294,7 +292,6 @@ public class FilesTab {
 	
 	
 	public void setTargetBundle(EntityBundle bundle) {
-		EntityPresenter.filterToDownloadARs(bundle);
 		currentEntity = bundle.getEntity();
 		currentEntityId = currentEntity.getId();
 		boolean isFile = currentEntity instanceof FileEntity;

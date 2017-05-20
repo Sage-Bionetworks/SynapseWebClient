@@ -286,8 +286,6 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
-import org.sagebionetworks.web.client.widget.entity.controller.AccessRequirementController;
-import org.sagebionetworks.web.client.widget.entity.controller.AccessRequirementControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserController;
 import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -989,7 +987,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityActionController.class).to(EntityActionControllerImpl.class);
 		bind(EntityActionControllerView.class).to(EntityActionControllerViewImpl.class);
 		bind(PreflightController.class).to(PreflightControllerImpl.class);
-		bind(AccessRequirementController.class).to(AccessRequirementControllerImpl.class);
 		bind(CertifiedUserController.class).to(CertifiedUserControllerImpl.class);
 		
 		bind(PromptModalView.class).to(PromptModalViewImpl.class);

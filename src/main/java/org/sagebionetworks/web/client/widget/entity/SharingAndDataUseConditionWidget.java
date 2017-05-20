@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -38,12 +36,11 @@ public class SharingAndDataUseConditionWidget implements SharingAndDataUseCondit
 	
 	public void setEntity(String entityId) {
 		//get entity bundle (only the parts required by the public/private widget and restrictions widget
-		int mask = ENTITY | PERMISSIONS |  ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS ;
+		int mask = ENTITY | PERMISSIONS ;
 		synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundle>() {
 			
 			@Override
 			public void onSuccess(EntityBundle bundle) {
-				EntityPresenter.filterToDownloadARs(bundle);
 				setEntity(bundle);	
 			}
 			

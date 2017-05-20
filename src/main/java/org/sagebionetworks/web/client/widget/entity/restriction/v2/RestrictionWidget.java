@@ -251,8 +251,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	
 	@Override
 	public void linkClicked() {
-		AccessRequirementsPlace place = new AccessRequirementsPlace(AccessRequirementsPlace.ENTITY_ID_PARAM + "=" + entity.getId());
-		globalApplicationState.getPlaceChanger().goTo(place);
+		view.open("#!AccessRequirements:" + AccessRequirementsPlace.ENTITY_ID_PARAM + "=" + entity.getId());
 	}
 	
 	@Override
