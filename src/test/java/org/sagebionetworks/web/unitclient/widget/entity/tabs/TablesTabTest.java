@@ -139,7 +139,6 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.getProvenanceRenderer()).thenReturn(mockProvenanceWidget);
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		AccessRequirement tou = new TermsOfUseAccessRequirement();
-		when(mockProjectEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
@@ -149,7 +148,6 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.createEntityActionController()).thenReturn(mockEntityActionController);
 		when(mockPortalGinInjector.createNewTableEntityWidget()).thenReturn(mockTableEntityWidget);
 		
-		when(mockTableEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
 		when(mockTableEntityBundle.getEntity()).thenReturn(mockTableEntity);
 		when(mockTableEntity.getId()).thenReturn(tableEntityId);
 		when(mockTableEntity.getName()).thenReturn(tableName);

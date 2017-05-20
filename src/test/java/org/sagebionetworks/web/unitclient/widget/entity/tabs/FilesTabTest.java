@@ -150,7 +150,6 @@ public class FilesTabTest {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		AccessRequirement tou = new TermsOfUseAccessRequirement();
-		when(mockProjectEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntity.getId()).thenReturn(entityId);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
@@ -175,7 +174,6 @@ public class FilesTabTest {
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		when(mockEntityBundle.getAccessRequirements()).thenReturn(Collections.singletonList(tou));
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		when(mockFolderEntity.getId()).thenReturn(folderEntityId);
 		when(mockFolderEntity.getName()).thenReturn(folderName);
