@@ -334,8 +334,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
 				@Override
 				public void invoke(Boolean isACT) {
-					actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
-					actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);
+					if (isACT) {
+						actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
+						actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);	
+					}
 				}
 			});
 		}
