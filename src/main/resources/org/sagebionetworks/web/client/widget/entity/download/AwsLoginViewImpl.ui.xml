@@ -11,11 +11,11 @@
 		</b:Heading>
 		<b:FormGroup>
 			<b:FormLabel>Access Key</b:FormLabel>
-			<b:TextBox ui:field="accessKeyField" autocomplete="false"/>
+			<b:TextBox ui:field="accessKeyField" autoComplete="false"/>
 		</b:FormGroup>
 		<b:FormGroup>
 			<b:FormLabel>Secret Key</b:FormLabel>
-			<b:TextBox ui:field="secretKeyField" autocomplete="false"/>
+			<b:TextBox ui:field="secretKeyField" autoComplete="false"/>
 		</b:FormGroup>
 		<bh:Italic text="Note that these access keys are used to locally sign a request. They are not transmitted or stored by this website." />
 	</bh:Div>
