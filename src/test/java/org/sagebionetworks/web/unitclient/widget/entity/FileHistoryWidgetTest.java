@@ -103,8 +103,6 @@ public class FileHistoryWidgetTest {
 		accessRequirement.setId(101L);
 		accessRequirement.setTermsOfUse("terms of use");
 		accessRequirements.add(accessRequirement);
-		when(bundle.getAccessRequirements()).thenReturn(accessRequirements);
-		when(bundle.getUnmetAccessRequirements()).thenReturn(accessRequirements);
 				
 		AsyncMockStubber.callSuccessWith(vb).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 		

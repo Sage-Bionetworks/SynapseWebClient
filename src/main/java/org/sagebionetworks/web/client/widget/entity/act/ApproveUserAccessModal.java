@@ -12,6 +12,8 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
@@ -19,6 +21,7 @@ import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -32,6 +35,7 @@ import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -68,7 +72,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
 	private JobTrackingWidget progressWidget;
-	
+	private DataAccessClientAsync dataAccessClient;
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
 			SynapseAlert synAlert,
@@ -76,13 +80,15 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			UserGroupSuggestionProvider provider, 
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
-			JobTrackingWidget progressWidget) {
+			JobTrackingWidget progressWidget,
+			DataAccessClientAsync dataAccessClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.progressWidget = progressWidget;
+		this.dataAccessClient = dataAccessClient;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		this.view.setPresenter(this);
 		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
@@ -95,6 +101,27 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		});
 	}
 
+	public void configure(final EntityBundle bundle) {
+		RestrictableObjectDescriptor subject = new RestrictableObjectDescriptor();
+		subject.setId(bundle.getEntity().getId());
+		subject.setType(RestrictableObjectType.ENTITY);
+		dataAccessClient.getAccessRequirements(subject, 50L, 0L, new AsyncCallback<List<AccessRequirement>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			@Override
+			public void onSuccess(List<AccessRequirement> result) {
+				List<ACTAccessRequirement> ars = new ArrayList<>();
+				for (AccessRequirement ar : result) {
+					if (ar instanceof ACTAccessRequirement) {
+						ars.add((ACTAccessRequirement)ar);
+					}
+				}
+				configure(ars, bundle);
+			}
+		});
+	}
 	public void configure(List<ACTAccessRequirement> accessRequirements, EntityBundle bundle) {
 		view.startLoadingEmail();
 		this.entityBundle = bundle;

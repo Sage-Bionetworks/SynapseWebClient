@@ -194,8 +194,6 @@ import org.sagebionetworks.web.client.widget.docker.DockerRepoWidgetView;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalView;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalViewImpl;
-import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogView;
-import org.sagebionetworks.web.client.widget.entity.AccessRequirementDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
@@ -288,8 +286,6 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
-import org.sagebionetworks.web.client.widget.entity.controller.AccessRequirementController;
-import org.sagebionetworks.web.client.widget.entity.controller.AccessRequirementControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserController;
 import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -478,8 +474,6 @@ import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetView;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapperView;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapperViewImpl;
-import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderView;
-import org.sagebionetworks.web.client.widget.licenseddownloader.LicensedDownloaderViewImpl;
 import org.sagebionetworks.web.client.widget.login.LoginModalView;
 import org.sagebionetworks.web.client.widget.login.LoginModalViewImpl;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
@@ -946,9 +940,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(LoginWidgetViewImpl.class).in(Singleton.class);
 		bind(LoginWidgetView.class).to(LoginWidgetViewImpl.class);
 		
-		// LicenseBox
-		bind(LicensedDownloaderView.class).to(LicensedDownloaderViewImpl.class);
-		
 		// Breadcrumb
 		bind(BreadcrumbView.class).to(BreadcrumbViewImpl.class);
 		
@@ -998,7 +989,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityActionController.class).to(EntityActionControllerImpl.class);
 		bind(EntityActionControllerView.class).to(EntityActionControllerViewImpl.class);
 		bind(PreflightController.class).to(PreflightControllerImpl.class);
-		bind(AccessRequirementController.class).to(AccessRequirementControllerImpl.class);
 		bind(CertifiedUserController.class).to(CertifiedUserControllerImpl.class);
 		
 		bind(PromptModalView.class).to(PromptModalViewImpl.class);
@@ -1288,16 +1278,12 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(UserTeamConfigView.class).to(UserTeamConfigViewImpl.class);
 		
-		bind(org.sagebionetworks.web.client.widget.entity.RestrictionWidgetView.class).to(org.sagebionetworks.web.client.widget.entity.RestrictionWidgetViewImpl.class);
-
 		bind(SharingAndDataUseConditionWidgetView.class).to(SharingAndDataUseConditionWidgetViewImpl.class);
 		
 		bind(WizardProgressWidgetView.class).to(WizardProgressWidgetViewImpl.class);
 		bind(UploadDialogWidgetView.class).to(UploadDialogWidgetViewImpl.class);
 		
 		bind(LoginModalView.class).to(LoginModalViewImpl.class);
-		
-		bind(AccessRequirementDialogView.class).to(AccessRequirementDialogViewImpl.class);
 		
 		bind(ImageParamsPanelView.class).to(ImageParamsPanelViewImpl.class);
 		bind(RegisterTeamDialogView.class).to(RegisterTeamDialogViewImpl.class);
