@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.CallbackP;
-
-import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.*;
+import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.PLEASE_SELECT_A_FILE;
+import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.fixDefaultContentType;
 
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler;
@@ -28,14 +28,12 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 	String secretAccessKey;
 	String bucketName;
 	String endpoint;
-	JavaScriptObject s3;
 	String fileName; 
 	String contentType; 
 	JavaScriptObject blob; 
 	ProgressingFileUploadHandler handler; 
 	Long storageLocationId;
 	HasAttachHandlers view;
-	GWTWrapper gwt;
 	NumberFormat percentFormat;
 	SynapseClientAsync synapseClient;
 	
@@ -46,7 +44,6 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 			SynapseClientAsync synapseClient) {
 		this.awsSdk = awsSdk;
 		this.synapseJsniUtils = synapseJsniUtils;
-		this.gwt = gwt;
 		this.synapseClient = synapseClient;
 		this.percentFormat = gwt.getNumberFormat("##");
 	}
@@ -119,13 +116,12 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 			@Override
 			public void invoke(JavaScriptObject s3) {
 				// attempt the upload
-				upload();
+				upload(s3);
 			}
 		});
 	}
 	
-	private void upload() {
-		String key = fileName + "-" + gwt.getUniqueElementId();
-		awsSdk.upload(key, blob, contentType, s3, this);
+	private void upload(JavaScriptObject s3) {
+		awsSdk.upload(fileName, blob, contentType, s3, this);
 	}
 }
