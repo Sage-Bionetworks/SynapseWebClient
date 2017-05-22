@@ -170,12 +170,8 @@ public class PlotlyWidgetTest {
 		request = queryBundleRequestCaptor.getValue();
 		assertEquals(LIMIT, request.getQuery().getOffset());
 		
-		String progressMessage = "processing result x/y";
-		when(mockAsynchronousJobStatus.getProgressMessage()).thenReturn(progressMessage);
-		jobTrackerCallbackCaptor.getValue().onUpdate(mockAsynchronousJobStatus);
 		verify(mockView, times(2)).setLoadingMessage(stringCaptor.capture());
 		String loadingMessage = stringCaptor.getValue();
-		assertTrue(loadingMessage.contains(progressMessage));
 		assertTrue(loadingMessage.contains(LIMIT.toString()));
 		
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
