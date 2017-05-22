@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Strong;
 
@@ -16,9 +17,9 @@ public class AwsLoginViewImpl implements AwsLoginView {
 	@UiField
 	Strong endpointField;
 	@UiField
-	TextBox accessKeyField;
+	Input accessKeyField;
 	@UiField
-	TextBox secretKeyField;
+	Input secretKeyField;
 	
 	@Inject
 	public AwsLoginViewImpl(Binder uiBinder) {
@@ -43,8 +44,8 @@ public class AwsLoginViewImpl implements AwsLoginView {
 	@Override
 	public void clear() {
 		endpointField.setText("");
-		accessKeyField.clear();
-		secretKeyField.clear();
+		accessKeyField.setValue("");
+		secretKeyField.setValue("");
 	}
 	
 	@Override

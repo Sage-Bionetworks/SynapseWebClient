@@ -9,14 +9,14 @@
 			<bh:Text>Authorization is required to access</bh:Text>
 			<bh:Strong ui:field="endpointField" addStyleNames="margin-left-5"/>
 		</b:Heading>
-		<b:FormGroup>
+		<bh:Italic text="Keys are used to locally sign a request, and are not transmitted or stored by this website." />
+		<b:FormGroup addStyleNames="margin-top-10">
 			<b:FormLabel>Access Key</b:FormLabel>
-			<b:TextBox ui:field="accessKeyField" autoComplete="false"/>
+			<b:Input type="PASSWORD" ui:field="accessKeyField"/>
 		</b:FormGroup>
 		<b:FormGroup>
 			<b:FormLabel>Secret Key</b:FormLabel>
-			<b:TextBox ui:field="secretKeyField" autoComplete="false"/>
+			<b:Input type="PASSWORD" ui:field="secretKeyField"/>
 		</b:FormGroup>
-		<bh:Italic text="Note that these access keys are used to locally sign a request. They are not transmitted or stored by this website." />
 	</bh:Div>
 </ui:UiBinder>
