@@ -28,7 +28,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.Annotations;
@@ -60,6 +62,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
+import org.sagebionetworks.web.client.widget.entity.download.S3DirectUploader;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -74,7 +77,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 
 public class UploaderTest {
-	
+	@Mock
+	S3DirectUploader mockS3DirectUploader;
 	MultipartUploaderStub multipartUploader;
 	UploaderView view;
 	AuthenticationController authenticationController; 
@@ -94,6 +98,7 @@ public class UploaderTest {
 	String md5 = "e10e3f4491440ce7b48edc97f03307bb";
 	@Before
 	public void before() throws Exception {
+		MockitoAnnotations.initMocks(this);
 		multipartUploader = new MultipartUploaderStub();
 		view = mock(UploaderView.class);
 		authenticationController = mock(AuthenticationController.class); 
@@ -138,10 +143,16 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), anyString(), anyLong(), any(AsyncCallback.class));
 		//by default, there is no name conflict
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
-		uploader = new Uploader(view,
+		uploader = new Uploader(
+				view,
 				synapseClient,
 				synapseJsniUtils,
-				gwt, authenticationController, multipartUploader, mockGlobalApplicationState, mockLogger);
+				gwt, 
+				authenticationController, 
+				multipartUploader, 
+				mockGlobalApplicationState, 
+				mockLogger,
+				mockS3DirectUploader);
 		uploader.addCancelHandler(cancelHandler);
 		parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId);

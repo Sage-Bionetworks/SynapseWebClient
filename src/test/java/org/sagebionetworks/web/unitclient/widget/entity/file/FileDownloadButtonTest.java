@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -36,6 +37,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
@@ -89,6 +91,11 @@ public class FileDownloadButtonTest {
 	PlaceChanger mockPlaceChanger;
 	@Mock
 	RestrictionInformationResponse mockRestrictionInformation;
+	@Mock
+	AwsSdk mockAwsSdk;
+	@Mock
+	PopupUtilsView mockPopupUtilsView;
+	
 	FileDownloadButton widget;
 	List<FileHandle> fileHandles;
 	
@@ -100,7 +107,7 @@ public class FileDownloadButtonTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		widget = new FileDownloadButton(mockView, mockSynapseClient, mockLoginModalWidget, mockGlobalAppState, mockSynAlert, mockGinInjector,
-				mockDataAccessClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies);
+				mockDataAccessClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies, mockAwsSdk, mockPopupUtilsView);
 		when(mockGlobalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(SFTP_ENDPOINT);
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);
