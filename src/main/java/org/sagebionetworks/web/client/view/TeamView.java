@@ -23,6 +23,7 @@ public interface TeamView extends IsWidget, SynapseView {
 		void showInviteModal();
 		void clear();
 		void onShowMap();
+		void onManageAccess();
 	}
 
 	void setSynAlertWidget(Widget asWidget);
@@ -43,6 +44,7 @@ public interface TeamView extends IsWidget, SynapseView {
 	void setMap(Widget w);
 	void showMapModal();
 	void setShowMapVisible(boolean visible);
+	void setManageAccessVisible(boolean visible);
 	int getClientHeight();
 	
 }
