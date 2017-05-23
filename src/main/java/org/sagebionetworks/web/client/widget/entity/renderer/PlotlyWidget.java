@@ -118,6 +118,9 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	}
 	
 	public void getMoreResults() {
+		if (currentOffset > 0) {
+			view.setLoadingMessage("Loaded " + currentOffset+" rows. ");	
+		}
 		// run the job
 		query.setOffset(currentOffset);
 		jobTracker.startAndTrack(AsynchType.TableQuery, qbr, AsynchronousProgressWidget.WAIT_MS, new UpdatingAsynchProgressHandler() {
@@ -135,15 +138,10 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 
 			@Override
 			public void onUpdate(AsynchronousJobStatus status) {
-				if (currentOffset > 0) {
-					String progressMessage = status.getProgressMessage() == null ? "" : status.getProgressMessage();
-					view.setLoadingMessage("Loaded " + currentOffset+" rows. " + progressMessage);	
-				}
 			}
-
+			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
-				view.setLoadingVisible(false);
 				QueryResultBundle result = (QueryResultBundle) response;
 				if (graphData == null) {
 					initializeGraphData(result);
@@ -219,6 +217,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 				plotlyGraphData[i].setName(columnName);
 				i++;
 			}
+			view.setLoadingVisible(false);
 			view.showChart(title, xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase());
 		} catch (Throwable ex) {
 			synAlert.showError("Error showing plot: " + ex.getMessage());
