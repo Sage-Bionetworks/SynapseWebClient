@@ -2,11 +2,13 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -89,7 +91,19 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			}
 		});
 	}
-
+	public static TableType getTableType(Entity entity) {
+		if (entity instanceof TableEntity) {
+			return TableType.table;
+		} else if (entity instanceof EntityView) {
+			EntityView view = (EntityView)entity;
+			if (org.sagebionetworks.repo.model.table.ViewType.file.equals(view.getType())) {
+				return TableType.fileview;
+			} else if (org.sagebionetworks.repo.model.table.ViewType.project.equals(view.getType())) {
+				return TableType.projectview;
+			}
+		}
+		return null;
+	}
 	@Override
 	public void configure(EntityBundle bundle, boolean isEditable, EntityUpdatedHandler updateHandler) {
 		this.isEditable = isEditable;
@@ -98,17 +112,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		this.updateHandler = updateHandler;
 		viewer.configure(ViewType.VIEWER, this.isEditable);
 		boolean isEditableView = isEditable && bundle.getEntity() instanceof EntityView;
-		if (bundle.getEntity() instanceof EntityView) {
-			EntityView view = (EntityView)bundle.getEntity();
-			if (org.sagebionetworks.repo.model.table.ViewType.file.equals(view.getType())) {
-				tableType = TableType.fileview;
-			} else {
-				tableType = TableType.projectview;
-			}
-		} else {
-			tableType = TableType.table;
-		}
-		
+		tableType = getTableType(bundle.getEntity());
 		editor.setAddDefaultViewColumnsButtonVisible(isEditableView);
 		editor.setAddAnnotationColumnsButtonVisible(isEditableView);
 		for(ColumnModel cm: startingModels){

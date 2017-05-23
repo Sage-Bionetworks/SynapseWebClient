@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
@@ -43,7 +44,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	List<RowWidget> rows;
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	String tableId;
-	boolean isView;
+	TableType tableType;
 	FacetsWidget facetsWidget;
 	Callback resetFacetsHandler;
 	/*
@@ -77,12 +78,12 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			Query query, 
 			List<SortItem> sortList, 
 			boolean isEditable, 
-			boolean isView, 
+			TableType tableType, 
 			RowSelectionListener rowSelectionListener, 
 			final PagingAndSortingListener pageChangeListener,
 			CallbackP<FacetColumnRequest> facetChangedHandler,
 			Callback resetFacetsHandler){
-		this.isView = isView;
+		this.tableType = tableType;
 		this.rowSelectionListener = rowSelectionListener;
 		this.resetFacetsHandler = resetFacetsHandler;
 		// The pagination widget is only visible if a listener was provider
@@ -169,7 +170,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		if(rowSelectionListener != null){
 			listner = this;
 		}
-		rowWidget.configure(tableId, types, isEditor, isView, row, listner);
+		rowWidget.configure(tableId, types, isEditor, tableType, row, listner);
 		rows.add(rowWidget);
 		view.addRow(rowWidget);
 		if(keyboardNavigationHandler != null){

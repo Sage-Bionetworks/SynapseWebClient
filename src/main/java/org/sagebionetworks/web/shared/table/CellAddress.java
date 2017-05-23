@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.shared.table;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 
 /**
  * The full address of a cell.
@@ -16,7 +17,7 @@ public class CellAddress {
 	ColumnModel column;
 	Long rowId;
 	Long rowVersion;
-	boolean isView;
+	TableType tableType;
 	
 	/**
 	 * Create a new address.
@@ -24,13 +25,13 @@ public class CellAddress {
 	 * @param rowId The ID of the row.
 	 * @param rowVersion The version number of the row.
 	 */
-	public CellAddress(String tableId, ColumnModel column, Long rowId, Long rowVersion, boolean isView) {
+	public CellAddress(String tableId, ColumnModel column, Long rowId, Long rowVersion, TableType tableType) {
 		super();
 		this.tableId = tableId;
 		this.column = column;
 		this.rowId = rowId;
 		this.rowVersion = rowVersion;
-		this.isView = isView;
+		this.tableType = tableType;
 	}
 
 	public String getTableId() {
@@ -49,20 +50,19 @@ public class CellAddress {
 		return column;
 	}
 	
-	public boolean isView() {
-		return isView;
+	public TableType getTableType() {
+		return tableType;
 	}
 
-	
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((column == null) ? 0 : column.hashCode());
-		result = prime * result + (isView ? 1231 : 1237);
 		result = prime * result + ((rowId == null) ? 0 : rowId.hashCode());
 		result = prime * result + ((rowVersion == null) ? 0 : rowVersion.hashCode());
 		result = prime * result + ((tableId == null) ? 0 : tableId.hashCode());
+		result = prime * result + ((tableType == null) ? 0 : tableType.hashCode());
 		return result;
 	}
 
@@ -80,8 +80,6 @@ public class CellAddress {
 				return false;
 		} else if (!column.equals(other.column))
 			return false;
-		if (isView != other.isView)
-			return false;
 		if (rowId == null) {
 			if (other.rowId != null)
 				return false;
@@ -96,6 +94,8 @@ public class CellAddress {
 			if (other.tableId != null)
 				return false;
 		} else if (!tableId.equals(other.tableId))
+			return false;
+		if (tableType != other.tableType)
 			return false;
 		return true;
 	}

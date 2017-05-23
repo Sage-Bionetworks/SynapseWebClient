@@ -6,10 +6,10 @@ import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.table.CellAddress;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -45,12 +45,12 @@ public class FileCellRendererImpl implements FileCellRenderer {
 			view.setLoadingVisible(true);
 			association = new FileHandleAssociation();
 			association.setFileHandleId(fileHandleId);
-			if (address.isView()) {
-				association.setAssociateObjectType(FileHandleAssociateType.FileEntity);
-				association.setAssociateObjectId(address.getRowId().toString());
-			} else {
+			if (TableType.table.equals(address.getTableType())) {
 				association.setAssociateObjectType(FileHandleAssociateType.TableEntity);
 				association.setAssociateObjectId(address.getTableId());
+			} else {
+				association.setAssociateObjectType(FileHandleAssociateType.FileEntity);
+				association.setAssociateObjectId(address.getRowId().toString());
 			}
 			fileHandleAsynHandler.getFileHandle(association, new AsyncCallback<FileResult>() {
 				

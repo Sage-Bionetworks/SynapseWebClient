@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -50,7 +51,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultEditorWidget queryResultEditor;
 	Query startingQuery;
 	boolean isEditable;
-	boolean isView;
+	TableType tableType;
 	QueryResultsListener queryListener;
 	JobTrackingWidget progressWidget;
 	SynapseAlert synapseAlert;
@@ -111,9 +112,9 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param is table a file view?
 	 * @param listener Listener for query start and finish events.
 	 */
-	public void configure(Query query, boolean isEditable, boolean isView, QueryResultsListener listener){
+	public void configure(Query query, boolean isEditable, TableType tableType, QueryResultsListener listener){
 		this.isEditable = isEditable;
-		this.isView = isView;
+		this.tableType = tableType;
 		this.startingQuery = query;
 		this.queryListener = listener;
 		runQuery();
@@ -227,7 +228,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setErrorVisible(false);
 		this.view.setProgressWidgetVisible(false);
 		// configure the page widget
-		this.pageViewerWidget.configure(bundle, this.startingQuery, sortItems, false, isView, null, this, facetChangedHandler, resetFacetsHandler);
+		this.pageViewerWidget.configure(bundle, this.startingQuery, sortItems, false, tableType, null, this, facetChangedHandler, resetFacetsHandler);
 		this.view.setTableVisible(true);
 		fireFinishEvent(true, isQueryResultEditable());
 	}
@@ -305,7 +306,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			this.queryResultEditor = ginInjector.createNewQueryResultEditorWidget();
 			view.setEditorWidget(this.queryResultEditor);
 		}
-		this.queryResultEditor.showEditor(bundle, isView, new Callback() {
+		this.queryResultEditor.showEditor(bundle, tableType, new Callback() {
 			@Override
 			public void invoke() {
 				runQuery();
