@@ -201,7 +201,7 @@ public class TableListWidgetTest {
 		widget.configure(parentBundle);
 		widget.onAddFileView();
 		// proceed to create
-		verify(mockCreateTableViewWizard).configure(ENTITY_ID, TableType.view);
+		verify(mockCreateTableViewWizard).configure(ENTITY_ID, TableType.fileview);
 		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
 	}
 }

@@ -57,7 +57,7 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 		this.parentId = parentId;
 		this.tableType = type;
 		boolean canEdit = true;
-		view.setScopeWidgetVisible(TableType.view.equals(type));
+		view.setScopeWidgetVisible(TableType.fileview.equals(type));
 		entityContainerList.configure(new ArrayList<String>(), canEdit);
 		view.setName("");
 	}
@@ -69,7 +69,7 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 	private void createFileViewEntity(final String name) {
 		modalPresenter.setLoading(true);
 		Table table;
-		if (TableType.view.equals(tableType)) {
+		if (TableType.fileview.equals(tableType)) {
 			table = new EntityView();
 			List<String> scopeIds = entityContainerList.getEntityIds();
 			((EntityView)table).setScopeIds(scopeIds);

@@ -20,7 +20,8 @@ public class CreateTableViewWizard {
 	CreateTableViewWizardStep1 step1;
 	public enum TableType {
 	    table,
-	    view
+	    fileview,
+	    projectview
 	}
 	private String parentId;
 	private TableType type;
@@ -37,7 +38,7 @@ public class CreateTableViewWizard {
 	public void configure(String parentId, TableType type) {
 		this.parentId = parentId;
 		this.type = type;
-		if (TableType.view.equals(type)) {
+		if (TableType.fileview.equals(type)) {
 			this.modalWizardWidget.setTitle("Create File View");
 			this.modalWizardWidget.setHelp(VIEW_HELP, VIEW_URL);
 			

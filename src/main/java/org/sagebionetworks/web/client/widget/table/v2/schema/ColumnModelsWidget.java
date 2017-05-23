@@ -18,7 +18,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -44,13 +44,13 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	EntityBundle bundle;
 	EntityUpdatedHandler updateHandler;
 	JobTrackingWidget jobTrackingWidget;
-	FileViewDefaultColumns fileViewDefaultColumns;
+	ViewDefaultColumns fileViewDefaultColumns;
 	TableType tableType;
 	
 	public static final String UPDATING_SCHEMA = "Updating the table schema...";
 	/**
 	 * New presenter with its view.
-	 * @param view
+	 * @param fileview
 	 */
 	@Inject
 	public ColumnModelsWidget(ColumnModelsViewBase baseView, 
@@ -58,7 +58,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			SynapseClientAsync synapseClient, 
 			ColumnModelsEditorWidget editor, 
 			JobTrackingWidget jobTrackingWidget,
-			FileViewDefaultColumns fileViewDefaultColumns){
+			ViewDefaultColumns fileViewDefaultColumns){
 		this.ginInjector = ginInjector;
 		// we will always have a viewer
 		this.baseView = baseView;
@@ -98,7 +98,17 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		this.updateHandler = updateHandler;
 		viewer.configure(ViewType.VIEWER, this.isEditable);
 		boolean isEditableView = isEditable && bundle.getEntity() instanceof EntityView;
-		tableType = bundle.getEntity() instanceof EntityView ? TableType.view : TableType.table; 
+		if (bundle.getEntity() instanceof EntityView) {
+			EntityView view = (EntityView)bundle.getEntity();
+			if (org.sagebionetworks.repo.model.table.ViewType.file.equals(view.getType())) {
+				tableType = TableType.fileview;
+			} else {
+				tableType = TableType.projectview;
+			}
+		} else {
+			tableType = TableType.table;
+		}
+		
 		editor.setAddDefaultViewColumnsButtonVisible(isEditableView);
 		editor.setAddAnnotationColumnsButtonVisible(isEditableView);
 		for(ColumnModel cm: startingModels){
@@ -113,16 +123,13 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	public void getDefaultColumnsForView() {
 		baseView.hideErrors();
 		boolean isClearIds = true;
-		fileViewDefaultColumns.getDefaultColumns(isClearIds, new AsyncCallback<List<ColumnModel>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				baseView.showError(caught.getMessage());
-			}
-			@Override
-			public void onSuccess(List<ColumnModel> columns) {
-				editor.addColumns(columns);
-			}
-		});
+		List<ColumnModel> defaultColumns;
+		if (TableType.fileview.equals(tableType)) {
+			defaultColumns = fileViewDefaultColumns.getDefaultFileViewColumns(isClearIds); 
+		} else {
+			defaultColumns = fileViewDefaultColumns.getDefaultProjectViewColumns(isClearIds);
+		}
+		editor.addColumns(defaultColumns); 
 	}
 	
 	public void getPossibleColumnModelsForViewScope(String nextPageToken) {

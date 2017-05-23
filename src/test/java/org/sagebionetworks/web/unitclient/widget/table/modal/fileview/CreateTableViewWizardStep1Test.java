@@ -62,7 +62,7 @@ public class CreateTableViewWizardStep1Test {
 	
 	@Test
 	public void testNullName(){
-		widget.configure(parentId, TableType.view);
+		widget.configure(parentId, TableType.fileview);
 		when(mockView.getName()).thenReturn(null);
 		widget.onPrimary();
 		verify(mockWizardPresenter).setErrorMessage(CreateTableViewWizardStep1.NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
@@ -71,7 +71,7 @@ public class CreateTableViewWizardStep1Test {
 	
 	@Test
 	public void testCreateFileView(){
-		widget.configure(parentId, TableType.view);
+		widget.configure(parentId, TableType.fileview);
 		verify(mockView).setName("");
 		verify(mockView).setScopeWidgetVisible(true);
 		String tableName = "a name";
@@ -86,7 +86,7 @@ public class CreateTableViewWizardStep1Test {
 		assertEquals(scopeIds, capturedFileView.getScopeIds());
 		assertEquals(ViewType.file, capturedFileView.getType());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
-		verify(mockStep2).configure(table, TableType.view);
+		verify(mockStep2).configure(table, TableType.fileview);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);
 	}
 	
@@ -110,7 +110,7 @@ public class CreateTableViewWizardStep1Test {
 	
 	@Test
 	public void testCreateFailed(){
-		widget.configure(parentId, TableType.view);
+		widget.configure(parentId, TableType.fileview);
 		String tableName = "a name";
 		String error = "name already exists";
 		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).createEntity(any(Entity.class), any(AsyncCallback.class));

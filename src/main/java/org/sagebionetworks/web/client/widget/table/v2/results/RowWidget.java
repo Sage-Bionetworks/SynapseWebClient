@@ -6,7 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
@@ -33,10 +33,10 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 	CellFactory cellFactory;
 	Long rowId;
 	Long rowVersion;
-	FileViewDefaultColumns fileViewDefaultColumns;
+	ViewDefaultColumns fileViewDefaultColumns;
 	
 	@Inject
-	public RowWidget(RowView view, CellFactory cellFactory, FileViewDefaultColumns fileViewDefaultColumns){
+	public RowWidget(RowView view, CellFactory cellFactory, ViewDefaultColumns fileViewDefaultColumns){
 		this.view = view;
 		this.cellFactory = cellFactory;
 		this.fileViewDefaultColumns = fileViewDefaultColumns;

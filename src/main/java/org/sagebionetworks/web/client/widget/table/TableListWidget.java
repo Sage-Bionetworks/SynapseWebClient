@@ -201,7 +201,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	 * Called after all pre-flight checks are performed on a file view.
 	 */
 	private void postCheckCreateFileView() {
-		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.view);
+		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.fileview);
 		this.createTableViewWizard.showModal(refreshTablesCallback);
 	}
 	
