@@ -198,7 +198,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void showMemberMenuItems() {
 		leaveTeamItem.setVisible(true);
-		commandsContainer.setVisible(true);
 	}
 	
 	@Override
@@ -206,7 +205,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 		deleteTeamItem.setVisible(true);
 		editTeamItem.setVisible(true);
 		inviteMemberItem.setVisible(true);
-		commandsContainer.setVisible(true);
+	}
+	@Override
+	public void setCommandsVisible(boolean visible) {
+		commandsContainer.setVisible(visible);	
 	}
 	
 	@Override

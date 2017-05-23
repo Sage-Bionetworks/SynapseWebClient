@@ -153,12 +153,14 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			@Override
 			public void invoke(Boolean isACT) {
 				view.setManageAccessVisible(isACT);
+				if (isACT) {
+					view.setCommandsVisible(true);
+				}
 			}
 		});
 		synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, authenticationController.isLoggedIn(), new AsyncCallback<TeamBundle>() {
 			@Override
 			public void onSuccess(TeamBundle result) {
-				view.clear();
 				team = result.getTeam();
 				TeamMembershipStatus teamMembershipStatus = result.getTeamMembershipStatus();
 				boolean isAdmin = result.isUserAdmin();
@@ -180,6 +182,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 					joinTeamWidget.configure(teamId, false, teamMembershipStatus,
 							refreshCallback, null, null, null, null, false);
 				} else {
+					view.setCommandsVisible(true);
 					view.showMemberMenuItems();
 					if (isAdmin) {
 						openMembershipRequestsWidget.configure(teamId, refreshCallback);
