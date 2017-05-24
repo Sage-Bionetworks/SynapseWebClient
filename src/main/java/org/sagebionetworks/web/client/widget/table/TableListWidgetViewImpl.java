@@ -40,6 +40,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	Button addTable;
 	@UiField
 	Button addFileView;
+	@UiField
+	Button addProjectView;
 	
 	@UiField
 	Button uploadTable;
@@ -72,6 +74,9 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 		this.ginInjector = ginInjector;
 		HTML html = new HTML("<i class=\"fa fa-plus\" ></i>&nbsp;Add File View" + DisplayConstants.BETA_BADGE_HTML);
 		addFileView.add(html);
+		html = new HTML("<i class=\"fa fa-plus\" ></i>&nbsp;Add Project View" + DisplayConstants.BETA_BADGE_HTML);
+		addProjectView.add(html);
+		
 		createdOnDesc.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -150,6 +155,12 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 				presenter.onUploadTable();
 			}
 		});
+		addProjectView.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onAddProjectView();
+			}
+		});
 	}
 	
 	@Override
@@ -184,6 +195,10 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@Override
 	public void setAddFileViewVisible(boolean visible) {
 		addFileView.setVisible(visible);
+	}
+	@Override
+	public void setAddProjectViewVisible(boolean visible) {
+		addProjectView.setVisible(visible);
 	}
 	
 	@Override

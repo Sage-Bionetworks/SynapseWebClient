@@ -27,6 +27,8 @@ public class CreateTableViewWizard {
 	private TableType type;
 	public static final String VIEW_HELP = "Synapse File Views are views of all files within one or more Projects or Folders.";
 	public static final String VIEW_URL = WebConstants.DOCS_URL + "fileviews.html";
+	public static final String PROJECT_VIEW_HELP = "A Synapse Project View represents a logical collection of Projects.";
+	public static final String PROJECT_VIEW_URL = WebConstants.DOCS_URL + "projectviews.html";
 	
 	@Inject
 	public CreateTableViewWizard(ModalWizardWidget modalWizardWidget, CreateTableViewWizardStep1 step1) {
@@ -41,7 +43,9 @@ public class CreateTableViewWizard {
 		if (TableType.fileview.equals(type)) {
 			this.modalWizardWidget.setTitle("Create File View");
 			this.modalWizardWidget.setHelp(VIEW_HELP, VIEW_URL);
-			
+		} else if (TableType.fileview.equals(type)) {
+			this.modalWizardWidget.setTitle("Create Project View");
+			this.modalWizardWidget.setHelp(PROJECT_VIEW_HELP, PROJECT_VIEW_URL);
 		} else {
 			this.modalWizardWidget.setTitle("Create Table");
 			this.modalWizardWidget.setHelp(TablesTab.TABLES_HELP, TablesTab.TABLES_HELP_URL);

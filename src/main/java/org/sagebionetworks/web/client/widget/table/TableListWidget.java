@@ -73,6 +73,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 		this.view.setLoadMoreWidget(loadMoreWidget);
 		this.view.addUploadTableModal(uploadTableModalWidget);
 		this.view.addWizard(createTableViewWizard.asWidget());
+		view.setAddProjectViewVisible(DisplayUtils.isInTestWebsite(cookies));
 		refreshTablesCallback = new WizardCallback() {
 			@Override
 			public void onFinished() {
@@ -202,6 +203,24 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	 */
 	private void postCheckCreateFileView() {
 		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.fileview);
+		this.createTableViewWizard.showModal(refreshTablesCallback);
+	}
+	
+	@Override
+	public void onAddProjectView() {
+		preflightController.checkCreateEntity(parentBundle, EntityView.class.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postCheckCreateProjectView();
+			}
+		});
+	}
+	
+	/**
+	 * Called after all pre-flight checks are performed on a project view.
+	 */
+	private void postCheckCreateProjectView() {
+		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.projectview);
 		this.createTableViewWizard.showModal(refreshTablesCallback);
 	}
 	
