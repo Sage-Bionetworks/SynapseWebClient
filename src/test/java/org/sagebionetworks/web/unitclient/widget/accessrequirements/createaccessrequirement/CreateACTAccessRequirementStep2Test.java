@@ -136,7 +136,8 @@ public class CreateACTAccessRequirementStep2Test {
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		
 		when(mockACTAccessRequirement.getAreOtherAttachmentsRequired()).thenReturn(true);
-		when(mockACTAccessRequirement.getIsAnnualReviewRequired()).thenReturn(false);
+		Long expirationPeriod = 10000L;
+		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(expirationPeriod);
 		when(mockACTAccessRequirement.getIsCertifiedUserRequired()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(false);
 		when(mockACTAccessRequirement.getIsIDUPublic()).thenReturn(true);
@@ -178,7 +179,7 @@ public class CreateACTAccessRequirementStep2Test {
 
 		// verify access requirement was updated from the view (view value responses configured in the the test setUp()
 		verify(mockACTAccessRequirement).setAreOtherAttachmentsRequired(false);
-		verify(mockACTAccessRequirement).setIsAnnualReviewRequired(false);
+		verify(mockACTAccessRequirement).setExpirationPeriod(expirationPeriod);
 		verify(mockACTAccessRequirement).setIsCertifiedUserRequired(false);
 		verify(mockACTAccessRequirement).setIsDUCRequired(false);
 		verify(mockACTAccessRequirement).setIsIDUPublic(false);

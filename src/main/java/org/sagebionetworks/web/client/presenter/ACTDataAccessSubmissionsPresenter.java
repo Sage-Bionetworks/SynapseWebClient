@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
@@ -162,7 +163,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 							ducTemplateFileHandleWidget.configure(fha);	
 						}
 						view.setAreOtherAttachmentsRequired(actAccessRequirement.getAreOtherAttachmentsRequired());
-						view.setIsAnnualReviewRequired(actAccessRequirement.getIsAnnualReviewRequired());
+						view.setExpirationPeriod(actAccessRequirement.getExpirationPeriod());
 						view.setIsCertifiedUserRequired(actAccessRequirement.getIsCertifiedUserRequired());
 						view.setIsDUCRequired(actAccessRequirement.getIsDUCRequired());
 						view.setIsIDUPublic(actAccessRequirement.getIsIDUPublic());
@@ -208,7 +209,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 					w.setDucColumnVisible(actAccessRequirement.getIsDUCRequired());
 					w.setIrbColumnVisible(actAccessRequirement.getIsIRBApprovalRequired());
 					w.setOtherAttachmentsColumnVisible(actAccessRequirement.getAreOtherAttachmentsRequired());
-					w.setRenewalColumnsVisible(actAccessRequirement.getIsAnnualReviewRequired());
+					w.setExpirationPeriodColumnVisible(actAccessRequirement.getExpirationPeriod() != null && actAccessRequirement.getExpirationPeriod() > 0L);
 					loadMoreContainer.add(w.asWidget());
 				}
 				loadMoreContainer.setIsMore(nextPageToken != null);

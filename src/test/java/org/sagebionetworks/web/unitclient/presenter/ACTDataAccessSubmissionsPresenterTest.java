@@ -133,7 +133,8 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockACTAccessRequirement.getAreOtherAttachmentsRequired()).thenReturn(true);
-		when(mockACTAccessRequirement.getIsAnnualReviewRequired()).thenReturn(false);
+		Long expirationPeriod = 0L;
+		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(expirationPeriod);
 		when(mockACTAccessRequirement.getIsCertifiedUserRequired()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(false);
 		when(mockACTAccessRequirement.getIsIDUPublic()).thenReturn(true);
@@ -151,7 +152,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
 		verify(mockSubjectsWidget).configure(mockSubjects, true);
 		verify(mockView).setAreOtherAttachmentsRequired(true);
-		verify(mockView).setIsAnnualReviewRequired(false);
+		verify(mockView).setExpirationPeriod(expirationPeriod);
 		verify(mockView).setIsCertifiedUserRequired(true);
 		verify(mockView).setIsDUCRequired(false);
 		verify(mockView).setIsIDUPublic(true);
@@ -166,7 +167,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockACTDataAccessSubmissionWidget).setDucColumnVisible(false);
 		verify(mockACTDataAccessSubmissionWidget).setIrbColumnVisible(false);
 		verify(mockACTDataAccessSubmissionWidget).setOtherAttachmentsColumnVisible(true);
-		verify(mockACTDataAccessSubmissionWidget).setRenewalColumnsVisible(false);
+		verify(mockACTDataAccessSubmissionWidget).setExpirationPeriodColumnVisible(false);
 		verify(mockLoadMoreContainer).setIsMore(true);
 		
 		//verify final load of empty page

@@ -204,7 +204,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	public void setOtherAttachmentsColumnVisible(boolean visible) {
 		view.setOtherAttachmentsColumnVisible(visible);
 	}
-	public void setRenewalColumnsVisible(boolean visible) {
-		view.setRenewalColumnsVisible(visible);
+	public void setExpirationPeriodColumnVisible(boolean visible) {
+		view.setExpirationPeriodColumnVisible(visible);
 	}
 }

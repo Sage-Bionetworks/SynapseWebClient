@@ -96,7 +96,7 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 		configureWiki();
 		
 		view.setAreOtherAttachmentsRequired(accessRequirement.getAreOtherAttachmentsRequired());
-		view.setIsAnnualReviewRequired(accessRequirement.getIsAnnualReviewRequired());
+		view.setExpirationPeriod(accessRequirement.getExpirationPeriod());
 		view.setIsCertifiedUserRequired(accessRequirement.getIsCertifiedUserRequired());
 		view.setIsDUCRequired(accessRequirement.getIsDUCRequired());
 		view.setIsIDUPublic(accessRequirement.getIsIDUPublic());
@@ -124,7 +124,7 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 	public void onPrimary() {
 		// update access requirement from view
 		accessRequirement.setAreOtherAttachmentsRequired(view.areOtherAttachmentsRequired());
-		accessRequirement.setIsAnnualReviewRequired(view.isAnnualReviewRequired());
+		accessRequirement.setExpirationPeriod(view.getExpirationPeriod());
 		accessRequirement.setIsCertifiedUserRequired(view.isCertifiedUserRequired());
 		accessRequirement.setIsDUCRequired(view.isDUCRequired());
 		accessRequirement.setIsIDUPublic(view.isIDUPublic());

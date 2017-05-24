@@ -33,7 +33,7 @@ public interface ACTDataAccessSubmissionWidgetView extends IsWidget {
 	void setDucColumnVisible(boolean visible);
 	void setIrbColumnVisible(boolean visible);
 	void setOtherAttachmentsColumnVisible(boolean visible);
-	void setRenewalColumnsVisible(boolean visible);
+	void setExpirationPeriodColumnVisible(boolean visible);
 	void hideActions();
 	/**
 	 * Presenter interface
