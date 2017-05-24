@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -40,10 +39,7 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Unit test for ColumnModelsViewWidget
@@ -172,6 +168,7 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveSuccessValidateFalse() throws JSONObjectAdapterException{
+		widget.configure(TableType.table, schema);
 		// Add a column
 		ColumnModelTableRowEditorStub editor = (ColumnModelTableRowEditorStub) widget.addNewColumn();
 		editor.setValid(false);
@@ -227,6 +224,7 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testSelectNone(){
+		widget.configure(TableType.table, schema);
 		// Add three columns
 		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
 		ColumnModelTableRowEditorWidget two = widget.addNewColumn();
@@ -242,6 +240,7 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testToggleSelect(){
+		widget.configure(TableType.table, schema);
 		// Add three columns
 		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
 		ColumnModelTableRowEditorWidget two = widget.addNewColumn();
