@@ -19,10 +19,9 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -40,20 +39,19 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	Callback onAddDefaultViewColumnsCallback, onAddAnnotationColumnsCallback;
 	Set<String> columnModelIds;
 	CookieProvider cookies;
-	Set<String> defaultColumnNames;
 	
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
 	 */
 	boolean changingSelection = false;
-	FileViewDefaultColumns fileViewDefaultColumns;
+	ViewDefaultColumns fileViewDefaultColumns;
 	TableType tableType;
 	
 	public AdapterFactory adapterFactory;
 	@Inject
 	public ColumnModelsEditorWidget(PortalGinInjector ginInjector, 
 			AdapterFactory adapterFactory,
-			FileViewDefaultColumns fileViewDefaultColumns) {
+			ViewDefaultColumns fileViewDefaultColumns) {
 		columnModelIds = new HashSet<String>();
 		this.ginInjector = ginInjector;
 		this.editor = ginInjector.createNewColumnModelsView();
@@ -104,9 +102,9 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		if(this.keyboardNavigationHandler != null){
 			this.keyboardNavigationHandler.bindRow(rowEditor);
 		}
-		if (TableType.view.equals(tableType)) {
+		if (!TableType.table.equals(tableType)) {
 			rowEditor.setSelectVisible(!ETAG_COLUMN_NAME.equals(cm.getName()));
-			if (defaultColumnNames.contains(cm.getName())) {
+			if (getDefaultColumnNames().contains(cm.getName())) {
 				rowEditor.setToBeDefaultFileViewColumn();
 			}
 		}
@@ -129,25 +127,17 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		addColumns(this.startingModels);
 	}
 	
-	public void addColumns(final List<ColumnModel> models) {
-		if (TableType.view.equals(tableType)) {
-			fileViewDefaultColumns.getDefaultColumnNames(new AsyncCallback<Set<String>>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					editor.showErrorMessage(caught.getMessage());
-				}
-				@Override
-				public void onSuccess(Set<String> defaultColumnNames) {
-					ColumnModelsEditorWidget.this.defaultColumnNames = defaultColumnNames;
-					addColumnsAfterInit(models);
-				}
-			});
+	private Set<String> getDefaultColumnNames() {
+		if (TableType.fileview.equals(tableType)) {
+			return fileViewDefaultColumns.getDefaultFileViewColumnNames();
+		} else if (TableType.projectview.equals(tableType)) {
+			return fileViewDefaultColumns.getDefaultProjectViewColumnNames();
 		} else {
-			addColumnsAfterInit(models);
+			return null;
 		}
 	}
 	
-	public void addColumnsAfterInit(List<ColumnModel> models) {
+	public void addColumns(List<ColumnModel> models) {
 		List<ColumnModel> newColumns = new ArrayList<ColumnModel>(models.size());
 		newColumns.addAll(models);
 		List<ColumnModel> existingColumns = getEditedColumnModels();

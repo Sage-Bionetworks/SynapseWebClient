@@ -8,7 +8,8 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
+import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.*;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -84,7 +85,7 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 		boolean isVisible = bundle.getEntity() instanceof EntityView;
 		if (isVisible) {
 			currentView = (EntityView) bundle.getEntity();
-			viewScopeWidget.configure(currentView.getScopeIds(), false);
+			viewScopeWidget.configure(currentView.getScopeIds(), false, getTableType(currentView));
 			view.setEditButtonVisible(isEditable);
 		}
 		view.setVisible(isVisible);
@@ -119,7 +120,7 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 	@Override
 	public void onEdit() {
 		// configure edit list, and show modal
-		editScopeWidget.configure(currentView.getScopeIds(), true);
+		editScopeWidget.configure(currentView.getScopeIds(), true, getTableType(currentView));
 		view.showModal();
 	}
 }

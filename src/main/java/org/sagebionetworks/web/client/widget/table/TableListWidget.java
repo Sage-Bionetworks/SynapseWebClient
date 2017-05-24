@@ -102,6 +102,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 		this.canEdit = parentBundle.getPermissions().getCanEdit();
 		this.createTableModalWidget.configure(parentBundle.getEntity().getId(), this);
 		this.uploadTableModalWidget.configure(parentBundle.getEntity().getId(), null);
+		view.setAddProjectViewVisible(DisplayUtils.isInTestWebsite(cookies));
 		view.resetSortUI();
 		loadData();
 	}
@@ -201,7 +202,25 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	 * Called after all pre-flight checks are performed on a file view.
 	 */
 	private void postCheckCreateFileView() {
-		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.view);
+		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.fileview);
+		this.createTableViewWizard.showModal(refreshTablesCallback);
+	}
+	
+	@Override
+	public void onAddProjectView() {
+		preflightController.checkCreateEntity(parentBundle, EntityView.class.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postCheckCreateProjectView();
+			}
+		});
+	}
+	
+	/**
+	 * Called after all pre-flight checks are performed on a project view.
+	 */
+	private void postCheckCreateProjectView() {
+		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.projectview);
 		this.createTableViewWizard.showModal(refreshTablesCallback);
 	}
 	

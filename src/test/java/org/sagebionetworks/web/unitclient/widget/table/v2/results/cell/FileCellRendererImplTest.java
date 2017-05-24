@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.TableFileHandleRequest;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererView;
 import org.sagebionetworks.web.shared.table.CellAddress;
@@ -47,10 +48,10 @@ public class FileCellRendererImplTest {
 	Throwable error;
 	Stubber succesStubber;
 	Stubber failureStubber;
+	TableType tableType;
 	@Mock
 	AuthenticationController mockAuthController;
 	String xsrfToken = "98208";
-	boolean isView;
 	@Mock
 	FileResult mockFileResult;
 	@Before
@@ -63,8 +64,8 @@ public class FileCellRendererImplTest {
 		column.setId("456");
 		rowId = 15L;
 		rowVersion = 2L;
-		isView = false;
-		address = new CellAddress(tableId, column, rowId, rowVersion, isView);
+		tableType = TableType.table;
+		address = new CellAddress(tableId, column, rowId, rowVersion, tableType);
 		renderer.setCellAddresss(address);
 		fileHandleId = "999";
 		fileHandle = new S3FileHandle();
@@ -85,8 +86,8 @@ public class FileCellRendererImplTest {
 	
 	@Test
 	public void testCreateAnchorHrefView(){
-		isView = true;
-		address = new CellAddress(tableId, column, rowId, rowVersion, isView);
+		tableType = TableType.projectview;
+		address = new CellAddress(tableId, column, rowId, rowVersion, tableType);
 		renderer.setCellAddresss(address);
 		renderer.setValue(fileHandleId);
 		String expectedHref = "/Portal/filehandleassociation?associatedObjectId="+rowId+"&associatedObjectType=FileEntity&fileHandleId="+fileHandleId+"&xsrfToken=98208";

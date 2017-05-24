@@ -1,21 +1,20 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.getTableType;
+
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -73,24 +72,16 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter{
 	public void configureTableQueryResultWidget(final Query query) {
 		synAlert.clear();
 		final String tableId = QueryBundleUtils.getTableIdFromSql(query.getSql());
-		synapseClient.getEntityHeaderBatch(Collections.singletonList(tableId), new AsyncCallback<ArrayList<EntityHeader>>() {
-			@Override
-			public void onSuccess(ArrayList<EntityHeader> result) {
-				if (result.size() != 1) {
-					onFailure(new NotFoundException(tableId));
-				} else {
-					EntityHeader header = result.get(0);
-					boolean isView = EntityView.class.getName().equals(header.getType());
-					tableQueryResultWidget.configure(query, false, isView, null);			
-				}
-			}
-			
+		synapseClient.getEntity(tableId, new AsyncCallback<Entity>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
+			public void onSuccess(Entity tableEntity) {
+				TableType tableType = getTableType(tableEntity);
+				tableQueryResultWidget.configure(query, false, tableType, null);
+			};
 		});
-				
 	}
 	@Override
 	public Widget asWidget() {

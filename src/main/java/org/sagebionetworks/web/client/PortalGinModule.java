@@ -550,7 +550,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableVie
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
@@ -1421,7 +1421,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FacetColumnResultRangeView.class).to(FacetColumnResultRangeViewImpl.class);
 		bind(FacetColumnResultDateRangeView.class).to(FacetColumnResultDateRangeViewImpl.class);
 		
-		bind(FileViewDefaultColumns.class).in(Singleton.class);
+		bind(ViewDefaultColumns.class).in(Singleton.class);
 		bind(SubscribersWidgetView.class).to(SubscribersWidgetViewImpl.class);
 		bind(PlaceView.class).to(PlaceViewImpl.class);
 		bind(ACTAccessRequirementWidgetView.class).to(ACTAccessRequirementWidgetViewImpl.class);

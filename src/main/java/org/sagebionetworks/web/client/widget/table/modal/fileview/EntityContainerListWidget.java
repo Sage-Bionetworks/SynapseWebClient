@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -26,6 +27,8 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 	List<String> entityIds;
 	SynapseAlert synAlert;
 	boolean canEdit = true;
+	boolean showVersions = false;
+	SelectedHandler<List<Reference>> selectionHandler;
 	@Inject
 	public EntityContainerListWidget(EntityContainerListWidgetView view, EntityFinder finder, SynapseClientAsync synapseClient, SynapseAlert synAlert) {
 		this.view = view;
@@ -33,19 +36,19 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
 		view.setPresenter(this);
-		boolean showVersions = false;
+		
 		entityIds = new ArrayList<String>();
-		finder.configureMulti(EntityFilter.CONTAINER, showVersions, new SelectedHandler<List<Reference>>() {
+		selectionHandler = new SelectedHandler<List<Reference>>() {
 			@Override
 			public void onSelected(List<Reference> selected) {
 				for (Reference ref : selected) {
 					onAddProject(ref.getTargetId());
 				}
 			}
-		});
+		};
 	}
 	
-	public void configure(List<String> entityContainerIds, boolean canEdit) {
+	public void configure(List<String> entityContainerIds, boolean canEdit, TableType tableType) {
 		view.clear();
 		entityIds.clear();
 		this.canEdit = canEdit;
@@ -68,6 +71,14 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 				}
 			});
 		}
+		EntityFilter filter;
+		if (TableType.fileview.equals(tableType)) {
+			filter = EntityFilter.CONTAINER;
+		} else {
+			//project view
+			filter = EntityFilter.PROJECT;
+		}
+		finder.configureMulti(filter, showVersions, selectionHandler);
 	}
 	
 	@Override
