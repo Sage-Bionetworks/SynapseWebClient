@@ -91,6 +91,27 @@ public class CreateTableViewWizardStep1Test {
 	}
 	
 	@Test
+	public void testCreateProjectView(){
+		widget.configure(parentId, TableType.projectview);
+		verify(mockView).setName("");
+		verify(mockView).setScopeWidgetVisible(true);
+		String tableName = "a name";
+		EntityView table = new EntityView();
+		table.setName(tableName);
+		table.setId("syn57");
+		ArgumentCaptor<Entity> captor = ArgumentCaptor.forClass(Entity.class);
+		AsyncMockStubber.callSuccessWith(table).when(mockSynapseClient).createEntity(captor.capture(), any(AsyncCallback.class));
+		when(mockView.getName()).thenReturn(tableName);
+		widget.onPrimary();
+		EntityView capturedFileView = (EntityView)captor.getValue();
+		assertEquals(scopeIds, capturedFileView.getScopeIds());
+		assertEquals(ViewType.project, capturedFileView.getType());
+		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
+		verify(mockStep2).configure(table, TableType.projectview);
+		verify(mockWizardPresenter).setNextActivePage(mockStep2);
+	}
+	
+	@Test
 	public void testCreateTable(){
 		widget.configure(parentId, TableType.table);
 		verify(mockView).setScopeWidgetVisible(false);

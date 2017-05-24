@@ -61,7 +61,11 @@ public class CreateTableViewWizardStep2Test {
 	TableEntity tableEntity;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	List<ColumnModel> mockDefaultColumnModels;
+	@Mock
+	List<ColumnModel> mockDefaultProjectColumnModels;
+	
 	@Mock
 	JobTrackingWidget mockJobTrackingWidget;
 	@Mock
@@ -96,6 +100,7 @@ public class CreateTableViewWizardStep2Test {
 		when(mockTableSchemaChangeRequest.getChanges()).thenReturn(Collections.singletonList(mockTableUpdateRequest));
 		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), anyList(), any(AsyncCallback.class));
 		when(mockFileViewDefaultColumns.getDefaultFileViewColumns(anyBoolean())).thenReturn(mockDefaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultProjectViewColumns(anyBoolean())).thenReturn(mockDefaultProjectColumnModels);
 		when(viewEntity.getScopeIds()).thenReturn(mockViewScopeIds);
 		when(mockColumnModelPage1.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN);
 		when(mockColumnModelPage1.getResults()).thenReturn(mockAnnotationColumnsPage1);
@@ -123,6 +128,18 @@ public class CreateTableViewWizardStep2Test {
 		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
 		verify(mockEditor).setAddAnnotationColumnsButtonVisible(true);
 		verify(mockEditor).addColumns(mockDefaultColumnModels);
+	}
+	
+	@Test
+	public void testConfigureProjectView() {
+		verify(mockView).setJobTracker(any(Widget.class));
+		verify(mockView).setEditor(any(Widget.class));
+		
+		widget.configure(viewEntity, TableType.projectview);
+		verify(mockEditor).configure(TableType.projectview, new ArrayList<ColumnModel>());
+		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
+		verify(mockEditor).setAddAnnotationColumnsButtonVisible(true);
+		verify(mockEditor).addColumns(mockDefaultProjectColumnModels);
 	}
 	
 	@Test

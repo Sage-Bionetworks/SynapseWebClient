@@ -204,4 +204,23 @@ public class TableListWidgetTest {
 		verify(mockCreateTableViewWizard).configure(ENTITY_ID, TableType.fileview);
 		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
 	}
+	
+	@Test
+	public void testAddProjectViewPreflightFailed(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
+		widget.configure(parentBundle);
+		widget.onAddProjectView();
+		// Failure should not proceed to create
+		verify(mockCreateTableViewWizard, never()).showModal(any(WizardCallback.class));
+	}
+	
+	@Test
+	public void testAddProjectViewPreflightPassed(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
+		widget.configure(parentBundle);
+		widget.onAddProjectView();
+		// proceed to create
+		verify(mockCreateTableViewWizard).configure(ENTITY_ID, TableType.projectview);
+		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
+	}
 }
