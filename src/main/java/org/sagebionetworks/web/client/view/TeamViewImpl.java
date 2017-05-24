@@ -72,6 +72,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@UiField
 	AnchorListItem inviteMemberItem;
 	@UiField
+	AnchorListItem manageAccessItem;
+	@UiField
 	TextBox synapseEmailField;
 	@UiField
 	Div mapPanel;
@@ -145,6 +147,12 @@ public class TeamViewImpl extends Composite implements TeamView {
 				synapseEmailField.selectAll();
 			}
 		});
+		manageAccessItem.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onManageAccess();
+			}
+		});
 	}
 	
 	@Override
@@ -190,7 +198,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void showMemberMenuItems() {
 		leaveTeamItem.setVisible(true);
-		commandsContainer.setVisible(true);
 	}
 	
 	@Override
@@ -198,7 +205,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 		deleteTeamItem.setVisible(true);
 		editTeamItem.setVisible(true);
 		inviteMemberItem.setVisible(true);
-		commandsContainer.setVisible(true);
+	}
+	@Override
+	public void setCommandsVisible(boolean visible) {
+		commandsContainer.setVisible(visible);	
 	}
 	
 	@Override
@@ -286,4 +296,8 @@ public class TeamViewImpl extends Composite implements TeamView {
 	public int getClientHeight() {
 		return Window.getClientHeight();
 	};
+	@Override
+	public void setManageAccessVisible(boolean visible) {
+		manageAccessItem.setVisible(visible);
+	}
 }

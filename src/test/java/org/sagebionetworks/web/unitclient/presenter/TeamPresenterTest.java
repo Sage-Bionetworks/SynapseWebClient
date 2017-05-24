@@ -12,6 +12,8 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Team;
@@ -24,7 +26,9 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.TeamView;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
@@ -77,6 +81,11 @@ public class TeamPresenterTest {
 	GoogleMap mockGoogleMap;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
+	
+	@Captor
+	ArgumentCaptor<CallbackP<Boolean>> callbackPcaptor;
 	
 	@Before
 	public void setup() {
@@ -97,7 +106,8 @@ public class TeamPresenterTest {
 		presenter = new TeamPresenter(mockView, mockAuthenticationController, mockGlobalAppState, 
 				mockSynClient, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, 
 				mockInviteModal, mockJoinWidget, mockMemberListWidget, 
-				mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget, mockGoogleMap, mockCookies);
+				mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget, mockGoogleMap, mockCookies,
+				mockIsACTMemberAsyncHandler);
 		mockTeam = mock(Team.class);
 		when(mockTeam.getName()).thenReturn(teamName);
 		mockTeamBundle = mock(TeamBundle.class);
@@ -117,6 +127,11 @@ public class TeamPresenterTest {
 		
 		when(mockAuthenticationController.getCurrentXsrfToken()).thenReturn(xsrfToken);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+	}
+	
+	private void setIsACT(boolean isACT) {
+		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPcaptor.capture());
+		callbackPcaptor.getValue().invoke(isACT);
 	}
 	
 	@Test
@@ -166,6 +181,19 @@ public class TeamPresenterTest {
 		//never
 		verify(mockJoinWidget, never()).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
+	}
+	
+	@Test
+	public void testIsACT() {
+		presenter.refresh(teamId);
+		setIsACT(true);
+		verify(mockView).setManageAccessVisible(true);
+	}
+	@Test
+	public void testIsNotACT() {
+		presenter.refresh(teamId);
+		setIsACT(false);
+		verify(mockView).setManageAccessVisible(false);
 	}
 	
 	@Test
