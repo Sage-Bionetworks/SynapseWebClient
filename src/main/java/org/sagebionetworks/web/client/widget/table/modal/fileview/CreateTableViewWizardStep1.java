@@ -57,7 +57,7 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 		this.parentId = parentId;
 		this.tableType = type;
 		boolean canEdit = true;
-		view.setScopeWidgetVisible(TableType.fileview.equals(type));
+		view.setScopeWidgetVisible(!TableType.table.equals(type));
 		entityContainerList.configure(new ArrayList<String>(), canEdit, type);
 		view.setName("");
 	}
@@ -69,14 +69,20 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 	private void createFileViewEntity(final String name) {
 		modalPresenter.setLoading(true);
 		Table table;
-		if (TableType.fileview.equals(tableType)) {
+		if (TableType.table.equals(tableType)) {
+			table = new TableEntity();
+		}
+		else {
 			table = new EntityView();
 			List<String> scopeIds = entityContainerList.getEntityIds();
 			((EntityView)table).setScopeIds(scopeIds);
-			((EntityView)table).setType(ViewType.file);
-		} else {
-			table = new TableEntity();
-		}
+			
+			if (TableType.fileview.equals(tableType)) {
+				((EntityView)table).setType(ViewType.file);	
+			} else if (TableType.projectview.equals(tableType)) {
+				((EntityView)table).setType(ViewType.project);
+			}
+		} 
 		table.setName(name);
 		table.setParentId(parentId);
 		synapseClient.createEntity(table, new AsyncCallback<Entity>() {

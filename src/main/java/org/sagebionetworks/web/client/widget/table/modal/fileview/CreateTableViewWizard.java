@@ -43,7 +43,7 @@ public class CreateTableViewWizard {
 		if (TableType.fileview.equals(type)) {
 			this.modalWizardWidget.setTitle("Create File View");
 			this.modalWizardWidget.setHelp(VIEW_HELP, VIEW_URL);
-		} else if (TableType.fileview.equals(type)) {
+		} else if (TableType.projectview.equals(type)) {
 			this.modalWizardWidget.setTitle("Create Project View");
 			this.modalWizardWidget.setHelp(PROJECT_VIEW_HELP, PROJECT_VIEW_URL);
 		} else {

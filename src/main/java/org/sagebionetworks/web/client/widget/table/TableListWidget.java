@@ -73,7 +73,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 		this.view.setLoadMoreWidget(loadMoreWidget);
 		this.view.addUploadTableModal(uploadTableModalWidget);
 		this.view.addWizard(createTableViewWizard.asWidget());
-		view.setAddProjectViewVisible(DisplayUtils.isInTestWebsite(cookies));
 		refreshTablesCallback = new WizardCallback() {
 			@Override
 			public void onFinished() {
@@ -103,6 +102,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 		this.canEdit = parentBundle.getPermissions().getCanEdit();
 		this.createTableModalWidget.configure(parentBundle.getEntity().getId(), this);
 		this.uploadTableModalWidget.configure(parentBundle.getEntity().getId(), null);
+		view.setAddProjectViewVisible(DisplayUtils.isInTestWebsite(cookies));
 		view.resetSortUI();
 		loadData();
 	}
