@@ -1,12 +1,21 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Radio;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.form.error.BasicEditorError;
+import org.gwtbootstrap3.client.ui.form.validator.DecimalMinValidator;
+import org.gwtbootstrap3.client.ui.form.validator.Validator;
+import org.gwtbootstrap3.client.ui.form.validator.Validator.Priority;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
-
+import com.google.gwt.editor.client.Editor;
+import com.google.gwt.editor.client.EditorError;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -43,7 +52,7 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 	@UiField
 	CheckBox otherAttachmentsCheckbox;
 	@UiField
-	CheckBox annualRenewalCheckbox;
+	TextBox expirationPeriodTextbox;
 	@UiField
 	CheckBox intendedDataUsePublicCheckbox;
 	@UiField
@@ -76,6 +85,22 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 				showHasRequestUI(false);
 			}
 		});
+		expirationPeriodTextbox.addValidator(new Validator<String>() {
+			public List<EditorError> validate(Editor<String> editor, String value) {
+				List<EditorError> result = new ArrayList<EditorError>();
+				try {
+					Long.parseLong(value.toString());
+				} catch (Throwable th) {
+					result.add(new BasicEditorError(editor, value, "Value must be >= 0"));
+				}
+				return result;
+			};
+
+			@Override
+			public int getPriority() {
+				return Priority.MEDIUM;
+			}
+		});
 	}
 	
 	@Override
@@ -102,8 +127,12 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 		otherAttachmentsCheckbox.setValue(value);
 	}
 	@Override
-	public void setIsAnnualReviewRequired(boolean value) {
-		annualRenewalCheckbox.setValue(value);
+	public void setExpirationPeriod(Long value) {
+		expirationPeriodTextbox.setValue(value.toString());	
+	}
+	@Override
+	public long getExpirationPeriod() {
+		return Long.parseLong(expirationPeriodTextbox.getValue());
 	}
 	@Override
 	public void setIsCertifiedUserRequired(boolean value) {
@@ -137,10 +166,7 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 	public boolean areOtherAttachmentsRequired() {
 		return otherAttachmentsCheckbox.getValue();
 	}
-	@Override
-	public boolean isAnnualReviewRequired() {
-		return annualRenewalCheckbox.getValue();
-	}
+	
 	@Override
 	public boolean isCertifiedUserRequired() {
 		return certifiedCheckbox.getValue();

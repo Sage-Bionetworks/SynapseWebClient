@@ -167,7 +167,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockACTDataAccessSubmissionWidget).setDucColumnVisible(false);
 		verify(mockACTDataAccessSubmissionWidget).setIrbColumnVisible(false);
 		verify(mockACTDataAccessSubmissionWidget).setOtherAttachmentsColumnVisible(true);
-		verify(mockACTDataAccessSubmissionWidget).setExpirationPeriodColumnVisible(false);
+		verify(mockACTDataAccessSubmissionWidget).setRenewalColumnsVisible(false);
 		verify(mockLoadMoreContainer).setIsMore(true);
 		
 		//verify final load of empty page

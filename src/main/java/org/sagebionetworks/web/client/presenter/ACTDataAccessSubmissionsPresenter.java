@@ -209,7 +209,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 					w.setDucColumnVisible(actAccessRequirement.getIsDUCRequired());
 					w.setIrbColumnVisible(actAccessRequirement.getIsIRBApprovalRequired());
 					w.setOtherAttachmentsColumnVisible(actAccessRequirement.getAreOtherAttachmentsRequired());
-					w.setExpirationPeriodColumnVisible(actAccessRequirement.getExpirationPeriod() != null && actAccessRequirement.getExpirationPeriod() > 0L);
+					w.setRenewalColumnsVisible(actAccessRequirement.getExpirationPeriod() != null && actAccessRequirement.getExpirationPeriod() > 0L);
 					loadMoreContainer.add(w.asWidget());
 				}
 				loadMoreContainer.setIsMore(nextPageToken != null);

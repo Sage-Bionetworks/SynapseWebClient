@@ -67,6 +67,7 @@ public class CreateACTAccessRequirementStep2Test {
 	public static final Long AR_ID = 8765L;
 	public static final String FILENAME = "templatefile.pdf";
 	public static final String FILE_HANDLE_ID = "9999";
+	public static final Long EXPIRATION_PERIOD = 222L;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -80,7 +81,7 @@ public class CreateACTAccessRequirementStep2Test {
 		when(mockFileMetadata.getFileName()).thenReturn(FILENAME);
 		
 		when(mockView.areOtherAttachmentsRequired()).thenReturn(false);
-		when(mockView.isAnnualReviewRequired()).thenReturn(false);
+		when(mockView.getExpirationPeriod()).thenReturn(EXPIRATION_PERIOD);
 		when(mockView.isCertifiedUserRequired()).thenReturn(false);
 		when(mockView.isDUCRequired()).thenReturn(false);
 		when(mockView.isIDUPublic()).thenReturn(false);
@@ -143,7 +144,6 @@ public class CreateACTAccessRequirementStep2Test {
 		when(mockACTAccessRequirement.getIsIDUPublic()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsIRBApprovalRequired()).thenReturn(false);
 		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
-		
 		widget.configure(mockACTAccessRequirement);
 		verify(mockView).setOldTermsVisible(false);
 		verify(mockView).setOldTerms("");
@@ -162,7 +162,7 @@ public class CreateACTAccessRequirementStep2Test {
 		
 		//validate view is set according to AR values
 		verify(mockView).setAreOtherAttachmentsRequired(true);
-		verify(mockView).setIsAnnualReviewRequired(false);
+		verify(mockView).setExpirationPeriod(expirationPeriod);
 		verify(mockView).setIsCertifiedUserRequired(true);
 		verify(mockView).setIsDUCRequired(false);
 		verify(mockView).setIsIDUPublic(true);
@@ -179,7 +179,7 @@ public class CreateACTAccessRequirementStep2Test {
 
 		// verify access requirement was updated from the view (view value responses configured in the the test setUp()
 		verify(mockACTAccessRequirement).setAreOtherAttachmentsRequired(false);
-		verify(mockACTAccessRequirement).setExpirationPeriod(expirationPeriod);
+		verify(mockACTAccessRequirement).setExpirationPeriod(EXPIRATION_PERIOD);
 		verify(mockACTAccessRequirement).setIsCertifiedUserRequired(false);
 		verify(mockACTAccessRequirement).setIsDUCRequired(false);
 		verify(mockACTAccessRequirement).setIsIDUPublic(false);
