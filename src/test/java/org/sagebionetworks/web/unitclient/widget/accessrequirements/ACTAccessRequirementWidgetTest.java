@@ -216,6 +216,18 @@ public class ACTAccessRequirementWidgetTest {
 	}
 	
 	@Test
+	public void testUnApprovedStateNoDataAccessRequestWithOpenJiraIssue() {
+		widget.setRequirement(mockACTAccessRequirement);
+		when(mockDataAccessSubmissionStatus.getCurrentSubmissionStatus()).thenReturn(null);
+		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(false);
+		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(true);
+		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockView).showRequestAccessButton();
+	}
+	
+	@Test
 	public void testRejectedState() {
 		String rejectedReason = "Please sign";
 		widget.setRequirement(mockACTAccessRequirement);
