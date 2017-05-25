@@ -3252,7 +3252,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	private boolean isTable(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
-		EntityChildrenRequest request = createGetEntityChildrenRequest(projectId, EntityType.table);
+		EntityChildrenRequest request = createGetEntityChildrenRequest(projectId, EntityType.table, EntityType.entityview);
 		EntityChildrenResponse results = synapseClient.getEntityChildren(request);
 		return !results.getPage().isEmpty();
 	}
