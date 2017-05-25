@@ -63,6 +63,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	AnchorListItem nameDesc;
 	@UiField
 	Button sortButton;
+	@UiField
+	Div synAlertContainer;
 	
 	HTMLPanel panel;
 	Presenter presenter;
@@ -222,5 +224,10 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 		fileViewWizardContainer.add(wizard);
 	}
 	
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
+	}
 
 }

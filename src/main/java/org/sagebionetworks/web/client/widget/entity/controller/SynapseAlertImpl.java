@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKE
 
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -24,6 +25,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presenter  {
@@ -62,7 +64,17 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		clear();
 		this.ex = ex;
 		boolean isLoggedIn = authController.isLoggedIn();
-		if(ex instanceof ReadOnlyModeException || ex instanceof SynapseDownException) {
+		if (ex instanceof StatusCodeException) {
+			StatusCodeException sce = (StatusCodeException)ex;
+			if (sce.getStatusCode() == 0) {
+				// request failed (network error) or it's been aborted (left the page).
+				view.showError(DisplayConstants.NETWORK_ERROR);
+			} else if (DisplayUtils.isDefined(sce.getStatusText())) {
+				view.showError(sce.getStatusText());
+			} else {
+				view.showError("Server responded with unexpected status code: " + sce.getStatusCode());
+			}
+		} else if(ex instanceof ReadOnlyModeException || ex instanceof SynapseDownException) {
 			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
 		} else if(ex instanceof UnauthorizedException) {
 			// send user to login page

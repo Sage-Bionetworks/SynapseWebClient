@@ -54,6 +54,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;

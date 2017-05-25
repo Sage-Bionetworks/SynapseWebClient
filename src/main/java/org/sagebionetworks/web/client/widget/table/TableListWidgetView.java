@@ -53,7 +53,7 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	void clearTableWidgets();
 	void addTableListItem(EntityHeader header);
 	void setLoadMoreWidget(IsWidget w);
-	
+	void setSynAlert(IsWidget w);
 	/**
 	 * Show/hide the add table button.
 	 * @param enabled

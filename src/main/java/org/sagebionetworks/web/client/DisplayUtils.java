@@ -257,13 +257,14 @@ public class DisplayUtils {
 	}
 	
 	public static void showErrorMessage(String message) {
-		showPopup("", message, MessagePopup.WARNING, null, null);
+		if (message != null && !"0".equals(message.trim())) {
+			showPopup("", message, MessagePopup.WARNING, null, null);
+		}
 	}
 	
 	public static void showErrorMessage(String title, String message) {
 		showPopup(title, message, MessagePopup.WARNING, null, null);
 	}
-
 
 	/**
 	 * @param t
