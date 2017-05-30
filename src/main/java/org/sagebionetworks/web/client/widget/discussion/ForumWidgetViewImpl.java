@@ -91,12 +91,14 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 		sortRepliesAscending.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				repliesSortButton.setText(sortRepliesAscending.getText());
 				presenter.onSortReplies(true);
 			}
 		});
 		sortRepliesDescending.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				repliesSortButton.setText(sortRepliesDescending.getText());
 				presenter.onSortReplies(false);
 			}
 		});
