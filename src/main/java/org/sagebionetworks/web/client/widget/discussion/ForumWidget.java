@@ -416,6 +416,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	
 	@Override
 	public void onSortReplies(boolean ascending) {
+		// no longer looking at a single reply if setting sort
+		updatePlaceToReply(null);
+		urlChangeCallback.invoke();
 		singleThreadWidget.setSortDirection(ascending);	
 	}
 }

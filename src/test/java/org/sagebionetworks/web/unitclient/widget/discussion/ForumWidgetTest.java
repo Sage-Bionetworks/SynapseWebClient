@@ -622,6 +622,9 @@ public class ForumWidgetTest {
 	
 	@Test
 	public void testOnSortReplies() {
+		ParameterizedToken param = new ParameterizedToken("");
+		forumWidget.configure("syn123", param, canModerate, mockParamChangeCallback, mockCallback);
+		
 		verify(mockDiscussionThreadWidget, never()).setSortDirection(anyBoolean());
 		forumWidget.onSortReplies(true);
 		verify(mockDiscussionThreadWidget).setSortDirection(true);
