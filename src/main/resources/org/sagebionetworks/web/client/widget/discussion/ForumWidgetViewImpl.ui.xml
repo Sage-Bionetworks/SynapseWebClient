@@ -31,6 +31,13 @@
 			<b:Row>
 				<b:Column size="XS_12">
 					<b:Button ui:field="showAllThreadsButton" type="DEFAULT" size="SMALL" icon="ARROW_LEFT" addStyleNames="margin-top-10" visible="false">Show all threads</b:Button>
+					<b:ButtonGroup pull="RIGHT">
+						<b:Button ui:field="repliesSortButton" dataToggle="DROPDOWN" size="EXTRA_SMALL" height="26px" visible="false"/>
+						<b:DropDownMenu ui:field="sortRepliesDropDownMenu">
+							<b:AnchorListItem ui:field="sortRepliesAscending" text="Date posted"/>
+							<b:AnchorListItem ui:field="sortRepliesDescending" text="Most recent"/>
+						</b:DropDownMenu>
+					</b:ButtonGroup>
 				</b:Column>
 			</b:Row>
 			<b:Row>

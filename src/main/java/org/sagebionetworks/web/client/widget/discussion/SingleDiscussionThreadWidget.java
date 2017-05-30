@@ -351,7 +351,12 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		loadMore();
 		watchReplyCount();
 	}
-
+	
+	public void setSortDirection(Boolean ascending) {
+		this.ascending = ascending;
+		configureReplies();
+	}
+	
 	@Override
 	public void loadMore() {
 		synAlert.clear();
