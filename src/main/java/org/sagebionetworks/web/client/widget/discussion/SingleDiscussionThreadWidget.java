@@ -45,7 +45,7 @@ import com.google.inject.Inject;
 public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidgetView.Presenter{
 
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
-	private static final Boolean DEFAULT_ASCENDING = true;
+	public static final Boolean DEFAULT_ASCENDING = true;
 	public static final Long LIMIT = 5L;
 	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
 

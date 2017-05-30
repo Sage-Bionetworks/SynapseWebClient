@@ -619,4 +619,13 @@ public class ForumWidgetTest {
 		verifyNoMoreInteractions(mockDiscussionForumClient);
 		verify(mockCallback).invoke();
 	}
+	
+	@Test
+	public void testOnSortReplies() {
+		verify(mockDiscussionThreadWidget, never()).setSortDirection(anyBoolean());
+		forumWidget.onSortReplies(true);
+		verify(mockDiscussionThreadWidget).setSortDirection(true);
+		forumWidget.onSortReplies(false);
+		verify(mockDiscussionThreadWidget).setSortDirection(false);
+	}
 }
