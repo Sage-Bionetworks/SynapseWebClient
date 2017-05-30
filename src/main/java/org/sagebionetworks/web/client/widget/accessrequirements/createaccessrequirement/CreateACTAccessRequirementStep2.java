@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
+import java.util.concurrent.TimeUnit;
+
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -96,7 +98,11 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 		configureWiki();
 		
 		view.setAreOtherAttachmentsRequired(accessRequirement.getAreOtherAttachmentsRequired());
-		view.setExpirationPeriod(accessRequirement.getExpirationPeriod());
+		Long expirationPeriodDays = 0L;
+		if (accessRequirement.getExpirationPeriod() != null) {
+			expirationPeriodDays = TimeUnit.MILLISECONDS.toDays(accessRequirement.getExpirationPeriod());
+		}
+		view.setExpirationPeriod(expirationPeriodDays);
 		view.setIsCertifiedUserRequired(accessRequirement.getIsCertifiedUserRequired());
 		view.setIsDUCRequired(accessRequirement.getIsDUCRequired());
 		view.setIsIDUPublic(accessRequirement.getIsIDUPublic());
@@ -124,7 +130,7 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 	public void onPrimary() {
 		// update access requirement from view
 		accessRequirement.setAreOtherAttachmentsRequired(view.areOtherAttachmentsRequired());
-		accessRequirement.setExpirationPeriod(view.getExpirationPeriod());
+		accessRequirement.setExpirationPeriod(TimeUnit.DAYS.toMillis(view.getExpirationPeriod()));
 		accessRequirement.setIsCertifiedUserRequired(view.isCertifiedUserRequired());
 		accessRequirement.setIsDUCRequired(view.isDUCRequired());
 		accessRequirement.setIsIDUPublic(view.isIDUPublic());

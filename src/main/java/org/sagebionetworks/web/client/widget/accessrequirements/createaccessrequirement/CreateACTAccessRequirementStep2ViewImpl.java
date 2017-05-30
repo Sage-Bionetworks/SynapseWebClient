@@ -9,11 +9,10 @@ import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.form.error.BasicEditorError;
-import org.gwtbootstrap3.client.ui.form.validator.DecimalMinValidator;
 import org.gwtbootstrap3.client.ui.form.validator.Validator;
-import org.gwtbootstrap3.client.ui.form.validator.Validator.Priority;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
+
 import com.google.gwt.editor.client.Editor;
 import com.google.gwt.editor.client.EditorError;
 import com.google.gwt.event.dom.client.ClickEvent;
