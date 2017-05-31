@@ -138,8 +138,7 @@ public class CreateACTAccessRequirementStep2Test {
 		Long expirationPeriodDays = 5L;
 		Long newExpirationPeriodDays = 365L;
 		when(mockView.getExpirationPeriod()).thenReturn(newExpirationPeriodDays);
-		int daysToMs = 1000*60*60*24;
-		Long expirationPeriodMs = expirationPeriodDays * daysToMs;
+		Long expirationPeriodMs = expirationPeriodDays * CreateACTAccessRequirementStep2.DAY_IN_MS;
 		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(expirationPeriodMs);
 		when(mockACTAccessRequirement.getIsCertifiedUserRequired()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(false);
@@ -181,7 +180,7 @@ public class CreateACTAccessRequirementStep2Test {
 
 		// verify access requirement was updated from the view (view value responses configured in the the test setUp()
 		verify(mockACTAccessRequirement).setAreOtherAttachmentsRequired(false);
-		verify(mockACTAccessRequirement).setExpirationPeriod(newExpirationPeriodDays * daysToMs);
+		verify(mockACTAccessRequirement).setExpirationPeriod(newExpirationPeriodDays * CreateACTAccessRequirementStep2.DAY_IN_MS);
 		verify(mockACTAccessRequirement).setIsCertifiedUserRequired(false);
 		verify(mockACTAccessRequirement).setIsDUCRequired(false);
 		verify(mockACTAccessRequirement).setIsIDUPublic(false);
