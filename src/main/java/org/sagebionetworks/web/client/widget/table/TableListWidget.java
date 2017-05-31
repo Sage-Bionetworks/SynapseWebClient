@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
@@ -50,6 +51,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	private CookieProvider cookies;
 	WizardCallback refreshTablesCallback;
 	private LoadMoreWidgetContainer loadMoreWidget;
+	private SynapseAlert synAlert;
 	
 	@Inject
 	public TableListWidget(PreflightController preflightController,
@@ -59,7 +61,8 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 			UploadTableModalWidget uploadTableModalWidget,
 			CookieProvider cookies,
 			CreateTableViewWizard createTableViewWizard,
-			LoadMoreWidgetContainer loadMoreWidget) {
+			LoadMoreWidgetContainer loadMoreWidget, 
+			SynapseAlert synAlert) {
 		this.preflightController = preflightController;
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -68,11 +71,13 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 		this.createTableViewWizard = createTableViewWizard;
 		this.loadMoreWidget = loadMoreWidget;
 		this.cookies = cookies;
+		this.synAlert = synAlert;
 		this.view.setPresenter(this);
 		this.view.addCreateTableModal(createTableModalWidget);
 		this.view.setLoadMoreWidget(loadMoreWidget);
 		this.view.addUploadTableModal(uploadTableModalWidget);
 		this.view.addWizard(createTableViewWizard.asWidget());
+		view.setSynAlert(synAlert);
 		refreshTablesCallback = new WizardCallback() {
 			@Override
 			public void onFinished() {
@@ -143,6 +148,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	 * @param offset The offset used by the query.
 	 */
 	private void loadMore(){
+		synAlert.clear();
 		synapseClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
 			public void onSuccess(EntityChildrenResponse result) {
 				query.setNextPageToken(result.getNextPageToken());
@@ -151,7 +157,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 			};
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				synAlert.handleException(caught);
 			}
 		});
 	}

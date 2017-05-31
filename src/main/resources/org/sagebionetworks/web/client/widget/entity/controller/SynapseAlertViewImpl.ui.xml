@@ -18,6 +18,7 @@
   		
   		<b:Alert ui:field="alert" type="DANGER" addStyleNames="margin-bottom-0-imp">
   			<bh:Strong ui:field="alertText"></bh:Strong>
+  			<b:Button ui:field="reloadButton" text="Retry" visible="false" icon="REFRESH" size="EXTRA_SMALL" addStyleNames="margin-left-15"/>
   		</b:Alert>
   		<b:Modal ui:field="jiraDialog" title="Synapse Error" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalBody>

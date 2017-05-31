@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
@@ -62,6 +63,8 @@ public class TableListWidgetTest {
 	LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
 	@Mock
 	EntityChildrenResponse mockResults;
+	@Mock
+	SynapseAlert mockSynAlert;
 	List<EntityHeader> searchResults;
 	
 	
@@ -80,7 +83,7 @@ public class TableListWidgetTest {
 		mockcreateTableModalWidget = Mockito.mock(CreateTableModalWidget.class);
 		mockUploadTableModalWidget = Mockito.mock(UploadTableModalWidget.class);
 		mockPreflightController = Mockito.mock(PreflightController.class);
-		widget = new TableListWidget(mockPreflightController, mockView, mockSynapseClient, mockcreateTableModalWidget, mockUploadTableModalWidget, mockCookies, mockCreateTableViewWizard, mockLoadMoreWidgetContainer);
+		widget = new TableListWidget(mockPreflightController, mockView, mockSynapseClient, mockcreateTableModalWidget, mockUploadTableModalWidget, mockCookies, mockCreateTableViewWizard, mockLoadMoreWidgetContainer, mockSynAlert);
 		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		searchResults = new ArrayList<EntityHeader>();
 		when(mockResults.getPage()).thenReturn(searchResults);
@@ -133,9 +136,10 @@ public class TableListWidgetTest {
 	public void testConfigureFailure(){
 		parentBundle.getPermissions().setCanEdit(false);
 		String error = "an error";
-		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		Throwable th = new Throwable(error);
+		AsyncMockStubber.callFailureWith(th).when(mockSynapseClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		widget.configure(parentBundle);
-		verify(mockView).showErrorMessage(error);
+		verify(mockSynAlert).handleException(th);
 	}
 	
 	@Test
