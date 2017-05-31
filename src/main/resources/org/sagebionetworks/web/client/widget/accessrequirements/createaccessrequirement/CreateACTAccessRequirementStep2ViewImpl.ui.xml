@@ -43,7 +43,6 @@
 						<b:FormGroup>
 							<b:FormLabel>Expiration Period (Days)</b:FormLabel>
 							<b:TextBox ui:field="expirationPeriodTextbox"/>
-							<b:Button ui:field=""/>
 						</b:FormGroup>
 						<b:CheckBox ui:field="intendedDataUsePublicCheckbox"
 							text="Intended Data Use statements will be publicly available." />					
