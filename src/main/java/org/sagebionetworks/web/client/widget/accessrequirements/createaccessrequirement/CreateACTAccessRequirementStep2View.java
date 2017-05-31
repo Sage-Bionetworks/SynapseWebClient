@@ -10,7 +10,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface CreateACTAccessRequirementStep2View extends IsWidget {
 	void setAreOtherAttachmentsRequired(boolean value);
-	void setIsAnnualReviewRequired(boolean value);
+	void setExpirationPeriod(String days);
 	void setIsCertifiedUserRequired(boolean value);
 	void setIsDUCRequired(boolean value);
 	void setIsIDUPublic(boolean value);
@@ -19,7 +19,7 @@ public interface CreateACTAccessRequirementStep2View extends IsWidget {
 	void setOldTermsVisible(boolean visible);
 	void setOldTerms(String terms);
 	boolean areOtherAttachmentsRequired();
-	boolean isAnnualReviewRequired();
+	String getExpirationPeriod();
 	boolean isCertifiedUserRequired();
 	boolean isDUCRequired();
 	boolean isIDUPublic();

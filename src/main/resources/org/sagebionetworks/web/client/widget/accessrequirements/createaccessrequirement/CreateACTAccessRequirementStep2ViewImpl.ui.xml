@@ -40,7 +40,10 @@
 						</b:FormGroup>
 						<b:CheckBox ui:field="irbCheckbox" text="IRB approval is required." />
 						<b:CheckBox ui:field="otherAttachmentsCheckbox" text="Other documents are required." />
-						<b:CheckBox ui:field="annualRenewalCheckbox" text="Annual renewal is required." />
+						<b:FormGroup>
+							<b:FormLabel>Expiration Period (Days)</b:FormLabel>
+							<b:TextBox ui:field="expirationPeriodTextbox"/>
+						</b:FormGroup>
 						<b:CheckBox ui:field="intendedDataUsePublicCheckbox"
 							text="Intended Data Use statements will be publicly available." />					
 					</b:PanelBody>

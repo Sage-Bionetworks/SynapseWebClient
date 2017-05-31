@@ -80,7 +80,6 @@ public class CreateACTAccessRequirementStep2Test {
 		when(mockFileMetadata.getFileName()).thenReturn(FILENAME);
 		
 		when(mockView.areOtherAttachmentsRequired()).thenReturn(false);
-		when(mockView.isAnnualReviewRequired()).thenReturn(false);
 		when(mockView.isCertifiedUserRequired()).thenReturn(false);
 		when(mockView.isDUCRequired()).thenReturn(false);
 		when(mockView.isIDUPublic()).thenReturn(false);
@@ -136,13 +135,17 @@ public class CreateACTAccessRequirementStep2Test {
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		
 		when(mockACTAccessRequirement.getAreOtherAttachmentsRequired()).thenReturn(true);
-		when(mockACTAccessRequirement.getIsAnnualReviewRequired()).thenReturn(false);
+		Long expirationPeriodDays = 5L;
+		Long newExpirationPeriodDays = 365L;
+		String newExpirationPeriodDaysString = newExpirationPeriodDays.toString();
+		when(mockView.getExpirationPeriod()).thenReturn(newExpirationPeriodDaysString);
+		Long expirationPeriodMs = expirationPeriodDays * CreateACTAccessRequirementStep2.DAY_IN_MS;
+		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(expirationPeriodMs);
 		when(mockACTAccessRequirement.getIsCertifiedUserRequired()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(false);
 		when(mockACTAccessRequirement.getIsIDUPublic()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsIRBApprovalRequired()).thenReturn(false);
 		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
-		
 		widget.configure(mockACTAccessRequirement);
 		verify(mockView).setOldTermsVisible(false);
 		verify(mockView).setOldTerms("");
@@ -161,7 +164,7 @@ public class CreateACTAccessRequirementStep2Test {
 		
 		//validate view is set according to AR values
 		verify(mockView).setAreOtherAttachmentsRequired(true);
-		verify(mockView).setIsAnnualReviewRequired(false);
+		verify(mockView).setExpirationPeriod(expirationPeriodDays.toString());
 		verify(mockView).setIsCertifiedUserRequired(true);
 		verify(mockView).setIsDUCRequired(false);
 		verify(mockView).setIsIDUPublic(true);
@@ -178,7 +181,7 @@ public class CreateACTAccessRequirementStep2Test {
 
 		// verify access requirement was updated from the view (view value responses configured in the the test setUp()
 		verify(mockACTAccessRequirement).setAreOtherAttachmentsRequired(false);
-		verify(mockACTAccessRequirement).setIsAnnualReviewRequired(false);
+		verify(mockACTAccessRequirement).setExpirationPeriod(newExpirationPeriodDays * CreateACTAccessRequirementStep2.DAY_IN_MS);
 		verify(mockACTAccessRequirement).setIsCertifiedUserRequired(false);
 		verify(mockACTAccessRequirement).setIsDUCRequired(false);
 		verify(mockACTAccessRequirement).setIsIDUPublic(false);
@@ -228,4 +231,17 @@ public class CreateACTAccessRequirementStep2Test {
 		verify(mockModalPresenter, never()).onFinished();
 	}
 	
+	@Test
+	public void testInvalidExpirationPeriod() {
+		String newExpirationPeriodDaysString = "20.2345";
+		when(mockView.getExpirationPeriod()).thenReturn(newExpirationPeriodDaysString);
+		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(null);
+		widget.configure(mockACTAccessRequirement);
+		
+		//on finish
+		widget.onPrimary();
+		
+		verify(mockModalPresenter).setErrorMessage(anyString());
+		verify(mockModalPresenter, never()).onFinished();
+	}
 }

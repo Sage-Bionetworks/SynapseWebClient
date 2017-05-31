@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.MAX_DATE_PARAM;
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.MIN_DATE_PARAM;
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.STATE_FILTER_PARAM;
+import static org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateACTAccessRequirementStep2.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -19,6 +20,7 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
@@ -162,7 +164,10 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 							ducTemplateFileHandleWidget.configure(fha);	
 						}
 						view.setAreOtherAttachmentsRequired(actAccessRequirement.getAreOtherAttachmentsRequired());
-						view.setIsAnnualReviewRequired(actAccessRequirement.getIsAnnualReviewRequired());
+						if (actAccessRequirement.getExpirationPeriod() != null) {
+							view.setExpirationPeriod(actAccessRequirement.getExpirationPeriod() / DAY_IN_MS);	
+						}
+						
 						view.setIsCertifiedUserRequired(actAccessRequirement.getIsCertifiedUserRequired());
 						view.setIsDUCRequired(actAccessRequirement.getIsDUCRequired());
 						view.setIsIDUPublic(actAccessRequirement.getIsIDUPublic());
@@ -208,7 +213,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 					w.setDucColumnVisible(actAccessRequirement.getIsDUCRequired());
 					w.setIrbColumnVisible(actAccessRequirement.getIsIRBApprovalRequired());
 					w.setOtherAttachmentsColumnVisible(actAccessRequirement.getAreOtherAttachmentsRequired());
-					w.setRenewalColumnsVisible(actAccessRequirement.getIsAnnualReviewRequired());
+					w.setRenewalColumnsVisible(actAccessRequirement.getExpirationPeriod() != null && actAccessRequirement.getExpirationPeriod() > 0L);
 					loadMoreContainer.add(w.asWidget());
 				}
 				loadMoreContainer.setIsMore(nextPageToken != null);
