@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
@@ -77,8 +78,6 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	@UiField
 	CheckBox otherAttachmentsCheckbox;
 	@UiField
-	CheckBox annualRenewalCheckbox;
-	@UiField
 	CheckBox intendedDataUsePublicCheckbox;
 	@UiField
 	Div subjectsContainer;
@@ -86,6 +85,8 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	Div hasRequestUI;
 	@UiField
 	AnchorListItem backLink;
+	@UiField
+	TextBox expirationPeriodTextbox;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -235,11 +236,6 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	}
 
 	@Override
-	public void setIsAnnualReviewRequired(boolean value) {
-		annualRenewalCheckbox.setValue(value);
-	}
-
-	@Override
 	public void setIsCertifiedUserRequired(boolean value) {
 		certifiedCheckbox.setValue(value);
 	}
@@ -271,5 +267,10 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	@Override
 	public void setHasRequestUIVisible(boolean visible) {
 		hasRequestUI.setVisible(visible);
+	}
+
+	@Override
+	public void setExpirationPeriod(Long value) {
+		expirationPeriodTextbox.setValue(value.toString());
 	}
 }
