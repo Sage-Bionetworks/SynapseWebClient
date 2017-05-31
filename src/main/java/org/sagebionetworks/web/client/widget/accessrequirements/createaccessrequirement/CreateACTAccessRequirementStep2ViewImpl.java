@@ -84,22 +84,6 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 				showHasRequestUI(false);
 			}
 		});
-		expirationPeriodTextbox.addValidator(new Validator<String>() {
-			public List<EditorError> validate(Editor<String> editor, String value) {
-				List<EditorError> result = new ArrayList<EditorError>();
-				try {
-					Long.parseLong(value.toString());
-				} catch (Throwable th) {
-					result.add(new BasicEditorError(editor, value, "Value must be >= 0"));
-				}
-				return result;
-			};
-
-			@Override
-			public int getPriority() {
-				return Priority.MEDIUM;
-			}
-		});
 	}
 	
 	@Override
@@ -126,12 +110,12 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 		otherAttachmentsCheckbox.setValue(value);
 	}
 	@Override
-	public void setExpirationPeriod(Long value) {
-		expirationPeriodTextbox.setValue(value.toString());	
+	public void setExpirationPeriod(String value) {
+		expirationPeriodTextbox.setValue(value);	
 	}
 	@Override
-	public long getExpirationPeriod() {
-		return Long.parseLong(expirationPeriodTextbox.getValue());
+	public String getExpirationPeriod() {
+		return expirationPeriodTextbox.getValue();
 	}
 	@Override
 	public void setIsCertifiedUserRequired(boolean value) {

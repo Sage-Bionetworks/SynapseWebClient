@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
@@ -18,6 +19,7 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -96,11 +98,11 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 		configureWiki();
 		
 		view.setAreOtherAttachmentsRequired(accessRequirement.getAreOtherAttachmentsRequired());
-		Long expirationPeriodDays = 0L;
 		if (accessRequirement.getExpirationPeriod() != null) {
-			expirationPeriodDays = accessRequirement.getExpirationPeriod() / DAY_IN_MS;
+			view.setExpirationPeriod(Long.toString(accessRequirement.getExpirationPeriod() / DAY_IN_MS));
+		} else {
+			view.setExpirationPeriod("");
 		}
-		view.setExpirationPeriod(expirationPeriodDays);
 		view.setIsCertifiedUserRequired(accessRequirement.getIsCertifiedUserRequired());
 		view.setIsDUCRequired(accessRequirement.getIsDUCRequired());
 		view.setIsIDUPublic(accessRequirement.getIsIDUPublic());
@@ -127,8 +129,24 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 	@Override
 	public void onPrimary() {
 		// update access requirement from view
+		modalPresenter.setLoading(true);
 		accessRequirement.setAreOtherAttachmentsRequired(view.areOtherAttachmentsRequired());
-		accessRequirement.setExpirationPeriod(view.getExpirationPeriod() * DAY_IN_MS);
+		String expirationPeriod = view.getExpirationPeriod();
+		if (DisplayUtils.isDefined(expirationPeriod)) {
+			try {
+				long expirationPeriodInDays = Long.parseLong(expirationPeriod);
+				if (expirationPeriodInDays < 0) {
+					throw new NumberFormatException("Must be a positive integer.");
+				}
+				accessRequirement.setExpirationPeriod(expirationPeriodInDays * DAY_IN_MS);
+			} catch (NumberFormatException e) {
+				modalPresenter.setErrorMessage("Please enter a valid expiration period (in days): " + e.getMessage());
+				return;
+			}	
+		} else {
+			accessRequirement.setExpirationPeriod(null);
+		}
+		
 		accessRequirement.setIsCertifiedUserRequired(view.isCertifiedUserRequired());
 		accessRequirement.setIsDUCRequired(view.isDUCRequired());
 		accessRequirement.setIsIDUPublic(view.isIDUPublic());
@@ -136,7 +154,6 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 		accessRequirement.setIsValidatedProfileRequired(view.isValidatedProfileRequired());
 		accessRequirement.setAcceptRequest(view.getHasRequests());
 		// create/update access requirement
-		modalPresenter.setLoading(true);
 		synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {
 			@Override
 			public void onFailure(Throwable caught) {
