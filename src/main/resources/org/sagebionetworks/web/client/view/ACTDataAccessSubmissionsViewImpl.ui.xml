@@ -34,7 +34,6 @@
 					<b:FormLabel>Expiration Period (Days)</b:FormLabel>
 					<b:TextBox ui:field="expirationPeriodTextbox" readOnly="true"/>
 				</b:FormGroup>
-				<b:CheckBox ui:field="annualRenewalCheckbox" text="Annual renewal is required." enabled="false" />
 				<b:CheckBox ui:field="intendedDataUsePublicCheckbox"
 					text="Intended Data Use statements will be publicly available." enabled="false" />
 			</bh:Div>
