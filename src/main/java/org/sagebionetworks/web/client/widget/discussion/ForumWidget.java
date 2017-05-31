@@ -302,6 +302,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setThreadListUIVisible(false);
 		view.setNewThreadButtonVisible(false);
 		view.setShowAllThreadsButtonVisible(false);
+		view.setSortRepliesButtonVisible(false);
 		view.setDefaultThreadWidgetVisible(false);
 		view.setDeletedThreadListVisible(false);
 		view.setDeletedThreadButtonVisible(false);
@@ -335,6 +336,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 				view.setSingleThreadUIVisible(true);
 				view.setShowAllThreadsButtonVisible(true);
+				view.setSortRepliesButtonVisible(true);
 				view.setMainContainerVisible(true);
 			}
 		});
@@ -410,5 +412,13 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			deletedThreadListWidget.configure(forumId, isCurrentUserModerator,
 					moderatorIds, null, DiscussionFilter.DELETED_ONLY);
 		}
+	}
+	
+	@Override
+	public void onSortReplies(boolean ascending) {
+		// no longer looking at a single reply if setting sort
+		updatePlaceToReply(null);
+		urlChangeCallback.invoke();
+		singleThreadWidget.setSortDirection(ascending);	
 	}
 }

@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -29,6 +31,10 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@UiField
 	Button showAllThreadsButton;
 	@UiField
+	Button repliesSortButton;
+	@UiField
+	DropDownMenu sortRepliesDropDownMenu;	
+	@UiField
 	SimplePanel singleThreadContainer;
 	@UiField
 	SimplePanel defaultThreadContainer;
@@ -46,6 +52,10 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	Div mainContainer;
 	@UiField
 	Span subscribersContainer;
+	@UiField
+	AnchorListItem sortRepliesAscending;
+	@UiField
+	AnchorListItem sortRepliesDescending;
 	
 	Timer newThreadTooltipHider = new Timer() { 
 	    public void run() {
@@ -76,6 +86,20 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickDeletedThreadButton();
+			}
+		});
+		sortRepliesAscending.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				repliesSortButton.setText(sortRepliesAscending.getText());
+				presenter.onSortReplies(true);
+			}
+		});
+		sortRepliesDescending.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				repliesSortButton.setText(sortRepliesDescending.getText());
+				presenter.onSortReplies(false);
 			}
 		});
 	}
@@ -134,6 +158,10 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@Override
 	public void setShowAllThreadsButtonVisible(boolean visible) {
 		showAllThreadsButton.setVisible(visible);
+	}
+	@Override
+	public void setSortRepliesButtonVisible(boolean visible) {
+		repliesSortButton.setVisible(visible);
 	}
 	@Override
 	public void setSubscribeButton(Widget w) {
