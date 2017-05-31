@@ -20,7 +20,7 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 	
 	void setHasRequestUIVisible(boolean visible);
 	void setAreOtherAttachmentsRequired(boolean value);
-	void setIsAnnualReviewRequired(boolean value);
+	void setExpirationPeriod(Long value);
 	void setIsCertifiedUserRequired(boolean value);
 	void setIsDUCRequired(boolean value);
 	void setIsIDUPublic(boolean value);
