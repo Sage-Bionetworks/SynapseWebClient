@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.filter.QueryFilter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
@@ -92,7 +91,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	@Inject
 	public PasswordResetViewImpl(PasswordResetViewImplUiBinder binder,
 			Header headerWidget, Footer footerWidget,
-			IconsImageBundle iconsImageBundle, QueryFilter filter,
+			IconsImageBundle iconsImageBundle,
 			SageImageBundle sageImageBundle) {		
 		initWidget(binder.createAndBindUi(this));
 

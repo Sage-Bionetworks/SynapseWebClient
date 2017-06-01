@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitserver.servlet;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.mock;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
@@ -16,11 +15,7 @@ import java.io.InputStreamReader;
 import java.util.logging.Logger;
 
 import org.junit.Test;
-import org.mockito.Mockito;
-import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.ServiceUtils;
-import org.sagebionetworks.web.server.servlet.TokenProvider;
 
 
 /**
@@ -33,26 +28,6 @@ import org.sagebionetworks.web.server.servlet.TokenProvider;
 public class ServiceUtilsTest {
 
 	public static Logger logger = Logger.getLogger(ServiceUtilsTest.class.getName());
-
-	@Test
-	public void testCreateSynapseClient() {
-		final String SESSION_TOKEN = "token";
-
-		TokenProvider mockTokenProvider = mock(TokenProvider.class);
-		Mockito.when(mockTokenProvider.getSessionToken()).thenReturn(
-				SESSION_TOKEN);
-		ServiceUrlProvider serviceUrlProvider = new ServiceUrlProvider();
-
-		SynapseClient client = ServiceUtils.createSynapseClient(mockTokenProvider,
-				serviceUrlProvider);
-
-		Mockito.verify(mockTokenProvider).getSessionToken();
-		assertEquals(SESSION_TOKEN, client.getCurrentSessionToken());
-		assertEquals(serviceUrlProvider.getRepositoryServiceUrl(),
-				client.getRepoEndpoint());
-		assertEquals(serviceUrlProvider.getPublicAuthBaseUrl(),
-				client.getAuthEndpoint());
-	}
 
 	@Test
 	public void testWriteToFile() throws Exception {

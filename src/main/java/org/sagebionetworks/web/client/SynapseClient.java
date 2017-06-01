@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -19,12 +18,9 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
@@ -42,7 +38,6 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDestination;
@@ -56,9 +51,7 @@ import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
-import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
-import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.repo.model.table.ViewType;
@@ -68,7 +61,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
-import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
@@ -76,7 +68,6 @@ import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
-import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -92,8 +83,6 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	public Entity getEntity(String entityId) throws RestServiceException;
 	
-	public Project getProject(String projectId) throws RestServiceException;
-	
 	public Entity getEntityForVersion(String entityId, Long versionNumber) throws RestServiceException;
 		
 	public PaginatedResults<VersionInfo> getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
@@ -104,29 +93,19 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	public void deleteEntityVersionById(String entityId, Long versionNumber) throws RestServiceException;
 	
-	public void moveToTrash(String entityId) throws RestServiceException;
-
 	public void restoreFromTrash(String entityId, String newParentId) throws RestServiceException;
 
 	public PaginatedResults<TrashedEntity> viewTrashForUser(long offset, long limit) throws RestServiceException;
 	
 	public void purgeTrashForUser() throws RestServiceException;
 
-	public void purgeTrashForUser(String entityId) throws RestServiceException;
-	
 	public void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds) throws RestServiceException;
 	
-	public EntityPath getEntityPath(String entityId) throws RestServiceException;
-	
 	public SearchResults search(SearchQuery searchQuery) throws RestServiceException; 
-	
-	public PaginatedResults<EntityHeader> getEntityTypeBatch(List<String> entityIds) throws RestServiceException;
 	
 	public PaginatedResults<EntityHeader> getEntityHeaderBatch(ReferenceList referenceList) throws RestServiceException;
 	
 	public ArrayList<EntityHeader> getEntityHeaderBatch(List<String> entityIds) throws RestServiceException;
-	
-	public SerializableWhitelist junk(SerializableWhitelist l);
 	
 	/**
 	 * Update an entity.
@@ -198,13 +177,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	public String createOrUpdateEntity(Entity entity, Annotations annos, boolean isNew) throws RestServiceException;
 
 	/**
-	 * Returns the user's profile object
-	 * @return
-	 * @throws RestServiceException
-	 */
-	public UserProfile getUserProfile() throws RestServiceException;
-	
-	/**
 	 * Returns the specified user's profile object in json string
 	 * @return
 	 * @throws RestServiceException
@@ -258,33 +230,20 @@ public interface SynapseClient extends XsrfProtectedService {
 	public AccessControlList createAcl(AccessControlList acl) throws RestServiceException;
 	
 	/**
-	 * Update an ACL. Default to non-recursive application.
-	 */
-	public AccessControlList updateAcl(AccessControlList acl) throws RestServiceException;
-	
-	/**
 	 * Update an entity's ACL. If 'recursive' is set to true, then any child 
 	 * ACLs will be deleted, such that all child entities inherit this ACL. 
 	 */
 	public AccessControlList updateAcl(AccessControlList aclEW, boolean recursive) throws RestServiceException;
 
-	public AccessControlList updateTeamAcl(AccessControlList acl) throws RestServiceException;
-	
 	public AccessControlList getTeamAcl(String teamId) throws RestServiceException;
 	
 	public AccessControlList deleteAcl(String ownerEntityId) throws RestServiceException;
-
-	public boolean hasAccess(String ownerEntityId, String accessType) throws RestServiceException;
 	
 	public boolean hasAccess(String ownerId, String ownerType, String accessType) throws RestServiceException;
 
 	AccessRequirement createOrUpdateAccessRequirement(AccessRequirement arEW) throws RestServiceException;
-
-	AccessRequirementsTransport getUnmetAccessRequirements(String entityId, ACCESS_TYPE accessType)
-			throws RestServiceException;
 	
 	List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException;
-	PaginatedResults<AccessRequirement> getAllEntityUploadAccessRequirements(String entityId) throws RestServiceException;
 	
 	public Activity getActivityForEntity(String entityId) throws RestServiceException;
 	
@@ -300,28 +259,19 @@ public interface SynapseClient extends XsrfProtectedService {
 	public FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	 // V2 Wiki crud
-    public V2WikiPage createV2WikiPage(String ownerId, String ownerType, V2WikiPage page) throws RestServiceException;
     public V2WikiPage getV2WikiPage(WikiPageKey key) throws RestServiceException;
-    public V2WikiPage getVersionOfV2WikiPage(WikiPageKey key, Long version) throws RestServiceException;
-    public V2WikiPage updateV2WikiPage(String ownerId, String ownerType, V2WikiPage wikiPag) throws RestServiceException;
     public V2WikiPage restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate) throws RestServiceException;
     public void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
     public List<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
 	public V2WikiOrderHint getV2WikiOrderHint(WikiPageKey key) throws RestServiceException;
 	public V2WikiOrderHint updateV2WikiOrderHint(V2WikiOrderHint toUpdate) throws RestServiceException;
     public FileHandleResults getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
-    public FileHandleResults getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version) throws RestServiceException;
     public PaginatedResults<V2WikiHistorySnapshot> getV2WikiHistory(WikiPageKey key, Long limit, Long offset) throws RestServiceException;
     
-	public String getMarkdown(WikiPageKey key)throws IOException, RestServiceException;
-	public String getVersionOfMarkdown(WikiPageKey key, Long version) throws IOException, RestServiceException;
-	
 	public WikiPage createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
 	public WikiPage updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
 	public WikiPage getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
 	public WikiPage getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
-	
-	public String getFileEndpoint() throws RestServiceException;
 	
 	public EntityHeader addFavorite(String entityId) throws RestServiceException;
 	
@@ -360,8 +310,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	public Doi getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
 	public void createDoi(String entityId, Long versionNumber) throws RestServiceException;
 	
-	public String getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber) throws RestServiceException;
-		
 	public String getSynapseVersions() throws RestServiceException;
 	
 	public HashMap<String, String> getSynapseProperties();
@@ -386,8 +334,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	public HashMap<String, WikiPageKey> getPageNameToWikiKeyMap() throws RestServiceException; 
 
 	public String deleteApiKey() throws RestServiceException;
-	
-	public String deleteRowsFromTable(String toDelete) throws RestServiceException;
 	
 	public TableUpdateTransactionRequest getTableUpdateTransactionRequest(String tableId, List<ColumnModel> oldSchema, List<ColumnModel> newSchema)
 			throws RestServiceException;
@@ -452,17 +398,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	 */
 	public Entity createEntity(Entity entity) throws RestServiceException;
 
-	/**
-	 * Get the file Handle given its ID.
-	 * Note: Only the creator of the FileHandle can get the FileHandle with this method.
-	 * 
-	 * @param fileHandleId
-	 * @return
-	 * @throws RestServiceException 
-	 */
-	FileHandle getFileHandle(String fileHandleId) throws RestServiceException;
-	
-	
 	String createFileHandleURL(String fileHandleId) throws RestServiceException;
 
 	/**
@@ -487,18 +422,8 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	String getHost(String urlString) throws RestServiceException;
 
-	/**
-	 * Fetch a batch of FileHandles
-	 * @param set
-	 * @return
-	 * @throws RestServiceException
-	 */
-	TableFileHandleResults getTableFileHandle(RowReferenceSet set) throws RestServiceException;
 
 	void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException;
-
-	@Deprecated
-	void createLockAccessRequirement(String entityId) throws RestServiceException;
 
 	AccessApproval createAccessApproval(AccessApproval aaEW) throws RestServiceException;
 
@@ -518,8 +443,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	List<String> getMyLocationSettingBanners() throws RestServiceException;
 
 	LogEntry hexDecodeLogEntry(String encodedLogEntry);
-
-	String hexEncodeLogEntry(LogEntry logEntry);
 
 	Boolean isTeamMember(String userId, Long groupPrincipalId)
 			throws RestServiceException;
@@ -541,7 +464,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	BatchFileResult getFileHandleAndUrlBatch(BatchFileRequest request) throws RestServiceException;
 	
-	void deleteAccessApproval(Long approvalId) throws RestServiceException;
 	void deleteAccessApprovals(String accessRequirement, String accessorId) throws RestServiceException;
 
 	String generateSqlWithFacets(String basicSql, List<org.sagebionetworks.repo.model.table.FacetColumnRequest> selectedFacets, List<ColumnModel> schema) throws RestServiceException;

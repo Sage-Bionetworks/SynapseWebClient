@@ -7,9 +7,10 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("dockerclient")
-public interface DockerClient extends RemoteService {
+public interface DockerClient extends XsrfProtectedService {
 
 	PaginatedResults<DockerCommit> getDockerCommits(String entityId, Long limit,
 			Long offset, DockerCommitSortBy sortBy, Boolean ascending) throws RestServiceException;
