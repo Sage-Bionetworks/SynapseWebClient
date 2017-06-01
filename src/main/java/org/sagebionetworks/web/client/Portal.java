@@ -34,11 +34,6 @@ public class Portal implements EntryPoint {
 		console.error(message);
 	}-*/;
 
-
-	public final static native void _fadeout(String fromElementId, String toElementId) /*-{
-		$wnd.jQuery('#'+fromElementId).fadeOut("fast");
-		$wnd.jQuery('#'+toElementId).fadeIn("fast");
-	}-*/;
 	/**
 	 * This is the entry point method.
 	 */
@@ -80,8 +75,7 @@ public class Portal implements EntryPoint {
 						historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());						
 						
 						RootPanel.get("rootPanel").add(appWidget);
-						_fadeout("initialLoadingUI", "rootPanel");
-//						RootPanel.get("initialLoadingUI").setVisible(false);
+						RootPanel.get("initialLoadingUI").setVisible(false);
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
