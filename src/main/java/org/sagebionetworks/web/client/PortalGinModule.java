@@ -14,12 +14,6 @@ import org.sagebionetworks.web.client.cache.StorageImpl;
 import org.sagebionetworks.web.client.cache.StorageWrapper;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.cookie.GWTCookieImpl;
-import org.sagebionetworks.web.client.factory.EditorFactory;
-import org.sagebionetworks.web.client.factory.EditorFactoryImpl;
-import org.sagebionetworks.web.client.factory.RendererFactory;
-import org.sagebionetworks.web.client.factory.RendererFactoryImpl;
-import org.sagebionetworks.web.client.factory.TableColumnRendererFactory;
-import org.sagebionetworks.web.client.factory.TableColumnRendererFactoryImpl;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
@@ -895,19 +889,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// Trash
 		bind(TrashViewImpl.class).in(Singleton.class);
 		bind(TrashView.class).to(TrashViewImpl.class);
-
-		/*
-		 * Factories
-		 */
-		// editor
-		bind(EditorFactoryImpl.class).in(Singleton.class);
-		bind(EditorFactory.class).to(EditorFactoryImpl.class);
-		// renderer
-		bind(RendererFactoryImpl.class).in(Singleton.class);
-		bind(RendererFactory.class).to(RendererFactoryImpl.class);
-		// table
-		bind(TableColumnRendererFactoryImpl.class).in(Singleton.class);
-		bind(TableColumnRendererFactory.class).to(TableColumnRendererFactoryImpl.class);
 		
 		// Asynchronous progress
 		bind(TimerProvider.class).to(TimerProviderImpl.class);

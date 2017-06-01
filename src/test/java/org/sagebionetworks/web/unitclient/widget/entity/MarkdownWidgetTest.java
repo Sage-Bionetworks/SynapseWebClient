@@ -125,9 +125,6 @@ public class MarkdownWidgetTest {
 		
 		//verify loadMath
 		verify(mockSynapseJSNIUtils).processWithMathJax(mockElementWrapper.getElement());
-		
-		//verify highlight code blocks applied
-		verify(mockSynapseJSNIUtils).highlightCodeBlocks();
 				
 		//verify loadWidgets
 		verify(mockWidgetRegistrar).getWidgetContentType(elementContentType);
@@ -220,7 +217,6 @@ public class MarkdownWidgetTest {
 		verify(mockSynAlert).showError(anyString());
 	}
 	
-	@Ignore
 	@Test
 	public void testMdCache() {
 		//simulate value is found in the cache.

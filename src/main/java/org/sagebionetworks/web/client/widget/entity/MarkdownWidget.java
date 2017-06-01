@@ -97,12 +97,11 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.wikiKey = wikiKey;
 		this.wikiVersionInView = wikiVersionInView;
 		final String uniqueSuffix = new Date().getTime() + "" + gwt.nextRandomInt();
-//		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-//		String hostPrefix = gwt.getHostPrefix();
-//		final String key = getKey(md, hostPrefix, isInTestWebsite);
-		//avoid cache for new md processor until it is in good shape.
-//		final MarkdownCacheValue cachedValue = getValueFromCache(key);
-//		if(cachedValue == null) {
+		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
+		String hostPrefix = gwt.getHostPrefix();
+		final String key = getKey(md, hostPrefix, isInTestWebsite);
+		final MarkdownCacheValue cachedValue = getValueFromCache(key);
+		if(cachedValue == null) {
 			view.callbackWhenAttached(new Callback() {
 				@Override
 				public void invoke() {
@@ -116,15 +115,15 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 					}
 				}
 			});
-//		} else {
-//			//used cached value
-//			view.callbackWhenAttached(new Callback() {
-//				@Override
-//				public void invoke() {
-//					loadHtml(cachedValue.getUniqueSuffix(), cachedValue.getHtml());
-//				}
-//			});
-//		}
+		} else {
+			//used cached value
+			view.callbackWhenAttached(new Callback() {
+				@Override
+				public void invoke() {
+					loadHtml(cachedValue.getUniqueSuffix(), cachedValue.getHtml());
+				}
+			});
+		}
 	}
 	
 	public String getKey(String md, String hostPrefix, boolean isInTestWebsite) {
@@ -152,14 +151,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		if(result != null && !result.isEmpty()) {
 			view.setEmptyVisible(false);
 			view.setMarkdown(result);
-			boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-
-			//TODO: remove highlightCodeBlocks call once markdown-it has replaced the server-side processor
-			// (because code highlighting is does in the new parser)
-			if (!isInTestWebsite) {
-				synapseJSNIUtils.highlightCodeBlocks();
-			}
-				
 			loadMath(uniqueSuffix);
 			loadWidgets(wikiKey, wikiVersionInView, uniqueSuffix);	
 			loadTableSorters();
