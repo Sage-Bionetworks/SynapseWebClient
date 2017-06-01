@@ -1,7 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
 	<head>
-		<meta name="description" content="" />
+		<title>Synapse</title>
+		<meta name="description" content="Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges." />
+		<meta name='author' content='Sage Bionetworks, info@sagebase.org' />
 		<meta name="google-site-verification" content="KIO5H8Bg3i0oAEAzTEMK5qIlYJLbd2zogLs_-im4rI0" />
 		<meta name="msvalidate.01" content="E37AC1589F823723B64275D4BC890B1A" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -34,34 +36,38 @@
 		
 		<link rel="icon" type="image/png"  href="favicon.png?v=3" />
 		<link href="/opensearch.xml" rel="search" title="Synapse" type="application/opensearchdescription+xml" />
-		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" media="print" />
 		<link rel="stylesheet" type="text/css" href="Portal.css" />
-		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/default.min.css"/>
-		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
-				
-		<!-- head.js -->
+		
 		<script src="js/head.load.min.js"></script>
+		<!-- Google Analytics -->
+		<script type="text/javascript">
+			window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+			ga('create', 'UA-29804340-1', 'auto');
+			ga('send', 'pageview');
+		</script>
+		
 		<script>
-			head
-			.js("//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js")
-			.js("//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js")
-			.js("js/spark-md5.min.js")
-			.js("js/swfobject/swfobject.js")
-			.js("js/jquery.tablesorter.min.js")
-			.js("js/jquery.tablesorter.scinot.js")
-			.js("js/highlight.pack.js")
-			.js("js/jsPlumb/jquery.jsPlumb-1.6.2-min.js")
-			.js("js/init-nchart.js")
-			.js("js/moment_min.js")
-			.js("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js")
-			.js("js/markdown-it-plugins-9.min.js")
-			.js("js/polyfill.js")
-			.js("js/xss.min.js")
-			.js("js/pica.min.js")
-			;
+			head.load("//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js");
+			head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js");
+			head.load("js/spark-md5.min.js");
+			head.load("js/swfobject/swfobject.js");
+			head.load("js/jquery.tablesorter.min.js");
+			head.load("js/jquery.tablesorter.scinot.js");
+			head.load("js/highlight.pack.js");
+			head.load("js/jsPlumb/jquery.jsPlumb-1.6.2-min.js");
+			head.load("js/init-nchart.js");
+			head.load("js/moment_min.js");
+			head.load("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js");
+			head.load("js/markdown-it-plugins-9.min.js");
+			head.load("js/polyfill.js");
+			head.load("js/xss.min.js");
+			head.load("js/pica.min.js");
+			head.load("//www.google-analytics.com/analytics.js");
+			head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css");
+			head.load("//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/default.min.css");
+			head.load("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css");
 	   	</script>
 	   	<!-- xss.min.js from https://github.com/leizongmin/js-xss -->
-		<title>Sage Synapse : Contribute to the Cure</title>
 		
 		<!--                                           -->
 		<!-- This script loads your compiled module.   -->
@@ -70,18 +76,6 @@
 		<!--                                           -->
 		<script type="text/javascript" language="javascript" src="js/compiled-closure-lib.js"></script>
 		<script type="text/javascript" language="javascript" src="Portal/Portal.nocache.js"></script>
-			
-		<!-- Search autocomplete script. Temporary -->
-	
-		<!-- put this last -->
-		<!-- Google Analytics -->
-		<script type="text/javascript">
-			window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-			ga('create', 'UA-29804340-1', 'auto');
-			ga('send', 'pageview');
-		</script>
-		<script async src='//www.google-analytics.com/analytics.js'></script>
-		<!-- End Google Analytics -->
 	</head>
 	<body style="overflow-y: auto">
 		<div>
@@ -113,7 +107,14 @@
 				<div id="alertContainer"></div>
 			</div>
 			<div id="rootPanel"></div>
-	
+			
+			<div id="initialLoadingUI" style="background-color:#1e7098; height:3000px; padding-top:180px">
+				<svg width='130px' height='130px' style="margin:auto; display:block;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="uil-spin"><rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect><g transform="translate(50 50)"><g transform="rotate(0) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#ffffff"><animate attributeName="opacity" from="1" to="0.1" begin="-1.13s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-1.13s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(45) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#ffffff"><animate attributeName="opacity" from="1" to="0.1" begin="-0.97s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0.97s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(90) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#ffffff"><animate attributeName="opacity" from="1" to="0.1" begin="-0.81s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0.81s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(135) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#ffffff"><animate attributeName="opacity" from="1" to="0.1" begin="-0.65s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0.65s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(180) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#ffffff"><animate attributeName="opacity" from="1" to="0.1" begin="-0.48s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0.48s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(225) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#ffffff"><animate attributeName="opacity" from="1" to="0.1" begin="-0.32s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0.32s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(270) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#ffffff"><animate attributeName="opacity" from="1" to="0.1" begin="-0.16s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0.16s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(315) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#ffffff"><animate attributeName="opacity" from="1" to="0.1" begin="-0s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g></g></svg>
+				<center>
+					<h2 style="color:#ffffff; margin-top:10px; font-family:Sans-serif">Loading Synapse</h2>
+				</center>
+			</div>
+			
 		</div>
 		<div class="clear"></div>
 	</body>

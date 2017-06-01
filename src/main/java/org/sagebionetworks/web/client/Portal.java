@@ -78,7 +78,7 @@ public class Portal implements EntryPoint {
 						historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());						
 						
 						RootPanel.get("rootPanel").add(appWidget);
-
+						RootPanel.get("initialLoadingUI").setVisible(false);
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
