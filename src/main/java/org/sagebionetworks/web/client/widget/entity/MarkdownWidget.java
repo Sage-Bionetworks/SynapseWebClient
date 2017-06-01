@@ -151,6 +151,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		if(result != null && !result.isEmpty()) {
 			view.setEmptyVisible(false);
 			view.setMarkdown(result);
+			synapseJSNIUtils.highlightCodeBlocks();
 			loadMath(uniqueSuffix);
 			loadWidgets(wikiKey, wikiVersionInView, uniqueSuffix);	
 			loadTableSorters();
