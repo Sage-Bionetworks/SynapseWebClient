@@ -1,14 +1,14 @@
 package org.sagebionetworks.web.client.security;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -28,7 +28,9 @@ import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -72,7 +74,10 @@ public class AuthenticationControllerImplTest {
 	XsrfToken mockXsrfToken;
 	@Mock
 	HasRpcToken mockServiceHasRpcToken;
-	
+	@Mock
+	SubscriptionClientAsync mockSubscriptionClient;
+	@Mock
+	ChallengeClientAsync mockChallengeClient;
 	String xsrfToken = "12barbaz34";
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	HashMap<String, String> serverProperties;
@@ -93,7 +98,7 @@ public class AuthenticationControllerImplTest {
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
 		when(mockGWT.asHasRpcToken(any())).thenReturn(mockServiceHasRpcToken);
 		when(mockGWT.asServiceDefTarget(any())).thenReturn(mockServiceDefTarget);
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockXsrfTokenService, mockSynapseClient, mockGWT);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockXsrfTokenService, mockSynapseClient, mockGWT, mockChallengeClient, mockSubscriptionClient);
 		serverProperties = new HashMap<String, String>();
 		AsyncMockStubber.callSuccessWith(serverProperties).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 	}
@@ -270,7 +275,10 @@ public class AuthenticationControllerImplTest {
 		verify(mockClientCache).put(eq(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT), eq(newAuthReceipt), anyLong());
 		
 		//verify xsrf token has been updated
-		verify(mockServiceHasRpcToken).setRpcToken(mockXsrfToken);
+		verify(mockGWT).asHasRpcToken(mockSynapseClient);
+		verify(mockGWT).asHasRpcToken(mockChallengeClient);
+		verify(mockGWT).asHasRpcToken(mockSubscriptionClient);
+		verify(mockServiceHasRpcToken, times(3)).setRpcToken(mockXsrfToken);
 		verify(mockClientCache).put(eq(AuthenticationControllerImpl.XSRF_TOKEN_KEY), eq(xsrfToken), anyLong());
 		
 		verify(loginCallback).onSuccess(any(UserSessionData.class));

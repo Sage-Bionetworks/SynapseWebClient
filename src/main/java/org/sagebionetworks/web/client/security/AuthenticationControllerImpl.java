@@ -10,9 +10,11 @@ import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DateUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
+import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -45,6 +47,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private ClientCache localStorage;
 	private AdapterFactory adapterFactory;
 	private SynapseClientAsync synapseClient;
+	private ChallengeClientAsync challengeClient;
+	private SubscriptionClientAsync subscriptionClient;
 	private XsrfTokenServiceAsync xsrfTokenService;
 	private GWTWrapper gwt;
 	
@@ -57,7 +61,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			AdapterFactory adapterFactory,
 			XsrfTokenServiceAsync xsrfTokenService,
 			SynapseClientAsync synapseClient,
-			GWTWrapper gwt){
+			GWTWrapper gwt,
+			ChallengeClientAsync challengeClient,
+			SubscriptionClientAsync subscriptionClient){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		this.sessionStorage = sessionStorage;
@@ -65,6 +71,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		this.adapterFactory = adapterFactory;
 		this.synapseClient = synapseClient;
 		this.xsrfTokenService = xsrfTokenService;
+		this.challengeClient = challengeClient;
+		this.subscriptionClient = subscriptionClient;
 		this.gwt = gwt;
 		gwt.asServiceDefTarget(xsrfTokenService).setServiceEntryPoint(gwt.getModuleBaseURL() + "xsrf");
 	}
@@ -162,6 +170,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		xsrfTokenService.getNewXsrfToken(new AsyncCallback<XsrfToken>() {
 			public void onSuccess(XsrfToken token) {
 				gwt.asHasRpcToken(synapseClient).setRpcToken(token);
+				gwt.asHasRpcToken(challengeClient).setRpcToken(token);
+				gwt.asHasRpcToken(subscriptionClient).setRpcToken(token);
 				localStorage.put(XSRF_TOKEN_KEY, token.getToken(), DateUtils.getDayFromNow().getTime());
 				callback.onSuccess(userSessionData);
 			}

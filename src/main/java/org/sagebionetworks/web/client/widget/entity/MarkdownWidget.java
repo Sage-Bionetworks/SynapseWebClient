@@ -19,8 +19,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheKey;
-import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheValue;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -97,69 +95,24 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.wikiKey = wikiKey;
 		this.wikiVersionInView = wikiVersionInView;
 		final String uniqueSuffix = new Date().getTime() + "" + gwt.nextRandomInt();
-//		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-//		String hostPrefix = gwt.getHostPrefix();
-//		final String key = getKey(md, hostPrefix, isInTestWebsite);
-		//avoid cache for new md processor until it is in good shape.
-//		final MarkdownCacheValue cachedValue = getValueFromCache(key);
-//		if(cachedValue == null) {
-			view.callbackWhenAttached(new Callback() {
-				@Override
-				public void invoke() {
-					try {
-						String result = markdownIt.markdown2Html(md, uniqueSuffix);
-						//avoid cache for new md processor until it is in good shape.
-//						sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
-						loadHtml(uniqueSuffix, result);
-					} catch (RuntimeException e) { //JavaScriptException
-						synAlert.showError(e.getMessage());
-					}
+		view.callbackWhenAttached(new Callback() {
+			@Override
+			public void invoke() {
+				try {
+					String result = markdownIt.markdown2Html(md, uniqueSuffix);
+					loadHtml(uniqueSuffix, result);
+				} catch (RuntimeException e) { //JavaScriptException
+					synAlert.showError(e.getMessage());
 				}
-			});
-//		} else {
-//			//used cached value
-//			view.callbackWhenAttached(new Callback() {
-//				@Override
-//				public void invoke() {
-//					loadHtml(cachedValue.getUniqueSuffix(), cachedValue.getHtml());
-//				}
-//			});
-//		}
+			}
+		});
 	}
 	
-	public String getKey(String md, String hostPrefix, boolean isInTestWebsite) {
-		MarkdownCacheKey key = ginInjector.getMarkdownCacheKey();
-		key.init(md, hostPrefix, isInTestWebsite);
-		return key.toJSON();
-	}
-	
-	public String getValueToCache(String uniqueSuffix, String html) {
-		MarkdownCacheValue value = ginInjector.getMarkdownCacheValue();
-		value.init(uniqueSuffix, html);
-		return value.toJSON();
-	}
-	
-	public MarkdownCacheValue getValueFromCache(String key) {
-		String value = sessionStorage.getItem(key);
-		if (value != null) {
-			MarkdownCacheValue cacheValue = ginInjector.getMarkdownCacheValue();
-			cacheValue.init(value);
-			return cacheValue;
-		}
-		return null;
-	}
 	public void loadHtml(String uniqueSuffix, String result) {
 		if(result != null && !result.isEmpty()) {
 			view.setEmptyVisible(false);
 			view.setMarkdown(result);
-			boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-
-			//TODO: remove highlightCodeBlocks call once markdown-it has replaced the server-side processor
-			// (because code highlighting is does in the new parser)
-			if (!isInTestWebsite) {
-				synapseJSNIUtils.highlightCodeBlocks();
-			}
-				
+			synapseJSNIUtils.highlightCodeBlocks();
 			loadMath(uniqueSuffix);
 			loadWidgets(wikiKey, wikiVersionInView, uniqueSuffix);	
 			loadTableSorters();
@@ -274,9 +227,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			}
 		});				
 	}
-
-	
-	
 	
 	public void refresh() {
 		configure(md, wikiKey, wikiVersionInView);
