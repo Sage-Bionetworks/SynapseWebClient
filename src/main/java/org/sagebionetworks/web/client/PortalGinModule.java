@@ -34,16 +34,12 @@ import org.sagebionetworks.web.client.view.ACTView;
 import org.sagebionetworks.web.client.view.ACTViewImpl;
 import org.sagebionetworks.web.client.view.AccountView;
 import org.sagebionetworks.web.client.view.AccountViewImpl;
-import org.sagebionetworks.web.client.view.CellTableProvider;
-import org.sagebionetworks.web.client.view.CellTableProviderImpl;
 import org.sagebionetworks.web.client.view.CertificateView;
 import org.sagebionetworks.web.client.view.CertificateViewImpl;
 import org.sagebionetworks.web.client.view.ChallengeOverviewView;
 import org.sagebionetworks.web.client.view.ChallengeOverviewViewImpl;
 import org.sagebionetworks.web.client.view.ChangeUsernameView;
 import org.sagebionetworks.web.client.view.ChangeUsernameViewImpl;
-import org.sagebionetworks.web.client.view.ColumnsPopupView;
-import org.sagebionetworks.web.client.view.ColumnsPopupViewImpl;
 import org.sagebionetworks.web.client.view.ComingSoonView;
 import org.sagebionetworks.web.client.view.ComingSoonViewImpl;
 import org.sagebionetworks.web.client.view.DivView;
@@ -460,8 +456,6 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationListView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationListViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl;
-import org.sagebionetworks.web.client.widget.filter.QueryFilterView;
-import org.sagebionetworks.web.client.widget.filter.QueryFilterViewImpl;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
 import org.sagebionetworks.web.client.widget.footer.FooterViewImpl;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMapView;
@@ -550,9 +544,9 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableVie
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsView;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsViewImpl;
 import org.sagebionetworks.web.client.widget.table.modal.upload.CSVOptionsWidget;
@@ -944,20 +938,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// Bind the cookie provider
 		bind(GWTCookieImpl.class).in(Singleton.class);
 		bind(CookieProvider.class).to(GWTCookieImpl.class);
-		
-		// The ImagePrototySingleton should be...well a singleton
-		bind(ImagePrototypeSingleton.class).in(Singleton.class);
-		
-		// The runtime provider
-		bind(CellTableProvider.class).to(CellTableProviderImpl.class);
-		
-		// The column popup
-		bind(ColumnsPopupViewImpl.class).in(Singleton.class);
-		bind(ColumnsPopupView.class).to(ColumnsPopupViewImpl.class);
-		
-		// Query filter
-		bind(QueryFilterViewImpl.class).in(Singleton.class);
-		bind(QueryFilterView.class).to(QueryFilterViewImpl.class);
 		
 		// ACL Editor
 		bind(AccessControlListEditorView.class).to(AccessControlListEditorViewImpl.class);

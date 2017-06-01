@@ -12,51 +12,6 @@ import org.sagebionetworks.client.SynapseClientImpl;
 import org.sagebionetworks.client.SynapseProfileProxy;
 
 public class ServiceUtils {
-
-	private static Logger logger = Logger.getLogger(ServiceUtils.class.getName());
-	
-	public static final String REPOSVC_PATH_ENTITY = "entity";
-	public static final String REPOSVC_PATH_HAS_ACCESS = "access";
-	public static final String REPOSVC_PATH_GET_USERS = "user";
-	public static final String REPOSVC_PATH_PUBLIC_PROFILE = "publicprofile";
-	public static final String REPOSVC_SUFFIX_PATH_ANNOTATIONS = "annotations";
-	public static final String REPOSVC_SUFFIX_PATH_PREVIEW = "preview";
-	public static final String REPOSVC_SUFFIX_LOCATION_PATH = "location";	
-	public static final String REPOSVC_SUFFIX_PATH_SCHEMA = "schema";
-	public static final String REPOSVC_SUFFIX_PATH_ACL = "acl"; 	
-	public static final String REPOSVC_SUFFIX_PATH_TYPE = "type";
-	public static final String REPOSVC_SUFFIX_PATH_BENEFACTOR = "benefactor"; 
-	
-	public static final String AUTHSVC_GET_GROUPS_PATH = "userGroup";
-	
-	public static final String AUTHSVC_ACL_PRINCIPAL_NAME = "name";
-	public static final String AUTHSVC_ACL_PRINCIPAL_ID = "id";
-	public static final String AUTHSVC_ACL_PRINCIPAL_CREATION_DATE = "creationDate";
-	public static final String AUTHSVC_ACL_PRINCIPAL_URI = "uri";
-	public static final String AUTHSVC_ACL_PRINCIPAL_ETAG = "etag";
-	public static final String AUTHSVC_ACL_PRINCIPAL_INDIVIDUAL = "individual";
-	
-	/**
-	 * The synapse client is stateful so we must create a new one for each request
-	 */
-	public static SynapseClient createSynapseClient(TokenProvider tokenProvider, ServiceUrlProvider urlProvider) {
-		SynapseClient synapseClient = SynapseProfileProxy.createProfileProxy(new SynapseClientImpl());
-		synapseClient.setSessionToken(tokenProvider.getSessionToken());
-		synapseClient.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
-		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
-		return synapseClient;
-	}	
-	
-	public static SynapseClient createSynapseClient(SynapseProvider synapseProvider, ServiceUrlProvider urlProvider, String sessionToken) {
-		SynapseClient client = synapseProvider.createNewClient();
-		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
-		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
-		client.setSessionToken(sessionToken);
-		return client;
-	}
-
-	
-	
 	public static void writeToFile(File temp, InputStream stream, final long maxAttachmentSizeBytes) throws IOException {
 		BufferedOutputStream out = new BufferedOutputStream(new FileOutputStream(temp, false));
 		try {

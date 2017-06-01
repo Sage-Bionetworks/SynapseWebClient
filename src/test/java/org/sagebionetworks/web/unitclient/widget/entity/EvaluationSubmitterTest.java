@@ -15,7 +15,8 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter.*;
+import static org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter.NO_COMMITS_SELECTED_MSG;
+import static org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter.ZERO_COMMITS_ERROR;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +32,6 @@ import org.sagebionetworks.evaluation.model.MemberSubmissionEligibility;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.SubmissionEligibility;
 import org.sagebionetworks.evaluation.model.TeamSubmissionEligibility;
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -56,7 +56,6 @@ import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
-import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -97,7 +96,6 @@ public class EvaluationSubmitterTest {
 	FileEntity entity;
 	EntityBundle bundle;
 	PaginatedResults<TermsOfUseAccessRequirement> requirements;
-	AccessRequirementsTransport art;
 	Submission returnSubmission;
 	Evaluation e1;
 	TeamSubmissionEligibility testTeamSubmissionEligibility;
@@ -221,7 +219,6 @@ public class EvaluationSubmitterTest {
 		reset(mockView);
 		
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(ACCESS_TYPE.class), any(AsyncCallback.class));
 
 		submitter.onNextClicked(null, null, e1);
 		//Should invoke once directly without terms of use

@@ -20,9 +20,10 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("dataaccessclient")
-public interface DataAccessClient extends RemoteService {
+public interface DataAccessClient extends XsrfProtectedService {
 	ResearchProject getResearchProject(Long id) throws RestServiceException;
 	ResearchProject updateResearchProject(ResearchProject researchProject)  throws RestServiceException;
 	RequestInterface getDataAccessRequest(Long id) throws RestServiceException;
