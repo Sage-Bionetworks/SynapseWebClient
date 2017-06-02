@@ -18,7 +18,7 @@
 		<bh:Div ui:field="synAlertContainer" />
 		<b:Panel ui:field="accessRequirementUI" addStyleNames="margin-top-30 margin-left-35 margin-right-10 light-border padding-10">
 			<bh:Div ui:field="accessRequirementContainer" />
-			<bh:Div ui:field="hasRequestUI">
+			<bh:Div>
 				<b:FormGroup>
 					<b:CheckBox ui:field="certifiedCheckbox" text="Accessors must be certified." enabled="false"/>
 					<b:CheckBox ui:field="validatedCheckbox"

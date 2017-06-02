@@ -32,7 +32,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTRevokeUserAccessButton;
@@ -75,7 +75,7 @@ public class AccessRequirementsPresenterTest {
 	@Captor
 	ArgumentCaptor<RestrictableObjectDescriptor> subjectCaptor;
 	@Mock
-	ACTAccessRequirementWidget mockACTAccessRequirementWidget;
+	ManagedACTAccessRequirementWidget mockACTAccessRequirementWidget;
 	@Mock
 	TermsOfUseAccessRequirementWidget mockTermsOfUseAccessRequirementWidget;
 	@Mock
@@ -98,7 +98,7 @@ public class AccessRequirementsPresenterTest {
 		accessRequirements.add(mockTermsOfUseAccessRequirement);
 		accessRequirements.add(mockLockAccessRequirement);
 		AsyncMockStubber.callSuccessWith(accessRequirements).when(mockDataAccessClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong(), any(AsyncCallback.class));
-		when(mockGinInjector.getACTAccessRequirementWidget()).thenReturn(mockACTAccessRequirementWidget);
+		when(mockGinInjector.getManagedACTAccessRequirementWidget()).thenReturn(mockACTAccessRequirementWidget);
 		when(mockGinInjector.getTermsOfUseAccessRequirementWidget()).thenReturn(mockTermsOfUseAccessRequirementWidget);
 		when(mockGinInjector.getLockAccessRequirementWidget()).thenReturn(mockLockAccessRequirementWidget);
 	}	

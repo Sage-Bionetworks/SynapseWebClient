@@ -41,7 +41,7 @@ import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -69,7 +69,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	@Mock
 	LoadMoreWidgetContainer mockLoadMoreContainer;
 	@Mock
-	ACTAccessRequirementWidget mockACTAccessRequirementWidget;
+	ManagedACTAccessRequirementWidget mockACTAccessRequirementWidget;
 	@Mock
 	Button mockButton;
 	@Mock

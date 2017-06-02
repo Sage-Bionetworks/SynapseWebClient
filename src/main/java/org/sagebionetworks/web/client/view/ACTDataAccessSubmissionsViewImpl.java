@@ -82,8 +82,6 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	@UiField
 	Div subjectsContainer;
 	@UiField
-	Div hasRequestUI;
-	@UiField
 	AnchorListItem backLink;
 	@UiField
 	TextBox expirationPeriodTextbox;
@@ -264,11 +262,6 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 		subjectsContainer.clear();
 		subjectsContainer.add(w);
 	}
-	@Override
-	public void setHasRequestUIVisible(boolean visible) {
-		hasRequestUI.setVisible(visible);
-	}
-
 	@Override
 	public void setExpirationPeriod(Long value) {
 		expirationPeriodTextbox.setValue(value.toString());

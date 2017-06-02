@@ -14,7 +14,7 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmission;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -33,7 +33,7 @@ public class OpenSubmissionWidgetTest {
 	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
 	@Mock
-	ACTAccessRequirementWidget mockAccessRequirementWidget;
+	ManagedACTAccessRequirementWidget mockAccessRequirementWidget;
 
 	OpenSubmissionWidget widget;
 

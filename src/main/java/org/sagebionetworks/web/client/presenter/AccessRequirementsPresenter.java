@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.LockAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
@@ -16,6 +17,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
@@ -142,7 +144,11 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 						isNewAr = true;
 						allArs.add(ar);
 						// create a new row for each access requirement.
-						if( ar instanceof ACTAccessRequirement) {
+						if( ar instanceof ManagedACTAccessRequirement) {
+							ManagedACTAccessRequirementWidget w = ginInjector.getManagedACTAccessRequirementWidget();
+							w.setRequirement((ManagedACTAccessRequirement)ar);
+							loadMoreContainer.add(w.asWidget());
+						} else if( ar instanceof ACTAccessRequirement) {
 							ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
 							w.setRequirement((ACTAccessRequirement)ar);
 							loadMoreContainer.add(w.asWidget());

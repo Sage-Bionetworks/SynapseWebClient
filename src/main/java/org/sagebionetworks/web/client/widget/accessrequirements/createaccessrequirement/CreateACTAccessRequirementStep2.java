@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
@@ -108,7 +108,7 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 		view.setIsIDUPublic(accessRequirement.getIsIDUPublic());
 		view.setIsIRBApprovalRequired(accessRequirement.getIsIRBApprovalRequired());
 		view.setIsValidatedProfileRequired(accessRequirement.getIsValidatedProfileRequired());
-		view.showHasRequestUI(ACTAccessRequirementWidget.isAcceptDataAccessRequest(accessRequirement.getAcceptRequest()));
+		view.showHasRequestUI(ManagedACTAccessRequirementWidget.isAcceptDataAccessRequest(accessRequirement.getAcceptRequest()));
 	}
 	
 	

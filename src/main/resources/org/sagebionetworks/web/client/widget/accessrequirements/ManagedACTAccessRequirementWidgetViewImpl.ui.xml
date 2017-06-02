@@ -18,14 +18,8 @@
 			    <g:InlineLabel styleName="boldText" text="Access to the data requires that you are a registered Synapse user and fulfill the following requirements:" />
 			</bh:Div>
 			<!-- terms -->
-			<b:BlockQuote ui:field="wikiTermsUI" visible="false">
+			<b:BlockQuote>
 				<g:SimplePanel ui:field="wikiContainer" />	
-			</b:BlockQuote>
-			
-			<b:BlockQuote ui:field="termsUI" visible="false">
-			    <bh:Paragraph>
-			    	<g:HTML ui:field="terms" styleName="font-size-14" />
-			    </bh:Paragraph>
 			</b:BlockQuote>
 			<bh:Div>
 			    <bh:Text>For more information on use conditions, please read the </bh:Text>
@@ -40,15 +34,31 @@
 			</bh:Div>
 			<bh:ClearFix />
 			<bh:Div addStyleNames="margin-top-5">
+				<bh:Div ui:field="manageAccessContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
 				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
 				<bh:Div ui:field="deleteAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
 				<bh:Div ui:field="revokeAccessButtonContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
+				<bh:Div ui:field="cancelRequestButtonContainer" pull="RIGHT">
+					<b:Button ui:field="cancelRequestButton" type="DEFAULT" size="SMALL" text="Cancel Request" visible="false" addStyleNames="margin-right-5 margin-top-5" />
+				</bh:Div>
+				<bh:Div ui:field="updateRequestButtonContainer" pull="RIGHT">
+					<b:Button ui:field="updateRequestButton" type="DEFAULT" size="SMALL" text="Update Request" visible="false" addStyleNames="margin-right-5 margin-top-5"/>
+				</bh:Div>
 				<bh:Div ui:field="requestAccessButtonContainer" pull="RIGHT">
 					<b:Button ui:field="requestAccessButton" type="PRIMARY" text="Request Access" visible="false" addStyleNames="margin-right-5 margin-top-5"/>
 				</bh:Div>
+				<bh:Div ui:field="requestSubmittedByOther" visible="false">
+					<b:Alert type="INFO" text="Data access has been requested on your behalf by:" pull="RIGHT" addStyleNames="small-alert margin-top-5 margin-right-2">
+						<bh:Div ui:field="submitterUserBadgeContainer" />
+					</b:Alert>
+				</bh:Div>
+				
+				<b:Alert type="INFO" ui:field="requestSubmittedMessage" text="You have submitted a data access request." pull="RIGHT" visible="false" addStyleNames="small-alert margin-top-5 margin-right-2"/>
 				<b:Alert type="SUCCESS" ui:field="requestApprovedMessage" text="Your data access request has been approved." pull="RIGHT" visible="false" addStyleNames="small-alert margin-top-5 margin-right-2"/>
+				<b:Alert type="WARNING" ui:field="requestRejectedMessage" text="" pull="RIGHT" visible="false" addStyleNames="small-alert margin-top-5 margin-right-2"/>
 			</bh:Div>
 			<bh:ClearFix />
+			<bh:Div ui:field="requestDataAccessWizardContainer" />
 			<bh:Div ui:field="synAlertContainer" />
 		</b:PanelBody>
 	</b:Panel>

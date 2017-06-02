@@ -102,6 +102,8 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerViewImpl;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.RadioWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidgetView;
@@ -1385,6 +1387,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ViewDefaultColumns.class).in(Singleton.class);
 		bind(SubscribersWidgetView.class).to(SubscribersWidgetViewImpl.class);
 		bind(PlaceView.class).to(PlaceViewImpl.class);
+		bind(ManagedACTAccessRequirementWidgetView.class).to(ManagedACTAccessRequirementWidgetViewImpl.class);
 		bind(ACTAccessRequirementWidgetView.class).to(ACTAccessRequirementWidgetViewImpl.class);
 		bind(TermsOfUseAccessRequirementWidgetView.class).to(TermsOfUseAccessRequirementWidgetViewImpl.class);
 		bind(CreateResearchProjectWizardStep1View.class).to(CreateResearchProjectWizardStep1ViewImpl.class);

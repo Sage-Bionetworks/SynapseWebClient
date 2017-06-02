@@ -4,15 +4,15 @@ import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.MAX_DATE_PARAM;
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.MIN_DATE_PARAM;
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.STATE_FILTER_PARAM;
-import static org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateACTAccessRequirementStep2.*;
+import static org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateACTAccessRequirementStep2.DAY_IN_MS;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
@@ -20,7 +20,6 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
@@ -29,7 +28,7 @@ import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -51,7 +50,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	DataAccessClientAsync dataAccessClient;
 	private GlobalApplicationState globalAppState;
 	LoadMoreWidgetContainer loadMoreContainer;
-	ACTAccessRequirementWidget actAccessRequirementWidget;
+	ManagedACTAccessRequirementWidget actAccessRequirementWidget;
 	boolean isAccessRequirementVisible;
 	public static final String HIDE_AR_TEXT = "Hide Access Requirement";
 	public static final String SHOW_AR_TEXT = "Show Access Requirement";
@@ -62,7 +61,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	List<String> states;
 	boolean isSortedAsc;
 	String nextPageToken;
-	private ACTAccessRequirement actAccessRequirement;
+	private ManagedACTAccessRequirement actAccessRequirement;
 	private SubjectsWidget subjectsWidget;
 	@Inject
 	public ACTDataAccessSubmissionsPresenter(
@@ -71,7 +70,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 			PortalGinInjector ginInjector,
 			GlobalApplicationState globalAppState,
 			LoadMoreWidgetContainer loadMoreContainer,
-			ACTAccessRequirementWidget actAccessRequirementWidget,
+			ManagedACTAccessRequirementWidget actAccessRequirementWidget,
 			final Button showHideAccessRequirementButton,
 			FileHandleWidget ducTemplateFileHandleWidget,
 			DataAccessClientAsync dataAccessClient,
@@ -153,9 +152,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				}
 				@Override
 				public void onSuccess(AccessRequirement requirement) {
-					if (requirement instanceof ACTAccessRequirement) {
-						actAccessRequirement = (ACTAccessRequirement) requirement;
-						view.setHasRequestUIVisible(ACTAccessRequirementWidget.isAcceptDataAccessRequest(actAccessRequirement.getAcceptRequest()));
+					if (requirement instanceof ManagedACTAccessRequirement) {
+						actAccessRequirement = (ManagedACTAccessRequirement) requirement;
 						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
 							FileHandleAssociation fha = new FileHandleAssociation();
 							fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);

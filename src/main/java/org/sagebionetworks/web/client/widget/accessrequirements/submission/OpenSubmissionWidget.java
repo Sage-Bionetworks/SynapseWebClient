@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmission;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 
@@ -17,7 +17,7 @@ import com.google.inject.Inject;
 public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter, IsWidget {
 
 	private OpenSubmissionWidgetView view;
-	private ACTAccessRequirementWidget accessRequirementWidget;
+	private ManagedACTAccessRequirementWidget accessRequirementWidget;
 	private DataAccessClientAsync dataAccessClient;
 	private SynapseAlert synAlert;
 	private LazyLoadHelper lazyLoadHelper;
@@ -26,7 +26,7 @@ public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter,
 	@Inject
 	public OpenSubmissionWidget(
 			OpenSubmissionWidgetView view,
-			ACTAccessRequirementWidget accessRequirementWidget,
+			ManagedACTAccessRequirementWidget accessRequirementWidget,
 			DataAccessClientAsync dataAccessClient,
 			SynapseAlert synAlert,
 			LazyLoadHelper lazyLoadHelper) {
@@ -37,7 +37,6 @@ public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter,
 		this.lazyLoadHelper = lazyLoadHelper;
 		view.setSynAlert(synAlert);
 		accessRequirementWidget.hideButtons();
-		accessRequirementWidget.setManageAccessVisible(true);
 		view.setACTAccessRequirementWidget(accessRequirementWidget);
 		view.setPresenter(this);
 		Callback loadDataCallback = new Callback() {
@@ -53,7 +52,6 @@ public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter,
 	public void loadAccessRequirement() {
 		synAlert.clear();
 		dataAccessClient.getAccessRequirement(accessRequirementId, new AsyncCallback<AccessRequirement>(){
-
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -61,10 +59,10 @@ public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter,
 
 			@Override
 			public void onSuccess(AccessRequirement ar) {
-				if (ar instanceof ACTAccessRequirement) {
-					accessRequirementWidget.setRequirement((ACTAccessRequirement)ar);
+				if (ar instanceof ManagedACTAccessRequirement) {
+					accessRequirementWidget.setRequirement((ManagedACTAccessRequirement)ar);
 				} else {
-					onFailure(new IllegalStateException("Expected an ACTAccessRequirement, but get "+ar.getConcreteType()));
+					onFailure(new IllegalStateException("Expected an ManagedACTAccessRequirement, but get "+ar.getConcreteType()));
 				}
 			}
 			
