@@ -1,52 +1,25 @@
 package org.sagebionetworks.web.unitclient.widget.entity.act;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.*;
-
-import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.*;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.sagebionetworks.repo.model.ACTAccessApproval;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
-import org.sagebionetworks.repo.model.AccessApproval;
-import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.table.QueryBundleRequest;
-import org.sagebionetworks.repo.model.table.QueryResult;
-import org.sagebionetworks.repo.model.table.QueryResultBundle;
-import org.sagebionetworks.repo.model.table.Row;
-import org.sagebionetworks.repo.model.table.RowSet;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
-import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
-import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.act.ACTRevokeUserAccessModal;
-import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
-import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
 import org.sagebionetworks.web.client.widget.entity.act.RevokeUserAccessModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ACTRevokeUserAccessModalTest {

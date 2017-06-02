@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.dataaccess.ACTAccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.ManagedACTAccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -184,14 +184,14 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			}
 			@Override
 			public void onSuccess(AccessRequirementStatus status) {
-				if (((ACTAccessRequirementStatus)status).getCurrentSubmissionStatus() == null) {
+				if (((ManagedACTAccessRequirementStatus)status).getCurrentSubmissionStatus() == null) {
 					if (status.getIsApproved()) {
 						showApproved();
 					} else {
 						showUnapproved();
 					}
 				} else {
-					setDataAccessSubmissionStatus(((ACTAccessRequirementStatus)status).getCurrentSubmissionStatus());	
+					setDataAccessSubmissionStatus(((ManagedACTAccessRequirementStatus)status).getCurrentSubmissionStatus());	
 				}
 			}
 		});

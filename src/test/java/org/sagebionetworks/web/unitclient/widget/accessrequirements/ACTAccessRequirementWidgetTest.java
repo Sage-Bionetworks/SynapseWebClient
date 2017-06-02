@@ -21,7 +21,7 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.dataaccess.ACTAccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.ManagedACTAccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
@@ -86,7 +86,7 @@ public class ACTAccessRequirementWidgetTest {
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Mock
-	ACTAccessRequirementStatus mockDataAccessSubmissionStatus;
+	ManagedACTAccessRequirementStatus mockDataAccessSubmissionStatus;
 	@Mock
 	AuthenticationController mockAuthController;
 	@Mock

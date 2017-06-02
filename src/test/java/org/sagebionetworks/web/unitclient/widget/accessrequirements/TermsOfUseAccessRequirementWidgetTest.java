@@ -17,7 +17,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.dataaccess.TermsOfUseAccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -67,7 +67,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Mock
-	TermsOfUseAccessRequirementStatus mockDataAccessSubmissionStatus;
+	BasicAccessRequirementStatus mockDataAccessSubmissionStatus;
 	
 	Callback lazyLoadDataCallback;
 
