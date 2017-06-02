@@ -53,27 +53,6 @@ public interface SageImageBundle extends ClientBundle {
 	@Source("resource/images/genomeSpace-logo-title-16.gif")
 	ImageResource genomeSpaceLogoTitle16();
 	
-	@Source("resource/images/NCI_logo.jpg")
-	ImageResource nciLogo();
-	
-	@Source("resource/images/CTF_logo.png")
-	ImageResource ctfLogo();
-
-	@Source("resource/images/LSDF_logo.jpg")
-	ImageResource lsdfLogo();
-
-	@Source("resource/images/NHLBI_logo.jpg")
-	ImageResource nhlbiLogo();
-
-	@Source("resource/images/Sloan_logo.jpg")
-	ImageResource sloanLogo();
-	
-	@Source("resource/images/NIA_logo.jpg")
-	ImageResource niaLogo();
-	
-	@Source("resource/images/NIMH_logo.jpg")
-	ImageResource nimhLogo();
-	
 	@Source("resource/images/certificate.png")
 	ImageResource certificate();
 
