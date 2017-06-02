@@ -6,13 +6,11 @@ import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.ManagedACTAccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -43,8 +41,6 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	AuthenticationController authController;
 	UserBadge submitterUserBadge;
 	ACTRevokeUserAccessButton revokeUserAccessButton;
-	JiraURLHelper jiraURLHelper;
-	PopupUtilsView popupUtils;
 	
 	@Inject
 	public ManagedACTAccessRequirementWidget(ManagedACTAccessRequirementWidgetView view, 
@@ -60,9 +56,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 			DataAccessClientAsync dataAccessClient,
 			LazyLoadHelper lazyLoadHelper,
 			AuthenticationController authController,
-			UserBadge submitterUserBadge,
-			JiraURLHelper jiraURLHelper,
-			PopupUtilsView popupUtils) {
+			UserBadge submitterUserBadge) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -77,8 +71,6 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		this.authController = authController;
 		this.submitterUserBadge = submitterUserBadge;
 		this.revokeUserAccessButton = revokeUserAccessButton;
-		this.jiraURLHelper = jiraURLHelper;
-		this.popupUtils = popupUtils;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setSubmitterUserBadge(submitterUserBadge);
 		view.setPresenter(this);
@@ -120,10 +112,6 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
 		lazyLoadHelper.setIsConfigured();
-	}
-	
-	public static boolean isAcceptDataAccessRequest(Boolean isAcceptDataAccessRequest) {
-		return isAcceptDataAccessRequest != null && isAcceptDataAccessRequest;
 	}
 	
 	public void setDataAccessSubmissionStatus(SubmissionStatus status) {

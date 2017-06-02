@@ -21,7 +21,6 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.ManagedACTAccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
@@ -33,8 +32,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetView;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTRevokeUserAccessButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
@@ -54,10 +51,10 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
-public class ACTAccessRequirementWidgetTest {
-	ACTAccessRequirementWidget widget;
+public class ManagedACTAccessRequirementWidgetTest {
+	ManagedACTAccessRequirementWidget widget;
 	@Mock
-	ACTAccessRequirementWidgetView mockView; 
+	ManagedACTAccessRequirementWidgetView mockView; 
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
@@ -89,7 +86,7 @@ public class ACTAccessRequirementWidgetTest {
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Mock
-	BasicAccessRequirementStatus mockDataAccessSubmissionStatus;
+	ManagedACTAccessRequirementStatus mockDataAccessSubmissionStatus;
 	@Mock
 	AuthenticationController mockAuthController;
 	@Mock
@@ -102,21 +99,27 @@ public class ACTAccessRequirementWidgetTest {
 	UserSessionData mockUserSessionData;
 	@Mock
 	UserProfile mockProfile;
+	@Mock
+	SubmissionStatus mockSubmissionStatus;
 	Callback lazyLoadDataCallback;
 	
 	public final static String ROOT_WIKI_ID = "777";
+	public final static String SUBMISSION_ID = "442";
+	public final static String SUBMITTER_ID = "9";
 	
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new ACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockRevokeUserAccessButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockJiraURLHelper, mockPopupUtils);
+		widget = new ManagedACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockRevokeUserAccessButton, mockManageAccessButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockSubmitterUserBadge, mockJiraURLHelper, mockPopupUtils);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
 		lazyLoadDataCallback = callbackCaptor.getValue();
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
-		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
+		when(mockDataAccessSubmissionStatus.getCurrentSubmissionStatus()).thenReturn(mockSubmissionStatus);
+		when(mockSubmissionStatus.getSubmissionId()).thenReturn(SUBMISSION_ID);
+		when(mockSubmissionStatus.getSubmittedBy()).thenReturn(SUBMITTER_ID);
 		when(mockAuthController.getCurrentUserSessionData()).thenReturn(mockUserSessionData);
 		when(mockUserSessionData.getProfile()).thenReturn(mockProfile);
 		when(mockProfile.getEmails()).thenReturn(Collections.singletonList("email@email.com"));
@@ -155,8 +158,44 @@ public class ACTAccessRequirementWidgetTest {
 	}
 	
 	@Test
+	public void testSubmittedState() {
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(SUBMITTER_ID);
+		widget.setRequirement(mockACTAccessRequirement);
+		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.SUBMITTED);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockView).showRequestSubmittedMessage();
+		verify(mockView).showCancelRequestButton();
+	}
+	
+
+	@Test
+	public void testSubmittedStateByAnotherUser() {
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn("different id");
+		widget.setRequirement(mockACTAccessRequirement);
+		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.SUBMITTED);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockSubmitterUserBadge).configure(SUBMITTER_ID);
+		verify(mockView).showRequestSubmittedByOtherUser();
+		verify(mockView, never()).showCancelRequestButton();
+	}
+	
+	@Test
 	public void testApprovedState() {
 		widget.setRequirement(mockACTAccessRequirement);
+		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(true);
+		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.APPROVED);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showApprovedHeading();
+		verify(mockView).showRequestApprovedMessage();
+		verify(mockView).showUpdateRequestButton();
+	}
+	
+	@Test
+	public void testApprovedStateNoDataAccessRequest() {
+		widget.setRequirement(mockACTAccessRequirement);
+		when(mockDataAccessSubmissionStatus.getCurrentSubmissionStatus()).thenReturn(null);
 		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(false);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
 		lazyLoadDataCallback.invoke();

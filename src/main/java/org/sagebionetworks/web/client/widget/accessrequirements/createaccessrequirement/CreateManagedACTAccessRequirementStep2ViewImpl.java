@@ -1,20 +1,10 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
-import org.gwtbootstrap3.client.ui.FormGroup;
-import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.form.error.BasicEditorError;
-import org.gwtbootstrap3.client.ui.form.validator.Validator;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Paragraph;
 
-import com.google.gwt.editor.client.Editor;
-import com.google.gwt.editor.client.EditorError;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -23,15 +13,11 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessRequirementStep2View {
+public class CreateManagedACTAccessRequirementStep2ViewImpl implements CreateManagedACTAccessRequirementStep2View {
 
-	public interface Binder extends UiBinder<Widget, CreateACTAccessRequirementStep2ViewImpl> {}
+	public interface Binder extends UiBinder<Widget, CreateManagedACTAccessRequirementStep2ViewImpl> {}
 	
 	Widget widget;
-	@UiField
-	FormGroup oldInstructionsUI;
-	@UiField
-	Paragraph oldInstructions;
 	@UiField
 	Div wikiPageContainer;
 	@UiField
@@ -54,17 +40,11 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 	TextBox expirationPeriodTextbox;
 	@UiField
 	CheckBox intendedDataUsePublicCheckbox;
-	@UiField
-	Div hasRequestUI;
-	@UiField
-	Radio hasRequestButton;
-	@UiField
-	Radio hasNoRequestButton;
 	
 	Presenter presenter;
 	
 	@Inject
-	public CreateACTAccessRequirementStep2ViewImpl(Binder binder){
+	public CreateManagedACTAccessRequirementStep2ViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
 		editWikiButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -72,30 +52,8 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 				presenter.onEditWiki();
 			}
 		});
-		hasRequestButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				showHasRequestUI(true);
-			}
-		});
-		hasNoRequestButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				showHasRequestUI(false);
-			}
-		});
 	}
 	
-	@Override
-	public void showHasRequestUI(boolean hasRequest) {
-		hasRequestUI.setVisible(hasRequest);
-		hasRequestButton.setValue(hasRequest, false);
-		hasNoRequestButton.setValue(!hasRequest, false);
-	}
-	@Override
-	public boolean getHasRequests() {
-		return hasRequestButton.getValue();
-	}
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -136,14 +94,6 @@ public class CreateACTAccessRequirementStep2ViewImpl implements CreateACTAccessR
 	@Override
 	public void setIsValidatedProfileRequired(boolean value) {
 		validatedCheckbox.setValue(value);
-	}
-	@Override
-	public void setOldTermsVisible(boolean visible) {
-		oldInstructionsUI.setVisible(visible);
-	}
-	@Override
-	public void setOldTerms(String terms) {
-		oldInstructions.setText(terms);
 	}
 	@Override
 	public boolean areOtherAttachmentsRequired() {

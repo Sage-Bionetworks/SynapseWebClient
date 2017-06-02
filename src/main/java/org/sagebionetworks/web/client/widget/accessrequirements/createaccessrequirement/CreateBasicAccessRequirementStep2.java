@@ -1,10 +1,11 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
+import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
@@ -14,21 +15,21 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * Second page of creating an access requirement (Terms Of Use)  
+ * Second page of creating an access requirement (Terms Of Use or old ACT)  
  * @author Jay
  *
  */
-public class CreateTermsOfUseAccessRequirementStep2 implements ModalPage, CreateTermsOfUseAccessRequirementStep2View.Presenter {
-	CreateTermsOfUseAccessRequirementStep2View view;
+public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasicAccessRequirementStep2View.Presenter {
+	CreateBasicAccessRequirementStep2View view;
 	ModalPresenter modalPresenter;
-	TermsOfUseAccessRequirement accessRequirement;
+	AccessRequirement accessRequirement;
 	WikiMarkdownEditor wikiMarkdownEditor;
 	WikiPageWidget wikiPageRenderer;
 	WikiPageKey wikiKey;
 	
 	@Inject
-	public CreateTermsOfUseAccessRequirementStep2(
-			CreateTermsOfUseAccessRequirementStep2View view,
+	public CreateBasicAccessRequirementStep2(
+			CreateBasicAccessRequirementStep2View view,
 			WikiMarkdownEditor wikiMarkdownEditor,
 			WikiPageWidget wikiPageRenderer
 		) {
@@ -47,12 +48,13 @@ public class CreateTermsOfUseAccessRequirementStep2 implements ModalPage, Create
 	 * Configure this widget before use.
 	 * 
 	 */
-	public void configure(TermsOfUseAccessRequirement accessRequirement) {
+	public void configure(AccessRequirement accessRequirement) {
 		this.accessRequirement = accessRequirement;
 		wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
-		boolean isExistOldTermsOfUse = accessRequirement.getTermsOfUse() != null;
+		String oldTerms = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
+		boolean isExistOldTermsOfUse = oldTerms != null;
 		view.setOldTermsVisible(isExistOldTermsOfUse);
-		view.setOldTerms(isExistOldTermsOfUse ? accessRequirement.getTermsOfUse() : "");
+		view.setOldTerms(isExistOldTermsOfUse ? oldTerms : "");
 				
 		configureWiki();
 	}
