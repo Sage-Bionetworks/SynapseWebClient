@@ -26,6 +26,9 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 	void setIsValidatedProfileRequired(boolean value);
 	void setSubjectsWidget(IsWidget w);
 	void setAccessRequirementUIVisible(boolean visible);
+	void setProjectedExpirationDateVisible(boolean visible);
+	void setProjectedExpirationDate(String date);
+	
 	public interface Presenter {
 		void onClearDateFilter();
 		void onClearStateFilter();

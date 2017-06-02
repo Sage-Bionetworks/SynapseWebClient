@@ -24,7 +24,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public class CreateTermsOfUseAccessRequirementStep2Test {
+public class CreateBasicAccessRequirementStep2Test {
 	
 	CreateBasicAccessRequirementStep2 widget;
 	@Mock

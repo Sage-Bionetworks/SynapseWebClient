@@ -10,6 +10,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmission;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
@@ -71,7 +72,7 @@ public class OpenSubmissionWidgetTest {
 
 	@Test
 	public void testLoadAccessRequirementSuccessWithACTAccessRequirement() {
-		ACTAccessRequirement actAccessRequirement = new ACTAccessRequirement();
+		ManagedACTAccessRequirement actAccessRequirement = new ManagedACTAccessRequirement();
 		AsyncMockStubber.callSuccessWith(actAccessRequirement).when(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		widget.loadAccessRequirement();
 		verify(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));

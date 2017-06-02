@@ -10,8 +10,10 @@ import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.Well;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateEvent;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateHandler;
@@ -85,6 +87,10 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	AnchorListItem backLink;
 	@UiField
 	TextBox expirationPeriodTextbox;
+	@UiField
+	Well expirationDateUI;
+	@UiField
+	Text expirationDate;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -265,5 +271,15 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	@Override
 	public void setExpirationPeriod(Long value) {
 		expirationPeriodTextbox.setValue(value.toString());
+	}
+	
+	@Override
+	public void setProjectedExpirationDate(String date) {
+		expirationDate.setText(date);
+	}
+	
+	@Override
+	public void setProjectedExpirationDateVisible(boolean visible) {
+		expirationDateUI.setVisible(visible);
 	}
 }

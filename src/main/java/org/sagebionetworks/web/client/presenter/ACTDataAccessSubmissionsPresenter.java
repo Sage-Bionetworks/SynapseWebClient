@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
@@ -63,6 +64,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	String nextPageToken;
 	private ManagedACTAccessRequirement actAccessRequirement;
 	private SubjectsWidget subjectsWidget;
+	private GWTWrapper gwt;
+	
 	@Inject
 	public ACTDataAccessSubmissionsPresenter(
 			final ACTDataAccessSubmissionsView view,
@@ -74,7 +77,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 			final Button showHideAccessRequirementButton,
 			FileHandleWidget ducTemplateFileHandleWidget,
 			DataAccessClientAsync dataAccessClient,
-			SubjectsWidget subjectsWidget
+			SubjectsWidget subjectsWidget,
+			GWTWrapper gwt
 			) {
 		this.view = view;
 		this.synAlert = synAlert;
@@ -86,6 +90,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		this.subjectsWidget = subjectsWidget;
 		this.globalAppState = globalAppState;
 		this.ducTemplateFileHandleWidget = ducTemplateFileHandleWidget;
+		this.gwt = gwt;
 		states = new ArrayList<String>();
 		for (SubmissionState state : SubmissionState.values()) {
 			states.add(state.toString());	
@@ -143,6 +148,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 			view.setSelectedMaxDate(toDate);
 		}
 		synAlert.clear();
+		view.setProjectedExpirationDateVisible(false);
 		if (actAccessRequirementIdString != null) {
 			actAccessRequirementId = Long.parseLong(actAccessRequirementIdString);
 			dataAccessClient.getAccessRequirement(actAccessRequirementId, new AsyncCallback<AccessRequirement>() {
@@ -154,6 +160,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				public void onSuccess(AccessRequirement requirement) {
 					if (requirement instanceof ManagedACTAccessRequirement) {
 						actAccessRequirement = (ManagedACTAccessRequirement) requirement;
+						refreshProjectedExpiration();
+						actAccessRequirement.getExpirationPeriod();
 						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
 							FileHandleAssociation fha = new FileHandleAssociation();
 							fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
@@ -184,6 +192,15 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		} else {
 			synAlert.showError(INVALID_AR_ID);
 		}
+	}
+	public void refreshProjectedExpiration() {
+		Long expirationPeriod = actAccessRequirement.getExpirationPeriod();
+		if (expirationPeriod != null && expirationPeriod > 0) {
+			Date expirationDate = new Date(new Date().getTime() + expirationPeriod);
+			view.setProjectedExpirationDate(gwt.getFormattedDateString(expirationDate));
+			view.setProjectedExpirationDateVisible(true);
+		}
+		
 	}
 	
 	public void loadData() {

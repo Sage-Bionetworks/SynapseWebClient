@@ -1,8 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.createaccessrequirement;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,29 +21,20 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
-import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateACTAccessRequirementStep2;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1View;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateBasicAccessRequirementStep2;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionStep2;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateResearchProjectStep1;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateResearchProjectWizardStep1View;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep2;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
-import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public class CreateAccessRequirementStep1Test {
 	
@@ -46,7 +42,7 @@ public class CreateAccessRequirementStep1Test {
 	@Mock
 	CreateAccessRequirementStep1View mockView;
 	@Mock
-	CreateACTAccessRequirementStep2 mockActStep2;
+	CreateManagedACTAccessRequirementStep2 mockActStep2;
 	@Mock
 	CreateBasicAccessRequirementStep2 mockTouStep2;
 	@Mock
@@ -55,7 +51,7 @@ public class CreateAccessRequirementStep1Test {
 	ModalPresenter mockModalPresenter;
 	
 	@Mock
-	ACTAccessRequirement mockACTAccessRequirement;
+	ManagedACTAccessRequirement mockACTAccessRequirement;
 	@Mock
 	TermsOfUseAccessRequirement mockTermsOfUseAccessRequirement;
 	

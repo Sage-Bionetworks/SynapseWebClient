@@ -37,8 +37,11 @@
 				<b:CheckBox ui:field="intendedDataUsePublicCheckbox"
 					text="Intended Data Use statements will be publicly available." enabled="false" />
 			</bh:Div>
-			
 		</b:Panel>
+		<b:Well size="SMALL" ui:field="expirationDateUI">
+			<bh:Text>If approved, access will expire on: </bh:Text>
+			<bh:Text ui:field="expirationDate"/>
+		</b:Well>
 		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10 light-border">
 			<bh:Div width="265px">
 				<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20 margin-top-10">

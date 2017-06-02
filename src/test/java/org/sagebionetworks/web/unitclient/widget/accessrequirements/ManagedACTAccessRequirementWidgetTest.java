@@ -17,7 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -25,27 +25,24 @@ import org.sagebionetworks.repo.model.dataaccess.ManagedACTAccessRequirementStat
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTRevokeUserAccessButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManageAccessButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
-import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -68,7 +65,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 	@Mock
 	CreateDataAccessRequestWizard mockCreateDataAccessRequestWizard;
 	@Mock
-	ACTAccessRequirement mockACTAccessRequirement;
+	ManagedACTAccessRequirement mockACTAccessRequirement;
 	@Mock
 	CreateAccessRequirementButton mockCreateAccessRequirementButton;
 	@Mock
@@ -92,10 +89,6 @@ public class ManagedACTAccessRequirementWidgetTest {
 	@Mock
 	UserBadge mockSubmitterUserBadge;
 	@Mock
-	JiraURLHelper mockJiraURLHelper;
-	@Mock
-	PopupUtilsView mockPopupUtils;
-	@Mock
 	UserSessionData mockUserSessionData;
 	@Mock
 	UserProfile mockProfile;
@@ -110,7 +103,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new ManagedACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockRevokeUserAccessButton, mockManageAccessButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockSubmitterUserBadge, mockJiraURLHelper, mockPopupUtils);
+		widget = new ManagedACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockRevokeUserAccessButton, mockManageAccessButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockSubmitterUserBadge);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
@@ -135,26 +128,9 @@ public class ManagedACTAccessRequirementWidgetTest {
 	}
 
 	@Test
-	public void testSetRequirementWithContactInfoTerms() {
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
-		String tou = "must do things before access is allowed";
-		when(mockACTAccessRequirement.getActContactInfo()).thenReturn(tou);
-		widget.setRequirement(mockACTAccessRequirement);
-		verify(mockView).setTerms(tou);
-		verify(mockView).showTermsUI();
-		verify(mockCreateAccessRequirementButton).configure(mockACTAccessRequirement);
-		verify(mockDeleteAccessRequirementButton).configure(mockACTAccessRequirement);
-		verify(mockManageAccessButton).configure(mockACTAccessRequirement);
-		boolean isHideIfLoadError = true;
-		verify(mockSubjectsWidget).configure(mockSubjectIds, isHideIfLoadError);
-		verify(mockLazyLoadHelper).setIsConfigured();
-	}
-	@Test
 	public void testSetRequirementWithWikiTerms() {
 		widget.setRequirement(mockACTAccessRequirement);
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class), eq(false));
-		verify(mockView, never()).setTerms(anyString());
-		verify(mockView, never()).showTermsUI();
 	}
 	
 	@Test
@@ -184,47 +160,11 @@ public class ManagedACTAccessRequirementWidgetTest {
 	@Test
 	public void testApprovedState() {
 		widget.setRequirement(mockACTAccessRequirement);
-		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(true);
 		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.APPROVED);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();
 		verify(mockView).showRequestApprovedMessage();
 		verify(mockView).showUpdateRequestButton();
-	}
-	
-	@Test
-	public void testApprovedStateNoDataAccessRequest() {
-		widget.setRequirement(mockACTAccessRequirement);
-		when(mockDataAccessSubmissionStatus.getCurrentSubmissionStatus()).thenReturn(null);
-		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(false);
-		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
-		lazyLoadDataCallback.invoke();
-		verify(mockView).showApprovedHeading();
-		verify(mockView).showRequestApprovedMessage();
-		verify(mockView, never()).showUpdateRequestButton();
-	}
-	
-	@Test
-	public void testUnApprovedStateNoDataAccessRequest() {
-		widget.setRequirement(mockACTAccessRequirement);
-		when(mockDataAccessSubmissionStatus.getCurrentSubmissionStatus()).thenReturn(null);
-		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(false);
-		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
-		lazyLoadDataCallback.invoke();
-		verify(mockView).showUnapprovedHeading();
-		verify(mockView, never()).showRequestAccessButton();
-	}
-	
-	@Test
-	public void testUnApprovedStateNoDataAccessRequestWithOpenJiraIssue() {
-		widget.setRequirement(mockACTAccessRequirement);
-		when(mockDataAccessSubmissionStatus.getCurrentSubmissionStatus()).thenReturn(null);
-		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(false);
-		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(true);
-		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
-		lazyLoadDataCallback.invoke();
-		verify(mockView).showUnapprovedHeading();
-		verify(mockView).showRequestAccessButton();
 	}
 	
 	@Test
@@ -242,7 +182,6 @@ public class ManagedACTAccessRequirementWidgetTest {
 	@Test
 	public void testCancelledState() {
 		widget.setRequirement(mockACTAccessRequirement);
-		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(true);
 		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.CANCELLED);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showUnapprovedHeading();
@@ -289,7 +228,6 @@ public class ManagedACTAccessRequirementWidgetTest {
 	@Test
 	public void testRequestAccess() {
 		when(mockDataAccessSubmissionStatus.getCurrentSubmissionStatus()).thenReturn(null);
-		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(true);
 		widget.setRequirement(mockACTAccessRequirement);
 		lazyLoadDataCallback.invoke();
 		
@@ -297,19 +235,4 @@ public class ManagedACTAccessRequirementWidgetTest {
 		verify(mockCreateDataAccessRequestWizard).configure(mockACTAccessRequirement);
 		verify(mockCreateDataAccessRequestWizard).showModal(any(WizardCallback.class));
 	}
-	
-	@Test
-	public void testRequestAccessNoDataAccessRequest() {
-		when(mockDataAccessSubmissionStatus.getCurrentSubmissionStatus()).thenReturn(null);
-		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(false);
-		widget.setRequirement(mockACTAccessRequirement);
-		lazyLoadDataCallback.invoke();
-		String requestAccessURLString = "requestAccessURLString";
-		when(mockJiraURLHelper.createRequestAccessIssue(any(String.class),any(String.class),any(String.class),any(String.class),any(String.class))).thenReturn(requestAccessURLString);
-		
-		widget.onRequestAccess();
-		
-		verify(mockPopupUtils).openInNewWindow(requestAccessURLString);
-	}
-
 }

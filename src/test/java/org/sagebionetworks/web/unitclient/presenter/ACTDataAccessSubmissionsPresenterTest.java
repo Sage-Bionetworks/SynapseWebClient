@@ -23,7 +23,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
@@ -32,6 +32,7 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
@@ -78,7 +79,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	DataAccessClientAsync mockDataAccessClient;
 	
 	@Mock
-	ACTAccessRequirement mockACTAccessRequirement;
+	ManagedACTAccessRequirement mockACTAccessRequirement;
 	@Mock
 	SubmissionPage mockDataAccessSubmissionPage;
 	@Mock
@@ -91,6 +92,8 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	SubjectsWidget mockSubjectsWidget;
 	@Mock
 	List<RestrictableObjectDescriptor> mockSubjects;
+	@Mock
+	GWTWrapper mockGWT;
 	public static final String FILE_HANDLE_ID = "9999";
 	public static final Long AR_ID = 76555L;
 	public static final String NEXT_PAGE_TOKEN = "abc678";
@@ -98,7 +101,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockGlobalApplicationState, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockDataAccessClient, mockSubjectsWidget);
+		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockGlobalApplicationState, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockDataAccessClient, mockSubjectsWidget, mockGWT);
 		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionPage).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 		when(mockDataAccessSubmissionPage.getResults()).thenReturn(Collections.singletonList(mockDataAccessSubmission));

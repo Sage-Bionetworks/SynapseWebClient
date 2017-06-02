@@ -23,6 +23,7 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.Renewal;
 import org.sagebionetworks.repo.model.dataaccess.Request;
 import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
@@ -100,7 +101,7 @@ public class CreateDataAccessSubmissionStep2Test {
 	@Mock
 	ResearchProject mockResearchProject;
 	@Mock
-	ACTAccessRequirement mockACTAccessRequirement;
+	ManagedACTAccessRequirement mockACTAccessRequirement;
 	
 	@Mock
 	List<String> mockAccessorUserIds;

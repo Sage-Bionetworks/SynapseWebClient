@@ -114,7 +114,9 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	
 	public void showUnapproved() {
 		view.showUnapprovedHeading();
-		view.showRequestAccessButton();
+		if (ar.getOpenJiraIssue()) {
+			view.showRequestAccessButton();	
+		}
 	}
 	
 	public void showApproved() {
