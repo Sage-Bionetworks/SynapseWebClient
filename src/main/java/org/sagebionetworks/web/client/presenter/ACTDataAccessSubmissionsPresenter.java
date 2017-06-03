@@ -38,6 +38,8 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
@@ -64,8 +66,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	String nextPageToken;
 	private ManagedACTAccessRequirement actAccessRequirement;
 	private SubjectsWidget subjectsWidget;
-	private GWTWrapper gwt;
-	
+	DateTimeFormat dateFormat;
 	@Inject
 	public ACTDataAccessSubmissionsPresenter(
 			final ACTDataAccessSubmissionsView view,
@@ -90,7 +91,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		this.subjectsWidget = subjectsWidget;
 		this.globalAppState = globalAppState;
 		this.ducTemplateFileHandleWidget = ducTemplateFileHandleWidget;
-		this.gwt = gwt;
+		dateFormat = gwt.getDateTimeFormat(PredefinedFormat.DATE_FULL);
 		states = new ArrayList<String>();
 		for (SubmissionState state : SubmissionState.values()) {
 			states.add(state.toString());	
@@ -197,7 +198,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		Long expirationPeriod = actAccessRequirement.getExpirationPeriod();
 		if (expirationPeriod != null && expirationPeriod > 0) {
 			Date expirationDate = new Date(new Date().getTime() + expirationPeriod);
-			view.setProjectedExpirationDate(gwt.getFormattedDateString(expirationDate));
+			view.setProjectedExpirationDate(dateFormat.format(expirationDate));
 			view.setProjectedExpirationDateVisible(true);
 		}
 		

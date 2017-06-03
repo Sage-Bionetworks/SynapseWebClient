@@ -34,6 +34,8 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	FormGroup arTypeUI;
 	
 	@UiField
+	Radio managedActTypeButton;
+	@UiField
 	Radio actTypeButton;
 	@UiField
 	Radio termsOfUseButton;
@@ -126,6 +128,10 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	@Override
 	public boolean isACTAccessRequirementType() {
 		return actTypeButton.getValue();
+	}
+	@Override
+	public boolean isManagedACTAccessRequirementType() {
+		return managedActTypeButton.getValue();
 	}
 	
 	@Override

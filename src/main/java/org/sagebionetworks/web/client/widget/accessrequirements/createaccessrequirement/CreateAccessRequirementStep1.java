@@ -133,6 +133,9 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 		if (accessRequirement == null) {
 			if (view.isACTAccessRequirementType()) {
 				accessRequirement = new ACTAccessRequirement();
+				((ACTAccessRequirement)accessRequirement).setOpenJiraIssue(true);
+			} else if (view.isManagedACTAccessRequirementType()) {
+				accessRequirement = new ManagedACTAccessRequirement();
 			} else {
 				accessRequirement = new TermsOfUseAccessRequirement();
 			}
