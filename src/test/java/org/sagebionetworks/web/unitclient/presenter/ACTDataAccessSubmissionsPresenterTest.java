@@ -7,6 +7,7 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.ACCESS_REQUIREMENT_ID_PARAM;
@@ -15,6 +16,7 @@ import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace
 import static org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter.SHOW_AR_TEXT;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -23,7 +25,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
@@ -32,6 +34,7 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
@@ -41,13 +44,15 @@ import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -69,7 +74,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	@Mock
 	LoadMoreWidgetContainer mockLoadMoreContainer;
 	@Mock
-	ACTAccessRequirementWidget mockACTAccessRequirementWidget;
+	ManagedACTAccessRequirementWidget mockACTAccessRequirementWidget;
 	@Mock
 	Button mockButton;
 	@Mock
@@ -78,7 +83,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	DataAccessClientAsync mockDataAccessClient;
 	
 	@Mock
-	ACTAccessRequirement mockACTAccessRequirement;
+	ManagedACTAccessRequirement mockACTAccessRequirement;
 	@Mock
 	SubmissionPage mockDataAccessSubmissionPage;
 	@Mock
@@ -91,6 +96,10 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	SubjectsWidget mockSubjectsWidget;
 	@Mock
 	List<RestrictableObjectDescriptor> mockSubjects;
+	@Mock
+	GWTWrapper mockGWT;
+	@Mock
+	DateTimeFormat mockDateTimeFormat;
 	public static final String FILE_HANDLE_ID = "9999";
 	public static final Long AR_ID = 76555L;
 	public static final String NEXT_PAGE_TOKEN = "abc678";
@@ -98,7 +107,8 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockGlobalApplicationState, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockDataAccessClient, mockSubjectsWidget);
+		when(mockGWT.getDateTimeFormat(any(PredefinedFormat.class))).thenReturn(mockDateTimeFormat);
+		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockGlobalApplicationState, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockDataAccessClient, mockSubjectsWidget, mockGWT);
 		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionPage).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 		when(mockDataAccessSubmissionPage.getResults()).thenReturn(Collections.singletonList(mockDataAccessSubmission));
@@ -176,6 +186,23 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		presenter.loadMore();
 		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq(NEXT_PAGE_TOKEN), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockLoadMoreContainer).setIsMore(false);
+		verify(mockView).setProjectedExpirationDateVisible(false);
+		verify(mockView, never()).setProjectedExpirationDateVisible(true);
+	}
+	
+
+	@Test
+	public void testProjectedExpiration() {
+		String formattedDateTime = "In the future";
+		when(mockDateTimeFormat.format(any(Date.class))).thenReturn(formattedDateTime);
+		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID.toString());
+		
+		Long expirationPeriod = 1111L;
+		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(expirationPeriod);
+		presenter.setPlace(mockPlace);
+		verify(mockView).setProjectedExpirationDateVisible(false);
+		verify(mockView).setProjectedExpirationDateVisible(true);
+		verify(mockView).setProjectedExpirationDate(formattedDateTime);
 	}
 	
 	@Test

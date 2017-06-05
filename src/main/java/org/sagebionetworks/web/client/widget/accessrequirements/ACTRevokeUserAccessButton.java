@@ -3,9 +3,8 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ACTAccessRequirementInterface;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
@@ -24,7 +23,7 @@ public class ACTRevokeUserAccessButton implements IsWidget {
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	public PortalGinInjector ginInjector;
 	RestrictableObjectDescriptor subject;
-	ACTAccessRequirement ar;
+	ACTAccessRequirementInterface ar;
 	
 	@Inject
 	public ACTRevokeUserAccessButton(Button button, 
@@ -47,7 +46,7 @@ public class ACTRevokeUserAccessButton implements IsWidget {
 		});
 	}	
 	
-	public void configure(ACTAccessRequirement ar) {
+	public void configure(ACTAccessRequirementInterface ar) {
 		this.ar = ar;
 		showIfACTMember();
 	}

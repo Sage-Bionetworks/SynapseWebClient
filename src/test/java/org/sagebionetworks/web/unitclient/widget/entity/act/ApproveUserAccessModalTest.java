@@ -1,5 +1,26 @@
 package org.sagebionetworks.web.unitclient.widget.entity.act;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.APPROVED_USER;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.APPROVE_BUT_FAIL_TO_EMAIL;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.EMAIL_SENT;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.MESSAGE_BLANK;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.NO_EMAIL_MESSAGE;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.NO_USER_SELECTED;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.QUERY_CANCELLED;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.REVOKED_USER;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -7,16 +28,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Mockito.*;
-
-import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.*;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.sagebionetworks.repo.model.ACTAccessApproval;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.Entity;
@@ -268,7 +279,7 @@ public class ApproveUserAccessModalTest {
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
-		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
+		verify(mockSynapseClient).createAccessApproval(any(AccessApproval.class), aaCaptor.capture());
 		aaCaptor.getValue().onFailure(ex);
 		verify(mockSynAlert).handleException(ex);
 	}
@@ -286,7 +297,7 @@ public class ApproveUserAccessModalTest {
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
-		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
+		verify(mockSynapseClient).createAccessApproval(any(AccessApproval.class), aaCaptor.capture());
 		aaCaptor.getValue().onSuccess(mockAccessApproval);
 		verify(mockSynapseClient).sendMessage(anySetOf(String.class), anyString(), anyString(), anyString(), sCaptor.capture());
 	}
@@ -305,7 +316,7 @@ public class ApproveUserAccessModalTest {
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
-		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
+		verify(mockSynapseClient).createAccessApproval(any(AccessApproval.class), aaCaptor.capture());
 		aaCaptor.getValue().onSuccess(mockAccessApproval);
 		
 		verify(mockSynapseClient).sendMessage(anySetOf(String.class), anyString(), anyString(), anyString(), sCaptor.capture());
@@ -329,7 +340,7 @@ public class ApproveUserAccessModalTest {
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
-		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
+		verify(mockSynapseClient).createAccessApproval(any(AccessApproval.class), aaCaptor.capture());
 		aaCaptor.getValue().onSuccess(mockAccessApproval);
 		
 		verify(mockSynapseClient).sendMessage(anySetOf(String.class), anyString(), anyString(), anyString(), sCaptor.capture());

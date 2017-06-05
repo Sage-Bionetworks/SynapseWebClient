@@ -2,10 +2,9 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
-import org.sagebionetworks.repo.model.dataaccess.TermsOfUseAccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -93,7 +92,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		lazyLoadHelper.setIsConfigured();
 	}
 	
-	public void setDataAccessSubmissionStatus(TermsOfUseAccessRequirementStatus status) {
+	public void setDataAccessSubmissionStatus(BasicAccessRequirementStatus status) {
 		// set up view based on DataAccessSubmission state
 		view.resetState();
 		if (status.getIsApproved()) {
@@ -113,7 +112,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			}
 			@Override
 			public void onSuccess(AccessRequirementStatus status) {
-				setDataAccessSubmissionStatus((TermsOfUseAccessRequirementStatus)status);
+				setDataAccessSubmissionStatus((BasicAccessRequirementStatus)status);
 			}
 		});
 	}
@@ -132,7 +131,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 				refreshApprovalState();
 			}
 		};
-		TermsOfUseAccessApproval approval = new TermsOfUseAccessApproval();
+		AccessApproval approval = new AccessApproval();
 		approval.setAccessorId(authController.getCurrentUserPrincipalId());
 		approval.setRequirementId(ar.getId());
 		synapseClient.createAccessApproval(approval, callback);

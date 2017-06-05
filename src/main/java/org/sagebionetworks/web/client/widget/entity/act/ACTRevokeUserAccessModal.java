@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ACTAccessRequirementInterface;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -24,7 +24,7 @@ public class ACTRevokeUserAccessModal implements RevokeUserAccessModalView.Prese
 	private SynapseAlert synAlert;
 	private SynapseSuggestBox peopleSuggestWidget;
 	private SynapseClientAsync synapseClient;
-	private ACTAccessRequirement ar;
+	private ACTAccessRequirementInterface ar;
 	@Inject
 	public ACTRevokeUserAccessModal(RevokeUserAccessModalView view,
 			SynapseAlert synAlert,
@@ -48,7 +48,7 @@ public class ACTRevokeUserAccessModal implements RevokeUserAccessModalView.Prese
 		});
 	}
 
-	public void configure(ACTAccessRequirement ar) {
+	public void configure(ACTAccessRequirementInterface ar) {
 		this.ar = ar;
 		synAlert.clear();
 		view.show();

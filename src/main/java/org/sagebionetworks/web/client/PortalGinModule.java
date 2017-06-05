@@ -106,14 +106,16 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequire
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateACTAccessRequirementStep2View;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateACTAccessRequirementStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1View;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1ViewImpl;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateTermsOfUseAccessRequirementStep2View;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateTermsOfUseAccessRequirementStep2ViewImpl;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateBasicAccessRequirementStep2View;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateBasicAccessRequirementStep2ViewImpl;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep2View;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionWizardStep2View;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionWizardStep2ViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateResearchProjectWizardStep1View;
@@ -1385,14 +1387,15 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ViewDefaultColumns.class).in(Singleton.class);
 		bind(SubscribersWidgetView.class).to(SubscribersWidgetViewImpl.class);
 		bind(PlaceView.class).to(PlaceViewImpl.class);
+		bind(ManagedACTAccessRequirementWidgetView.class).to(ManagedACTAccessRequirementWidgetViewImpl.class);
 		bind(ACTAccessRequirementWidgetView.class).to(ACTAccessRequirementWidgetViewImpl.class);
 		bind(TermsOfUseAccessRequirementWidgetView.class).to(TermsOfUseAccessRequirementWidgetViewImpl.class);
 		bind(CreateResearchProjectWizardStep1View.class).to(CreateResearchProjectWizardStep1ViewImpl.class);
 		bind(CreateDataAccessSubmissionWizardStep2View.class).to(CreateDataAccessSubmissionWizardStep2ViewImpl.class);
 		bind(FileHandleWidgetView.class).to(FileHandleWidgetViewImpl.class);
 		bind(CreateAccessRequirementStep1View.class).to(CreateAccessRequirementStep1ViewImpl.class);
-		bind(CreateACTAccessRequirementStep2View.class).to(CreateACTAccessRequirementStep2ViewImpl.class);
-		bind(CreateTermsOfUseAccessRequirementStep2View.class).to(CreateTermsOfUseAccessRequirementStep2ViewImpl.class);
+		bind(CreateManagedACTAccessRequirementStep2View.class).to(CreateManagedACTAccessRequirementStep2ViewImpl.class);
+		bind(CreateBasicAccessRequirementStep2View.class).to(CreateBasicAccessRequirementStep2ViewImpl.class);
 		bind(Button.class).to(ButtonImpl.class);
 
 		bind(IsACTMemberAsyncHandlerImpl.class).in(Singleton.class);

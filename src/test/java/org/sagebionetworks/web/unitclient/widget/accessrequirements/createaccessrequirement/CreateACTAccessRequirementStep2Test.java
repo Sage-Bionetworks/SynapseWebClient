@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.createaccessrequirement;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,16 +14,16 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateACTAccessRequirementStep2;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateACTAccessRequirementStep2View;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep2;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep2View;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
@@ -34,12 +38,12 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 public class CreateACTAccessRequirementStep2Test {
 	
-	CreateACTAccessRequirementStep2 widget;
+	CreateManagedACTAccessRequirementStep2 widget;
 	@Mock
 	ModalPresenter mockModalPresenter;
 	
 	@Mock
-	CreateACTAccessRequirementStep2View mockView;
+	CreateManagedACTAccessRequirementStep2View mockView;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
@@ -47,7 +51,7 @@ public class CreateACTAccessRequirementStep2Test {
 	@Mock
 	WikiPageWidget mockWikiPageRenderer;
 	@Mock
-	ACTAccessRequirement mockACTAccessRequirement;
+	ManagedACTAccessRequirement mockACTAccessRequirement;
 	@Mock
 	FileHandleUploadWidget mockDucTemplateUploader;
 	@Mock
@@ -71,7 +75,7 @@ public class CreateACTAccessRequirementStep2Test {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new CreateACTAccessRequirementStep2(mockView, mockSynapseClient, mockWikiMarkdownEditor, mockWikiPageRenderer, mockDucTemplateUploader, mockDucTemplateFileHandleWidget);
+		widget = new CreateManagedACTAccessRequirementStep2(mockView, mockSynapseClient, mockWikiMarkdownEditor, mockWikiPageRenderer, mockDucTemplateUploader, mockDucTemplateFileHandleWidget);
 		widget.setModalPresenter(mockModalPresenter);
 		when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
 		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockSynapseClient).createOrUpdateAccessRequirement(any(AccessRequirement.class), any(AsyncCallback.class));
@@ -110,27 +114,6 @@ public class CreateACTAccessRequirementStep2Test {
 	}
 	
 	@Test
-	public void testHasRequestUI() {
-		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(true);
-		widget.configure(mockACTAccessRequirement);
-		verify(mockView).showHasRequestUI(true);
-	}
-	
-	@Test
-	public void testNoRequestUI() {
-		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(false);
-		widget.configure(mockACTAccessRequirement);
-		verify(mockView).showHasRequestUI(false);
-	}
-
-	@Test
-	public void testNullRequest() {
-		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(null);
-		widget.configure(mockACTAccessRequirement);
-		verify(mockView).showHasRequestUI(false);
-	}
-	
-	@Test
 	public void testConfigureWithWiki() {
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		
@@ -139,7 +122,7 @@ public class CreateACTAccessRequirementStep2Test {
 		Long newExpirationPeriodDays = 365L;
 		String newExpirationPeriodDaysString = newExpirationPeriodDays.toString();
 		when(mockView.getExpirationPeriod()).thenReturn(newExpirationPeriodDaysString);
-		Long expirationPeriodMs = expirationPeriodDays * CreateACTAccessRequirementStep2.DAY_IN_MS;
+		Long expirationPeriodMs = expirationPeriodDays * CreateManagedACTAccessRequirementStep2.DAY_IN_MS;
 		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(expirationPeriodMs);
 		when(mockACTAccessRequirement.getIsCertifiedUserRequired()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(false);
@@ -147,8 +130,6 @@ public class CreateACTAccessRequirementStep2Test {
 		when(mockACTAccessRequirement.getIsIRBApprovalRequired()).thenReturn(false);
 		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
 		widget.configure(mockACTAccessRequirement);
-		verify(mockView).setOldTermsVisible(false);
-		verify(mockView).setOldTerms("");
 		verify(mockWikiPageRenderer).configure(wikiPageKeyCaptor.capture(), eq(false), eq((WikiPageWidget.Callback)null), eq(false));
 		WikiPageKey key = wikiPageKeyCaptor.getValue();
 		assertEquals(AR_ID.toString(), key.getOwnerObjectId());
@@ -174,63 +155,21 @@ public class CreateACTAccessRequirementStep2Test {
 		// on edit of wiki
 		widget.onEditWiki();
 		verify(mockWikiMarkdownEditor).configure(eq(key), any(CallbackP.class));
-		when(mockView.getHasRequests()).thenReturn(true);
 		
 		//on finish
 		widget.onPrimary();
 
 		// verify access requirement was updated from the view (view value responses configured in the the test setUp()
 		verify(mockACTAccessRequirement).setAreOtherAttachmentsRequired(false);
-		verify(mockACTAccessRequirement).setExpirationPeriod(newExpirationPeriodDays * CreateACTAccessRequirementStep2.DAY_IN_MS);
+		verify(mockACTAccessRequirement).setExpirationPeriod(newExpirationPeriodDays * CreateManagedACTAccessRequirementStep2.DAY_IN_MS);
 		verify(mockACTAccessRequirement).setIsCertifiedUserRequired(false);
 		verify(mockACTAccessRequirement).setIsDUCRequired(false);
 		verify(mockACTAccessRequirement).setIsIDUPublic(false);
 		verify(mockACTAccessRequirement).setIsIRBApprovalRequired(false);
 		verify(mockACTAccessRequirement).setIsValidatedProfileRequired(false);
-		verify(mockACTAccessRequirement).setAcceptRequest(true);
 		verify(mockModalPresenter).onFinished();
 	}
-	
-	@Test
-	public void testConfigureWithOldTermsOfUse() {
-		String tou = "these are the old conditions";
-		when(mockACTAccessRequirement.getActContactInfo()).thenReturn(tou);
-		widget.configure(mockACTAccessRequirement);
-		verify(mockView).setOldTermsVisible(true);
-		verify(mockView).setOldTerms(tou);
-		verify(mockWikiPageRenderer).configure(wikiPageKeyCaptor.capture(), eq(false), eq((WikiPageWidget.Callback)null), eq(false));
-		WikiPageKey key = wikiPageKeyCaptor.getValue();
-		assertEquals(AR_ID.toString(), key.getOwnerObjectId());
-		assertEquals(ObjectType.ACCESS_REQUIREMENT.toString(), key.getOwnerObjectType());
-		
-		// on edit of wiki
-		widget.onEditWiki();
-		verify(mockWikiMarkdownEditor).configure(eq(key), any(CallbackP.class));
-		
-		//on finish, it should clear out the old terms of use
-		widget.onPrimary();
-		verify(mockModalPresenter).setLoading(true);
-		verify(mockModalPresenter).setLoading(false);
-		verify(mockModalPresenter, never()).setErrorMessage(anyString());
-		verify(mockModalPresenter).onFinished();
-	}
-	
-	@Test
-	public void testConfigureWithOldTermsOfUseFailureToSave() {
-		String tou = "these are the old conditions";
-		when(mockACTAccessRequirement.getActContactInfo()).thenReturn(tou);
-		widget.configure(mockACTAccessRequirement);
-		
-		//on finish, it should try to clear out the old terms of use
-		String error = "error message";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).createOrUpdateAccessRequirement(any(AccessRequirement.class), any(AsyncCallback.class));
-		widget.onPrimary();
-		verify(mockModalPresenter).setLoading(true);
-		verify(mockModalPresenter).setLoading(false);
-		verify(mockModalPresenter).setErrorMessage(error);
-		verify(mockModalPresenter, never()).onFinished();
-	}
-	
+
 	@Test
 	public void testInvalidExpirationPeriod() {
 		String newExpirationPeriodDaysString = "20.2345";

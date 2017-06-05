@@ -14,9 +14,9 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class CreateTermsOfUseAccessRequirementStep2ViewImpl implements CreateTermsOfUseAccessRequirementStep2View {
+public class CreateBasicAccessRequirementStep2ViewImpl implements CreateBasicAccessRequirementStep2View {
 
-	public interface Binder extends UiBinder<Widget, CreateTermsOfUseAccessRequirementStep2ViewImpl> {}
+	public interface Binder extends UiBinder<Widget, CreateBasicAccessRequirementStep2ViewImpl> {}
 	
 	Widget widget;
 	@UiField
@@ -31,7 +31,7 @@ public class CreateTermsOfUseAccessRequirementStep2ViewImpl implements CreateTer
 	Presenter presenter;
 	
 	@Inject
-	public CreateTermsOfUseAccessRequirementStep2ViewImpl(Binder binder){
+	public CreateBasicAccessRequirementStep2ViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
 		editWikiButton.addClickHandler(new ClickHandler() {
 			@Override

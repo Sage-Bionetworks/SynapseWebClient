@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.Renewal;
 import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -46,7 +46,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	CreateDataAccessSubmissionWizardStep2View view;
 	PortalGinInjector ginInjector;
 	DataAccessClientAsync client;
-	ACTAccessRequirement ar;
+	ManagedACTAccessRequirement ar;
 	ModalPresenter modalPresenter;
 	ResearchProject researchProject;
 	FileHandleWidget templateFileRenderer;
@@ -152,7 +152,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	/**
 	 * Configure this widget before use.
 	 */
-	public void configure(ResearchProject researchProject, ACTAccessRequirement ar) {
+	public void configure(ResearchProject researchProject, ManagedACTAccessRequirement ar) {
 		this.ar = ar;
 		this.researchProject = researchProject;
 		view.setIRBVisible(ValidationUtils.isTrue(ar.getIsIRBApprovalRequired()));

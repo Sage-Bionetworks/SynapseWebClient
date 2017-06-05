@@ -15,8 +15,8 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateTermsOfUseAccessRequirementStep2;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateTermsOfUseAccessRequirementStep2View;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateBasicAccessRequirementStep2;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateBasicAccessRequirementStep2View;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
@@ -24,14 +24,14 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public class CreateTermsOfUseAccessRequirementStep2Test {
+public class CreateBasicAccessRequirementStep2Test {
 	
-	CreateTermsOfUseAccessRequirementStep2 widget;
+	CreateBasicAccessRequirementStep2 widget;
 	@Mock
 	ModalPresenter mockModalPresenter;
 	
 	@Mock
-	CreateTermsOfUseAccessRequirementStep2View mockView;
+	CreateBasicAccessRequirementStep2View mockView;
 	@Mock
 	WikiMarkdownEditor mockWikiMarkdownEditor;
 	@Mock
@@ -44,7 +44,7 @@ public class CreateTermsOfUseAccessRequirementStep2Test {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new CreateTermsOfUseAccessRequirementStep2(mockView, mockWikiMarkdownEditor, mockWikiPageRenderer);
+		widget = new CreateBasicAccessRequirementStep2(mockView, mockWikiMarkdownEditor, mockWikiPageRenderer);
 		widget.setModalPresenter(mockModalPresenter);
 		when(mockTermsOfUseAccessRequirement.getId()).thenReturn(AR_ID);
 	}

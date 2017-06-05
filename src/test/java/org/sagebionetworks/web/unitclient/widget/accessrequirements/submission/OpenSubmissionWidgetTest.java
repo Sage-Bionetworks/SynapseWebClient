@@ -10,11 +10,12 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmission;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.OpenSubmissionWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -33,7 +34,7 @@ public class OpenSubmissionWidgetTest {
 	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
 	@Mock
-	ACTAccessRequirementWidget mockAccessRequirementWidget;
+	ManagedACTAccessRequirementWidget mockAccessRequirementWidget;
 
 	OpenSubmissionWidget widget;
 
@@ -71,7 +72,7 @@ public class OpenSubmissionWidgetTest {
 
 	@Test
 	public void testLoadAccessRequirementSuccessWithACTAccessRequirement() {
-		ACTAccessRequirement actAccessRequirement = new ACTAccessRequirement();
+		ManagedACTAccessRequirement actAccessRequirement = new ManagedACTAccessRequirement();
 		AsyncMockStubber.callSuccessWith(actAccessRequirement).when(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		widget.loadAccessRequirement();
 		verify(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
