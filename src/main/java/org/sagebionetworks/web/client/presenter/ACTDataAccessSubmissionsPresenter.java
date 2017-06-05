@@ -162,7 +162,6 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 					if (requirement instanceof ManagedACTAccessRequirement) {
 						actAccessRequirement = (ManagedACTAccessRequirement) requirement;
 						refreshProjectedExpiration();
-						actAccessRequirement.getExpirationPeriod();
 						if (actAccessRequirement.getDucTemplateFileHandleId() != null) {
 							FileHandleAssociation fha = new FileHandleAssociation();
 							fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
