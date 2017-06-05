@@ -37,11 +37,6 @@ public class IsACTMemberAsyncHandlerImpl implements IsACTMemberAsyncHandler {
 	
 	@Override
 	public void isACTMember(final CallbackP<Boolean> callback) {
-		if (true) {
-			callback.invoke(true);
-			return;
-		}
-		
 		if (!authController.isLoggedIn()) {
 			callback.invoke(false);
 			return;
