@@ -7,6 +7,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
@@ -28,8 +29,8 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	CreateAccessRequirementStep1View view;
 	List<RestrictableObjectDescriptor> subjects;
 	ModalPresenter modalPresenter;
-	CreateACTAccessRequirementStep2 actStep2;
-	CreateTermsOfUseAccessRequirementStep2 touStep2;
+	CreateManagedACTAccessRequirementStep2 actStep2;
+	CreateBasicAccessRequirementStep2 basicStep2;
 	ACCESS_TYPE currentAccessType;
 	AccessRequirement accessRequirement;
 	SynapseClientAsync synapseClient;
@@ -38,14 +39,14 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	@Inject
 	public CreateAccessRequirementStep1(
 			CreateAccessRequirementStep1View view,
-			CreateACTAccessRequirementStep2 actStep2,
-			CreateTermsOfUseAccessRequirementStep2 touStep2,
+			CreateManagedACTAccessRequirementStep2 actStep2,
+			CreateBasicAccessRequirementStep2 touStep2,
 			SynapseClientAsync synapseClient,
 			SubjectsWidget subjectsWidget) {
 		super();
 		this.view = view;
 		this.actStep2 = actStep2;
-		this.touStep2 = touStep2;
+		this.basicStep2 = touStep2;
 		this.subjectsWidget = subjectsWidget;
 		this.synapseClient = synapseClient;
 		view.setSubjects(subjectsWidget);
@@ -132,6 +133,9 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 		if (accessRequirement == null) {
 			if (view.isACTAccessRequirementType()) {
 				accessRequirement = new ACTAccessRequirement();
+				((ACTAccessRequirement)accessRequirement).setOpenJiraIssue(true);
+			} else if (view.isManagedACTAccessRequirementType()) {
+				accessRequirement = new ManagedACTAccessRequirement();
 			} else {
 				accessRequirement = new TermsOfUseAccessRequirement();
 			}
@@ -149,12 +153,12 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 			@Override
 			public void onSuccess(AccessRequirement accessRequirement) {
 				modalPresenter.setLoading(false);
-				if (accessRequirement instanceof ACTAccessRequirement) {
-					actStep2.configure((ACTAccessRequirement)accessRequirement);
+				if (accessRequirement instanceof ManagedACTAccessRequirement) {
+					actStep2.configure((ManagedACTAccessRequirement)accessRequirement);
 					modalPresenter.setNextActivePage(actStep2);
 				} else {
-					touStep2.configure((TermsOfUseAccessRequirement)accessRequirement);
-					modalPresenter.setNextActivePage(touStep2);
+					basicStep2.configure(accessRequirement);
+					modalPresenter.setNextActivePage(basicStep2);
 				}		
 			}
 		});

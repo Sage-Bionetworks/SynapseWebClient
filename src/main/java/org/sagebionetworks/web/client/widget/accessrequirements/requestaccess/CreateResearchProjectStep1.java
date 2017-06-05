@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -19,7 +20,7 @@ import com.google.inject.Inject;
 public class CreateResearchProjectStep1 implements ModalPage {
 	CreateResearchProjectWizardStep1View view;
 	DataAccessClientAsync client;
-	ACTAccessRequirement ar;
+	ManagedACTAccessRequirement ar;
 	ModalPresenter modalPresenter;
 	CreateDataAccessSubmissionStep2 step2;
 	ResearchProject researchProject;
@@ -40,7 +41,7 @@ public class CreateResearchProjectStep1 implements ModalPage {
 	 * 
 	 * @param parentId
 	 */
-	public void configure(ACTAccessRequirement ar) {
+	public void configure(ManagedACTAccessRequirement ar) {
 		this.ar = ar;
 		view.setIDUPublicNoteVisible(ar.getIsIDUPublic());
 		client.getResearchProject(ar.getId(), new AsyncCallback<ResearchProject>() {

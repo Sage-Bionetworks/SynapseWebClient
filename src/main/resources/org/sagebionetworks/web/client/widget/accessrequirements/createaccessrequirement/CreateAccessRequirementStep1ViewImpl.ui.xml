@@ -36,7 +36,8 @@
 			</b:FormGroup>
 			<b:FormGroup ui:field="arTypeUI">
 				<b:FormLabel>Access requirement type</b:FormLabel>
-				<b:Radio ui:field="actTypeButton" text="Controlled" name="accessRequirementType" value="true"/>
+				<b:Radio ui:field="managedActTypeButton" text="Controlled - requests are in Synapse" name="accessRequirementType" value="true"/>
+				<b:Radio ui:field="actTypeButton" text="Controlled - requests are handled outside of Synapse (Jira/email/spreadsheets, legacy requirement)" name="accessRequirementType"/>
 				<b:Radio ui:field="termsOfUseButton" text="Click wrap" name="accessRequirementType" />
 			</b:FormGroup>
 		</bh:Div>

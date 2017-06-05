@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
@@ -19,7 +18,6 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -29,10 +27,10 @@ import com.google.inject.Inject;
  * @author Jay
  *
  */
-public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAccessRequirementStep2View.Presenter {
-	CreateACTAccessRequirementStep2View view;
+public class CreateManagedACTAccessRequirementStep2 implements ModalPage, CreateManagedACTAccessRequirementStep2View.Presenter {
+	CreateManagedACTAccessRequirementStep2View view;
 	ModalPresenter modalPresenter;
-	ACTAccessRequirement accessRequirement;
+	ManagedACTAccessRequirement accessRequirement;
 	SynapseClientAsync synapseClient;
 	WikiMarkdownEditor wikiMarkdownEditor;
 	WikiPageWidget wikiPageRenderer;
@@ -41,8 +39,8 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 	FileHandleWidget ducTemplateFileHandleWidget;
 	public static final int DAY_IN_MS = 1000*60*60*24;
 	@Inject
-	public CreateACTAccessRequirementStep2(
-			CreateACTAccessRequirementStep2View view,
+	public CreateManagedACTAccessRequirementStep2(
+			CreateManagedACTAccessRequirementStep2View view,
 			SynapseClientAsync synapseClient,
 			WikiMarkdownEditor wikiMarkdownEditor,
 			WikiPageWidget wikiPageRenderer,
@@ -79,13 +77,10 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 	 * Configure this widget before use.
 	 * 
 	 */
-	public void configure(ACTAccessRequirement accessRequirement) {
+	public void configure(ManagedACTAccessRequirement accessRequirement) {
 		ducTemplateFileHandleWidget.setVisible(false);
 		this.accessRequirement = accessRequirement;
 		wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
-		boolean isExistOldTermsOfUse = accessRequirement.getActContactInfo() != null;
-		view.setOldTermsVisible(isExistOldTermsOfUse);
-		view.setOldTerms(isExistOldTermsOfUse ? accessRequirement.getActContactInfo() : "");
 		if (accessRequirement.getDucTemplateFileHandleId() != null) {
 			FileHandleAssociation fha = new FileHandleAssociation();
 			fha.setAssociateObjectType(FileHandleAssociateType.AccessRequirementAttachment);
@@ -108,7 +103,6 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 		view.setIsIDUPublic(accessRequirement.getIsIDUPublic());
 		view.setIsIRBApprovalRequired(accessRequirement.getIsIRBApprovalRequired());
 		view.setIsValidatedProfileRequired(accessRequirement.getIsValidatedProfileRequired());
-		view.showHasRequestUI(ACTAccessRequirementWidget.isAcceptDataAccessRequest(accessRequirement.getAcceptRequest()));
 	}
 	
 	
@@ -152,7 +146,6 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 		accessRequirement.setIsIDUPublic(view.isIDUPublic());
 		accessRequirement.setIsIRBApprovalRequired(view.isIRBApprovalRequired());
 		accessRequirement.setIsValidatedProfileRequired(view.isValidatedProfileRequired());
-		accessRequirement.setAcceptRequest(view.getHasRequests());
 		// create/update access requirement
 		synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {
 			@Override
@@ -179,6 +172,4 @@ public class CreateACTAccessRequirementStep2 implements ModalPage, CreateACTAcce
 		this.modalPresenter = modalPresenter;
 		modalPresenter.setPrimaryButtonText(DisplayConstants.FINISH);
 	}
-
-
 }

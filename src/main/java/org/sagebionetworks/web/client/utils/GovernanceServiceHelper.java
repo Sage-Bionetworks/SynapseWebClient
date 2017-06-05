@@ -6,10 +6,7 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.LockAccessRequirement;
-import org.sagebionetworks.repo.model.PostMessageContentAccessApproval;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
-import org.sagebionetworks.repo.model.SelfSignAccessApproval;
-import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 
@@ -22,18 +19,7 @@ public class GovernanceServiceHelper {
 	public static AccessApproval getAccessApproval(
 			String principalId, 
 			AccessRequirement ar) {
-		SelfSignAccessApproval approval;
-		
-		if (ar instanceof TermsOfUseAccessRequirement) {
-			//Terms of Use
-			approval = new TermsOfUseAccessApproval();
-		} else if (ar instanceof PostMessageContentAccessRequirement) {
-			//Post Message
-			approval = new PostMessageContentAccessApproval();
-		} else {
-			throw new IllegalArgumentException("Unexpected access requirement type "+ar.getClass());
-		}
-
+		AccessApproval approval = new AccessApproval();
 		approval.setAccessorId(principalId);
 		approval.setRequirementId(ar.getId());
 		return approval;

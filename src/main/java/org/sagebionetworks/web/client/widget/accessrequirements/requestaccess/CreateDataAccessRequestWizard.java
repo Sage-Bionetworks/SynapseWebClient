@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -19,7 +20,7 @@ public class CreateDataAccessRequestWizard implements IsWidget{
 	
 	ModalWizardWidget modalWizardWidget;
 	CreateResearchProjectStep1 step1;
-	private ACTAccessRequirement ar;
+	private ManagedACTAccessRequirement ar;
 	public static final String VIEW_HELP = "To access Controlled Data (data with Conditions for Use), you must fulfill the Conditions for Use set by the data contributor.";
 	public static final String VIEW_URL = WebConstants.DOCS_URL + "contribute_and_access_controlled_use_data.html";
 	
@@ -30,7 +31,7 @@ public class CreateDataAccessRequestWizard implements IsWidget{
 		this.step1 = step1;
 	}
 
-	public void configure(ACTAccessRequirement ar) {
+	public void configure(ManagedACTAccessRequirement ar) {
 		this.ar = ar;
 		this.modalWizardWidget.setTitle("Request Access");
 		this.modalWizardWidget.setHelp(VIEW_HELP, VIEW_URL);

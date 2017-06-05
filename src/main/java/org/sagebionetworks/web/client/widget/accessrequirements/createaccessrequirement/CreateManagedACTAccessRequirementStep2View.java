@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author Jay
  *
  */
-public interface CreateACTAccessRequirementStep2View extends IsWidget {
+public interface CreateManagedACTAccessRequirementStep2View extends IsWidget {
 	void setAreOtherAttachmentsRequired(boolean value);
 	void setExpirationPeriod(String days);
 	void setIsCertifiedUserRequired(boolean value);
@@ -16,8 +16,6 @@ public interface CreateACTAccessRequirementStep2View extends IsWidget {
 	void setIsIDUPublic(boolean value);
 	void setIsIRBApprovalRequired(boolean value);
 	void setIsValidatedProfileRequired(boolean value);
-	void setOldTermsVisible(boolean visible);
-	void setOldTerms(String terms);
 	boolean areOtherAttachmentsRequired();
 	String getExpirationPeriod();
 	boolean isCertifiedUserRequired();
@@ -25,12 +23,9 @@ public interface CreateACTAccessRequirementStep2View extends IsWidget {
 	boolean isIDUPublic();
 	boolean isIRBApprovalRequired();
 	boolean isValidatedProfileRequired();
-	boolean getHasRequests();
-	
 	void setWikiPageRenderer(IsWidget w);
 	void setDUCTemplateUploadWidget(IsWidget w);
 	void setDUCTemplateWidget(IsWidget w);
-	public void showHasRequestUI(boolean hasRequest);
 	public void setPresenter(Presenter p);
 	/*
 	 * Presenter interface

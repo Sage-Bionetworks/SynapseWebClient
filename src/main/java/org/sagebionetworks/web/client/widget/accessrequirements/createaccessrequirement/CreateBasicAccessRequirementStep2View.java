@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author Jay
  *
  */
-public interface CreateTermsOfUseAccessRequirementStep2View extends IsWidget {
+public interface CreateBasicAccessRequirementStep2View extends IsWidget {
 	void setOldTermsVisible(boolean visible);
 	void setOldTerms(String terms);
 	
