@@ -101,16 +101,13 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		return $wnd.moment(s).calendar();
 	}-*/;
 	
-	private static native String _getLongFriendlyDate(String s) /*-{
-		return $wnd.moment(s).format('LLLL');
-	}-*/;
-
 	private static DateTimeFormat smallDateFormat = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm:ssaa");
+	private static DateTimeFormat longDateFormat = DateTimeFormat.getFormat("EEEE, MMMM d, yyyy h:mm a");
 	private static DateTimeFormat iso8601Format =  DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
 	
 	@Override
 	public String convertDateToSmallString(Date toFormat) {
-		return smallDateFormat.format(toFormat);
+		return smallDateFormat.format(toFormat, GlobalApplicationStateImpl.currentTimezone);
 	}
 	@Override
 	public String getRelativeTime(Date toFormat) {
@@ -123,7 +120,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	@Override
 	public String getLongFriendlyDate(Date toFormat) {
-		return _getLongFriendlyDate(iso8601Format.format(toFormat));
+		return longDateFormat.format(toFormat, GlobalApplicationStateImpl.currentTimezone);
 	}
 	
 	@Override

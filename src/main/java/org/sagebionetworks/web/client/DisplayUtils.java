@@ -521,7 +521,7 @@ public class DisplayUtils {
 		if (prettyFormat == null) {
 			prettyFormat = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
 		}
-		return prettyFormat.format(toFormat);
+		return prettyFormat.format(toFormat, GlobalApplicationStateImpl.currentTimezone);
 	}
 	
 	

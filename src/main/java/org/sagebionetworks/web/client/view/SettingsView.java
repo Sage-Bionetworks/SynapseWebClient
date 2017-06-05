@@ -49,6 +49,7 @@ public interface SettingsView extends IsWidget, SynapseView {
 
 		void changePassword();
 		void passwordChanged(String password);
+		void setShowUTCTime(boolean isUTC);
 	}
 
 	public void setApiKey(String apiKey);
@@ -80,4 +81,6 @@ public interface SettingsView extends IsWidget, SynapseView {
 	void setChangePasswordEnabled(boolean isEnabled);
 
 	void resetChangePasswordUI();
+	void setShowingUTCTime();
+	void setShowingLocalTime();
 }

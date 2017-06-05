@@ -105,7 +105,6 @@ public interface GlobalApplicationState {
 	void clearLastPlace();
 	void clearCurrentPlace();
 	
-	
 	public boolean isWikiBasedEntity(String entityId);
 
 	/**
@@ -126,4 +125,6 @@ public interface GlobalApplicationState {
 
 	void replaceCurrentPlace(Place targetPlace);
 
+	void setShowUTCTime(boolean showUTC);
+	boolean isShowingUTCTime();
 }

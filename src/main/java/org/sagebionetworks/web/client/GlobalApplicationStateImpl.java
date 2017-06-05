@@ -8,7 +8,7 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
+import static org.sagebionetworks.web.client.cookie.CookieKeys.*;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
@@ -20,10 +20,12 @@ import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
+import com.google.gwt.i18n.client.TimeZone;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
@@ -48,6 +50,10 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private ClientCache localStorage;
 	private GWTWrapper gwt;
 	private boolean isShowingVersionAlert;
+	
+	public static TimeZone currentTimezone = null;
+	public static final TimeZone UTC_TIMEZONE = TimeZone.createTimeZone(0);
+	
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -137,17 +143,17 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	@Override
 	public Place getLastPlace(Place defaultPlace) {
-		String historyValue = cookieProvider.getCookie(CookieKeys.LAST_PLACE);
+		String historyValue = cookieProvider.getCookie(LAST_PLACE);
 		return getPlaceFromHistoryValue(historyValue, fixIfNull(defaultPlace));
 	}
 	
 	@Override
 	public void clearLastPlace() {
-		cookieProvider.removeCookie(CookieKeys.LAST_PLACE);
+		cookieProvider.removeCookie(LAST_PLACE);
 	}
 	@Override
 	public void clearCurrentPlace() {
-		cookieProvider.removeCookie(CookieKeys.CURRENT_PLACE);
+		cookieProvider.removeCookie(CURRENT_PLACE);
 	}
 	
 	@Override
@@ -168,19 +174,19 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void setLastPlace(Place lastPlace) {
 		Date expires = new Date(System.currentTimeMillis() + (1000*60*60*2)); // store for 2 hours (we don't want to lose this state while a user registers for Synapse)
-		cookieProvider.setCookie(CookieKeys.LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace), expires);
+		cookieProvider.setCookie(LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace), expires);
 	}
 
 	@Override
 	public Place getCurrentPlace() {
-		String historyValue = cookieProvider.getCookie(CookieKeys.CURRENT_PLACE);
+		String historyValue = cookieProvider.getCookie(CURRENT_PLACE);
 		return getPlaceFromHistoryValue(historyValue, AppActivityMapper.getDefaultPlace());		
 	}
 
 	@Override
 	public void setCurrentPlace(Place currentPlace) {		
 		Date expires = new Date(System.currentTimeMillis() + 300000); // store for 5 minutes
-		cookieProvider.setCookie(CookieKeys.CURRENT_PLACE, appPlaceHistoryMapper.getToken(currentPlace), expires);
+		cookieProvider.setCookie(CURRENT_PLACE, appPlaceHistoryMapper.getToken(currentPlace), expires);
 	}
 
 	@Override
@@ -280,6 +286,10 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		}
 		initWikiEntitiesAndVersions(c);
 		view.initGlobalViewProperties();
+		String showInUTC = cookieProvider.getCookie(SHOW_DATETIME_IN_UTC);
+		if (showInUTC != null) {
+			setShowUTCTime(Boolean.parseBoolean(showInUTC));
+		}
 	}
 	
 	public void initSynapsePropertiesFromServer(final Callback c) {
@@ -403,5 +413,18 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		}
 		Place currentPlace = appPlaceHistoryMapper.getPlace(place); 
 		getPlaceChanger().goTo(currentPlace);
+	}
+	
+	@Override
+	public void setShowUTCTime(boolean showUTC) {
+		Date yearFromNow = new Date();
+		CalendarUtil.addMonthsToDate(yearFromNow, 12);
+		GlobalApplicationStateImpl.currentTimezone = showUTC ? UTC_TIMEZONE : null;
+		cookieProvider.setCookie(SHOW_DATETIME_IN_UTC, Boolean.toString(showUTC), yearFromNow);
+	}
+	
+	@Override
+	public boolean isShowingUTCTime() {
+		return UTC_TIMEZONE.equals(GlobalApplicationStateImpl.currentTimezone);
 	}
 }
