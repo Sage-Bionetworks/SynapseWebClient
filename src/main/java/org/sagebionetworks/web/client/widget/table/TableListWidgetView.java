@@ -79,13 +79,6 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	public void setUploadTableVisible(boolean enabled);
 	
 	/**
-	 * Add the create table modal to the page.
-	 * @param createTableModal
-	 */
-	public void addCreateTableModal(IsWidget createTableModal);
-
-
-	/**
 	 * Add the modal dialog to the view.
 	 * @param uploadTableModalWidget
 	 */

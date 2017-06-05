@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
@@ -41,7 +40,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	private PreflightController preflightController;
 	private TableListWidgetView view;
 	private SynapseClientAsync synapseClient;
-	private CreateTableModalWidget createTableModalWidget;
 	private UploadTableModalWidget uploadTableModalWidget;
 	private CreateTableViewWizard createTableViewWizard;
 	private boolean canEdit;
@@ -57,7 +55,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	public TableListWidget(PreflightController preflightController,
 			TableListWidgetView view,
 			SynapseClientAsync synapseClient,
-			CreateTableModalWidget createTableModalWidget,
 			UploadTableModalWidget uploadTableModalWidget,
 			CookieProvider cookies,
 			CreateTableViewWizard createTableViewWizard,
@@ -66,14 +63,12 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 		this.preflightController = preflightController;
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.createTableModalWidget = createTableModalWidget;
 		this.uploadTableModalWidget = uploadTableModalWidget;
 		this.createTableViewWizard = createTableViewWizard;
 		this.loadMoreWidget = loadMoreWidget;
 		this.cookies = cookies;
 		this.synAlert = synAlert;
 		this.view.setPresenter(this);
-		this.view.addCreateTableModal(createTableModalWidget);
 		this.view.setLoadMoreWidget(loadMoreWidget);
 		this.view.addUploadTableModal(uploadTableModalWidget);
 		this.view.addWizard(createTableViewWizard.asWidget());
@@ -105,7 +100,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	public void configure(EntityBundle parentBundle) {
 		this.parentBundle = parentBundle;
 		this.canEdit = parentBundle.getPermissions().getCanEdit();
-		this.createTableModalWidget.configure(parentBundle.getEntity().getId(), this);
 		this.uploadTableModalWidget.configure(parentBundle.getEntity().getId(), null);
 		view.setAddProjectViewVisible(DisplayUtils.isInTestWebsite(cookies));
 		view.resetSortUI();
@@ -245,13 +239,8 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	 * Called after all pre-flight checks are performed on a table.
 	 */
 	private void postCheckCreateTable(){
-		// use new wizard if in alpha mode
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.table);
-			this.createTableViewWizard.showModal(refreshTablesCallback);
-		} else {
-			this.createTableModalWidget.showCreateModal();	
-		}
+		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.table);
+		this.createTableViewWizard.showModal(refreshTablesCallback);
 	}
 	
 

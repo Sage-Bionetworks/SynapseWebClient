@@ -46,8 +46,6 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@UiField
 	Button uploadTable;
 	@UiField
-	SimplePanel createTableModalPanel;
-	@UiField
 	SimplePanel uploadTableModalPanel;
 	@UiField
 	SimplePanel fileViewWizardContainer;
@@ -206,11 +204,6 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@Override
 	public void setUploadTableVisible(boolean visibile) {
 		this.uploadTable.setVisible(visibile);
-	}
-
-	@Override
-	public void addCreateTableModal(IsWidget createTableModal) {
-		this.createTableModalPanel.add(createTableModal);
 	}
 
 	@Override
