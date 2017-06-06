@@ -51,7 +51,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private GWTWrapper gwt;
 	private boolean isShowingVersionAlert;
 	
-	public static TimeZone currentTimezone = null;
+	public static TimeZone currentTimezone;
 	public static final TimeZone UTC_TIMEZONE = TimeZone.createTimeZone(0);
 	
 	@Inject
@@ -426,5 +426,17 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public boolean isShowingUTCTime() {
 		return UTC_TIMEZONE.equals(GlobalApplicationStateImpl.currentTimezone);
+	}
+	
+	private static Integer timezoneOffsetMs = null;
+	/**
+	 * 
+	 * @return the time difference between UTC time and local time, in milliseconds
+	 */
+	public static Integer getTimezoneOffsetMs() {
+		if (timezoneOffsetMs == null) {
+			timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
+		}
+		return timezoneOffsetMs;
 	}
 }
