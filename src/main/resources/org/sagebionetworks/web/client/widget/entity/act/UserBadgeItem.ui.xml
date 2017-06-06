@@ -11,9 +11,7 @@
 		</t:TableData>
 		<t:TableData width="100%">
 			<bh:Span ui:field="userBadgeContainer" />
-			<b:Tooltip title="User has been approved" placement="LEFT">
-				<g:Image ui:field="metRequirementIcon" styleName="displayInline moveup-5" resource='{icons.checkGreen16}' visible="false" />
-			</b:Tooltip>
+			<!-- TODO: add applicable actions available for the submitter to choose (like "revoke" or "renew" if updating an accessor) -->
 		</t:TableData>
 	</t:TableRow>
 </ui:UiBinder>
