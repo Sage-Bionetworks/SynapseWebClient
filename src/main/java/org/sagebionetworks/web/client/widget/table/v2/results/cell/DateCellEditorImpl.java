@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import java.util.Date;
 
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.StringUtils;
 
@@ -15,10 +16,10 @@ public class DateCellEditorImpl implements DateCellEditor {
 	
 	private DateCellEditorView view;
 	private Long originalTime;
-	GlobalApplicationStateImpl globalAppState;
+	GlobalApplicationState globalAppState;
 	
 	@Inject
-	public DateCellEditorImpl(DateCellEditorView view, GlobalApplicationStateImpl globalAppState) {
+	public DateCellEditorImpl(DateCellEditorView view, GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 	}
@@ -41,10 +42,11 @@ public class DateCellEditorImpl implements DateCellEditor {
 		originalTime = null;
 		if(value != null){
 			originalTime = Long.parseLong(value);
-			date = new Date(originalTime);
+			Long time = originalTime;
 			if (globalAppState.isShowingUTCTime()) {
-				date = new Date(date.getTime() + GlobalApplicationStateImpl.getTimezoneOffsetMs());
+				time += GlobalApplicationStateImpl.getTimezoneOffsetMs();
 			}
+			date = new Date(time);
 		}
 		view.setValue(date);
 	}

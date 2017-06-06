@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
@@ -392,5 +392,21 @@ public class GlobalApplicationStateImplTest {
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockAppPlaceHistoryMapper).getPlace(captor.capture());
 		assertEquals(GlobalApplicationStateImpl.DEFAULT_REFRESH_PLACE, captor.getValue());
+	}
+	
+	@Test
+	public void testSetShowLocalTime() {
+		globalApplicationState.setShowUTCTime(false);
+		assertNull(GlobalApplicationStateImpl.currentTimezone);
+		verify(mockCookieProvider).setCookie(eq(CookieKeys.SHOW_DATETIME_IN_UTC), eq(Boolean.FALSE.toString()), any(Date.class));
+		assertFalse(globalApplicationState.isShowingUTCTime());
+	}
+	
+	@Test
+	public void testSetShowUTCTime() {
+		globalApplicationState.setShowUTCTime(true);
+		assertEquals(GlobalApplicationStateImpl.UTC_TIMEZONE, GlobalApplicationStateImpl.currentTimezone);
+		verify(mockCookieProvider).setCookie(eq(CookieKeys.SHOW_DATETIME_IN_UTC), eq(Boolean.TRUE.toString()), any(Date.class));
+		assertTrue(globalApplicationState.isShowingUTCTime());
 	}
 }
