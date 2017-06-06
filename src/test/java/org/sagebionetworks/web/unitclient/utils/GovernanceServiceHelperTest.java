@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.LockAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -141,4 +142,10 @@ public class GovernanceServiceHelperTest {
 		assertEquals(GovernanceServiceHelper.LOCK_ACCESS_REQUIREMENT_TEXT, 
 				GovernanceServiceHelper.getAccessRequirementText(new LockAccessRequirement()));
 	}
+	@Test 
+	public void testManagedAccessRequirementText() throws Exception {
+		assertEquals("", 
+				GovernanceServiceHelper.getAccessRequirementText(new ManagedACTAccessRequirement()));
+	}
+
 }

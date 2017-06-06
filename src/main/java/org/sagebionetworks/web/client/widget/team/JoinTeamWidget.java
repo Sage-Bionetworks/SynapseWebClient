@@ -9,6 +9,7 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -329,7 +330,9 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			//pop up the requirement
 			progressWidget.configure(currentPage, getTotalPageCount());
 			
-			if (accessRequirement instanceof TermsOfUseAccessRequirement || accessRequirement instanceof ACTAccessRequirement) {
+			if (accessRequirement instanceof TermsOfUseAccessRequirement || 
+					accessRequirement instanceof ACTAccessRequirement ||
+					accessRequirement instanceof ManagedACTAccessRequirement) {
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
 				if (text == null || text.trim().isEmpty()) {
 					WikiPageKey wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
@@ -342,12 +345,10 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 					view.setAccessRequirementHTML(text);
 					view.setCurrentWizardPanelVisible(false);
 				}
-				boolean isACTAccessRequirement = accessRequirement instanceof ACTAccessRequirement;
+				boolean isACTAccessRequirement = accessRequirement instanceof ACTAccessRequirement || accessRequirement instanceof ManagedACTAccessRequirement;
 				String primaryButtonText = isACTAccessRequirement ? "Continue" : "Accept";
 				view.setJoinWizardPrimaryButtonText(primaryButtonText);
-				// TODO: remove check for alpha mode once released.
-				boolean isAlpha = DisplayUtils.isInTestWebsite(cookies);
-				view.setAccessRequirementsLinkVisible(isAlpha && isACTAccessRequirement);
+				view.setAccessRequirementsLinkVisible(isACTAccessRequirement);
 			} else {
 				synAlert.showError("Unsupported access restriction type - " + accessRequirement.getClass().getName());
 			}
@@ -391,7 +392,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 				synAlert.handleException(t);
 			}
 		};
-		if (ar instanceof ACTAccessRequirement) {
+		if (ar instanceof ACTAccessRequirement || ar instanceof ManagedACTAccessRequirement) {
 			//no need to sign, just continue
 			callback.onSuccess(null);
 		} else {

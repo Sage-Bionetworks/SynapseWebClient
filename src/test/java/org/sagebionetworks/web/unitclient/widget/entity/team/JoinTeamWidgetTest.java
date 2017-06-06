@@ -30,6 +30,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -230,7 +231,6 @@ public class JoinTeamWidgetTest {
 		ACTAccessRequirement terms = new ACTAccessRequirement();
 		terms.setId(1L);
 		ars.add(terms);
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 		joinWidget.sendJoinRequestStep0();
 		verify(mockView).setButtonsEnabled(true);
 		verify(mockView).showJoinWizard();
@@ -244,7 +244,25 @@ public class JoinTeamWidgetTest {
 		verify(mockView).setCurrentWizardContent(mockWikiPageWidget);
 		verify(mockWikiPageWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class),eq(true));
 	}
-
+	
+	@Test
+	public void testJoinRequestStep2WithManagedActRestrictionText() throws Exception {
+		ManagedACTAccessRequirement terms = new ManagedACTAccessRequirement();
+		terms.setId(1L);
+		ars.add(terms);
+		joinWidget.sendJoinRequestStep0();
+		verify(mockView).setButtonsEnabled(true);
+		verify(mockView).showJoinWizard();
+		verify(mockWizardProgress).configure(Mockito.anyInt(), Mockito.anyInt());
+		verify(mockSynapseClient).getTeamAccessRequirements(anyString(), any(AsyncCallback.class));		
+		verify(mockView).setAccessRequirementHTML("");
+		verify(mockView).setJoinWizardCallback(any(Callback.class));
+		verify(mockView).setCurrentWizardPanelVisible(true);
+		verify(mockView).setJoinWizardPrimaryButtonText("Continue");
+		verify(mockView).setAccessRequirementsLinkVisible(true);
+		verify(mockView).setCurrentWizardContent(mockWikiPageWidget);
+		verify(mockWikiPageWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class),eq(true));
+	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
