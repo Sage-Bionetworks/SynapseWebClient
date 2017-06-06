@@ -60,6 +60,8 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		UserBadgeItem item = ginInjector.getUserBadgeItem();
 		item.configure(userId);
 		item.setSelectionChangedCallback(selectionChangedCallback);
+		// TODO: show available actions if renewal 
+		// (new accessors will always be "gain access", but existing accessors could be "revoked" or "renewed")
 		users.add(item);
 		view.addUserBadge(item.asWidget());
 		boolean toolbarVisible = isToolbarVisible && users.size() > 0;
