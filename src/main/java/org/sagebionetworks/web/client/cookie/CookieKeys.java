@@ -34,4 +34,9 @@ public class CookieKeys {
 	 * LinkedIn requestToken key
 	 */
 	public static String LINKEDIN = "org.sagebionetworks.synapse.linkedin";
+	
+	/**
+	 * Showing UTC?
+	 */
+	public static String SHOW_DATETIME_IN_UTC = "org.sagebionetworks.synapse.datetime.utc";
 }

@@ -265,6 +265,11 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			synapseClient.getUserProfile(null, callback);
 			
 			subscriptionListWidget.configure();
+			if (globalApplicationState.isShowingUTCTime()) {
+				view.setShowingUTCTime();	
+			} else {
+				view.setShowingLocalTime();
+			}
 		}
 		this.view.render();
 	}
@@ -398,4 +403,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		passwordStrengthWidget.scorePassword(password);
 	}
 
+	@Override
+	public void setShowUTCTime(boolean isUTC) {
+		globalApplicationState.setShowUTCTime(isUTC);
+	}
 }

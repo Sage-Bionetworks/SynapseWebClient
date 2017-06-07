@@ -3,7 +3,10 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 import java.util.Date;
 
 import org.gwtbootstrap3.client.ui.html.Text;
-
+import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRendererView;
+import com.google.gwt.i18n.client.TimeZone;
+import com.google.gwt.i18n.client.constants.TimeZoneConstants;
 import com.google.gwt.i18n.shared.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -38,14 +41,14 @@ public class DateCellRendererViewImpl implements DateCellRendererView {
 
 	@Override
 	public void setValue(Date value) {
-		text.setText(format.format(value));
+		text.setText(format.format(value, GlobalApplicationStateImpl.currentTimezone));
 	}
 
 	@Override
 	public void setFormat(String format) {
 		this.format = DateTimeFormat.getFormat(format);
 	}
-
+	
 	@Override
 	public Widget asWidget() {
 		return widget;
