@@ -26,14 +26,11 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.entity.ContentType;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Whitelist;
 import org.sagebionetworks.client.AsynchJobType;
-import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseResultNotReadyException;
@@ -1933,38 +1930,16 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	 */
 	@Override
 	public String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException {
-		String queryString =  	"select * from entity where parentId == '" + parentEntityId +
-								WebConstants.AND_NAME_EQUALS + fileName + WebConstants.LIMIT_ONE;
-		JSONObject query = query(queryString);
-		if (query == null) {
-			throw new SynapseClientException("Query service call returned null");
-		}
-		if(!query.has("totalNumberOfResults")){
-			throw new SynapseClientException("Query results did not have "+"totalNumberOfResults");
-		}
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			if (query.getLong("totalNumberOfResults") != 0) {
-				JSONObject result = query.getJSONArray("results").getJSONObject(0);
-				
-				// Get types associated with found entity.
-				JSONArray typeArray = result.getJSONArray("entity.concreteType");
-				Set<String> types = new HashSet<String>();
-				for (int i = 0; i < typeArray.length(); i++) {
-					types.add(typeArray.getString(i));
-				}
-				
-				if (types.contains(FileEntity.class.getName())) {
-					// The found entity is a File Entity.
-					return result.getString("entity.id");
-				} else {
-					// The found entity is not a File Entity.
-					throw new ConflictException("An non-file entity with name " + fileName + " and parentId " + parentEntityId + " already exists.");
-				}
-			} else {
-				throw new NotFoundException("An entity with name " + fileName + " and parentId " + parentEntityId + " was not found.");
+			String entityId = synapseClient.lookupChild(parentEntityId, fileName);
+			Entity entity = synapseClient.getEntityById(entityId);
+			if (!(entity instanceof FileEntity)) {
+				throw new ConflictException("name conflict");
 			}
-		} catch (JSONException e) {
-			throw new SynapseClientException(e);
+			return entityId;
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
 	

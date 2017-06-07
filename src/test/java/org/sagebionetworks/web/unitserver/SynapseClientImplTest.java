@@ -1207,9 +1207,9 @@ public class SynapseClientImplTest {
 	public void testGetFileEntityIdWithSameNameNotFound()
 			throws JSONObjectAdapterException, SynapseException,
 			RestServiceException, JSONException {
-		JSONObject queryResult = new JSONObject();
-		queryResult.put("totalNumberOfResults", (long) 0);
-		when(mockSynapse.query(anyString())).thenReturn(queryResult); // TODO
+		
+		// Have results returned in query.
+		when(mockSynapse.lookupChild(anyString(), eq(testFileName))).thenThrow(new SynapseNotFoundException());
 
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(
 				testFileName, "parentEntityId");
@@ -1220,25 +1220,12 @@ public class SynapseClientImplTest {
 			throws JSONObjectAdapterException, SynapseException,
 			RestServiceException, JSONException {
 		Folder folder = new Folder();
+		folder.setId("syn8888");
 		folder.setName(testFileName);
-		JSONObject queryResult = new JSONObject();
-		JSONArray results = new JSONArray();
-
-		// Set up results.
-		JSONObject objectResult = EntityFactory
-				.createJSONObjectForEntity(folder);
-		JSONArray typeArray = new JSONArray();
-		typeArray.put("Folder");
-		objectResult.put("entity.concreteType", typeArray);
-		results.put(objectResult);
-
-		// Set up query result.
-		queryResult.put("totalNumberOfResults", (long) 1);
-		queryResult.put("results", results);
-
-		// Have results returned in query.
-		when(mockSynapse.query(anyString())).thenReturn(queryResult);
-
+		
+		when(mockSynapse.lookupChild(anyString(), eq(testFileName))).thenReturn(folder.getId());
+		when(mockSynapse.getEntityById(folder.getId())).thenReturn(folder);
+		
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(
 				testFileName, "parentEntityId");
 	}
@@ -1247,22 +1234,10 @@ public class SynapseClientImplTest {
 	public void testGetFileEntityIdWithSameNameFound() throws JSONException,
 			JSONObjectAdapterException, SynapseException, RestServiceException {
 		FileEntity file = getTestFileEntity();
-		JSONObject queryResult = new JSONObject();
-		JSONArray results = new JSONArray();
-
-		// Set up results.
-		JSONObject objectResult = EntityFactory.createJSONObjectForEntity(file);
-		JSONArray typeArray = new JSONArray();
-		typeArray.put(FileEntity.class.getName());
-		objectResult.put("entity.concreteType", typeArray);
-		objectResult.put("entity.id", file.getId());
-		results.put(objectResult);
-		queryResult.put("totalNumberOfResults", (long) 1);
-		queryResult.put("results", results);
-
+		
 		// Have results returned in query.
-		when(mockSynapse.query(anyString())).thenReturn(queryResult);
-
+		when(mockSynapse.lookupChild(anyString(), eq(testFileName))).thenReturn(file.getId());
+		when(mockSynapse.getEntityById(file.getId())).thenReturn(file);
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(
 				testFileName, "parentEntityId");
 		assertEquals(fileEntityId, file.getId());
