@@ -24,6 +24,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.dataaccess.AccessType;
+import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.repo.model.dataaccess.Renewal;
 import org.sagebionetworks.repo.model.dataaccess.Request;
 import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
@@ -116,6 +118,8 @@ public class CreateDataAccessSubmissionStep2Test {
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Captor
 	ArgumentCaptor<CallbackP<List<String>>> callbackPStringListCaptor;
+	@Captor
+	ArgumentCaptor<AccessorChange> accessorChangeCaptor;
 	
 	
 	public static final String FILE_HANDLE_ID = "543345";
@@ -207,7 +211,10 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockPeopleSuggestBox).addItemSelectedHandler(callbackPUserSuggestionCaptor.capture());
 		CallbackP<SynapseSuggestion> callback = callbackPUserSuggestionCaptor.getValue();
 		callback.invoke(mockSynapseSuggestion);
-		verify(mockAccessorsList).addUserBadge(SUGGESTED_USER_ID);
+		verify(mockAccessorsList).addUserBadge(accessorChangeCaptor.capture());
+		AccessorChange change = accessorChangeCaptor.getValue();
+		assertEquals(SUGGESTED_USER_ID, change.getUserId());
+		assertEquals(AccessType.GAIN_ACCESS, change.getType());
 	}
 	
 	@Test
@@ -343,11 +350,17 @@ public class CreateDataAccessSubmissionStep2Test {
 	}
 	
 	@Test
-	public void testConfigureWithAccessors() {
-		List<String> accessorUserIds = new ArrayList<String>();
-		accessorUserIds.add(CURRENT_USER_ID);
-		accessorUserIds.add(USER_ID2);
-		when(mockDataAccessRequest.getAccessors()).thenReturn(accessorUserIds);
+	public void testConfigureWithAccessorChanges() {
+		List<AccessorChange> accessorUserIds = new ArrayList<AccessorChange>();
+		AccessorChange change1 = new AccessorChange();
+		change1.setUserId(CURRENT_USER_ID);
+		change1.setType(AccessType.GAIN_ACCESS);
+		accessorUserIds.add(change1);
+		AccessorChange change2 = new AccessorChange();
+		change2.setUserId(USER_ID2);
+		change2.setType(AccessType.RENEW_ACCESS);
+		accessorUserIds.add(change2);
+		when(mockDataAccessRequest.getAccessorChanges()).thenReturn(accessorUserIds);
 		widget.configure(mockResearchProject, mockACTAccessRequirement);
 		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
 		verify(mockAccessorsList, times(2)).addUserBadge(anyString());

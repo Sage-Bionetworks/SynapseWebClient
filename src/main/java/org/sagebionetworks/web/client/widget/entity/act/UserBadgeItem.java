@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.dataaccess.AccessType;
+import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
@@ -25,12 +29,19 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	CheckBox select;
 	@UiField
 	Span userBadgeContainer;
+	@UiField
+	Button dropdown;
+	@UiField
+	AnchorListItem renew;
+	@UiField
+	AnchorListItem revoke;
 	
 	Widget widget;
 	
 	String userId;
 	Callback selectionChangedCallback;
 	PortalGinInjector portalGinInjector;
+	AccessType accessType;
 
 	@Inject
 	public UserBadgeItem(UserBadgeItemUiBinder binder,
@@ -45,11 +56,30 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 				}
 			}
 		});
+		
+		renew.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				accessType = AccessType.RENEW_ACCESS;
+				dropdown.setText(renew.getText());
+			}
+		});
+		revoke.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				accessType = AccessType.REVOKE_ACCESS;
+				dropdown.setText(revoke.getText());
+			}
+		});
+
 	}
 	
-	public UserBadgeItem configure(String ownerId) {
-		userId = ownerId;
-		
+	public UserBadgeItem configure(AccessorChange change) {
+		userId = change.getUserId();
+		accessType = change.getType();
+		boolean isGainAccess = AccessType.GAIN_ACCESS.equals(accessType);
+		dropdown.setVisible(!isGainAccess);
+		select.setVisible(!isGainAccess);
 		UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
 		userBadge.configure(userId);
 		userBadge.setSize(BadgeSize.SMALL);
@@ -65,16 +95,10 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		userBadgeContainer.add(userBadge.asWidget());
 		
 		ProfileCertifiedValidatedWidget w = portalGinInjector.getProfileCertifiedValidatedWidget();
-		w.configure(Long.parseLong(ownerId));
+		w.configure(Long.parseLong(userId));
 		w.asWidget().addStyleName("moveup-8 margin-left-5");
 		userBadgeContainer.add(w.asWidget());
 		
-		return this;
-	}
-	
-	public UserBadgeItem configure(String ownerId, Callback callback) {
-		selectionChangedCallback = callback;
-		configure(ownerId);
 		return this;
 	}
 	
@@ -97,6 +121,10 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	
 	public String getUserId() {
 		return userId;
+	}
+	
+	public AccessType getAccessType() {
+		return accessType;
 	}
 	
 	@Override

@@ -11,7 +11,14 @@
 		</t:TableData>
 		<t:TableData width="100%">
 			<bh:Span ui:field="userBadgeContainer" />
-			<!-- TODO: add applicable actions available for the submitter to choose (like "revoke" or "renew" if updating an accessor) -->
+			<b:ButtonGroup>
+				<b:Button ui:field="dropdown" dataToggle="DROPDOWN" size="SMALL" text="Renew" addStyleNames="margin-top-10"/>
+				<b:DropDownMenu>
+					<b:AnchorListItem ui:field="renew" text="Renew"/>
+					<b:AnchorListItem ui:field="revoke" text="Revoke"/>
+				</b:DropDownMenu>
+			</b:ButtonGroup>
+
 		</t:TableData>
 	</t:TableRow>
 </ui:UiBinder>

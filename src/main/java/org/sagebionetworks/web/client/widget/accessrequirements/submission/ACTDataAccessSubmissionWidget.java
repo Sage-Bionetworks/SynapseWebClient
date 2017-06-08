@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
@@ -90,8 +91,8 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 			default:
 		}
 		view.clearAccessors();
-		if (submission.getAccessors() != null) {
-			addAccessorUserBadges(submission.getAccessors());
+		if (submission.getAccessorChanges() != null) {
+			addAccessorUserBadges(submission.getAccessorChanges());
 		}
 		otherDocuments.clear();
 		if (submission.getAttachments() != null) {
@@ -124,10 +125,10 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setSubmittedBy(badge);
 	}
 	
-	public void addAccessorUserBadges(List<String> accessorIds) {
-		for (String accessorId : accessorIds) {
+	public void addAccessorUserBadges(List<AccessorChange> accessorChanges) {
+		for (AccessorChange change : accessorChanges) {
 			UserBadgeItem badge = ginInjector.getUserBadgeItem();
-			badge.configure(accessorId);
+			badge.configure(change);
 			badge.setSelectVisible(false);
 			view.addAccessors(badge);
 		}
