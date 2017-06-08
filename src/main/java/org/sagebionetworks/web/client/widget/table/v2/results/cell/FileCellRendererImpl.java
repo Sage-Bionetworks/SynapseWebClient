@@ -6,7 +6,7 @@ import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.table.CellAddress;
 
