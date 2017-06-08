@@ -106,7 +106,7 @@ public class CreateDataAccessSubmissionStep2Test {
 	ManagedACTAccessRequirement mockACTAccessRequirement;
 	
 	@Mock
-	List<String> mockAccessorUserIds;
+	List<AccessorChange> mockAccessorChanges;
 	@Mock
 	List<String> mockOtherFileHandleIds;
 	@Captor
@@ -363,19 +363,19 @@ public class CreateDataAccessSubmissionStep2Test {
 		when(mockDataAccessRequest.getAccessorChanges()).thenReturn(accessorUserIds);
 		widget.configure(mockResearchProject, mockACTAccessRequirement);
 		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
-		verify(mockAccessorsList, times(2)).addUserBadge(anyString());
-		verify(mockAccessorsList).addUserBadge(CURRENT_USER_ID);
-		verify(mockAccessorsList).addUserBadge(USER_ID2);
+		verify(mockAccessorsList, times(2)).addUserBadge(any(AccessorChange.class));
+		verify(mockAccessorsList).addUserBadge(change1);
+		verify(mockAccessorsList).addUserBadge(change2);
 	}
 	
 	@Test
 	public void testSubmit() {
 		widget.configure(mockResearchProject, mockACTAccessRequirement);
-		when(mockAccessorsList.getUserIds()).thenReturn(mockAccessorUserIds);
+		when(mockAccessorsList.getAccessorChanges()).thenReturn(mockAccessorChanges);
 		when(mockOtherDocuments.getFileHandleIds()).thenReturn(mockOtherFileHandleIds);
 		widget.onPrimary();
 		
-		verify(mockDataAccessRequest).setAccessors(mockAccessorUserIds);
+		verify(mockDataAccessRequest).setAccessorChanges(mockAccessorChanges);
 		verify(mockDataAccessRequest).setAttachments(mockOtherFileHandleIds);
 		verify(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 		
@@ -404,7 +404,7 @@ public class CreateDataAccessSubmissionStep2Test {
 	@Test
 	public void testSave() {
 		widget.configure(mockResearchProject, mockACTAccessRequirement);
-		when(mockAccessorsList.getUserIds()).thenReturn(mockAccessorUserIds);
+		when(mockAccessorsList.getAccessorChanges()).thenReturn(mockAccessorChanges);
 		when(mockOtherDocuments.getFileHandleIds()).thenReturn(mockOtherFileHandleIds);
 		verify(mockModalPresenter).addCallback(wizardCallbackCaptor.capture());
 		// simulate user cancel
@@ -415,7 +415,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		//simulate user clicks Yes to save
 		callbackCaptor.getValue().invoke();
 		
-		verify(mockDataAccessRequest).setAccessors(mockAccessorUserIds);
+		verify(mockDataAccessRequest).setAccessorChanges(mockAccessorChanges);
 		verify(mockDataAccessRequest).setAttachments(mockOtherFileHandleIds);
 		verify(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 		verify(mockClient, never()).submitDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));

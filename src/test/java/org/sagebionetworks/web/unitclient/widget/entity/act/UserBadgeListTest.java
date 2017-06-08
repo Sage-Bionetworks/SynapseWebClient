@@ -12,7 +12,8 @@ import static org.mockito.Mockito.*;
 
 import java.util.List;
 
-
+import org.sagebionetworks.repo.model.dataaccess.AccessType;
+import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
@@ -34,8 +35,12 @@ public class UserBadgeListTest {
 	CallbackP<List<String>> mockUserIdsDeletedCallback; 
 	@Captor
 	ArgumentCaptor<List<String>> listCaptor;
-	String userId;
-	String userId2;
+	@Mock
+	AccessorChange mockChange1;
+	@Mock
+	AccessorChange mockChange2;
+	public final static String USER_ID_1 = "1234567";
+	public final static String USER_ID_2 = "9876543";
 	
 	@Mock
 	UserBadgeItem mockUserBadgeItem;
@@ -47,11 +52,13 @@ public class UserBadgeListTest {
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		list = new UserBadgeList(mockView, mockGinInjector);
-		userId = "1234567";
-		userId2 = "9876543";
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem);
-		when(mockUserBadgeItem.getUserId()).thenReturn(userId);
-		when(mockUserBadgeItem2.getUserId()).thenReturn(userId2);
+		when(mockUserBadgeItem.getUserId()).thenReturn(USER_ID_1);
+		when(mockUserBadgeItem2.getUserId()).thenReturn(USER_ID_2);
+		when(mockChange1.getUserId()).thenReturn(USER_ID_1);
+		when(mockChange1.getType()).thenReturn(AccessType.GAIN_ACCESS);
+		when(mockChange2.getUserId()).thenReturn(USER_ID_2);
+		when(mockChange2.getType()).thenReturn(AccessType.GAIN_ACCESS);
 	}
 	
 	@Test
@@ -63,7 +70,7 @@ public class UserBadgeListTest {
 	@Test
 	public void testAddUser() {
 		list.configure();
-		list.addUserBadge(userId);
+		list.addUserBadge(mockChange1);
 		verify(mockGinInjector).getUserBadgeItem();
 		verify(mockView).addUserBadge(any(Widget.class));
 	}
@@ -78,7 +85,7 @@ public class UserBadgeListTest {
 	@Test
 	public void testSetDeleteTrueWithUsers() {
 		list.configure();
-		list.addUserBadge(userId);
+		list.addUserBadge(mockChange1);
 		list.setCanDelete(true);
 		verify(mockView).setToolbarVisible(true);
 	}
@@ -93,7 +100,7 @@ public class UserBadgeListTest {
 	@Test
 	public void testRefreshListUIWithUser() {
 		list.configure();
-		list.addUserBadge(userId);
+		list.addUserBadge(mockChange1);
 		list.refreshListUI();
 		verify(mockView).clearUserBadges();
 		verify(mockView, times(2)).addUserBadge(any(Widget.class));
@@ -110,7 +117,7 @@ public class UserBadgeListTest {
 	@Test
 	public void testDeleteSelected() {
 		list.configure();
-		list.addUserBadge(userId);
+		list.addUserBadge(mockChange1);
 		when(mockUserBadgeItem.isSelected()).thenReturn(true);
 		list.deleteSelected();
 		verify(mockView).clearUserBadges();
@@ -123,8 +130,8 @@ public class UserBadgeListTest {
 		when(mockUserBadgeItem.isSelected()).thenReturn(true);
 		when(mockUserBadgeItem2.isSelected()).thenReturn(false);
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem, mockUserBadgeItem2);
-		list.addUserBadge(userId);
-		list.addUserBadge(userId2);
+		list.addUserBadge(mockChange1);
+		list.addUserBadge(mockChange2);
 		verify(mockView, times(2)).addUserBadge(any(Widget.class)); 
 		reset(mockView);
 		list.deleteSelected();
@@ -139,13 +146,13 @@ public class UserBadgeListTest {
 		when(mockUserBadgeItem.isSelected()).thenReturn(true);
 		when(mockUserBadgeItem2.isSelected()).thenReturn(false);
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem, mockUserBadgeItem2);
-		list.addUserBadge(userId);
-		list.addUserBadge(userId2);
+		list.addUserBadge(mockChange1);
+		list.addUserBadge(mockChange2);
 		list.deleteSelected();
 		verify(mockUserIdsDeletedCallback).invoke(listCaptor.capture());
 		List<String> deletedUserIds = listCaptor.getValue();
 		assertEquals(1, deletedUserIds.size());
-		assertEquals(userId, deletedUserIds.get(0));
+		assertEquals(USER_ID_1, deletedUserIds.get(0));
 	}
 	
 	@Test
@@ -153,7 +160,7 @@ public class UserBadgeListTest {
 		list.configure();
 		when(mockUserBadgeItem.isSelected()).thenReturn(true);
 		list.setCanDelete(true);
-		list.addUserBadge(userId);
+		list.addUserBadge(mockChange1);
 		list.checkSelectionState();
 		verify(mockView).setCanDelete(true);
 	}
@@ -163,7 +170,7 @@ public class UserBadgeListTest {
 		list.configure();
 		when(mockUserBadgeItem.isSelected()).thenReturn(false);
 		list.setCanDelete(true);
-		list.addUserBadge(userId);
+		list.addUserBadge(mockChange1);
 		list.checkSelectionState();
 		verify(mockView).setCanDelete(false);
 	}
@@ -171,10 +178,11 @@ public class UserBadgeListTest {
 	@Test
 	public void testGetUserIds() {
 		list.configure();
-		list.addUserBadge(userId);
-		List<String> userIdList = list.getUserIds();
-		assertTrue(userIdList.size() == 1);
-		assertTrue(userIdList.contains(userId));
+		list.addUserBadge(mockChange1);
+		List<AccessorChange> changeList = list.getAccessorChanges();
+		assertTrue(changeList.size() == 1);
+		AccessorChange change = changeList.get(0);
+		assertEquals(USER_ID_1, change.getUserId());
 	}
 	
 	@Test
@@ -184,20 +192,21 @@ public class UserBadgeListTest {
 		when(mockUserBadgeItem.isSelected()).thenReturn(true);
 		when(mockUserBadgeItem2.isSelected()).thenReturn(false);
 		
-		list.addUserBadge(userId);
-		list.addUserBadge(userId2);
+		list.addUserBadge(mockChange1);
+		list.addUserBadge(mockChange2);
 		list.deleteSelected();
-		List<String> userIdList = list.getUserIds();
-		assertTrue(userIdList.size() == 1);
-		assertTrue(userIdList.contains(userId2));
+		List<AccessorChange> changeList = list.getAccessorChanges();
+		assertTrue(changeList.size() == 1);
+		AccessorChange change = changeList.get(0);
+		assertEquals(USER_ID_2, change.getUserId());
 	}
 
 	@Test
 	public void testSelectAll() {
 		list.configure();
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem, mockUserBadgeItem2);
-		list.addUserBadge(userId);
-		list.addUserBadge(userId2);
+		list.addUserBadge(mockChange1);
+		list.addUserBadge(mockChange2);
 		list.selectAll();
 		verify(mockUserBadgeItem).setSelected(true);
 		verify(mockUserBadgeItem2).setSelected(true);
@@ -207,8 +216,8 @@ public class UserBadgeListTest {
 	public void testSelectNone() {
 		list.configure();
 		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem, mockUserBadgeItem2);
-		list.addUserBadge(userId);
-		list.addUserBadge(userId2);
+		list.addUserBadge(mockChange1);
+		list.addUserBadge(mockChange2);
 		list.selectNone();
 		verify(mockUserBadgeItem).setSelected(false);
 		verify(mockUserBadgeItem2).setSelected(false);
