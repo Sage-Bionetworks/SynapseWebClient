@@ -79,7 +79,9 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		accessType = change.getType();
 		boolean isGainAccess = AccessType.GAIN_ACCESS.equals(accessType);
 		dropdown.setVisible(!isGainAccess);
-		select.setVisible(!isGainAccess);
+		if (!isGainAccess) {
+			select.setVisible(false);
+		}
 		UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
 		userBadge.configure(userId);
 		userBadge.setSize(BadgeSize.SMALL);
@@ -112,7 +114,9 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	}
 	
 	public void setSelected(boolean selected){
-		select.setValue(selected, true);
+		if (select.isVisible()) {
+			select.setValue(selected, true);	
+		}
 	}
 	
 	public void setSelectVisible(boolean visible) {

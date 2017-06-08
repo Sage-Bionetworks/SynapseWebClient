@@ -58,6 +58,14 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	}
 	
 	public void addUserBadge(AccessorChange change) {
+		addUserBadge(change, false);
+	}
+	
+	public void addSubmitterUserBadge(AccessorChange change) {
+		addUserBadge(change, true);
+	}
+	
+	private void addUserBadge(AccessorChange change, boolean hideSelect) {
 		UserBadgeItem item = ginInjector.getUserBadgeItem();
 		item.configure(change);
 		item.setSelectionChangedCallback(selectionChangedCallback);
@@ -65,6 +73,9 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		view.addUserBadge(item.asWidget());
 		boolean toolbarVisible = isToolbarVisible && users.size() > 0;
 		view.setToolbarVisible(toolbarVisible);
+		if (hideSelect) {
+			item.setSelectVisible(false);
+		}
 	}
 	
 	public void refreshListUI() {

@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.AccessType;
@@ -234,10 +232,22 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	}
 	
 	public void initAccessors() {
+		boolean submitterFound = false;
 		if (dataAccessRequest.getAccessorChanges() != null) {
 			for (AccessorChange change : dataAccessRequest.getAccessorChanges()) {
-				accessorsList.addUserBadge(change);	
-			}	
+				if (change.getUserId().equals(authController.getCurrentUserPrincipalId())) {
+					submitterFound = true;
+					accessorsList.addSubmitterUserBadge(change);	
+				} else {
+					accessorsList.addUserBadge(change);	
+				}
+			}
+		}
+		if (!submitterFound) {
+			AccessorChange submitterChange = new AccessorChange();
+			submitterChange.setUserId(authController.getCurrentUserPrincipalId());
+			submitterChange.setType(AccessType.GAIN_ACCESS);
+			accessorsList.addSubmitterUserBadge(submitterChange);
 		}
 	}
 	
