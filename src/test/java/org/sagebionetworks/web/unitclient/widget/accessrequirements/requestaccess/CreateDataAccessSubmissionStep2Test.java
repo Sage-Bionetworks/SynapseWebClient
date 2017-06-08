@@ -363,8 +363,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		when(mockDataAccessRequest.getAccessorChanges()).thenReturn(accessorUserIds);
 		widget.configure(mockResearchProject, mockACTAccessRequirement);
 		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
-		verify(mockAccessorsList, times(2)).addUserBadge(any(AccessorChange.class));
-		verify(mockAccessorsList).addUserBadge(change1);
+		verify(mockAccessorsList).addSubmitterUserBadge(change1);
 		verify(mockAccessorsList).addUserBadge(change2);
 	}
 	
