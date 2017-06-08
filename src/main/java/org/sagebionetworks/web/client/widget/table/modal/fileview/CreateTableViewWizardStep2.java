@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -109,6 +110,8 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	public void getPossibleColumnModelsForViewScope(String nextPageToken) {
 		ViewScope scope = new ViewScope();
 		scope.setScope(((EntityView)entity).getScopeIds());
+		ViewType type = TableType.fileview.equals(tableType) ? ViewType.file : ViewType.project;
+		scope.setViewType(type);
 		synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken, new AsyncCallback<ColumnModelPage>() {
 			@Override
 			public void onFailure(Throwable caught) {
