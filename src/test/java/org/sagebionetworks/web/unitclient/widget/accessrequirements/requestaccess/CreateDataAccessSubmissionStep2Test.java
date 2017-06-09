@@ -22,7 +22,6 @@ import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
@@ -252,26 +251,9 @@ public class CreateDataAccessSubmissionStep2Test {
 	}
 	
 	@Test
-	public void testUserIdsDeleted() {
-		verify(mockAccessorsList).setUserIdsDeletedCallback(callbackPStringListCaptor.capture());
-		CallbackP<List<String>> userIdsDeletedCallback = callbackPStringListCaptor.getValue();
-		
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
-		
-		userIdsDeletedCallback.invoke(null);
-		verify(mockView, never()).setRevokeNoteVisible(true);
-	}
-	
-	@Test
 	public void testConfigureWithRenewal() {
-		verify(mockAccessorsList).setUserIdsDeletedCallback(callbackPStringListCaptor.capture());
-		CallbackP<List<String>> userIdsDeletedCallback = callbackPStringListCaptor.getValue();
-		
 		AsyncMockStubber.callSuccessWith(mockDataAccessRenewal).when(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
 		widget.configure(mockResearchProject, mockACTAccessRequirement);
-		
-		userIdsDeletedCallback.invoke(null);
-		verify(mockView).setRevokeNoteVisible(true);
 		
 		verify(mockView).setPublicationsVisible(true);
 		verify(mockView).setSummaryOfUseVisible(true);

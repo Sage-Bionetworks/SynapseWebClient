@@ -1,21 +1,24 @@
 package org.sagebionetworks.web.unitclient.widget.entity.act;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import java.util.List;
-
 import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeListView;
@@ -31,8 +34,6 @@ public class UserBadgeListTest {
 	UserBadgeListView mockView;
 	@Mock
 	PortalGinInjector mockGinInjector;
-	@Mock
-	CallbackP<List<String>> mockUserIdsDeletedCallback; 
 	@Captor
 	ArgumentCaptor<List<String>> listCaptor;
 	@Mock
@@ -137,22 +138,6 @@ public class UserBadgeListTest {
 		list.deleteSelected();
 		verify(mockView).clearUserBadges();
 		verify(mockView, times(1)).addUserBadge(any(Widget.class)); 
-	}
-	
-	@Test
-	public void testDeleteSelectedCallback() {
-		list.configure();
-		list.setUserIdsDeletedCallback(mockUserIdsDeletedCallback);
-		when(mockUserBadgeItem.isSelected()).thenReturn(true);
-		when(mockUserBadgeItem2.isSelected()).thenReturn(false);
-		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem, mockUserBadgeItem2);
-		list.addUserBadge(mockChange1);
-		list.addUserBadge(mockChange2);
-		list.deleteSelected();
-		verify(mockUserIdsDeletedCallback).invoke(listCaptor.capture());
-		List<String> deletedUserIds = listCaptor.getValue();
-		assertEquals(1, deletedUserIds.size());
-		assertEquals(USER_ID_1, deletedUserIds.get(0));
 	}
 	
 	@Test
