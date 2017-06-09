@@ -82,6 +82,17 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		if (!isGainAccess) {
 			select.setVisible(false);
 		}
+		
+		switch(accessType) {
+			case RENEW_ACCESS:
+				dropdown.setText(renew.getText());
+				break;
+			case REVOKE_ACCESS:
+				dropdown.setText(revoke.getText());
+				break;
+			default:
+		}
+		
 		UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
 		userBadge.configure(userId);
 		userBadge.setSize(BadgeSize.SMALL);
