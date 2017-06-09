@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;

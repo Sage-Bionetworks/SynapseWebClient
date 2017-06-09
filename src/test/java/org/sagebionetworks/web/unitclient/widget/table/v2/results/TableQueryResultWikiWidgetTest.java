@@ -29,7 +29,7 @@ import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;

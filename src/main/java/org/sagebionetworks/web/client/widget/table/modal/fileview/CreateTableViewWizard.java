@@ -18,11 +18,6 @@ public class CreateTableViewWizard {
 	
 	ModalWizardWidget modalWizardWidget;
 	CreateTableViewWizardStep1 step1;
-	public enum TableType {
-	    table,
-	    fileview,
-	    projectview
-	}
 	private String parentId;
 	private TableType type;
 	public static final String VIEW_HELP = "Synapse File Views are views of all files within one or more Projects or Folders.";

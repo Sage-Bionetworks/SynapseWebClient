@@ -7,9 +7,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -76,12 +74,7 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 			table = new EntityView();
 			List<String> scopeIds = entityContainerList.getEntityIds();
 			((EntityView)table).setScopeIds(scopeIds);
-			
-			if (TableType.fileview.equals(tableType)) {
-				((EntityView)table).setType(ViewType.file);	
-			} else if (TableType.projectview.equals(tableType)) {
-				((EntityView)table).setType(ViewType.project);
-			}
+			((EntityView)table).setType(tableType.getViewType());	
 		} 
 		table.setName(name);
 		table.setParentId(parentId);

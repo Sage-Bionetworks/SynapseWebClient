@@ -6,7 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;

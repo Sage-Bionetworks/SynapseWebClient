@@ -19,10 +19,10 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetView;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;

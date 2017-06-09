@@ -29,12 +29,13 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2View;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
@@ -151,10 +152,27 @@ public class CreateTableViewWizardStep2Test {
 		widget.getPossibleColumnModelsForViewScope(firstPageToken);
 		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(viewScopeCaptor.capture(), eq(firstPageToken), any(AsyncCallback.class));
 		//verify scope
-		assertEquals(mockViewScopeIds, viewScopeCaptor.getValue().getScope());
+		ViewScope viewScope = viewScopeCaptor.getValue();
+		assertEquals(mockViewScopeIds, viewScope.getScope());
+		assertEquals(ViewType.file, viewScope.getViewType());
+		
 		verify(mockEditor).addColumns(mockAnnotationColumnsPage1);
 		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(any(ViewScope.class), eq(NEXT_PAGE_TOKEN), any(AsyncCallback.class));
 		verify(mockEditor).addColumns(mockAnnotationColumnsPage2);
+	}
+	
+	@Test
+	public void testGetPossibleColumnModelsForProjectViewScope() {
+		// test is set up so that rpc successfully returns 2 pages, and then stops.
+		widget.configure(viewEntity, TableType.projectview);
+
+		String firstPageToken = null;
+		widget.getPossibleColumnModelsForViewScope(firstPageToken);
+		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(viewScopeCaptor.capture(), eq(firstPageToken), any(AsyncCallback.class));
+		//verify scope
+		ViewScope viewScope = viewScopeCaptor.getValue();
+		assertEquals(mockViewScopeIds, viewScope.getScope());
+		assertEquals(ViewType.project, viewScope.getViewType());
 	}
 	
 	@Test

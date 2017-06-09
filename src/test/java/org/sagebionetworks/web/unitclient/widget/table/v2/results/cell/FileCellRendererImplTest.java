@@ -24,7 +24,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.TableFileHandleRequest;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererView;
 import org.sagebionetworks.web.shared.table.CellAddress;
