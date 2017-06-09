@@ -241,7 +241,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		}
 	}
 	
-	private void updateDataAccessRequest(final boolean isSubmit) {
+	public void updateDataAccessRequest(final boolean isSubmit) {
 		modalPresenter.setLoading(true);
 		dataAccessRequest.setAccessorChanges(accessorsList.getAccessorChanges());
 		dataAccessRequest.setAttachments(otherDocuments.getFileHandleIds());

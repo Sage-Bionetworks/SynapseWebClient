@@ -186,8 +186,34 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).setInstitution(INSTITUTION);
 		verify(mockView).setIntendedDataUse(INTENDED_DATA_USE);
 		verify(mockView).setIsRenewal(false);
+		verify(mockView).setRenewalColumnsVisible(false);
 		verify(mockView).setProjectLead(PROJECT_LEAD);
 		verify(mockView).setSubmittedOn(SMALL_DATE_STRING);
+	}
+	
+	@Test
+	public void testConfigureRenewal() {
+		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadge);
+		String userId1 = "12";
+		List<AccessorChange> changes = new ArrayList<AccessorChange>();
+		AccessorChange change1 = new AccessorChange();
+		change1.setUserId(userId1);
+		change1.setType(AccessType.RENEW_ACCESS);
+		changes.add(change1);
+		when(mockDataAccessSubmission.getAccessorChanges()).thenReturn(changes);
+		when(mockDataAccessSubmission.getIsRenewalSubmission()).thenReturn(true);
+		
+		widget.configure(mockDataAccessSubmission);
+		
+		verify(mockView).hideActions();
+		// verify accessors
+		verify(mockView).clearAccessors();
+		verify(mockGinInjector).getUserBadgeItem();
+		verify(mockUserBadge).configure(change1);
+		verify(mockView).addAccessors(any(IsWidget.class));
+		// verify view
+		verify(mockView).setIsRenewal(true);
+		verify(mockView).setRenewalColumnsVisible(true);
 	}
 	
 	@Test

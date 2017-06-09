@@ -259,6 +259,16 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockView).setSummaryOfUseVisible(true);
 		verify(mockView).setPublications(anyString());
 		verify(mockView).setSummaryOfUse(anyString());
+		
+		String publications = "publications";
+		when(mockView.getPublications()).thenReturn(publications);
+		String summary = "summary of use";
+		when(mockView.getSummaryOfUse()).thenReturn(summary);
+		// save renewal, verify renewal values are taken from the view
+		widget.updateDataAccessRequest(false);
+		verify(mockClient).updateDataAccessRequest(eq(mockDataAccessRenewal), any(AsyncCallback.class));
+		verify(mockDataAccessRenewal).setPublication(publications);
+		verify(mockDataAccessRenewal).setSummaryOfUse(summary);
 	}
 	
 	@Test
