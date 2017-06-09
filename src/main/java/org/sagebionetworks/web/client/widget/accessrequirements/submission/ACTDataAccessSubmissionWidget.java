@@ -120,6 +120,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setPublications(submission.getPublication());
 		view.setSummaryOfUse(submission.getSummaryOfUse());
 		view.setSubmittedOn(jsniUtils.convertDateToSmallString(submission.getSubmittedOn()));
+		view.setRenewalColumnsVisible(submission.getIsRenewalSubmission());
 		UserBadge badge = ginInjector.getUserBadgeWidget();
 		badge.configure(submission.getSubmittedBy());
 		view.setSubmittedBy(badge);
@@ -130,6 +131,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 			UserBadgeItem badge = ginInjector.getUserBadgeItem();
 			badge.configure(change);
 			badge.setSelectVisible(false);
+			badge.setAccessTypeDropdownEnabled(false);
 			view.addAccessors(badge);
 		}
 	}
@@ -186,8 +188,5 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	}
 	public void setOtherAttachmentsColumnVisible(boolean visible) {
 		view.setOtherAttachmentsColumnVisible(visible);
-	}
-	public void setRenewalColumnsVisible(boolean visible) {
-		view.setRenewalColumnsVisible(visible);
 	}
 }

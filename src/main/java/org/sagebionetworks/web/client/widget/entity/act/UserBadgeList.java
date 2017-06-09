@@ -7,7 +7,6 @@ import java.util.List;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,7 +20,6 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	boolean isToolbarVisible, changingSelection;
 	List<UserBadgeItem> users;
 	Callback selectionChangedCallback;
-	CallbackP<List<String>> userIdsDeletedCallback;
 	@Inject
 	public UserBadgeList (
 			UserBadgeListView view, 
@@ -104,9 +102,6 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 			}
 		}
 		refreshListUI();
-		if (userIdsDeletedCallback != null) {
-			userIdsDeletedCallback.invoke(userIdsDeleted);
-		}
 	}
 	
 	/**
@@ -169,9 +164,5 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 			accessorChanges.add(change);
 		}
 		return accessorChanges;
-	}
-	
-	public void setUserIdsDeletedCallback(CallbackP<List<String>> userIdsDeletedCallback) {
-		this.userIdsDeletedCallback = userIdsDeletedCallback;
 	}
 }

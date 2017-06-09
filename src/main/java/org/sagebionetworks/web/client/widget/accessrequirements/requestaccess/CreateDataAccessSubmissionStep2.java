@@ -118,15 +118,6 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 				CreateDataAccessSubmissionStep2.this.accessorsList.addUserBadge(change);
 			};
 		});
-		accessorsList.setUserIdsDeletedCallback(new CallbackP<List<String>>() {
-			@Override
-			public void invoke(List<String> param) {
-				if (dataAccessRequest instanceof Renewal) {
-					// notify user that removing a user does not revoke access, with link to inform ACT
-					CreateDataAccessSubmissionStep2.this.view.setRevokeNoteVisible(true);
-				}
-			}
-		});
 	}
 	
 	public void setDUCFileHandle(String fileName, String ducFileHandleId) {
@@ -164,7 +155,6 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		accessorsList.clear();
 		view.setPublicationsVisible(false);
 		view.setSummaryOfUseVisible(false);
-		view.setRevokeNoteVisible(false);
 		peopleSuggestWidget.clear();
 		view.setOtherDocumentUploadVisible(ValidationUtils.isTrue(ar.getAreOtherAttachmentsRequired()));
 		boolean isDucTemplate = ar.getDucTemplateFileHandleId() != null;
@@ -256,6 +246,13 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		dataAccessRequest.setAccessorChanges(accessorsList.getAccessorChanges());
 		dataAccessRequest.setAttachments(otherDocuments.getFileHandleIds());
 		dataAccessRequest.setResearchProjectId(researchProject.getId());
+
+		boolean isRenewal = dataAccessRequest instanceof Renewal;
+		if (isRenewal) {
+			((Renewal)dataAccessRequest).setPublication(view.getPublications());
+			((Renewal)dataAccessRequest).setSummaryOfUse(view.getSummaryOfUse());
+		}
+
 		client.updateDataAccessRequest(dataAccessRequest, new AsyncCallback<RequestInterface>() {
 			@Override
 			public void onFailure(Throwable caught) {

@@ -135,4 +135,8 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	public Widget asWidget() {
 		return widget;
 	}
+	
+	public void setAccessTypeDropdownEnabled(boolean enabled) {
+		dropdown.setEnabled(enabled);
+	}
 }
