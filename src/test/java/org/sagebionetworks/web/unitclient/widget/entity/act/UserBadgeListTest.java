@@ -185,7 +185,16 @@ public class UserBadgeListTest {
 		AccessorChange change = changeList.get(0);
 		assertEquals(USER_ID_2, change.getUserId());
 	}
-
+	
+	@Test
+	public void testAddSubmitterUserBadge() {
+		list.configure();
+		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadgeItem);
+		list.addSubmitterUserBadge(mockChange1);
+		verify(mockUserBadgeItem).configure(mockChange1);
+		verify(mockUserBadgeItem).setSelectVisible(false);
+	}
+	
 	@Test
 	public void testSelectAll() {
 		list.configure();
