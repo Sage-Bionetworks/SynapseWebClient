@@ -54,7 +54,13 @@
 				</bh:Div>
 				
 				<b:Alert type="INFO" ui:field="requestSubmittedMessage" text="You have submitted a data access request." pull="RIGHT" visible="false" addStyleNames="small-alert margin-top-5 margin-right-2"/>
-				<b:Alert type="SUCCESS" ui:field="requestApprovedMessage" text="Your data access request has been approved." pull="RIGHT" visible="false" addStyleNames="small-alert margin-top-5 margin-right-2"/>
+				<b:Alert type="SUCCESS" ui:field="requestApprovedMessage" pull="RIGHT" visible="false" addStyleNames="small-alert margin-top-5 margin-right-2">
+					<bh:Text>Your data access request has been approved.</bh:Text>
+					<bh:Span ui:field="expirationUI" addStyleNames="margin-left-10">
+						<bh:Text>Access expires on </bh:Text>
+						<bh:Text ui:field="expirationDateText"/>
+					</bh:Span>
+				</b:Alert>
 				<b:Alert type="WARNING" ui:field="requestRejectedMessage" text="" pull="RIGHT" visible="false" addStyleNames="small-alert margin-top-5 margin-right-2"/>
 			</bh:Div>
 			<bh:ClearFix />

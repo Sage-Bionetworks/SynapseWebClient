@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -27,6 +28,7 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTRevokeUserAccessButton;
@@ -94,6 +96,9 @@ public class ManagedACTAccessRequirementWidgetTest {
 	UserProfile mockProfile;
 	@Mock
 	SubmissionStatus mockSubmissionStatus;
+	@Mock
+	SynapseJSNIUtils mockJsniUtils;
+	
 	Callback lazyLoadDataCallback;
 	
 	public final static String ROOT_WIKI_ID = "777";
@@ -103,7 +108,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new ManagedACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockRevokeUserAccessButton, mockManageAccessButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockSubmitterUserBadge);
+		widget = new ManagedACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockRevokeUserAccessButton, mockManageAccessButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockSubmitterUserBadge, mockJsniUtils);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
@@ -165,6 +170,21 @@ public class ManagedACTAccessRequirementWidgetTest {
 		verify(mockView).showApprovedHeading();
 		verify(mockView).showRequestApprovedMessage();
 		verify(mockView).showUpdateRequestButton();
+		verify(mockView, never()).showExpirationDate(anyString());
+	}
+	
+	@Test
+	public void testApprovedStateWithExpiration() {
+		String friendlyDate = "June 9th, 2018";
+		widget.setRequirement(mockACTAccessRequirement);
+		when(mockDataAccessSubmissionStatus.getExpiredOn()).thenReturn(new Date());
+		when(mockJsniUtils.getLongFriendlyDate(any(Date.class))).thenReturn(friendlyDate);
+		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.APPROVED);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showApprovedHeading();
+		verify(mockView).showRequestApprovedMessage();
+		verify(mockView).showUpdateRequestButton();
+		verify(mockView).showExpirationDate(friendlyDate);
 	}
 	
 	@Test
