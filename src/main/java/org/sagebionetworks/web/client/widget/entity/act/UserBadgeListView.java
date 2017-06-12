@@ -11,7 +11,6 @@ import com.google.gwt.user.client.ui.Widget;
 public interface UserBadgeListView extends IsWidget {
 	
 	public interface Presenter{
-		List<String> getUserIds();
 		void deleteSelected();
 		void selectNone();
 		void selectAll();

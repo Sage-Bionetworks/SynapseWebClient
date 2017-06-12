@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.dataaccess.AccessType;
+import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.repo.model.dataaccess.Renewal;
 import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -112,17 +112,11 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			public void invoke(SynapseSuggestion suggestion) {
 				peopleSuggestWidget.clear();
-				CreateDataAccessSubmissionStep2.this.accessorsList.addUserBadge(suggestion.getId());
+				AccessorChange change = new AccessorChange();
+				change.setUserId(suggestion.getId());
+				change.setType(AccessType.GAIN_ACCESS);
+				CreateDataAccessSubmissionStep2.this.accessorsList.addUserBadge(change);
 			};
-		});
-		accessorsList.setUserIdsDeletedCallback(new CallbackP<List<String>>() {
-			@Override
-			public void invoke(List<String> param) {
-				if (dataAccessRequest instanceof Renewal) {
-					// notify user that removing a user does not revoke access, with link to inform ACT
-					CreateDataAccessSubmissionStep2.this.view.setRevokeNoteVisible(true);
-				}
-			}
 		});
 	}
 	
@@ -161,7 +155,6 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		accessorsList.clear();
 		view.setPublicationsVisible(false);
 		view.setSummaryOfUseVisible(false);
-		view.setRevokeNoteVisible(false);
 		peopleSuggestWidget.clear();
 		view.setOtherDocumentUploadVisible(ValidationUtils.isTrue(ar.getAreOtherAttachmentsRequired()));
 		boolean isDucTemplate = ar.getDucTemplateFileHandleId() != null;
@@ -229,21 +222,37 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	}
 	
 	public void initAccessors() {
-		Set<String> uniqueAccessors = new HashSet<String>();
-		uniqueAccessors.add(authController.getCurrentUserPrincipalId());
-		if (dataAccessRequest.getAccessors() != null) {
-			uniqueAccessors.addAll(dataAccessRequest.getAccessors());
+		boolean submitterFound = false;
+		if (dataAccessRequest.getAccessorChanges() != null) {
+			for (AccessorChange change : dataAccessRequest.getAccessorChanges()) {
+				if (change.getUserId().equals(authController.getCurrentUserPrincipalId())) {
+					submitterFound = true;
+					accessorsList.addSubmitterUserBadge(change);	
+				} else {
+					accessorsList.addUserBadge(change);	
+				}
+			}
 		}
-		for (String userId : uniqueAccessors) {
-			accessorsList.addUserBadge(userId);
+		if (!submitterFound) {
+			AccessorChange submitterChange = new AccessorChange();
+			submitterChange.setUserId(authController.getCurrentUserPrincipalId());
+			submitterChange.setType(AccessType.GAIN_ACCESS);
+			accessorsList.addSubmitterUserBadge(submitterChange);
 		}
 	}
 	
-	private void updateDataAccessRequest(final boolean isSubmit) {
+	public void updateDataAccessRequest(final boolean isSubmit) {
 		modalPresenter.setLoading(true);
-		dataAccessRequest.setAccessors(accessorsList.getUserIds());
+		dataAccessRequest.setAccessorChanges(accessorsList.getAccessorChanges());
 		dataAccessRequest.setAttachments(otherDocuments.getFileHandleIds());
 		dataAccessRequest.setResearchProjectId(researchProject.getId());
+
+		boolean isRenewal = dataAccessRequest instanceof Renewal;
+		if (isRenewal) {
+			((Renewal)dataAccessRequest).setPublication(view.getPublications());
+			((Renewal)dataAccessRequest).setSummaryOfUse(view.getSummaryOfUse());
+		}
+
 		client.updateDataAccessRequest(dataAccessRequest, new AsyncCallback<RequestInterface>() {
 			@Override
 			public void onFailure(Throwable caught) {

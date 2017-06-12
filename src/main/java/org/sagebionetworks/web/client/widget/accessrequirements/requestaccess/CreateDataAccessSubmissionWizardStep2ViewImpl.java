@@ -52,8 +52,6 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	FormGroup otherUploadUI;
 	@UiField
 	FormGroup ducTemplateUI;
-	@UiField
-	Alert revokeAccessNote;
 	
 	@Inject
 	public CreateDataAccessSubmissionWizardStep2ViewImpl(Binder binder){
@@ -157,9 +155,5 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	@Override
 	public void setDUCTemplateVisible(boolean visible) {
 		ducTemplateUI.setVisible(visible);
-	}
-	@Override
-	public void setRevokeNoteVisible(boolean visible) {
-		revokeAccessNote.setVisible(visible);	
 	}
 }

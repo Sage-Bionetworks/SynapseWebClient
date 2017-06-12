@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
@@ -41,6 +42,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	AuthenticationController authController;
 	UserBadge submitterUserBadge;
 	ACTRevokeUserAccessButton revokeUserAccessButton;
+	SynapseJSNIUtils jsniUtils;
 	
 	@Inject
 	public ManagedACTAccessRequirementWidget(ManagedACTAccessRequirementWidgetView view, 
@@ -56,7 +58,8 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 			DataAccessClientAsync dataAccessClient,
 			LazyLoadHelper lazyLoadHelper,
 			AuthenticationController authController,
-			UserBadge submitterUserBadge) {
+			UserBadge submitterUserBadge,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -71,6 +74,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		this.authController = authController;
 		this.submitterUserBadge = submitterUserBadge;
 		this.revokeUserAccessButton = revokeUserAccessButton;
+		this.jsniUtils = jsniUtils;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setSubmitterUserBadge(submitterUserBadge);
 		view.setPresenter(this);
@@ -114,13 +118,13 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		lazyLoadHelper.setIsConfigured();
 	}
 	
-	public void setDataAccessSubmissionStatus(SubmissionStatus status) {
-		submissionId = status.getSubmissionId();
-		view.resetState();
-		switch (status.getState()) {
+	public void setDataAccessSubmissionStatus(ManagedACTAccessRequirementStatus status) {
+		SubmissionStatus currentSubmissionStatus = status.getCurrentSubmissionStatus();
+		submissionId = currentSubmissionStatus.getSubmissionId();
+		switch (currentSubmissionStatus.getState()) {
 			case SUBMITTED:
 				// request has been submitted on your behalf, or by you?
-				String submitterUserId = status.getSubmittedBy();
+				String submitterUserId = currentSubmissionStatus.getSubmittedBy();
 				view.showUnapprovedHeading();
 				if (authController.getCurrentUserPrincipalId().equals(submitterUserId)) {
 					view.showRequestSubmittedMessage();
@@ -133,10 +137,13 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 				break;
 			case APPROVED:
 				showApproved();
+				if (status.getExpiredOn() != null) {
+					view.showExpirationDate(jsniUtils.getLongFriendlyDate(status.getExpiredOn()));
+				}
 				break;
 			case REJECTED:
 				view.showUnapprovedHeading();
-				view.showRequestRejectedMessage(status.getRejectedReason());
+				view.showRequestRejectedMessage(currentSubmissionStatus.getRejectedReason());
 				view.showUpdateRequestButton();
 				break;
 			case CANCELLED:
@@ -158,6 +165,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	}
 	
 	public void refreshApprovalState() {
+		view.resetState();
 		dataAccessClient.getAccessRequirementStatus(ar.getId().toString(), new AsyncCallback<AccessRequirementStatus>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -165,14 +173,15 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 			}
 			@Override
 			public void onSuccess(AccessRequirementStatus status) {
-				if (((ManagedACTAccessRequirementStatus)status).getCurrentSubmissionStatus() == null) {
+				ManagedACTAccessRequirementStatus managedACTARStatus = (ManagedACTAccessRequirementStatus)status;
+				if (managedACTARStatus.getCurrentSubmissionStatus() == null) {
 					if (status.getIsApproved()) {
 						showApproved();
 					} else {
 						showUnapproved();
 					}
 				} else {
-					setDataAccessSubmissionStatus(((ManagedACTAccessRequirementStatus)status).getCurrentSubmissionStatus());	
+					setDataAccessSubmissionStatus(managedACTARStatus);	
 				}
 			}
 		});
