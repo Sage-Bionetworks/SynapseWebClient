@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -61,6 +63,10 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	Div requestAccessButtonContainer;
 	@UiField
 	Div revokeAccessButtonContainer;
+	@UiField
+	Span expirationUI;
+	@UiField
+	Text expirationDateText;
 	
 	Callback onAttachCallback;
 	public interface Binder extends UiBinder<Widget, ManagedACTAccessRequirementWidgetViewImpl> {
@@ -171,6 +177,7 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 		updateRequestButton.setVisible(false);
 		requestAccessButton.setVisible(false);
 		requestSubmittedByOther.setVisible(false);
+		expirationUI.setVisible(false);
 	}
 	
 	@Override
@@ -246,5 +253,10 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 		updateRequestButtonContainer.setVisible(false);
 		requestAccessButtonContainer.setVisible(false);
 		revokeAccessButtonContainer.setVisible(false);
+	}
+	@Override
+	public void showExpirationDate(String dateString) {
+		expirationDateText.setText(dateString);
+		expirationUI.setVisible(true);
 	}
 }

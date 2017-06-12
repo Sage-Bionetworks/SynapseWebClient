@@ -21,6 +21,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.dataaccess.AccessType;
+import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
@@ -123,10 +125,17 @@ public class ACTDataAccessSubmissionWidgetTest {
 		boolean user2HasApproval = false;
 		String userId1 = "12";
 		String userId2 = "34";
-		List<String> userIds = new ArrayList<String>();
-		userIds.add(userId1);
-		userIds.add(userId2);
-		when(mockDataAccessSubmission.getAccessors()).thenReturn(userIds);
+		List<AccessorChange> changes = new ArrayList<AccessorChange>();
+		AccessorChange change1 = new AccessorChange();
+		change1.setUserId(userId1);
+		change1.setType(AccessType.GAIN_ACCESS);
+		AccessorChange change2 = new AccessorChange();
+		change2.setUserId(userId2);
+		change2.setType(AccessType.GAIN_ACCESS);
+		
+		changes.add(change1);
+		changes.add(change2);
+		when(mockDataAccessSubmission.getAccessorChanges()).thenReturn(changes);
 		// set up other documents
 		String fileHandleId1 = "873";
 		String fileHandleId2 = "5432";
@@ -147,8 +156,8 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).clearAccessors();
 		verify(mockGinInjector, times(2)).getUserBadgeItem();
 		
-		verify(mockUserBadge).configure(userId1);
-		verify(mockUserBadge).configure(userId2);
+		verify(mockUserBadge).configure(change1);
+		verify(mockUserBadge).configure(change2);
 		
 		verify(mockView, times(2)).addAccessors(any(IsWidget.class));
 		// verify other documents
@@ -177,8 +186,34 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).setInstitution(INSTITUTION);
 		verify(mockView).setIntendedDataUse(INTENDED_DATA_USE);
 		verify(mockView).setIsRenewal(false);
+		verify(mockView).setRenewalColumnsVisible(false);
 		verify(mockView).setProjectLead(PROJECT_LEAD);
 		verify(mockView).setSubmittedOn(SMALL_DATE_STRING);
+	}
+	
+	@Test
+	public void testConfigureRenewal() {
+		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadge);
+		String userId1 = "12";
+		List<AccessorChange> changes = new ArrayList<AccessorChange>();
+		AccessorChange change1 = new AccessorChange();
+		change1.setUserId(userId1);
+		change1.setType(AccessType.RENEW_ACCESS);
+		changes.add(change1);
+		when(mockDataAccessSubmission.getAccessorChanges()).thenReturn(changes);
+		when(mockDataAccessSubmission.getIsRenewalSubmission()).thenReturn(true);
+		
+		widget.configure(mockDataAccessSubmission);
+		
+		verify(mockView).hideActions();
+		// verify accessors
+		verify(mockView).clearAccessors();
+		verify(mockGinInjector).getUserBadgeItem();
+		verify(mockUserBadge).configure(change1);
+		verify(mockView).addAccessors(any(IsWidget.class));
+		// verify view
+		verify(mockView).setIsRenewal(true);
+		verify(mockView).setRenewalColumnsVisible(true);
 	}
 	
 	@Test

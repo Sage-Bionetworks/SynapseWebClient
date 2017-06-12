@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -18,9 +18,8 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	UserBadgeListView view;
 	PortalGinInjector ginInjector;
 	boolean isToolbarVisible, changingSelection;
-	List<UserBadgeItem> users;	
+	List<UserBadgeItem> users;
 	Callback selectionChangedCallback;
-	CallbackP<List<String>> userIdsDeletedCallback;
 	@Inject
 	public UserBadgeList (
 			UserBadgeListView view, 
@@ -56,16 +55,25 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		return this;
 	}
 	
-	public void addUserBadge(String userId) {
+	public void addUserBadge(AccessorChange change) {
+		addUserBadge(change, false);
+	}
+	
+	public void addSubmitterUserBadge(AccessorChange change) {
+		addUserBadge(change, true);
+	}
+	
+	private void addUserBadge(AccessorChange change, boolean hideSelect) {
 		UserBadgeItem item = ginInjector.getUserBadgeItem();
-		item.configure(userId);
+		item.configure(change);
 		item.setSelectionChangedCallback(selectionChangedCallback);
-		// TODO: show available actions if renewal 
-		// (new accessors will always be "gain access", but existing accessors could be "revoked" or "renewed")
 		users.add(item);
 		view.addUserBadge(item.asWidget());
 		boolean toolbarVisible = isToolbarVisible && users.size() > 0;
 		view.setToolbarVisible(toolbarVisible);
+		if (hideSelect) {
+			item.setSelectVisible(false);
+		}
 	}
 	
 	public void refreshListUI() {
@@ -94,9 +102,6 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 			}
 		}
 		refreshListUI();
-		if (userIdsDeletedCallback != null) {
-			userIdsDeletedCallback.invoke(userIdsDeleted);
-		}
 	}
 	
 	/**
@@ -150,16 +155,14 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		return view.asWidget();
 	}
 
-	@Override
-	public List<String> getUserIds() {
-		List<String> userIds = new ArrayList<String>();
+	public List<AccessorChange> getAccessorChanges() {
+		List<AccessorChange> accessorChanges = new ArrayList<AccessorChange>();
 		for (UserBadgeItem item : users) {
-			userIds.add(item.getUserId());
+			AccessorChange change = new AccessorChange();
+			change.setUserId(item.getUserId());
+			change.setType(item.getAccessType());
+			accessorChanges.add(change);
 		}
-		return userIds;
-	}
-	
-	public void setUserIdsDeletedCallback(CallbackP<List<String>> userIdsDeletedCallback) {
-		this.userIdsDeletedCallback = userIdsDeletedCallback;
+		return accessorChanges;
 	}
 }
