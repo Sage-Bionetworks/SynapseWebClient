@@ -1,16 +1,21 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_JS;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
+import static org.sagebionetworks.web.shared.WidgetConstants.FILL_COLUMN_NAME;
 import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
 import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
-import static org.sagebionetworks.web.client.ClientProperties.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -34,6 +39,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -60,7 +66,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	QueryBundleRequest qbr;
 	public static final Long LIMIT = 150L;
 	Map<String, List<String>> graphData;
-	String xAxisColumnName;
+	String xAxisColumnName, fillColumnName;
 	private ResourceLoader resourceLoader;
 	
 	@Inject
@@ -88,6 +94,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		clear();
 		graphData = null;
 		xAxisColumnName = null;
+		fillColumnName = descriptor.get(FILL_COLUMN_NAME);
 		sql = descriptor.get(TABLE_QUERY_KEY);
 		title = descriptor.get(TITLE);
 		xTitle = descriptor.get(X_AXIS_TITLE);
@@ -205,24 +212,89 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		}
 		
 		try {
-			String[] xData = ArrayUtils.getStringArray(graphData.remove(xAxisColumnName));
-			PlotlyTrace[] plotlyGraphData = new PlotlyTrace[graphData.size()];
-			int i = 0;
-			for (String columnName : graphData.keySet()) {
-				plotlyGraphData[i] = new PlotlyTrace();
-				plotlyGraphData[i].setX(xData);
-				String[] yData = ArrayUtils.getStringArray(graphData.get(columnName));
-				plotlyGraphData[i].setY(yData);
-				plotlyGraphData[i].setType(graphType);
-				plotlyGraphData[i].setName(columnName);
-				i++;
+			PlotlyTrace[] plotlyGraphData;
+			if (fillColumnName != null) {
+				plotlyGraphData = transform(xAxisColumnName, fillColumnName, graphType, graphData);
+			} else { 
+				plotlyGraphData = transform(xAxisColumnName, graphType, graphData); 
 			}
 			view.setLoadingVisible(false);
 			view.showChart(title, xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase());
 		} catch (Throwable ex) {
 			synAlert.showError("Error showing plot: " + ex.getMessage());
 		}
+	}
+	
+	
+	/**
+	 * Transforms graph data into standard x/y traces, used by xy line and bar charts.
+	 * @param xAxisColumnName
+	 * @param graphType
+	 * @param graphData
+	 * @return
+	 */
+	public PlotlyTrace[] transform(String xAxisColumnName, GraphType graphType, Map<String, List<String>> graphData) {
+		String[] xData = ArrayUtils.getStringArray(graphData.remove(xAxisColumnName));
+		PlotlyTrace[] plotlyGraphData = new PlotlyTrace[graphData.size()];
+		int i = 0;
+		for (String columnName : graphData.keySet()) {
+			plotlyGraphData[i] = new PlotlyTrace();
+			plotlyGraphData[i].setX(xData);
+			String[] yData = ArrayUtils.getStringArray(graphData.get(columnName));
+			plotlyGraphData[i].setY(yData);
+			plotlyGraphData[i].setType(graphType);
+			plotlyGraphData[i].setName(columnName);
+			i++;
+		}
+		return plotlyGraphData;
+	}
+	
+	public PlotlyTrace[] transform(String xAxisColumnName, String fillColumnName, GraphType graphType, Map<String, List<String>> graphData) {
+		String[] xData = ArrayUtils.getStringArray(graphData.remove(xAxisColumnName));
+		String[] fillColumnData = ArrayUtils.getStringArray(graphData.remove(fillColumnName));
 		
+		Set<String> uniqueFillColumnDataValues = new HashSet<>();
+		//get the unique values of the fill column
+		for (String fillColValue : fillColumnData) {
+			uniqueFillColumnDataValues.add(fillColValue);
+		}
+		List<PlotlyTrace> plotlyTraceData = new ArrayList<>();
+		for (String columnName : graphData.keySet()) {
+			for (String targetFillColumnValue : uniqueFillColumnDataValues) {
+				// create a new trace for each fill column value
+				PlotlyTrace newTrace = new PlotlyTrace();
+				List<String> traceX = new ArrayList<>();
+				List<String> traceY = new ArrayList<>();
+				
+				List<String> yData = graphData.get(columnName);
+				for (int j = 0; j < fillColumnData.length; j++) {
+					if (Objects.equals(targetFillColumnValue, fillColumnData[j])) {
+						traceX.add(xData[j]);
+						traceY.add(yData.get(j));
+					}
+				}
+				
+				newTrace.setX(ArrayUtils.getStringArray(traceX));
+				newTrace.setY(ArrayUtils.getStringArray(traceY));
+				newTrace.setType(graphType);
+				String traceName = targetFillColumnValue == null ? "" : targetFillColumnValue;
+				newTrace.setName(traceName);
+				plotlyTraceData.add(newTrace);
+			}
+		}
+		
+		return getPlotlyTraceArray(plotlyTraceData);
+	}
+
+	public static PlotlyTrace[] getPlotlyTraceArray(List<PlotlyTrace> l) {
+		if (l == null) {
+			return null;
+		}
+		PlotlyTrace[] d = new PlotlyTrace[l.size()];
+		for (int i = 0; i < l.size(); i++) {
+			d[i] = l.get(i);
+		}
+		return d;
 	}
 	
 	@Override
