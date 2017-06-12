@@ -52,6 +52,14 @@ public class PlotlyTrace {
 				a[i] = "";
 			}
 		}
-
+	}
+	public String getName() {
+		return name;
+	}
+	public String[] getX() {
+		return x;
+	}
+	public String[] getY() {
+		return y;
 	}
 }

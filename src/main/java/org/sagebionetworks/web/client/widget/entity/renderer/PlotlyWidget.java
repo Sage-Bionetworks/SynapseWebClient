@@ -39,7 +39,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -233,7 +232,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	 * @param graphData
 	 * @return
 	 */
-	public PlotlyTrace[] transform(String xAxisColumnName, GraphType graphType, Map<String, List<String>> graphData) {
+	public static PlotlyTrace[] transform(String xAxisColumnName, GraphType graphType, Map<String, List<String>> graphData) {
 		String[] xData = ArrayUtils.getStringArray(graphData.remove(xAxisColumnName));
 		PlotlyTrace[] plotlyGraphData = new PlotlyTrace[graphData.size()];
 		int i = 0;
@@ -249,7 +248,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		return plotlyGraphData;
 	}
 	
-	public PlotlyTrace[] transform(String xAxisColumnName, String fillColumnName, GraphType graphType, Map<String, List<String>> graphData) {
+	public static PlotlyTrace[] transform(String xAxisColumnName, String fillColumnName, GraphType graphType, Map<String, List<String>> graphData) {
 		String[] xData = ArrayUtils.getStringArray(graphData.remove(xAxisColumnName));
 		String[] fillColumnData = ArrayUtils.getStringArray(graphData.remove(fillColumnName));
 		
