@@ -27,11 +27,13 @@ public class PlotlyTrace {
 	@JsIgnore
 	public void setX(String[] x) {
 		this.x = x;
+		removeNulls(x);
 	}
 	
 	@JsIgnore
 	public void setY(String[] y) {
 		this.y = y;
+		removeNulls(y);
 	}
 	
 	@JsIgnore
@@ -42,5 +44,22 @@ public class PlotlyTrace {
 	@JsIgnore
 	public String getType() {
 		return type;
+	}
+	
+	private static final void removeNulls(String[] a) {
+		for (int i = 0; i < a.length; i++) {
+			if (a[i] == null) {
+				a[i] = "";
+			}
+		}
+	}
+	public String getName() {
+		return name;
+	}
+	public String[] getX() {
+		return x;
+	}
+	public String[] getY() {
+		return y;
 	}
 }
