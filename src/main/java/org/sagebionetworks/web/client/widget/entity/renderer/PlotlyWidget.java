@@ -258,6 +258,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			uniqueFillColumnDataValues.add(fillColValue);
 		}
 		List<PlotlyTrace> plotlyTraceData = new ArrayList<>();
+		int yColumnCount = graphData.keySet().size();
 		for (String columnName : graphData.keySet()) {
 			for (String targetFillColumnValue : uniqueFillColumnDataValues) {
 				// create a new trace for each fill column value
@@ -277,6 +278,9 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 				newTrace.setY(ArrayUtils.getStringArray(traceY));
 				newTrace.setType(graphType);
 				String traceName = targetFillColumnValue == null ? "" : targetFillColumnValue;
+				if (yColumnCount > 1) {
+					traceName = columnName + " : " + traceName;
+				}
 				newTrace.setName(traceName);
 				plotlyTraceData.add(newTrace);
 			}
