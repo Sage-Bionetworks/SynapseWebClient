@@ -41,7 +41,6 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	LazyLoadHelper lazyLoadHelper;
 	AuthenticationController authController;
 	UserBadge submitterUserBadge;
-	ACTRevokeUserAccessButton revokeUserAccessButton;
 	SynapseJSNIUtils jsniUtils;
 	
 	@Inject
@@ -53,7 +52,6 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 			SubjectsWidget subjectsWidget,
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
-			ACTRevokeUserAccessButton revokeUserAccessButton,
 			ManageAccessButton manageAccessButton,
 			DataAccessClientAsync dataAccessClient,
 			LazyLoadHelper lazyLoadHelper,
@@ -73,7 +71,6 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.authController = authController;
 		this.submitterUserBadge = submitterUserBadge;
-		this.revokeUserAccessButton = revokeUserAccessButton;
 		this.jsniUtils = jsniUtils;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setSubmitterUserBadge(submitterUserBadge);
@@ -81,7 +78,6 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
-		view.setRevokeUserAccessWidget(revokeUserAccessButton);
 		view.setManageAccessWidget(manageAccessButton);
 		view.setSubjectsWidget(subjectsWidget);
 		view.setSynAlert(synAlert);
@@ -112,7 +108,6 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		});
 		createAccessRequirementButton.configure(ar);
 		deleteAccessRequirementButton.configure(ar);
-		revokeUserAccessButton.configure(ar);
 		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
 		lazyLoadHelper.setIsConfigured();

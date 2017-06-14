@@ -24,7 +24,6 @@ public interface ACTAccessRequirementWidgetView extends IsWidget, SupportsLazyLo
 	void showRequestAccessButton();
 	void setEditAccessRequirementWidget(IsWidget w);
 	void setDeleteAccessRequirementWidget(IsWidget w);
-	void setRevokeUserAccessWidget(IsWidget w);
 	void setSubjectsWidget(IsWidget w);
 	void setVisible(boolean visible);
 	void setSynAlert(IsWidget w);

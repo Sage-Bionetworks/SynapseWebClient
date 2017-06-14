@@ -27,7 +27,6 @@ public interface ManagedACTAccessRequirementWidgetView extends IsWidget, Support
 	void setDataAccessRequestWizard(IsWidget w);
 	void setEditAccessRequirementWidget(IsWidget w);
 	void setDeleteAccessRequirementWidget(IsWidget w);
-	void setRevokeUserAccessWidget(IsWidget w);
 	void setSubmitterUserBadge(IsWidget w);
 	void setManageAccessWidget(IsWidget w);
 	void setSubjectsWidget(IsWidget w);

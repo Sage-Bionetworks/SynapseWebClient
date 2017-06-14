@@ -42,7 +42,6 @@
 			<bh:Div addStyleNames="margin-top-5">
 				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
 				<bh:Div ui:field="deleteAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
-				<bh:Div ui:field="revokeAccessButtonContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
 				<bh:Div ui:field="requestAccessButtonContainer" pull="RIGHT">
 					<b:Button ui:field="requestAccessButton" type="PRIMARY" text="Request Access" visible="false" addStyleNames="margin-right-5 margin-top-5"/>
 				</bh:Div>
