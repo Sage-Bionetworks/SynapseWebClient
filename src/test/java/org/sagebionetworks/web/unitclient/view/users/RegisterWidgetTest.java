@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.view.users;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -11,14 +12,11 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.view.users.RegisterWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -49,11 +47,12 @@ public class RegisterWidgetTest {
 	
 	@Test
 	public void testRegisterUser() {
-		widget.registerUser(email);
+		widget.registerUser("    " + email + "     ");
 		verify(mockView).enableRegisterButton(false);
 		verify(mockView).showInfo(DisplayConstants.ACCOUNT_EMAIL_SENT);
 		verify(mockView).enableRegisterButton(true);
 		verify(mockView).clear();
+		verify(mockUserService).createUserStep1(eq(email), anyString(), any(AsyncCallback.class));
 	}
 
 	@Test

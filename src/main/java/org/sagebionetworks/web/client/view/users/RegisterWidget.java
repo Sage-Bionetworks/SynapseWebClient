@@ -53,7 +53,7 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 		synAlert.clear();
 		view.enableRegisterButton(false);
 		String callbackUrl = gwt.getHostPageBaseURL() + "#!NewAccount:";
-		userService.createUserStep1(email, callbackUrl, new AsyncCallback<Void>() {			
+		userService.createUserStep1(email.trim(), callbackUrl, new AsyncCallback<Void>() {			
 			@Override
 			public void onSuccess(Void result) {
 				view.enableRegisterButton(true);
