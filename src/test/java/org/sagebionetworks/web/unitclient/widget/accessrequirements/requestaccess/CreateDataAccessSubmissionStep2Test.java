@@ -210,7 +210,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockPeopleSuggestBox).addItemSelectedHandler(callbackPUserSuggestionCaptor.capture());
 		CallbackP<SynapseSuggestion> callback = callbackPUserSuggestionCaptor.getValue();
 		callback.invoke(mockSynapseSuggestion);
-		verify(mockAccessorsList).addUserBadge(accessorChangeCaptor.capture());
+		verify(mockAccessorsList).addAccessorChange(accessorChangeCaptor.capture());
 		AccessorChange change = accessorChangeCaptor.getValue();
 		assertEquals(SUGGESTED_USER_ID, change.getUserId());
 		assertEquals(AccessType.GAIN_ACCESS, change.getType());
@@ -355,8 +355,8 @@ public class CreateDataAccessSubmissionStep2Test {
 		when(mockDataAccessRequest.getAccessorChanges()).thenReturn(accessorUserIds);
 		widget.configure(mockResearchProject, mockACTAccessRequirement);
 		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
-		verify(mockAccessorsList).addSubmitterUserBadge(change1);
-		verify(mockAccessorsList).addUserBadge(change2);
+		verify(mockAccessorsList).addSubmitterAccessorChange(change1);
+		verify(mockAccessorsList).addAccessorChange(change2);
 	}
 	
 	@Test
