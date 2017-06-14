@@ -46,8 +46,6 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	@UiField
 	Div requestAccessButtonContainer;
 	@UiField
-	Div revokeAccessButtonContainer;
-	@UiField
 	Alert requestApprovedMessage;
 
 	Callback onAttachCallback;
@@ -140,11 +138,6 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		deleteAccessRequirementContainer.add(w);
 	}
 	@Override
-	public void setRevokeUserAccessWidget(IsWidget w) {
-		revokeAccessButtonContainer.clear();
-		revokeAccessButtonContainer.add(w);
-	}
-	@Override
 	public void setSubjectsWidget(IsWidget w) {
 		subjectsWidgetContainer.clear();
 		subjectsWidgetContainer.add(w);
@@ -176,7 +169,6 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		editAccessRequirementContainer.setVisible(false);
 		deleteAccessRequirementContainer.setVisible(false);
 		requestAccessButtonContainer.setVisible(false);
-		revokeAccessButtonContainer.setVisible(false);
 	}
 	@Override
 	public void showRequestApprovedMessage() {

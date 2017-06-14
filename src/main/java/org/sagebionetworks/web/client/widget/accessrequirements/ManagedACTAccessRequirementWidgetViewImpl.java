@@ -62,8 +62,6 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	@UiField
 	Div requestAccessButtonContainer;
 	@UiField
-	Div revokeAccessButtonContainer;
-	@UiField
 	Span expirationUI;
 	@UiField
 	Text expirationDateText;
@@ -202,11 +200,6 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 		deleteAccessRequirementContainer.add(w);
 	}
 	@Override
-	public void setRevokeUserAccessWidget(IsWidget w) {
-		revokeAccessButtonContainer.clear();
-		revokeAccessButtonContainer.add(w);
-	}
-	@Override
 	public void setSubjectsWidget(IsWidget w) {
 		subjectsWidgetContainer.clear();
 		subjectsWidgetContainer.add(w);
@@ -252,7 +245,6 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 		cancelRequestButtonContainer.setVisible(false);
 		updateRequestButtonContainer.setVisible(false);
 		requestAccessButtonContainer.setVisible(false);
-		revokeAccessButtonContainer.setVisible(false);
 	}
 	@Override
 	public void showExpirationDate(String dateString) {

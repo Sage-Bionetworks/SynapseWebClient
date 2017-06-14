@@ -38,7 +38,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	String submissionId;
 	LazyLoadHelper lazyLoadHelper;
 	AuthenticationController authController;
-	ACTRevokeUserAccessButton revokeUserAccessButton;
 	JiraURLHelper jiraURLHelper;
 	PopupUtilsView popupUtils;
 	
@@ -51,7 +50,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			SubjectsWidget subjectsWidget,
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
-			ACTRevokeUserAccessButton revokeUserAccessButton,
 			DataAccessClientAsync dataAccessClient,
 			LazyLoadHelper lazyLoadHelper,
 			AuthenticationController authController,
@@ -68,7 +66,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.dataAccessClient = dataAccessClient;
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.authController = authController;
-		this.revokeUserAccessButton = revokeUserAccessButton;
 		this.jiraURLHelper = jiraURLHelper;
 		this.popupUtils = popupUtils;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
@@ -76,7 +73,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
-		view.setRevokeUserAccessWidget(revokeUserAccessButton);
 		view.setSubjectsWidget(subjectsWidget);
 		view.setSynAlert(synAlert);
 		Callback loadDataCallback = new Callback() {
@@ -107,7 +103,6 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		});
 		createAccessRequirementButton.configure(ar);
 		deleteAccessRequirementButton.configure(ar);
-		revokeUserAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
 		lazyLoadHelper.setIsConfigured();
 	}
