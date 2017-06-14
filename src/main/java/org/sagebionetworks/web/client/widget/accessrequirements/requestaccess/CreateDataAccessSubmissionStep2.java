@@ -54,7 +54,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	SynapseJSNIUtils jsniUtils;
 	AuthenticationController authController;
 	RequestInterface dataAccessRequest;
-	UserBadgeList accessorsList;
+	UserBadgeList accessorChangesList;
 	private SynapseSuggestBox peopleSuggestWidget;
 	FileHandleList otherDocuments;
 	
@@ -79,7 +79,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;
 		this.authController = authController;
-		this.accessorsList = accessorsList;
+		this.accessorChangesList = accessorsList;
 		this.otherDocuments = otherDocuments;
 		otherDocuments.configure()
 			.setUploadButtonText("Browse...")
@@ -115,7 +115,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 				AccessorChange change = new AccessorChange();
 				change.setUserId(suggestion.getId());
 				change.setType(AccessType.GAIN_ACCESS);
-				CreateDataAccessSubmissionStep2.this.accessorsList.addUserBadge(change);
+				CreateDataAccessSubmissionStep2.this.accessorChangesList.addAccessorChange(change);
 			};
 		});
 	}
@@ -152,7 +152,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		view.setIRBVisible(ValidationUtils.isTrue(ar.getIsIRBApprovalRequired()));
 		view.setDUCVisible(ValidationUtils.isTrue(ar.getIsDUCRequired()));
 		otherDocuments.clear();
-		accessorsList.clear();
+		accessorChangesList.clear();
 		view.setPublicationsVisible(false);
 		view.setSummaryOfUseVisible(false);
 		peopleSuggestWidget.clear();
@@ -227,9 +227,9 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			for (AccessorChange change : dataAccessRequest.getAccessorChanges()) {
 				if (change.getUserId().equals(authController.getCurrentUserPrincipalId())) {
 					submitterFound = true;
-					accessorsList.addSubmitterUserBadge(change);	
+					accessorChangesList.addSubmitterAccessorChange(change);	
 				} else {
-					accessorsList.addUserBadge(change);	
+					accessorChangesList.addAccessorChange(change);	
 				}
 			}
 		}
@@ -237,13 +237,13 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			AccessorChange submitterChange = new AccessorChange();
 			submitterChange.setUserId(authController.getCurrentUserPrincipalId());
 			submitterChange.setType(AccessType.GAIN_ACCESS);
-			accessorsList.addSubmitterUserBadge(submitterChange);
+			accessorChangesList.addSubmitterAccessorChange(submitterChange);
 		}
 	}
 	
 	public void updateDataAccessRequest(final boolean isSubmit) {
 		modalPresenter.setLoading(true);
-		dataAccessRequest.setAccessorChanges(accessorsList.getAccessorChanges());
+		dataAccessRequest.setAccessorChanges(accessorChangesList.getAccessorChanges());
 		dataAccessRequest.setAttachments(otherDocuments.getFileHandleIds());
 		dataAccessRequest.setResearchProjectId(researchProject.getId());
 
