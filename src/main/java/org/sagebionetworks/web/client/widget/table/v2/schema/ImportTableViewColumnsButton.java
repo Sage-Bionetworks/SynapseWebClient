@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class AddTableViewColumnsButton implements IsWidget {
+public class ImportTableViewColumnsButton implements IsWidget {
 	public static final String BUTTON_TEXT = "Import columns";
 	public Button button;
 	public PortalGinInjector ginInjector;
@@ -35,7 +35,7 @@ public class AddTableViewColumnsButton implements IsWidget {
 	CallbackP<List<ColumnModel>> callback;
 	EntityFinder finder;
 	@Inject
-	public AddTableViewColumnsButton(
+	public ImportTableViewColumnsButton(
 			Button button,
 			final EntityFinder finder,
 			SynapseClientAsync synapseClient) {
@@ -69,7 +69,7 @@ public class AddTableViewColumnsButton implements IsWidget {
 				@Override
 				public void onSuccess(EntityBundle bundle) {
 					if (!(bundle.getEntity() instanceof Table)) {
-						finder.showError("Please select a Table or View to copy columns from.");
+						finder.showError("Please select a Table or View.");
 						return;
 					}
 					finder.hide();
@@ -77,7 +77,9 @@ public class AddTableViewColumnsButton implements IsWidget {
 					for (ColumnModel cm : columns) {
 						cm.setId(null);
 					}
-					callback.invoke(columns);
+					if (callback != null) {
+						callback.invoke(columns);	
+					}
 				}
 				
 				@Override

@@ -33,7 +33,7 @@ import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
-import org.sagebionetworks.web.client.widget.table.v2.schema.AddTableViewColumnsButton;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ImportTableViewColumnsButton;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
@@ -68,7 +68,7 @@ public class ColumnModelsEditorWidgetTest {
 	@Mock
 	ColumnModelTableRowEditorWidget mockColumnModelTableRowEditorWidget2;
 	@Mock
-	AddTableViewColumnsButton mockAddTableViewColumnsButton;
+	ImportTableViewColumnsButton mockAddTableViewColumnsButton;
 	
 	ColumnModel nonEditableColumn;
 	List<ColumnModel> nonEditableColumns;
@@ -91,7 +91,7 @@ public class ColumnModelsEditorWidgetTest {
 				return new ColumnModelTableRowViewerStub();
 			}
 		});
-		when(mockGinInjector.getAddTableViewColumnsButton()).thenReturn(mockAddTableViewColumnsButton);
+		when(mockGinInjector.getImportTableViewColumnsButton()).thenReturn(mockAddTableViewColumnsButton);
 		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
 		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
