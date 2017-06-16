@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -35,20 +34,14 @@ public class AddTableViewColumnsButton implements IsWidget {
 	SynapseClientAsync synapseClient;
 	CallbackP<List<ColumnModel>> callback;
 	EntityFinder finder;
-	DivView div;
 	@Inject
 	public AddTableViewColumnsButton(
 			Button button,
 			final EntityFinder finder,
-			SynapseClientAsync synapseClient,
-			DivView div) {
+			SynapseClientAsync synapseClient) {
 		this.button = button;
 		this.synapseClient = synapseClient;
-		this.div = div;
 		this.finder = finder;
-		div.addStyleName("displayInlineBlock");
-		div.add(button);
-		div.add(finder);
 		button.setText(BUTTON_TEXT);
 		button.setSize(ButtonSize.DEFAULT);
 		button.setType(ButtonType.DEFAULT);
@@ -99,7 +92,7 @@ public class AddTableViewColumnsButton implements IsWidget {
 	}
 	
 	public Widget asWidget() {
-		return div.asWidget();
+		return button.asWidget();
 	}
 	
 }

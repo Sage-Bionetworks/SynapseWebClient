@@ -127,8 +127,4 @@ public class ModalWizardViewImpl implements ModalWizardView {
 		help.setAddStyleNames("margin-left-5");
 		helpContainer.add(help);
 	}
-	@Override
-	public void addStyleNames(String styles) {
-		modal.addStyleName(styles);
-	}
 }

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import org.gwtbootstrap3.client.ui.ModalSize;
 import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
@@ -27,7 +28,7 @@ public class CreateTableViewWizard {
 	@Inject
 	public CreateTableViewWizard(ModalWizardWidget modalWizardWidget, CreateTableViewWizardStep1 step1) {
 		this.modalWizardWidget = modalWizardWidget;
-		this.modalWizardWidget.addStyleNames("modal-90-percent");
+		this.modalWizardWidget.setModalSize(ModalSize.LARGE);
 		this.step1 = step1;
 	}
 

@@ -2,7 +2,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:b.html="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
-	<g:HTMLPanel addStyleNames="min-height-500">
+	<g:HTMLPanel>
 		<b:ButtonToolBar ui:field="buttonToolbar" visible="false">
 			<b:ButtonGroup>
 				<b:Button ui:field="selectTogglebutton" icon="SQUARE_O" />

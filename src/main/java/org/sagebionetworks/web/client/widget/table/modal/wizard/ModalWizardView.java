@@ -92,5 +92,4 @@ public interface ModalWizardView extends IsWidget {
 	public void setSize(ModalSize size);
 
 	void setHelp(String helpMarkdown, String helpUrl);
-	void addStyleNames(String styles);
 }
