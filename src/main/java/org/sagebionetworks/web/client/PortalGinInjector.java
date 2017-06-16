@@ -406,7 +406,7 @@ public interface PortalGinInjector extends Ginjector {
 	
 	// TableEntity V2
 	public ColumnModelsView createNewColumnModelsView();
-	public AddTableViewColumnsButton createAddTableViewColumnsButton();
+	public AddTableViewColumnsButton getAddTableViewColumnsButton();
 	public ColumnModelsWidget createNewColumnModelsWidget();
 	public ColumnModelTableRowViewer createNewColumnModelTableRowViewer();
 	public ColumnModelTableRowEditorWidget createColumnModelEditorWidget();

@@ -61,7 +61,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		this.editor.setPresenter(this);
 		this.editorRows = new LinkedList<ColumnModelTableRow>();
 		this.adapterFactory = adapterFactory;
-		this.addTableViewColumnsButton = ginInjector.createAddTableViewColumnsButton();
+		this.addTableViewColumnsButton = ginInjector.getAddTableViewColumnsButton();
 		editor.addButton(addTableViewColumnsButton);
 		cookies = ginInjector.getCookieProvider();
 		addTableViewColumnsButton.configure(new CallbackP<List<ColumnModel>>() {
