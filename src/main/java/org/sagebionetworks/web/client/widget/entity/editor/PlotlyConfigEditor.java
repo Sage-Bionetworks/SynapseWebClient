@@ -71,7 +71,6 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
 		this.showHideAdvancedButton = showHideAdvancedButton;
-		view.add(finder);
 		view.setSynAlert(synAlert);
 		view.setPresenter(this);
 		view.setShowHideButton(showHideAdvancedButton);

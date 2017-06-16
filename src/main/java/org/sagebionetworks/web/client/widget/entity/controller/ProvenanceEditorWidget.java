@@ -57,7 +57,6 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 		view.setSynAlertWidget(synAlert);
 		view.setUsedProvenanceList(usedProvenanceList);
 		view.setExecutedProvenanceList(executedProvenanceList);
-		view.setEntityFinder(entityFinder);
 		view.setURLDialog(urlDialog);
 		view.setPresenter(this);
 	}
