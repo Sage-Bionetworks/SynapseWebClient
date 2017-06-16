@@ -212,6 +212,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumn
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesWidget;
+import org.sagebionetworks.web.client.widget.table.v2.schema.AddTableViewColumnsButton;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
@@ -405,6 +406,7 @@ public interface PortalGinInjector extends Ginjector {
 	
 	// TableEntity V2
 	public ColumnModelsView createNewColumnModelsView();
+	public AddTableViewColumnsButton createAddTableViewColumnsButton();
 	public ColumnModelsWidget createNewColumnModelsWidget();
 	public ColumnModelTableRowViewer createNewColumnModelTableRowViewer();
 	public ColumnModelTableRowEditorWidget createColumnModelEditorWidget();

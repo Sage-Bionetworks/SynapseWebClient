@@ -48,6 +48,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	TableType tableType;
 	
 	public AdapterFactory adapterFactory;
+	public AddTableViewColumnsButton addTableViewColumnsButton;
 	@Inject
 	public ColumnModelsEditorWidget(PortalGinInjector ginInjector, 
 			AdapterFactory adapterFactory,
@@ -59,6 +60,8 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		this.editor.setPresenter(this);
 		this.editorRows = new LinkedList<ColumnModelTableRow>();
 		this.adapterFactory = adapterFactory;
+		this.addTableViewColumnsButton = ginInjector.createAddTableViewColumnsButton();
+		editor.addButton(addTableViewColumnsButton);
 		cookies = ginInjector.getCookieProvider();
 	}
 	

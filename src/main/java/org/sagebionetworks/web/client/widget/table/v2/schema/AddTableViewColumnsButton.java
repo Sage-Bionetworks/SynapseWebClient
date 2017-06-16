@@ -1,0 +1,99 @@
+package org.sagebionetworks.web.client.widget.table.v2.schema;
+
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
+
+import java.util.List;
+
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.view.DivView;
+import org.sagebionetworks.web.client.widget.Button;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
+import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+
+public class AddTableViewColumnsButton implements IsWidget {
+	public static final String BUTTON_TEXT = "Import columns";
+	public Button button;
+	public PortalGinInjector ginInjector;
+	SynapseClientAsync synapseClient;
+	CallbackP<List<ColumnModel>> callback;
+	EntityFinder finder;
+	DivView div;
+	@Inject
+	public AddTableViewColumnsButton(
+			Button button,
+			final EntityFinder finder,
+			SynapseClientAsync synapseClient,
+			DivView div) {
+		this.button = button;
+		this.synapseClient = synapseClient;
+		this.div = div;
+		div.addStyleName("displayInlineBlock");
+		div.add(button);
+		div.add(finder);
+		button.setSize(ButtonSize.DEFAULT);
+		button.setType(ButtonType.DEFAULT);
+		button.setIcon(IconType.PLUS);
+		finder.configure(EntityFilter.PROJECT_OR_TABLE, false, new DisplayUtils.SelectedHandler<Reference>() {
+			@Override
+			public void onSelected(Reference selected) {
+				onTableViewSelected(selected.getTargetId());
+			}
+		});
+		button.addStyleName("margin-left-10");
+		button.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				finder.show();
+			}
+		});
+	}	
+	
+	public void onTableViewSelected(String entityId) {
+		// get the column schema
+		int mask =  ENTITY | TABLE_DATA;
+		synapseClient.getEntityBundle(entityId, mask, 
+			new AsyncCallback<EntityBundle>() {
+				@Override
+				public void onSuccess(EntityBundle bundle) {
+					if (!(bundle.getEntity() instanceof Table)) {
+						finder.showError("Please select a Table or View to copy columns from.");
+						return;
+					}
+					finder.hide();
+					callback.invoke(bundle.getTableBundle().getColumnModels());
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					finder.showError(caught.getMessage());
+				}			
+		});
+	}
+	
+	public void configure(CallbackP<List<ColumnModel>> callback) {
+		this.callback = callback;
+	}
+	
+	public Widget asWidget() {
+		return div.asWidget();
+	}
+	
+}
