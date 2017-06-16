@@ -180,4 +180,5 @@ public interface ColumnModelsView extends IsWidget {
 		EDITOR
 	}
 	void showErrorMessage(String message);
+	void addButton(IsWidget widget);
 }

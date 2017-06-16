@@ -17,6 +17,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
@@ -48,6 +49,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	TableType tableType;
 	
 	public AdapterFactory adapterFactory;
+	public ImportTableViewColumnsButton addTableViewColumnsButton;
 	@Inject
 	public ColumnModelsEditorWidget(PortalGinInjector ginInjector, 
 			AdapterFactory adapterFactory,
@@ -59,7 +61,15 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		this.editor.setPresenter(this);
 		this.editorRows = new LinkedList<ColumnModelTableRow>();
 		this.adapterFactory = adapterFactory;
+		this.addTableViewColumnsButton = ginInjector.getImportTableViewColumnsButton();
+		editor.addButton(addTableViewColumnsButton);
 		cookies = ginInjector.getCookieProvider();
+		addTableViewColumnsButton.configure(new CallbackP<List<ColumnModel>>() {
+			@Override
+			public void invoke(List<ColumnModel> columns) {
+				addColumns(columns);
+			}
+		});
 	}
 	
 	public void configure(TableType tableType, List<ColumnModel> startingModels) {

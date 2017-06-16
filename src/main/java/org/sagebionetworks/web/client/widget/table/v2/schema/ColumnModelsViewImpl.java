@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.view.bootstrap.ButtonUtils;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
@@ -14,6 +15,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -54,7 +56,8 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	Button addDefaultViewColumnsButton;
 	@UiField
 	Button addAnnotationColumnsButton;
-	
+	@UiField
+	Span extraButtonsContainer;
 	ViewType viewType;
 	Presenter presenter;
 	
@@ -215,5 +218,9 @@ public class ColumnModelsViewImpl extends Composite implements ColumnModelsView 
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+	}
+	@Override
+	public void addButton(IsWidget widget) {
+		extraButtonsContainer.add(widget);
 	}
 }

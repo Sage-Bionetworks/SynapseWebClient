@@ -59,6 +59,7 @@
  			Default View Columns</b:Button>
  		<b:Button ui:field="addAnnotationColumnsButton" type="DEFAULT" visible="false" addStyleNames="margin-left-5">Add
  			All Annotations</b:Button>
+ 		<b.html:Span ui:field="extraButtonsContainer" />
 	</g:HTMLPanel>
 
 </ui:UiBinder>
