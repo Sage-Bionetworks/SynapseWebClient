@@ -45,9 +45,11 @@ public class AddTableViewColumnsButton implements IsWidget {
 		this.button = button;
 		this.synapseClient = synapseClient;
 		this.div = div;
+		this.finder = finder;
 		div.addStyleName("displayInlineBlock");
 		div.add(button);
 		div.add(finder);
+		button.setText(BUTTON_TEXT);
 		button.setSize(ButtonSize.DEFAULT);
 		button.setType(ButtonType.DEFAULT);
 		button.setIcon(IconType.PLUS);
@@ -78,7 +80,11 @@ public class AddTableViewColumnsButton implements IsWidget {
 						return;
 					}
 					finder.hide();
-					callback.invoke(bundle.getTableBundle().getColumnModels());
+					List<ColumnModel> columns = bundle.getTableBundle().getColumnModels();
+					for (ColumnModel cm : columns) {
+						cm.setId(null);
+					}
+					callback.invoke(columns);
 				}
 				
 				@Override

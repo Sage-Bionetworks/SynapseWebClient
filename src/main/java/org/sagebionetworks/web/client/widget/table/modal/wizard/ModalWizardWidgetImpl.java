@@ -128,5 +128,9 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 	public List<WizardCallback> getCallbacks() {
 		return callbacks;
 	}
+	@Override
+	public void addStyleNames(String styles) {
+		view.addStyleNames(styles);
+	}
 
 }
