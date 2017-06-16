@@ -41,8 +41,8 @@ import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -218,7 +218,8 @@ public class TablePageWidgetTest {
 		boolean isEditable = true;
 		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
 		// Pagination should be setup since a page change listener was provided.
-		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		long rowCount = rows.size();
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
 		verify(mockView).setEditorBufferVisible(true);
 	}
@@ -231,7 +232,8 @@ public class TablePageWidgetTest {
 		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
 		verify(mockView).setFacetsVisible(false);
 		verify(mockView, never()).setFacetsVisible(true);
-		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		long rowCount = rows.size();
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(true);
 		assertEquals(bundle.getColumnModels().size()+1, staticHeader.size());
 	}
@@ -243,7 +245,8 @@ public class TablePageWidgetTest {
 		assertTrue(sortHeaders.isEmpty());
 		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
 		verify(mockFacetsWidget).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
-		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		long rowCount = rows.size();
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(false);
 		assertEquals(bundle.getColumnModels().size()+1, sortHeaders.size());
 	}
@@ -268,7 +271,8 @@ public class TablePageWidgetTest {
 		boolean isEditable = false;
 		widget.configure(bundle, query, sortList, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
 		// Pagination should be setup since a page change listener was provided.
-		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		long rowCount = rows.size();
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
 		
 		// Check each header
@@ -300,7 +304,8 @@ public class TablePageWidgetTest {
 		boolean isEditable = false;
 		widget.configure(bundle, query, sortList, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
 		// Pagination should be setup since a page change listener was provided.
-		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		long rowCount = rows.size();
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
 		
 		// Check each header
@@ -330,7 +335,8 @@ public class TablePageWidgetTest {
 		boolean isEditable = false;
 		widget.configure(bundle, query, sortList, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
 		// Pagination should be setup since a page change listener was provided.
-		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		long rowCount = rows.size();
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
 		
 		// Check each header
@@ -361,7 +367,8 @@ public class TablePageWidgetTest {
 		boolean isEditable = false;
 		widget.configure(bundle, query, sortList, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
 		// Pagination should be setup since a page change listener was provided.
-		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), mockPageChangeListner);
+		long rowCount = rows.size();
+		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
 		verify(mockView).setPaginationWidgetVisible(true);
 		
 		// Check each header
