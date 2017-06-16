@@ -1,14 +1,16 @@
 package org.sagebionetworks.web.client.widget.pagination;
 
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 /**
- * A basic pagination widget with a previous button, current page, total pages, and next button.
- * @author John
+ * A basic pagination widget with a previous button and next button.
+ * @author Jay
  *
  */
-public class BasicPaginationWidget implements BasicPaginationView.Presenter, PaginationWidget {
+public class BasicPaginationWidget implements BasicPaginationView.Presenter, IsWidget {
 	
 	BasicPaginationView view;
 	PageChangeListener listener;
@@ -27,22 +29,16 @@ public class BasicPaginationWidget implements BasicPaginationView.Presenter, Pag
 	 * @param offset
 	 * @param count
 	 */
-	@Override
-	public void configure(Long limit, Long offset, Long count, PageChangeListener listener){
+	public void configure(Long limit, Long offset, Long currentPageItemCount, PageChangeListener listener){
 		this.listener = listener;
-		if(count == null || limit == null || offset == null || count < 1 || limit < 1){
+		if(limit == null || offset == null || limit < 1){
 			setLoading();
 			view.setCurrentPage(1l);
 		} else {
 			this.limit = limit;
 			this.offset = offset;
-			long remainder = count%limit;
-			long totalNumberOfPages = count/limit;
-			if(remainder > 0){
-				totalNumberOfPages++;
-			}
 			long currentPageNumber = offset/limit + 1;
-			view.setNextVisible(currentPageNumber < totalNumberOfPages);
+			view.setNextVisible(currentPageItemCount >= limit);
 			view.setPreviousVisible(currentPageNumber > 1);
 			view.setCurrentPage(currentPageNumber);
 		}

@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
-import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -90,7 +89,7 @@ public class TablePageViewImpl implements TablePageView {
 	}
 
 	@Override
-	public void setPaginationWidget(PaginationWidget paginationWidget) {
+	public void setPaginationWidget(IsWidget paginationWidget) {
 		this.paginationPanel.add(paginationWidget);
 	}
 

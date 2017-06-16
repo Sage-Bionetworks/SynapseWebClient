@@ -41,7 +41,16 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public static final String VERIFYING_ETAG_MESSAGE = "Verifying that the recent changes have propagated through the system...";
 	public static final String RUNNING_QUERY_MESSAGE = "Running query...";
 	public static final String QUERY_CANCELED = "Query canceled";
-	// Mask to get all parts of a query.
+	/**
+	 * Masks for requesting what should be included in the query bundle.
+	 */
+	public static final long BUNDLE_MASK_QUERY_RESULTS = 0x1;
+	public static final long BUNDLE_MASK_QUERY_COUNT = 0x2;
+	public static final long BUNDLE_MASK_QUERY_SELECT_COLUMNS = 0x4;
+	public static final long BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE = 0x8;
+	public static final long BUNDLE_MASK_QUERY_COLUMN_MODELS = 0x10;
+	public static final long BUNDLE_MASK_QUERY_FACETS = 0x20;
+
 	private static final Long ALL_PARTS_MASK = new Long(255);
 	SynapseClientAsync synapseClient;
 	TableQueryResultView view;
@@ -130,7 +139,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		if (viewEtag == null) {
 			// run the job
 			QueryBundleRequest qbr = new QueryBundleRequest();
-			qbr.setPartMask(ALL_PARTS_MASK);
+			// do not ask for query count
+			qbr.setPartMask(BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_FACETS);
 			qbr.setQuery(this.startingQuery);
 			qbr.setEntityId(entityId);
 			this.progressWidget.startAndTrackJob(RUNNING_QUERY_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
