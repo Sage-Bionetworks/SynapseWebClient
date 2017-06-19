@@ -1620,7 +1620,7 @@ ol.lowerroman {
 	padding-bottom: 4px !important;
 }
 
-.padding-5 {
+.padding-5, #rootPanel .padding-5 {
 	padding: 5px;
 }
 
@@ -1636,7 +1636,7 @@ ol.lowerroman {
 	padding: 30px;
 }
 
-.padding-2 {
+.padding-2, #rootPanel .padding-2 {
 	padding: 2px;
 }
 
@@ -2120,6 +2120,10 @@ a.projectTitle:hover {
     padding-bottom: 99999px;  
 }
 
+.padding-right-2, #rootPanel .padding-right-2 {
+	padding-right: 2px;
+}
+
 .padding-right-5 {
 	padding-right: 5px;
 }
@@ -2129,6 +2133,10 @@ a.projectTitle:hover {
 
 .padding-left-0 {
 	padding-left: 0px;
+}
+
+.padding-left-2, #rootPanel .padding-left-2 {
+	padding-left: 2px;
 }
 
 .padding-left-0-imp {
