@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
@@ -15,7 +16,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -29,6 +29,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.ClientLogger;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.GlobalApplicationStateView;
@@ -70,6 +71,8 @@ public class GlobalApplicationStateImplTest {
 	ClientCache mockLocalStorage;
 	@Mock
 	GWTWrapper mockGWT;
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -86,7 +89,7 @@ public class GlobalApplicationStateImplTest {
 		testProps = new HashMap<String, String>();
 		AsyncMockStubber.callSuccessWith(testProps).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 		
-		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLogger, mockLocalStorage, mockGWT);
+		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLogger, mockLocalStorage, mockGWT, mockDateTimeUtils);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
 	}
@@ -397,16 +400,21 @@ public class GlobalApplicationStateImplTest {
 	@Test
 	public void testSetShowLocalTime() {
 		globalApplicationState.setShowUTCTime(false);
-		assertNull(GlobalApplicationStateImpl.currentTimezone);
+		verify(mockDateTimeUtils).setShowUTCTime(false);
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.SHOW_DATETIME_IN_UTC), eq(Boolean.FALSE.toString()), any(Date.class));
+	}
+	
+	@Test
+	public void testIsShowingUTCTime() {
+		when(mockDateTimeUtils.isShowingUTCTime()).thenReturn(false);
 		assertFalse(globalApplicationState.isShowingUTCTime());
+		verify(mockDateTimeUtils).isShowingUTCTime();
 	}
 	
 	@Test
 	public void testSetShowUTCTime() {
 		globalApplicationState.setShowUTCTime(true);
-		assertEquals(GlobalApplicationStateImpl.UTC_TIMEZONE, GlobalApplicationStateImpl.currentTimezone);
+		verify(mockDateTimeUtils).setShowUTCTime(true);
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.SHOW_DATETIME_IN_UTC), eq(Boolean.TRUE.toString()), any(Date.class));
-		assertTrue(globalApplicationState.isShowingUTCTime());
 	}
 }

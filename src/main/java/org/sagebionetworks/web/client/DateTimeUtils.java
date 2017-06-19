@@ -24,4 +24,6 @@ public interface DateTimeUtils {
 	 */
 	String getLongFriendlyDate(Date toFormat);
 	String convertDateToSimpleString(Date toFormat);
+	void setShowUTCTime(boolean showUTC);
+	boolean isShowingUTCTime();
 }

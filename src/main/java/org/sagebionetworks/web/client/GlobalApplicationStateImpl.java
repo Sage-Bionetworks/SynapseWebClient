@@ -50,10 +50,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private ClientCache localStorage;
 	private GWTWrapper gwt;
 	private boolean isShowingVersionAlert;
-	
-	public static TimeZone currentTimezone;
-	public static final TimeZone UTC_TIMEZONE = TimeZone.createTimeZone(0);
-	
+	private DateTimeUtils dateTimeUtils;
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -63,7 +60,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			SynapseJSNIUtils synapseJSNIUtils, 
 			ClientLogger logger,
 			ClientCache localStorage, 
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			DateTimeUtils dateTimeUtils) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
@@ -73,6 +71,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.localStorage = localStorage;
 		this.gwt = gwt;
 		this.view = view;
+		this.dateTimeUtils = dateTimeUtils;
 		isEditing = false;
 		isShowingVersionAlert = false;
 		initUncaughtExceptionHandler();
@@ -419,13 +418,13 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void setShowUTCTime(boolean showUTC) {
 		Date yearFromNow = new Date();
 		CalendarUtil.addMonthsToDate(yearFromNow, 12);
-		GlobalApplicationStateImpl.currentTimezone = showUTC ? UTC_TIMEZONE : null;
 		cookieProvider.setCookie(SHOW_DATETIME_IN_UTC, Boolean.toString(showUTC), yearFromNow);
+		dateTimeUtils.setShowUTCTime(showUTC);
 	}
 	
 	@Override
 	public boolean isShowingUTCTime() {
-		return UTC_TIMEZONE.equals(GlobalApplicationStateImpl.currentTimezone);
+		return dateTimeUtils.isShowingUTCTime();
 	}
 	
 	private static Integer timezoneOffsetMs = null;
