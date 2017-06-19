@@ -29,6 +29,7 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -79,7 +80,8 @@ public class ACTDataAccessSubmissionWidgetTest {
 	UserBadgeItem mockUserBadge;
 	@Mock
 	UserBadge mockModifiedByBadge;
-	
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
 	public static final String SUBMISSION_ID = "9876545678987";
 	public static final String INSTITUTION = "Univerisity of Washington";
 	public static final String INTENDED_DATA_USE = "lorem ipsum";
@@ -101,9 +103,9 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockResearchProjectSnapshot.getInstitution()).thenReturn(INSTITUTION);
 		when(mockResearchProjectSnapshot.getIntendedDataUseStatement()).thenReturn(INTENDED_DATA_USE);
 		when(mockResearchProjectSnapshot.getProjectLead()).thenReturn(PROJECT_LEAD);
-		when(mockJSNIUtils.convertDateToSmallString(any(Date.class))).thenReturn(SMALL_DATE_STRING);
+		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(SMALL_DATE_STRING);
 		
-		widget = new ACTDataAccessSubmissionWidget(mockView, mockSynapseAlert, mockClient, mockPromptModalView, mockDucFileRenderer, mockIrbFileRenderer, mockFileHandleList, mockJSNIUtils, mockGinInjector);
+		widget = new ACTDataAccessSubmissionWidget(mockView, mockSynapseAlert, mockClient, mockPromptModalView, mockDucFileRenderer, mockIrbFileRenderer, mockFileHandleList, mockJSNIUtils, mockGinInjector, mockDateTimeUtils);
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmission).when(mockClient).updateDataAccessSubmissionState(anyString(), any(SubmissionState.class), anyString(), any(AsyncCallback.class));
 		verify(mockPromptModalView).configure(anyString(),  anyString(), anyString(),  promptModalPresenterCaptor.capture());
 		confirmRejectionCallback = promptModalPresenterCaptor.getValue();

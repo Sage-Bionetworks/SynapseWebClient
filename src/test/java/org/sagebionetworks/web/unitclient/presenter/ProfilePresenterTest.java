@@ -2,18 +2,19 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,10 +45,9 @@ import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -90,7 +90,6 @@ import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import org.sagebionetworks.web.test.helper.CallbackMockStubber;
 import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
 import org.sagebionetworks.web.unitserver.ChallengeClientImplTest;
 
@@ -153,6 +152,9 @@ public class ProfilePresenterTest {
 	LoadMoreWidgetContainer mockLoadMoreContainer;
 	@Mock
 	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
+
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
 	
@@ -179,7 +181,7 @@ public class ProfilePresenterTest {
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
 				mockSynapseClient, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, 
-				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal, mockIsACTMemberAsyncHandler);
+				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal, mockIsACTMemberAsyncHandler, mockDateTimeUtils);
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
@@ -1611,7 +1613,7 @@ public class ProfilePresenterTest {
 		when(mockVerificationSubmission.getOrcid()).thenReturn(orcId);
 		when(mockVerificationSubmission.getLocation()).thenReturn(location);
 		
-		when(mockGwt.getFormattedDateString(any(Date.class))).thenReturn(friendlyDate);
+		when(mockDateTimeUtils.getLongFriendlyDate(any(Date.class))).thenReturn(friendlyDate);
 		//not the owner of this profile, but is ACT
 		viewProfile("123", "456");
 		

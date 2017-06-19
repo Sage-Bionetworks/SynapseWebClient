@@ -297,9 +297,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
 				for (String key : properties.keySet()) {
-					localStorage.put(key, properties.get(key), DateUtils.getYearFromNow().getTime());
+					localStorage.put(key, properties.get(key), DateTimeUtilsImpl.getYearFromNow().getTime());
 				}
-				localStorage.put(PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateUtils.getWeekFromNow().getTime());
+				localStorage.put(PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateTimeUtilsImpl.getWeekFromNow().getTime());
 			}
 			
 			@Override

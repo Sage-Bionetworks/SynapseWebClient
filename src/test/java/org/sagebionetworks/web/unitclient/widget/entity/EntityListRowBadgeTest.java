@@ -25,12 +25,11 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadgeView;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -48,10 +47,9 @@ public class EntityListRowBadgeTest {
 	@Mock
 	UserBadge mockUserBadge;
 	@Mock
-	SynapseJSNIUtils mockSynapseJSNIUtils;
-	@Mock
 	SynapseClientAsync mockSynapseClient;
-	
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
 	@Mock
 	FileDownloadButton mockFileDownloadButton;
 	@Mock
@@ -59,8 +57,8 @@ public class EntityListRowBadgeTest {
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
-		widget = new EntityListRowBadge(mockView, mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient,
-				mockFileDownloadButton, mockLazyLoadHelper);
+		widget = new EntityListRowBadge(mockView, mockUserBadge, mockSynapseClient,
+				mockFileDownloadButton, mockLazyLoadHelper, mockDateTimeUtils);
 	}
 	@Test
 	public void testConstruction() {

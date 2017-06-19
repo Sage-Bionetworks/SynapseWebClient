@@ -44,8 +44,6 @@ public interface GWTWrapper {
 	
 	int nextRandomInt();
 
-	String getFormattedDateString(Date date);
-	
 	void addDaysToDate(Date date, int days);
 	
 	boolean isWhitespace(String text);

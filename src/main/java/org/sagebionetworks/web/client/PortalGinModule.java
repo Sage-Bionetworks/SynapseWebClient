@@ -1407,5 +1407,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RevokeUserAccessModalView.class).to(RevokeUserAccessModalViewImpl.class);
 		bind(PlotlyWidgetView.class).to(PlotlyWidgetViewImpl.class);
 		bind(PlotlyConfigView.class).to(PlotlyConfigViewImpl.class);
+		
+		bind(DateTimeUtilsImpl.class).in(Singleton.class);
+		bind(DateTimeUtils.class).to(DateTimeUtilsImpl.class);
 	}
 }

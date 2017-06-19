@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -35,6 +36,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	FileHandleWidget irbFileRenderer;
 	SynapseJSNIUtils jsniUtils;
 	PortalGinInjector ginInjector;
+	DateTimeUtils dateTimeUtils;
 	
 	@Inject
 	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, 
@@ -45,13 +47,15 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 			FileHandleWidget irbFileRenderer,
 			FileHandleList otherDocuments,
 			SynapseJSNIUtils jsniUtils,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.dataAccessClient = dataAccessClient;
 		this.promptDialog = promptDialog;
 		this.jsniUtils = jsniUtils;
 		this.ginInjector = ginInjector;
+		this.dateTimeUtils = dateTimeUtils;
 		
 		otherDocuments.configure()
 			.setCanDelete(false)
@@ -119,7 +123,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setProjectLead(submission.getResearchProjectSnapshot().getProjectLead());
 		view.setPublications(submission.getPublication());
 		view.setSummaryOfUse(submission.getSummaryOfUse());
-		view.setSubmittedOn(jsniUtils.convertDateToSmallString(submission.getSubmittedOn()));
+		view.setSubmittedOn(dateTimeUtils.convertDateToSmallString(submission.getSubmittedOn()));
 		view.setRenewalColumnsVisible(submission.getIsRenewalSubmission());
 		UserBadge badge = ginInjector.getUserBadgeWidget();
 		badge.configure(submission.getSubmittedBy());

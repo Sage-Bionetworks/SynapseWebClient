@@ -4,7 +4,7 @@ import java.util.Date;
 
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
@@ -35,13 +35,16 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	SageImageBundle sageImageBundle;
 	
 	Widget widget;
+	DateTimeUtils dateTimeUtils;
 	@Inject
 	public ProjectBadgeViewImpl(final Binder uiBinder,
 			SynapseJSNIUtils synapseJSNIUtils,
-			SageImageBundle sageImageBundle
+			SageImageBundle sageImageBundle,
+			DateTimeUtils dateTimeUtils
 			) {
 		widget = uiBinder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
+		this.dateTimeUtils = dateTimeUtils;
 	}
 	
 	@Override
@@ -60,7 +63,7 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	
 	@Override
 	public String getSimpleDateString(Date date) {
-		return DisplayUtils.converDateaToSimpleString(date);
+		return dateTimeUtils.convertDateToSimpleString(date);
 	}
 	
 	@Override

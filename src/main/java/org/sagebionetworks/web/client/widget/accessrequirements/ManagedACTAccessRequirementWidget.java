@@ -6,9 +6,9 @@ import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.ManagedACTAccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
@@ -41,7 +41,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	LazyLoadHelper lazyLoadHelper;
 	AuthenticationController authController;
 	UserBadge submitterUserBadge;
-	SynapseJSNIUtils jsniUtils;
+	DateTimeUtils dateTimeUtils;
 	
 	@Inject
 	public ManagedACTAccessRequirementWidget(ManagedACTAccessRequirementWidgetView view, 
@@ -57,7 +57,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 			LazyLoadHelper lazyLoadHelper,
 			AuthenticationController authController,
 			UserBadge submitterUserBadge,
-			SynapseJSNIUtils jsniUtils) {
+			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -71,7 +71,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.authController = authController;
 		this.submitterUserBadge = submitterUserBadge;
-		this.jsniUtils = jsniUtils;
+		this.dateTimeUtils = dateTimeUtils;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setSubmitterUserBadge(submitterUserBadge);
 		view.setPresenter(this);
@@ -133,7 +133,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 			case APPROVED:
 				showApproved();
 				if (status.getExpiredOn() != null) {
-					view.showExpirationDate(jsniUtils.getLongFriendlyDate(status.getExpiredOn()));
+					view.showExpirationDate(dateTimeUtils.getLongFriendlyDate(status.getExpiredOn()));
 				}
 				break;
 			case REJECTED:

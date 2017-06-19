@@ -26,6 +26,7 @@ import org.sagebionetworks.repo.model.dataaccess.ManagedACTAccessRequirementStat
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -95,7 +96,9 @@ public class ManagedACTAccessRequirementWidgetTest {
 	SubmissionStatus mockSubmissionStatus;
 	@Mock
 	SynapseJSNIUtils mockJsniUtils;
-	
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
+
 	Callback lazyLoadDataCallback;
 	
 	public final static String ROOT_WIKI_ID = "777";
@@ -105,7 +108,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new ManagedACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockManageAccessButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockSubmitterUserBadge, mockJsniUtils);
+		widget = new ManagedACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockManageAccessButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockSubmitterUserBadge, mockDateTimeUtils);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
@@ -175,7 +178,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 		String friendlyDate = "June 9th, 2018";
 		widget.setRequirement(mockACTAccessRequirement);
 		when(mockDataAccessSubmissionStatus.getExpiredOn()).thenReturn(new Date());
-		when(mockJsniUtils.getLongFriendlyDate(any(Date.class))).thenReturn(friendlyDate);
+		when(mockDateTimeUtils.getLongFriendlyDate(any(Date.class))).thenReturn(friendlyDate);
 		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.APPROVED);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();

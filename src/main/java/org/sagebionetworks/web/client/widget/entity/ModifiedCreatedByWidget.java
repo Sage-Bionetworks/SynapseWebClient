@@ -2,10 +2,9 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.Date;
 
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -14,14 +13,16 @@ public class ModifiedCreatedByWidget implements ModifiedCreatedByWidgetView.Pres
 	private ModifiedCreatedByWidgetView view;
 	private UserBadge createdByBadge;
 	private UserBadge modifiedByBadge;
-	private SynapseJSNIUtils jsniUtils;
+	private DateTimeUtils dateTimeUtils;
+	
 	@Inject
 	public ModifiedCreatedByWidget(ModifiedCreatedByWidgetView view, UserBadge createdByBadge,
-			UserBadge modifiedByBadge, SynapseJSNIUtils jsniUtils) {
+			UserBadge modifiedByBadge,
+			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.createdByBadge = createdByBadge;
 		this.modifiedByBadge = modifiedByBadge;
-		this.jsniUtils = jsniUtils;
+		this.dateTimeUtils = dateTimeUtils;
 		view.setCreatedBadge(createdByBadge);
 		view.setModifiedBadge(modifiedByBadge);
 	}
@@ -29,8 +30,8 @@ public class ModifiedCreatedByWidget implements ModifiedCreatedByWidgetView.Pres
 	public void configure(Date createdOn, String createdBy, Date modifiedOn, String modifiedBy) {
 		createdByBadge.configure(createdBy);
 		modifiedByBadge.configure(modifiedBy);
-		view.setCreatedOnText(" on " + jsniUtils.getLongFriendlyDate(createdOn));
-		view.setModifiedOnText(" on " + jsniUtils.getLongFriendlyDate(modifiedOn));
+		view.setCreatedOnText(" on " + dateTimeUtils.getLongFriendlyDate(createdOn));
+		view.setModifiedOnText(" on " + dateTimeUtils.getLongFriendlyDate(modifiedOn));
 		view.setVisible(true);
 	}
 

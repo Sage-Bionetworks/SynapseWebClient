@@ -12,13 +12,13 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.provenance.UsedURL;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -172,22 +172,16 @@ public class ProvUtils {
 		}
 		return refToHeader;
 	}
-
-	public static KeyValueDisplay<String> entityToKeyValueDisplay(Entity entity, String modifiedBy) {
-		return entityToKeyValueDisplay(entity, modifiedBy, true);
-	}
 	
-	public static KeyValueDisplay<String> entityToKeyValueDisplay(Entity entity, String modifiedBy, boolean includeName) {
+	public static KeyValueDisplay<String> entityToKeyValueDisplay(Entity entity, String modifiedBy, DateTimeUtils dateTimeUtils) {
 		Map<String,String> map = new HashMap<String, String>();
 		List<String> order = new ArrayList<String>();
 		
 		order.add("ID");
 		map.put("ID", entity.getId());
 		
-		if (includeName) {
-			order.add("Name");
-			map.put("Name", entity.getName());
-		}
+		order.add("Name");
+		map.put("Name", entity.getName());
 		
 		if(entity instanceof VersionableEntity) {
 			order.add("Version");
@@ -199,7 +193,7 @@ public class ProvUtils {
 		order.add("Modified On");
 
 		if (entity.getModifiedOn() != null)
-			map.put("Modified On", DisplayUtils.convertDataToPrettyString(entity.getModifiedOn()));
+			map.put("Modified On", dateTimeUtils.getLongFriendlyDate(entity.getModifiedOn()));
 		
 		order.add("Description");
 		map.put("Description", entity.getDescription());		
@@ -207,7 +201,7 @@ public class ProvUtils {
 		return new KeyValueDisplay<String>(map, order);
 	}
 	
-	public static KeyValueDisplay<String> activityToKeyValueDisplay(Activity activity, String modifiedBy) {
+	public static KeyValueDisplay<String> activityToKeyValueDisplay(Activity activity, String modifiedBy, DateTimeUtils dateTimeUtils) {
 		Map<String,String> map = new HashMap<String, String>();
 		List<String> order = new ArrayList<String>();
 			
@@ -221,7 +215,7 @@ public class ProvUtils {
 		map.put("Modified By", modifiedBy);
 		
 		order.add("Modified On");
-		map.put("Modified On", DisplayUtils.convertDataToPrettyString(activity.getModifiedOn()));		
+		map.put("Modified On", dateTimeUtils.getLongFriendlyDate(activity.getModifiedOn()));		
 		
 		order.add("Description");
 		map.put("Description", activity.getDescription());				
@@ -254,6 +248,7 @@ public class ProvUtils {
 			SynapseClientAsync synapseClient,
 			AdapterFactory adapterFactory,
 			ClientCache clientCache,
+			DateTimeUtils dateTimeUtils,
 			Map<String, ProvGraphNode> idToNode,
 			final AsyncCallback<KeyValueDisplay<String>> callback) {
 		if(callback == null) return;
@@ -262,9 +257,9 @@ public class ProvUtils {
 		ProvGraphNode node = idToNode.get(nodeId);
 		if(node == null) callback.onFailure(null);
 		if(node instanceof EntityGraphNode) {
-			getInfoEntityTreeNode(synapseClient, adapterFactory, clientCache, callback, (EntityGraphNode)node);
+			getInfoEntityTreeNode(synapseClient, adapterFactory, clientCache, dateTimeUtils, callback, (EntityGraphNode)node);
 		} else if(node instanceof ActivityGraphNode) { 
-			getInfoActivityTreeNode(synapseClient, adapterFactory, clientCache, callback, (ActivityGraphNode)node);
+			getInfoActivityTreeNode(synapseClient, adapterFactory, clientCache, dateTimeUtils, callback, (ActivityGraphNode)node);
 		} else if(node instanceof ExternalGraphNode) {
 			callback.onSuccess(ProvUtils.externalNodeToKeyValueDisplay((ExternalGraphNode) node));
 		}
@@ -278,6 +273,7 @@ public class ProvUtils {
 			final SynapseClientAsync synapseClient,
 			final AdapterFactory adapterFactory,
 			final ClientCache clientCache,
+			final DateTimeUtils dateTimeUtils,
 			final AsyncCallback<KeyValueDisplay<String>> callback,
 			ActivityGraphNode atNode) {
 		synapseClient.getActivity(atNode.getActivityId(), new AsyncCallback<Activity>() {
@@ -286,7 +282,7 @@ public class ProvUtils {
 				UserBadge.getUserProfile(activity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 					@Override
 					public void onSuccess(UserProfile profile) {
-						callback.onSuccess(ProvUtils.activityToKeyValueDisplay(activity, DisplayUtils.getDisplayName(profile)));		
+						callback.onSuccess(ProvUtils.activityToKeyValueDisplay(activity, DisplayUtils.getDisplayName(profile), dateTimeUtils));		
 					}
 					
 					@Override
@@ -305,6 +301,7 @@ public class ProvUtils {
 	private static void getInfoEntityTreeNode(final SynapseClientAsync synapseClient,
 			final AdapterFactory adapterFactory,
 			final ClientCache clientCache,
+			final DateTimeUtils dateTimeUtils,
 			final AsyncCallback<KeyValueDisplay<String>> callback,
 			EntityGraphNode etNode) {
 		synapseClient.getEntityForVersion(etNode.getEntityId(), etNode.getVersionNumber(), new AsyncCallback<Entity>() {
@@ -314,7 +311,7 @@ public class ProvUtils {
 				UserBadge.getUserProfile(entity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
 					@Override
 					public void onSuccess(UserProfile profile) {
-						callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(profile)));		
+						callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(profile), dateTimeUtils));		
 					}
 					@Override
 					public void onFailure(Throwable caught) {

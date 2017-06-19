@@ -38,10 +38,10 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -84,14 +84,15 @@ public class EntityBadgeTest {
 	List<Annotation> annotationList;
 	Annotations annotations;
 	UserBadge mockUserBadge;
-	SynapseJSNIUtils mockSynapseJSNIUtils;
 	UserEntityPermissions mockPermissions;
 	AccessControlList mockBenefactorAcl;
 	@Mock
 	FileDownloadButton mockFileDownloadButton;
 	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
-	
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
+
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -105,13 +106,13 @@ public class EntityBadgeTest {
 		mockUserBadge = mock(UserBadge.class);
 		mockPermissions = mock(UserEntityPermissions.class);
 		when(mockPermissions.getCanPublicRead()).thenReturn(true);
-		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockBenefactorAcl = mock(AccessControlList.class);
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
-				mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient,
-				mockFileDownloadButton, mockLazyLoadHelper);
+				mockUserBadge, mockSynapseClient,
+				mockFileDownloadButton, mockLazyLoadHelper,
+				mockDateTimeUtils);
 		
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY1, Collections.EMPTY_LIST));
@@ -189,7 +190,7 @@ public class EntityBadgeTest {
 		testFile.setModifiedBy(modifiedByPrincipalId.toString());
 		Date modifiedOn = new Date();
 		String smallDateString="10/02/2000 01:26:45PM";
-		when(mockSynapseJSNIUtils.convertDateToSmallString(any(Date.class))).thenReturn(smallDateString);
+		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(smallDateString);
 		testFile.setModifiedOn(modifiedOn);
 		
 		entityThreadCount = 1L;
@@ -200,7 +201,7 @@ public class EntityBadgeTest {
 		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockUserBadge).configure(modifiedByPrincipalId.toString());
 		verify(mockView).setModifiedByWidgetVisible(true);
-		verify(mockSynapseJSNIUtils).convertDateToSmallString(modifiedOn);
+		verify(mockDateTimeUtils).convertDateToSmallString(modifiedOn);
 		verify(mockView).setModifiedOn(smallDateString);
 				
 		verify(mockView).showPublicIcon();

@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.display;
 
-import org.sagebionetworks.web.client.DateUtils;
+import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -133,7 +133,7 @@ public class ProjectDisplayDialog implements ProjectDisplayView.Presenter, IsWid
 	
 	private void updateCache(boolean isChecked, boolean hasContent, String key) {
 		if (isChecked && !hasContent) {
-			storage.put(tag + key, Boolean.TRUE.toString(), DateUtils.getYearFromNow().getTime());
+			storage.put(tag + key, Boolean.TRUE.toString(), DateTimeUtilsImpl.getYearFromNow().getTime());
 		} else if (!isChecked && hasContent) {
 			throw new IllegalArgumentException(key + " tab contains content. Content must be deleted to hide tab.");
 		} else { //user doesn't want it, or they do but it already has content and doesn't belong in cache

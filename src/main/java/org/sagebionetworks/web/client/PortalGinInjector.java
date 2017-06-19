@@ -541,4 +541,5 @@ public interface PortalGinInjector extends Ginjector {
 	public ProfileCertifiedValidatedWidget getProfileCertifiedValidatedWidget();
 	public ACTDataAccessSubmissionWidget getACTDataAccessSubmissionWidget();
 	public OpenSubmissionWidget getOpenSubmissionWidget();
+	public DateTimeUtils getDateTimeUtils();
 }
