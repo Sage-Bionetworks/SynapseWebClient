@@ -7,6 +7,6 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	
 	<bt:TableHeader>
-		<b:Button ui:field="button" iconPosition="RIGHT" type="LINK"/>
+		<b:Button ui:field="button" iconPosition="RIGHT" type="LINK" addStyleNames="padding-left-2 padding-right-2"/>
 	</bt:TableHeader>
 </ui:UiBinder>

@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -151,15 +152,17 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 		List<ColumnModel> newColumns = new ArrayList<ColumnModel>(models.size());
 		newColumns.addAll(models);
 		List<ColumnModel> existingColumns = getEditedColumnModels();
-		Set<String> existingColumnNames = new HashSet<String>();
-		Map<String, ColumnModel> newModels = new HashMap<String, ColumnModel>();
+		Set<ColumnModelKey> existingColumnNames = new HashSet<ColumnModelKey>();
+		Map<ColumnModelKey, ColumnModel> newModels = new HashMap<ColumnModelKey, ColumnModel>();
 		for (ColumnModel cm : newColumns) {
-			newModels.put(cm.getName(), cm);
+			ColumnModelKey key = new ColumnModelKey(cm.getName(), cm.getColumnType());
+			newModels.put(key, cm);
 		}
 		for (ColumnModel cm : existingColumns) {
-			existingColumnNames.add(cm.getName());
+			ColumnModelKey key = new ColumnModelKey(cm.getName(), cm.getColumnType());
+			existingColumnNames.add(key);
 		}
-		for (String newModelName : newModels.keySet()) {
+		for (ColumnModelKey newModelName : newModels.keySet()) {
 			if (existingColumnNames.contains(newModelName)) {
 				newColumns.remove(newModels.get(newModelName));
 			}
