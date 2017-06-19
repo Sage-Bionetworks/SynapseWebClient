@@ -45,7 +45,7 @@ public class ImportTableViewColumnsButton implements IsWidget {
 		button.setText(BUTTON_TEXT);
 		button.setSize(ButtonSize.DEFAULT);
 		button.setType(ButtonType.DEFAULT);
-		button.setIcon(IconType.PLUS);
+		button.setIcon(IconType.ARROW_CIRCLE_O_DOWN);
 		finder.configure(EntityFilter.PROJECT_OR_TABLE, false, new DisplayUtils.SelectedHandler<Reference>() {
 			@Override
 			public void onSelected(Reference selected) {

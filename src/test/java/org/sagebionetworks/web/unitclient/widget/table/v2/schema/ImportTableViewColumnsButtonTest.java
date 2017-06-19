@@ -73,7 +73,7 @@ public class ImportTableViewColumnsButtonTest {
 	public void testConstruction() {
 		verify(mockButton).setText(ImportTableViewColumnsButton.BUTTON_TEXT);
 		verify(mockButton).setSize(ButtonSize.DEFAULT);
-		verify(mockButton).setIcon(IconType.PLUS);
+		verify(mockButton).setIcon(IconType.ARROW_CIRCLE_O_DOWN);
 		verify(mockButton).setType(ButtonType.DEFAULT);
 	}
 	

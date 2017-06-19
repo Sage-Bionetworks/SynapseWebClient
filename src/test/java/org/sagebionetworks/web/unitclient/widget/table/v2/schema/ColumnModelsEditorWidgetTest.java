@@ -140,6 +140,27 @@ public class ColumnModelsEditorWidgetTest {
 	}
 	
 	@Test
+	public void testAddDuplicateColumns(){
+		widget.configure(TableType.table, schema);
+		
+		List<ColumnModel> clone = widget.getEditedColumnModels();
+		assertEquals(schema, clone);
+		
+		// change the column type of the first column
+		clone.get(0).setId(null);
+		clone.get(0).setColumnType(ColumnType.FILEHANDLEID);
+		// change the column name of the second column
+		clone.get(1).setId(null);
+		clone.get(1).setName("newname");
+		
+		// the third column looks to be new, but should be filtered out because it has the same name and type as an existing column in the editor
+		clone.get(2).setId(null);
+		// all other columns should be ignored (because they have the same name and type)
+		widget.addColumns(clone);
+		verify(mockEditor, times(schema.size() + 2)).addColumn(any(ColumnModelTableRow.class));
+	}
+	
+	@Test
 	public void testFileView() {
 		//try to add non-editable column
 		when(mockGinInjector.createColumnModelEditorWidget()).thenReturn(mockColumnModelTableRowEditorWidget1, mockColumnModelTableRowEditorWidget2);
