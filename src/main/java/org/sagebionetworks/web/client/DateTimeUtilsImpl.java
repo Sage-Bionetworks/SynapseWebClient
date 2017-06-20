@@ -11,10 +11,10 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 	private DateTimeFormat dateOnly = DateTimeFormat.getFormat("MM/dd/yyyy");
 	private static final String SMALL_DATE_FORMAT = "MM/dd/yyyy hh:mm:ssaa";
 	private DateTimeFormat smallDateFormat = DateTimeFormat.getFormat(SMALL_DATE_FORMAT);
-	private DateTimeFormat smallDateFormatUTC = DateTimeFormat.getFormat(SMALL_DATE_FORMAT + " UTC");
+	private DateTimeFormat smallDateFormatUTC = DateTimeFormat.getFormat(SMALL_DATE_FORMAT + " 'UTC'");
 	private static final String LONG_DATE_FORMAT = "EEEE, MMMM d, yyyy h:mm a";
 	private DateTimeFormat longDateFormat = DateTimeFormat.getFormat(LONG_DATE_FORMAT);
-	private DateTimeFormat longDateFormatUTC = DateTimeFormat.getFormat(LONG_DATE_FORMAT + " UTC");
+	private DateTimeFormat longDateFormatUTC = DateTimeFormat.getFormat(LONG_DATE_FORMAT + " 'UTC'");
 	private DateTimeFormat iso8601Format =  DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
 	public TimeZone currentTimezone;
 	public static final TimeZone UTC_TIMEZONE = TimeZone.createTimeZone(0);
