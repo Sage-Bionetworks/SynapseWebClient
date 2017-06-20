@@ -1055,7 +1055,8 @@ a.shortBtn {
 	max-width: none;
 }
 
-.color-white, .color-white:hover, .color-white:visited, .color-white:focus {
+.color-white, .color-white:hover, .color-white:visited, .color-white:focus, 
+#rootPanel .color-white, #rootPanel .color-white:hover, #rootPanel .color-white:visited, #rootPanel .color-white:focus {
 	color: white;
 }
 
