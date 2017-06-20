@@ -60,18 +60,27 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		renew.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				accessType = AccessType.RENEW_ACCESS;
-				dropdown.setText(renew.getText());
+				showRenew();
 			}
 		});
 		revoke.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				accessType = AccessType.REVOKE_ACCESS;
-				dropdown.setText(revoke.getText());
+				showRevoke();
 			}
 		});
-
+	}
+	
+	private void showRenew() {
+		accessType = AccessType.RENEW_ACCESS;
+		dropdown.setText(renew.getText());
+		userBadgeContainer.removeStyleName("strikeout-links");
+	}
+	
+	private void showRevoke() {
+		accessType = AccessType.REVOKE_ACCESS;
+		dropdown.setText(revoke.getText());
+		userBadgeContainer.addStyleName("strikeout-links");
 	}
 	
 	public UserBadgeItem configure(AccessorChange change) {
@@ -85,10 +94,10 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		
 		switch(accessType) {
 			case RENEW_ACCESS:
-				dropdown.setText(renew.getText());
+				showRenew();
 				break;
 			case REVOKE_ACCESS:
-				dropdown.setText(revoke.getText());
+				showRevoke();
 				break;
 			default:
 		}
