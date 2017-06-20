@@ -162,6 +162,16 @@ public class ACTAccessRequirementWidgetTest {
 		verify(mockView).showUnapprovedHeading();
 		verify(mockView, never()).showRequestAccessButton();
 	}
+
+	@Test
+	public void testUnApprovedStateNullOpenJira() {
+		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(null);
+		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
+		widget.setRequirement(mockACTAccessRequirement);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showUnapprovedHeading();
+		verify(mockView, never()).showRequestAccessButton();
+	}
 	
 	@Test
 	public void testUnApprovedStateNoDataAccessRequestWithOpenJiraIssue() {
