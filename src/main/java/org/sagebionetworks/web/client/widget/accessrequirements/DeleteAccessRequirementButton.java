@@ -3,9 +3,11 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
@@ -31,18 +33,21 @@ public class DeleteAccessRequirementButton implements IsWidget {
 	PopupUtilsView popupUtils;
 	Callback confirmedDeleteCallback;
 	GlobalApplicationState globalAppState;
+	CookieProvider cookies;
 	
 	@Inject
 	public DeleteAccessRequirementButton(Button button, 
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
 			GlobalApplicationState globalAppState,
 			SynapseClientAsync synapseClient, 
-			PopupUtilsView popupUtils) {
+			PopupUtilsView popupUtils,
+			CookieProvider cookies) {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.synapseClient = synapseClient;
 		this.popupUtils = popupUtils;
 		this.globalAppState = globalAppState;
+		this.cookies = cookies;
 		button.setVisible(false);
 		button.addStyleName("margin-left-10");
 		button.setType(ButtonType.DANGER);
@@ -90,7 +95,8 @@ public class DeleteAccessRequirementButton implements IsWidget {
 		isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean isACTMember) {
-				button.setVisible(isACTMember);
+				boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
+				button.setVisible(isACTMember && isInAlpha);
 			}
 		});
 	}
