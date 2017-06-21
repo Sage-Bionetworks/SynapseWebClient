@@ -601,8 +601,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEdito
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRendererImpl;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRendererView;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellRendererViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellEditor;
@@ -1160,7 +1158,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DateCellEditor.class).to(DateCellEditorImpl.class);
 		bind(UserIdCellEditor.class).to(UserIdCellEditorImpl.class);
 		bind(DateCellRenderer.class).to(DateCellRendererImpl.class);
-		bind(DateCellRendererView.class).to(DateCellRendererViewImpl.class);
 		bind(DoubleCellEditor.class).to(DoubleCellEditorImpl.class);
 		bind(IntegerCellEditor.class).to(IntegerCellEditorImpl.class);
 		bind(LinkCellRenderer.class).to(LinkCellRendererImpl.class);
@@ -1407,5 +1404,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RevokeUserAccessModalView.class).to(RevokeUserAccessModalViewImpl.class);
 		bind(PlotlyWidgetView.class).to(PlotlyWidgetViewImpl.class);
 		bind(PlotlyConfigView.class).to(PlotlyConfigViewImpl.class);
+		
+		bind(DateTimeUtilsImpl.class).in(Singleton.class);
+		bind(DateTimeUtils.class).to(DateTimeUtilsImpl.class);
 	}
 }

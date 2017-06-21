@@ -5,7 +5,7 @@ import java.util.Date;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
-import org.sagebionetworks.web.client.DateUtils;
+import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -106,7 +106,7 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 	
 	@Override
 	public void onDismiss() {
-		clientCache.put(STU_ANNOUNCEMENT_CLICKED_PREFIX_KEY + announcementThreadId, Boolean.TRUE.toString(), DateUtils.getYearFromNow().getTime());
+		clientCache.put(STU_ANNOUNCEMENT_CLICKED_PREFIX_KEY + announcementThreadId, Boolean.TRUE.toString(), DateTimeUtilsImpl.getYearFromNow().getTime());
 		view.hide();
 	}
 	

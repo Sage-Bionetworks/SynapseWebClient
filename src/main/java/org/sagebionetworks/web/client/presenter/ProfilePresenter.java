@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -117,7 +118,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public Callback getMoreProjectsCallback;
 	public Callback refreshTeamsCallback;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
-	
+	public DateTimeUtils dateTimeUtils;
 	@Inject
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
@@ -133,7 +134,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			PortalGinInjector ginInjector,
 			UserProfileClientAsync userProfileClient,
 			VerificationSubmissionWidget verificationModal,
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
+			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -150,6 +152,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.userProfileClient = userProfileClient;
 		this.verificationModal = verificationModal;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
+		this.dateTimeUtils = dateTimeUtils;
 		
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
@@ -400,7 +403,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		if (isVerified) {
 			List<VerificationState> stateHistory = submission.getStateHistory();
 			VerificationState latestState = stateHistory.get(stateHistory.size()-1);
-			String dateVerified = gwt.getFormattedDateString(latestState.getCreatedOn());
+			String dateVerified = dateTimeUtils.getLongFriendlyDate(latestState.getCreatedOn());
 			view.showVerifiedBadge(submission.getFirstName(), submission.getLastName(), submission.getLocation(),submission.getCompany(), submission.getOrcid(), dateVerified);
 		}
 		

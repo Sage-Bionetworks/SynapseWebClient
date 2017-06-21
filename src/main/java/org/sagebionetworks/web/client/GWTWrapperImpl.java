@@ -85,11 +85,6 @@ public class GWTWrapperImpl implements GWTWrapper {
 	}
 	
 	@Override
-	public String getFormattedDateString(Date date) {
-		return DisplayUtils.convertDataToPrettyString(date);
-	}
-	
-	@Override
 	public void scheduleExecution(final Callback callback, int delayMillis) {
 		Timer timer = new Timer() { 
 		    public void run() { 

@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -105,17 +106,21 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private Footer footerWidget;
 	private PortalGinInjector ginInjector;
-	
+	DateTimeUtils dateTimeUtils;
 	@Inject
-	public SearchViewImpl(SearchViewImplUiBinder binder, Header headerWidget,
+	public SearchViewImpl(SearchViewImplUiBinder binder, 
+			Header headerWidget,
 			Footer footerWidget,
-			SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
+			SynapseJSNIUtils synapseJSNIUtils, 
+			PortalGinInjector ginInjector,
+			DateTimeUtils dateTimeUtils) {
 		initWidget(binder.createAndBindUi(this));
 		
 		this.headerWidget = headerWidget;
 		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.ginInjector = ginInjector;
+		this.dateTimeUtils = dateTimeUtils;
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
@@ -239,7 +244,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 					String formattedDateString;
 					try{
 						long valueInMiliseconds = Long.parseLong(valueAsString) * 1000;
-						formattedDateString = valueInMiliseconds == 0 ? "any time": DisplayUtils.converDateaToSimpleString(new Date(valueInMiliseconds));
+						formattedDateString = valueInMiliseconds == 0 ? "any time": dateTimeUtils.convertDateToSimpleString(new Date(valueInMiliseconds));
 					}catch (NumberFormatException e){
 						formattedDateString = valueAsString;
 					}
@@ -368,14 +373,14 @@ public class SearchViewImpl extends Composite implements SearchView {
 		createdByBadgeWidget.addStyleName("movedown-7");
 		attributionPanel.add(createdByBadgeWidget);
 		
-		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getCreated_on()*1000)) + ", Updated by ");
+		inlineHtml = new InlineHTML(" on " + dateTimeUtils.convertDateToSimpleString(new Date(hit.getCreated_on()*1000)) + ", Updated by ");
 		inlineHtml.addStyleName("hitattribution");
 		
 		attributionPanel.add(inlineHtml);
 		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
 		modifiedByBadgeWidget.addStyleName("movedown-7");
 		attributionPanel.add(modifiedByBadgeWidget);
-		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000)));
+		inlineHtml = new InlineHTML(" on " + dateTimeUtils.convertDateToSimpleString(new Date(hit.getModified_on()*1000)));
 		inlineHtml.addStyleName("hitattribution");
 		
 		attributionPanel.add(inlineHtml);

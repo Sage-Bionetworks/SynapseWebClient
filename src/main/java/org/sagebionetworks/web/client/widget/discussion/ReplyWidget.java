@@ -4,10 +4,10 @@ import java.util.Set;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TopicUtils;
@@ -33,7 +33,6 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	private static final String DELETE_SUCCESS_TITLE = "Reply deleted";
 	private static final String DELETE_SUCCESS_MESSAGE = "A reply has been deleted.";
 	ReplyWidgetView view;
-	SynapseJSNIUtils jsniUtils;
 	UserBadge authorWidget;
 	RequestBuilderWrapper requestBuilder;
 	SynapseAlert synAlert;
@@ -50,12 +49,13 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	private Set<String> moderatorIds;
 	private String message;
 	private boolean isThreadDeleted;
+	private DateTimeUtils dateTimeUtils;
 	
 	@Inject
 	public ReplyWidget(
 			ReplyWidgetView view,
 			UserBadge authorWidget,
-			SynapseJSNIUtils jsniUtils,
+			DateTimeUtils dateTimeUtils,
 			SynapseAlert synAlert,
 			RequestBuilderWrapper requestBuilder,
 			DiscussionForumClientAsync discussionForumClientAsync,
@@ -67,7 +67,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			) {
 		this.view = view;
 		this.authorWidget = authorWidget;
-		this.jsniUtils = jsniUtils;
+		this.dateTimeUtils = dateTimeUtils;
 		this.synAlert = synAlert;
 		this.requestBuilder = requestBuilder;
 		this.discussionForumClientAsync = discussionForumClientAsync;
@@ -98,7 +98,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.deleteReplyCallback = deleteReplyCallback;
 		this.isThreadDeleted = isThreadDeleted;
 		authorWidget.configure(bundle.getCreatedBy());
-		view.setCreatedOn(SingleDiscussionThreadWidget.CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
+		view.setCreatedOn(SingleDiscussionThreadWidget.CREATED_ON_PREFIX+dateTimeUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setMessageVisible(true);
 		view.setEditedVisible(bundle.getIsEdited());
 		boolean isAuthorModerator = moderatorIds.contains(bundle.getCreatedBy());

@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -31,24 +32,23 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	public static final String N_A = "N/A";
 	private EntityListRowBadgeView view;
 	private UserBadge createdByUserBadge;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	private SynapseClientAsync synapseClient;
 	private FileDownloadButton fileDownloadButton;
 	private String entityId;
 	private Long version;
 	private Callback selectionChangedCallback;
 	private LazyLoadHelper lazyLoadHelper;
-	
+	private DateTimeUtils dateTimeUtils;
 	@Inject
 	public EntityListRowBadge(EntityListRowBadgeView view, 
 			UserBadge userBadge,
-			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseClientAsync synapseClient,
 			FileDownloadButton fileDownloadButton,
-			LazyLoadHelper lazyLoadHelper) {
+			LazyLoadHelper lazyLoadHelper,
+			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.createdByUserBadge = userBadge;
-		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.dateTimeUtils = dateTimeUtils;
 		this.synapseClient = synapseClient;
 		this.fileDownloadButton = fileDownloadButton;
 		this.lazyLoadHelper = lazyLoadHelper;
@@ -129,7 +129,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		}
 		
 		if (eb.getEntity().getCreatedOn() != null) {
-			String dateString = synapseJSNIUtils.convertDateToSmallString(eb.getEntity().getCreatedOn());
+			String dateString = dateTimeUtils.convertDateToSmallString(eb.getEntity().getCreatedOn());
 			view.setCreatedOn(dateString);
 		} else {
 			view.setCreatedOn("");

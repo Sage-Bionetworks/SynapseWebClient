@@ -99,7 +99,6 @@ import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
-	private static DateTimeFormat prettyFormat = null; 
 	private static Logger displayUtilsLogger = Logger.getLogger(DisplayUtils.class.getName());
 	public static PublicPrincipalIds publicPrincipalIds = null;
 	public static enum MessagePopup {  
@@ -509,30 +508,6 @@ public class DisplayUtils {
 	
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
-	}
-		
-	/**
-	 * YYYY-MM-DD HH:mm:ss
-	 * @param toFormat
-	 * @return
-	 */
-	public static String convertDataToPrettyString(Date toFormat) {
-		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		if (prettyFormat == null) {
-			prettyFormat = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
-		}
-		return prettyFormat.format(toFormat, GlobalApplicationStateImpl.currentTimezone);
-	}
-	
-	
-	/**
-	 * Converts a date to just a date.
-     * @return  yyyy-MM-dd
-	 * @return
-	 */
-	public static String converDateaToSimpleString(Date toFormat) {
-		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		return DateUtils.convertDateToString(FORMAT.DATE, toFormat);
 	}
 	
 	public static String getTeamHistoryToken(String teamId) {

@@ -35,6 +35,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.Topic;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -80,7 +81,7 @@ public class SingleDiscussionThreadWidgetTest {
 	@Mock
 	ReplyWidget mockReplyWidget;
 	@Mock
-	SynapseJSNIUtils mockJsniUtils;
+	DateTimeUtils mockDateTimeUtils;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
@@ -144,7 +145,7 @@ public class SingleDiscussionThreadWidgetTest {
 		when(mockGinInjector.getReplyCountAlert()).thenReturn(mockRefreshAlert);
 		discussionThreadWidget = new SingleDiscussionThreadWidget(mockView, mockSynAlert,
 				mockAuthorWidget, mockDiscussionForumClientAsync, mockGinInjector,
-				mockJsniUtils, mockRequestBuilder, mockAuthController,
+				mockDateTimeUtils, mockRequestBuilder, mockAuthController,
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
 				mockRepliesContainer, mockSubscribeButtonWidget, mockNewReplyWidget,
 				mockNewReplyWidget, mockSubscribersWidget);

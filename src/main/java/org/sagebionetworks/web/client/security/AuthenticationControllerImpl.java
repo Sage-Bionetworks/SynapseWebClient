@@ -11,7 +11,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.DateUtils;
+import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.SubscriptionClientAsync;
@@ -97,7 +97,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 	
 	public void storeAuthenticationReceipt(String username, String receipt) {
-		localStorage.put(username + USER_AUTHENTICATION_RECEIPT, receipt, DateUtils.getYearFromNow().getTime());
+		localStorage.put(username + USER_AUTHENTICATION_RECEIPT, receipt, DateTimeUtilsImpl.getYearFromNow().getTime());
 	}
 	
 	public LoginRequest getLoginRequest(String username, String password) {
@@ -129,9 +129,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
 				for (String key : properties.keySet()) {
-					localStorage.put(key, properties.get(key), DateUtils.getYearFromNow().getTime());
+					localStorage.put(key, properties.get(key), DateTimeUtilsImpl.getYearFromNow().getTime());
 				}
-				localStorage.put(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateUtils.getWeekFromNow().getTime());
+				localStorage.put(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateTimeUtilsImpl.getWeekFromNow().getTime());
 			}
 			
 			@Override
@@ -151,8 +151,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		userAccountService.getUserSessionData(token, new AsyncCallback<UserSessionData>() {
 			@Override
 			public void onSuccess(UserSessionData userSessionData) {
-				Date tomorrow = DateUtils.getDayFromNow();
-				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateUtils.getWeekFromNow());
+				Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
+				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
 				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 				currentUser = userSessionData;
 				localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
@@ -172,7 +172,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				gwt.asHasRpcToken(synapseClient).setRpcToken(token);
 				gwt.asHasRpcToken(challengeClient).setRpcToken(token);
 				gwt.asHasRpcToken(subscriptionClient).setRpcToken(token);
-				localStorage.put(XSRF_TOKEN_KEY, token.getToken(), DateUtils.getDayFromNow().getTime());
+				localStorage.put(XSRF_TOKEN_KEY, token.getToken(), DateTimeUtilsImpl.getDayFromNow().getTime());
 				callback.onSuccess(userSessionData);
 			}
 
@@ -205,7 +205,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public void updateCachedProfile(UserProfile updatedProfile){
 		if(currentUser != null) {
 			currentUser.setProfile(updatedProfile);
-			Date tomorrow = DateUtils.getDayFromNow();
+			Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
 			localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
 		}
 	}
