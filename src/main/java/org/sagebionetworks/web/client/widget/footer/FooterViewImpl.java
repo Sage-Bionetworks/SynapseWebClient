@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.widget.accessrequirements.HideACTActionsButton;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -37,16 +38,21 @@ public class FooterViewImpl extends Composite implements FooterView {
 	
 	@UiField
 	Anchor reportAbuseLink;
+	@UiField
+	Span hideACTActionsContainer;
 	
 	private Presenter presenter;
 	private CookieProvider cookies;
 	private GlobalApplicationState globalAppState;
+	private HideACTActionsButton hideACTActionsButton;
 	@Inject
-	public FooterViewImpl(Binder binder, CookieProvider cookies, GlobalApplicationState globalAppState) {
+	public FooterViewImpl(Binder binder, CookieProvider cookies, GlobalApplicationState globalAppState, HideACTActionsButton hideACTActionsButton) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.cookies = cookies;
 		this.globalAppState = globalAppState;
-		initDebugModeLink();		
+		this.hideACTActionsButton = hideACTActionsButton;
+		initDebugModeLink();
+		hideACTActionsContainer.add(hideACTActionsButton);
 		copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " Sage Bionetworks");
 		reportAbuseLink.addClickHandler(new ClickHandler() {
 			
@@ -99,5 +105,10 @@ public class FooterViewImpl extends Composite implements FooterView {
 	@Override
 	public void open(String url) {
 		DisplayUtils.newWindow(url, "_blank", "");
+	}
+	
+	@Override
+	public void refresh() {
+		hideACTActionsButton.refresh();	
 	}
 }
