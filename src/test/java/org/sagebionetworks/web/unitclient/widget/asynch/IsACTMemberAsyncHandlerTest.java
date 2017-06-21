@@ -73,15 +73,24 @@ public class IsACTMemberAsyncHandlerTest {
 		when(mockSessionStorage.getItem(SESSION_KEY_PREFIX + CURRENT_USER_ID)).thenReturn(Boolean.TRUE.toString());
 		widget.isACTActionAvailable(mockCallback);
 		verify(mockCallback).invoke(true);
+		// if hiding ACT UI, should invoke false
+		widget.setACTActionVisible(false);
+		widget.isACTActionAvailable(mockCallback);
+		verify(mockCallback).invoke(false);
+		
+		reset(mockCallback);
 		
 		when(mockSessionStorage.getItem(SESSION_KEY_PREFIX + CURRENT_USER_ID)).thenReturn(Boolean.FALSE.toString());
 		widget.isACTActionAvailable(mockCallback);
 		verify(mockCallback).invoke(false);
+		widget.setACTActionVisible(true);
+		widget.isACTActionAvailable(mockCallback);
+		verify(mockCallback, times(2)).invoke(false);
 	}
 	
 	@Test
 	public void testRpcSuccess() {
-		Boolean isACTMember = false;
+		Boolean isACTMember = true;
 		when(mockUserBundle.getIsACTMember()).thenReturn(isACTMember);
 		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
 		widget.isACTActionAvailable(mockCallback);
@@ -89,6 +98,33 @@ public class IsACTMemberAsyncHandlerTest {
 		verify(mockSessionStorage).setItem(SESSION_KEY_PREFIX + CURRENT_USER_ID, isACTMember.toString());
 		verify(mockCallback).invoke(isACTMember);
 	}
+	
+	@Test
+	public void testRpcSuccessHideACTAction() {
+		// Is in ACT, but hide ACT UI.  Answer to isACTActionAvailable should be false.
+		widget.setACTActionVisible(false);
+		Boolean isACTMember = true;
+		when(mockUserBundle.getIsACTMember()).thenReturn(isACTMember);
+		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
+		widget.isACTActionAvailable(mockCallback);
+		verify(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
+		verify(mockSessionStorage).setItem(SESSION_KEY_PREFIX + CURRENT_USER_ID, isACTMember.toString());
+		verify(mockCallback).invoke(false);
+	}
+	
+	@Test
+	public void testIsMember() {
+		// Is in ACT, but hide ACT UI.  Answer to isACTMember should be true.
+		widget.setACTActionVisible(false);
+		Boolean isACTMember = true;
+		when(mockUserBundle.getIsACTMember()).thenReturn(isACTMember);
+		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
+		widget.isACTMember(mockCallback);
+		verify(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
+		verify(mockSessionStorage).setItem(SESSION_KEY_PREFIX + CURRENT_USER_ID, isACTMember.toString());
+		verify(mockCallback).invoke(true);
+	}
+
 	@Test
 	public void testRpcFailure() {
 		String message = "an error occurred";
