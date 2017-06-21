@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
@@ -50,7 +51,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private ClientCache localStorage;
 	private GWTWrapper gwt;
 	private boolean isShowingVersionAlert;
-	
+	private PublicPrincipalIds publicPrincipalIds;
 	public static TimeZone currentTimezone;
 	public static final TimeZone UTC_TIMEZONE = TimeZone.createTimeZone(0);
 	
@@ -438,5 +439,16 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
 		}
 		return timezoneOffsetMs;
+	}
+	
+	@Override
+	public PublicPrincipalIds getPublicPrincipalIds() {
+		if (publicPrincipalIds == null) {
+			publicPrincipalIds = new PublicPrincipalIds();
+			publicPrincipalIds.setPublicAclPrincipalId(Long.parseLong(getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
+			publicPrincipalIds.setAnonymousUserId(Long.parseLong(getSynapseProperty(WebConstants.ANONYMOUS_USER_PRINCIPAL_ID)));
+			publicPrincipalIds.setAuthenticatedAclPrincipalId(Long.parseLong(getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)));	
+		}
+		return publicPrincipalIds;
 	}
 }
