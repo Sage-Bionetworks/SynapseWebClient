@@ -432,7 +432,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getIsACTMemberAndShowVerificationUI(final VerificationSubmission submission) {
 		if (authenticationController.isLoggedIn()) {
-			isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+			isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 				@Override
 				public void invoke(Boolean isACTMember) {
 					showVerificationUI(submission, isACTMember);
@@ -1189,7 +1189,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void editVerificationSubmissionClicked() {
 		//edit the existing submission
-		isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean isACTMember) {
 				verificationModal.configure(

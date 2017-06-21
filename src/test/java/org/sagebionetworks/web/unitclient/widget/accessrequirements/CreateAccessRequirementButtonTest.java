@@ -75,7 +75,7 @@ public class CreateAccessRequirementButtonTest {
 	public void testConfigureWithAR() {
 		widget.configure(mockAccessRequirement);
 		verify(mockButton).setText(CreateAccessRequirementButton.EDIT_ACCESS_REQUIREMENT_BUTTON_TEXT);
-		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
+		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
 		
 		CallbackP<Boolean> isACTMemberCallback = callbackPCaptor.getValue();
 		// invoking with false should hide the button again
@@ -97,7 +97,7 @@ public class CreateAccessRequirementButtonTest {
 	public void testConfigureWithSubject() {
 		widget.configure(mockSubject);
 		verify(mockButton).setText(CreateAccessRequirementButton.CREATE_NEW_ACCESS_REQUIREMENT_BUTTON_TEXT);
-		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
+		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
 		
 		// configured with a subject, when clicked it should pop up the wizard pointing to the new subject
 		onButtonClickHandler.onClick(null);

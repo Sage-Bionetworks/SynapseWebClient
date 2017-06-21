@@ -51,7 +51,7 @@ public class ManageAccessButton implements IsWidget {
 	}
 	
 	private void showIfACTMember() {
-		isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean isACTMember) {
 				button.setVisible(isACTMember);

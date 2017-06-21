@@ -65,7 +65,7 @@ public class ManageAccessButtonTest {
 	@Test
 	public void testConfigureWithAR() {
 		widget.configure(mockAccessRequirement);
-		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
+		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
 		
 		CallbackP<Boolean> isACTMemberCallback = callbackPCaptor.getValue();
 		// invoking with false should hide the button again

@@ -65,17 +65,17 @@ public class IsACTMemberAsyncHandlerTest {
 	@Test
 	public void testAnonymous() {
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
-		widget.isACTMember(mockCallback);
+		widget.isACTActionAvailable(mockCallback);
 		verify(mockCallback).invoke(false);
 	}
 	@Test
 	public void testCache() {
 		when(mockSessionStorage.getItem(SESSION_KEY_PREFIX + CURRENT_USER_ID)).thenReturn(Boolean.TRUE.toString());
-		widget.isACTMember(mockCallback);
+		widget.isACTActionAvailable(mockCallback);
 		verify(mockCallback).invoke(true);
 		
 		when(mockSessionStorage.getItem(SESSION_KEY_PREFIX + CURRENT_USER_ID)).thenReturn(Boolean.FALSE.toString());
-		widget.isACTMember(mockCallback);
+		widget.isACTActionAvailable(mockCallback);
 		verify(mockCallback).invoke(false);
 	}
 	
@@ -84,7 +84,7 @@ public class IsACTMemberAsyncHandlerTest {
 		Boolean isACTMember = false;
 		when(mockUserBundle.getIsACTMember()).thenReturn(isACTMember);
 		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
-		widget.isACTMember(mockCallback);
+		widget.isACTActionAvailable(mockCallback);
 		verify(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
 		verify(mockSessionStorage).setItem(SESSION_KEY_PREFIX + CURRENT_USER_ID, isACTMember.toString());
 		verify(mockCallback).invoke(isACTMember);
@@ -94,7 +94,7 @@ public class IsACTMemberAsyncHandlerTest {
 		String message = "an error occurred";
 		Exception ex = new Exception(message);
 		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
-		widget.isACTMember(mockCallback);
+		widget.isACTActionAvailable(mockCallback);
 		verify(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
 		verify(mockJsniUtils).consoleError(message);
 		verify(mockCallback).invoke(false);

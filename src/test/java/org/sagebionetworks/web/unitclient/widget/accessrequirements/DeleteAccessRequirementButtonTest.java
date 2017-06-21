@@ -87,7 +87,7 @@ public class DeleteAccessRequirementButtonTest {
 	public void testConfigureWithAR() {
 		widget.configure(mockAccessRequirement);
 		verify(mockButton).setText(DELETE_ACCESS_REQUIREMENT_BUTTON_TEXT);
-		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
+		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
 		
 		CallbackP<Boolean> isACTMemberCallback = callbackPCaptor.getValue();
 		// invoking with false should hide the button again

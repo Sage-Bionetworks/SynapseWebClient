@@ -10,7 +10,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.widget.accessrequirements.HideACTActionsButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.ToggleACTActionsButton;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -44,9 +44,9 @@ public class FooterViewImpl extends Composite implements FooterView {
 	private Presenter presenter;
 	private CookieProvider cookies;
 	private GlobalApplicationState globalAppState;
-	private HideACTActionsButton hideACTActionsButton;
+	private ToggleACTActionsButton hideACTActionsButton;
 	@Inject
-	public FooterViewImpl(Binder binder, CookieProvider cookies, GlobalApplicationState globalAppState, HideACTActionsButton hideACTActionsButton) {
+	public FooterViewImpl(Binder binder, CookieProvider cookies, GlobalApplicationState globalAppState, ToggleACTActionsButton hideACTActionsButton) {
 		this.initWidget(binder.createAndBindUi(this));
 		this.cookies = cookies;
 		this.globalAppState = globalAppState;

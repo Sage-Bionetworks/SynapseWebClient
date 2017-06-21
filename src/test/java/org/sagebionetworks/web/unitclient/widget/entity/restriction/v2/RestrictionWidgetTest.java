@@ -89,7 +89,7 @@ public class RestrictionWidgetTest {
 	}
 	
 	private void verifyIsACTMember(boolean isACT) {
-		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
+		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
 		callbackPCaptor.getValue().invoke(isACT);
 	}
 	

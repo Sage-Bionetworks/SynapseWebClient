@@ -149,7 +149,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.currentTeamId = teamId;
 		clear();
 		synAlert.clear();
-		isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean isACT) {
 				view.setManageAccessVisible(isACT);

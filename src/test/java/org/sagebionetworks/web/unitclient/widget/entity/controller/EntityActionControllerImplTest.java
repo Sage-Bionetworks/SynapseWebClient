@@ -1519,7 +1519,7 @@ public class EntityActionControllerImplTest {
 		
 		verify(mockActionMenu, never()).setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, true);
 		verify(mockActionMenu, never()).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
-		verify(mockIsACTMemberAsyncHandler, atLeastOnce()).isACTMember(callbackPCaptor.capture());
+		verify(mockIsACTMemberAsyncHandler, atLeastOnce()).isACTActionAvailable(callbackPCaptor.capture());
 		List<CallbackP<Boolean>> isACTCallbacks = callbackPCaptor.getAllValues();
 		for (CallbackP<Boolean> isACTCallback : isACTCallbacks) {
 			isACTCallback.invoke(false);	
