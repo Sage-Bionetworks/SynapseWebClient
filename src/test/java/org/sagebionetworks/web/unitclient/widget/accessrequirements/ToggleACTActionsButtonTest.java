@@ -40,7 +40,7 @@ public class ToggleACTActionsButtonTest {
 	}
 
 	private void verifyIsACTMember(boolean isACT) {
-		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
+		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
 		callbackPCaptor.getValue().invoke(isACT);
 	}
 	
