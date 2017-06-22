@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
@@ -127,4 +128,6 @@ public interface GlobalApplicationState {
 
 	void setShowUTCTime(boolean showUTC);
 	boolean isShowingUTCTime();
+	
+	PublicPrincipalIds getPublicPrincipalIds();
 }

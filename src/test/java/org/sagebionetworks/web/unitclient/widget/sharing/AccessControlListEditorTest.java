@@ -26,6 +26,7 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -45,6 +46,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.HasChangesHandler;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -83,7 +85,8 @@ public class AccessControlListEditorTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	@Captor
 	ArgumentCaptor<ArrayList<String>> listCaptor;
-	
+	@Mock
+	PublicPrincipalIds mockPublicPrincipalIds;
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws JSONObjectAdapterException {
@@ -105,7 +108,8 @@ public class AccessControlListEditorTest {
 		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
 		mockACLEView = mock(AccessControlListEditorView.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn(TEST_PUBLIC_PRINCIPAL_ID + "");
+		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
+		when(mockPublicPrincipalIds.getPublicAclPrincipalId()).thenReturn(TEST_PUBLIC_PRINCIPAL_ID);
 		mockGwt = mock(GWTWrapper.class);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
 		AsyncMockStubber.callSuccessWith(userGroupHeaderRP).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<ArrayList<String>>any(), any(AsyncCallback.class));

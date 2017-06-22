@@ -27,6 +27,8 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
 
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -43,6 +45,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sagebionetworks.repo.model.ACCESS_TYPE;
+import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
@@ -54,6 +58,7 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
@@ -103,6 +108,7 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -172,7 +178,15 @@ public class EntityActionControllerImplTest {
 	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
 	@Captor
 	ArgumentCaptor<CallbackP<Boolean>> callbackPCaptor;
+	@Mock
+	PublicPrincipalIds mockPublicPrincipalIds;
+	@Mock
+	AccessControlList mockACL;
+	Set<ResourceAccess> resourceAccessSet;
+	
 	public static final String SELECTED_TEAM_ID = "987654";
+	public static final long PUBLIC_USER_ID = 77772L;
+	
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
@@ -218,7 +232,7 @@ public class EntityActionControllerImplTest {
 		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClient);
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockSubmitter);
-		
+		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		// The controller under test.
 		controller = new EntityActionControllerImpl(mockView,
 				mockPreflightController,
@@ -247,6 +261,10 @@ public class EntityActionControllerImplTest {
 		entityBundle.setPermissions(permissions);
 		entityBundle.setDoi(new Doi());
 		entityBundle.setAccessRequirements(accessReqs);
+		entityBundle.setBenefactorAcl(mockACL);
+		resourceAccessSet = new HashSet<>();
+		when(mockACL.getResourceAccess()).thenReturn(resourceAccessSet);
+		when(mockPublicPrincipalIds.isPublic(PUBLIC_USER_ID)).thenReturn(true);
 		selected = new Reference();
 		selected.setTargetId("syn9876");
 		// Setup the mock entity selector to select an entity.
@@ -291,11 +309,18 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_FILE_HISTORY, false);
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FILE_HISTORY, false);
 	}
+	private void setPublicCanRead() {
+		ResourceAccess ra = new ResourceAccess();
+		ra.setAccessType(Collections.singleton(ACCESS_TYPE.READ));
+		ra.setPrincipalId(PUBLIC_USER_ID);
+		resourceAccessSet.add(ra);
+	}
 	
 	@Test
 	public void testConfigurePublicReadTable(){
-		entityBundle.getPermissions().setCanPublicRead(true);
+		setPublicCanRead();
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, mockEntityUpdatedHandler);
+		
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.GLOBE);
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_ANNOTATIONS, true);
 		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_ANNOTATIONS, true);
@@ -307,11 +332,11 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testConfigurePublicReadFile(){
+		setPublicCanRead();
 		Entity file = new FileEntity();
 		file.setId(entityId);
 		file.setParentId(parentId);
 		entityBundle.setEntity(file);
-		entityBundle.getPermissions().setCanPublicRead(true);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.GLOBE);
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_ANNOTATIONS, true);
@@ -357,6 +382,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(file);
 		entityBundle.setPermissions(permissions);
 		entityBundle.setAccessRequirements(accessReqs);
+		entityBundle.setBenefactorAcl(mockACL);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.TOGGLE_FILE_HISTORY, true);
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_FILE_HISTORY, true);
@@ -811,6 +837,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(project);
 		entityBundle.setPermissions(permissions);
 		entityBundle.setAccessRequirements(accessReqs);
+		entityBundle.setBenefactorAcl(mockACL);
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		// call under test
 		Place result = controller.createDeletePlace();

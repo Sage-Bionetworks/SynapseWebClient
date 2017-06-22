@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
 import static org.sagebionetworks.repo.model.EntityBundle.DOI;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
@@ -182,7 +183,7 @@ public class DockerTab implements DockerTabView.Presenter{
 	private void getTargetBundleAndDisplay(final String entityId) {
 		synAlert.clear();
 		view.clearDockerRepoWidget();
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | DOI;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | DOI | BENEFACTOR_ACL;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
