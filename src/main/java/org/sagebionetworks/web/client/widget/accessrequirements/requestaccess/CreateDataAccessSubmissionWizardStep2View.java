@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
-import org.sagebionetworks.web.client.utils.Callback;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -22,7 +20,6 @@ public interface CreateDataAccessSubmissionWizardStep2View extends IsWidget {
 	void setOtherDocumentUploadVisible(boolean visible);
 	void setOtherDocumentUploaded(IsWidget w);
 	void setAccessorListWidget(IsWidget w);
-	void showConfirmDialog(String title, String message, Callback yesCallback);
 	void setPublicationsVisible(boolean visible);
 	void setPublications(String text);
 	String getPublications();
@@ -30,5 +27,5 @@ public interface CreateDataAccessSubmissionWizardStep2View extends IsWidget {
 	void setSummaryOfUseVisible(boolean visible);
 	void setSummaryOfUse(String text);
 	String getSummaryOfUse();
-	void showInfo(String message);
+	void setValidatedUserProfileNoteVisible(boolean visible);
 }
