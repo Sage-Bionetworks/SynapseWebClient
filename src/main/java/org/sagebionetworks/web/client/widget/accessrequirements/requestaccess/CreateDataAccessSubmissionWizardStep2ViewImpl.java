@@ -52,6 +52,8 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	FormGroup otherUploadUI;
 	@UiField
 	FormGroup ducTemplateUI;
+	@UiField
+	Div validatedUserProfileNote;
 	
 	@Inject
 	public CreateDataAccessSubmissionWizardStep2ViewImpl(Binder binder){
@@ -143,5 +145,9 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	@Override
 	public void setDUCTemplateVisible(boolean visible) {
 		ducTemplateUI.setVisible(visible);
+	}
+	@Override
+	public void setValidatedUserProfileNoteVisible(boolean visible) {
+		validatedUserProfileNote.setVisible(visible);	
 	}
 }

@@ -156,6 +156,8 @@ public class JoinTeamWidgetTest {
 	public void testJoinRequestStep1() throws Exception {
 		WikiPageKey challengeInfoKey = mock(WikiPageKey.class);
 		joinWidget.sendJoinRequestStep0();
+		verify(mockView).setAccessRequirementsLinkVisible(false);
+		verify(mockView, never()).setAccessRequirementsLinkVisible(true);
 		joinWidget.sendJoinRequestStep1(challengeInfoKey);
 		verify(mockView).setJoinWizardCallback(any(Callback.class));
 		verify(mockWikiPageWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class),eq(false));
@@ -221,7 +223,7 @@ public class JoinTeamWidgetTest {
 		verify(mockView).setJoinWizardCallback(any(Callback.class));
 		verify(mockView).setCurrentWizardPanelVisible(true);
 		verify(mockView).setJoinWizardPrimaryButtonText("Accept");
-		verify(mockView).setAccessRequirementsLinkVisible(false);
+		verify(mockView, times(2)).setAccessRequirementsLinkVisible(false);
 		verify(mockView).setCurrentWizardContent(mockWikiPageWidget);
 		verify(mockWikiPageWidget).loadMarkdownFromWikiPage(any(WikiPageKey.class),eq(true));
 	}

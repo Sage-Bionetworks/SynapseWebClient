@@ -160,6 +160,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		view.setPublicationsVisible(false);
 		view.setSummaryOfUseVisible(false);
 		peopleSuggestWidget.clear();
+		view.setValidatedUserProfileNoteVisible(ar.getIsValidatedProfileRequired());
 		view.setOtherDocumentUploadVisible(ValidationUtils.isTrue(ar.getAreOtherAttachmentsRequired()));
 		boolean isDucTemplate = ar.getDucTemplateFileHandleId() != null;
 		view.setDUCTemplateVisible(isDucTemplate);

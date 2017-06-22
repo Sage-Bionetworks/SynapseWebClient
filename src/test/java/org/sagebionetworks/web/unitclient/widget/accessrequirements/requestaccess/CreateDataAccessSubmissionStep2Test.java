@@ -223,11 +223,13 @@ public class CreateDataAccessSubmissionStep2Test {
 	
 	@Test
 	public void testConfigure() {
+		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsIRBApprovalRequired()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(true);
 		when(mockACTAccessRequirement.getAreOtherAttachmentsRequired()).thenReturn(true);
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		verify(mockView).setValidatedUserProfileNoteVisible(true);
 		verify(mockView).setIRBVisible(true);
 		verify(mockView).setDUCVisible(true);
 		verify(mockOtherDocuments).clear();
@@ -278,9 +280,11 @@ public class CreateDataAccessSubmissionStep2Test {
 	
 	@Test
 	public void testConfigureWithDuc() {
+		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(false);
 		when(mockDataAccessRequest.getDucFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(true);
 		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		verify(mockView).setValidatedUserProfileNoteVisible(false);
 		verify(mockView).setIRBVisible(false);
 		verify(mockView).setDUCVisible(true);
 		verify(mockView, times(2)).setPublicationsVisible(false);
