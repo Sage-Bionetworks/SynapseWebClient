@@ -228,6 +228,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 	}
 	
 	public void sendJoinRequestStep0() {
+		view.setAccessRequirementsLinkVisible(false);
 		view.setButtonsEnabled(false);
 		currentPage = 0;
 		currentAccessRequirement = 0;
