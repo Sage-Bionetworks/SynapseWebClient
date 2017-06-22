@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.MembershipInvitation;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 
 import com.google.gwt.place.shared.Place;
@@ -26,16 +26,19 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 	private AuthenticationController authenticationController;
 	private PortalGinInjector ginInjector;
 	private Callback teamUpdatedCallback, refreshCallback;
-	
+	private SynapseAlert synAlert;
 	@Inject
 	public OpenTeamInvitationsWidget(OpenTeamInvitationsWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalApplicationState, 
 			AuthenticationController authenticationController,
-			PortalGinInjector ginInjector
+			PortalGinInjector ginInjector,
+			SynapseAlert synAlert
 			) {
 		this.view = view;
+		this.synAlert = synAlert;
 		view.setPresenter(this);
+		view.setSynAlert(synAlert);
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
@@ -50,10 +53,11 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 
 	public void configure(final Callback teamUpdatedCallback, final CallbackP<List<OpenUserInvitationBundle>> openTeamInvitationsCallback) {
 		this.teamUpdatedCallback = teamUpdatedCallback;
-		
 		view.clear();
+		synAlert.clear();
 		//using the current user, ask for all of the open invitations extended to this user.
 		if (authenticationController.isLoggedIn()) {
+			view.setLoadingVisible(true);
 			//get the open invitations
 			synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<ArrayList<OpenUserInvitationBundle>>() {
 				@Override
@@ -65,9 +69,8 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-						view.showErrorMessage(caught.getMessage());
-					} 
+					view.setLoadingVisible(false);
+					synAlert.handleException(caught);
 				}
 			});			
 		}
@@ -80,6 +83,7 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 	public void showTeamInvites(List<OpenUserInvitationBundle> invites) {
 		//create the associated object list, and pass to the view to render
 		view.clear();
+		view.setLoadingVisible(false);
 		for (OpenUserInvitationBundle b : invites) {
 			String invitationMessage = "";
 			MembershipInvitation invite = b.getMembershipInvitation();
@@ -109,7 +113,6 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 	}
 	
 	public Widget asWidget() {
-		view.setPresenter(this);
 		return view.asWidget();
 	}
 

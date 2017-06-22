@@ -3,52 +3,52 @@ package org.sagebionetworks.web.client.widget.team;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.constants.ColumnSize;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements OpenTeamInvitationsWidgetView {
+public class OpenTeamInvitationsWidgetViewImpl implements OpenTeamInvitationsWidgetView {
 	
-	private SageImageBundle sageImageBundle;
+	public interface Binder extends UiBinder<Widget, OpenTeamInvitationsWidgetViewImpl> {}
+
+	@UiField
+	Div mainContainer;
+	@UiField
+	Div synAlertContainer;
+	@UiField
+	Row singleRow;
+	@UiField
+	Image loadingUI;
+	Widget widget;
 	private OpenTeamInvitationsWidgetView.Presenter presenter;
 	private PortalGinInjector ginInjector;
-	private FlowPanel mainContainer;
-	private Row singleRow;
 	@Inject
-	public OpenTeamInvitationsWidgetViewImpl(SageImageBundle sageImageBundle, PortalGinInjector ginInjector) {
+	public OpenTeamInvitationsWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
+		widget = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
-		this.sageImageBundle = sageImageBundle;
-		mainContainer = new FlowPanel();
 		mainContainer.addStyleName("highlight-box");
 		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_TEAM_INVITATIONS);
-		add(mainContainer);
 		singleRow = new Row();
 		mainContainer.add(singleRow);
 	}
 	
 	@Override
-	public void showLoading() {
-		clear();
-		add(DisplayUtils.getLoadingWidget(sageImageBundle));
+	public void setLoadingVisible(boolean visible) {
+		loadingUI.setVisible(visible);
 	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-
+	
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -62,6 +62,7 @@ public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements Open
 	
 	@Override
 	public void addTeamInvite(Team team, String inviteMessage, Widget joinButtonWidget) {
+		loadingUI.setVisible(false);
 		mainContainer.setVisible(true);
 		FlowPanel lc = new FlowPanel();
 		BigTeamBadge teamRenderer = ginInjector.getBigTeamBadgeWidget();
@@ -76,5 +77,16 @@ public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements Open
 		lc.add(teamBadgeColumn);
 		lc.add(buttonContainer);
 		singleRow.add(lc);
+	}
+	
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return widget;
 	}
 }

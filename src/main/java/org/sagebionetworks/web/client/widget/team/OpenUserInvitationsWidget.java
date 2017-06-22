@@ -5,11 +5,10 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
@@ -23,44 +22,45 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	public static final Integer INVITATION_BATCH_LIMIT = 10;
 	private OpenUserInvitationsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
 	private String teamId;
 	private Callback teamRefreshCallback;
 	private Integer currentOffset;
 	private List<UserProfile> profiles;
 	private List<MembershipInvtnSubmission> invitations;
-	
+	private SynapseAlert synAlert;
 	@Inject
 	public OpenUserInvitationsWidget(OpenUserInvitationsWidgetView view, 
 			SynapseClientAsync synapseClient, 
-			GlobalApplicationState globalApplicationState, 
-			AuthenticationController authenticationController) {
+			GlobalApplicationState globalApplicationState,
+			SynapseAlert synAlert) {
 		this.view = view;
+		this.synAlert = synAlert;
 		view.setPresenter(this);
+		view.setSynAlert(synAlert);
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 	}
 	
-	@Override
 	public void clear() {
 		view.clear();
 	}
 
 	@Override
 	public void removeInvitation(String invitationId) {
+		synAlert.clear();
+		view.setLoadingVisible(true);
 		synapseClient.deleteMembershipInvitation(invitationId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
+				view.setLoadingVisible(false);
 				teamRefreshCallback.invoke();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
+				view.setLoadingVisible(false);
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -76,10 +76,13 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 
 	@Override
 	public void getNextBatch() {
+		synAlert.clear();
+		view.setLoadingVisible(true);
 		//using the given team, try to show all pending membership requests (or nothing if empty)
 		synapseClient.getOpenTeamInvitations(teamId, INVITATION_BATCH_LIMIT, currentOffset, new AsyncCallback<ArrayList<OpenTeamInvitationBundle>>() {
 			@Override
 			public void onSuccess(ArrayList<OpenTeamInvitationBundle> result) {
+				view.setLoadingVisible(false);
 				currentOffset += result.size();
 				
 				//create the associated object list, and pass to the view to render
@@ -95,10 +98,11 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setLoadingVisible(false);
 				if (caught instanceof NotFoundException) {
 					view.setMoreResultsVisible(false);
-				} else if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
+				} else {
+					synAlert.handleException(caught);
 				} 
 			}
 		});
@@ -110,7 +114,6 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	}
 	
 	public Widget asWidget() {
-		view.setPresenter(this);
 		return view.asWidget();
 	}
 	

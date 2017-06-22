@@ -14,6 +14,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -23,6 +25,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidgetView;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
@@ -43,15 +46,17 @@ public class OpenUserInvitationsWidgetTest {
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	UserProfile testProfile;
 	MembershipInvtnSubmission testInvite;
-	
+	@Mock
+	SynapseAlert mockSynapseAlert;
 	@Before
 	public void before() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(OpenUserInvitationsWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
-		widget = new OpenUserInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController);
+		widget = new OpenUserInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseAlert);
 		
 		
 		testProfile = new UserProfile();
@@ -91,10 +96,11 @@ public class OpenUserInvitationsWidgetTest {
 	}
 	@Test
 	public void testConfigureFailure() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(),anyInt(),any(AsyncCallback.class));
+		Exception ex = new Exception("unhandled exception");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(),anyInt(),any(AsyncCallback.class));
 		widget.configure(teamId, mockTeamUpdatedCallback);
 		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynapseAlert).handleException(ex);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -111,11 +117,12 @@ public class OpenUserInvitationsWidgetTest {
 	@Test
 	public void testDeleteOpenInviteFailure() throws Exception {
 		String invitationId = "123";
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).deleteMembershipInvitation(anyString(), any(AsyncCallback.class));
+		Exception ex = new Exception("unhandled exception");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).deleteMembershipInvitation(anyString(), any(AsyncCallback.class));
 		widget.configure(teamId, mockTeamUpdatedCallback);
 		widget.removeInvitation(invitationId);
 		verify(mockSynapseClient).deleteMembershipInvitation(eq(invitationId), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynapseAlert).handleException(ex);
 	}
 	@Test
 	public void testMoreResultsUnavailable() throws Exception {
