@@ -418,4 +418,7 @@ public interface SynapseClientAsync {
 	void isChallenge(String id, AsyncCallback<Boolean> callback);
 
 	void getProjectDisplay(String projectId, AsyncCallback<ProjectDisplayBundle> callback);
+
+	void addTeamMember(String userGroupId, String teamId, String message, String hostPageBaseURL,
+			AsyncCallback<Void> callback);
 }

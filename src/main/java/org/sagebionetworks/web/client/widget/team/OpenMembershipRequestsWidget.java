@@ -89,8 +89,8 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 	@Override
 	public void acceptRequest(String userId) {
 		synAlert.clear();
-		//invite user id to team (to complete handshake), then update open membership request list
-		synapseClient.inviteMember(userId, teamId, "", gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
+		//try to add user id to team (since we know there's an open membership request). then update open membership request list
+		synapseClient.addTeamMember(userId, teamId, "", gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				popupUtils.showInfo("Accepted Request","");
