@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.ValidationUtils;
@@ -42,7 +43,8 @@ import com.google.inject.Inject;
 public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	public static final String SAVED_PROGRESS_MESSAGE = "Saved your progress.";
 	public static final String SAVE_CHANGES_MESSAGE = "Would you want to save your recent changes?";
-	public static final String SUCCESSFULLY_SUBMITTED_MESSAGE = "Your data access request has been successfully submitted for review.";
+	public static final String SUCCESSFULLY_SUBMITTED_TITLE = "Thank you for requesting data through Synapse.";
+	public static final String SUCCESSFULLY_SUBMITTED_MESSAGE = "Your request for access to data is being processed. You will be contacted when you have access to the data.";
 	CreateDataAccessSubmissionWizardStep2View view;
 	PortalGinInjector ginInjector;
 	DataAccessClientAsync client;
@@ -57,7 +59,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	UserBadgeList accessorChangesList;
 	private SynapseSuggestBox peopleSuggestWidget;
 	FileHandleList otherDocuments;
-	
+	PopupUtilsView popupUtils;
 	@Inject
 	public CreateDataAccessSubmissionStep2(
 			CreateDataAccessSubmissionWizardStep2View view,
@@ -71,7 +73,8 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			UserBadgeList accessorsList,
 			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider,
-			FileHandleList otherDocuments) {
+			FileHandleList otherDocuments,
+			PopupUtilsView popupUtils) {
 		super();
 		this.view = view;
 		this.client = client;
@@ -81,6 +84,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		this.authController = authController;
 		this.accessorChangesList = accessorsList;
 		this.otherDocuments = otherDocuments;
+		this.popupUtils = popupUtils;
 		otherDocuments.configure()
 			.setUploadButtonText("Browse...")
 			.setCanDelete(true)
@@ -266,7 +270,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 				if (isSubmit) {
 					submitDataAccessRequest();
 				} else {
-					view.showInfo(SAVED_PROGRESS_MESSAGE);
+					popupUtils.showInfo(SAVED_PROGRESS_MESSAGE, "");
 					modalPresenter.setLoading(false);
 					modalPresenter.onFinished();
 				}
@@ -283,7 +287,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(SUCCESSFULLY_SUBMITTED_MESSAGE);
+				popupUtils.showInfoDialog(SUCCESSFULLY_SUBMITTED_TITLE, SUCCESSFULLY_SUBMITTED_MESSAGE, null);
 				modalPresenter.setLoading(false);
 				modalPresenter.onFinished();
 			}
@@ -313,7 +317,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			public void onCanceled() {
 				// check to see if the user would like to discard changes.
 				// if saving, then update the DataAccessRequest/DataAccessRenewal (but do not submit)
-				view.showConfirmDialog("Save?",SAVE_CHANGES_MESSAGE, new Callback() {
+				popupUtils.showConfirmDialog("Save?",SAVE_CHANGES_MESSAGE, new Callback() {
 					@Override
 					public void invoke() {
 						updateDataAccessRequest(false);

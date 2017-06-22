@@ -11,6 +11,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionStep2.SUCCESSFULLY_SUBMITTED_MESSAGE;
+import static org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionStep2.SUCCESSFULLY_SUBMITTED_TITLE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +34,7 @@ import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -119,7 +122,8 @@ public class CreateDataAccessSubmissionStep2Test {
 	ArgumentCaptor<CallbackP<List<String>>> callbackPStringListCaptor;
 	@Captor
 	ArgumentCaptor<AccessorChange> accessorChangeCaptor;
-	
+	@Mock
+	PopupUtilsView mockPopupUtils;
 	
 	public static final String FILE_HANDLE_ID = "543345";
 	public static final String FILE_HANDLE_ID2 = "2";
@@ -149,7 +153,8 @@ public class CreateDataAccessSubmissionStep2Test {
 				mockAccessorsList, 
 				mockPeopleSuggestBox, 
 				mockProvider, 
-				mockOtherDocuments);
+				mockOtherDocuments,
+				mockPopupUtils);
 		widget.setModalPresenter(mockModalPresenter);
 		AsyncMockStubber.callSuccessWith(mockDataAccessRequest).when(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
 		when(mockFileUpload.getFileMeta()).thenReturn(mockFileMetadata);
@@ -377,7 +382,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		//submitted (primary button was clicked)
 		verify(mockClient).submitDataAccessRequest(eq(mockDataAccessRequest), any(AsyncCallback.class));
 		
-		verify(mockView).showInfo(CreateDataAccessSubmissionStep2.SUCCESSFULLY_SUBMITTED_MESSAGE);
+		verify(mockPopupUtils).showInfoDialog(SUCCESSFULLY_SUBMITTED_TITLE, SUCCESSFULLY_SUBMITTED_MESSAGE, null);
 		InOrder order = inOrder(mockModalPresenter);
 		order.verify(mockModalPresenter).setLoading(true);
 		order.verify(mockModalPresenter).setLoading(false);
@@ -405,7 +410,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		// simulate user cancel
 		wizardCallbackCaptor.getValue().onCanceled();
 		
-		verify(mockView).showConfirmDialog(anyString(), eq(CreateDataAccessSubmissionStep2.SAVE_CHANGES_MESSAGE), callbackCaptor.capture());
+		verify(mockPopupUtils).showConfirmDialog(anyString(), eq(CreateDataAccessSubmissionStep2.SAVE_CHANGES_MESSAGE), callbackCaptor.capture());
 		
 		//simulate user clicks Yes to save
 		callbackCaptor.getValue().invoke();
@@ -415,7 +420,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 		verify(mockClient, never()).submitDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 		
-		verify(mockView).showInfo(CreateDataAccessSubmissionStep2.SAVED_PROGRESS_MESSAGE);
+		verify(mockPopupUtils).showInfo(CreateDataAccessSubmissionStep2.SAVED_PROGRESS_MESSAGE, "");
 		InOrder order = inOrder(mockModalPresenter);
 		order.verify(mockModalPresenter).setLoading(true);
 		order.verify(mockModalPresenter).setLoading(false);
