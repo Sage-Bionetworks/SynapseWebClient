@@ -136,18 +136,6 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	}
 	
 	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message, "");
-	}
-	@Override
-	public void showConfirmDialog(
-			String title, 
-			String message,
-			Callback yesCallback
-			) {
-		DisplayUtils.showConfirmDialog(title, message, yesCallback);
-	}
-	@Override
 	public void setPeopleSuggestWidget(IsWidget w) {
 		peopleSuggestContainer.clear();
 		peopleSuggestContainer.add(w);
