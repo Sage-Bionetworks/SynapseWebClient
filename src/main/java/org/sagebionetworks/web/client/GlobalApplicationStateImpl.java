@@ -15,12 +15,12 @@ import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
-import com.google.gwt.i18n.client.TimeZone;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
@@ -51,6 +51,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private GWTWrapper gwt;
 	private boolean isShowingVersionAlert;
 	private DateTimeUtils dateTimeUtils;
+	private PublicPrincipalIds publicPrincipalIds;
+	
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -69,9 +71,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.logger = logger;
 		this.localStorage = localStorage;
+		this.dateTimeUtils = dateTimeUtils;
 		this.gwt = gwt;
 		this.view = view;
-		this.dateTimeUtils = dateTimeUtils;
 		isEditing = false;
 		isShowingVersionAlert = false;
 		initUncaughtExceptionHandler();
@@ -437,5 +439,16 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
 		}
 		return timezoneOffsetMs;
+	}
+	
+	@Override
+	public PublicPrincipalIds getPublicPrincipalIds() {
+		if (publicPrincipalIds == null) {
+			publicPrincipalIds = new PublicPrincipalIds();
+			publicPrincipalIds.setPublicAclPrincipalId(Long.parseLong(getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
+			publicPrincipalIds.setAnonymousUserId(Long.parseLong(getSynapseProperty(WebConstants.ANONYMOUS_USER_PRINCIPAL_ID)));
+			publicPrincipalIds.setAuthenticatedAclPrincipalId(Long.parseLong(getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)));	
+		}
+		return publicPrincipalIds;
 	}
 }

@@ -17,7 +17,9 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,6 +33,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
@@ -42,6 +45,7 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -55,6 +59,7 @@ import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -91,8 +96,12 @@ public class EntityBadgeTest {
 	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
 	@Mock
+	PublicPrincipalIds mockPublicPrincipalIds;
+	@Mock
+	ResourceAccess mockResourceAccess;
+	@Mock
 	DateTimeUtils mockDateTimeUtils;
-
+	Set<ResourceAccess> resourceAccessSet;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -114,6 +123,7 @@ public class EntityBadgeTest {
 				mockFileDownloadButton, mockLazyLoadHelper,
 				mockDateTimeUtils);
 		
+		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY1, Collections.EMPTY_LIST));
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY2, Collections.singletonList(VALUE2)));
@@ -123,6 +133,9 @@ public class EntityBadgeTest {
 		rootWikiKeyId = "123";
 		when(mockView.isAttached()).thenReturn(true);
 		entityThreadCount = 0L;
+		resourceAccessSet = new HashSet<>();
+		resourceAccessSet.add(mockResourceAccess);
+		when(mockBenefactorAcl.getResourceAccess()).thenReturn(resourceAccessSet);
 	}
 	
 	private EntityBundle setupEntity(Entity entity) {
@@ -156,6 +169,7 @@ public class EntityBadgeTest {
 	@Test
 	public void testCheckForInViewAndLoadData() {
 		//set up entity
+		when(mockPublicPrincipalIds.isPublic(anyLong())).thenReturn(true);
 		String entityId = "syn12345";
 		Project testProject = new Project();
 		testProject.setId(entityId);
@@ -192,7 +206,7 @@ public class EntityBadgeTest {
 		String smallDateString="10/02/2000 01:26:45PM";
 		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(smallDateString);
 		testFile.setModifiedOn(modifiedOn);
-		
+		when(mockPublicPrincipalIds.isPublic(anyLong())).thenReturn(true);
 		entityThreadCount = 1L;
 		setupEntity(testFile);
 		configure();
