@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
 import static org.sagebionetworks.repo.model.EntityBundle.DOI;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
@@ -249,7 +250,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	
 	public void getTargetBundleAndDisplay(final String entityId) {
 		synAlert.clear();
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | DOI | TABLE_DATA;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | DOI | TABLE_DATA | BENEFACTOR_ACL;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {

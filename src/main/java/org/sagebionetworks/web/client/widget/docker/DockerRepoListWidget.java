@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.docker;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
 import static org.sagebionetworks.repo.model.EntityBundle.DOI;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
@@ -130,7 +131,7 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 	
 	private void setResults(List<EntityHeader> results) {
 		synAlert.clear();
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | DOI;
+		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | DOI | BENEFACTOR_ACL;
 		for (EntityHeader header: results) {
 			synapseClient.getEntityBundle(header.getId(), mask, new AsyncCallback<EntityBundle>(){
 				@Override

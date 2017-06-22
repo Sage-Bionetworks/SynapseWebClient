@@ -33,7 +33,10 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransfo
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
+import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -130,7 +133,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		
 		view.setSize(getContentSize(handles));
 		view.setMd5(getContentMd5(handles));
-		if(eb.getPermissions().getCanPublicRead()) {
+		if (PublicPrivateBadge.isPublic(eb.getBenefactorAcl(), globalAppState.getPublicPrincipalIds())) {
 			view.showPublicIcon();
 		} else {
 			view.showPrivateIcon();

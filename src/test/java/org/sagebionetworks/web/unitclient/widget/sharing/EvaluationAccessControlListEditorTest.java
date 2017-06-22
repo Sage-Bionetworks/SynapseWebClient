@@ -20,13 +20,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -76,10 +77,12 @@ public class EvaluationAccessControlListEditorTest {
 	private static UserGroupHeaderResponsePage userGroupHeaderRP;
 	GlobalApplicationState mockGlobalApplicationState;
 	EvaluationAccessControlListEditor.HasChangesHandler mockHasChangesHandler;
-	
+	@Mock
+	PublicPrincipalIds mockPublicPrincipalIds;
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		// set up test Synapse objects
 		evaluation = new Evaluation();
 		evaluation.setId(EVALUATION_ID);
@@ -88,7 +91,6 @@ public class EvaluationAccessControlListEditorTest {
 		acl = createACL(EVALUATION_ID);
 		uep = createUEP();
 		userGroupHeaderRP = AccessControlListEditorTest.createUGHRP();
-		
 		// set up mocks
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
@@ -98,7 +100,8 @@ public class EvaluationAccessControlListEditorTest {
 		
 		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID, TEST_ANONYMOUS_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn(TEST_PUBLIC_PRINCIPAL_ID + "");
+		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
+		when(mockPublicPrincipalIds.getPublicAclPrincipalId()).thenReturn(TEST_PUBLIC_PRINCIPAL_ID);
 		AsyncMockStubber.callSuccessWith(acl.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockChallengeClient).getEvaluationAcl(anyString(), any(AsyncCallback.class));
 		
 		AsyncMockStubber.callSuccessWith(uep.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockChallengeClient).getUserEvaluationPermissions(anyString(), any(AsyncCallback.class));

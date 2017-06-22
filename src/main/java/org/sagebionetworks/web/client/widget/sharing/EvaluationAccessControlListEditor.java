@@ -84,11 +84,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		view.setPermissionsToDisplay(getPermList(), getPermissionsToDisplay());
 		view.setNotifyCheckboxVisible(false);
 		view.setDeleteLocalACLButtonVisible(false);
-		
-		publicPrincipalIds = new PublicPrincipalIds();
-		publicPrincipalIds.setPublicAclPrincipalId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
-		publicPrincipalIds.setAnonymousUserId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.ANONYMOUS_USER_PRINCIPAL_ID)));
-		publicPrincipalIds.setAuthenticatedAclPrincipalId(Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)));
+		publicPrincipalIds = globalApplicationState.getPublicPrincipalIds();
 		initViewPrincipalIds();
 	}
 
