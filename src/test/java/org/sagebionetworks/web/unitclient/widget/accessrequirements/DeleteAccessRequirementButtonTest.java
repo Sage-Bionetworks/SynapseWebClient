@@ -118,7 +118,7 @@ public class DeleteAccessRequirementButtonTest {
 	public void testConfigureWithARNotInAlpha() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn(null);
 		widget.configure(mockAccessRequirement);
-		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
+		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
 		
 		CallbackP<Boolean> isACTMemberCallback = callbackPCaptor.getValue();
 		// invoking with false should hide the button again
