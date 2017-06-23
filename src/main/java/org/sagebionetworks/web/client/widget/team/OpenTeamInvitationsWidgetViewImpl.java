@@ -6,15 +6,11 @@ import org.gwtbootstrap3.client.ui.constants.ColumnSize;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.modal.Dialog;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -29,8 +25,6 @@ public class OpenTeamInvitationsWidgetViewImpl implements OpenTeamInvitationsWid
 	Div synAlertContainer;
 	@UiField
 	Row singleRow;
-	@UiField
-	Image loadingUI;
 	Widget widget;
 	private OpenTeamInvitationsWidgetView.Presenter presenter;
 	private PortalGinInjector ginInjector;
@@ -42,11 +36,6 @@ public class OpenTeamInvitationsWidgetViewImpl implements OpenTeamInvitationsWid
 		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_TEAM_INVITATIONS);
 		singleRow = new Row();
 		mainContainer.add(singleRow);
-	}
-	
-	@Override
-	public void setLoadingVisible(boolean visible) {
-		loadingUI.setVisible(visible);
 	}
 	
 	@Override
@@ -62,7 +51,6 @@ public class OpenTeamInvitationsWidgetViewImpl implements OpenTeamInvitationsWid
 	
 	@Override
 	public void addTeamInvite(Team team, String inviteMessage, Widget joinButtonWidget) {
-		loadingUI.setVisible(false);
 		mainContainer.setVisible(true);
 		FlowPanel lc = new FlowPanel();
 		BigTeamBadge teamRenderer = ginInjector.getBigTeamBadgeWidget();

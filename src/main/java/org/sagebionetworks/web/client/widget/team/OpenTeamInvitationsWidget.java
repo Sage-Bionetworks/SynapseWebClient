@@ -57,12 +57,10 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 		synAlert.clear();
 		//using the current user, ask for all of the open invitations extended to this user.
 		if (authenticationController.isLoggedIn()) {
-			view.setLoadingVisible(true);
 			//get the open invitations
 			synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<ArrayList<OpenUserInvitationBundle>>() {
 				@Override
 				public void onSuccess(ArrayList<OpenUserInvitationBundle> result) {
-					view.setLoadingVisible(false);
 					if (openTeamInvitationsCallback != null)
 						openTeamInvitationsCallback.invoke(result);
 					showTeamInvites(result);
@@ -70,7 +68,6 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.setLoadingVisible(false);
 					synAlert.handleException(caught);
 				}
 			});			

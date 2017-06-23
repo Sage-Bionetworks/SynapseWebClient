@@ -17,7 +17,6 @@ public interface OpenUserInvitationsWidgetView extends IsWidget {
 	public void setPresenter(Presenter presenter);
 	void setSynAlert(IsWidget w);
 	void clear();
-	void setLoadingVisible(boolean visible);
 	/**
 	 * shows nothing if membershipRequests is empty.
 	 */

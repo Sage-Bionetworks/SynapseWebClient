@@ -19,7 +19,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -32,8 +31,6 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 	Div mainContainer;
 	@UiField
 	Div synAlertContainer;
-	@UiField
-	Image loadingUI;
 	Widget widget;
 	private Presenter presenter;
 	private PortalGinInjector ginInjector;
@@ -46,11 +43,6 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_JOIN_REQUESTS);
 	}
 	
-	@Override
-	public void setLoadingVisible(boolean visible) {
-		loadingUI.setVisible(visible);
-	}
-
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;

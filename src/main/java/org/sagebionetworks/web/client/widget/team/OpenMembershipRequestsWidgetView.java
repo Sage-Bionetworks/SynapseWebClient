@@ -15,7 +15,6 @@ public interface OpenMembershipRequestsWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	void setSynAlert(IsWidget w);
-	void setLoadingVisible(boolean visible);
 	void clear();
 	
 	/**

@@ -46,7 +46,6 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 	}
 
 	public void configure(String teamId, Callback teamUpdatedCallback) {
-		view.setLoadingVisible(true);
 		synAlert.clear();
 		this.teamId = teamId;
 		this.teamUpdatedCallback = teamUpdatedCallback;
@@ -54,7 +53,6 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 		synapseClient.getOpenRequests(teamId, new AsyncCallback<List<MembershipRequestBundle>>() {
 			@Override
 			public void onSuccess(List<MembershipRequestBundle> result) {
-				view.setLoadingVisible(false);
 				//create the associated object list, and pass to the view to render
 				List<UserProfile> profiles = new ArrayList<UserProfile>();
 				List<String> requestMessages = new ArrayList<String>();
@@ -71,7 +69,6 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setLoadingVisible(false);
 				synAlert.handleException(caught);
 			}
 		});

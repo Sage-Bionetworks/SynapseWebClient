@@ -14,7 +14,6 @@ public interface OpenTeamInvitationsWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	void setSynAlert(IsWidget w);
-	void setLoadingVisible(boolean visible);
 	void addTeamInvite(Team team, String inviteMessage, Widget joinButtonWidget);
 	void clear();
 	public interface Presenter {

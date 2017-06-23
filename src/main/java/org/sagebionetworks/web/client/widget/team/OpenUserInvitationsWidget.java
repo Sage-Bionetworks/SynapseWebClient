@@ -49,17 +49,14 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	@Override
 	public void removeInvitation(String invitationId) {
 		synAlert.clear();
-		view.setLoadingVisible(true);
 		synapseClient.deleteMembershipInvitation(invitationId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.setLoadingVisible(false);
 				teamRefreshCallback.invoke();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setLoadingVisible(false);
 				synAlert.handleException(caught);
 			}
 		});
@@ -77,12 +74,10 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	@Override
 	public void getNextBatch() {
 		synAlert.clear();
-		view.setLoadingVisible(true);
 		//using the given team, try to show all pending membership requests (or nothing if empty)
 		synapseClient.getOpenTeamInvitations(teamId, INVITATION_BATCH_LIMIT, currentOffset, new AsyncCallback<ArrayList<OpenTeamInvitationBundle>>() {
 			@Override
 			public void onSuccess(ArrayList<OpenTeamInvitationBundle> result) {
-				view.setLoadingVisible(false);
 				currentOffset += result.size();
 				
 				//create the associated object list, and pass to the view to render
@@ -98,7 +93,6 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setLoadingVisible(false);
 				if (caught instanceof NotFoundException) {
 					view.setMoreResultsVisible(false);
 				} else {

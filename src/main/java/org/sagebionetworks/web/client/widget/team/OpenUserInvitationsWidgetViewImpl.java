@@ -20,7 +20,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -32,8 +31,6 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	Div mainContainer;
 	@UiField
 	Div synAlertContainer;
-	@UiField
-	Image loadingUI;
 	Widget widget;
 	
 	private Presenter presenter;
@@ -46,10 +43,6 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 		this.ginInjector = ginInjector;
 		mainContainer.addStyleName("highlight-box");
 		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_INVITATIONS);
-	}
-	@Override
-	public void setLoadingVisible(boolean visible) {
-		loadingUI.setVisible(visible);
 	}
 	
 	@Override
