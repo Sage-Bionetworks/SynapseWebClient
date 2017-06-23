@@ -326,7 +326,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, false);	
 		actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
 		if (authenticationController.isLoggedIn()) {
-			isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+			isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 				@Override
 				public void invoke(Boolean isACT) {
 					if (isACT) {
@@ -343,7 +343,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, false);	
 		actionMenu.setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, this);
 		if (authenticationController.isLoggedIn()) {
-			isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+			isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 				@Override
 				public void invoke(Boolean isACT) {
 					if (isACT) {

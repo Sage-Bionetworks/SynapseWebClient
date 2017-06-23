@@ -47,6 +47,7 @@
 							</t:TableData>
 							<t:TableData paddingRight="2" addStyleNames="text-align-right">
 								<bh:Div addStyleNames="displayInline margin-left-10">
+									<bh:Span ui:field="hideACTActionsContainer"/>
 									<g:Label addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-2 displayInline" text="portal: " />
 									<bh:Span ui:field="portalVersionSpan" addStyleNames="margin-top-5 margin-bottom-5 color-white" />
 									<g:Label addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10 displayInline" text="repo: " />

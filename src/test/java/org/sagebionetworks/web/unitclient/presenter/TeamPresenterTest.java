@@ -130,7 +130,7 @@ public class TeamPresenterTest {
 	}
 	
 	private void setIsACT(boolean isACT) {
-		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPcaptor.capture());
+		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPcaptor.capture());
 		callbackPcaptor.getValue().invoke(isACT);
 	}
 	

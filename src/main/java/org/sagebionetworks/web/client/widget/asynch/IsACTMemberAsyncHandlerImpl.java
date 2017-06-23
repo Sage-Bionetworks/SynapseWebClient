@@ -21,7 +21,7 @@ public class IsACTMemberAsyncHandlerImpl implements IsACTMemberAsyncHandler {
 	SessionStorage sessionStorage;
 	AuthenticationController authController;
 	SynapseJSNIUtils jsniUtils;
-	
+	boolean visible = true;
 	public static final String SESSION_KEY_PREFIX = "ACT_MEMBER_";
 	
 	@Inject
@@ -33,6 +33,16 @@ public class IsACTMemberAsyncHandlerImpl implements IsACTMemberAsyncHandler {
 		this.sessionStorage = sessionStorage;
 		this.authController = authController;
 		this.jsniUtils = jsniUtils;
+	}
+	
+	@Override
+	public void isACTActionAvailable(final CallbackP<Boolean> callback) {
+		isACTMember(new CallbackP<Boolean>() {
+			@Override
+			public void invoke(Boolean isACTMember) {
+				callback.invoke(isACTMember && visible);
+			}
+		});
 	}
 	
 	@Override
@@ -62,7 +72,16 @@ public class IsACTMemberAsyncHandlerImpl implements IsACTMemberAsyncHandler {
 				jsniUtils.consoleError(caught.getMessage());
 				callback.invoke(false);
 			}
-		});	
+		});
 	}
-		
+	
+	@Override
+	public void setACTActionVisible(boolean visible) {
+		this.visible = visible;
+	}
+	
+	@Override
+	public boolean isACTActionVisible() {
+		return visible;
+	}
 }

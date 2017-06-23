@@ -28,7 +28,6 @@ public class Footer implements FooterView.Presenter, IsWidget {
 	}
 
 	public Widget asWidget() {
-		view.setPresenter(this);
 		if (!isInitialized) {
 			isInitialized = true;
 			globalAppState.checkVersionCompatibility(new AsyncCallback<VersionState>() {
@@ -54,6 +53,7 @@ public class Footer implements FooterView.Presenter, IsWidget {
 				}
 			});
 		}
+		view.refresh();
 		return view.asWidget();
 	}
 	

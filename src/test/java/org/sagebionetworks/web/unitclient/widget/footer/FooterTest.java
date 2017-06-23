@@ -41,6 +41,7 @@ public class FooterTest {
 	public void testAsWidget(){
 		footer.asWidget();
 		verify(mockSynapseClient).checkVersionCompatibility(any(AsyncCallback.class));
+		verify(mockView).refresh();
 	}
 	
 	@Test

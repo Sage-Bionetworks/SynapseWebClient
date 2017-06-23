@@ -275,7 +275,7 @@ public class ProfilePresenterTest {
 	}
 	
 	public void verifyAndInvokeACTMember(Boolean isACTMember) {
-		verify(mockIsACTMemberAsyncHandler, atLeastOnce()).isACTMember(callbackPCaptor.capture());
+		verify(mockIsACTMemberAsyncHandler, atLeastOnce()).isACTActionAvailable(callbackPCaptor.capture());
 		callbackPCaptor.getValue().invoke(isACTMember);
 	}
 	
