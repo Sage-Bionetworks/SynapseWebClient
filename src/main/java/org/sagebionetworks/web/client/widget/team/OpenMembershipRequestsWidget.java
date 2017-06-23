@@ -19,6 +19,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidgetView.Presenter {
+	public static final String ACCEPTED_REQUEST_MESSAGE = "Accepted Request";
 	private OpenMembershipRequestsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private Callback teamUpdatedCallback;
@@ -90,7 +91,7 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 		synapseClient.addTeamMember(userId, teamId, "", gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				popupUtils.showInfo("Accepted Request","");
+				popupUtils.showInfo(ACCEPTED_REQUEST_MESSAGE,"");
 				teamUpdatedCallback.invoke();
 			}
 			@Override
