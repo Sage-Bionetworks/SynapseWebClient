@@ -490,4 +490,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	ProjectDisplayBundle getProjectDisplay(String projectId) throws RestServiceException;
 
 	void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException;
+
+	void addTeamMember(String userGroupId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
 }

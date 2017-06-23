@@ -2,60 +2,49 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.constants.IconSize;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class OpenUserInvitationsWidgetViewImpl extends FlowPanel implements
-	OpenUserInvitationsWidgetView {
+public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWidgetView {
+	public interface Binder extends UiBinder<Widget, OpenUserInvitationsWidgetViewImpl> {}
+
+	@UiField
+	Div mainContainer;
+	@UiField
+	Div synAlertContainer;
+	Widget widget;
+	
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
 	private PortalGinInjector ginInjector;
-	private FlowPanel mainContainer;
 	private UnorderedListPanel ulPanel;
 	
 	@Inject
-	public OpenUserInvitationsWidgetViewImpl(SageImageBundle sageImageBundle, PortalGinInjector ginInjector) {
-		this.sageImageBundle = sageImageBundle;
+	public OpenUserInvitationsWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
+		widget = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
-		mainContainer = new FlowPanel();
 		mainContainer.addStyleName("highlight-box");
 		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_INVITATIONS);
 	}
 	
-	
-	@Override
-	public void showLoading() {
-		clear();
-		add(DisplayUtils.getLoadingWidget(sageImageBundle));
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -64,9 +53,8 @@ public class OpenUserInvitationsWidgetViewImpl extends FlowPanel implements
 	@Override
 	public void configure(List<UserProfile> profiles, List<MembershipInvtnSubmission> invitations) {
 		clear();
-		mainContainer.clear();
 		FlowPanel singleRow = DisplayUtils.createRowContainerFlowPanel();
-		
+		mainContainer.setVisible(false);
 		for (int i = 0; i < profiles.size(); i++) {
 			FlowPanel rowPanel = new FlowPanel();
 			rowPanel.addStyleName("col-md-12");
@@ -100,6 +88,7 @@ public class OpenUserInvitationsWidgetViewImpl extends FlowPanel implements
 			right.add(leaveButton);
 			
 			singleRow.add(rowPanel);
+			mainContainer.setVisible(true);
 		}
 		mainContainer.add(singleRow);
 		ulPanel = new UnorderedListPanel();
@@ -115,8 +104,6 @@ public class OpenUserInvitationsWidgetViewImpl extends FlowPanel implements
 			ulPanel.add(moreLink);
 			ulPanel.setVisible(false);
 			mainContainer.add(ulPanel);
-			
-			add(mainContainer);
 		}
 	}
 	
@@ -125,5 +112,19 @@ public class OpenUserInvitationsWidgetViewImpl extends FlowPanel implements
 		if (ulPanel != null)
 			ulPanel.setVisible(isVisible);
 	}
+
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
+	}
 	
+	@Override
+	public Widget asWidget() {
+		return widget;
+	}
+	@Override
+	public void clear() {
+		mainContainer.clear();
+	}
 }

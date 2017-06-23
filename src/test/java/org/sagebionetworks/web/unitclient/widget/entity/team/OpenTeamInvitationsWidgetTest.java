@@ -16,6 +16,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -28,6 +30,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidgetView;
@@ -54,8 +57,12 @@ public class OpenTeamInvitationsWidgetTest {
 	List<OpenUserInvitationBundle> testReturn;
 	Callback mockTeamUpdatedCallback;
 	CallbackP<List<OpenUserInvitationBundle>> mockOpenTeamInvitationsCallback;
+	@Mock
+	SynapseAlert mockSynapseAlert;
+	
 	@Before
 	public void before() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(OpenTeamInvitationsWidgetView.class);
@@ -63,7 +70,7 @@ public class OpenTeamInvitationsWidgetTest {
 		mockTeamUpdatedCallback = mock(Callback.class);
 		mockPortalGinInjector = mock(PortalGinInjector.class);
 		mockJoinTeamWidget = mock(JoinTeamWidget.class);
-		widget = new OpenTeamInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockPortalGinInjector);
+		widget = new OpenTeamInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockPortalGinInjector, mockSynapseAlert);
 		testTeam = new Team();
 		testTeam.setId(teamId);
 		testTeam.setName("Bob's Team");
@@ -112,9 +119,10 @@ public class OpenTeamInvitationsWidgetTest {
 	}
 	
 	public void testConfigureFailureGetOpenInvites() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
+		Exception ex = new Exception("unhandled exception");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
 		widget.configure(mockTeamUpdatedCallback, mockOpenTeamInvitationsCallback);
 		verify(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynapseAlert).handleException(ex);
 	}
 }
