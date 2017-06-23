@@ -62,6 +62,7 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 			synapseClient.getOpenInvitations(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<ArrayList<OpenUserInvitationBundle>>() {
 				@Override
 				public void onSuccess(ArrayList<OpenUserInvitationBundle> result) {
+					view.setLoadingVisible(false);
 					if (openTeamInvitationsCallback != null)
 						openTeamInvitationsCallback.invoke(result);
 					showTeamInvites(result);
@@ -83,7 +84,6 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 	public void showTeamInvites(List<OpenUserInvitationBundle> invites) {
 		//create the associated object list, and pass to the view to render
 		view.clear();
-		view.setLoadingVisible(false);
 		for (OpenUserInvitationBundle b : invites) {
 			String invitationMessage = "";
 			MembershipInvitation invite = b.getMembershipInvitation();

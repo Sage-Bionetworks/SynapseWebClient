@@ -61,7 +61,7 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	public void configure(List<UserProfile> profiles, List<MembershipInvtnSubmission> invitations) {
 		clear();
 		FlowPanel singleRow = DisplayUtils.createRowContainerFlowPanel();
-		
+		mainContainer.setVisible(false);
 		for (int i = 0; i < profiles.size(); i++) {
 			FlowPanel rowPanel = new FlowPanel();
 			rowPanel.addStyleName("col-md-12");
@@ -95,6 +95,7 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 			right.add(leaveButton);
 			
 			singleRow.add(rowPanel);
+			mainContainer.setVisible(true);
 		}
 		mainContainer.add(singleRow);
 		ulPanel = new UnorderedListPanel();

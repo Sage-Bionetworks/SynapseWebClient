@@ -64,6 +64,7 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 	@Override
 	public void configure(List<UserProfile> profiles, List<String> requestMessages) {
 		clear();
+		mainContainer.setVisible(false);
 		FlowPanel singleRow = DisplayUtils.createRowContainerFlowPanel();
 		for (int i = 0; i < profiles.size(); i++) {
 			FlowPanel lc = new FlowPanel();
@@ -89,6 +90,7 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 			lc.add(buttonContainer);
 			
 			singleRow.add(lc);
+			mainContainer.setVisible(true);
 		}
 		mainContainer.add(singleRow);
 	}

@@ -5,8 +5,8 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	<bh:Div>
-		<g:Image ui:field="loadingUI" resource='{sageImageBundle.loading31}'/>
+		<g:Image ui:field="loadingUI" resource='{sageImageBundle.loading31}' visible="false"/>
 		<bh:Div ui:field="synAlertContainer"/>
-		<bh:Div ui:field="mainContainer" />
+		<bh:Div ui:field="mainContainer" visible="false"/>
 	</bh:Div>
 </ui:UiBinder>
