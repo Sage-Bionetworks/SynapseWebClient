@@ -97,11 +97,10 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		Icon profilePicture;
 		if (publicAclPrincipalId != null && Long.parseLong(teamId) == publicAclPrincipalId) {
 			profilePicture = new Icon(IconType.GLOBE);
-			nameLabel.setText("Public");
+			nameLabel.setText("Anyone on the web");
 		} else if (authenticatedAclPrincipalId != null && Long.parseLong(teamId) == authenticatedAclPrincipalId) {
-			profilePicture = new Icon();
-			profilePicture.addStyleName("fa fa-user-circle");
-			nameLabel.setText("All Synapse users");
+			profilePicture = new Icon(IconType.GLOBE);
+			nameLabel.setText("All registered Synapse users");
 		} else {
 			profilePicture = new Icon(IconType.USERS);
 		}
