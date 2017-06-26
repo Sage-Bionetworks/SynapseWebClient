@@ -1,16 +1,23 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
+import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -26,21 +33,29 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 	WikiMarkdownEditor wikiMarkdownEditor;
 	WikiPageWidget wikiPageRenderer;
 	WikiPageKey wikiKey;
-	
+	SynapseClientAsync synapseClient;
+	SynapseAlert synAlert;
+	PopupUtilsView popupUtils;
 	@Inject
 	public CreateBasicAccessRequirementStep2(
 			CreateBasicAccessRequirementStep2View view,
 			WikiMarkdownEditor wikiMarkdownEditor,
-			WikiPageWidget wikiPageRenderer
+			WikiPageWidget wikiPageRenderer,
+			SynapseClientAsync synapseClient,
+			SynapseAlert synAlert,
+			PopupUtilsView popupUtils
 		) {
 		super();
 		this.view = view;
 		this.wikiMarkdownEditor = wikiMarkdownEditor;
 		this.wikiPageRenderer = wikiPageRenderer;
-		
+		this.synapseClient = synapseClient;
+		this.synAlert = synAlert;
+		this.popupUtils = popupUtils;
 		wikiMarkdownEditor.setDeleteButtonVisible(false);
 		view.setWikiPageRenderer(wikiPageRenderer.asWidget());
 		view.setPresenter(this);
+		view.setSynAlert(synAlert);
 		wikiPageRenderer.setModifiedCreatedByHistoryVisible(false);
 	}
 	
@@ -65,6 +80,35 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 			@Override
 			public void invoke(WikiPage wikiPage) {
 				configureWiki();
+			}
+		});
+	}
+	@Override
+	public void onClearOldInstructions() {
+		popupUtils.showConfirmDialog("Are you sure?", "Deleting the old instructions cannot be undone.  Continue?", new Callback() {
+			@Override
+			public void invoke() {
+				onClearOldInstructionsAfterConfirm();
+			}
+		});
+		
+	}
+	public void onClearOldInstructionsAfterConfirm() {
+		if (accessRequirement instanceof TermsOfUseAccessRequirement) {
+			((TermsOfUseAccessRequirement)accessRequirement).setTermsOfUse(null);
+		} else if (accessRequirement instanceof ACTAccessRequirement) {
+			((ACTAccessRequirement)accessRequirement).setActContactInfo(null);
+		}
+		synAlert.clear();
+		synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {
+			@Override
+			public void onSuccess(AccessRequirement ar) {
+				configure(ar);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
 			}
 		});
 	}

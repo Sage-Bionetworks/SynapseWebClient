@@ -10,12 +10,14 @@
 			<b:FormGroup ui:field="oldInstructionsUI">
 				<b:FormLabel>Legacy text-only instructions</b:FormLabel>
 				<bh:Paragraph ui:field="oldInstructions" />
+				<b:Button ui:field="clearOldTermsButton" text="Delete old instructions" type="DANGER"/>
 			</b:FormGroup>
 			<b:FormGroup>
 				<b:FormLabel>Instructions (Wiki)</b:FormLabel>
 				<bh:Div ui:field="wikiPageContainer" />
 				<b:Button ui:field="editWikiButton" text="Edit Instructions" />
 			</b:FormGroup>
+			<bh:Div ui:field="synAlertContainer" />
 		</bh:Div>
 	</bh:Div>
 </ui:UiBinder>

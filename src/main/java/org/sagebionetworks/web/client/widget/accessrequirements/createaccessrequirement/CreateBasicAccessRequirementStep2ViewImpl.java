@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
@@ -27,7 +26,10 @@ public class CreateBasicAccessRequirementStep2ViewImpl implements CreateBasicAcc
 	Div wikiPageContainer;
 	@UiField
 	Button editWikiButton;
-	
+	@UiField
+	Button clearOldTermsButton;
+	@UiField
+	Div synAlertContainer;
 	Presenter presenter;
 	
 	@Inject
@@ -39,7 +41,13 @@ public class CreateBasicAccessRequirementStep2ViewImpl implements CreateBasicAcc
 				presenter.onEditWiki();
 			}
 		});
-		
+		clearOldTermsButton.addClickHandler(new ClickHandler() {
+			
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClearOldInstructions();
+			}
+		});
 	}
 	@Override
 	public Widget asWidget() {
@@ -63,5 +71,10 @@ public class CreateBasicAccessRequirementStep2ViewImpl implements CreateBasicAcc
 	public void setWikiPageRenderer(IsWidget w) {
 		wikiPageContainer.clear();
 		wikiPageContainer.add(w);
+	}
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }
