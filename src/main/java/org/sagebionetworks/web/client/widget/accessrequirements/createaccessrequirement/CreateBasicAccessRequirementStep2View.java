@@ -13,12 +13,13 @@ public interface CreateBasicAccessRequirementStep2View extends IsWidget {
 	void setOldTerms(String terms);
 	
 	void setWikiPageRenderer(IsWidget w);
-	
+	void setSynAlert(IsWidget w);
 	public void setPresenter(Presenter p);
 	/*
 	 * Presenter interface
 	 */
 	public interface Presenter {
+		void onClearOldInstructions();
 		void onEditWiki();
 	}
 }
