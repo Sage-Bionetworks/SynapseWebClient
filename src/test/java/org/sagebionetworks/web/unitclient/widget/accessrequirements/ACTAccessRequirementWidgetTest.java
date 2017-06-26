@@ -143,7 +143,6 @@ public class ACTAccessRequirementWidgetTest {
 	@Test
 	public void testApprovedState() {
 		widget.setRequirement(mockACTAccessRequirement);
-		when(mockACTAccessRequirement.getAcceptRequest()).thenReturn(false);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();
