@@ -112,6 +112,8 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccess
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupView;
+import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1View;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1ViewImpl;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateBasicAccessRequirementStep2View;
@@ -1410,5 +1412,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DateTimeUtilsImpl.class).in(Singleton.class);
 		bind(DateTimeUtils.class).to(DateTimeUtilsImpl.class);
 		bind(ACTAccessApprovalsView.class).to(ACTAccessApprovalsViewImpl.class);
+		bind(AccessorGroupView.class).to(AccessorGroupViewImpl.class);
 	}
 }

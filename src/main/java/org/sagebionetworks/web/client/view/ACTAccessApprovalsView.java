@@ -21,6 +21,4 @@ public interface ACTAccessApprovalsView extends IsWidget, SynapseView {
 		void onClearAccessRequirementFilter();
 		void onExpiresBeforeDateSelected(Date selectedDate);
 	}
-
-	
 }

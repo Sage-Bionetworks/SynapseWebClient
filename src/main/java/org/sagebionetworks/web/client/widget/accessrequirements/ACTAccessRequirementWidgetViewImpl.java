@@ -47,7 +47,8 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	Div requestAccessButtonContainer;
 	@UiField
 	Alert requestApprovedMessage;
-
+	@UiField
+	Div manageAccessContainer;
 	Callback onAttachCallback;
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
 	}
@@ -174,4 +175,10 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	public void showRequestApprovedMessage() {
 		requestApprovedMessage.setVisible(true);
 	}
+	@Override
+	public void setManageAccessWidget(IsWidget w) {
+		manageAccessContainer.clear();
+		manageAccessContainer.add(w);
+	}
+
 }
