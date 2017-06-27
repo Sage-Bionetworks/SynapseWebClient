@@ -29,7 +29,7 @@
 					<g:TextBox ui:field="emailAddressesTextbox" />
 				</t:TableData>
 				<t:TableData width="100px" >
-					<b:Button ui:field="showAccessRequirementButton" type="PRIMARY" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2 margin-bottom-5" text="Show Access Requirement" />
+					<b:Button ui:field="showAccessRequirementButton" type="PRIMARY" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2 margin-bottom-5" text="Show" />
 				</t:TableData>
 			</t:TableRow>
 		</t:Table>

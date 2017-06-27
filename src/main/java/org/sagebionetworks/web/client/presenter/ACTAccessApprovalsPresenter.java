@@ -139,7 +139,6 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		synAlert.clear();
 		boolean isAccessRequirementId = actAccessRequirementIdString != null;
 		
-		view.setAccessRequirementUIVisible(isAccessRequirementId);
 		showHideAccessRequirementButton.setVisible(isAccessRequirementId);
 		if (isAccessRequirementId) {
 			accessorGroupRequest.setAccessRequirementId(actAccessRequirementIdString);
