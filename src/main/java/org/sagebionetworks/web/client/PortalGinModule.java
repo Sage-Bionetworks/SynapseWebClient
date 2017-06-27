@@ -22,6 +22,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.JsoProviderImpl;
+import org.sagebionetworks.web.client.view.ACTAccessApprovalsView;
+import org.sagebionetworks.web.client.view.ACTAccessApprovalsViewImpl;
 import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
 import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsViewImpl;
 import org.sagebionetworks.web.client.view.ACTView;
@@ -1407,5 +1409,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(DateTimeUtilsImpl.class).in(Singleton.class);
 		bind(DateTimeUtils.class).to(DateTimeUtilsImpl.class);
+		bind(ACTAccessApprovalsView.class).to(ACTAccessApprovalsViewImpl.class);
 	}
 }

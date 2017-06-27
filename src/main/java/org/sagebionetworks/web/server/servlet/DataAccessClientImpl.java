@@ -176,6 +176,14 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
-	
+	}
+	@Override
+	public void revokeGroup(String accessRequirementId, String submitterId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.revokeGroup(accessRequirementId, submitterId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
 	}
 }

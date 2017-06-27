@@ -41,4 +41,5 @@ public interface DataAccessClientAsync {
 			AsyncCallback<Submission> callback);
 	void getOpenSubmissions(String nextPageToken, AsyncCallback<OpenSubmissionPage> callback);
 	void listAccessorGroup(AccessorGroupRequest request, AsyncCallback<AccessorGroupResponse> asyncCallback);
+	void revokeGroup(String accessRequirementId, String submitterId, AsyncCallback<Void> callback);
 }

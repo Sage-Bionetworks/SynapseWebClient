@@ -1,32 +1,26 @@
 package org.sagebionetworks.web.client.presenter;
 
-import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.*;
+import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.ACCESS_REQUIREMENT_ID_PARAM;
+import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.EXPIRES_BEFORE_PARAM;
+import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.SUBMITTER_ID_PARAM;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.repo.model.*;
-import org.sagebionetworks.repo.model.dataaccess.*;
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
-import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
+import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
+import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
-import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
-import org.sagebionetworks.web.client.place.ACTPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ACTAccessApprovalsView;
-import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
 import org.sagebionetworks.web.client.widget.Button;
-import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.accessrequirements.*;
-import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
@@ -38,11 +32,8 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 
 public class ACTAccessApprovalsPresenter extends AbstractActivity implements Presenter<ACTAccessApprovalsPlace>, ACTAccessApprovalsView.Presenter {
@@ -60,7 +51,8 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	SynapseSuggestBox peopleSuggestWidget;
 	private UserBadge selectedUserBadge;
 	Button showHideAccessRequirementButton;
-	
+	AccessRequirementWidget accessRequirementWidget;
+	Callback refreshCallback;
 	@Inject
 	public ACTAccessApprovalsPresenter(
 			final ACTAccessApprovalsView view,
@@ -71,7 +63,8 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 			DataAccessClientAsync dataAccessClient,
 			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider,
-			UserBadge selectedUserBadge
+			UserBadge selectedUserBadge,
+			AccessRequirementWidget accessRequirementWidget
 			) {
 		this.view = view;
 		this.synAlert = synAlert;
@@ -80,6 +73,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		this.loadMoreContainer = loadMoreContainer;
 		this.selectedUserBadge = selectedUserBadge;
 		this.showHideAccessRequirementButton = showHideAccessRequirementButton;
+		this.accessRequirementWidget = accessRequirementWidget;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		isAccessRequirementVisible = false;
 		showHideAccessRequirementButton.setText(SHOW_AR_TEXT);
@@ -98,6 +92,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		view.setSynAlert(synAlert);
 		view.setLoadMoreContainer(loadMoreContainer);
 		view.setShowHideButton(showHideAccessRequirementButton);
+		view.setAccessRequirementWidget(accessRequirementWidget);
 		view.setUserPickerWidget(peopleSuggestWidget.asWidget());
 		view.setSelectedUserBadge(selectedUserBadge.asWidget());
 		view.setPresenter(this);
@@ -113,6 +108,12 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 				loadMore();
 			}
 		});
+		refreshCallback = new Callback() {
+			@Override
+			public void invoke() {
+				loadData();
+			}
+		};
 	}
 
 	@Override
@@ -141,31 +142,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		showHideAccessRequirementButton.setVisible(isAccessRequirementId);
 		if (isAccessRequirementId) {
 			accessorGroupRequest.setAccessRequirementId(actAccessRequirementIdString);
-			long accessRequirementId = Long.parseLong(actAccessRequirementIdString);
-			dataAccessClient.getAccessRequirement(accessRequirementId, new AsyncCallback<AccessRequirement>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.showError(INVALID_AR_ID);
-				}
-				@Override
-				public void onSuccess(AccessRequirement requirement) {
-					IsWidget accessRequirementWidget = null;
-					if (requirement instanceof ManagedACTAccessRequirement) {
-						ManagedACTAccessRequirementWidget arWidget = ginInjector.getManagedACTAccessRequirementWidget();
-						arWidget.setRequirement((ManagedACTAccessRequirement) requirement);
-						accessRequirementWidget = arWidget;
-					} else if (requirement instanceof ACTAccessRequirement) {
-						ACTAccessRequirementWidget arWidget = ginInjector.getACTAccessRequirementWidget();
-						arWidget.setRequirement((ACTAccessRequirement) requirement);
-						accessRequirementWidget = arWidget;
-					} else if (requirement instanceof TermsOfUseAccessRequirement) {
-						TermsOfUseAccessRequirementWidget arWidget = ginInjector.getTermsOfUseAccessRequirementWidget();
-						arWidget.setRequirement((TermsOfUseAccessRequirement) requirement);
-						accessRequirementWidget = arWidget;
-					}
-					view.setAccessRequirementWidget(accessRequirementWidget);
-				}
-			});
+			accessRequirementWidget.configure(actAccessRequirementIdString);
 		}
 		accessorGroupRequest.setSubmitterId(submitterId);
 		loadData();
@@ -190,7 +167,8 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 				accessorGroupRequest.setNextPageToken(response.getNextPageToken());
 				for (AccessorGroup group : response.getResults()) {
 					AccessorGroupWidget w = ginInjector.getAccessorGroupWidget();
-					w.configure(group); 
+					w.configure(group);
+					w.setOnRevokeCallback(refreshCallback);
 					loadMoreContainer.add(w.asWidget());
 				}
 				loadMoreContainer.setIsMore(response.getNextPageToken() != null);
