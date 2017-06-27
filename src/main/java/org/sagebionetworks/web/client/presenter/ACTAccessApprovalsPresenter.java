@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.place.ACTPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.view.ACTAccessApprovalsView;
 import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
@@ -50,7 +51,6 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
 	DataAccessClientAsync dataAccessClient;
-	private GlobalApplicationState globalAppState;
 	LoadMoreWidgetContainer loadMoreContainer;
 	boolean isAccessRequirementVisible;
 	public static final String HIDE_AR_TEXT = "Hide Access Requirement";
@@ -59,13 +59,13 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	AccessorGroupRequest accessorGroupRequest;
 	SynapseSuggestBox peopleSuggestWidget;
 	private UserBadge selectedUserBadge;
+	Button showHideAccessRequirementButton;
 	
 	@Inject
 	public ACTAccessApprovalsPresenter(
 			final ACTAccessApprovalsView view,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
-			GlobalApplicationState globalAppState,
 			LoadMoreWidgetContainer loadMoreContainer,
 			final Button showHideAccessRequirementButton,
 			DataAccessClientAsync dataAccessClient,
@@ -78,8 +78,8 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		this.ginInjector = ginInjector;
 		this.dataAccessClient = dataAccessClient;
 		this.loadMoreContainer = loadMoreContainer;
-		this.globalAppState = globalAppState;
 		this.selectedUserBadge = selectedUserBadge;
+		this.showHideAccessRequirementButton = showHideAccessRequirementButton;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		isAccessRequirementVisible = false;
 		showHideAccessRequirementButton.setText(SHOW_AR_TEXT);
@@ -135,8 +135,11 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		}
 		
 		synAlert.clear();
-		view.setAccessRequirementUIVisible(actAccessRequirementIdString != null);
-		if (actAccessRequirementIdString != null) {
+		boolean isAccessRequirementId = actAccessRequirementIdString != null;
+		
+		view.setAccessRequirementUIVisible(isAccessRequirementId);
+		showHideAccessRequirementButton.setVisible(isAccessRequirementId);
+		if (isAccessRequirementId) {
 			accessorGroupRequest.setAccessRequirementId(actAccessRequirementIdString);
 			long accessRequirementId = Long.parseLong(actAccessRequirementIdString);
 			dataAccessClient.getAccessRequirement(accessRequirementId, new AsyncCallback<AccessRequirement>() {
@@ -196,7 +199,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	}
 	
 	@Override
-	public void onClearDateFilter() {
+	public void onClearExpireBeforeFilter() {
 		accessorGroupRequest.setExpireBefore(null);
 		view.setExpiresBeforeDate(null);
 		place.removeParam(EXPIRES_BEFORE_PARAM);
@@ -212,8 +215,18 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		loadData();	
 	}
 	
+
 	@Override
-	public void setExpiresBeforeDateSelected(Date date) {
+	public void onClearAccessRequirementFilter() {
+		accessorGroupRequest.setAccessRequirementId(null);
+		place.removeParam(ACCESS_REQUIREMENT_ID_PARAM);
+		view.setAccessRequirementUIVisible(false);
+		showHideAccessRequirementButton.setVisible(false);
+		loadData();	
+	}
+	
+	@Override
+	public void onExpiresBeforeDateSelected(Date date) {
 		accessorGroupRequest.setExpireBefore(date);
 		place.putParam(EXPIRES_BEFORE_PARAM, Long.toString(date.getTime()));
 		loadData();
