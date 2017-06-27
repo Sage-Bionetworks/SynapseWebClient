@@ -61,7 +61,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 			LoadMoreWidgetContainer loadMoreContainer,
 			final Button showHideAccessRequirementButton,
 			DataAccessClientAsync dataAccessClient,
-			SynapseSuggestBox peopleSuggestBox,
+			SynapseSuggestBox peopleSuggestWidget,
 			UserGroupSuggestionProvider provider,
 			UserBadge selectedUserBadge,
 			AccessRequirementWidget accessRequirementWidget
@@ -74,6 +74,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		this.selectedUserBadge = selectedUserBadge;
 		this.showHideAccessRequirementButton = showHideAccessRequirementButton;
 		this.accessRequirementWidget = accessRequirementWidget;
+		this.peopleSuggestWidget = peopleSuggestWidget;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		isAccessRequirementVisible = false;
 		showHideAccessRequirementButton.setText(SHOW_AR_TEXT);
@@ -96,7 +97,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		view.setUserPickerWidget(peopleSuggestWidget.asWidget());
 		view.setSelectedUserBadge(selectedUserBadge.asWidget());
 		view.setPresenter(this);
-		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
+		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			@Override
 			public void invoke(SynapseSuggestion suggestion) {
 				onUserSelected((UserGroupSuggestion)suggestion);
