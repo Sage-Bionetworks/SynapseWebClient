@@ -10,7 +10,7 @@
 		<b:Modal ui:field="dialog" title="" closable="true" dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
 			<b:ModalBody>
 				<bh:Div ui:field="accessRequirementWidgetContainer"/>
-				<bh:Div ui:field="emailAddresses"/>
+				<bh:Span ui:field="emailAddresses"/>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button ui:field="closeButton" type="DEFAULT" text="Close" />
