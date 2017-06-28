@@ -58,7 +58,6 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 		UserBadge badge = ginInjector.getUserBadgeWidget();
 		badge.configure(accessorGroup.getSubmitterId());
 		view.setSubmittedBy(badge);
-		setEmailAddresses(accessorGroup.getAccessorIds());
 	}
 	
 	public void setOnRevokeCallback(Callback onRevokeCallback) {
@@ -73,9 +72,10 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 			view.addAccessor(badge);
 		}
 	}
-	
-	public void setEmailAddresses(List<String> accessorIds) {
-		synapseClient.listUserProfiles(accessorIds, new AsyncCallback<List<UserProfile>>() {
+	@Override
+	public void onShowEmails() {
+		//get the profiles, to get the usernames
+		synapseClient.listUserProfiles(accessorGroup.getAccessorIds(), new AsyncCallback<List<UserProfile>>() {
 			@Override
 			public void onSuccess(List<UserProfile> userProfiles) {
 				StringBuilder sb = new StringBuilder();
@@ -87,6 +87,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 					}
 				}
 				view.setEmailAddresses(sb.toString());
+				view.showEmailAddressesDialog();
 			}
 			
 			@Override

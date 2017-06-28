@@ -3,13 +3,13 @@ package org.sagebionetworks.web.client.widget.accessrequirements.approval;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -24,9 +24,11 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	@UiField
 	Button showAccessRequirementButton;
 	@UiField
+	Button showEmailsButton;
+	@UiField
 	Button revokeAccessButton;
 	@UiField
-	TextBox emailAddressesTextbox;
+	Span emailAddresses;
 	
 	@UiField
 	Button closeButton;
@@ -56,16 +58,16 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 				presenter.onRevoke();
 			}
 		});
+		showEmailsButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onShowEmails();
+			}
+		});
 		closeButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				dialog.hide();
-			}
-		});
-		emailAddressesTextbox.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				emailAddressesTextbox.selectAll();
 			}
 		});
 	}
@@ -110,6 +112,8 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	}
 	@Override
 	public void showAccessRequirementDialog() {
+		emailAddresses.setVisible(false);
+		accessRequirementWidgetContainer.setVisible(true);
 		dialog.show();
 	}
 
@@ -120,7 +124,14 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	}
 	
 	@Override
-	public void setEmailAddresses(String emailAddresses) {
-		emailAddressesTextbox.setText(emailAddresses);
+	public void setEmailAddresses(String emails) {
+		emailAddresses.setText(emails);
+	}
+	
+	@Override
+	public void showEmailAddressesDialog() {
+		accessRequirementWidgetContainer.setVisible(false);
+		emailAddresses.setVisible(true);
+		dialog.show();
 	}
 }

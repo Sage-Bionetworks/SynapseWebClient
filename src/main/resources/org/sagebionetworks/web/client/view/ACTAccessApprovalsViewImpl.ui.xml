@@ -50,8 +50,12 @@
 						<bh:Span text="Submitted By" />
 					</t:TableHeader>
 					<t:TableHeader width="40%">
-						<!-- list of accessor badges, as well as easy way to copy all (synapse.org) email addresses -->
+						<!-- list of accessor badge-->
 						<bh:Span text="Accessors" />
+					</t:TableHeader>
+					<t:TableHeader width="100px">
+					 	<!-- easy way to copy all (synapse.org) email addresses --> 
+						<bh:Span text="Emails" />
 					</t:TableHeader>
 					<t:TableHeader width="100px">
 						<bh:Span text="Access Requirement" />

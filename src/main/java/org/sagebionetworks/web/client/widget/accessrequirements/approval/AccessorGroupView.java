@@ -17,6 +17,7 @@ public interface AccessorGroupView extends IsWidget {
 	void setSubmittedBy(IsWidget w);
 	void setAccessRequirementWidget(IsWidget w);
 	void showAccessRequirementDialog();
+	void showEmailAddressesDialog();
 	void setEmailAddresses(String emailAddresses);
 	/**
 	 * Presenter interface
@@ -24,6 +25,7 @@ public interface AccessorGroupView extends IsWidget {
 	public interface Presenter {
 		void onShowAccessRequirement();
 		void onRevoke();
+		void onShowEmails();
 	}
 
 }
