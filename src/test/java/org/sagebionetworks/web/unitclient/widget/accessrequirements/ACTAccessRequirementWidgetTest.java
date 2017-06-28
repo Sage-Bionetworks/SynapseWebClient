@@ -31,7 +31,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequire
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
-import org.sagebionetworks.web.client.widget.accessrequirements.ManageAccessButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
@@ -91,7 +91,7 @@ public class ACTAccessRequirementWidgetTest {
 	@Mock
 	UserProfile mockProfile;
 	@Mock
-	ManageAccessButton mockManageAccessButton;
+	ReviewAccessorsButton mockManageAccessButton;
 	Callback lazyLoadDataCallback;
 	
 	public final static String ROOT_WIKI_ID = "777";

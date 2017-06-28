@@ -28,6 +28,9 @@
 				<t:TableData width="40%" >
 					<bh:Div ui:field="accessorsContainer" />
 				</t:TableData>
+				<t:TableData width="175px" >
+					<g:Label ui:field="expiresOnField"/>
+				</t:TableData>
 				<t:TableData width="100px" >
 					<b:Button ui:field="showEmailsButton" type="PRIMARY" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2 margin-bottom-5" text="Email" />
 				</t:TableData>

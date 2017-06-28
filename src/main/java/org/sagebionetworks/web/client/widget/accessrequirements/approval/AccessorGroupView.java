@@ -15,6 +15,7 @@ public interface AccessorGroupView extends IsWidget {
 	void clearAccessors();
 	void addAccessor(IsWidget w);
 	void setSubmittedBy(IsWidget w);
+	void setExpiresOn(String expiresOn);
 	void setAccessRequirementWidget(IsWidget w);
 	void showAccessRequirementDialog();
 	void showEmailAddressesDialog();

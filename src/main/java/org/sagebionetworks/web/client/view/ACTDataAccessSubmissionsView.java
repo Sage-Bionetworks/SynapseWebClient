@@ -37,6 +37,7 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 		void onMaxDateSelected(Date date);
 		void onCreatedOnClick();
 		void onBack();
+		void onReviewAccessors();
 	}
 
 	

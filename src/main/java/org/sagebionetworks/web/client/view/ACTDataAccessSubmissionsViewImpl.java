@@ -86,6 +86,8 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	@UiField
 	AnchorListItem backLink;
 	@UiField
+	AnchorListItem reviewAccessorsLink;
+	@UiField
 	TextBox expirationPeriodTextbox;
 	@UiField
 	Well expirationDateUI;
@@ -142,6 +144,12 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onCreatedOnClick();
+			}
+		});
+		reviewAccessorsLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onReviewAccessors();
 			}
 		});
 	}

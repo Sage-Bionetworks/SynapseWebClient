@@ -40,7 +40,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	AuthenticationController authController;
 	JiraURLHelper jiraURLHelper;
 	PopupUtilsView popupUtils;
-	ManageAccessButton manageAccessButton;
+	ReviewAccessorsButton manageAccessButton;
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
 			SynapseClientAsync synapseClient,
@@ -55,7 +55,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			AuthenticationController authController,
 			JiraURLHelper jiraURLHelper,
 			PopupUtilsView popupUtils,
-			ManageAccessButton manageAccessButton) {
+			ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;

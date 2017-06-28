@@ -14,14 +14,14 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ManageAccessButton implements IsWidget {
+public class ReviewAccessorsButton implements IsWidget {
 	public static final String MANAGE_ACCESS_BUTTON_TEXT = "Review Accessors";
 	public Button button;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	AccessRequirement ar;
 	
 	@Inject
-	public ManageAccessButton(Button button, 
+	public ReviewAccessorsButton(Button button, 
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
 			final GlobalApplicationState globalAppState) {
 		this.button = button;

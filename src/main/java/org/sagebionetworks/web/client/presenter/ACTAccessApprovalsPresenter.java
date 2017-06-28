@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
+import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ACTAccessApprovalsView;
@@ -55,6 +56,8 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	AccessRequirementWidget accessRequirementWidget;
 	Callback refreshCallback;
 	GlobalApplicationState globalAppState;
+	String accessRequirementId;
+	
 	@Inject
 	public ACTAccessApprovalsPresenter(
 			final ACTAccessApprovalsView view,
@@ -132,7 +135,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	public void setPlace(ACTAccessApprovalsPlace place) {
 		this.place = place;
 		accessorGroupRequest = new AccessorGroupRequest();
-		String actAccessRequirementIdString = place.getParam(ACCESS_REQUIREMENT_ID_PARAM);
+		accessRequirementId = place.getParam(ACCESS_REQUIREMENT_ID_PARAM);
 		String expireTime = place.getParam(EXPIRES_BEFORE_PARAM);
 		String submitterId = place.getParam(SUBMITTER_ID_PARAM);
 		if (expireTime != null) {
@@ -142,12 +145,12 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		}
 		
 		synAlert.clear();
-		boolean isAccessRequirementId = actAccessRequirementIdString != null;
+		boolean isAccessRequirementId = accessRequirementId != null;
 		
 		showHideAccessRequirementButton.setVisible(isAccessRequirementId);
 		if (isAccessRequirementId) {
-			accessorGroupRequest.setAccessRequirementId(actAccessRequirementIdString);
-			accessRequirementWidget.configure(actAccessRequirementIdString);
+			accessorGroupRequest.setAccessRequirementId(accessRequirementId);
+			accessRequirementWidget.configure(accessRequirementId);
 		}
 		accessorGroupRequest.setSubmitterId(submitterId);
 		loadData();
@@ -238,4 +241,10 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
     public String mayStop() {
         return null;
     }
+	
+	@Override
+	public void onReviewRequests() {
+		ACTDataAccessSubmissionsPlace place = new ACTDataAccessSubmissionsPlace(ACTDataAccessSubmissionsPlace.ACCESS_REQUIREMENT_ID_PARAM + "=" + accessRequirementId);
+		globalAppState.getPlaceChanger().goTo(place);
+	}
 }

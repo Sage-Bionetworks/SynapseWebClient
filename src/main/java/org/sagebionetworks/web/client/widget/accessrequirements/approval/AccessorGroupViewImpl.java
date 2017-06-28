@@ -10,6 +10,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -29,7 +30,8 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	Button revokeAccessButton;
 	@UiField
 	Span emailAddresses;
-	
+	@UiField
+	Label expiresOnField;
 	@UiField
 	Button closeButton;
 	
@@ -133,5 +135,9 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 		accessRequirementWidgetContainer.setVisible(false);
 		emailAddresses.setVisible(true);
 		dialog.show();
+	}
+	@Override
+	public void setExpiresOn(String expiresOnString) {
+		expiresOnField.setText(expiresOnString);
 	}
 }

@@ -24,7 +24,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
-import org.sagebionetworks.web.client.widget.accessrequirements.ManageAccessButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidgetView;
@@ -70,7 +70,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	@Mock
 	BasicAccessRequirementStatus mockDataAccessSubmissionStatus;
 	@Mock
-	ManageAccessButton mockManageAccessButton;
+	ReviewAccessorsButton mockManageAccessButton;
 	Callback lazyLoadDataCallback;
 
 	public final static String ROOT_WIKI_ID = "777";

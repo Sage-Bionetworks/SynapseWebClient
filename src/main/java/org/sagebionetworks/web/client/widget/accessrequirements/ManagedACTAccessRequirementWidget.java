@@ -42,7 +42,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	AuthenticationController authController;
 	UserBadge submitterUserBadge;
 	DateTimeUtils dateTimeUtils;
-	ManageAccessButton manageAccessButton;
+	ReviewAccessorsButton manageAccessButton;
 	
 	@Inject
 	public ManagedACTAccessRequirementWidget(ManagedACTAccessRequirementWidgetView view, 
@@ -59,7 +59,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 			AuthenticationController authController,
 			UserBadge submitterUserBadge,
 			DateTimeUtils dateTimeUtils,
-			ManageAccessButton manageAccessButton) {
+			ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;

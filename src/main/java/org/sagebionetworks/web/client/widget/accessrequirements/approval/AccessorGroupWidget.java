@@ -6,6 +6,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -30,6 +31,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 	DataAccessClientAsync dataAccessClient;
 	SynapseClientAsync synapseClient;
 	Callback onRevokeCallback;
+	DateTimeUtils dateTimeUtils;
 	
 	@Inject
 	public AccessorGroupWidget(AccessorGroupView view, 
@@ -38,7 +40,8 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 			PopupUtilsView popupUtils,
 			AccessRequirementWidget accessRequirementWidget,
 			DataAccessClientAsync dataAccessClient,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
@@ -46,6 +49,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 		this.accessRequirementWidget = accessRequirementWidget;
 		this.dataAccessClient = dataAccessClient;
 		this.synapseClient = synapseClient;
+		this.dateTimeUtils = dateTimeUtils;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert);
 		view.setAccessRequirementWidget(accessRequirementWidget);
@@ -57,6 +61,13 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 		addAccessorUserBadges(accessorGroup.getAccessorIds());
 		UserBadge badge = ginInjector.getUserBadgeWidget();
 		badge.configure(accessorGroup.getSubmitterId());
+		//TODO: set expiresOn (when available)
+//		if (accessorGroup.getExpiresOn() != null) {
+//			view.setExpiresOn(dateTimeUtils.convertDateToSmallString(accessorGroup.getExpiresOn()));	
+//		} else {
+//			view.setExpiresOn("");
+//		}
+		
 		view.setSubmittedBy(badge);
 	}
 	

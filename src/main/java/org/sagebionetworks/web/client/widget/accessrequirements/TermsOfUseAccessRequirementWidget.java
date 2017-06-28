@@ -31,7 +31,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	DeleteAccessRequirementButton deleteAccessRequirementButton;
 	SubjectsWidget subjectsWidget;
 	LazyLoadHelper lazyLoadHelper;
-	ManageAccessButton manageAccessButton;
+	ReviewAccessorsButton manageAccessButton;
 	@Inject
 	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view,
 			AuthenticationController authController,
@@ -43,7 +43,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
 			LazyLoadHelper lazyLoadHelper,
-			ManageAccessButton manageAccessButton) {
+			ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.dataAccessClient = dataAccessClient;
