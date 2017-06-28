@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -53,6 +54,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	Button showHideAccessRequirementButton;
 	AccessRequirementWidget accessRequirementWidget;
 	Callback refreshCallback;
+	GlobalApplicationState globalAppState;
 	@Inject
 	public ACTAccessApprovalsPresenter(
 			final ACTAccessApprovalsView view,
@@ -64,7 +66,8 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 			SynapseSuggestBox peopleSuggestWidget,
 			UserGroupSuggestionProvider provider,
 			UserBadge selectedUserBadge,
-			AccessRequirementWidget accessRequirementWidget
+			AccessRequirementWidget accessRequirementWidget,
+			GlobalApplicationState globalAppState
 			) {
 		this.view = view;
 		this.synAlert = synAlert;
@@ -74,6 +77,8 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		this.selectedUserBadge = selectedUserBadge;
 		this.showHideAccessRequirementButton = showHideAccessRequirementButton;
 		this.accessRequirementWidget = accessRequirementWidget;
+		this.globalAppState = globalAppState;
+		accessRequirementWidget.hideButtons();
 		this.peopleSuggestWidget = peopleSuggestWidget;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		isAccessRequirementVisible = false;
@@ -149,6 +154,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	}
 	
 	public void loadData() {
+		globalAppState.pushCurrentPlace(place);
 		loadMoreContainer.clear();
 		accessorGroupRequest.setNextPageToken(null);
 		loadMore();

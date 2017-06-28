@@ -18,6 +18,7 @@ public class AccessRequirementWidget implements IsWidget{
 	PortalGinInjector ginInjector;
 	DataAccessClientAsync dataAccessClient;
 	DivView div;
+	boolean isHideButtons = false;
 	@Inject
 	public AccessRequirementWidget(PortalGinInjector ginInjector, 
 			DataAccessClientAsync dataAccessClient,
@@ -42,16 +43,25 @@ public class AccessRequirementWidget implements IsWidget{
 			}
 		});
 	}
+	public void hideButtons() {
+		isHideButtons = true;
+	}
 	
 	public void configure(AccessRequirement requirement) {
 		div.clear();
 		if (requirement instanceof ManagedACTAccessRequirement) {
 			ManagedACTAccessRequirementWidget arWidget = ginInjector.getManagedACTAccessRequirementWidget();
 			arWidget.setRequirement((ManagedACTAccessRequirement) requirement);
+			if (isHideButtons) {
+				arWidget.hideButtons();
+			}
 			div.add(arWidget);
 		} else if (requirement instanceof ACTAccessRequirement) {
 			ACTAccessRequirementWidget arWidget = ginInjector.getACTAccessRequirementWidget();
 			arWidget.setRequirement((ACTAccessRequirement) requirement);
+			if (isHideButtons) {
+				arWidget.hideButtons();
+			} 
 			div.add(arWidget);
 		} else if (requirement instanceof TermsOfUseAccessRequirement) {
 			TermsOfUseAccessRequirementWidget arWidget = ginInjector.getTermsOfUseAccessRequirementWidget();

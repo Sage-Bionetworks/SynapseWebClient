@@ -6,17 +6,18 @@
 	xmlns:bd="urn:import:org.gwtbootstrap3.extras.datetimepicker.client.ui">
 	<bh:Div>
 		<g:SimplePanel ui:field="header" />
-		<bh:Div ui:field="showHideAccessRequirementButtonContainer" pull="RIGHT"/>
+		<b:Heading size="H3" text="Review current access" addStyleNames="margin-left-35 margin-right-10 margin-bottom-20" />
+		<bh:Div ui:field="showHideAccessRequirementButtonContainer" pull="RIGHT" addStyleNames="moveup-35 margin-right-10"/>
 		<bh:Div ui:field="synAlertContainer" />
-		<b:Panel ui:field="accessRequirementUI" addStyleNames="margin-top-30 margin-left-35 margin-right-10 light-border padding-10">
+		<b:Panel ui:field="accessRequirementUI" addStyleNames="margin-left-35 margin-right-10 light-border padding-10">
 			<bh:Div ui:field="accessRequirementContainer" />
-			<b:Button ui:field="clearAccessRequirementFilter" size="EXTRA_SMALL">Expand search to all Access Requirements</b:Button>
+			<b:Button ui:field="clearAccessRequirementFilter" type="INFO">Expand search to all Access Requirements</b:Button>
 		</b:Panel>
 		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10 light-border">
 			<b:Column size="SM_6">
-				<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+				<b:Panel addStyleNames="margin-top-10 margin-left-10 margin-right-10 margin-bottom-20">
 					<b:PanelHeader>
-						<b:Heading size="H3" text="User Filter" />
+						<b:Heading size="H3" text="Submitter Filter" />
 						<bh:Div ui:field="currentUserContainer" />
 						<b:Button ui:field="clearUserFilter" type="DANGER" pull="RIGHT" addStyleNames="moveup-18" size="EXTRA_SMALL">Clear</b:Button>
 					</b:PanelHeader>
@@ -25,7 +26,7 @@
 					</b:PanelBody>
 				</b:Panel>
 			</b:Column>
-			<b:Column size="SM_6" visible="false">
+			<b:Column size="SM_6">
 				<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
 					<b:PanelHeader>
 						<b:Heading size="H3" text="Expires..." />
@@ -55,9 +56,9 @@
 					</t:TableHeader>
 					<t:TableHeader width="100px">
 					 	<!-- easy way to copy all (synapse.org) email addresses --> 
-						<bh:Span text="Emails" />
+						<bh:Span text="Email" />
 					</t:TableHeader>
-					<t:TableHeader width="100px">
+					<t:TableHeader width="150px">
 						<bh:Span text="Access Requirement" />
 					</t:TableHeader>
 				</t:TableRow>

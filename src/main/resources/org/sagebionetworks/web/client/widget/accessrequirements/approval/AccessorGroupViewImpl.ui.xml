@@ -29,9 +29,9 @@
 					<bh:Div ui:field="accessorsContainer" />
 				</t:TableData>
 				<t:TableData width="100px" >
-					<b:Button ui:field="showEmailsButton" type="PRIMARY" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2 margin-bottom-5" text="Emails" />
+					<b:Button ui:field="showEmailsButton" type="PRIMARY" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2 margin-bottom-5" text="Email" />
 				</t:TableData>
-				<t:TableData width="100px" >
+				<t:TableData width="150px" >
 					<b:Button ui:field="showAccessRequirementButton" type="PRIMARY" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2 margin-bottom-5" text="Access Requirement" />
 				</t:TableData>
 			</t:TableRow>

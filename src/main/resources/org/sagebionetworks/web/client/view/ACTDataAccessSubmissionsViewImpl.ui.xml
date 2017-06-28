@@ -12,7 +12,7 @@
 		</b:NavPills>
 		<bh:Div ui:field="showHideAccessRequirementButtonContainer" pull="RIGHT"/>
 		<b:Heading ui:field="title" size="H3" addStyleNames="margin-top-30 margin-left-35 margin-right-10">
-			<bh:Text>Manage access for: </bh:Text>
+			<bh:Text>Review requests for access: </bh:Text>
 			<bh:Div ui:field="subjectsContainer" />	 
 		</b:Heading>
 		<bh:Div ui:field="synAlertContainer" />
