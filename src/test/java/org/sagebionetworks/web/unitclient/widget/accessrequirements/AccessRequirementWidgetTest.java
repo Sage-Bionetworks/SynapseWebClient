@@ -70,17 +70,12 @@ public class AccessRequirementWidgetTest {
 	@Mock
 	DivView mockView;
 	@Mock
-	LazyLoadHelper mockLazyLoadHelper;
-	@Mock
 	DataAccessClientAsync mockDataAccessClient;
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
 	SynapseAlert mockSynAlert;
 
-	@Captor
-	ArgumentCaptor<Callback> callbackCaptor;
-	Callback lazyLoadDataCallback;
 	@Mock
 	ManagedACTAccessRequirement mockManagedACTAccessRequirement;
 	public static final long MANAGED_ACT_AR_ID = 222L;
@@ -102,11 +97,8 @@ public class AccessRequirementWidgetTest {
 		
 		widget = new AccessRequirementWidget(mockGinInjector,
 				mockDataAccessClient,
-				mockView,
-				mockLazyLoadHelper);
+				mockView);
 		
-		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
-		lazyLoadDataCallback = callbackCaptor.getValue();
 		AsyncMockStubber.callSuccessWith(mockManagedACTAccessRequirement).when(mockDataAccessClient).getAccessRequirement(eq(MANAGED_ACT_AR_ID), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockDataAccessClient).getAccessRequirement(eq(ACT_AR_ID), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockToUAccessRequirement).when(mockDataAccessClient).getAccessRequirement(eq(TOU_AR_ID), any(AsyncCallback.class));
@@ -122,10 +114,6 @@ public class AccessRequirementWidgetTest {
 	@Test
 	public void testConfigureManagedACTAccessRequirement() {
 		widget.configure(Long.toString(MANAGED_ACT_AR_ID));
-		verify(mockLazyLoadHelper).setIsConfigured();
-		verify(mockDataAccessClient, never()).getAccessRequirement(anyLong(), any(AsyncCallback.class));
-		
-		lazyLoadDataCallback.invoke();
 		verify(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		verify(mockManagedACTAccessRequirementWidget).setRequirement(mockManagedACTAccessRequirement);
 		verify(mockView).add(mockManagedACTAccessRequirementWidget);
@@ -133,10 +121,6 @@ public class AccessRequirementWidgetTest {
 	@Test
 	public void testConfigureACTAccessRequirement() {
 		widget.configure(Long.toString(ACT_AR_ID));
-		verify(mockLazyLoadHelper).setIsConfigured();
-		verify(mockDataAccessClient, never()).getAccessRequirement(anyLong(), any(AsyncCallback.class));
-		
-		lazyLoadDataCallback.invoke();
 		verify(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		verify(mockACTAccessRequirementWidget).setRequirement(mockACTAccessRequirement);
 		verify(mockView).add(mockACTAccessRequirementWidget);
@@ -144,10 +128,6 @@ public class AccessRequirementWidgetTest {
 	@Test
 	public void testConfigureToUAccessRequirement() {
 		widget.configure(Long.toString(TOU_AR_ID));
-		verify(mockLazyLoadHelper).setIsConfigured();
-		verify(mockDataAccessClient, never()).getAccessRequirement(anyLong(), any(AsyncCallback.class));
-		
-		lazyLoadDataCallback.invoke();
 		verify(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		verify(mockToUAccessRequirementWidget).setRequirement(mockToUAccessRequirement);
 		verify(mockView).add(mockToUAccessRequirementWidget);
@@ -155,10 +135,6 @@ public class AccessRequirementWidgetTest {
 	@Test
 	public void testConfigureLockAccessRequirement() {
 		widget.configure(Long.toString(LOCK_AR_ID));
-		verify(mockLazyLoadHelper).setIsConfigured();
-		verify(mockDataAccessClient, never()).getAccessRequirement(anyLong(), any(AsyncCallback.class));
-		
-		lazyLoadDataCallback.invoke();
 		verify(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		verify(mockLockAccessRequirementWidget).setRequirement(mockLockAccessRequirement);
 		verify(mockView).add(mockLockAccessRequirementWidget);
@@ -175,7 +151,6 @@ public class AccessRequirementWidgetTest {
 		Exception ex = new Exception();
 		AsyncMockStubber.callFailureWith(ex).when(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		widget.configure("888");
-		lazyLoadDataCallback.invoke();
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 	
