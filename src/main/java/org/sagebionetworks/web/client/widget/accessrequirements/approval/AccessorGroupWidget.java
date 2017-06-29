@@ -22,6 +22,8 @@ import com.google.inject.Inject;
 
 public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidget {
 	
+	public static final String ARE_YOU_SURE = "Are you sure?";
+	public static final String REVOKE_ACCESS_TO_GROUP = "Revoke access to group?";
 	private AccessorGroupView view;
 	SynapseAlert synAlert;
 	AccessorGroup accessorGroup;
@@ -130,7 +132,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 	
 	@Override
 	public void onRevoke() {
-		popupUtils.showConfirmDialog("Revoke access to group?", "Are you sure?", new Callback() {
+		popupUtils.showConfirmDialog(REVOKE_ACCESS_TO_GROUP, ARE_YOU_SURE, new Callback() {
 			@Override
 			public void invoke() {
 				onRevokeAfterConfirm();
