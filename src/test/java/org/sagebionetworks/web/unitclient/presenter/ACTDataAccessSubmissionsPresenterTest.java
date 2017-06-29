@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
@@ -36,7 +37,9 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -53,6 +56,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -100,6 +104,10 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	GWTWrapper mockGWT;
 	@Mock
 	DateTimeFormat mockDateTimeFormat;
+	@Mock
+	PlaceChanger mockPlaceChanger;
+	@Captor
+	ArgumentCaptor<Place> placeCaptor;
 	public static final String FILE_HANDLE_ID = "9999";
 	public static final Long AR_ID = 76555L;
 	public static final String NEXT_PAGE_TOKEN = "abc678";
@@ -117,6 +125,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
 		when(mockGinInjector.getACTDataAccessSubmissionWidget()).thenReturn(mockACTDataAccessSubmissionWidget);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjects);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}	
 	
 	@Test
@@ -189,7 +198,6 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockView, never()).setProjectedExpirationDateVisible(true);
 	}
 	
-
 	@Test
 	public void testProjectedExpiration() {
 		String formattedDateTime = "In the future";
@@ -211,5 +219,17 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		presenter.loadData();
 		verify(mockSynAlert).handleException(ex);
 		verify(mockLoadMoreContainer).setIsMore(false);
+	}
+	
+	@Test
+	public void testOnReviewAccessors() {
+		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID.toString());
+		presenter.setPlace(mockPlace);
+		
+		presenter.onReviewAccessors();
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Place place = placeCaptor.getValue();
+		assertTrue(place instanceof ACTAccessApprovalsPlace);
+		assertEquals(AR_ID.toString(), ((ACTAccessApprovalsPlace)place).getParam(ACTAccessApprovalsPlace.ACCESS_REQUIREMENT_ID_PARAM));
 	}
 }
