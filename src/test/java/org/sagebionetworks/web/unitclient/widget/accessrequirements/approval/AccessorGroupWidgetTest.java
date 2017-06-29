@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.approval;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -8,6 +9,7 @@ import static org.sagebionetworks.web.client.widget.accessrequirements.approval.
 import static org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget.REVOKE_ACCESS_TO_GROUP;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -56,11 +58,16 @@ public class AccessorGroupWidgetTest {
 	UserBadge mockUserBadge;
 	@Mock
 	AccessorGroup mockAccessorGroup;
+	@Mock
+	Callback onRevokeCallback;
 	
 	List<String> accessorIds;
 	public static final String ACCESSOR_USER_ID = "98888";
 	public static final String SUBMITTER_USER_ID = "77776";
 	public static final String USER_NAME = "luke";
+	public static final String ACCESS_REQUIREMENT_ID = "98765678";
+	public static final Date AROUND_NOW = new Date();
+	public static final String FORMATTED_DATE = "todayish";
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
@@ -80,7 +87,10 @@ public class AccessorGroupWidgetTest {
 		when(mockAccessorGroup.getSubmitterId()).thenReturn(SUBMITTER_USER_ID);
 		accessorIds = Collections.singletonList(ACCESSOR_USER_ID);
 		when(mockAccessorGroup.getAccessorIds()).thenReturn(accessorIds);
+		when(mockAccessorGroup.getAccessRequirementId()).thenReturn(ACCESS_REQUIREMENT_ID);
 		when(mockUserProfile.getUserName()).thenReturn(USER_NAME);
+		when(mockAccessorGroup.getExpiredOn()).thenReturn(AROUND_NOW);
+		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(FORMATTED_DATE);
 	}
 	
 	@Test
@@ -97,7 +107,8 @@ public class AccessorGroupWidgetTest {
 		verify(mockUserBadge).configure(ACCESSOR_USER_ID);
 		verify(mockView).setSubmittedBy(mockUserBadge);
 		verify(mockView).addAccessor(mockUserBadge);
-		//TODO: test expires on
+		verify(mockDateTimeUtils).convertDateToSmallString(AROUND_NOW);
+		verify(mockView).setExpiresOn(FORMATTED_DATE);
 	}
 	
 	@Test
@@ -130,9 +141,12 @@ public class AccessorGroupWidgetTest {
 	
 	@Test
 	public void testOnRevokeAfterConfirm() {
+		AsyncMockStubber.callSuccessWith(null).when(mockDataAccessClient).revokeGroup(anyString(), anyString(), any(AsyncCallback.class));
 		widget.configure(mockAccessorGroup);
+		widget.setOnRevokeCallback(onRevokeCallback);
 		widget.onRevokeAfterConfirm();
 		
-		//TODO: verify we revoke the correct group
+		verify(mockDataAccessClient).revokeGroup(eq(ACCESS_REQUIREMENT_ID), eq(SUBMITTER_USER_ID), any(AsyncCallback.class));
+		verify(onRevokeCallback).invoke();
 	}
 }

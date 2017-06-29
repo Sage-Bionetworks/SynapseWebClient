@@ -63,12 +63,11 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 		addAccessorUserBadges(accessorGroup.getAccessorIds());
 		UserBadge badge = ginInjector.getUserBadgeWidget();
 		badge.configure(accessorGroup.getSubmitterId());
-		//TODO: set expiresOn (when available)
-//		if (accessorGroup.getExpiresOn() != null) {
-//			view.setExpiresOn(dateTimeUtils.convertDateToSmallString(accessorGroup.getExpiresOn()));	
-//		} else {
-//			view.setExpiresOn("");
-//		}
+		if (accessorGroup.getExpiredOn() != null) {
+			view.setExpiresOn(dateTimeUtils.convertDateToSmallString(accessorGroup.getExpiredOn()));	
+		} else {
+			view.setExpiresOn("");
+		}
 		
 		view.setSubmittedBy(badge);
 	}
@@ -125,8 +124,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 	
 	@Override
 	public void onShowAccessRequirement() {
-		// TODO:  uncomment when access requirement id is available from the accessor group
-//		accessRequirementWidget.configure(accessorGroup.getAccessRequirementId());
+		accessRequirementWidget.configure(accessorGroup.getAccessRequirementId());
 		view.showAccessRequirementDialog();
 	}
 	
@@ -141,20 +139,19 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 	}
 	
 	public void onRevokeAfterConfirm() {
-		// TODO:  uncomment when access requirement id is available from the accessor group
-//		dataAccessClient.revokeGroup(accessorGroup.getAccessRequirementId(), accessorGroup.getSubmitterId(), new AsyncCallback<Void>() {
-//			@Override
-//			public void onSuccess(Void result) {
-//				popupUtils.showInfo("Successfully revoked access.", "");
-//				if (onRevokeCallback != null) {
-//					onRevokeCallback.invoke();
-//				}
-//			}
-//			
-//			@Override
-//			public void onFailure(Throwable caught) {
-//				synAlert.handleException(caught);
-//			}
-//		});
+		dataAccessClient.revokeGroup(accessorGroup.getAccessRequirementId(), accessorGroup.getSubmitterId(), new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				popupUtils.showInfo("Successfully revoked access.", "");
+				if (onRevokeCallback != null) {
+					onRevokeCallback.invoke();
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
 	}
 }
