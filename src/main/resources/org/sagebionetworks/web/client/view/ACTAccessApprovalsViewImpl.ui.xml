@@ -15,7 +15,6 @@
 				<b:Button ui:field="clearAccessRequirementFilter" type="PRIMARY" >Expand search to all Access Requirements</b:Button>
 				<b:Button ui:field="reviewRequestsButton" type="PRIMARY" addStyleNames="margin-left-10">Review Requests</b:Button>
 			</bh:Div>
-			
 		</b:Panel>
 		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10 light-border">
 			<b:Column size="SM_6">
