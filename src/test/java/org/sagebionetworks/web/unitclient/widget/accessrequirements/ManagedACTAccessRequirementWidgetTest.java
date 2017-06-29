@@ -45,6 +45,7 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -136,6 +137,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 	public void testSetRequirementWithWikiTerms() {
 		widget.setRequirement(mockACTAccessRequirement);
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class), eq(false));
+		verify(mockView).setWikiTermsWidgetVisible(true);
 	}
 	
 	@Test
@@ -254,5 +256,13 @@ public class ManagedACTAccessRequirementWidgetTest {
 		widget.onRequestAccess();
 		verify(mockCreateDataAccessRequestWizard).configure(mockACTAccessRequirement);
 		verify(mockCreateDataAccessRequestWizard).showModal(any(WizardCallback.class));
+	}
+	
+	@Test
+	public void testNoWiki() {
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		widget.setRequirement(mockACTAccessRequirement);
+		verify(mockView).setWikiTermsWidgetVisible(false);
+		verify(mockView, never()).setWikiTermsWidgetVisible(true);
 	}
 }

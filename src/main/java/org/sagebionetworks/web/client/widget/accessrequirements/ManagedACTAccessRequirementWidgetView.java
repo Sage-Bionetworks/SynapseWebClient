@@ -14,6 +14,7 @@ public interface ManagedACTAccessRequirementWidgetView extends IsWidget, Support
 	void setPresenter(Presenter presenter);
 	void addStyleNames(String styleNames);
 	void setWikiTermsWidget(Widget wikiWidget);
+	void setWikiTermsWidgetVisible(boolean visible);
 	void showRequestSubmittedByOtherUser();
 	void showApprovedHeading();
 	void showUnapprovedHeading();
