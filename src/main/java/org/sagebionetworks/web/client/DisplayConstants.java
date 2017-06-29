@@ -6,7 +6,7 @@ public class DisplayConstants {
 	 * Text constants
 	 */
 	public static final String UPLOAD_SUCCESS = "Upload Success";
-	public static final String DEFAULT_PAGE_TITLE = "Sage Synapse: Contribute to the Cure";
+	public static final String DEFAULT_PAGE_TITLE = "Synapse | Sage Bionetworks";
 	public static final String DEFAULT_PAGE_DESCRIPTION = "Synapse is a collaborative compute space that allows scientists to share and analyze data together.";
 	public static final String NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE = "No files were selected for upload.";
 	public static final String CREDENTIALS_REQUIRED_MESSAGE = "Credentials are required to upload to this external site.";
