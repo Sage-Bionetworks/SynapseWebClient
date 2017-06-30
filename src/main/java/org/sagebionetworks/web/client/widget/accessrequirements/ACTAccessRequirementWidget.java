@@ -40,7 +40,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	AuthenticationController authController;
 	JiraURLHelper jiraURLHelper;
 	PopupUtilsView popupUtils;
-	
+	ReviewAccessorsButton manageAccessButton;
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
 			SynapseClientAsync synapseClient,
@@ -54,7 +54,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			LazyLoadHelper lazyLoadHelper,
 			AuthenticationController authController,
 			JiraURLHelper jiraURLHelper,
-			PopupUtilsView popupUtils) {
+			PopupUtilsView popupUtils,
+			ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -68,6 +69,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.authController = authController;
 		this.jiraURLHelper = jiraURLHelper;
 		this.popupUtils = popupUtils;
+		this.manageAccessButton = manageAccessButton;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
@@ -75,6 +77,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
 		view.setSubjectsWidget(subjectsWidget);
 		view.setSynAlert(synAlert);
+		view.setManageAccessWidget(manageAccessButton);
 		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -104,6 +107,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		createAccessRequirementButton.configure(ar);
 		deleteAccessRequirementButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
+		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
 	}
 	

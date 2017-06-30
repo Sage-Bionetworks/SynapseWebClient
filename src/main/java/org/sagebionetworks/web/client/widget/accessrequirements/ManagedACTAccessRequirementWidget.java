@@ -37,12 +37,13 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	CreateAccessRequirementButton createAccessRequirementButton;
 	DeleteAccessRequirementButton deleteAccessRequirementButton;
 	SubjectsWidget subjectsWidget;
-	ManageAccessButton manageAccessButton;
+	ReviewAccessRequestsButton reviewAccessRequestsButton;
 	String submissionId;
 	LazyLoadHelper lazyLoadHelper;
 	AuthenticationController authController;
 	UserBadge submitterUserBadge;
 	DateTimeUtils dateTimeUtils;
+	ReviewAccessorsButton manageAccessButton;
 	
 	@Inject
 	public ManagedACTAccessRequirementWidget(ManagedACTAccessRequirementWidgetView view, 
@@ -53,12 +54,13 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 			SubjectsWidget subjectsWidget,
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
-			ManageAccessButton manageAccessButton,
+			ReviewAccessRequestsButton reviewAccessRequestsButton,
 			DataAccessClientAsync dataAccessClient,
 			LazyLoadHelper lazyLoadHelper,
 			AuthenticationController authController,
 			UserBadge submitterUserBadge,
-			DateTimeUtils dateTimeUtils) {
+			DateTimeUtils dateTimeUtils,
+			ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -67,6 +69,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		this.subjectsWidget = subjectsWidget;
 		this.createAccessRequirementButton = createAccessRequirementButton;
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
+		this.reviewAccessRequestsButton = reviewAccessRequestsButton;
 		this.manageAccessButton = manageAccessButton;
 		this.dataAccessClient = dataAccessClient;
 		this.lazyLoadHelper = lazyLoadHelper;
@@ -79,6 +82,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
+		view.setReviewAccessRequestsWidget(reviewAccessRequestsButton);
 		view.setManageAccessWidget(manageAccessButton);
 		view.setSubjectsWidget(subjectsWidget);
 		view.setSynAlert(synAlert);
@@ -113,6 +117,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		});
 		createAccessRequirementButton.configure(ar);
 		deleteAccessRequirementButton.configure(ar);
+		reviewAccessRequestsButton.configure(ar);
 		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
 		lazyLoadHelper.setIsConfigured();
@@ -238,7 +243,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	public void hideButtons() {
 		view.hideButtonContainers();
 	}
-	public void setManageAccessVisible(boolean visible) {
-		view.setManageAccessWidgetContainerVisible(visible);
+	public void setReviewAccessRequestsVisible(boolean visible) {
+		view.setReviewAccessRequestsWidgetContainerVisible(visible);
 	}
 }

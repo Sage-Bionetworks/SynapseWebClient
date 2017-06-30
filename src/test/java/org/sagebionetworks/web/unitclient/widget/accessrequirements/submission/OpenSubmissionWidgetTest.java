@@ -93,7 +93,7 @@ public class OpenSubmissionWidgetTest {
 		Exception exception = captor.getValue();
 		assertTrue(exception instanceof IllegalStateException);
 		verify(mockAccessRequirementWidget).hideButtons();
-		verify(mockAccessRequirementWidget).setManageAccessVisible(true);
+		verify(mockAccessRequirementWidget).setReviewAccessRequestsVisible(true);
 		verifyNoMoreInteractions(mockAccessRequirementWidget);
 	}
 

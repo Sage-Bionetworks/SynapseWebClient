@@ -16,14 +16,14 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
-import org.sagebionetworks.web.client.widget.accessrequirements.ManageAccessButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessRequestsButton;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.place.shared.Place;
 
-public class ManageAccessButtonTest {
-	ManageAccessButton widget;
+public class ReviewAccessRequestsButtonTest {
+	ReviewAccessRequestsButton widget;
 	@Mock
 	Button mockButton; 
 	@Mock
@@ -49,7 +49,7 @@ public class ManageAccessButtonTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new ManageAccessButton(mockButton, mockIsACTMemberAsyncHandler, mockGlobalApplicationState);
+		widget = new ReviewAccessRequestsButton(mockButton, mockIsACTMemberAsyncHandler, mockGlobalApplicationState);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		verify(mockButton).addClickHandler(clickHandlerCaptor.capture());
 		onButtonClickHandler = clickHandlerCaptor.getValue();
@@ -59,7 +59,7 @@ public class ManageAccessButtonTest {
 	@Test
 	public void testConstruction() {
 		verify(mockButton).setVisible(false);
-		verify(mockButton).setText(ManageAccessButton.MANAGE_ACCESS_BUTTON_TEXT);
+		verify(mockButton).setText(ReviewAccessRequestsButton.REVIEW_ACCESS_BUTTON_TEXT);
 	}
 
 	@Test

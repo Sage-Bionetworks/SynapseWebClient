@@ -31,7 +31,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	DeleteAccessRequirementButton deleteAccessRequirementButton;
 	SubjectsWidget subjectsWidget;
 	LazyLoadHelper lazyLoadHelper;
-	
+	ReviewAccessorsButton manageAccessButton;
 	@Inject
 	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view,
 			AuthenticationController authController,
@@ -42,7 +42,8 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			SubjectsWidget subjectsWidget,
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
-			LazyLoadHelper lazyLoadHelper) {
+			LazyLoadHelper lazyLoadHelper,
+			ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.dataAccessClient = dataAccessClient;
@@ -53,12 +54,14 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		this.createAccessRequirementButton = createAccessRequirementButton;
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		this.lazyLoadHelper = lazyLoadHelper;
+		this.manageAccessButton = manageAccessButton;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
 		view.setSubjectsWidget(subjectsWidget);
+		view.setManageAccessWidget(manageAccessButton);
 		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -89,6 +92,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		createAccessRequirementButton.configure(ar);
 		deleteAccessRequirementButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
+		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
 	}
 	

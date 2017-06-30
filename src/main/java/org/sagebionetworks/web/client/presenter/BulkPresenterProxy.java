@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.Portal;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionDashboardPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.place.ACTPlace;
@@ -254,6 +255,10 @@ public class BulkPresenterProxy extends AbstractActivity {
 					} else if (place instanceof ACTDataAccessSubmissionDashboardPlace) {
 						ACTDataAccessSubmissionDashboardPresenter presenter = ginjector.getACTDataAccessSubmissionDashboardPresenter();
 						presenter.setPlace((ACTDataAccessSubmissionDashboardPlace) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof ACTAccessApprovalsPlace) {
+						ACTAccessApprovalsPresenter presenter = ginjector.getACTAccessApprovalsPresenter();
+						presenter.setPlace((ACTAccessApprovalsPlace) place);
 						presenter.start(panel, eventBus);
 					} else {
 						// Log that we have an unknown place but send the user to the default

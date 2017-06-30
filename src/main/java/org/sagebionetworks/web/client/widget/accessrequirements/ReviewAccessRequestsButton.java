@@ -2,15 +2,11 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
-import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -18,15 +14,14 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ManageAccessButton implements IsWidget {
-	public static final String MANAGE_ACCESS_BUTTON_TEXT = "Manage Access";
+public class ReviewAccessRequestsButton implements IsWidget {
+	public static final String REVIEW_ACCESS_BUTTON_TEXT = "Review Requests";
 	public Button button;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
-	RestrictableObjectDescriptor subject;
 	AccessRequirement ar;
 	
 	@Inject
-	public ManageAccessButton(Button button, 
+	public ReviewAccessRequestsButton(Button button, 
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
 			final GlobalApplicationState globalAppState) {
 		this.button = button;
@@ -34,7 +29,7 @@ public class ManageAccessButton implements IsWidget {
 		button.setVisible(false);
 		button.addStyleName("margin-left-10");
 		button.setType(ButtonType.PRIMARY);
-		button.setText(MANAGE_ACCESS_BUTTON_TEXT);
+		button.setText(REVIEW_ACCESS_BUTTON_TEXT);
 		button.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -45,7 +40,6 @@ public class ManageAccessButton implements IsWidget {
 	}	
 	
 	public void configure(AccessRequirement ar) {
-		this.subject = null;
 		this.ar = ar;
 		showIfACTMember();
 	}

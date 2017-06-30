@@ -30,11 +30,12 @@ public interface ManagedACTAccessRequirementWidgetView extends IsWidget, Support
 	void setDeleteAccessRequirementWidget(IsWidget w);
 	void setSubmitterUserBadge(IsWidget w);
 	void setManageAccessWidget(IsWidget w);
+	void setReviewAccessRequestsWidget(IsWidget w);
 	void setSubjectsWidget(IsWidget w);
 	void setVisible(boolean visible);
 	void setSynAlert(IsWidget w);
 	void hideButtonContainers();
-	void setManageAccessWidgetContainerVisible(boolean visible);
+	void setReviewAccessRequestsWidgetContainerVisible(boolean visible);
 	void showExpirationDate(String dateString);
 	/**
 	 * Presenter interface

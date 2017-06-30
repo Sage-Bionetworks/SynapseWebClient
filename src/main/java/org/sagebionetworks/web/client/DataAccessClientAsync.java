@@ -7,6 +7,8 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
+import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -38,4 +40,6 @@ public interface DataAccessClientAsync {
 	void updateDataAccessSubmissionState(String submissionId, SubmissionState newState, String reason,
 			AsyncCallback<Submission> callback);
 	void getOpenSubmissions(String nextPageToken, AsyncCallback<OpenSubmissionPage> callback);
+	void listAccessorGroup(AccessorGroupRequest request, AsyncCallback<AccessorGroupResponse> asyncCallback);
+	void revokeGroup(String accessRequirementId, String submitterId, AsyncCallback<Void> callback);
 }

@@ -34,7 +34,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
-import org.sagebionetworks.web.client.widget.accessrequirements.ManageAccessButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessRequestsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
@@ -74,7 +75,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 	@Mock
 	DeleteAccessRequirementButton mockDeleteAccessRequirementButton;
 	@Mock
-	ManageAccessButton mockManageAccessButton;
+	ReviewAccessRequestsButton mockReviewAccessRequestsButton;
 	@Mock
 	SubjectsWidget mockSubjectsWidget;
 	@Mock
@@ -99,7 +100,8 @@ public class ManagedACTAccessRequirementWidgetTest {
 	SynapseJSNIUtils mockJsniUtils;
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
-
+	@Mock
+	ReviewAccessorsButton mockManageAccessButton;
 	Callback lazyLoadDataCallback;
 	
 	public final static String ROOT_WIKI_ID = "777";
@@ -109,7 +111,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new ManagedACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockManageAccessButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockSubmitterUserBadge, mockDateTimeUtils);
+		widget = new ManagedACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockReviewAccessRequestsButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockSubmitterUserBadge, mockDateTimeUtils, mockManageAccessButton);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));

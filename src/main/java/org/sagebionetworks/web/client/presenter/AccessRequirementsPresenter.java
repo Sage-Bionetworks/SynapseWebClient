@@ -3,13 +3,9 @@ package org.sagebionetworks.web.client.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.LockAccessRequirement;
-import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
@@ -17,11 +13,8 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
-import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -143,26 +136,9 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 					if (!allArs.contains(ar)) {
 						isNewAr = true;
 						allArs.add(ar);
-						// create a new row for each access requirement.
-						if( ar instanceof ManagedACTAccessRequirement) {
-							ManagedACTAccessRequirementWidget w = ginInjector.getManagedACTAccessRequirementWidget();
-							w.setRequirement((ManagedACTAccessRequirement)ar);
-							loadMoreContainer.add(w.asWidget());
-						} else if( ar instanceof ACTAccessRequirement) {
-							ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
-							w.setRequirement((ACTAccessRequirement)ar);
-							loadMoreContainer.add(w.asWidget());
-						} else if (ar instanceof TermsOfUseAccessRequirement) {
-							TermsOfUseAccessRequirementWidget w = ginInjector.getTermsOfUseAccessRequirementWidget();
-							w.setRequirement((TermsOfUseAccessRequirement)ar);
-							loadMoreContainer.add(w.asWidget());						
-						} else if (ar instanceof LockAccessRequirement) {
-							LockAccessRequirementWidget w = ginInjector.getLockAccessRequirementWidget();
-							w.setRequirement((LockAccessRequirement)ar);
-							loadMoreContainer.add(w.asWidget());						
-						} else {
-							synAlert.showError("unsupported access requirement type: " + ar.getClass().getName());
-						}
+						AccessRequirementWidget w = ginInjector.getAccessRequirementWidget();
+						w.configure(ar);
+						loadMoreContainer.add(w.asWidget());
 					}
 				}
 				loadMoreContainer.setIsMore(isNewAr);
