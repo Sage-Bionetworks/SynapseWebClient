@@ -1226,6 +1226,10 @@ h1, h2, h3, h4, h5, h6 {
 .strikeout-links a {
 	text-decoration: line-through; 
 }
+.lightgrey-links a {
+	color: #909090; 
+}
+
 .scroll-x {
 	overflow-x: auto;
 }
