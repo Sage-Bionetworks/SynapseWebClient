@@ -2,10 +2,10 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public class AccessRequirementsPresenterTest {
@@ -74,6 +75,7 @@ public class AccessRequirementsPresenterTest {
 	@Mock
 	AccessRequirementsPlace mockPlace;
 	List<AccessRequirement> accessRequirements;
+	List<Boolean> accessRequirementApprovalStatus;
 	@Captor
 	ArgumentCaptor<RestrictableObjectDescriptor> subjectCaptor;
 	@Mock
@@ -112,11 +114,18 @@ public class AccessRequirementsPresenterTest {
 				mockUnmetAccessRequirementsDiv,
 				mockMetAccessRequirementsDiv);
 		accessRequirements = new ArrayList<AccessRequirement>();
+		accessRequirementApprovalStatus = new ArrayList<Boolean>();
 		accessRequirements.add(mockACTAccessRequirement);
+		accessRequirementApprovalStatus.add(true);
 		accessRequirements.add(mockTermsOfUseAccessRequirement);
+		accessRequirementApprovalStatus.add(false);
 		accessRequirements.add(mockBasicACTAccessRequirement);
+		accessRequirementApprovalStatus.add(true);
 		accessRequirements.add(mockLockAccessRequirement);
+		accessRequirementApprovalStatus.add(false);
 		AsyncMockStubber.callSuccessWith(accessRequirements).when(mockDataAccessClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(accessRequirementApprovalStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyList(), any(AsyncCallback.class));
+		
 		when(mockGinInjector.getManagedACTAccessRequirementWidget()).thenReturn(mockACTAccessRequirementWidget);
 		when(mockGinInjector.getTermsOfUseAccessRequirementWidget()).thenReturn(mockTermsOfUseAccessRequirementWidget);
 		when(mockGinInjector.getACTAccessRequirementWidget()).thenReturn(mockBasicACTAccessRequirementWidget);
@@ -135,6 +144,7 @@ public class AccessRequirementsPresenterTest {
 		when(mockPlace.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM)).thenReturn(ENTITY_ID);
 		presenter.setPlace(mockPlace);
 		verify(mockDataAccessClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
+		verify(mockDataAccessClient).getAccessRequirementStatus(anyList(), any(AsyncCallback.class));
 		RestrictableObjectDescriptor subject = subjectCaptor.getValue();
 		assertEquals(ENTITY_ID, subject.getId());
 		assertEquals(RestrictableObjectType.ENTITY, subject.getType());
@@ -145,6 +155,8 @@ public class AccessRequirementsPresenterTest {
 		verify(mockLockAccessRequirementWidget).setRequirement(mockLockAccessRequirement);
 		verify(mockBasicACTAccessRequirementWidget).setRequirement(mockBasicACTAccessRequirement);
 		verify(mockEmptyResultsDiv, never()).setVisible(true);
+		verify(mockMetAccessRequirementsDiv, times(2)).add(any(IsWidget.class));
+		verify(mockUnmetAccessRequirementsDiv, times(2)).add(any(IsWidget.class));
 		//load the next page
 		verify(mockDataAccessClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), eq(AccessRequirementsPresenter.LIMIT), eq(AccessRequirementsPresenter.LIMIT), any(AsyncCallback.class));
 	}
@@ -152,6 +164,7 @@ public class AccessRequirementsPresenterTest {
 	@Test
 	public void testLoadDataEntityEmptyResults() {
 		accessRequirements.clear();
+		accessRequirementApprovalStatus.clear();
 		when(mockPlace.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM)).thenReturn(ENTITY_ID);
 		presenter.setPlace(mockPlace);
 		verify(mockDataAccessClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
