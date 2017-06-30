@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -68,6 +69,8 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Mock
 	BasicAccessRequirementStatus mockDataAccessSubmissionStatus;
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
 	
 	Callback lazyLoadDataCallback;
 
@@ -75,7 +78,17 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new TermsOfUseAccessRequirementWidget(mockView, mockAuthController, mockDataAccessClient, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockLazyLoadHelper);
+		widget = new TermsOfUseAccessRequirementWidget(mockView, 
+				mockAuthController, 
+				mockDataAccessClient, 
+				mockSynapseClient, 
+				mockWikiPageWidget, 
+				mockSynAlert, 
+				mockSubjectsWidget, 
+				mockCreateAccessRequirementButton, 
+				mockDeleteAccessRequirementButton, 
+				mockLazyLoadHelper,
+				mockGlobalApplicationState);
 		when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));

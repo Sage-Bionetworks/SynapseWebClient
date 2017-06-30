@@ -58,8 +58,6 @@ public class AccessRequirementsPresenterTest {
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
-	LoadMoreWidgetContainer mockLoadMoreContainer;
-	@Mock
 	EntityIdCellRendererImpl mockEntityIdCellRenderer;
 	@Mock
 	TeamBadge mockTeamBadge;
@@ -92,13 +90,27 @@ public class AccessRequirementsPresenterTest {
 	DataAccessClientAsync mockDataAccessClient;
 	@Mock
 	DivView mockEmptyResultsDiv;
+	@Mock
+	DivView mockUnmetAccessRequirementsDiv;
+	@Mock
+	DivView mockMetAccessRequirementsDiv;
 	public static final String ENTITY_ID = "syn239834";
 	public static final String TEAM_ID = "45678";
 	
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		presenter = new AccessRequirementsPresenter(mockView, mockDataAccessClient, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockEntityIdCellRenderer, mockTeamBadge, mockCreateARButton, mockEmptyResultsDiv);
+		presenter = new AccessRequirementsPresenter(
+				mockView, 
+				mockDataAccessClient, 
+				mockSynAlert, 
+				mockGinInjector, 
+				mockEntityIdCellRenderer, 
+				mockTeamBadge, 
+				mockCreateARButton, 
+				mockEmptyResultsDiv,
+				mockUnmetAccessRequirementsDiv,
+				mockMetAccessRequirementsDiv);
 		accessRequirements = new ArrayList<AccessRequirement>();
 		accessRequirements.add(mockACTAccessRequirement);
 		accessRequirements.add(mockTermsOfUseAccessRequirement);
@@ -116,7 +128,6 @@ public class AccessRequirementsPresenterTest {
 		verify(mockView, atLeastOnce()).add(any(Widget.class));
 		verify(mockView, atLeastOnce()).addTitle(any(Widget.class));
 		verify(mockView, atLeastOnce()).addAboveBody(any(Widget.class));
-		verify(mockLoadMoreContainer).configure(any(Callback.class));
 	}
 	
 	@Test
@@ -133,12 +144,9 @@ public class AccessRequirementsPresenterTest {
 		verify(mockTermsOfUseAccessRequirementWidget).setRequirement(mockTermsOfUseAccessRequirement);
 		verify(mockLockAccessRequirementWidget).setRequirement(mockLockAccessRequirement);
 		verify(mockBasicACTAccessRequirementWidget).setRequirement(mockBasicACTAccessRequirement);
-		verify(mockLoadMoreContainer).setIsMore(true);
 		verify(mockEmptyResultsDiv, never()).setVisible(true);
-		presenter.loadMore();
 		//load the next page
 		verify(mockDataAccessClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), eq(AccessRequirementsPresenter.LIMIT), eq(AccessRequirementsPresenter.LIMIT), any(AsyncCallback.class));
-		verify(mockLoadMoreContainer).setIsMore(false);
 	}
 	
 	@Test
@@ -147,7 +155,6 @@ public class AccessRequirementsPresenterTest {
 		when(mockPlace.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM)).thenReturn(ENTITY_ID);
 		presenter.setPlace(mockPlace);
 		verify(mockDataAccessClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
-		verify(mockLoadMoreContainer).setIsMore(false);
 		verify(mockEmptyResultsDiv).setVisible(true);
 	}	
 	
@@ -158,7 +165,6 @@ public class AccessRequirementsPresenterTest {
 		when(mockPlace.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM)).thenReturn(ENTITY_ID);
 		presenter.setPlace(mockPlace);
 		verify(mockSynAlert).handleException(ex);
-		verify(mockLoadMoreContainer).setIsMore(false);
 	}	
 	
 	@Test

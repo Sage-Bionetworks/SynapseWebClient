@@ -37,4 +37,5 @@ public interface DataAccessClient extends XsrfProtectedService {
 			String reason) throws RestServiceException;
 	OpenSubmissionPage getOpenSubmissions(String nextPageToken) throws RestServiceException;
 	void submitDataAccessRequest(RequestInterface dataAccessRequest) throws RestServiceException;
+	List<Boolean> getAccessRequirementStatus(List<String> accessRequirementIds) throws RestServiceException;
 }

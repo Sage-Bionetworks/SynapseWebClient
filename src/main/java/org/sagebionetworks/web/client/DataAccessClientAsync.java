@@ -38,4 +38,5 @@ public interface DataAccessClientAsync {
 	void updateDataAccessSubmissionState(String submissionId, SubmissionState newState, String reason,
 			AsyncCallback<Submission> callback);
 	void getOpenSubmissions(String nextPageToken, AsyncCallback<OpenSubmissionPage> callback);
+	void getAccessRequirementStatus(List<String> accessRequirementIds, AsyncCallback<List<Boolean>> callback);
 }
