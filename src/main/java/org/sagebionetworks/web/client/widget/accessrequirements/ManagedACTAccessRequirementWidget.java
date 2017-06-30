@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -94,14 +95,18 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	public void setRequirement(final ManagedACTAccessRequirement ar) {
 		this.ar = ar;
 		synAlert.clear();
+		view.setWikiTermsWidgetVisible(false);
 		synapseClient.getRootWikiId(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				if (!(caught instanceof NotFoundException)) {
+					synAlert.handleException(caught);	
+				}
 			}
 			@Override
 			public void onSuccess(String rootWikiId) {
 				//get wiki terms
+				view.setWikiTermsWidgetVisible(true);
 	 			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), rootWikiId);
 	 			wikiPageWidget.configure(wikiKey, false, null, false);
 			}

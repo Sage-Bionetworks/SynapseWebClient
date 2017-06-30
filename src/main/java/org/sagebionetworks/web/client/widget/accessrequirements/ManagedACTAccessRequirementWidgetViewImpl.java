@@ -124,6 +124,10 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 		wikiContainer.setWidget(wikiWidget);
 	}
 	@Override
+	public void setWikiTermsWidgetVisible(boolean visible) {
+		wikiContainer.setVisible(visible);
+	}
+	@Override
 	public void showApprovedHeading() {
 		approvedHeading.setVisible(true);
 	}
