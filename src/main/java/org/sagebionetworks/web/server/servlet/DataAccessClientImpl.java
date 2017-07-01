@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -111,6 +112,21 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.getAccessRequirementStatus(accessRequirementId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+	@Override
+	public List<Boolean> getAccessRequirementStatus(List<String> accessRequirementIds)
+			throws RestServiceException {
+		//TODO: replace with a single call, when available (see PLFM-4492)
+		List<Boolean> status = new ArrayList<>(accessRequirementIds.size());
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			for (String accessRequirementId : accessRequirementIds) {
+				status.add(synapseClient.getAccessRequirementStatus(accessRequirementId).getIsApproved());
+			}
+			return status;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

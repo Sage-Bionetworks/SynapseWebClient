@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -31,6 +32,8 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	DeleteAccessRequirementButton deleteAccessRequirementButton;
 	SubjectsWidget subjectsWidget;
 	LazyLoadHelper lazyLoadHelper;
+	GlobalApplicationState globalAppState;
+	
 	ReviewAccessorsButton manageAccessButton;
 	@Inject
 	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view,
@@ -43,6 +46,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
 			LazyLoadHelper lazyLoadHelper,
+			GlobalApplicationState globalAppState,
 			ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -55,6 +59,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.manageAccessButton = manageAccessButton;
+		this.globalAppState = globalAppState;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
@@ -132,7 +137,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			}
 			@Override
 			public void onSuccess(AccessApproval result) {
-				refreshApprovalState();
+				globalAppState.refreshPage();
 			}
 		};
 		AccessApproval approval = new AccessApproval();

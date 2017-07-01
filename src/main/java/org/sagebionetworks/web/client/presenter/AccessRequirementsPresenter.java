@@ -9,10 +9,8 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
-import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -23,6 +21,7 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 
 public class AccessRequirementsPresenter extends AbstractActivity implements Presenter<AccessRequirementsPlace> {
@@ -31,7 +30,6 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
 	private DataAccessClientAsync dataAccessClient;
-	LoadMoreWidgetContainer loadMoreContainer;
 	public static Long LIMIT = 30L;
 	Long currentOffset;
 	RestrictableObjectDescriptor subject;
@@ -40,28 +38,37 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	List<AccessRequirement> allArs;
 	CreateAccessRequirementButton createAccessRequirementButton;
 	DivView noResultsDiv;
+	DivView metAccessRequirementsDiv;
+	DivView unmetAccessRequirementsDiv;
+	
 	@Inject
 	public AccessRequirementsPresenter(PlaceView view,
 			DataAccessClientAsync dataAccessClient,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
-			LoadMoreWidgetContainer loadMoreContainer, 
 			EntityIdCellRendererImpl entityIdRenderer, 
 			TeamBadge teamBadge,
 			CreateAccessRequirementButton createAccessRequirementButton,
-			DivView noResultsDiv) {
+			DivView noResultsDiv,
+			DivView unmetAccessRequirementsDiv,
+			DivView metAccessRequirementsDiv
+			) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.dataAccessClient = dataAccessClient;
-		this.loadMoreContainer = loadMoreContainer;
 		this.entityIdRenderer = entityIdRenderer;
 		this.teamBadge = teamBadge;
 		this.createAccessRequirementButton = createAccessRequirementButton;
 		this.noResultsDiv = noResultsDiv;
+		this.metAccessRequirementsDiv = metAccessRequirementsDiv;
+		this.unmetAccessRequirementsDiv = unmetAccessRequirementsDiv;
 		view.addAboveBody(synAlert);
 		view.addAboveBody(createAccessRequirementButton);
-		view.add(loadMoreContainer.asWidget());
+		unmetAccessRequirementsDiv.addStyleName("min-height-200");
+		metAccessRequirementsDiv.addStyleName("min-height-200");
+		view.add(unmetAccessRequirementsDiv.asWidget());
+		view.add(metAccessRequirementsDiv.asWidget());
 		view.addTitle("All conditions for ");
 		view.addTitle(entityIdRenderer.asWidget());
 		view.addTitle(teamBadge.asWidget());
@@ -69,12 +76,6 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		noResultsDiv.addStyleName("min-height-400");
 		noResultsDiv.setVisible(false);
 		view.add(noResultsDiv.asWidget());
-		loadMoreContainer.configure(new Callback() {
-			@Override
-			public void invoke() {
-				loadMore();
-			}
-		});
 	}
 
 	@Override
@@ -112,7 +113,8 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	
 	public void loadData() {
 		createAccessRequirementButton.configure(subject);
-		loadMoreContainer.clear();
+		metAccessRequirementsDiv.clear();
+		unmetAccessRequirementsDiv.clear();
 		currentOffset = 0L;
 		allArs = new ArrayList<AccessRequirement>();
 		loadMore();
@@ -125,7 +127,6 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
-				loadMoreContainer.setIsMore(false);
 			}
 			
 			public void onSuccess(List<AccessRequirement> accessRequirements) {
@@ -136,14 +137,45 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 					if (!allArs.contains(ar)) {
 						isNewAr = true;
 						allArs.add(ar);
-						AccessRequirementWidget w = ginInjector.getAccessRequirementWidget();
-						w.configure(ar);
-						loadMoreContainer.add(w.asWidget());
 					}
 				}
-				loadMoreContainer.setIsMore(isNewAr);
+				if (isNewAr) {
+					loadMore();
+				} else {
+					getStatusForEachAccessRequirement();
+				}
 			};
 		});
+	}
+
+	public IsWidget getAccessRequirementWidget(AccessRequirement ar) {
+		AccessRequirementWidget w = ginInjector.getAccessRequirementWidget();
+		w.configure(ar);
+		return w;
+	}
+
+	public void getStatusForEachAccessRequirement() {
+		List<String> arIds = new ArrayList<String>();
+		for (AccessRequirement accessRequirement : allArs) {
+			arIds.add(Long.toString(accessRequirement.getId()));
+		}
+		dataAccessClient.getAccessRequirementStatus(arIds, new AsyncCallback<List<Boolean>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			@Override
+			public void onSuccess(List<Boolean> statuses) {
+				for (int i = 0; i < statuses.size(); i++) {
+					AccessRequirement ar = allArs.get(i);
+					if (statuses.get(i)) {
+						metAccessRequirementsDiv.add(getAccessRequirementWidget(ar));	
+					} else {
+						unmetAccessRequirementsDiv.add(getAccessRequirementWidget(ar));	
+					}
+				}
+			}
+		});	
 	}
 	
 	public AccessRequirementsPlace getPlace() {
