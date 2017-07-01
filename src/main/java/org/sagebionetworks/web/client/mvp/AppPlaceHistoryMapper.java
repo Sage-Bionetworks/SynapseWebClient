@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.mvp;
 
+import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionDashboardPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.place.ACTPlace;
@@ -57,6 +58,6 @@ import com.google.gwt.place.shared.WithTokenizers;
 		SignedToken.Tokenizer.class, ErrorPlace.Tokenizer.class, ACTPlace.Tokenizer.class, 
 		SynapseForumPlace.Tokenizer.class, SubscriptionPlace.Tokenizer.class,
 		AccessRequirementsPlace.Tokenizer.class, ACTDataAccessSubmissionsPlace.Tokenizer.class,
-		ACTDataAccessSubmissionDashboardPlace.Tokenizer.class})
+		ACTDataAccessSubmissionDashboardPlace.Tokenizer.class, ACTAccessApprovalsPlace.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

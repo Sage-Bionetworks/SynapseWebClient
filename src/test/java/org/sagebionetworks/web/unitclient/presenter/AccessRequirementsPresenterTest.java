@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
@@ -79,13 +80,7 @@ public class AccessRequirementsPresenterTest {
 	@Captor
 	ArgumentCaptor<RestrictableObjectDescriptor> subjectCaptor;
 	@Mock
-	ManagedACTAccessRequirementWidget mockACTAccessRequirementWidget;
-	@Mock
-	ACTAccessRequirementWidget mockBasicACTAccessRequirementWidget;
-	@Mock
-	TermsOfUseAccessRequirementWidget mockTermsOfUseAccessRequirementWidget;
-	@Mock
-	LockAccessRequirementWidget mockLockAccessRequirementWidget;
+	AccessRequirementWidget mockAccessRequirementWidget;
 	@Mock
 	CreateAccessRequirementButton mockCreateARButton;
 	@Mock
@@ -125,11 +120,7 @@ public class AccessRequirementsPresenterTest {
 		accessRequirementApprovalStatus.add(false);
 		AsyncMockStubber.callSuccessWith(accessRequirements).when(mockDataAccessClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(accessRequirementApprovalStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyList(), any(AsyncCallback.class));
-		
-		when(mockGinInjector.getManagedACTAccessRequirementWidget()).thenReturn(mockACTAccessRequirementWidget);
-		when(mockGinInjector.getTermsOfUseAccessRequirementWidget()).thenReturn(mockTermsOfUseAccessRequirementWidget);
-		when(mockGinInjector.getACTAccessRequirementWidget()).thenReturn(mockBasicACTAccessRequirementWidget);
-		when(mockGinInjector.getLockAccessRequirementWidget()).thenReturn(mockLockAccessRequirementWidget);
+		when(mockGinInjector.getAccessRequirementWidget()).thenReturn(mockAccessRequirementWidget);
 	}	
 	
 	@Test
@@ -150,10 +141,8 @@ public class AccessRequirementsPresenterTest {
 		assertEquals(RestrictableObjectType.ENTITY, subject.getType());
 		verify(mockEntityIdCellRenderer).setValue(ENTITY_ID);
 		
-		verify(mockACTAccessRequirementWidget).setRequirement(mockACTAccessRequirement);
-		verify(mockTermsOfUseAccessRequirementWidget).setRequirement(mockTermsOfUseAccessRequirement);
-		verify(mockLockAccessRequirementWidget).setRequirement(mockLockAccessRequirement);
-		verify(mockBasicACTAccessRequirementWidget).setRequirement(mockBasicACTAccessRequirement);
+		verify(mockAccessRequirementWidget, times(4)).configure(any(AccessRequirement.class));
+
 		verify(mockEmptyResultsDiv, never()).setVisible(true);
 		verify(mockMetAccessRequirementsDiv, times(2)).add(any(IsWidget.class));
 		verify(mockUnmetAccessRequirementsDiv, times(2)).add(any(IsWidget.class));

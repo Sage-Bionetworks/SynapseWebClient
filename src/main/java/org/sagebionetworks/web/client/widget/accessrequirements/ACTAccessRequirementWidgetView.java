@@ -28,6 +28,7 @@ public interface ACTAccessRequirementWidgetView extends IsWidget, SupportsLazyLo
 	void setVisible(boolean visible);
 	void setSynAlert(IsWidget w);
 	void hideButtonContainers();
+	void setManageAccessWidget(IsWidget w);
 	/**
 	 * Presenter interface
 	 */

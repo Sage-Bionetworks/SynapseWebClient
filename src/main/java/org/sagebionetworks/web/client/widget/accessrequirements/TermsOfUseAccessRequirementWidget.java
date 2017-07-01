@@ -34,6 +34,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	LazyLoadHelper lazyLoadHelper;
 	GlobalApplicationState globalAppState;
 	
+	ReviewAccessorsButton manageAccessButton;
 	@Inject
 	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view,
 			AuthenticationController authController,
@@ -45,7 +46,8 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
 			LazyLoadHelper lazyLoadHelper,
-			GlobalApplicationState globalAppState) {
+			GlobalApplicationState globalAppState,
+			ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.dataAccessClient = dataAccessClient;
@@ -56,6 +58,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		this.createAccessRequirementButton = createAccessRequirementButton;
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		this.lazyLoadHelper = lazyLoadHelper;
+		this.manageAccessButton = manageAccessButton;
 		this.globalAppState = globalAppState;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
@@ -63,6 +66,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
 		view.setSubjectsWidget(subjectsWidget);
+		view.setManageAccessWidget(manageAccessButton);
 		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -93,6 +97,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		createAccessRequirementButton.configure(ar);
 		deleteAccessRequirementButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
+		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
 	}
 	

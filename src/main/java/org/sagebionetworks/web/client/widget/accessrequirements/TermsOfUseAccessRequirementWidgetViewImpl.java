@@ -39,6 +39,8 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 	Div deleteAccessRequirementContainer;
 	@UiField
 	Div subjectsWidgetContainer;
+	@UiField
+	Div manageAccessContainer;
 	Callback onAttachCallback;
 	public interface Binder extends UiBinder<Widget, TermsOfUseAccessRequirementWidgetViewImpl> {
 	}
@@ -144,4 +146,10 @@ public class TermsOfUseAccessRequirementWidgetViewImpl implements TermsOfUseAcce
 	public boolean isAttached() {
 		return w.isAttached();
 	}
+	@Override
+	public void setManageAccessWidget(IsWidget w) {
+		manageAccessContainer.clear();
+		manageAccessContainer.add(w);
+	}
+
 }

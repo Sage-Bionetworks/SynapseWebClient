@@ -953,7 +953,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.deleteAccessApprovals(accessRequirement, accessorId);
+			synapseClient.revokeAccessApprovals(accessRequirement, accessorId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -31,68 +32,38 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmissionsView {
+public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 
-	public interface ACTViewImplUiBinder extends UiBinder<Widget, ACTDataAccessSubmissionsViewImpl> {}
+	public interface ACTViewImplUiBinder extends UiBinder<Widget, ACTAccessApprovalsViewImpl> {}
 
 	@UiField
 	SimplePanel header;
 	@UiField
 	SimplePanel footer;
-	
 	@UiField
-	DropDownMenu stateDropdownMenu;
-	@UiField
-	DateTimePicker minDatePicker;
-	@UiField
-	DateTimePicker maxDatePicker;
-	
+	DateTimePicker expiresBeforeDatePicker;
 	@UiField
 	Div synAlertContainer;
 	@UiField
 	Div accessRequirementContainer;
 	@UiField
 	Div showHideAccessRequirementButtonContainer;
-	
 	@UiField
 	Div tableData;
 	@UiField
-	Button clearStateFilter;
-	@UiField
 	Button clearDateFilter;
-	
 	@UiField
-	Span currentState;
+	Button clearUserFilter;
+	@UiField
+	Button clearAccessRequirementFilter;
 	@UiField
 	Panel accessRequirementUI;
 	@UiField
-	Anchor createdOnColumnHeader;
+	Div userSelectContainer;
 	@UiField
-	CheckBox certifiedCheckbox;
+	Div currentUserContainer;
 	@UiField
-	CheckBox validatedCheckbox;
-	@UiField
-	CheckBox ducCheckbox;
-	@UiField
-	Div ducTemplateFileContainer;
-	@UiField
-	CheckBox irbCheckbox;
-	@UiField
-	CheckBox otherAttachmentsCheckbox;
-	@UiField
-	CheckBox intendedDataUsePublicCheckbox;
-	@UiField
-	Div subjectsContainer;
-	@UiField
-	AnchorListItem backLink;
-	@UiField
-	AnchorListItem reviewAccessorsLink;
-	@UiField
-	TextBox expirationPeriodTextbox;
-	@UiField
-	Well expirationDateUI;
-	@UiField
-	Strong expirationDate;
+	Button reviewRequestsButton;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -100,7 +71,7 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	
 	Widget widget;
 	@Inject
-	public ACTDataAccessSubmissionsViewImpl(ACTViewImplUiBinder binder,
+	public ACTAccessApprovalsViewImpl(ACTViewImplUiBinder binder,
 			Header headerWidget, 
 			Footer footerWidget
 			) {
@@ -110,46 +81,36 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-		backLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onBack();
-			}
-		});
-		clearStateFilter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClearStateFilter();
-			}
-		});
+		
 		clearDateFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onClearDateFilter();
+				presenter.onClearExpireBeforeFilter();
 			}
 		});
-		minDatePicker.addChangeDateHandler(new ChangeDateHandler() {
-			@Override
-			public void onChangeDate(ChangeDateEvent evt) {
-				presenter.onMinDateSelected(minDatePicker.getValue());;
-			}
-		});
-		maxDatePicker.addChangeDateHandler(new ChangeDateHandler() {
-			@Override
-			public void onChangeDate(ChangeDateEvent evt) {
-				presenter.onMaxDateSelected(maxDatePicker.getValue());;
-			}
-		});
-		createdOnColumnHeader.addClickHandler(new ClickHandler() {
+		clearUserFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onCreatedOnClick();
+				presenter.onClearUserFilter();
 			}
 		});
-		reviewAccessorsLink.addClickHandler(new ClickHandler() {
+		clearAccessRequirementFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onReviewAccessors();
+				presenter.onClearAccessRequirementFilter();
+			}
+		});
+		
+		expiresBeforeDatePicker.addChangeDateHandler(new ChangeDateHandler() {
+			@Override
+			public void onChangeDate(ChangeDateEvent evt) {
+				presenter.onExpiresBeforeDateSelected(expiresBeforeDatePicker.getValue());
+			}
+		});
+		reviewRequestsButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onReviewRequests();
 			}
 		});
 	}
@@ -188,36 +149,13 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	public void clear() {		
 	}
 	@Override
-	public void setSelectedStateText(String state) {
-		currentState.setText(state);
-	}
-	@Override
-	public void setSelectedMaxDate(Date date) {
-		maxDatePicker.setValue(date);
-	}
-	@Override
-	public void setSelectedMinDate(Date date) {
-		minDatePicker.setValue(date);
+	public void setExpiresBeforeDate(Date date) {
+		expiresBeforeDatePicker.setValue(date);
 	}
 	
 	@Override
 	public Widget asWidget() {
 		return widget;
-	}
-	
-	@Override
-	public void setStates(List<String> states) {
-		stateDropdownMenu.clear();
-		for (final String state : states) {
-			AnchorListItem item = new AnchorListItem(state);
-			item.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.onStateSelected(state);
-				}
-			});
-			stateDropdownMenu.add(item);
-		}
 	}
 	
 	@Override
@@ -241,53 +179,21 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 		showHideAccessRequirementButtonContainer.clear();
 		showHideAccessRequirementButtonContainer.add(button);
 	}
-	
-	@Override
-	public void setAreOtherAttachmentsRequired(boolean value) {
-		otherAttachmentsCheckbox.setValue(value);
-	}
 
 	@Override
-	public void setIsCertifiedUserRequired(boolean value) {
-		certifiedCheckbox.setValue(value);
-	}
-
-	@Override
-	public void setIsDUCRequired(boolean value) {
-		ducCheckbox.setValue(value);
-	}
-
-	@Override
-	public void setIsIDUPublic(boolean value) {
-		intendedDataUsePublicCheckbox.setValue(value);
-	}
-
-	@Override
-	public void setIsIRBApprovalRequired(boolean value) {
-		irbCheckbox.setValue(value);
-	}
-
-	@Override
-	public void setIsValidatedProfileRequired(boolean value) {
-		validatedCheckbox.setValue(value);
-	}
-	@Override
-	public void setSubjectsWidget(IsWidget w) {
-		subjectsContainer.clear();
-		subjectsContainer.add(w);
-	}
-	@Override
-	public void setExpirationPeriod(Long value) {
-		expirationPeriodTextbox.setValue(value.toString());
+	public void setUserPickerWidget(IsWidget w) {
+		userSelectContainer.clear();
+		userSelectContainer.add(w);
 	}
 	
 	@Override
-	public void setProjectedExpirationDate(String date) {
-		expirationDate.setText(date);
+	public void setSelectedUserBadge(IsWidget w) {
+		currentUserContainer.clear();
+		currentUserContainer.add(w);
 	}
-	
+
 	@Override
-	public void setProjectedExpirationDateVisible(boolean visible) {
-		expirationDateUI.setVisible(visible);
+	public void setSelectedUserBadgeVisible(boolean visible) {
+		currentUserContainer.setVisible(visible);
 	}
 }

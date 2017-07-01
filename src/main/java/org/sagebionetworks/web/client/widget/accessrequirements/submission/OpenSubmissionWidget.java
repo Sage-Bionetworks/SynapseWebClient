@@ -38,7 +38,7 @@ public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter,
 		view.setSynAlert(synAlert);
 		accessRequirementWidget.hideButtons();
 		view.setACTAccessRequirementWidget(accessRequirementWidget);
-		accessRequirementWidget.setManageAccessVisible(true);
+		accessRequirementWidget.setReviewAccessRequestsVisible(true);
 		view.setPresenter(this);
 		Callback loadDataCallback = new Callback() {
 			@Override

@@ -24,6 +24,7 @@ public interface TermsOfUseAccessRequirementWidgetView extends IsWidget, Support
 	void setEditAccessRequirementWidget(IsWidget w);
 	void setDeleteAccessRequirementWidget(IsWidget w);
 	void setSubjectsWidget(IsWidget w);
+	void setManageAccessWidget(IsWidget w);
 	/**
 	 * Presenter interface
 	 */

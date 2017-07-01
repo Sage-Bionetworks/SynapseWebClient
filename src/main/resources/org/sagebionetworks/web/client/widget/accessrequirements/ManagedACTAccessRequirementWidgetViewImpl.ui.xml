@@ -34,6 +34,7 @@
 			</bh:Div>
 			<bh:ClearFix />
 			<bh:Div addStyleNames="margin-top-5">
+				<bh:Div ui:field="reviewAccessRequestsContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
 				<bh:Div ui:field="manageAccessContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
 				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />
 				<bh:Div ui:field="deleteAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5 margin-top-5" />

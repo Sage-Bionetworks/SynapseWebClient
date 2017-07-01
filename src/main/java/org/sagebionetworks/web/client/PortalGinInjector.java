@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionDashboardPresenter;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter;
 import org.sagebionetworks.web.client.presenter.ACTPresenter;
@@ -44,8 +45,10 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
@@ -316,6 +319,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ACTDataAccessSubmissionDashboardPresenter getACTDataAccessSubmissionDashboardPresenter();
 	public SynapseForumPresenter getSynapseForumPresenter();
 	public SubscriptionPresenter getSubscriptionPresenter();
+	public ACTAccessApprovalsPresenter getACTAccessApprovalsPresenter();
 	
 	/*
 	 *  Markdown Widgets
@@ -542,4 +546,6 @@ public interface PortalGinInjector extends Ginjector {
 	public ACTDataAccessSubmissionWidget getACTDataAccessSubmissionWidget();
 	public OpenSubmissionWidget getOpenSubmissionWidget();
 	public DateTimeUtils getDateTimeUtils();
+	public AccessorGroupWidget getAccessorGroupWidget();
+	public AccessRequirementWidget getAccessRequirementWidget();
 }

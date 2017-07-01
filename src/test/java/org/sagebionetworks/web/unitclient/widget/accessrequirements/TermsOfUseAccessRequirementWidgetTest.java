@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidgetView;
@@ -70,6 +71,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	@Mock
 	BasicAccessRequirementStatus mockDataAccessSubmissionStatus;
 	@Mock
+	ReviewAccessorsButton mockManageAccessButton;
 	GlobalApplicationState mockGlobalApplicationState;
 	
 	Callback lazyLoadDataCallback;
@@ -88,7 +90,8 @@ public class TermsOfUseAccessRequirementWidgetTest {
 				mockCreateAccessRequirementButton, 
 				mockDeleteAccessRequirementButton, 
 				mockLazyLoadHelper,
-				mockGlobalApplicationState);
+				mockGlobalApplicationState,
+				mockManageAccessButton);
 		when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));

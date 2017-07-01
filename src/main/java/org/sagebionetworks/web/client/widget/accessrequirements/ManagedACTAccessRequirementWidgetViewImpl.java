@@ -45,6 +45,8 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	@UiField
 	Div deleteAccessRequirementContainer;
 	@UiField
+	Div reviewAccessRequestsContainer;
+	@UiField
 	Div manageAccessContainer;
 	
 	@UiField
@@ -219,6 +221,11 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 		manageAccessContainer.add(w);
 	}
 	@Override
+	public void setReviewAccessRequestsWidget(IsWidget w) {
+		reviewAccessRequestsContainer.clear();
+		reviewAccessRequestsContainer.add(w);
+	}
+	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
@@ -237,13 +244,14 @@ public class ManagedACTAccessRequirementWidgetViewImpl implements ManagedACTAcce
 	}
 	
 	@Override
-	public void setManageAccessWidgetContainerVisible(boolean visible) {
-		manageAccessContainer.setVisible(visible);
+	public void setReviewAccessRequestsWidgetContainerVisible(boolean visible) {
+		reviewAccessRequestsContainer.setVisible(visible);
 	}
 	
 	@Override
 	public void hideButtonContainers() {
 		manageAccessContainer.setVisible(false);
+		reviewAccessRequestsContainer.setVisible(false);
 		editAccessRequirementContainer.setVisible(false);
 		deleteAccessRequirementContainer.setVisible(false);
 		cancelRequestButtonContainer.setVisible(false);
