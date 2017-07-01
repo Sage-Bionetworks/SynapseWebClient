@@ -74,13 +74,13 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 	private void showRenew() {
 		accessType = AccessType.RENEW_ACCESS;
 		dropdown.setText(renew.getText());
-		userBadgeContainer.removeStyleName("strikeout-links");
+		userBadgeContainer.removeStyleName("strikeout-links lightgrey-links");
 	}
 	
 	private void showRevoke() {
 		accessType = AccessType.REVOKE_ACCESS;
 		dropdown.setText(revoke.getText());
-		userBadgeContainer.addStyleName("strikeout-links");
+		userBadgeContainer.addStyleName("strikeout-links lightgrey-links");
 	}
 	
 	public UserBadgeItem configure(AccessorChange change) {
