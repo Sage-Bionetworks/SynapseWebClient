@@ -65,6 +65,8 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.unmetAccessRequirementsDiv = unmetAccessRequirementsDiv;
 		view.addAboveBody(synAlert);
 		view.addAboveBody(createAccessRequirementButton);
+		unmetAccessRequirementsDiv.addStyleName("min-height-200");
+		metAccessRequirementsDiv.addStyleName("min-height-200");
 		view.add(unmetAccessRequirementsDiv.asWidget());
 		view.add(metAccessRequirementsDiv.asWidget());
 		view.addTitle("All conditions for ");
