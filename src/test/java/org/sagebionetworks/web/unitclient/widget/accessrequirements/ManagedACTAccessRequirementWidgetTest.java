@@ -169,6 +169,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 	@Test
 	public void testApprovedState() {
 		widget.setRequirement(mockACTAccessRequirement);
+		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
 		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.APPROVED);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();
@@ -184,6 +185,7 @@ public class ManagedACTAccessRequirementWidgetTest {
 		when(mockDataAccessSubmissionStatus.getExpiredOn()).thenReturn(new Date());
 		when(mockDateTimeUtils.getLongFriendlyDate(any(Date.class))).thenReturn(friendlyDate);
 		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.APPROVED);
+		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();
 		verify(mockView).showRequestApprovedMessage();
@@ -205,11 +207,24 @@ public class ManagedACTAccessRequirementWidgetTest {
 	
 	@Test
 	public void testCancelledState() {
+		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
 		widget.setRequirement(mockACTAccessRequirement);
 		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.CANCELLED);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showUnapprovedHeading();
 		verify(mockView).showRequestAccessButton();
+	}
+	
+	@Test
+	public void testCancelledStatePreviouslyApproved() {
+		// see SWC-3686
+		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
+		widget.setRequirement(mockACTAccessRequirement);
+		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.CANCELLED);
+		lazyLoadDataCallback.invoke();
+		verify(mockView).showApprovedHeading();
+		verify(mockView).showRequestApprovedMessage();
+		verify(mockView).showUpdateRequestButton();
 	}
 	
 	@Test

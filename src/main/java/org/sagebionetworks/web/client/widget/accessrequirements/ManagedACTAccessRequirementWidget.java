@@ -138,13 +138,6 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 					submitterUserBadge.configure(submitterUserId);
 					view.showRequestSubmittedByOtherUser();
 				}
-				
-				break;
-			case APPROVED:
-				showApproved();
-				if (status.getExpiredOn() != null) {
-					view.showExpirationDate(dateTimeUtils.getLongFriendlyDate(status.getExpiredOn()));
-				}
 				break;
 			case REJECTED:
 				view.showUnapprovedHeading();
@@ -152,8 +145,16 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 				view.showUpdateRequestButton();
 				break;
 			case CANCELLED:
+			case APPROVED:
 			default:
-				showUnapproved();
+				if (status.getIsApproved()) {
+					showApproved();
+					if (status.getExpiredOn() != null) {
+						view.showExpirationDate(dateTimeUtils.getLongFriendlyDate(status.getExpiredOn()));
+					}
+				} else {
+					showUnapproved();	
+				}
 				break;
 		}
 	}
