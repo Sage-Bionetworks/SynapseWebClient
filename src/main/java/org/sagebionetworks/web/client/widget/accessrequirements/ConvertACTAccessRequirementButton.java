@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementConversionRequest;
@@ -20,10 +21,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler {
-	public static final String CONVERT_TO_MANAGED = "Convert to Managed";
+	public static final String CONVERT_TO_MANAGED = "Migrate";
 	public Button button;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
-	AccessRequirement ar;
+	ACTAccessRequirement ar;
 	PopupUtilsView popupUtils;
 	DataAccessClientAsync dataAccessClient;
 	GlobalApplicationState globalAppState;
@@ -41,21 +42,26 @@ public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler
 		button.setVisible(false);
 		button.addStyleName("margin-left-10");
 		button.setType(ButtonType.WARNING);
+		button.setIcon(IconType.HAND_SPOCK_O);
 		button.setText(CONVERT_TO_MANAGED);
 		button.addClickHandler(this);
 	}	
 	
 	@Override
 	public void onClick(ClickEvent event) {
-		// confirm
-		popupUtils.showConfirmDialog("Convert?", "Are you sure you want to convert this Controlled access requirement so that requests should now be handled in Synapse?  Have you tested this action on our staging stack?", 
-				new Callback() {
-			@Override
-			public void invoke() {
-				// confirmed
-				convertAccessRequirement();
-			}
-		});
+		if (ar.getActContactInfo() != null && ar.getActContactInfo().trim().length() > 0) {
+			popupUtils.showErrorMessage("Sorry, you have to delete the old (html) instructions before it can be converted.  Edit the Access Requirement, add a wiki, then delete the old instructions.");			
+		} else {
+			// confirm
+			popupUtils.showConfirmDialog("Are you sure you want to migrate this Access Requirement?", "Clicking OK will change this access requirement so that new data access requests will be handled within Synapse (no longer through Jira/email/spreadsheets). Please test the migration on staging (staging.synapse.org) before running on production (www.synapse.org). THIS ACTION CANNOT BE UNDONE.", 
+					new Callback() {
+				@Override
+				public void invoke() {
+					// confirmed
+					convertAccessRequirement();
+				}
+			});
+		}
 	}
 	
 	public void convertAccessRequirement() {
