@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.MembershipInvitation;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -27,13 +28,16 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 	private PortalGinInjector ginInjector;
 	private Callback teamUpdatedCallback, refreshCallback;
 	private SynapseAlert synAlert;
+	DateTimeUtils dateTimeUtils;
+	
 	@Inject
 	public OpenTeamInvitationsWidget(OpenTeamInvitationsWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalApplicationState, 
 			AuthenticationController authenticationController,
 			PortalGinInjector ginInjector,
-			SynapseAlert synAlert
+			SynapseAlert synAlert,
+			DateTimeUtils dateTimeUtils
 			) {
 		this.view = view;
 		this.synAlert = synAlert;
@@ -87,9 +91,13 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 			if (invite.getMessage() != null) {
 				invitationMessage = invite.getMessage();
 			}
+			String createdOnString = "";
+			if (invite.getCreatedOn() != null) {
+				createdOnString = dateTimeUtils.convertDateToSimpleString(invite.getCreatedOn());
+			}
 			JoinTeamWidget joinButton = ginInjector.getJoinTeamWidget();
 			joinButton.configure(b.getTeam().getId(), refreshCallback);
-			view.addTeamInvite(b.getTeam(), invitationMessage, joinButton.asWidget());
+			view.addTeamInvite(b.getTeam(), invitationMessage, createdOnString, joinButton.asWidget());
 		}
 	}
 	

@@ -12,6 +12,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -50,7 +51,7 @@ public class OpenTeamInvitationsWidgetViewImpl implements OpenTeamInvitationsWid
 	}
 	
 	@Override
-	public void addTeamInvite(Team team, String inviteMessage, Widget joinButtonWidget) {
+	public void addTeamInvite(Team team, String inviteMessage, String createdOn, Widget joinButtonWidget) {
 		mainContainer.setVisible(true);
 		FlowPanel lc = new FlowPanel();
 		BigTeamBadge teamRenderer = ginInjector.getBigTeamBadgeWidget();
@@ -58,12 +59,14 @@ public class OpenTeamInvitationsWidgetViewImpl implements OpenTeamInvitationsWid
 		Column teamBadgeColumn = new Column(ColumnSize.XS_8, ColumnSize.SM_9, ColumnSize.MD_10);
 		teamBadgeColumn.addStyleName("margin-top-15");
 		teamBadgeColumn.add(teamRenderer.asWidget());
+		teamBadgeColumn.add(new Label(createdOn));
 		joinButtonWidget.addStyleName("right margin-top-15 margin-right-15");
 		
 		Column buttonContainer = new Column(ColumnSize.XS_4, ColumnSize.SM_3, ColumnSize.MD_2);
 		buttonContainer.add(joinButtonWidget);
 		lc.add(teamBadgeColumn);
 		lc.add(buttonContainer);
+		
 		singleRow.add(lc);
 	}
 	

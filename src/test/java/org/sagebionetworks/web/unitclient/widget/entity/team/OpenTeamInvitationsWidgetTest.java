@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -23,6 +24,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -59,7 +61,9 @@ public class OpenTeamInvitationsWidgetTest {
 	CallbackP<List<OpenUserInvitationBundle>> mockOpenTeamInvitationsCallback;
 	@Mock
 	SynapseAlert mockSynapseAlert;
-	
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
+	public static final String FORMATTED_DATE = "Today";
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -70,7 +74,13 @@ public class OpenTeamInvitationsWidgetTest {
 		mockTeamUpdatedCallback = mock(Callback.class);
 		mockPortalGinInjector = mock(PortalGinInjector.class);
 		mockJoinTeamWidget = mock(JoinTeamWidget.class);
-		widget = new OpenTeamInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockPortalGinInjector, mockSynapseAlert);
+		widget = new OpenTeamInvitationsWidget(mockView, 
+				mockSynapseClient, 
+				mockGlobalApplicationState, 
+				mockAuthenticationController, 
+				mockPortalGinInjector, 
+				mockSynapseAlert,
+				mockDateTimeUtils);
 		testTeam = new Team();
 		testTeam.setId(teamId);
 		testTeam.setName("Bob's Team");
@@ -78,7 +88,9 @@ public class OpenTeamInvitationsWidgetTest {
 		testInvite.setTeamId(teamId);
 		testInvite.setUserId("42");
 		testInvite.setMessage("This is a test invite");
+		testInvite.setCreatedOn(new Date());
 		
+		when(mockDateTimeUtils.convertDateToSimpleString(any(Date.class))).thenReturn(FORMATTED_DATE);
 		testReturn = new ArrayList<OpenUserInvitationBundle>();
 		OpenUserInvitationBundle mib = new OpenUserInvitationBundle();
 		mib.setTeam(testTeam);
@@ -98,7 +110,7 @@ public class OpenTeamInvitationsWidgetTest {
 	public void testConfigure() throws Exception {
 		widget.configure(mockTeamUpdatedCallback, mockOpenTeamInvitationsCallback);
 		verify(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
-		verify(mockView).addTeamInvite(any(Team.class), any(String.class), any(Widget.class));
+		verify(mockView).addTeamInvite(any(Team.class), any(String.class), eq(FORMATTED_DATE), any(Widget.class));
 		verify(mockPortalGinInjector).getJoinTeamWidget();
 		ArgumentCaptor<Callback> refreshCallbackCaptor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockJoinTeamWidget).configure(eq(teamId), refreshCallbackCaptor.capture());
@@ -113,7 +125,7 @@ public class OpenTeamInvitationsWidgetTest {
 		refreshCallback.invoke();
 		verify(mockTeamUpdatedCallback).invoke();
 		verify(mockSynapseClient, times(2)).getOpenInvitations(anyString(), any(AsyncCallback.class));
-		verify(mockView, times(2)).addTeamInvite(any(Team.class), any(String.class), any(Widget.class));
+		verify(mockView, times(2)).addTeamInvite(any(Team.class), any(String.class), eq(FORMATTED_DATE), any(Widget.class));
 		verify(mockPortalGinInjector, times(2)).getJoinTeamWidget();
 		verify(mockJoinTeamWidget, times(2)).configure(eq(teamId), any(Callback.class));
 	}
