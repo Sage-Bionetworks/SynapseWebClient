@@ -8,6 +8,8 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirementInterface;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 
@@ -65,7 +67,7 @@ public class GovernanceServiceHelper {
 	 */
 	public static APPROVAL_TYPE accessRequirementApprovalType(AccessRequirement ar) {
 		if (ar==null) return APPROVAL_TYPE.NONE;
-		if (ar instanceof TermsOfUseAccessRequirement) return APPROVAL_TYPE.USER_AGREEMENT;
+		if (ar instanceof TermsOfUseAccessRequirement || ar instanceof SelfSignAccessRequirement) return APPROVAL_TYPE.USER_AGREEMENT;
 		if (ar instanceof ACTAccessRequirement || ar instanceof LockAccessRequirement) return APPROVAL_TYPE.ACT_APPROVAL;
 		if (ar instanceof PostMessageContentAccessRequirement) return APPROVAL_TYPE.POST_MESSAGE;
 		throw new IllegalArgumentException("Unexpected access requirement type "+ar.getClass());
@@ -83,7 +85,7 @@ public class GovernanceServiceHelper {
 		RESTRICTION_LEVEL ans = RESTRICTION_LEVEL.OPEN;
 		if (allARs==null) return ans;
 		for (AccessRequirement ar : allARs) {
-			if (ar instanceof TermsOfUseAccessRequirement) {
+			if (ar instanceof SelfSignAccessRequirementInterface) {
 				if (ans==RESTRICTION_LEVEL.OPEN) ans=RESTRICTION_LEVEL.RESTRICTED;
 			} else if (ar instanceof ACTAccessRequirement || ar instanceof LockAccessRequirement) {
 				ans=RESTRICTION_LEVEL.CONTROLLED;
@@ -94,7 +96,7 @@ public class GovernanceServiceHelper {
 	
 	public static RESTRICTION_LEVEL getRestrictionLevel(AccessRequirement ar) {
 		RESTRICTION_LEVEL ans = RESTRICTION_LEVEL.OPEN;
-		if (ar instanceof TermsOfUseAccessRequirement) {
+		if (ar instanceof SelfSignAccessRequirementInterface) {
 			if (ans==RESTRICTION_LEVEL.OPEN) ans=RESTRICTION_LEVEL.RESTRICTED;
 		} else if (ar instanceof ACTAccessRequirement || ar instanceof LockAccessRequirement) {
 			ans=RESTRICTION_LEVEL.CONTROLLED;
@@ -103,7 +105,7 @@ public class GovernanceServiceHelper {
 	}
 	
 	public static String getAccessRequirementText(AccessRequirement ar) {
-		if (ar==null || ar instanceof ManagedACTAccessRequirement) return "";
+		if (ar==null || ar instanceof ManagedACTAccessRequirement || ar instanceof SelfSignAccessRequirement) return "";
 		if (ar instanceof TermsOfUseAccessRequirement) {
 			return ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
 		} else if (ar instanceof ACTAccessRequirement) {

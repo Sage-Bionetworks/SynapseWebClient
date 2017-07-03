@@ -11,9 +11,9 @@ import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirementInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -331,7 +331,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 			//pop up the requirement
 			progressWidget.configure(currentPage, getTotalPageCount());
 			
-			if (accessRequirement instanceof TermsOfUseAccessRequirement || 
+			if (accessRequirement instanceof SelfSignAccessRequirementInterface || 
 					accessRequirement instanceof ACTAccessRequirement ||
 					accessRequirement instanceof ManagedACTAccessRequirement) {
 				String text = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);

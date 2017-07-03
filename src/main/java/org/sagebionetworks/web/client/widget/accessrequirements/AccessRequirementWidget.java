@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -73,6 +74,10 @@ public class AccessRequirementWidget implements IsWidget{
 		} else if (requirement instanceof TermsOfUseAccessRequirement) {
 			TermsOfUseAccessRequirementWidget w = ginInjector.getTermsOfUseAccessRequirementWidget();
 			w.setRequirement((TermsOfUseAccessRequirement) requirement);
+			div.add(w);
+		} else if (requirement instanceof SelfSignAccessRequirement) {
+			SelfSignAccessRequirementWidget w = ginInjector.getSelfSignAccessRequirementWidget();
+			w.setRequirement((SelfSignAccessRequirement) requirement);
 			div.add(w);
 		} else if (requirement instanceof LockAccessRequirement) {
 			LockAccessRequirementWidget w = ginInjector.getLockAccessRequirementWidget();
