@@ -129,7 +129,7 @@ public class OpenTeamInvitationsWidgetTest {
 		verify(mockPortalGinInjector, times(2)).getJoinTeamWidget();
 		verify(mockJoinTeamWidget, times(2)).configure(eq(teamId), any(Callback.class));
 	}
-	
+	@Test
 	public void testConfigureFailureGetOpenInvites() throws Exception {
 		Exception ex = new Exception("unhandled exception");
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));

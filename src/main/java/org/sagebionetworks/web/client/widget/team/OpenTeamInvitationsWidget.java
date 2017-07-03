@@ -47,6 +47,7 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.ginInjector = ginInjector;
+		this.dateTimeUtils = dateTimeUtils;
 		this.refreshCallback = new Callback() {
 			@Override
 			public void invoke() {
