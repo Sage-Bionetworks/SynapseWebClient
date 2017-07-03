@@ -21,6 +21,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler {
+	public static final String SUCCESS_MESSAGE = "Successfully converted access requirement";
+	public static final String CONVERT_AR_CONFIRM_TITLE = "Are you sure you want to migrate this Access Requirement?";
+	public static final String CONVERT_AR_CONFIRM_MESSAGE = "Clicking OK will change this access requirement so that new data access requests will be handled within Synapse (no longer through Jira/email/spreadsheets). Please test the migration on staging (staging.synapse.org) before running on production (www.synapse.org). THIS ACTION CANNOT BE UNDONE.";
+	public static final String DELETE_OLD_INSTRUCTIONS_MESSAGE = "Sorry, you have to delete the old (html) instructions before it can be converted.  Edit the Access Requirement, add a wiki, then delete the old instructions.";
 	public static final String CONVERT_TO_MANAGED = "Migrate";
 	public Button button;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
@@ -47,13 +51,27 @@ public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler
 		button.addClickHandler(this);
 	}	
 	
+	public void configure(ACTAccessRequirement ar) {
+		this.ar = ar;
+		showIfACTMember();	
+	}
+	
+	private void showIfACTMember() {
+		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
+			@Override
+			public void invoke(Boolean isACTMember) {
+				button.setVisible(isACTMember);
+			}
+		});
+	}
+	
 	@Override
 	public void onClick(ClickEvent event) {
 		if (ar.getActContactInfo() != null && ar.getActContactInfo().trim().length() > 0) {
-			popupUtils.showErrorMessage("Sorry, you have to delete the old (html) instructions before it can be converted.  Edit the Access Requirement, add a wiki, then delete the old instructions.");			
+			popupUtils.showErrorMessage(DELETE_OLD_INSTRUCTIONS_MESSAGE);			
 		} else {
 			// confirm
-			popupUtils.showConfirmDialog("Are you sure you want to migrate this Access Requirement?", "Clicking OK will change this access requirement so that new data access requests will be handled within Synapse (no longer through Jira/email/spreadsheets). Please test the migration on staging (staging.synapse.org) before running on production (www.synapse.org). THIS ACTION CANNOT BE UNDONE.", 
+			popupUtils.showConfirmDialog(CONVERT_AR_CONFIRM_TITLE, CONVERT_AR_CONFIRM_MESSAGE, 
 					new Callback() {
 				@Override
 				public void invoke() {
@@ -73,27 +91,13 @@ public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler
 			
 			@Override
 			public void onSuccess(AccessRequirement result) {
-				popupUtils.showInfo("Successfully converted access requirement", "");
+				popupUtils.showInfo(SUCCESS_MESSAGE, "");
 				globalAppState.refreshPage();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				popupUtils.showErrorMessage(caught.getMessage());
-			}
-		});
-	}
-	
-	public void configure(ACTAccessRequirement ar) {
-		this.ar = ar;
-		showIfACTMember();	
-	}
-	
-	private void showIfACTMember() {
-		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
-			@Override
-			public void invoke(Boolean isACTMember) {
-				button.setVisible(isACTMember);
 			}
 		});
 	}
