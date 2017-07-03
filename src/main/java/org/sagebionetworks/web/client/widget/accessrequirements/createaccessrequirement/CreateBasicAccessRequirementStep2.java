@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements.createaccessreq
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.HasAccessorRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -70,7 +71,7 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 		boolean isExistOldTermsOfUse = oldTerms != null;
 		view.setOldTermsVisible(isExistOldTermsOfUse);
 		view.setOldTerms(isExistOldTermsOfUse ? oldTerms : "");
-				
+		view.setHasAccessorRequirementUIVisible(accessRequirement instanceof HasAccessorRequirement);
 		configureWiki();
 	}
 	
@@ -119,8 +120,22 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 	
 	@Override
 	public void onPrimary() {
-		//can update wiki only
-		modalPresenter.onFinished();
+		if (accessRequirement instanceof HasAccessorRequirement) {
+			// update AR
+			synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+				}
+				@Override
+				public void onSuccess(AccessRequirement result) {
+					modalPresenter.onFinished();		
+				}
+			});
+		} else {
+			//can update wiki only
+			modalPresenter.onFinished();
+		}
 	}
 
 	@Override

@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -137,7 +138,7 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 			} else if (view.isManagedACTAccessRequirementType()) {
 				accessRequirement = new ManagedACTAccessRequirement();
 			} else {
-				accessRequirement = new TermsOfUseAccessRequirement();
+				accessRequirement = new SelfSignAccessRequirement();
 			}
 		}
 		accessRequirement.setAccessType(currentAccessType);
