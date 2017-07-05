@@ -72,6 +72,11 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 		view.setOldTermsVisible(isExistOldTermsOfUse);
 		view.setOldTerms(isExistOldTermsOfUse ? oldTerms : "");
 		view.setHasAccessorRequirementUIVisible(accessRequirement instanceof HasAccessorRequirement);
+		if (accessRequirement instanceof HasAccessorRequirement) {
+			HasAccessorRequirement hasAccessorRequirement = (HasAccessorRequirement) accessRequirement;
+			view.setIsCertifiedUserRequired(hasAccessorRequirement.getIsCertifiedUserRequired());
+			view.setIsValidatedProfileRequired(hasAccessorRequirement.getIsValidatedProfileRequired());
+		}
 		configureWiki();
 	}
 	
@@ -121,7 +126,10 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 	@Override
 	public void onPrimary() {
 		if (accessRequirement instanceof HasAccessorRequirement) {
+			HasAccessorRequirement hasAccessorRequirement = (HasAccessorRequirement) accessRequirement;
 			// update AR
+			hasAccessorRequirement.setIsCertifiedUserRequired(view.isCertifiedUserRequired());
+			hasAccessorRequirement.setIsValidatedProfileRequired(view.isValidatedProfileRequired());
 			synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {
 				@Override
 				public void onFailure(Throwable caught) {

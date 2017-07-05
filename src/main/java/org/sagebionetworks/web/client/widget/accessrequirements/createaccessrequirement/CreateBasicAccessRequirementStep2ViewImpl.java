@@ -86,15 +86,22 @@ public class CreateBasicAccessRequirementStep2ViewImpl implements CreateBasicAcc
 	}
 	
 	@Override
-	public boolean isCertifiedOnly() {
+	public boolean isCertifiedUserRequired() {
 		return certifiedCheckbox.getValue();
+	}
+	@Override
+	public void setIsCertifiedUserRequired(boolean value) {
+		certifiedCheckbox.setValue(value);
 	}
 	
 	@Override
-	public boolean isValidatedProfileOnly() {
+	public boolean isValidatedProfileRequired() {
 		return validatedCheckbox.getValue();
 	}
-	
+	@Override
+	public void setIsValidatedProfileRequired(boolean value) {
+		validatedCheckbox.setValue(value);
+	}
 	@Override
 	public void setHasAccessorRequirementUIVisible(boolean visible) {
 		hasAccessorRequirementUI.setVisible(visible);
