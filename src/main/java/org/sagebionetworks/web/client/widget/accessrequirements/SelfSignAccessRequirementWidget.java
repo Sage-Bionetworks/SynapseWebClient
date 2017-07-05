@@ -26,6 +26,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class SelfSignAccessRequirementWidget implements SelfSignAccessRequirementWidgetView.Presenter, IsWidget {
+	public static final String GET_VALIDATED_PROFILE_PAGE = "accounts_certified_users_and_profile_validation.html#validated-profile";
+	public static final String GET_CERTIFIED_PAGE = "accounts_certified_users_and_profile_validation.html#certified-users";
 	private SelfSignAccessRequirementWidgetView view;
 	SynapseClientAsync synapseClient;
 	DataAccessClientAsync dataAccessClient;
@@ -192,11 +194,11 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 	
 	@Override
 	public void onCertify() {
-		popupUtils.openInNewWindow(WebConstants.DOCS_URL + "accounts_certified_users_and_profile_validation.html#certified-users");
+		popupUtils.openInNewWindow(WebConstants.DOCS_URL + GET_CERTIFIED_PAGE);
 	}
 	
 	@Override
 	public void onValidateProfile() {
-		popupUtils.openInNewWindow(WebConstants.DOCS_URL + "accounts_certified_users_and_profile_validation.html#validated-profile");
+		popupUtils.openInNewWindow(WebConstants.DOCS_URL + GET_VALIDATED_PROFILE_PAGE);
 	}
 }
