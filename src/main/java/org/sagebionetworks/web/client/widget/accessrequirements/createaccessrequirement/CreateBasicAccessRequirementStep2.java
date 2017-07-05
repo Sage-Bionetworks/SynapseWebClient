@@ -68,7 +68,7 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 		this.accessRequirement = accessRequirement;
 		wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
 		String oldTerms = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
-		boolean isExistOldTermsOfUse = oldTerms != null;
+		boolean isExistOldTermsOfUse = oldTerms != null && oldTerms.length() > 0;
 		view.setOldTermsVisible(isExistOldTermsOfUse);
 		view.setOldTerms(isExistOldTermsOfUse ? oldTerms : "");
 		view.setHasAccessorRequirementUIVisible(accessRequirement instanceof HasAccessorRequirement);
