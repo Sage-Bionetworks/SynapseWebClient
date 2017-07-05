@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -21,6 +22,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.Presenter, IsWidget {
+	public static final String RECEIVED = "received ";
 	private OpenTeamInvitationsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
@@ -94,7 +96,7 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 			}
 			String createdOnString = "";
 			if (invite.getCreatedOn() != null) {
-				createdOnString = dateTimeUtils.convertDateToSimpleString(invite.getCreatedOn());
+				createdOnString = RECEIVED + dateTimeUtils.getRelativeTime(invite.getCreatedOn());
 			}
 			JoinTeamWidget joinButton = ginInjector.getJoinTeamWidget();
 			joinButton.configure(b.getTeam().getId(), refreshCallback);

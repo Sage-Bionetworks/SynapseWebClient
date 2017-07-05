@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.constants.ColumnSize;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -59,7 +60,9 @@ public class OpenTeamInvitationsWidgetViewImpl implements OpenTeamInvitationsWid
 		Column teamBadgeColumn = new Column(ColumnSize.XS_8, ColumnSize.SM_9, ColumnSize.MD_10);
 		teamBadgeColumn.addStyleName("margin-top-15");
 		teamBadgeColumn.add(teamRenderer.asWidget());
-		teamBadgeColumn.add(new Label(createdOn));
+		Span createdOnSpan = new Span();
+		createdOnSpan.setText(createdOn);
+		teamBadgeColumn.add(createdOnSpan);
 		joinButtonWidget.addStyleName("right margin-top-15 margin-right-15");
 		
 		Column buttonContainer = new Column(ColumnSize.XS_4, ColumnSize.SM_3, ColumnSize.MD_2);
