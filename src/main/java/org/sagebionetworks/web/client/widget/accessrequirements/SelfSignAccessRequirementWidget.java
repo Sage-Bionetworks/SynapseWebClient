@@ -180,6 +180,7 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 		AccessApproval approval = new AccessApproval();
 		approval.setAccessorId(authController.getCurrentUserPrincipalId());
 		approval.setRequirementId(ar.getId());
+		approval.setRequirementVersion(ar.getVersionNumber());
 		synapseClient.createAccessApproval(approval, callback);
 	}
 	

@@ -6,6 +6,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
 import static org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidget.*;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
@@ -87,11 +89,17 @@ public class SelfSignAccessRequirementWidgetTest {
 	UserProfileClientAsync mockUserProfileClient;
 	@Mock
 	UserBundle mockUserBundle;
+	@Mock
+	AccessApproval mockAccessApproval;
+	@Captor
+	ArgumentCaptor<AccessApproval> accessApprovalCaptor;
 	
 	Callback lazyLoadDataCallback;
 
 	public final static String ROOT_WIKI_ID = "777";
 	public final static String CURRENT_USER_ID = "6823";
+	public final static Long AR_ID = 8999L;
+	public final static Long AR_VERSION = 2L;
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
@@ -110,6 +118,8 @@ public class SelfSignAccessRequirementWidgetTest {
 				mockManageAccessButton,
 				mockPopupUtils,
 				mockUserProfileClient);
+		when(mockAccessRequirement.getId()).thenReturn(AR_ID);
+		when(mockAccessRequirement.getVersionNumber()).thenReturn(AR_VERSION);
 		when(mockAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
@@ -209,7 +219,48 @@ public class SelfSignAccessRequirementWidgetTest {
 		verify(mockView, never()).showGetProfileValidatedUI();
 		verify(mockView, never()).showSignTermsButton();
 	}
+
+	@Test
+	public void testGetUserBundleFailure() {
+		Exception ex = new Exception("error getting user bundle");
+		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		when(mockAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
+		widget.setRequirement(mockAccessRequirement);
+		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
+		
+		lazyLoadDataCallback.invoke();
+		
+		verify(mockSynAlert).handleException(ex);
+	}
+
+	@Test
+	public void testOnSignTerms() {
+		AsyncMockStubber.callSuccessWith(mockAccessApproval).when(mockSynapseClient).createAccessApproval(any(AccessApproval.class), any(AsyncCallback.class));
+		when(mockAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
+		widget.setRequirement(mockAccessRequirement);
+		
+		widget.onSignTerms();
+
+		verify(mockSynapseClient).createAccessApproval(accessApprovalCaptor.capture(), any(AsyncCallback.class));
+		verify(mockGlobalApplicationState).refreshPage();
+		AccessApproval capturedAccessApproval = accessApprovalCaptor.getValue();
+		assertEquals(AR_ID, capturedAccessApproval.getRequirementId());
+		assertEquals(AR_VERSION, capturedAccessApproval.getRequirementVersion());
+		assertEquals(CURRENT_USER_ID, capturedAccessApproval.getAccessorId());
+	}
 	
+	@Test
+	public void testOnSignTermsFailure() {
+		Exception ex = new Exception("error signing terms");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).createAccessApproval(any(AccessApproval.class), any(AsyncCallback.class));
+		widget.setRequirement(mockAccessRequirement);
+		
+		widget.onSignTerms();
+		
+		verify(mockSynapseClient).createAccessApproval(any(AccessApproval.class), any(AsyncCallback.class));
+		verify(mockSynAlert).handleException(ex);
+	}
+
 	@Test
 	public void testOnCertify() {
 		widget.onCertify();
