@@ -334,6 +334,16 @@ public class ColumnModelTableRowEditorWidgetTest {
 		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.Entity));
 		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.User));
 		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.File));
+		
+		editor.setCanHaveDefault(false);
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.Boolean));
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.Integer));
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.Boolean));
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.Double));
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.Date));
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.Entity));
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.User));
+		assertFalse(editor.canHaveDefault(ColumnTypeViewEnum.File));
 	}
 	
 }
