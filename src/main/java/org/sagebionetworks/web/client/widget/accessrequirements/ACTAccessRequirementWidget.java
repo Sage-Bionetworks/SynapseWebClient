@@ -41,6 +41,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	JiraURLHelper jiraURLHelper;
 	PopupUtilsView popupUtils;
 	ReviewAccessorsButton manageAccessButton;
+	ConvertACTAccessRequirementButton convertACTAccessRequirementButton;
+	
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
 			SynapseClientAsync synapseClient,
@@ -55,7 +57,8 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			AuthenticationController authController,
 			JiraURLHelper jiraURLHelper,
 			PopupUtilsView popupUtils,
-			ReviewAccessorsButton manageAccessButton) {
+			ReviewAccessorsButton manageAccessButton,
+			ConvertACTAccessRequirementButton convertACTAccessRequirementButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
@@ -70,6 +73,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.jiraURLHelper = jiraURLHelper;
 		this.popupUtils = popupUtils;
 		this.manageAccessButton = manageAccessButton;
+		this.convertACTAccessRequirementButton = convertACTAccessRequirementButton;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
@@ -78,6 +82,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		view.setSubjectsWidget(subjectsWidget);
 		view.setSynAlert(synAlert);
 		view.setManageAccessWidget(manageAccessButton);
+		view.setConvertAccessRequirementWidget(convertACTAccessRequirementButton);
 		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -108,6 +113,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		deleteAccessRequirementButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
 		manageAccessButton.configure(ar);
+		convertACTAccessRequirementButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
 	}
 	

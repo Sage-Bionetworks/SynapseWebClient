@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.ConvertACTAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
@@ -92,6 +93,9 @@ public class ACTAccessRequirementWidgetTest {
 	UserProfile mockProfile;
 	@Mock
 	ReviewAccessorsButton mockManageAccessButton;
+	@Mock
+	ConvertACTAccessRequirementButton mockConvertACTAccessRequirementButton;
+	
 	Callback lazyLoadDataCallback;
 	
 	public final static String ROOT_WIKI_ID = "777";
@@ -99,7 +103,22 @@ public class ACTAccessRequirementWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new ACTAccessRequirementWidget(mockView, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockGinInjector, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockDataAccessClient, mockLazyLoadHelper, mockAuthController, mockJiraURLHelper, mockPopupUtils, mockManageAccessButton);
+		widget = new ACTAccessRequirementWidget(
+				mockView, 
+				mockSynapseClient, 
+				mockWikiPageWidget, 
+				mockSynAlert, 
+				mockGinInjector, 
+				mockSubjectsWidget, 
+				mockCreateAccessRequirementButton, 
+				mockDeleteAccessRequirementButton, 
+				mockDataAccessClient, 
+				mockLazyLoadHelper, 
+				mockAuthController, 
+				mockJiraURLHelper, 
+				mockPopupUtils, 
+				mockManageAccessButton,
+				mockConvertACTAccessRequirementButton);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));

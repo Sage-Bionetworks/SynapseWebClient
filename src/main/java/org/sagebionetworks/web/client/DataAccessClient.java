@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
+import org.sagebionetworks.repo.model.dataaccess.AccessRequirementConversionRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
@@ -42,4 +43,5 @@ public interface DataAccessClient extends XsrfProtectedService {
 	List<Boolean> getAccessRequirementStatus(List<String> accessRequirementIds) throws RestServiceException;
 	AccessorGroupResponse listAccessorGroup(AccessorGroupRequest request) throws RestServiceException;
 	void revokeGroup(String accessRequirementId, String submitterId) throws RestServiceException;
+	AccessRequirement convertAccessRequirement(AccessRequirementConversionRequest request) throws RestServiceException;
 }

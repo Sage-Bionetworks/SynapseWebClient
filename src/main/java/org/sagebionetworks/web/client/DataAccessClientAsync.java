@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
+import org.sagebionetworks.repo.model.dataaccess.AccessRequirementConversionRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
@@ -43,4 +44,5 @@ public interface DataAccessClientAsync {
 	void getAccessRequirementStatus(List<String> accessRequirementIds, AsyncCallback<List<Boolean>> callback);
 	void listAccessorGroup(AccessorGroupRequest request, AsyncCallback<AccessorGroupResponse> asyncCallback);
 	void revokeGroup(String accessRequirementId, String submitterId, AsyncCallback<Void> callback);
+	void convertAccessRequirement(AccessRequirementConversionRequest request, AsyncCallback<AccessRequirement> callback);
 }
