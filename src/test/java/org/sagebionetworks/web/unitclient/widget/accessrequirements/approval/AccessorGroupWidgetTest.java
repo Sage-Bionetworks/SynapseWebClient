@@ -112,6 +112,13 @@ public class AccessorGroupWidgetTest {
 	}
 	
 	@Test
+	public void testConfigureExpiresOnZero() {
+		when(mockAccessorGroup.getExpiredOn()).thenReturn(new Date(0));
+		widget.configure(mockAccessorGroup);
+		verify(mockView).setExpiresOn("");
+	}
+	
+	@Test
 	public void testShowEmails() {
 		widget.configure(mockAccessorGroup);
 		widget.onShowEmails();
