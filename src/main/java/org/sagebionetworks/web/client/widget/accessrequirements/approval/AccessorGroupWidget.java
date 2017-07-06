@@ -63,7 +63,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 		addAccessorUserBadges(accessorGroup.getAccessorIds());
 		UserBadge badge = ginInjector.getUserBadgeWidget();
 		badge.configure(accessorGroup.getSubmitterId());
-		if (accessorGroup.getExpiredOn() != null) {
+		if (accessorGroup.getExpiredOn() != null && accessorGroup.getExpiredOn().getTime() > 0) {
 			view.setExpiresOn(dateTimeUtils.convertDateToSmallString(accessorGroup.getExpiredOn()));	
 		} else {
 			view.setExpiresOn("");

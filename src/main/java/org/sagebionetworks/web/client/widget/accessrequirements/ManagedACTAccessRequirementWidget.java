@@ -149,7 +149,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 			default:
 				if (status.getIsApproved()) {
 					showApproved();
-					if (status.getExpiredOn() != null) {
+					if (status.getExpiredOn() != null && status.getExpiredOn().getTime() > 0) {
 						view.showExpirationDate(dateTimeUtils.getLongFriendlyDate(status.getExpiredOn()));
 					}
 				} else {

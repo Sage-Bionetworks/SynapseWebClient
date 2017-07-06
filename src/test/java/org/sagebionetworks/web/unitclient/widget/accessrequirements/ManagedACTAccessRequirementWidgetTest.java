@@ -194,6 +194,16 @@ public class ManagedACTAccessRequirementWidgetTest {
 	}
 	
 	@Test
+	public void testApprovedStateWithExpirationZero() {
+		widget.setRequirement(mockACTAccessRequirement);
+		when(mockDataAccessSubmissionStatus.getExpiredOn()).thenReturn(new Date(0));
+		when(mockSubmissionStatus.getState()).thenReturn(SubmissionState.APPROVED);
+		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
+		lazyLoadDataCallback.invoke();
+		verify(mockView, never()).showExpirationDate(anyString());
+	}
+	
+	@Test
 	public void testRejectedState() {
 		String rejectedReason = "Please sign";
 		widget.setRequirement(mockACTAccessRequirement);
