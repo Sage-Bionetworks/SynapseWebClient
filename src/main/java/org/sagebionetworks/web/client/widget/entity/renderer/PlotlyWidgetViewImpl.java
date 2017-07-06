@@ -72,21 +72,23 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	}-*/;
 	
 	@Override
-	public void showChart(String title, String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode) {
+	public void showChart(String title, String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode, String xAxisType) {
 		chartContainer.clear();
-		_showChart(chartContainer.getElement(), xyData, barMode, title, xTitle, yTitle);
+		_showChart(chartContainer.getElement(), xyData, barMode, title, xTitle, yTitle, xAxisType);
 		_resize(chartContainer.getElement());
 	}
 	
-	private static native void _showChart(Element el, PlotlyTrace[] xyData, String barMode, String title, String xTitle, String yTitle) /*-{
+	private static native void _showChart(Element el, PlotlyTrace[] xyData, String barMode, String title, String xTitle, String yTitle, String xAxisType) /*-{
 		var layout = {
 		  title: title,
-		  xaxis: { title: xTitle },
+		  xaxis: {
+		  	title: xTitle,
+		  	type: xAxisType
+		  },
 		  yaxis: { title: yTitle },
 		  barmode: barMode
 		};
-		
-		$wnd.Plotly.plot(el, xyData, layout);
+		$wnd.Plotly.newPlot(el, xyData, layout);
 	}-*/;
 
 	@Override

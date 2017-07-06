@@ -162,7 +162,7 @@ public class PlotlyWidgetTest {
 		// complete first page load
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView, never()).showChart(eq(plotTitle), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
+		verify(mockView, never()).showChart(eq(plotTitle), anyString(), anyString(), any(PlotlyTrace[].class), anyString(), anyString());
 		
 		//test final page
 		rows.clear();
@@ -176,7 +176,7 @@ public class PlotlyWidgetTest {
 		assertTrue(loadingMessage.contains(LIMIT.toString()));
 		
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
-		verify(mockView).showChart(eq(plotTitle), eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()));
+		verify(mockView).showChart(eq(plotTitle), eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()), anyString());
 		PlotlyTrace[] traceArray = plotlyTraceArrayCaptor.getValue();
 		assertTrue(traceArray.length > 0);
 		assertEquals(type.toString().toLowerCase(), traceArray[0].getType());
@@ -229,7 +229,7 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString(), anyString());
 		
 		verify(mockResourceLoader).isLoaded(eq(PLOTLY_JS));
 		verify(mockResourceLoader).requires(eq(PLOTLY_JS), webResourceLoadedCallbackCaptor.capture());
@@ -238,11 +238,11 @@ public class PlotlyWidgetTest {
 		Exception ex = new Exception();
 		callback.onFailure(ex);
 		verify(mockSynAlert).handleException(ex);
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString(), anyString());
 		
 		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(true);
 		callback.onSuccess(null);
-		verify(mockView).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
+		verify(mockView).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString(), anyString());
 	}	
 
 

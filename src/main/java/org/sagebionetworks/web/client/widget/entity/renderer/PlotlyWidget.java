@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -56,6 +57,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	private SynapseAlert synAlert;
 	private String sql, title, xTitle, yTitle;
 	GraphType graphType;
+	String xAxisType;
 	BarMode barMode;
 	private AsynchronousJobTracker jobTracker;
 	// Mask to get all parts of a query.
@@ -67,6 +69,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	Map<String, List<String>> graphData;
 	String xAxisColumnName, fillColumnName;
 	private ResourceLoader resourceLoader;
+	public static final String X_AXIS_CATEGORY_TYPE = "category";
 	
 	@Inject
 	public PlotlyWidget(PlotlyWidgetView view,
@@ -177,7 +180,9 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			return;
 		}
 		
-		xAxisColumnName = result.getSelectColumns().get(0).getName();
+		SelectColumn xColumn = result.getSelectColumns().get(0);
+		xAxisType = ColumnType.STRING.equals(xColumn.getColumnType()) ? X_AXIS_CATEGORY_TYPE : "";
+		xAxisColumnName = xColumn.getName();
 		for (SelectColumn column : result.getSelectColumns()) {
 			graphData.put(column.getName(), new ArrayList<String>());
 		}
@@ -218,7 +223,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 				plotlyGraphData = transform(xAxisColumnName, graphType, graphData); 
 			}
 			view.setLoadingVisible(false);
-			view.showChart(title, xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase());
+			view.showChart(title, xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase(), xAxisType);
 		} catch (Throwable ex) {
 			synAlert.showError("Error showing plot: " + ex.getMessage());
 		}
