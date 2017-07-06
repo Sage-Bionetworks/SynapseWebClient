@@ -114,6 +114,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 			this.keyboardNavigationHandler.bindRow(rowEditor);
 		}
 		if (!TableType.table.equals(tableType)) {
+			rowEditor.setCanHaveDefault(false);
 			rowEditor.setSelectVisible(!ETAG_COLUMN_NAME.equals(cm.getName()));
 			if (getDefaultColumnNames().contains(cm.getName())) {
 				rowEditor.setToBeDefaultFileViewColumn();

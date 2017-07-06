@@ -31,6 +31,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 	ColumnTypeViewEnum currentType;
 	CellFactory factory;
 	String maxSize = null;
+	boolean canHaveDefault = true;
 	
 	@Inject
 	public ColumnModelTableRowEditorWidgetImpl(ColumnModelTableRowEditorView view, CellFactory factory){
@@ -70,14 +71,23 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 		view.setDefaultEditorVisible(canHaveDefault(newType));
 	}
 	
+	@Override
+	public void setCanHaveDefault(boolean canHaveDefault) {
+		this.canHaveDefault = canHaveDefault;
+	}
+	
 	public boolean canHaveDefault(ColumnTypeViewEnum type) {
-		switch(type.getType()){
-			case ENTITYID:
-			case FILEHANDLEID:
-			case USERID:
-				return false;
-			default:
-				return true;		
+		if (canHaveDefault) {
+			switch(type.getType()){
+				case ENTITYID:
+				case FILEHANDLEID:
+				case USERID:
+					return false;
+				default:
+					return true;		
+			}
+		} else {
+			return false;
 		}
 	}
 	

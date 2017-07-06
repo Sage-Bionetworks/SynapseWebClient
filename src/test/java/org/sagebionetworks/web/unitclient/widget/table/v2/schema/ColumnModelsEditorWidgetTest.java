@@ -168,6 +168,8 @@ public class ColumnModelsEditorWidgetTest {
 		verify(mockGinInjector,  times(nonEditableColumns.size())).createColumnModelEditorWidget();
 		verify(mockColumnModelTableRowEditorWidget1).setToBeDefaultFileViewColumn();
 		verify(mockColumnModelTableRowEditorWidget2).setToBeDefaultFileViewColumn();
+		verify(mockColumnModelTableRowEditorWidget1).setCanHaveDefault(false);
+		verify(mockColumnModelTableRowEditorWidget2).setCanHaveDefault(false);
 		//verify etag column selection is not enabled
 		verify(mockColumnModelTableRowEditorWidget1).setSelectVisible(true);
 		verify(mockColumnModelTableRowEditorWidget2).setSelectVisible(false);
@@ -217,6 +219,7 @@ public class ColumnModelsEditorWidgetTest {
 		verify(mockEditor).setCanDelete(false);
 		verify(mockEditor).setCanMoveUp(false);
 		verify(mockEditor).setCanMoveDown(false);
+		assertTrue(((ColumnModelTableRowEditorStub)one).canHaveDefault());
 		
 		ColumnModelTableRowEditorWidget two = widget.addNewColumn();
 		// Start with two selected
