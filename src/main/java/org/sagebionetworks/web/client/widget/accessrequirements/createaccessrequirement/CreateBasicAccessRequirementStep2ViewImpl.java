@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
@@ -30,6 +31,12 @@ public class CreateBasicAccessRequirementStep2ViewImpl implements CreateBasicAcc
 	Button clearOldTermsButton;
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	Div hasAccessorRequirementUI;
+	@UiField
+	CheckBox validatedCheckbox;
+	@UiField
+	CheckBox certifiedCheckbox;
 	Presenter presenter;
 	
 	@Inject
@@ -76,5 +83,27 @@ public class CreateBasicAccessRequirementStep2ViewImpl implements CreateBasicAcc
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+	
+	@Override
+	public boolean isCertifiedUserRequired() {
+		return certifiedCheckbox.getValue();
+	}
+	@Override
+	public void setIsCertifiedUserRequired(boolean value) {
+		certifiedCheckbox.setValue(value);
+	}
+	
+	@Override
+	public boolean isValidatedProfileRequired() {
+		return validatedCheckbox.getValue();
+	}
+	@Override
+	public void setIsValidatedProfileRequired(boolean value) {
+		validatedCheckbox.setValue(value);
+	}
+	@Override
+	public void setHasAccessorRequirementUIVisible(boolean visible) {
+		hasAccessorRequirementUI.setVisible(visible);
 	}
 }

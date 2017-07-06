@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements.createaccessreq
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.HasAccessorRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -67,10 +68,15 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 		this.accessRequirement = accessRequirement;
 		wikiKey = new WikiPageKey(accessRequirement.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), null);
 		String oldTerms = GovernanceServiceHelper.getAccessRequirementText(accessRequirement);
-		boolean isExistOldTermsOfUse = oldTerms != null;
+		boolean isExistOldTermsOfUse = oldTerms != null && oldTerms.length() > 0;
 		view.setOldTermsVisible(isExistOldTermsOfUse);
 		view.setOldTerms(isExistOldTermsOfUse ? oldTerms : "");
-				
+		view.setHasAccessorRequirementUIVisible(accessRequirement instanceof HasAccessorRequirement);
+		if (accessRequirement instanceof HasAccessorRequirement) {
+			HasAccessorRequirement hasAccessorRequirement = (HasAccessorRequirement) accessRequirement;
+			view.setIsCertifiedUserRequired(hasAccessorRequirement.getIsCertifiedUserRequired());
+			view.setIsValidatedProfileRequired(hasAccessorRequirement.getIsValidatedProfileRequired());
+		}
 		configureWiki();
 	}
 	
@@ -119,8 +125,25 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 	
 	@Override
 	public void onPrimary() {
-		//can update wiki only
-		modalPresenter.onFinished();
+		if (accessRequirement instanceof HasAccessorRequirement) {
+			HasAccessorRequirement hasAccessorRequirement = (HasAccessorRequirement) accessRequirement;
+			// update AR
+			hasAccessorRequirement.setIsCertifiedUserRequired(view.isCertifiedUserRequired());
+			hasAccessorRequirement.setIsValidatedProfileRequired(view.isValidatedProfileRequired());
+			synapseClient.createOrUpdateAccessRequirement(accessRequirement, new AsyncCallback<AccessRequirement>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+				}
+				@Override
+				public void onSuccess(AccessRequirement result) {
+					modalPresenter.onFinished();		
+				}
+			});
+		} else {
+			//can update wiki only
+			modalPresenter.onFinished();
+		}
 	}
 
 	@Override

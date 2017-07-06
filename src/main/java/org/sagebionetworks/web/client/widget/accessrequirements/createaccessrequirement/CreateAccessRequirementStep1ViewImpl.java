@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.Radio;
@@ -49,6 +50,7 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	InputGroup teamUI;
 	@UiField
 	InputGroup entityUI;
+	
 	@Inject
 	public CreateAccessRequirementStep1ViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);

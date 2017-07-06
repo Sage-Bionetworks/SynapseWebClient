@@ -24,6 +24,8 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirementInterface;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
@@ -129,7 +131,7 @@ public class CreateAccessRequirementStep1Test {
 		verify(mockSynapseClient).createOrUpdateAccessRequirement(arCaptor.capture(),  any(AsyncCallback.class));
 		AccessRequirement ar = arCaptor.getValue();
 		// in here, we have the view tell us that TermsOfUse was selected (not ACT).
-		assertTrue(ar instanceof TermsOfUseAccessRequirement);
+		assertTrue(ar instanceof SelfSignAccessRequirement);
 		assertEquals(ACCESS_TYPE.PARTICIPATE, ar.getAccessType());
 		assertEquals(1, ar.getSubjectIds().size());
 		assertEquals(mockTeamRestrictableObjectDescriptor, ar.getSubjectIds().get(0));
