@@ -7,7 +7,7 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
   	<bh:Div>
-		<b:Modal ui:field="dialog" title="" closable="true" dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
+		<b:Modal ui:field="dialog" title="" closable="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
 			<b:ModalBody>
 				<b:FormGroup ui:field="currentStateUI">
 					<b:FormLabel>State</b:FormLabel>
@@ -27,7 +27,7 @@
 				</b:FormGroup>
 				<b:FormGroup ui:field="intendedDataUseUI">
 					<b:FormLabel>Intended Data Use</b:FormLabel>
-					<b:TextArea ui:field="intendedDataUseField" readOnly="true"/>
+					<b:TextArea ui:field="intendedDataUseField" readOnly="true" visibleLines="10"/>
 				</b:FormGroup>
 				<b:FormGroup ui:field="accessorsUI">
 					<b:FormLabel>Accessors</b:FormLabel>
@@ -51,11 +51,11 @@
 				</b:FormGroup>
 				<b:FormGroup ui:field="publicationsUI">
 					<b:FormLabel>Publications</b:FormLabel>
-					<b:TextArea ui:field="publicationsField" readOnly="true"/>
+					<b:TextArea ui:field="publicationsField" readOnly="true" visibleLines="10"/>
 				</b:FormGroup>
 				<b:FormGroup ui:field="summaryOfUseUI">
 					<b:FormLabel>Summary Of Use</b:FormLabel>
-					<b:TextArea ui:field="summaryOfUseField" readOnly="true"/>
+					<b:TextArea ui:field="summaryOfUseField" readOnly="true" visibleLines="10"/>
 				</b:FormGroup>
 			</b:ModalBody>
 			<b:ModalFooter>
