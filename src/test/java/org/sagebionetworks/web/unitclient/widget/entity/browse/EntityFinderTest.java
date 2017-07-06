@@ -84,6 +84,7 @@ public class EntityFinderTest {
 	public void testLoadEntity() throws Exception {
 		SelectedHandler mockHandler = mock(SelectedHandler.class);
 		entityFinder.configure(true, mockHandler);
+		verify(mockView).setMultiVisible(false);
 		
 		String name = "name";
 		String id = "syn456";
@@ -103,7 +104,8 @@ public class EntityFinderTest {
 	@Test
 	public void testLoadMultiEntityComma() throws Exception {
 		SelectedHandler mockHandler = mock(SelectedHandler.class);
-		entityFinder.configureMulti(true, mockHandler);
+		entityFinder.configureMulti(EntityFilter.ALL, true, mockHandler);
+		verify(mockView).setMultiVisible(true);
 		
 		String name = "name";
 		String id = "syn456";
@@ -130,7 +132,7 @@ public class EntityFinderTest {
 	@Test
 	public void testLoadMultiEntitySpace() throws Exception {
 		SelectedHandler mockHandler = mock(SelectedHandler.class);
-		entityFinder.configureMulti(true, mockHandler);
+		entityFinder.configureMulti(EntityFilter.ALL, true, mockHandler);
 		
 		String name = "name";
 		String id = "syn456";

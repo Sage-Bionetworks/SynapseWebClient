@@ -495,9 +495,10 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
-
-	public void setMultiVisible(boolean b) {
-		createEnterMultiIdWidget();
+	
+	@Override
+	public void setMultiVisible(boolean visible) {
+		enterSynapseMultiIdContainer.setVisible(visible);
 	}
 }
 
