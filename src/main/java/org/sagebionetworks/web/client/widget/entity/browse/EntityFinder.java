@@ -68,18 +68,15 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		this.showVersions = showVersions;
 		this.selectedHandler = handler;
 		selectedEntities.clear();
+		view.setMultiVisible(false);
 	}
 	
-	public void configureMulti(boolean showVersions, SelectedHandler<List<Reference>> handler) {
-		configureMulti(EntityFilter.ALL, showVersions, handler);
-	}
-	
-
 	public void configureMulti(EntityFilter filter, boolean showVersions, SelectedHandler<List<Reference>> handler) {
 		this.filter = filter;
 		this.showVersions = showVersions;
 		this.selectedMultiHandler = handler;
 		selectedEntities.clear();
+		view.setMultiVisible(true);
 	}
 	
 	@Override
