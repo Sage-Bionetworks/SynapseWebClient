@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -82,6 +83,7 @@ public class TableListWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		searchResults = new ArrayList<EntityHeader>();
 		when(mockResults.getPage()).thenReturn(searchResults);
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 	}
 	
 	@Test
@@ -116,6 +118,7 @@ public class TableListWidgetTest {
 		verify(mockView).setAddTableVisible(true);
 		verify(mockView).setUploadTableVisible(true);
 		verify(mockView).setAddFileViewVisible(true);
+		verify(mockView).setAddProjectViewVisible(true);
 	}
 	
 	@Test
@@ -125,6 +128,17 @@ public class TableListWidgetTest {
 		verify(mockView).setAddTableVisible(false);
 		verify(mockView).setUploadTableVisible(false);
 		verify(mockView).setAddFileViewVisible(false);
+		verify(mockView).setAddProjectViewVisible(false);
+	}
+	
+	@Test
+	public void testNoAlphaMode(){
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
+		widget.configure(parentBundle);
+		verify(mockView).setAddTableVisible(true);
+		verify(mockView).setUploadTableVisible(true);
+		verify(mockView).setAddFileViewVisible(true);
+		verify(mockView).setAddProjectViewVisible(false);
 	}
 	
 	@Test

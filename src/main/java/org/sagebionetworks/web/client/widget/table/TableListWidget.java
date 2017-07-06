@@ -101,7 +101,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 		this.parentBundle = parentBundle;
 		this.canEdit = parentBundle.getPermissions().getCanEdit();
 		this.uploadTableModalWidget.configure(parentBundle.getEntity().getId(), null);
-		view.setAddProjectViewVisible(DisplayUtils.isInTestWebsite(cookies));
 		view.resetSortUI();
 		loadData();
 	}
@@ -164,6 +163,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 		view.setAddTableVisible(this.canEdit);
 		view.setUploadTableVisible(this.canEdit);
 		view.setAddFileViewVisible(this.canEdit);
+		view.setAddProjectViewVisible(DisplayUtils.isInTestWebsite(cookies) && this.canEdit);
 	}
     
 	@Override
