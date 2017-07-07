@@ -59,14 +59,6 @@ public class BigPromptModalViewImpl implements BigPromptModalView {
 				callback.invoke();
 			}
 		});
-		nameField.addKeyDownHandler(new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
-					callback.invoke();
-				}
-			}
-		});
 	}
 	
 	@Override

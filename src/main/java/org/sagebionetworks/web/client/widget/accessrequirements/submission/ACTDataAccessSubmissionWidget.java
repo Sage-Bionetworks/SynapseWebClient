@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
@@ -13,6 +14,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -37,6 +39,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	SynapseJSNIUtils jsniUtils;
 	PortalGinInjector ginInjector;
 	DateTimeUtils dateTimeUtils;
+	ShowEmailsButton showEmailsButton;
 	
 	@Inject
 	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, 
@@ -48,7 +51,8 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 			FileHandleList otherDocuments,
 			SynapseJSNIUtils jsniUtils,
 			PortalGinInjector ginInjector,
-			DateTimeUtils dateTimeUtils) {
+			DateTimeUtils dateTimeUtils,
+			ShowEmailsButton showEmailsButton) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.dataAccessClient = dataAccessClient;
@@ -56,6 +60,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		this.jsniUtils = jsniUtils;
 		this.ginInjector = ginInjector;
 		this.dateTimeUtils = dateTimeUtils;
+		this.showEmailsButton = showEmailsButton;
 		
 		otherDocuments.configure()
 			.setCanDelete(false)
@@ -70,6 +75,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setPromptModal(promptDialog);
 		view.setOtherAttachmentWidget(otherDocuments);
 		view.setSynAlert(synAlert);
+		view.setShowEmailButton(showEmailsButton);
 		promptDialog.configure("Reason", "Rejection reason:", "", new Callback() {
 			@Override
 			public void invoke() {
@@ -128,6 +134,17 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		UserBadge badge = ginInjector.getUserBadgeWidget();
 		badge.configure(submission.getSubmittedBy());
 		view.setSubmittedBy(badge);
+		configureShowEmailsButton(submission.getAccessorChanges());
+	}
+	
+	public void configureShowEmailsButton(List<AccessorChange> accessorChanges) {
+		List<String> userIds = new ArrayList<>();
+		if (accessorChanges != null) {
+			for (AccessorChange accessorChange : accessorChanges) {
+				userIds.add(accessorChange.getUserId());
+			}
+		}
+		showEmailsButton.configure(userIds);
 	}
 	
 	public void addAccessorUserBadges(List<AccessorChange> accessorChanges) {

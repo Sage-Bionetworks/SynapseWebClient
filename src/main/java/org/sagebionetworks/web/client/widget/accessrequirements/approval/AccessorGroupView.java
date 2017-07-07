@@ -18,15 +18,13 @@ public interface AccessorGroupView extends IsWidget {
 	void setExpiresOn(String expiresOn);
 	void setAccessRequirementWidget(IsWidget w);
 	void showAccessRequirementDialog();
-	void showEmailAddressesDialog();
-	void setEmailAddresses(String emailAddresses);
+	void setShowEmailsButton(IsWidget w);
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
 		void onShowAccessRequirement();
 		void onRevoke();
-		void onShowEmails();
 	}
 
 }

@@ -34,6 +34,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidgetView;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
@@ -82,6 +83,8 @@ public class ACTDataAccessSubmissionWidgetTest {
 	UserBadge mockModifiedByBadge;
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
+	@Mock
+	ShowEmailsButton mockShowEmailsButton;
 	public static final String SUBMISSION_ID = "9876545678987";
 	public static final String INSTITUTION = "Univerisity of Washington";
 	public static final String INTENDED_DATA_USE = "lorem ipsum";
@@ -105,7 +108,17 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockResearchProjectSnapshot.getProjectLead()).thenReturn(PROJECT_LEAD);
 		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(SMALL_DATE_STRING);
 		
-		widget = new ACTDataAccessSubmissionWidget(mockView, mockSynapseAlert, mockClient, mockPromptModalView, mockDucFileRenderer, mockIrbFileRenderer, mockFileHandleList, mockJSNIUtils, mockGinInjector, mockDateTimeUtils);
+		widget = new ACTDataAccessSubmissionWidget(mockView, 
+				mockSynapseAlert, 
+				mockClient, 
+				mockPromptModalView, 
+				mockDucFileRenderer, 
+				mockIrbFileRenderer, 
+				mockFileHandleList, 
+				mockJSNIUtils, 
+				mockGinInjector, 
+				mockDateTimeUtils, 
+				mockShowEmailsButton);
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmission).when(mockClient).updateDataAccessSubmissionState(anyString(), any(SubmissionState.class), anyString(), any(AsyncCallback.class));
 		verify(mockPromptModalView).configure(anyString(),  anyString(), anyString(),  promptModalPresenterCaptor.capture());
 		confirmRejectionCallback = promptModalPresenterCaptor.getValue();

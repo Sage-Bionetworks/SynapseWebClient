@@ -78,6 +78,9 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	Div submittedByContainer;
 	@UiField
 	Button moreInfoButton;
+	@UiField
+	Div showEmailsButtonContainer;
+	
 	public interface Binder extends UiBinder<Widget, ACTDataAccessSubmissionWidgetViewImpl> {
 	}
 	
@@ -240,5 +243,10 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	public void setSubmittedBy(IsWidget w) {
 		submittedByContainer.clear();
 		submittedByContainer.add(w);
+	}
+	@Override
+	public void setShowEmailButton(IsWidget w) {
+		showEmailsButtonContainer.clear();
+		showEmailsButtonContainer.add(w);
 	}
 }
