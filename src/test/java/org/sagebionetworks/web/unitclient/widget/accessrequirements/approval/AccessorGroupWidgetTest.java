@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.approval;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
@@ -16,15 +15,14 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupView;
 import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -48,23 +46,18 @@ public class AccessorGroupWidgetTest {
 	@Mock
 	DataAccessClientAsync mockDataAccessClient;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
 	DateTimeUtils mockDateTimeUtils;
-	List<UserProfile> userProfiles;
-	@Mock
-	UserProfile mockUserProfile;
 	@Mock
 	UserBadge mockUserBadge;
 	@Mock
 	AccessorGroup mockAccessorGroup;
 	@Mock
 	Callback onRevokeCallback;
-	
+	@Mock
+	ShowEmailsButton mockShowEmailsButton;
 	List<String> accessorIds;
 	public static final String ACCESSOR_USER_ID = "98888";
 	public static final String SUBMITTER_USER_ID = "77776";
-	public static final String USER_NAME = "luke";
 	public static final String ACCESS_REQUIREMENT_ID = "98765678";
 	public static final Date AROUND_NOW = new Date();
 	public static final String FORMATTED_DATE = "todayish";
@@ -79,16 +72,13 @@ public class AccessorGroupWidgetTest {
 				mockPopupUtils,
 				mockAccessRequirementWidget,
 				mockDataAccessClient,
-				mockSynapseClient, 
-				mockDateTimeUtils);
-		userProfiles = Collections.singletonList(mockUserProfile);
-		AsyncMockStubber.callSuccessWith(userProfiles).when(mockSynapseClient).listUserProfiles(anyList(), any(AsyncCallback.class));
+				mockDateTimeUtils,
+				mockShowEmailsButton);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		when(mockAccessorGroup.getSubmitterId()).thenReturn(SUBMITTER_USER_ID);
 		accessorIds = Collections.singletonList(ACCESSOR_USER_ID);
 		when(mockAccessorGroup.getAccessorIds()).thenReturn(accessorIds);
 		when(mockAccessorGroup.getAccessRequirementId()).thenReturn(ACCESS_REQUIREMENT_ID);
-		when(mockUserProfile.getUserName()).thenReturn(USER_NAME);
 		when(mockAccessorGroup.getExpiredOn()).thenReturn(AROUND_NOW);
 		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(FORMATTED_DATE);
 	}
@@ -116,27 +106,6 @@ public class AccessorGroupWidgetTest {
 		when(mockAccessorGroup.getExpiredOn()).thenReturn(new Date(0));
 		widget.configure(mockAccessorGroup);
 		verify(mockView).setExpiresOn("");
-	}
-	
-	@Test
-	public void testShowEmails() {
-		widget.configure(mockAccessorGroup);
-		widget.onShowEmails();
-		
-		verify(mockSynapseClient).listUserProfiles(eq(accessorIds), any(AsyncCallback.class));
-		verify(mockView).setEmailAddresses(USER_NAME + "@synapse.org");
-		verify(mockView).showEmailAddressesDialog();
-	}
-	
-	@Test
-	public void testShowEmailsFailure() {
-		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).listUserProfiles(anyList(), any(AsyncCallback.class));
-		
-		widget.configure(mockAccessorGroup);
-		widget.onShowEmails();
-		
-		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test

@@ -10,7 +10,6 @@
 		<b:Modal ui:field="dialog" title="" closable="true" dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
 			<b:ModalBody>
 				<bh:Div ui:field="accessRequirementWidgetContainer"/>
-				<bh:Span ui:field="emailAddresses"/>
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button ui:field="closeButton" type="DEFAULT" text="Close" />
@@ -32,7 +31,7 @@
 					<g:Label ui:field="expiresOnField"/>
 				</t:TableData>
 				<t:TableData width="100px" >
-					<b:Button ui:field="showEmailsButton" type="PRIMARY" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2 margin-bottom-5" text="Email" />
+					<bh:Div ui:field="showEmailsButtonContainer"/>
 				</t:TableData>
 				<t:TableData width="150px" >
 					<b:Button ui:field="showAccessRequirementButton" type="PRIMARY" size="EXTRA_SMALL" addStyleNames="margin-top-10 margin-right-2 margin-bottom-5" text="Access Requirement" />

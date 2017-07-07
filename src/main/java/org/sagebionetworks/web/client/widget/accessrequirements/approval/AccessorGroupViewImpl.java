@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.approval;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -25,18 +23,14 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	@UiField
 	Button showAccessRequirementButton;
 	@UiField
-	Button showEmailsButton;
+	Div showEmailsButtonContainer;
 	@UiField
 	Button revokeAccessButton;
-	@UiField
-	Span emailAddresses;
 	@UiField
 	Label expiresOnField;
 	@UiField
 	Button closeButton;
 	
-	@UiField
-	Modal dialog;
 	@UiField
 	Div accessRequirementWidgetContainer;
 	
@@ -58,18 +52,6 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onRevoke();
-			}
-		});
-		showEmailsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onShowEmails();
-			}
-		});
-		closeButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				dialog.hide();
 			}
 		});
 	}
@@ -114,9 +96,7 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	}
 	@Override
 	public void showAccessRequirementDialog() {
-		emailAddresses.setVisible(false);
 		accessRequirementWidgetContainer.setVisible(true);
-		dialog.show();
 	}
 
 	@Override
@@ -124,20 +104,13 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 		accessRequirementWidgetContainer.clear();
 		accessRequirementWidgetContainer.add(w);
 	}
-	
-	@Override
-	public void setEmailAddresses(String emails) {
-		emailAddresses.setText(emails);
-	}
-	
-	@Override
-	public void showEmailAddressesDialog() {
-		accessRequirementWidgetContainer.setVisible(false);
-		emailAddresses.setVisible(true);
-		dialog.show();
-	}
 	@Override
 	public void setExpiresOn(String expiresOnString) {
 		expiresOnField.setText(expiresOnString);
+	}
+	@Override
+	public void setShowEmailsButton(IsWidget w) {
+		showEmailsButtonContainer.clear();
+		showEmailsButtonContainer.add(w);
 	}
 }
