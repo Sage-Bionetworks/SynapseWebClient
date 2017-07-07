@@ -3,12 +3,16 @@ package org.sagebionetworks.web.client.presenter;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.AccessApprovalInfo;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoRequest;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoResponse;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
@@ -30,6 +34,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
 	private DataAccessClientAsync dataAccessClient;
+	private AuthenticationController authController;
 	public static Long LIMIT = 30L;
 	Long currentOffset;
 	RestrictableObjectDescriptor subject;
@@ -51,7 +56,8 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DivView noResultsDiv,
 			DivView unmetAccessRequirementsDiv,
-			DivView metAccessRequirementsDiv
+			DivView metAccessRequirementsDiv,
+			AuthenticationController authController
 			) {
 		this.view = view;
 		this.synAlert = synAlert;
@@ -63,6 +69,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.noResultsDiv = noResultsDiv;
 		this.metAccessRequirementsDiv = metAccessRequirementsDiv;
 		this.unmetAccessRequirementsDiv = unmetAccessRequirementsDiv;
+		this.authController = authController;
 		view.addAboveBody(synAlert);
 		view.addAboveBody(createAccessRequirementButton);
 		unmetAccessRequirementsDiv.addStyleName("min-height-200");
@@ -159,16 +166,21 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		for (AccessRequirement accessRequirement : allArs) {
 			arIds.add(Long.toString(accessRequirement.getId()));
 		}
-		dataAccessClient.getAccessRequirementStatus(arIds, new AsyncCallback<List<Boolean>>() {
+		BatchAccessApprovalInfoRequest request = new BatchAccessApprovalInfoRequest();
+		request.setAccessRequirementIds(arIds);
+		request.setUserId(authController.getCurrentUserPrincipalId());
+		
+		dataAccessClient.getAccessRequirementStatus(request, new AsyncCallback<BatchAccessApprovalInfoResponse>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 			}
 			@Override
-			public void onSuccess(List<Boolean> statuses) {
-				for (int i = 0; i < statuses.size(); i++) {
+			public void onSuccess(BatchAccessApprovalInfoResponse response) {
+				List<AccessApprovalInfo> results = response.getResults();
+				for (int i = 0; i < results.size(); i++) {
 					AccessRequirement ar = allArs.get(i);
-					if (statuses.get(i)) {
+					if (results.get(i).getHasAccessApproval()) {
 						metAccessRequirementsDiv.add(getAccessRequirementWidget(ar));	
 					} else {
 						unmetAccessRequirementsDiv.add(getAccessRequirementWidget(ar));	

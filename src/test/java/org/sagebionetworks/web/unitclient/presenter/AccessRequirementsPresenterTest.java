@@ -19,7 +19,10 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.AccessApprovalInfo;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoRequest;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoResponse;
 import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -29,6 +32,7 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.presenter.AccessRequirementsPresenter;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
@@ -76,7 +80,7 @@ public class AccessRequirementsPresenterTest {
 	@Mock
 	AccessRequirementsPlace mockPlace;
 	List<AccessRequirement> accessRequirements;
-	List<Boolean> accessRequirementApprovalStatus;
+	List<AccessApprovalInfo> accessRequirementApprovalStatus;
 	@Captor
 	ArgumentCaptor<RestrictableObjectDescriptor> subjectCaptor;
 	@Mock
@@ -91,8 +95,14 @@ public class AccessRequirementsPresenterTest {
 	DivView mockUnmetAccessRequirementsDiv;
 	@Mock
 	DivView mockMetAccessRequirementsDiv;
+	@Mock
+	AuthenticationController mockAuthController;
+	@Mock
+	BatchAccessApprovalInfoResponse mockBatchAccessApprovalInfoResponse;
+	
 	public static final String ENTITY_ID = "syn239834";
 	public static final String TEAM_ID = "45678";
+	public static final String CURRENT_USER_ID = "11111";
 	
 	@Before
 	public void setup(){
@@ -107,20 +117,28 @@ public class AccessRequirementsPresenterTest {
 				mockCreateARButton, 
 				mockEmptyResultsDiv,
 				mockUnmetAccessRequirementsDiv,
-				mockMetAccessRequirementsDiv);
+				mockMetAccessRequirementsDiv,
+				mockAuthController);
+		
 		accessRequirements = new ArrayList<AccessRequirement>();
-		accessRequirementApprovalStatus = new ArrayList<Boolean>();
+		accessRequirementApprovalStatus = new ArrayList<AccessApprovalInfo>();
 		accessRequirements.add(mockACTAccessRequirement);
-		accessRequirementApprovalStatus.add(true);
+		AccessApprovalInfo status = new AccessApprovalInfo();
+		status.setHasAccessApproval(true);
+		accessRequirementApprovalStatus.add(status);
 		accessRequirements.add(mockTermsOfUseAccessRequirement);
-		accessRequirementApprovalStatus.add(false);
+		accessRequirementApprovalStatus.add(status);
 		accessRequirements.add(mockBasicACTAccessRequirement);
-		accessRequirementApprovalStatus.add(true);
+		status = new AccessApprovalInfo();
+		status.setHasAccessApproval(false);
+		accessRequirementApprovalStatus.add(status);
 		accessRequirements.add(mockLockAccessRequirement);
-		accessRequirementApprovalStatus.add(false);
+		accessRequirementApprovalStatus.add(status);
 		AsyncMockStubber.callSuccessWith(accessRequirements).when(mockDataAccessClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(accessRequirementApprovalStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockBatchAccessApprovalInfoResponse).when(mockDataAccessClient).getAccessRequirementStatus(any(BatchAccessApprovalInfoRequest.class), any(AsyncCallback.class));
+		when(mockBatchAccessApprovalInfoResponse.getResults()).thenReturn(accessRequirementApprovalStatus);
 		when(mockGinInjector.getAccessRequirementWidget()).thenReturn(mockAccessRequirementWidget);
+		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CURRENT_USER_ID);
 	}	
 	
 	@Test
@@ -135,7 +153,7 @@ public class AccessRequirementsPresenterTest {
 		when(mockPlace.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM)).thenReturn(ENTITY_ID);
 		presenter.setPlace(mockPlace);
 		verify(mockDataAccessClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
-		verify(mockDataAccessClient).getAccessRequirementStatus(anyList(), any(AsyncCallback.class));
+		verify(mockDataAccessClient).getAccessRequirementStatus(any(BatchAccessApprovalInfoRequest.class), any(AsyncCallback.class));
 		RestrictableObjectDescriptor subject = subjectCaptor.getValue();
 		assertEquals(ENTITY_ID, subject.getId());
 		assertEquals(RestrictableObjectType.ENTITY, subject.getType());

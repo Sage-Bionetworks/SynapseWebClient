@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoRequest;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoResponse;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -40,7 +42,7 @@ public interface DataAccessClient extends XsrfProtectedService {
 			String reason) throws RestServiceException;
 	OpenSubmissionPage getOpenSubmissions(String nextPageToken) throws RestServiceException;
 	void submitDataAccessRequest(RequestInterface dataAccessRequest) throws RestServiceException;
-	List<Boolean> getAccessRequirementStatus(List<String> accessRequirementIds) throws RestServiceException;
+	BatchAccessApprovalInfoResponse getAccessRequirementStatus(BatchAccessApprovalInfoRequest request) throws RestServiceException;
 	AccessorGroupResponse listAccessorGroup(AccessorGroupRequest request) throws RestServiceException;
 	void revokeGroup(String accessRequirementId, String submitterId) throws RestServiceException;
 	AccessRequirement convertAccessRequirement(AccessRequirementConversionRequest request) throws RestServiceException;

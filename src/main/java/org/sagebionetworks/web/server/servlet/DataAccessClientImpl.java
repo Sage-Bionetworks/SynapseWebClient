@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoRequest;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoResponse;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
@@ -118,16 +120,11 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 		}
 	}
 	@Override
-	public List<Boolean> getAccessRequirementStatus(List<String> accessRequirementIds)
+	public BatchAccessApprovalInfoResponse getAccessRequirementStatus(BatchAccessApprovalInfoRequest request)
 			throws RestServiceException {
-		//TODO: replace with a single call, when available (see PLFM-4492)
-		List<Boolean> status = new ArrayList<>(accessRequirementIds.size());
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			for (String accessRequirementId : accessRequirementIds) {
-				status.add(synapseClient.getAccessRequirementStatus(accessRequirementId).getIsApproved());
-			}
-			return status;
+			return synapseClient.getBatchAccessApprovalInfo(request);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

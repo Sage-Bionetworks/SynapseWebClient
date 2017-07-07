@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoRequest;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoResponse;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -41,7 +43,7 @@ public interface DataAccessClientAsync {
 	void updateDataAccessSubmissionState(String submissionId, SubmissionState newState, String reason,
 			AsyncCallback<Submission> callback);
 	void getOpenSubmissions(String nextPageToken, AsyncCallback<OpenSubmissionPage> callback);
-	void getAccessRequirementStatus(List<String> accessRequirementIds, AsyncCallback<List<Boolean>> callback);
+	void getAccessRequirementStatus(BatchAccessApprovalInfoRequest request, AsyncCallback<BatchAccessApprovalInfoResponse> callback);
 	void listAccessorGroup(AccessorGroupRequest request, AsyncCallback<AccessorGroupResponse> asyncCallback);
 	void revokeGroup(String accessRequirementId, String submitterId, AsyncCallback<Void> callback);
 	void convertAccessRequirement(AccessRequirementConversionRequest request, AsyncCallback<AccessRequirement> callback);
