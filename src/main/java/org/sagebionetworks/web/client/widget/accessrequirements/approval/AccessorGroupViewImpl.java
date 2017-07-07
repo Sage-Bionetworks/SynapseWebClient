@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.approval;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -32,6 +33,8 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	Button closeButton;
 	
 	@UiField
+	Modal dialog;
+	@UiField
 	Div accessRequirementWidgetContainer;
 	
 	Presenter presenter;
@@ -52,6 +55,12 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onRevoke();
+			}
+		});
+		closeButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				dialog.hide();
 			}
 		});
 	}
@@ -97,6 +106,7 @@ public class AccessorGroupViewImpl implements AccessorGroupView {
 	@Override
 	public void showAccessRequirementDialog() {
 		accessRequirementWidgetContainer.setVisible(true);
+		dialog.show();
 	}
 
 	@Override
