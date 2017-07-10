@@ -11,11 +11,8 @@
 		<bh:Div ui:field="synAlertContainer" />
 		<b:Panel ui:field="accessRequirementUI" addStyleNames="margin-left-35 margin-right-10 light-border padding-10">
 			<bh:Div ui:field="accessRequirementContainer" />
-			<bh:Div>
-				<b:Button ui:field="clearAccessRequirementFilter" type="PRIMARY" >Expand search to all Access Requirements</b:Button>
-				<b:Button ui:field="reviewRequestsButton" type="PRIMARY" addStyleNames="margin-left-10">Review Requests</b:Button>
-			</bh:Div>
 		</b:Panel>
+		<b:Button ui:field="clearAccessRequirementFilter" type="PRIMARY" addStyleNames="margin-left-35" size="EXTRA_SMALL" icon="SEARCH">Expand search to all Access Requirements</b:Button>
 		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10 light-border">
 			<b:Column size="SM_6">
 				<b:Panel addStyleNames="margin-top-10 margin-left-10 margin-right-10 margin-bottom-20">
