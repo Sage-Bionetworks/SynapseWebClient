@@ -23,7 +23,6 @@
 				<b:Alert ui:field="certifyNote" type="INFO" text="You must be a certified user in order to access." pull="RIGHT" visible="false" addStyleNames="small-alert margin-right-2" />
 				<b:Button ui:field="validateProfileButton" type="PRIMARY" text="Validate profile" pull="RIGHT" visible="false" addStyleNames="margin-right-5"/>
 				<b:Alert ui:field="validateProfileNote" type="INFO" text="To access, you must have a validated profile." pull="RIGHT" visible="false" addStyleNames="small-alert margin-right-2" />
-				<b:FormLabel text="Resources:" pull="LEFT"/>
 				<bh:Div ui:field="subjectsWidgetContainer" pull="LEFT" addStyleNames="margin-left-5 margin-right-5" />
 				<bh:Div ui:field="editAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5"/>
 				<bh:Div ui:field="deleteAccessRequirementContainer" pull="RIGHT" addStyleNames="margin-right-5" />
