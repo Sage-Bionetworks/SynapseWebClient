@@ -29,8 +29,8 @@
 		</bh:Span>
 		
 		<bh:Span ui:field="linkUI">
-			<b:Anchor ui:field="changeLink" text="(change)"/>
-			<b:Anchor ui:field="showLink" text="(show)"/>
+			<b:Button addStyleNames="moveup-1" ui:field="changeLink" type="LINK" size="EXTRA_SMALL" text="(change)"/>
+			<b:Button addStyleNames="moveup-1" ui:field="showLink" type="SUCCESS" size="EXTRA_SMALL" text="All conditions met"/>
 			<b:Button addStyleNames="moveup-1" ui:field="showUnmetLink" type="WARNING" size="EXTRA_SMALL" text="Show unmet conditions"/>
 		</bh:Span>
 		
