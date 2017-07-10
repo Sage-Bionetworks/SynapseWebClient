@@ -29,7 +29,6 @@
 			</bh:Div>
 			<bh:ClearFix />
 			<bh:Div>
-				<b:FormLabel text="Resources:" pull="LEFT"/>
 				<bh:Div ui:field="subjectsWidgetContainer" pull="LEFT" addStyleNames="margin-left-5 margin-right-5" />
 			</bh:Div>
 			<bh:ClearFix />
