@@ -77,7 +77,7 @@ public class OpenSubmissionWidgetTest {
 		widget.loadAccessRequirement();
 		verify(mockClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).clear();
-		verify(mockAccessRequirementWidget).setRequirement(actAccessRequirement);
+		verify(mockAccessRequirementWidget).setRequirement(eq(actAccessRequirement), any(Callback.class));
 	}
 
 	@Test

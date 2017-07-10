@@ -31,18 +31,17 @@ public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler
 	ACTAccessRequirement ar;
 	PopupUtilsView popupUtils;
 	DataAccessClientAsync dataAccessClient;
-	GlobalApplicationState globalAppState;
+	Callback refreshCallback;
+	
 	@Inject
 	public ConvertACTAccessRequirementButton(Button button, 
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
 			PopupUtilsView popupUtilsView,
-			DataAccessClientAsync dataAccessClient,
-			GlobalApplicationState globalAppState) {
+			DataAccessClientAsync dataAccessClient) {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.popupUtils = popupUtilsView;
 		this.dataAccessClient = dataAccessClient;
-		this.globalAppState = globalAppState;
 		button.setVisible(false);
 		button.addStyleName("margin-left-10");
 		button.setType(ButtonType.WARNING);
@@ -51,8 +50,9 @@ public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler
 		button.addClickHandler(this);
 	}	
 	
-	public void configure(ACTAccessRequirement ar) {
+	public void configure(ACTAccessRequirement ar, Callback refreshCallback) {
 		this.ar = ar;
+		this.refreshCallback = refreshCallback;
 		showIfACTMember();	
 	}
 	
@@ -92,7 +92,7 @@ public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler
 			@Override
 			public void onSuccess(AccessRequirement result) {
 				popupUtils.showInfo(SUCCESS_MESSAGE, "");
-				globalAppState.refreshPage();
+				refreshCallback.invoke();
 			}
 			
 			@Override

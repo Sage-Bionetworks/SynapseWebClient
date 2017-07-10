@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.exceptions.IllegalArgumentException;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
@@ -31,7 +32,7 @@ public class AccessRequirementWidget implements IsWidget{
 		this.div = div;
 	}
 	
-	public void configure(String accessRequirementId) {
+	public void configure(final String accessRequirementId) {
 		dataAccessClient.getAccessRequirement(Long.parseLong(accessRequirementId), new AsyncCallback<AccessRequirement>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -39,7 +40,13 @@ public class AccessRequirementWidget implements IsWidget{
 			}
 			@Override
 			public void onSuccess(AccessRequirement requirement) {
-				configure(requirement);
+				Callback refreshCallback = new Callback() {
+					@Override
+					public void invoke() {
+						configure(accessRequirementId);
+					}
+				};
+				configure(requirement, refreshCallback);
 			}
 		});
 	}
@@ -55,33 +62,33 @@ public class AccessRequirementWidget implements IsWidget{
 		div.add(synAlert);
 	}
 	
-	public void configure(AccessRequirement requirement) {
+	public void configure(AccessRequirement requirement, Callback refreshCallback) {
 		div.clear();
 		if (requirement instanceof ManagedACTAccessRequirement) {
 			ManagedACTAccessRequirementWidget w = ginInjector.getManagedACTAccessRequirementWidget();
-			w.setRequirement((ManagedACTAccessRequirement) requirement);
+			w.setRequirement((ManagedACTAccessRequirement) requirement, refreshCallback);
 			if (isHideButtons) {
 				w.hideButtons();
 			}
 			div.add(w);
 		} else if (requirement instanceof ACTAccessRequirement) {
 			ACTAccessRequirementWidget w = ginInjector.getACTAccessRequirementWidget();
-			w.setRequirement((ACTAccessRequirement) requirement);
+			w.setRequirement((ACTAccessRequirement) requirement, refreshCallback);
 			if (isHideButtons) {
 				w.hideButtons();
 			} 
 			div.add(w);
 		} else if (requirement instanceof TermsOfUseAccessRequirement) {
 			TermsOfUseAccessRequirementWidget w = ginInjector.getTermsOfUseAccessRequirementWidget();
-			w.setRequirement((TermsOfUseAccessRequirement) requirement);
+			w.setRequirement((TermsOfUseAccessRequirement) requirement, refreshCallback);
 			div.add(w);
 		} else if (requirement instanceof SelfSignAccessRequirement) {
 			SelfSignAccessRequirementWidget w = ginInjector.getSelfSignAccessRequirementWidget();
-			w.setRequirement((SelfSignAccessRequirement) requirement);
+			w.setRequirement((SelfSignAccessRequirement) requirement, refreshCallback);
 			div.add(w);
 		} else if (requirement instanceof LockAccessRequirement) {
 			LockAccessRequirementWidget w = ginInjector.getLockAccessRequirementWidget();
-			w.setRequirement((LockAccessRequirement)requirement);
+			w.setRequirement((LockAccessRequirement)requirement, refreshCallback);
 			div.add(w);
 		} else {
 			handleException(new IllegalArgumentException("unsupported access requirement type: " + requirement.getClass().getName()));

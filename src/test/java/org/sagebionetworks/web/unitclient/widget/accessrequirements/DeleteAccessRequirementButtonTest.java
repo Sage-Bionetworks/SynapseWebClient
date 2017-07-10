@@ -55,22 +55,21 @@ public class DeleteAccessRequirementButtonTest {
 	AccessRequirement mockAccessRequirement;
 	@Mock
 	RestrictableObjectDescriptor mockSubject;
-	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
 	@Mock
 	CookieProvider mockCookies;
-	
+	@Mock
+	Callback mockRefreshCallback;
 	ClickHandler onButtonClickHandler;
 	public static final Long AR_ID = 98L;
 	
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new DeleteAccessRequirementButton(mockButton, mockIsACTMemberAsyncHandler, mockGlobalApplicationState, mockSynapseClient, mockPopupUtilsView, mockCookies);
+		widget = new DeleteAccessRequirementButton(mockButton, mockIsACTMemberAsyncHandler, mockSynapseClient, mockPopupUtilsView, mockCookies);
 		verify(mockButton).addClickHandler(clickHandlerCaptor.capture());
 		onButtonClickHandler = clickHandlerCaptor.getValue();
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteAccessRequirement(anyLong(), any(AsyncCallback.class));
@@ -90,7 +89,7 @@ public class DeleteAccessRequirementButtonTest {
 	@Test
 	public void testConfigureWithAR() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-		widget.configure(mockAccessRequirement);
+		widget.configure(mockAccessRequirement, mockRefreshCallback);
 		verify(mockButton).setText(DELETE_ACCESS_REQUIREMENT_BUTTON_TEXT);
 		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
 		
@@ -110,14 +109,14 @@ public class DeleteAccessRequirementButtonTest {
 		deleteConfirmedCallback.invoke();
 		verify(mockSynapseClient).deleteAccessRequirement(eq(AR_ID), any(AsyncCallback.class));
 		verify(mockPopupUtilsView).showInfo(eq(DELETED_ACCESS_REQUIREMENT_SUCCESS_MESSAGE), anyString());
-		verify(mockGlobalApplicationState).refreshPage();
+		verify(mockRefreshCallback).invoke();
 	}
 	
 
 	@Test
 	public void testConfigureWithARNotInAlpha() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn(null);
-		widget.configure(mockAccessRequirement);
+		widget.configure(mockAccessRequirement, mockRefreshCallback);
 		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
 		
 		CallbackP<Boolean> isACTMemberCallback = callbackPCaptor.getValue();
@@ -131,7 +130,7 @@ public class DeleteAccessRequirementButtonTest {
 	
 	@Test
 	public void testFailureToDelete() {
-		widget.configure(mockAccessRequirement);
+		widget.configure(mockAccessRequirement, mockRefreshCallback);
 		String errorMessage = "error";
 		Exception ex = new Exception(errorMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).deleteAccessRequirement(anyLong(), any(AsyncCallback.class));

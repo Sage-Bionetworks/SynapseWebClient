@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTIFIED;
+import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_VERIFIED;
+
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
@@ -7,7 +10,6 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
@@ -19,7 +21,7 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import static org.sagebionetworks.web.client.presenter.ProfilePresenter.*;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -39,10 +41,10 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 	DeleteAccessRequirementButton deleteAccessRequirementButton;
 	SubjectsWidget subjectsWidget;
 	LazyLoadHelper lazyLoadHelper;
-	GlobalApplicationState globalAppState;
 	PopupUtilsView popupUtils;
 	ReviewAccessorsButton manageAccessButton;
 	UserProfileClientAsync userProfileClient;
+	Callback refreshCallback;
 	
 	@Inject
 	public SelfSignAccessRequirementWidget(SelfSignAccessRequirementWidgetView view,
@@ -55,7 +57,6 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
 			LazyLoadHelper lazyLoadHelper,
-			GlobalApplicationState globalAppState,
 			ReviewAccessorsButton manageAccessButton,
 			PopupUtilsView popupUtils,
 			UserProfileClientAsync userProfileClient) {
@@ -70,7 +71,6 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.manageAccessButton = manageAccessButton;
-		this.globalAppState = globalAppState;
 		this.popupUtils = popupUtils;
 		this.userProfileClient = userProfileClient;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
@@ -91,8 +91,9 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 	}
 	
 	
-	public void setRequirement(final SelfSignAccessRequirement ar) {
+	public void setRequirement(final SelfSignAccessRequirement ar, Callback refreshCallback) {
 		this.ar = ar;
+		this.refreshCallback = refreshCallback;
 		synapseClient.getRootWikiId(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -107,8 +108,8 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 	 			wikiPageWidget.configure(wikiKey, false, null, false);
 			}
 		});
-		createAccessRequirementButton.configure(ar);
-		deleteAccessRequirementButton.configure(ar);
+		createAccessRequirementButton.configure(ar, refreshCallback);
+		deleteAccessRequirementButton.configure(ar, refreshCallback);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
 		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
@@ -174,7 +175,7 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 			}
 			@Override
 			public void onSuccess(AccessApproval result) {
-				globalAppState.refreshPage();
+				refreshCallback.invoke();
 			}
 		};
 		AccessApproval approval = new AccessApproval();

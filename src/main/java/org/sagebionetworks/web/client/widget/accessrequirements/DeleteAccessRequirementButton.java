@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -32,13 +31,11 @@ public class DeleteAccessRequirementButton implements IsWidget {
 	SynapseClientAsync synapseClient;
 	PopupUtilsView popupUtils;
 	Callback confirmedDeleteCallback;
-	GlobalApplicationState globalAppState;
 	CookieProvider cookies;
-	
+	Callback refreshCallback;
 	@Inject
 	public DeleteAccessRequirementButton(Button button, 
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			GlobalApplicationState globalAppState,
 			SynapseClientAsync synapseClient, 
 			PopupUtilsView popupUtils,
 			CookieProvider cookies) {
@@ -46,7 +43,6 @@ public class DeleteAccessRequirementButton implements IsWidget {
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.synapseClient = synapseClient;
 		this.popupUtils = popupUtils;
-		this.globalAppState = globalAppState;
 		this.cookies = cookies;
 		button.setVisible(false);
 		button.addStyleName("margin-left-10");
@@ -65,10 +61,11 @@ public class DeleteAccessRequirementButton implements IsWidget {
 		};
 	}	
 	
-	public void configure(AccessRequirement ar) {
+	public void configure(AccessRequirement ar, Callback refreshCallback) {
 		button.setText(DELETE_ACCESS_REQUIREMENT_BUTTON_TEXT);
 		this.subject = null;
 		this.ar = ar;
+		this.refreshCallback = refreshCallback;
 		showIfACTMember();
 	}
 	
@@ -81,7 +78,7 @@ public class DeleteAccessRequirementButton implements IsWidget {
 			@Override
 			public void onSuccess(Void result) {
 				popupUtils.showInfo(DELETED_ACCESS_REQUIREMENT_SUCCESS_MESSAGE, "");
-				globalAppState.refreshPage();
+				refreshCallback.invoke();
 			}
 			
 			@Override

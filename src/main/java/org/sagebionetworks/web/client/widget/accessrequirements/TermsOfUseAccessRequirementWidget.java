@@ -32,8 +32,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	DeleteAccessRequirementButton deleteAccessRequirementButton;
 	SubjectsWidget subjectsWidget;
 	LazyLoadHelper lazyLoadHelper;
-	GlobalApplicationState globalAppState;
-	
+	Callback refreshCallback;
 	ReviewAccessorsButton manageAccessButton;
 	@Inject
 	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view,
@@ -46,7 +45,6 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
 			LazyLoadHelper lazyLoadHelper,
-			GlobalApplicationState globalAppState,
 			ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -59,7 +57,6 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.manageAccessButton = manageAccessButton;
-		this.globalAppState = globalAppState;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
@@ -78,8 +75,9 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	}
 	
 	
-	public void setRequirement(final TermsOfUseAccessRequirement ar) {
+	public void setRequirement(final TermsOfUseAccessRequirement ar, Callback refreshCallback) {
 		this.ar = ar;
+		this.refreshCallback = refreshCallback;
 		synapseClient.getRootWikiId(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -94,8 +92,8 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	 			view.showWikiTermsUI();
 			}
 		});
-		createAccessRequirementButton.configure(ar);
-		deleteAccessRequirementButton.configure(ar);
+		createAccessRequirementButton.configure(ar, refreshCallback);
+		deleteAccessRequirementButton.configure(ar, refreshCallback);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
 		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
@@ -137,7 +135,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			}
 			@Override
 			public void onSuccess(AccessApproval result) {
-				globalAppState.refreshPage();
+				refreshCallback.invoke();
 			}
 		};
 		AccessApproval approval = new AccessApproval();

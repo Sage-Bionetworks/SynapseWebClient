@@ -72,6 +72,8 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	BasicAccessRequirementStatus mockDataAccessSubmissionStatus;
 	@Mock
 	ReviewAccessorsButton mockManageAccessButton;
+	@Mock
+	Callback mockRefreshCallback;
 	GlobalApplicationState mockGlobalApplicationState;
 	
 	Callback lazyLoadDataCallback;
@@ -90,7 +92,6 @@ public class TermsOfUseAccessRequirementWidgetTest {
 				mockCreateAccessRequirementButton, 
 				mockDeleteAccessRequirementButton, 
 				mockLazyLoadHelper,
-				mockGlobalApplicationState,
 				mockManageAccessButton);
 		when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
@@ -112,17 +113,17 @@ public class TermsOfUseAccessRequirementWidgetTest {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		String tou = "must do things before access is allowed";
 		when(mockTermsOfUseAccessRequirement.getTermsOfUse()).thenReturn(tou);
-		widget.setRequirement(mockTermsOfUseAccessRequirement);
+		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		verify(mockView).setTerms(tou);
 		verify(mockView).showTermsUI();
-		verify(mockCreateAccessRequirementButton).configure(mockTermsOfUseAccessRequirement);
-		verify(mockDeleteAccessRequirementButton).configure(mockTermsOfUseAccessRequirement);
+		verify(mockCreateAccessRequirementButton).configure(mockTermsOfUseAccessRequirement, mockRefreshCallback);
+		verify(mockDeleteAccessRequirementButton).configure(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		boolean isHideIfLoadError = true;
 		verify(mockSubjectsWidget).configure(mockSubjectIds, isHideIfLoadError);
 	}
 	@Test
 	public void testSetRequirementWithWikiTerms() {
-		widget.setRequirement(mockTermsOfUseAccessRequirement);
+		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class), eq(false));
 		verify(mockView, never()).setTerms(anyString());
 		verify(mockView, never()).showTermsUI();
@@ -130,7 +131,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	
 	@Test
 	public void testApprovedState() {
-		widget.setRequirement(mockTermsOfUseAccessRequirement);
+		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();
@@ -138,7 +139,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	
 	@Test
 	public void testUnApprovedState() {
-		widget.setRequirement(mockTermsOfUseAccessRequirement);
+		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showUnapprovedHeading();

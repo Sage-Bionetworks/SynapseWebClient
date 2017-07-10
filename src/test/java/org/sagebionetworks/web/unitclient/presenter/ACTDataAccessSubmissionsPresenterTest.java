@@ -178,7 +178,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockView).setIsIRBApprovalRequired(false);
 		verify(mockView).setIsValidatedProfileRequired(true);
 		
-		verify(mockACTAccessRequirementWidget).setRequirement(mockACTAccessRequirement);
+		verify(mockACTAccessRequirementWidget).setRequirement(eq(mockACTAccessRequirement), any(Callback.class));
 		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq((String)null), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 
 		//verify DataAccessSubmission widget is created/configured for the submission (based on the mockACTAccessRequirement configuration)
