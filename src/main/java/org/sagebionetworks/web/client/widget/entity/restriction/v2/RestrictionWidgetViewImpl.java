@@ -43,9 +43,9 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	Span linkUI;
 	
 	@UiField
-	Anchor changeLink;
+	Button changeLink;
 	@UiField
-	Anchor showLink;
+	Button showLink;
 	@UiField
 	Button showUnmetLink;
 	
