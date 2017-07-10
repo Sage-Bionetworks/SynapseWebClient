@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.Radio;
@@ -43,10 +42,6 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	Presenter presenter;
 	
 	@UiField
-	Radio entityButton;
-	@UiField
-	Radio teamButton;
-	@UiField
 	InputGroup teamUI;
 	@UiField
 	InputGroup entityUI;
@@ -68,33 +63,16 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 			}
 		});
 		
-		entityButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				showEntityUI();
-			}
-		});
-		
-		teamButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				showTeamUI();
-			}
-		});
 	}
 	
 	private void showEntityUI() {
 		entityUI.setVisible(true);
 		teamUI.setVisible(false);
-		entityButton.setValue(true, false);
-		teamButton.setValue(false, false);
 	}
 	
 	private void showTeamUI() {
 		entityUI.setVisible(false);
 		teamUI.setVisible(true);
-		entityButton.setValue(false, false);
-		teamButton.setValue(true, false);
 	}
 	
 	@Override

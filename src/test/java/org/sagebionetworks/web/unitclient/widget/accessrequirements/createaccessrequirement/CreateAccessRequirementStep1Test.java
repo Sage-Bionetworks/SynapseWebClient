@@ -8,8 +8,9 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -139,9 +140,18 @@ public class CreateAccessRequirementStep1Test {
 		verify(mockTouStep2).configure(mockTermsOfUseAccessRequirement);
 		verify(mockModalPresenter).setNextActivePage(mockTouStep2);
 	}
-	
+
+	@Test
+	public void testConfigureWithEmptySubjectList() {
+		widget.configure(mockACTAccessRequirement);
+		widget.onPrimary();
+		
+		verify(mockModalPresenter).setErrorMessage(EMPTY_SUBJECT_LIST_ERROR_MESSAGE);
+	}
+
 	@Test
 	public void testConfigureWithACTAccessRequirement() {
+		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(Collections.singletonList(mockEntityRestrictableObjectDescriptor));
 		widget.configure(mockACTAccessRequirement);
 		// on save, we should be updating the ar we passed in
 		widget.onPrimary();
@@ -152,6 +162,7 @@ public class CreateAccessRequirementStep1Test {
 	
 	@Test
 	public void testConfigureWithToUAccessRequirement() {
+		when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(Collections.singletonList(mockEntityRestrictableObjectDescriptor));
 		widget.configure(mockTermsOfUseAccessRequirement);
 		// on save, we should be updating the ar we passed in
 		//also verify any errors are shown
