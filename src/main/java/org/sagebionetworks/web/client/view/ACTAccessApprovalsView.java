@@ -15,11 +15,11 @@ public interface ACTAccessApprovalsView extends IsWidget, SynapseView {
 	void setSelectedUserBadge(IsWidget w);
 	void setSelectedUserBadgeVisible(boolean visible);
 	void setExpiresBeforeDate(Date date);
+	void setClearAccessRequirementFilterButtonVisible(boolean visible);
 	public interface Presenter {
 		void onClearUserFilter();
 		void onClearExpireBeforeFilter();
 		void onClearAccessRequirementFilter();
 		void onExpiresBeforeDateSelected(Date selectedDate);
-		void onReviewRequests();
 	}
 }

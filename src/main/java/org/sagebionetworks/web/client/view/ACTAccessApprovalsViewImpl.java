@@ -62,8 +62,6 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	Div userSelectContainer;
 	@UiField
 	Div currentUserContainer;
-	@UiField
-	Button reviewRequestsButton;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -107,12 +105,6 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 				presenter.onExpiresBeforeDateSelected(expiresBeforeDatePicker.getValue());
 			}
 		});
-		reviewRequestsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onReviewRequests();
-			}
-		});
 	}
 	
 	@Override
@@ -130,6 +122,10 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	@Override
 	public void setAccessRequirementUIVisible(boolean visible) {
 		accessRequirementUI.setVisible(visible);
+	}
+	@Override
+	public void setClearAccessRequirementFilterButtonVisible(boolean visible) {
+		clearAccessRequirementFilter.setVisible(visible);
 	}
 	@Override
 	public void showErrorMessage(String message) {

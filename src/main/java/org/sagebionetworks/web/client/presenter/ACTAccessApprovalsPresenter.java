@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
-import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ACTAccessApprovalsView;
@@ -81,7 +80,6 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		this.showHideAccessRequirementButton = showHideAccessRequirementButton;
 		this.accessRequirementWidget = accessRequirementWidget;
 		this.globalAppState = globalAppState;
-		accessRequirementWidget.hideButtons();
 		this.peopleSuggestWidget = peopleSuggestWidget;
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		isAccessRequirementVisible = false;
@@ -148,6 +146,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		boolean isAccessRequirementId = accessRequirementId != null;
 		
 		showHideAccessRequirementButton.setVisible(isAccessRequirementId);
+		view.setClearAccessRequirementFilterButtonVisible(isAccessRequirementId);
 		if (isAccessRequirementId) {
 			accessorGroupRequest.setAccessRequirementId(accessRequirementId);
 			accessRequirementWidget.configure(accessRequirementId);
@@ -209,6 +208,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		place.removeParam(ACCESS_REQUIREMENT_ID_PARAM);
 		view.setAccessRequirementUIVisible(false);
 		showHideAccessRequirementButton.setVisible(false);
+		view.setClearAccessRequirementFilterButtonVisible(false);
 		loadData();	
 	}
 	
@@ -241,10 +241,4 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
     public String mayStop() {
         return null;
     }
-	
-	@Override
-	public void onReviewRequests() {
-		ACTDataAccessSubmissionsPlace place = new ACTDataAccessSubmissionsPlace(ACTDataAccessSubmissionsPlace.ACCESS_REQUIREMENT_ID_PARAM + "=" + accessRequirementId);
-		globalAppState.getPlaceChanger().goTo(place);
-	}
 }

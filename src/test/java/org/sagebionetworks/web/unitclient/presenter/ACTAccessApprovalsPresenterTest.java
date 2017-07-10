@@ -1,20 +1,21 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.atLeast;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter.*;
-import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.*;
+import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.ACCESS_REQUIREMENT_ID_PARAM;
+import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.EXPIRES_BEFORE_PARAM;
+import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.SUBMITTER_ID_PARAM;
+import static org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter.HIDE_AR_TEXT;
+import static org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter.SHOW_AR_TEXT;
+
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -22,39 +23,23 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
-import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
-import org.sagebionetworks.repo.model.dataaccess.Submission;
-import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
-import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
-import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
-import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
-import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter;
-import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ACTAccessApprovalsView;
-import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
 import org.sagebionetworks.web.client.widget.Button;
-import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
@@ -63,11 +48,8 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ACTAccessApprovalsPresenterTest {
@@ -147,7 +129,6 @@ public class ACTAccessApprovalsPresenterTest {
 	
 	@Test
 	public void testConstruction() {
-		verify(mockAccessRequirementWidget).hideButtons();
 		verify(mockPeopleSuggestWidget).setSuggestionProvider(mockProvider);
 		verify(mockShowHideAccessRequirementButton).addClickHandler(clickHandlerCaptor.capture());
 		verify(mockView).setAccessRequirementUIVisible(false);
@@ -261,17 +242,5 @@ public class ACTAccessApprovalsPresenterTest {
 		verify(mockDataAccessClient).listAccessorGroup(accessorGroupRequestCaptor.capture(), any(AsyncCallback.class));
 		AccessorGroupRequest request = accessorGroupRequestCaptor.getValue();
 		assertEquals(USER_ID_SELECTED, request.getSubmitterId());
-	}
-	@Test
-	public void testReviewRequests() {
-		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID);
-		presenter.setPlace(mockPlace);
-		
-		presenter.onReviewRequests();
-		
-		verify(mockPlaceChanger).goTo(placeCaptor.capture());
-		Place place = placeCaptor.getValue();
-		assertTrue(place instanceof ACTDataAccessSubmissionsPlace);
-		assertEquals(AR_ID, ((ACTDataAccessSubmissionsPlace)place).getParam(ACTDataAccessSubmissionsPlace.ACCESS_REQUIREMENT_ID_PARAM));
 	}
 }
