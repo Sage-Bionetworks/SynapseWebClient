@@ -68,6 +68,8 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	private ManagedACTAccessRequirement actAccessRequirement;
 	private SubjectsWidget subjectsWidget;
 	DateTimeFormat dateFormat;
+	Callback refreshCallback;
+	
 	@Inject
 	public ACTDataAccessSubmissionsPresenter(
 			final ACTDataAccessSubmissionsView view,
@@ -125,6 +127,12 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 				loadMore();
 			}
 		});
+		refreshCallback = new Callback() {
+			@Override
+			public void invoke() {
+				loadData();	
+			}
+		};
 	}
 
 	@Override
@@ -181,7 +189,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 						view.setIsIRBApprovalRequired(actAccessRequirement.getIsIRBApprovalRequired());
 						view.setIsValidatedProfileRequired(actAccessRequirement.getIsValidatedProfileRequired());
 						
-						actAccessRequirementWidget.setRequirement(actAccessRequirement);
+						actAccessRequirementWidget.setRequirement(actAccessRequirement, refreshCallback);
 						subjectsWidget.configure(actAccessRequirement.getSubjectIds(), true);
 						
 						loadData();

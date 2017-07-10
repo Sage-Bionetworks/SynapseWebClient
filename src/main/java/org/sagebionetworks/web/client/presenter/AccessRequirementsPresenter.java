@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
@@ -45,6 +46,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	DivView noResultsDiv;
 	DivView metAccessRequirementsDiv;
 	DivView unmetAccessRequirementsDiv;
+	Callback refreshCallback;
 	
 	@Inject
 	public AccessRequirementsPresenter(PlaceView view,
@@ -82,6 +84,13 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		noResultsDiv.addStyleName("min-height-400");
 		noResultsDiv.setVisible(false);
 		view.add(noResultsDiv.asWidget());
+		refreshCallback = new Callback() {
+			@Override
+			public void invoke() {
+				loadData();	
+			}
+		};
+		
 	}
 
 	@Override
@@ -118,7 +127,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	}
 	
 	public void loadData() {
-		createAccessRequirementButton.configure(subject);
+		createAccessRequirementButton.configure(subject, refreshCallback);
 		metAccessRequirementsDiv.clear();
 		unmetAccessRequirementsDiv.clear();
 		currentOffset = 0L;
@@ -156,7 +165,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 
 	public IsWidget getAccessRequirementWidget(AccessRequirement ar) {
 		AccessRequirementWidget w = ginInjector.getAccessRequirementWidget();
-		w.configure(ar);
+		w.configure(ar, refreshCallback);
 		return w;
 	}
 

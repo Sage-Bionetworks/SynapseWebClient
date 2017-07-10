@@ -48,10 +48,10 @@ public class ConvertACTAccessRequirementButtonTest {
 	PopupUtilsView mockPopupUtilsView;
 	@Mock
 	DataAccessClientAsync mockDataAccessClientAsync;
-	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
 	@Captor
 	ArgumentCaptor<AccessRequirementConversionRequest> conversionRequestCaptor;
+	@Mock
+	Callback mockRefreshCallback;
 	
 	public static final Long AR_ID = 87654444L;
 	public static final Long AR_VERSION = 3L;
@@ -63,12 +63,11 @@ public class ConvertACTAccessRequirementButtonTest {
 				mockButton, 
 				mockIsACTMemberAsyncHandler, 
 				mockPopupUtilsView,
-				mockDataAccessClientAsync,
-				mockGlobalApplicationState);
+				mockDataAccessClientAsync);
 		when(mockAccessRequirement.getId()).thenReturn(AR_ID);
 		when(mockAccessRequirement.getVersionNumber()).thenReturn(AR_VERSION);
 		when(mockAccessRequirement.getEtag()).thenReturn(AR_ETAG);
-		widget.configure(mockAccessRequirement);
+		widget.configure(mockAccessRequirement, mockRefreshCallback);
 	}
 
 	@Test
@@ -122,7 +121,7 @@ public class ConvertACTAccessRequirementButtonTest {
 		assertEquals(AR_ETAG, request.getEtag());
 		
 		verify(mockPopupUtilsView).showInfo(SUCCESS_MESSAGE, "");
-		verify(mockGlobalApplicationState).refreshPage();
+		verify(mockRefreshCallback).invoke();
 	}
 	
 	@Test

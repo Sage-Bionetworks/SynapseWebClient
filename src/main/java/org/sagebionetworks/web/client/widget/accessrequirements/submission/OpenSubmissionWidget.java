@@ -61,7 +61,13 @@ public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter,
 			@Override
 			public void onSuccess(AccessRequirement ar) {
 				if (ar instanceof ManagedACTAccessRequirement) {
-					accessRequirementWidget.setRequirement((ManagedACTAccessRequirement)ar);
+					Callback refreshCallback = new Callback() {
+						@Override
+						public void invoke() {
+							loadAccessRequirement();	
+						}
+					};
+					accessRequirementWidget.setRequirement((ManagedACTAccessRequirement)ar, refreshCallback);
 				} else {
 					onFailure(new IllegalStateException("Expected an ManagedACTAccessRequirement, but get "+ar.getConcreteType()));
 				}

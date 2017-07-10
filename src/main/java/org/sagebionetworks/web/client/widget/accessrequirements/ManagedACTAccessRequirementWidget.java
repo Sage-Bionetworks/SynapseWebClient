@@ -96,7 +96,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		lazyLoadHelper.configure(loadDataCallback, view);
 	}
 	
-	public void setRequirement(final ManagedACTAccessRequirement ar) {
+	public void setRequirement(final ManagedACTAccessRequirement ar, Callback refreshCallback) {
 		this.ar = ar;
 		synAlert.clear();
 		view.setWikiTermsWidgetVisible(false);
@@ -115,8 +115,8 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	 			wikiPageWidget.configure(wikiKey, false, null, false);
 			}
 		});
-		createAccessRequirementButton.configure(ar);
-		deleteAccessRequirementButton.configure(ar);
+		createAccessRequirementButton.configure(ar, refreshCallback);
+		deleteAccessRequirementButton.configure(ar, refreshCallback);
 		reviewAccessRequestsButton.configure(ar);
 		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds(), true);

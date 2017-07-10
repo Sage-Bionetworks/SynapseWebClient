@@ -95,6 +95,8 @@ public class ACTAccessRequirementWidgetTest {
 	ReviewAccessorsButton mockManageAccessButton;
 	@Mock
 	ConvertACTAccessRequirementButton mockConvertACTAccessRequirementButton;
+	@Mock
+	Callback mockRefreshCallback;
 	
 	Callback lazyLoadDataCallback;
 	
@@ -145,18 +147,18 @@ public class ACTAccessRequirementWidgetTest {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		String tou = "must do things before access is allowed";
 		when(mockACTAccessRequirement.getActContactInfo()).thenReturn(tou);
-		widget.setRequirement(mockACTAccessRequirement);
+		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
 		verify(mockView).setTerms(tou);
 		verify(mockView).showTermsUI();
-		verify(mockCreateAccessRequirementButton).configure(mockACTAccessRequirement);
-		verify(mockDeleteAccessRequirementButton).configure(mockACTAccessRequirement);
+		verify(mockCreateAccessRequirementButton).configure(mockACTAccessRequirement, mockRefreshCallback);
+		verify(mockDeleteAccessRequirementButton).configure(mockACTAccessRequirement, mockRefreshCallback);
 		boolean isHideIfLoadError = true;
 		verify(mockSubjectsWidget).configure(mockSubjectIds, isHideIfLoadError);
 		verify(mockLazyLoadHelper).setIsConfigured();
 	}
 	@Test
 	public void testSetRequirementWithWikiTerms() {
-		widget.setRequirement(mockACTAccessRequirement);
+		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class), eq(false));
 		verify(mockView, never()).setTerms(anyString());
 		verify(mockView, never()).showTermsUI();
@@ -164,7 +166,7 @@ public class ACTAccessRequirementWidgetTest {
 	
 	@Test
 	public void testApprovedState() {
-		widget.setRequirement(mockACTAccessRequirement);
+		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();
@@ -175,7 +177,7 @@ public class ACTAccessRequirementWidgetTest {
 	public void testUnApprovedStateNoOpenJira() {
 		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(false);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
-		widget.setRequirement(mockACTAccessRequirement);
+		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showUnapprovedHeading();
 		verify(mockView, never()).showRequestAccessButton();
@@ -185,7 +187,7 @@ public class ACTAccessRequirementWidgetTest {
 	public void testUnApprovedStateNullOpenJira() {
 		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(null);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
-		widget.setRequirement(mockACTAccessRequirement);
+		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showUnapprovedHeading();
 		verify(mockView, never()).showRequestAccessButton();
@@ -193,7 +195,7 @@ public class ACTAccessRequirementWidgetTest {
 	
 	@Test
 	public void testUnApprovedStateNoDataAccessRequestWithOpenJiraIssue() {
-		widget.setRequirement(mockACTAccessRequirement);
+		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
 		when(mockACTAccessRequirement.getOpenJiraIssue()).thenReturn(true);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
 		lazyLoadDataCallback.invoke();
@@ -203,7 +205,7 @@ public class ACTAccessRequirementWidgetTest {
 	
 	@Test
 	public void testRequestAccess() {
-		widget.setRequirement(mockACTAccessRequirement);
+		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
 		lazyLoadDataCallback.invoke();
 		String requestAccessURLString = "requestAccessURLString";
 		when(mockJiraURLHelper.createRequestAccessIssue(any(String.class),any(String.class),any(String.class),any(String.class),any(String.class))).thenReturn(requestAccessURLString);

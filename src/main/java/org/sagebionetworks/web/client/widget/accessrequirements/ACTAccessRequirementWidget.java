@@ -93,7 +93,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		lazyLoadHelper.configure(loadDataCallback, view);
 	}
 	
-	public void setRequirement(final ACTAccessRequirement ar) {
+	public void setRequirement(final ACTAccessRequirement ar, Callback refreshCallback) {
 		this.ar = ar;
 		synapseClient.getRootWikiId(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), new AsyncCallback<String>() {
 			@Override
@@ -109,11 +109,11 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	 			view.showWikiTermsUI();
 			}
 		});
-		createAccessRequirementButton.configure(ar);
-		deleteAccessRequirementButton.configure(ar);
+		createAccessRequirementButton.configure(ar, refreshCallback);
+		deleteAccessRequirementButton.configure(ar, refreshCallback);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
 		manageAccessButton.configure(ar);
-		convertACTAccessRequirementButton.configure(ar);
+		convertACTAccessRequirementButton.configure(ar, refreshCallback);
 		lazyLoadHelper.setIsConfigured();
 	}
 	
