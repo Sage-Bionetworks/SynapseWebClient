@@ -14,9 +14,9 @@
 			<b:FormGroup>
 				<b:FormLabel>Accessors</b:FormLabel>
 				<bh:Div ui:field="validatedUserProfileNote" visible="false" >
-					<bh:Italic text="All accessors must have a validated user profile." />
-					<w:HelpWidget helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile." text=""
-											    	href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile" iconStyles="" />
+					<bh:Italic text="All accessors must have a " />
+					<w:HelpWidget helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile." text="validated user profile"
+						href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile" addMoreInfoStyleNames="font-italic" iconStyles="hide"/>
 				</bh:Div>
 				<b:Panel>
 					<b:PanelBody>

@@ -119,6 +119,10 @@ public class HelpWidget implements IsWidget {
 		widget.addStyleName(styleNames);
 	}
 	
+	public void setAddMoreInfoStyleNames(String styleNames) {
+		moreInfoText.addClassName(styleNames);
+	}
+	
 	public void setPull(Pull pull) {
 		widget.addStyleName(pull.getCssName());
 	}
