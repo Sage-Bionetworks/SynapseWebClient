@@ -4,7 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -32,11 +31,11 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
-import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -49,7 +48,6 @@ public class TableListWidgetTest {
 	private PreflightController mockPreflightController;
 	private TableListWidgetView mockView;
 	private SynapseClientAsync mockSynapseClient;
-	private CreateTableModalWidget mockcreateTableModalWidget;
 	private UploadTableModalWidget mockUploadTableModalWidget;
 	private TableListWidget widget;
 	private EntityBundle parentBundle;
@@ -62,6 +60,8 @@ public class TableListWidgetTest {
 	LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
 	@Mock
 	EntityChildrenResponse mockResults;
+	@Mock
+	SynapseAlert mockSynAlert;
 	List<EntityHeader> searchResults;
 	
 	
@@ -77,13 +77,13 @@ public class TableListWidgetTest {
 		parentBundle.setPermissions(permissions);
 		mockView = Mockito.mock(TableListWidgetView.class);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockcreateTableModalWidget = Mockito.mock(CreateTableModalWidget.class);
 		mockUploadTableModalWidget = Mockito.mock(UploadTableModalWidget.class);
 		mockPreflightController = Mockito.mock(PreflightController.class);
-		widget = new TableListWidget(mockPreflightController, mockView, mockSynapseClient, mockcreateTableModalWidget, mockUploadTableModalWidget, mockCookies, mockCreateTableViewWizard, mockLoadMoreWidgetContainer);
+		widget = new TableListWidget(mockPreflightController, mockView, mockSynapseClient, mockUploadTableModalWidget, mockCookies, mockCreateTableViewWizard, mockLoadMoreWidgetContainer, mockSynAlert);
 		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		searchResults = new ArrayList<EntityHeader>();
 		when(mockResults.getPage()).thenReturn(searchResults);
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 	}
 	
 	@Test
@@ -118,6 +118,7 @@ public class TableListWidgetTest {
 		verify(mockView).setAddTableVisible(true);
 		verify(mockView).setUploadTableVisible(true);
 		verify(mockView).setAddFileViewVisible(true);
+		verify(mockView).setAddProjectViewVisible(true);
 	}
 	
 	@Test
@@ -127,15 +128,27 @@ public class TableListWidgetTest {
 		verify(mockView).setAddTableVisible(false);
 		verify(mockView).setUploadTableVisible(false);
 		verify(mockView).setAddFileViewVisible(false);
+		verify(mockView).setAddProjectViewVisible(false);
+	}
+	
+	@Test
+	public void testNoAlphaMode(){
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
+		widget.configure(parentBundle);
+		verify(mockView).setAddTableVisible(true);
+		verify(mockView).setUploadTableVisible(true);
+		verify(mockView).setAddFileViewVisible(true);
+		verify(mockView).setAddProjectViewVisible(false);
 	}
 	
 	@Test
 	public void testConfigureFailure(){
 		parentBundle.getPermissions().setCanEdit(false);
 		String error = "an error";
-		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		Throwable th = new Throwable(error);
+		AsyncMockStubber.callFailureWith(th).when(mockSynapseClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		widget.configure(parentBundle);
-		verify(mockView).showErrorMessage(error);
+		verify(mockSynAlert).handleException(th);
 	}
 	
 	@Test
@@ -157,26 +170,17 @@ public class TableListWidgetTest {
 	}
 	
 	@Test
-	public void testAddTableCSVPreflightFailed(){
+	public void testCreateTableWizardPreflightFailed(){
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
 		widget.configure(parentBundle);
 		widget.onAddTable();
 		// Failure should not proceed to create
-		verify(mockcreateTableModalWidget, never()).showCreateModal();
-	}
-	
-	@Test
-	public void testCreateTableCSVPreflightPassed(){
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
-		widget.configure(parentBundle);
-		widget.onAddTable();
-		// proceed to create
-		verify(mockcreateTableModalWidget).showCreateModal();
+		verify(mockCreateTableViewWizard, never()).configure(ENTITY_ID, TableType.table);
+		verify(mockCreateTableViewWizard, never()).showModal(any(WizardCallback.class));
 	}
 	
 	@Test
 	public void testCreateTableWizardPreflightPassed(){
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
 		widget.configure(parentBundle);
 		widget.onAddTable();
@@ -201,7 +205,26 @@ public class TableListWidgetTest {
 		widget.configure(parentBundle);
 		widget.onAddFileView();
 		// proceed to create
-		verify(mockCreateTableViewWizard).configure(ENTITY_ID, TableType.view);
+		verify(mockCreateTableViewWizard).configure(ENTITY_ID, TableType.fileview);
+		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
+	}
+	
+	@Test
+	public void testAddProjectViewPreflightFailed(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
+		widget.configure(parentBundle);
+		widget.onAddProjectView();
+		// Failure should not proceed to create
+		verify(mockCreateTableViewWizard, never()).showModal(any(WizardCallback.class));
+	}
+	
+	@Test
+	public void testAddProjectViewPreflightPassed(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
+		widget.configure(parentBundle);
+		widget.onAddProjectView();
+		// proceed to create
+		verify(mockCreateTableViewWizard).configure(ENTITY_ID, TableType.projectview);
 		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
 	}
 }

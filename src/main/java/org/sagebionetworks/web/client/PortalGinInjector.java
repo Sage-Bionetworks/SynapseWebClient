@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionDashboardPresenter;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter;
 import org.sagebionetworks.web.client.presenter.ACTPresenter;
@@ -15,10 +16,10 @@ import org.sagebionetworks.web.client.presenter.ComingSoonPresenter;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.ErrorPresenter;
-import org.sagebionetworks.web.client.presenter.MapPresenter;
 import org.sagebionetworks.web.client.presenter.HelpPresenter;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
+import org.sagebionetworks.web.client.presenter.MapPresenter;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
@@ -42,9 +43,13 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.RadioWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.SelfSignAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
@@ -54,8 +59,6 @@ import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheKey;
-import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheValue;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
@@ -84,8 +87,8 @@ import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
-import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.ACTRevokeUserAccessModal;
+import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -108,8 +111,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.ImageLinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.ImageLinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LeaderboardConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor;
@@ -213,6 +216,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumn
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultRangeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultSliderRangeWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesWidget;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ImportTableViewColumnsButton;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
@@ -316,6 +320,7 @@ public interface PortalGinInjector extends Ginjector {
 	public ACTDataAccessSubmissionDashboardPresenter getACTDataAccessSubmissionDashboardPresenter();
 	public SynapseForumPresenter getSynapseForumPresenter();
 	public SubscriptionPresenter getSubscriptionPresenter();
+	public ACTAccessApprovalsPresenter getACTAccessApprovalsPresenter();
 	
 	/*
 	 *  Markdown Widgets
@@ -406,6 +411,7 @@ public interface PortalGinInjector extends Ginjector {
 	
 	// TableEntity V2
 	public ColumnModelsView createNewColumnModelsView();
+	public ImportTableViewColumnsButton getImportTableViewColumnsButton();
 	public ColumnModelsWidget createNewColumnModelsWidget();
 	public ColumnModelTableRowViewer createNewColumnModelTableRowViewer();
 	public ColumnModelTableRowEditorWidget createColumnModelEditorWidget();
@@ -472,9 +478,6 @@ public interface PortalGinInjector extends Ginjector {
 	public DiscussionThreadListItemWidget createThreadListItemWidget();
 	public ReplyWidget createReplyWidget();
 	
-	public MarkdownCacheKey getMarkdownCacheKey();
-	public MarkdownCacheValue getMarkdownCacheValue();
-	
 	public TopicRowWidget getTopicRowWidget();
 	public RefreshAlert getRefreshAlert();
 	public ReplyCountAlert getReplyCountAlert();
@@ -534,6 +537,7 @@ public interface PortalGinInjector extends Ginjector {
 	public UserIdCellRendererImpl getUserIdCellRenderer();
 	
 	public CreateDataAccessRequestWizard getCreateDataAccessRequestWizard();
+	public ManagedACTAccessRequirementWidget getManagedACTAccessRequirementWidget();
 	public ACTAccessRequirementWidget getACTAccessRequirementWidget();
 	public LockAccessRequirementWidget getLockAccessRequirementWidget();
 	public TermsOfUseAccessRequirementWidget getTermsOfUseAccessRequirementWidget();
@@ -542,4 +546,8 @@ public interface PortalGinInjector extends Ginjector {
 	public ProfileCertifiedValidatedWidget getProfileCertifiedValidatedWidget();
 	public ACTDataAccessSubmissionWidget getACTDataAccessSubmissionWidget();
 	public OpenSubmissionWidget getOpenSubmissionWidget();
+	public DateTimeUtils getDateTimeUtils();
+	public AccessorGroupWidget getAccessorGroupWidget();
+	public AccessRequirementWidget getAccessRequirementWidget();
+	public SelfSignAccessRequirementWidget getSelfSignAccessRequirementWidget();
 }

@@ -27,8 +27,7 @@ public class Portal implements EntryPoint {
 	public static final int CODE_LOAD_DELAY = 5000;
 	//  We are using gin to create all of our objects
 	private final PortalGinInjector ginjector = GWT.create(PortalGinInjector.class);
-	private final AppLoadingView loading = GWT.create(AppLoadingView.class);
-
+	
 	private SimplePanel appWidget = new SimplePanel();
 
 	public final static native void _consoleError(String message) /*-{
@@ -47,8 +46,6 @@ public class Portal implements EntryPoint {
 			Window.Location.replace(fullUrl);
 			Window.Location.reload();
 		} else {
-			// Show a loading dialog while we downlaod code
-			loading.showWidget();
 			// This is a split point where the browser can download the first large code file.
 			GWT.runAsync(new RunAsyncCallback() {
 				@Override
@@ -65,7 +62,7 @@ public class Portal implements EntryPoint {
 						PlaceController placeController = new PlaceController(eventBus);
 
 						// Start ActivityManager for the main widget with our ActivityMapper
-						AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), loading);
+						AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), null);
 						ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
 						activityManager.setDisplay(appWidget);
 						
@@ -78,7 +75,7 @@ public class Portal implements EntryPoint {
 						historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());						
 						
 						RootPanel.get("rootPanel").add(appWidget);
-
+						RootPanel.get("initialLoadingUI").setVisible(false);
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
@@ -98,7 +95,6 @@ public class Portal implements EntryPoint {
 								
 								// Goes to place represented on URL or default place
 								historyHandler.handleCurrentHistory();
-								loading.hide();
 								delayLoadOfZxcvbn();
 							}
 						});

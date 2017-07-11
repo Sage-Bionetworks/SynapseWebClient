@@ -26,8 +26,6 @@ import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.MultipartFileUploadClientImpl;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
-import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
-import org.sagebionetworks.web.server.servlet.SimpleSearchService;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SubscriptionClientImpl;
@@ -100,10 +98,6 @@ public class PortalServletModule extends ServletModule {
 		bind(UserProfileClientImpl.class).in(Singleton.class);
 		serve("/Portal/userprofileclient").with(UserProfileClientImpl.class);
 		
-		// Setup the Search service
-		bind(SearchServiceImpl.class).in(Singleton.class);
-		serve("/Portal/searchclient").with(SearchServiceImpl.class);
-	
 		// setup the layout service
 		bind(LayoutServiceImpl.class).in(Singleton.class);
 		serve("/Portal/layout").with(LayoutServiceImpl.class);
@@ -116,10 +110,6 @@ public class PortalServletModule extends ServletModule {
 		bind(StackConfigServiceImpl.class).in(Singleton.class);
 		serve("/Portal/stackConfig").with(StackConfigServiceImpl.class);
 		
-		// setup the Simple Search servlet
-		bind(SimpleSearchService.class).in(Singleton.class);
-		serve("/Portal/simplesearch").with(SimpleSearchService.class);
-
 		// Setup the File Uploader JNLP mapping
 		bind(FileUploaderJnlp.class).in(Singleton.class);
 		serve("/Portal/fileUploaderJnlp").with(FileUploaderJnlp.class);
@@ -185,9 +175,6 @@ public class PortalServletModule extends ServletModule {
 		bind(RestTemplateProvider.class).to(RestTemplateProviderImpl.class);
 		// Bind the properties from the config file
 		bindPropertiesFromFile("ServerConstants.properties");
-		
-		// Bind the ConlumnConfig to singleton
-		bind(ColumnConfigProvider.class).in(Singleton.class);
 		
 		// JSONObjectAdapter
 		bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);

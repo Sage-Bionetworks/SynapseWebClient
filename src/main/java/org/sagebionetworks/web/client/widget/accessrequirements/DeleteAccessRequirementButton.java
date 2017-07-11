@@ -3,9 +3,10 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
-import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
@@ -30,19 +31,19 @@ public class DeleteAccessRequirementButton implements IsWidget {
 	SynapseClientAsync synapseClient;
 	PopupUtilsView popupUtils;
 	Callback confirmedDeleteCallback;
-	GlobalApplicationState globalAppState;
-	
+	CookieProvider cookies;
+	Callback refreshCallback;
 	@Inject
 	public DeleteAccessRequirementButton(Button button, 
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			GlobalApplicationState globalAppState,
 			SynapseClientAsync synapseClient, 
-			PopupUtilsView popupUtils) {
+			PopupUtilsView popupUtils,
+			CookieProvider cookies) {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.synapseClient = synapseClient;
 		this.popupUtils = popupUtils;
-		this.globalAppState = globalAppState;
+		this.cookies = cookies;
 		button.setVisible(false);
 		button.addStyleName("margin-left-10");
 		button.setType(ButtonType.DANGER);
@@ -60,10 +61,11 @@ public class DeleteAccessRequirementButton implements IsWidget {
 		};
 	}	
 	
-	public void configure(AccessRequirement ar) {
+	public void configure(AccessRequirement ar, Callback refreshCallback) {
 		button.setText(DELETE_ACCESS_REQUIREMENT_BUTTON_TEXT);
 		this.subject = null;
 		this.ar = ar;
+		this.refreshCallback = refreshCallback;
 		showIfACTMember();
 	}
 	
@@ -76,7 +78,7 @@ public class DeleteAccessRequirementButton implements IsWidget {
 			@Override
 			public void onSuccess(Void result) {
 				popupUtils.showInfo(DELETED_ACCESS_REQUIREMENT_SUCCESS_MESSAGE, "");
-				globalAppState.refreshPage();
+				refreshCallback.invoke();
 			}
 			
 			@Override
@@ -87,10 +89,11 @@ public class DeleteAccessRequirementButton implements IsWidget {
 	}
 	
 	private void showIfACTMember() {
-		isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean isACTMember) {
-				button.setVisible(isACTMember);
+				boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
+				button.setVisible(isACTMember && isInAlpha);
 			}
 		});
 	}

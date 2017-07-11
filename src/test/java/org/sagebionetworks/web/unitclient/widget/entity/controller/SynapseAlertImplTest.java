@@ -40,6 +40,7 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.StatusCodeException;
 import com.google.gwt.user.client.ui.Widget;
 
 public class SynapseAlertImplTest {
@@ -99,6 +100,31 @@ public class SynapseAlertImplTest {
 		widget.handleException(new SynapseDownException());
 		verify(mockView, times(2)).clearState();
 		verify(mockPlaceChanger).goTo(isA(Down.class));
+	}
+	
+	@Test
+	public void testHandleStatusCodeExceptionWithMessage() {
+		String statusText = "error described here";
+		widget.handleException(new StatusCodeException(1, statusText, ""));
+		verify(mockView, times(2)).clearState();
+		verify(mockView).showError(statusText);
+		verify(mockView, never()).setRetryButtonVisible(true);
+	}
+
+	@Test
+	public void testHandleStatusCodeExceptionWithStatusCodeOnly() {
+		int statusCode = 418; //I'm a teapot status code
+		widget.handleException(new StatusCodeException(statusCode, ""));
+		verify(mockView, times(2)).clearState();
+		verify(mockView).showError(SynapseAlertImpl.SERVER_STATUS_CODE_MESSAGE + statusCode);
+		verify(mockView, never()).setRetryButtonVisible(true);
+	}
+	
+	public void testHandleStatusCodeExceptionZero() {
+		widget.handleException(new StatusCodeException(0, ""));
+		verify(mockView, times(2)).clearState();
+		verify(mockView).showError(DisplayConstants.NETWORK_ERROR);
+		verify(mockView).setRetryButtonVisible(true);
 	}
 	
 	@Test

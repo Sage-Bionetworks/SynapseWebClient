@@ -1,16 +1,20 @@
 package org.sagebionetworks.web.server.servlet;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoRequest;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoResponse;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
+import org.sagebionetworks.repo.model.dataaccess.AccessRequirementConversionRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
-import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalRequest;
-import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalResult;
+import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
+import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -115,6 +119,16 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	@Override
+	public BatchAccessApprovalInfoResponse getAccessRequirementStatus(BatchAccessApprovalInfoRequest request)
+			throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getBatchAccessApprovalInfo(request);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 	
 	@Override
 	public void cancelDataAccessSubmission(String submissionId) throws RestServiceException {
@@ -168,12 +182,30 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
 	}
-	
 	@Override
-	public BatchAccessApprovalResult getAccessApprovalInfo(BatchAccessApprovalRequest batchRequest) throws RestServiceException {
+	public AccessorGroupResponse listAccessorGroup(AccessorGroupRequest request) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			return synapseClient.getAccessApprovalInfo(batchRequest);
+			return synapseClient.listAccessorGroup(request);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+	@Override
+	public void revokeGroup(String accessRequirementId, String submitterId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.revokeGroup(accessRequirementId, submitterId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+	
+	@Override
+	public AccessRequirement convertAccessRequirement(AccessRequirementConversionRequest request) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.convertAccessRequirement(request);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 

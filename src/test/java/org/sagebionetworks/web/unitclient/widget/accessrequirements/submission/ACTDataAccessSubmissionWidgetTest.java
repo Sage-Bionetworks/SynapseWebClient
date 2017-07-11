@@ -21,19 +21,20 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.dataaccess.AccessApprovalResult;
-import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalRequest;
-import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalResult;
+import org.sagebionetworks.repo.model.dataaccess.AccessType;
+import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidgetView;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
@@ -79,15 +80,11 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	UserBadgeItem mockUserBadge;
 	@Mock
-	BatchAccessApprovalResult mockBatchAccessApprovalResult;
-	@Mock
 	UserBadge mockModifiedByBadge;
 	@Mock
-	AccessApprovalResult mockAccessApprovalResult1;
+	DateTimeUtils mockDateTimeUtils;
 	@Mock
-	AccessApprovalResult mockAccessApprovalResult2;
-	List<AccessApprovalResult> accessApprovalResults;
-	
+	ShowEmailsButton mockShowEmailsButton;
 	public static final String SUBMISSION_ID = "9876545678987";
 	public static final String INSTITUTION = "Univerisity of Washington";
 	public static final String INTENDED_DATA_USE = "lorem ipsum";
@@ -109,15 +106,22 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockResearchProjectSnapshot.getInstitution()).thenReturn(INSTITUTION);
 		when(mockResearchProjectSnapshot.getIntendedDataUseStatement()).thenReturn(INTENDED_DATA_USE);
 		when(mockResearchProjectSnapshot.getProjectLead()).thenReturn(PROJECT_LEAD);
-		when(mockJSNIUtils.convertDateToSmallString(any(Date.class))).thenReturn(SMALL_DATE_STRING);
+		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(SMALL_DATE_STRING);
 		
-		widget = new ACTDataAccessSubmissionWidget(mockView, mockSynapseAlert, mockClient, mockPromptModalView, mockDucFileRenderer, mockIrbFileRenderer, mockFileHandleList, mockJSNIUtils, mockGinInjector);
+		widget = new ACTDataAccessSubmissionWidget(mockView, 
+				mockSynapseAlert, 
+				mockClient, 
+				mockPromptModalView, 
+				mockDucFileRenderer, 
+				mockIrbFileRenderer, 
+				mockFileHandleList, 
+				mockJSNIUtils, 
+				mockGinInjector, 
+				mockDateTimeUtils, 
+				mockShowEmailsButton);
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmission).when(mockClient).updateDataAccessSubmissionState(anyString(), any(SubmissionState.class), anyString(), any(AsyncCallback.class));
 		verify(mockPromptModalView).configure(anyString(),  anyString(), anyString(),  promptModalPresenterCaptor.capture());
 		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
-		accessApprovalResults = new ArrayList<>();
-		when(mockBatchAccessApprovalResult.getResults()).thenReturn(accessApprovalResults);
-		AsyncMockStubber.callSuccessWith(mockBatchAccessApprovalResult).when(mockClient).getAccessApprovalInfo(any(BatchAccessApprovalRequest.class), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -136,10 +140,17 @@ public class ACTDataAccessSubmissionWidgetTest {
 		boolean user2HasApproval = false;
 		String userId1 = "12";
 		String userId2 = "34";
-		List<String> userIds = new ArrayList<String>();
-		userIds.add(userId1);
-		userIds.add(userId2);
-		when(mockDataAccessSubmission.getAccessors()).thenReturn(userIds);
+		List<AccessorChange> changes = new ArrayList<AccessorChange>();
+		AccessorChange change1 = new AccessorChange();
+		change1.setUserId(userId1);
+		change1.setType(AccessType.GAIN_ACCESS);
+		AccessorChange change2 = new AccessorChange();
+		change2.setUserId(userId2);
+		change2.setType(AccessType.GAIN_ACCESS);
+		
+		changes.add(change1);
+		changes.add(change2);
+		when(mockDataAccessSubmission.getAccessorChanges()).thenReturn(changes);
 		// set up other documents
 		String fileHandleId1 = "873";
 		String fileHandleId2 = "5432";
@@ -147,13 +158,6 @@ public class ACTDataAccessSubmissionWidgetTest {
 		fileHandleIds.add(fileHandleId1);
 		fileHandleIds.add(fileHandleId2);
 		when(mockDataAccessSubmission.getAttachments()).thenReturn(fileHandleIds);
-		when(mockAccessApprovalResult1.getUserId()).thenReturn(userId1);
-		when(mockAccessApprovalResult1.getHasApproval()).thenReturn(user1HasApproval);
-		accessApprovalResults.add(mockAccessApprovalResult1);
-		when(mockAccessApprovalResult2.getUserId()).thenReturn(userId2);
-		when(mockAccessApprovalResult2.getHasApproval()).thenReturn(user2HasApproval);
-		accessApprovalResults.add(mockAccessApprovalResult2);
-		
 		when(mockDataAccessSubmission.getIsRenewalSubmission()).thenReturn(false);
 		String fileHandleId3 = "565499";
 		when(mockDataAccessSubmission.getDucFileHandleId()).thenReturn(fileHandleId3);
@@ -167,11 +171,8 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).clearAccessors();
 		verify(mockGinInjector, times(2)).getUserBadgeItem();
 		
-		verify(mockUserBadge).configure(userId1);
-		verify(mockUserBadge).setMetRequirementIconVisible(user1HasApproval);
-		
-		verify(mockUserBadge).configure(userId2);
-		verify(mockUserBadge).setMetRequirementIconVisible(user2HasApproval);
+		verify(mockUserBadge).configure(change1);
+		verify(mockUserBadge).configure(change2);
 		
 		verify(mockView, times(2)).addAccessors(any(IsWidget.class));
 		// verify other documents
@@ -200,8 +201,34 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).setInstitution(INSTITUTION);
 		verify(mockView).setIntendedDataUse(INTENDED_DATA_USE);
 		verify(mockView).setIsRenewal(false);
+		verify(mockView).setRenewalColumnsVisible(false);
 		verify(mockView).setProjectLead(PROJECT_LEAD);
 		verify(mockView).setSubmittedOn(SMALL_DATE_STRING);
+	}
+	
+	@Test
+	public void testConfigureRenewal() {
+		when(mockGinInjector.getUserBadgeItem()).thenReturn(mockUserBadge);
+		String userId1 = "12";
+		List<AccessorChange> changes = new ArrayList<AccessorChange>();
+		AccessorChange change1 = new AccessorChange();
+		change1.setUserId(userId1);
+		change1.setType(AccessType.RENEW_ACCESS);
+		changes.add(change1);
+		when(mockDataAccessSubmission.getAccessorChanges()).thenReturn(changes);
+		when(mockDataAccessSubmission.getIsRenewalSubmission()).thenReturn(true);
+		
+		widget.configure(mockDataAccessSubmission);
+		
+		verify(mockView).hideActions();
+		// verify accessors
+		verify(mockView).clearAccessors();
+		verify(mockGinInjector).getUserBadgeItem();
+		verify(mockUserBadge).configure(change1);
+		verify(mockView).addAccessors(any(IsWidget.class));
+		// verify view
+		verify(mockView).setIsRenewal(true);
+		verify(mockView).setRenewalColumnsVisible(true);
 	}
 	
 	@Test

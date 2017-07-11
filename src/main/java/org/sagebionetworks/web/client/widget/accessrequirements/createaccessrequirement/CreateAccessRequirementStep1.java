@@ -7,9 +7,10 @@ import java.util.List;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
@@ -25,11 +26,12 @@ import com.google.inject.Inject;
  *
  */
 public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequirementStep1View.Presenter {
+	public static final String EMPTY_SUBJECT_LIST_ERROR_MESSAGE = "Please select at least one resource for this Access Requirement to be associated with.";
 	CreateAccessRequirementStep1View view;
 	List<RestrictableObjectDescriptor> subjects;
 	ModalPresenter modalPresenter;
-	CreateACTAccessRequirementStep2 actStep2;
-	CreateTermsOfUseAccessRequirementStep2 touStep2;
+	CreateManagedACTAccessRequirementStep2 actStep2;
+	CreateBasicAccessRequirementStep2 basicStep2;
 	ACCESS_TYPE currentAccessType;
 	AccessRequirement accessRequirement;
 	SynapseClientAsync synapseClient;
@@ -38,14 +40,14 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	@Inject
 	public CreateAccessRequirementStep1(
 			CreateAccessRequirementStep1View view,
-			CreateACTAccessRequirementStep2 actStep2,
-			CreateTermsOfUseAccessRequirementStep2 touStep2,
+			CreateManagedACTAccessRequirementStep2 actStep2,
+			CreateBasicAccessRequirementStep2 touStep2,
 			SynapseClientAsync synapseClient,
 			SubjectsWidget subjectsWidget) {
 		super();
 		this.view = view;
 		this.actStep2 = actStep2;
-		this.touStep2 = touStep2;
+		this.basicStep2 = touStep2;
 		this.subjectsWidget = subjectsWidget;
 		this.synapseClient = synapseClient;
 		view.setSubjects(subjectsWidget);
@@ -59,10 +61,12 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 		String[] entities = entityIds.split("[,\\s]\\s*");
 		List<RestrictableObjectDescriptor> newSubjects = new ArrayList<RestrictableObjectDescriptor>();
 		for (int i = 0; i < entities.length; i++) {
-			RestrictableObjectDescriptor newSubject = new RestrictableObjectDescriptor();
-			newSubject.setId(entities[i]);
-			newSubject.setType(RestrictableObjectType.ENTITY);
-			newSubjects.add(newSubject);
+			if (entities[i].trim().length() > 0) {
+				RestrictableObjectDescriptor newSubject = new RestrictableObjectDescriptor();
+				newSubject.setId(entities[i]);
+				newSubject.setType(RestrictableObjectType.ENTITY);
+				newSubjects.add(newSubject);
+			}
 		}
 		setSubjects(newSubjects);
 	}
@@ -74,10 +78,12 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 		String[] teams = teamIds.split("[,\\s]\\s*");
 		List<RestrictableObjectDescriptor> newSubjects = new ArrayList<RestrictableObjectDescriptor>();
 		for (int i = 0; i < teams.length; i++) {
-			RestrictableObjectDescriptor newSubject = new RestrictableObjectDescriptor();
-			newSubject.setId(teams[i]);
-			newSubject.setType(RestrictableObjectType.TEAM);
-			newSubjects.add(newSubject);
+			if (teams[i].trim().length() > 0) {
+				RestrictableObjectDescriptor newSubject = new RestrictableObjectDescriptor();
+				newSubject.setId(teams[i]);
+				newSubject.setType(RestrictableObjectType.TEAM);
+				newSubjects.add(newSubject);
+			}
 		}
 		setSubjects(newSubjects);
 	}
@@ -129,11 +135,20 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	
 	@Override
 	public void onPrimary() {
+		// SWC-3700: validate that subjects have been set
+		if (subjects.size() == 0) {
+			modalPresenter.setErrorMessage(EMPTY_SUBJECT_LIST_ERROR_MESSAGE);
+			return;
+		}
+		
 		if (accessRequirement == null) {
 			if (view.isACTAccessRequirementType()) {
 				accessRequirement = new ACTAccessRequirement();
+				((ACTAccessRequirement)accessRequirement).setOpenJiraIssue(true);
+			} else if (view.isManagedACTAccessRequirementType()) {
+				accessRequirement = new ManagedACTAccessRequirement();
 			} else {
-				accessRequirement = new TermsOfUseAccessRequirement();
+				accessRequirement = new SelfSignAccessRequirement();
 			}
 		}
 		accessRequirement.setAccessType(currentAccessType);
@@ -149,12 +164,12 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 			@Override
 			public void onSuccess(AccessRequirement accessRequirement) {
 				modalPresenter.setLoading(false);
-				if (accessRequirement instanceof ACTAccessRequirement) {
-					actStep2.configure((ACTAccessRequirement)accessRequirement);
+				if (accessRequirement instanceof ManagedACTAccessRequirement) {
+					actStep2.configure((ManagedACTAccessRequirement)accessRequirement);
 					modalPresenter.setNextActivePage(actStep2);
 				} else {
-					touStep2.configure((TermsOfUseAccessRequirement)accessRequirement);
-					modalPresenter.setNextActivePage(touStep2);
+					basicStep2.configure(accessRequirement);
+					modalPresenter.setNextActivePage(basicStep2);
 				}		
 			}
 		});

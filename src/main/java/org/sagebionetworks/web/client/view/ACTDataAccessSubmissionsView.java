@@ -17,10 +17,8 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 	void setSelectedMaxDate(Date date);
 	void setShowHideButton(IsWidget button);
 	void setAccessRequirementWidget(IsWidget w);
-	
-	void setHasRequestUIVisible(boolean visible);
 	void setAreOtherAttachmentsRequired(boolean value);
-	void setIsAnnualReviewRequired(boolean value);
+	void setExpirationPeriod(Long value);
 	void setIsCertifiedUserRequired(boolean value);
 	void setIsDUCRequired(boolean value);
 	void setIsIDUPublic(boolean value);
@@ -28,6 +26,9 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 	void setIsValidatedProfileRequired(boolean value);
 	void setSubjectsWidget(IsWidget w);
 	void setAccessRequirementUIVisible(boolean visible);
+	void setProjectedExpirationDateVisible(boolean visible);
+	void setProjectedExpirationDate(String date);
+	
 	public interface Presenter {
 		void onClearDateFilter();
 		void onClearStateFilter();
@@ -36,6 +37,7 @@ public interface ACTDataAccessSubmissionsView extends IsWidget, SynapseView {
 		void onMaxDateSelected(Date date);
 		void onCreatedOnClick();
 		void onBack();
+		void onReviewAccessors();
 	}
 
 	

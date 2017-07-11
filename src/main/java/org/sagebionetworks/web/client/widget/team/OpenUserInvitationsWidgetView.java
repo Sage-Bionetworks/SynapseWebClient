@@ -4,19 +4,19 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface OpenUserInvitationsWidgetView extends IsWidget, SynapseView {
+public interface OpenUserInvitationsWidgetView extends IsWidget {
 	
 	/**
 	 * Set this view's presenter
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	
+	void setSynAlert(IsWidget w);
+	void clear();
 	/**
 	 * shows nothing if membershipRequests is empty.
 	 */
@@ -29,6 +29,5 @@ public interface OpenUserInvitationsWidgetView extends IsWidget, SynapseView {
 		void goTo(Place place);
 		void removeInvitation(String ownerId);
 		void getNextBatch();
-		void clear();
 	}
 }

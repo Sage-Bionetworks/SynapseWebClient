@@ -25,12 +25,15 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 		 */
 		void onAddTable();
 
-		
 		/**
 		 * Add file view button pushed
 		 */
 		void onAddFileView();
 		
+		/**
+		 * Add project view button pushed
+		 */
+		void onAddProjectView();
 		/**
 		 * Upload table button pushed.
 		 */
@@ -50,7 +53,7 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	void clearTableWidgets();
 	void addTableListItem(EntityHeader header);
 	void setLoadMoreWidget(IsWidget w);
-	
+	void setSynAlert(IsWidget w);
 	/**
 	 * Show/hide the add table button.
 	 * @param enabled
@@ -63,6 +66,11 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 */
 	public void setAddFileViewVisible(boolean visible);
 	
+	/**
+	 * Show/hide the add project view button.
+	 * @param visible
+	 */
+	public void setAddProjectViewVisible(boolean visible);
 	
 	/**
 	 * Show or hide the upload tables button.
@@ -70,13 +78,6 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	 */
 	public void setUploadTableVisible(boolean enabled);
 	
-	/**
-	 * Add the create table modal to the page.
-	 * @param createTableModal
-	 */
-	public void addCreateTableModal(IsWidget createTableModal);
-
-
 	/**
 	 * Add the modal dialog to the view.
 	 * @param uploadTableModalWidget

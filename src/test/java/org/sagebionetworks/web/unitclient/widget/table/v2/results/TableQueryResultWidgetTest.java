@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.RowSelectionListener;
@@ -72,7 +73,7 @@ public class TableQueryResultWidgetTest {
 	QueryResult results;
 	SelectColumn select;
 	SynapseAlert mockSynapseAlert;
-	boolean isView;
+	TableType tableType;
 	@Captor
 	ArgumentCaptor<CallbackP<FacetColumnRequest>> mockFacetChangedHandlerCaptor;
 	@Mock
@@ -135,7 +136,7 @@ public class TableQueryResultWidgetTest {
 		delta.setTableId("syn123");
 		
 		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(true);
-		isView = false;
+		tableType = TableType.table;
 	}
 	
 	@Test
@@ -143,7 +144,7 @@ public class TableQueryResultWidgetTest {
 		boolean isEditable = true;
 		
 		// Make the call that changes it all.
-		widget.configure(query, isEditable, isView, mockListner);
+		widget.configure(query, isEditable, tableType, mockListner);
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
 		// invoke a success
 		asyncProgressHandlerCaptor.getValue().onComplete(bundle);
@@ -152,7 +153,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture(), callbackCaptor.capture());
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(tableType), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture(), callbackCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -191,9 +192,9 @@ public class TableQueryResultWidgetTest {
 	@Test
 	public void testConfigureSuccessNotEditable(){
 		boolean isEditable = false;
-		isView = true;
+		tableType = TableType.fileview;
 		// Make the call that changes it all.
-		widget.configure(query, isEditable, isView, mockListner);
+		widget.configure(query, isEditable, tableType, mockListner);
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
 		// invoke a success
 		asyncProgressHandlerCaptor.getValue().onComplete(bundle);
@@ -202,7 +203,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture(), any(Callback.class));
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(tableType), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture(), any(Callback.class));
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -216,7 +217,7 @@ public class TableQueryResultWidgetTest {
 		// Results are only editable if all of the select columns have IDs.
 		select.setId(null);
 		// Make the call that changes it all.
-		widget.configure(query, isEditable, isView, mockListner);
+		widget.configure(query, isEditable, tableType, mockListner);
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
 		// invoke a success
 		asyncProgressHandlerCaptor.getValue().onComplete(bundle);
@@ -225,7 +226,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
 		verify(mockView).setTableVisible(false);
-		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(isView), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture(), any(Callback.class));
+		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(tableType), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture(), any(Callback.class));
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
 		verify(mockView).setTableVisible(true);
@@ -237,7 +238,7 @@ public class TableQueryResultWidgetTest {
 	public void testConfigureCancel(){
 		boolean isEditable = true;
 		// Make the call that changes it all.
-		widget.configure(query, isEditable, isView, mockListner);
+		widget.configure(query, isEditable, tableType, mockListner);
 		
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
 		// invoke a cancel
@@ -260,7 +261,7 @@ public class TableQueryResultWidgetTest {
 	public void testConfigurError(){
 		boolean isEditable = true;
 		// Make the call that changes it all.
-		widget.configure(query, isEditable, isView, mockListner);
+		widget.configure(query, isEditable, tableType, mockListner);
 		
 		// Setup a failure
 		UnauthorizedException error = new UnauthorizedException("Failed!!");
@@ -295,7 +296,7 @@ public class TableQueryResultWidgetTest {
 		
 		boolean isEditable = true;
 		// Make the call that changes it all.
-		widget.configure(query, isEditable, isView, mockListner);
+		widget.configure(query, isEditable, tableType, mockListner);
 		
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.VERIFYING_ETAG_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
 		bundle.setQueryCount(0L);
@@ -312,7 +313,7 @@ public class TableQueryResultWidgetTest {
 		
 		boolean isEditable = true;
 		// Make the call that changes it all.
-		widget.configure(query, isEditable, isView, mockListner);
+		widget.configure(query, isEditable, tableType, mockListner);
 		
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.VERIFYING_ETAG_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
 		bundle.setQueryCount(1L);

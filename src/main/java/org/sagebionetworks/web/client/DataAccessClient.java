@@ -3,12 +3,15 @@ package org.sagebionetworks.web.client;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoRequest;
+import org.sagebionetworks.repo.model.BatchAccessApprovalInfoResponse;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
+import org.sagebionetworks.repo.model.dataaccess.AccessRequirementConversionRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
-import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalRequest;
-import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalResult;
+import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
+import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -18,11 +21,11 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("dataaccessclient")
-public interface DataAccessClient extends RemoteService {
+public interface DataAccessClient extends XsrfProtectedService {
 	ResearchProject getResearchProject(Long id) throws RestServiceException;
 	ResearchProject updateResearchProject(ResearchProject researchProject)  throws RestServiceException;
 	RequestInterface getDataAccessRequest(Long id) throws RestServiceException;
@@ -39,6 +42,8 @@ public interface DataAccessClient extends RemoteService {
 			String reason) throws RestServiceException;
 	OpenSubmissionPage getOpenSubmissions(String nextPageToken) throws RestServiceException;
 	void submitDataAccessRequest(RequestInterface dataAccessRequest) throws RestServiceException;
-	BatchAccessApprovalResult getAccessApprovalInfo(BatchAccessApprovalRequest batchRequest)
-			throws RestServiceException;
+	BatchAccessApprovalInfoResponse getAccessRequirementStatus(BatchAccessApprovalInfoRequest request) throws RestServiceException;
+	AccessorGroupResponse listAccessorGroup(AccessorGroupRequest request) throws RestServiceException;
+	void revokeGroup(String accessRequirementId, String submitterId) throws RestServiceException;
+	AccessRequirement convertAccessRequirement(AccessRequirementConversionRequest request) throws RestServiceException;
 }

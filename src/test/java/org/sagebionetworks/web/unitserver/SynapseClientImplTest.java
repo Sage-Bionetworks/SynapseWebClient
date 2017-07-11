@@ -27,7 +27,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.util.ArrayList;
@@ -624,32 +623,6 @@ public class SynapseClientImplTest {
 		assertNull(bundle.getHasChildren());
 	}
 
-	@Test(expected = IllegalArgumentException.class)
-	public void testParseEntityFromJsonNoType()
-			throws JSONObjectAdapterException {
-		ExampleEntity example = new ExampleEntity();
-		example.setName("some name");
-		example.setDescription("some description");
-		// do not set the type
-		String json = EntityFactory.createJSONStringForEntity(example);
-		// This will fail as the type is required
-		synapseClient.parseEntityFromJson(json);
-	}
-
-	@Test
-	public void testParseEntityFromJson() throws JSONObjectAdapterException {
-		ExampleEntity example = new ExampleEntity();
-		example.setName("some name");
-		example.setDescription("some description");
-		example.setEntityType(ExampleEntity.class.getName());
-		String json = EntityFactory.createJSONStringForEntity(example);
-		// System.out.println(json);
-		// Now make sure this can be read back
-		ExampleEntity clone = (ExampleEntity) synapseClient
-				.parseEntityFromJson(json);
-		assertEquals(example, clone);
-	}
-
 	@Test
 	public void testCreateOrUpdateEntityFalse()
 			throws JSONObjectAdapterException, RestServiceException,
@@ -772,12 +745,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testUpdateAcl() throws Exception {
-		AccessControlList clone = synapseClient.updateAcl(acl);
-		assertEquals(acl, clone);
-	}
-
-	@Test
 	public void testUpdateAclRecursive() throws Exception {
 		AccessControlList clone = synapseClient.updateAcl(acl, true);
 		assertEquals(acl, clone);
@@ -793,12 +760,6 @@ public class SynapseClientImplTest {
 		AccessControlList clone = synapseClient.deleteAcl("syn101");
 		assertEquals(acl, clone);
 	}
-
-	@Test
-	public void testHasAccess() throws Exception {
-		assertTrue(synapseClient.hasAccess("syn101", "READ"));
-	}
-
 
 	@Test
 	public void testGetUserProfile() throws Exception {
@@ -870,23 +831,6 @@ public class SynapseClientImplTest {
 						.getVersionOfV2WikiPage(
 								any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
 								any(Long.class))).thenReturn(v2Page);
-		synapseClient.getVersionOfV2WikiPage(new WikiPageKey("syn123",
-				ObjectType.ENTITY.toString(), "20"), new Long(0));
-		verify(mockSynapse).getVersionOfV2WikiPage(
-				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
-				any(Long.class));
-	}
-
-	@Test
-	public void testUpdateV2WikiPage() throws Exception {
-		Mockito.when(
-				mockSynapse.updateV2WikiPage(anyString(),
-						any(ObjectType.class), any(V2WikiPage.class)))
-				.thenReturn(v2Page);
-		synapseClient.updateV2WikiPage("testId", ObjectType.ENTITY.toString(),
-				v2Page);
-		verify(mockSynapse).updateV2WikiPage(anyString(),
-				any(ObjectType.class), any(V2WikiPage.class));
 	}
 
 	@Test
@@ -971,55 +915,6 @@ public class SynapseClientImplTest {
 		verify(mockSynapse).getV2WikiHistory(
 				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
 				any(Long.class), any(Long.class));
-	}
-
-	@Test
-	public void testGetV2WikiAttachmentHandles() throws Exception {
-		FileHandleResults testResults = new FileHandleResults();
-		Mockito.when(
-				mockSynapse
-						.getV2WikiAttachmentHandles(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class)))
-				.thenReturn(testResults);
-		synapseClient.getV2WikiAttachmentHandles(new WikiPageKey("syn123",
-				ObjectType.ENTITY.toString(), "20"));
-		verify(mockSynapse).getV2WikiAttachmentHandles(
-				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-
-		Mockito.when(
-				mockSynapse
-						.getVersionOfV2WikiAttachmentHandles(
-								any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
-								any(Long.class))).thenReturn(testResults);
-		synapseClient.getVersionOfV2WikiAttachmentHandles(new WikiPageKey(
-				"syn123", ObjectType.ENTITY.toString(), "20"), new Long(0));
-		verify(mockSynapse).getVersionOfV2WikiAttachmentHandles(
-				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
-				any(Long.class));
-	}
-
-	@Test
-	public void testGetMarkdown() throws IOException, RestServiceException,
-			SynapseException {
-		String someMarkDown = "someMarkDown";
-		Mockito.when(
-				mockSynapse
-						.downloadV2WikiMarkdown(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class)))
-				.thenReturn(someMarkDown);
-		synapseClient.getMarkdown(new WikiPageKey("syn123", ObjectType.ENTITY
-				.toString(), "20"));
-		verify(mockSynapse).downloadV2WikiMarkdown(
-				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-
-		Mockito.when(
-				mockSynapse
-						.downloadVersionOfV2WikiMarkdown(
-								any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
-								any(Long.class))).thenReturn(someMarkDown);
-		synapseClient.getVersionOfMarkdown(new WikiPageKey("syn123",
-				ObjectType.ENTITY.toString(), "20"), new Long(0));
-		verify(mockSynapse).downloadVersionOfV2WikiMarkdown(
-				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
-				any(Long.class));
 	}
 
 	@Test
@@ -1312,9 +1207,9 @@ public class SynapseClientImplTest {
 	public void testGetFileEntityIdWithSameNameNotFound()
 			throws JSONObjectAdapterException, SynapseException,
 			RestServiceException, JSONException {
-		JSONObject queryResult = new JSONObject();
-		queryResult.put("totalNumberOfResults", (long) 0);
-		when(mockSynapse.query(anyString())).thenReturn(queryResult); // TODO
+		
+		// Have results returned in query.
+		when(mockSynapse.lookupChild(anyString(), eq(testFileName))).thenThrow(new SynapseNotFoundException());
 
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(
 				testFileName, "parentEntityId");
@@ -1325,25 +1220,12 @@ public class SynapseClientImplTest {
 			throws JSONObjectAdapterException, SynapseException,
 			RestServiceException, JSONException {
 		Folder folder = new Folder();
+		folder.setId("syn8888");
 		folder.setName(testFileName);
-		JSONObject queryResult = new JSONObject();
-		JSONArray results = new JSONArray();
-
-		// Set up results.
-		JSONObject objectResult = EntityFactory
-				.createJSONObjectForEntity(folder);
-		JSONArray typeArray = new JSONArray();
-		typeArray.put("Folder");
-		objectResult.put("entity.concreteType", typeArray);
-		results.put(objectResult);
-
-		// Set up query result.
-		queryResult.put("totalNumberOfResults", (long) 1);
-		queryResult.put("results", results);
-
-		// Have results returned in query.
-		when(mockSynapse.query(anyString())).thenReturn(queryResult);
-
+		
+		when(mockSynapse.lookupChild(anyString(), eq(testFileName))).thenReturn(folder.getId());
+		when(mockSynapse.getEntityById(folder.getId())).thenReturn(folder);
+		
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(
 				testFileName, "parentEntityId");
 	}
@@ -1352,22 +1234,10 @@ public class SynapseClientImplTest {
 	public void testGetFileEntityIdWithSameNameFound() throws JSONException,
 			JSONObjectAdapterException, SynapseException, RestServiceException {
 		FileEntity file = getTestFileEntity();
-		JSONObject queryResult = new JSONObject();
-		JSONArray results = new JSONArray();
-
-		// Set up results.
-		JSONObject objectResult = EntityFactory.createJSONObjectForEntity(file);
-		JSONArray typeArray = new JSONArray();
-		typeArray.put(FileEntity.class.getName());
-		objectResult.put("entity.concreteType", typeArray);
-		objectResult.put("entity.id", file.getId());
-		results.put(objectResult);
-		queryResult.put("totalNumberOfResults", (long) 1);
-		queryResult.put("results", results);
-
+		
 		// Have results returned in query.
-		when(mockSynapse.query(anyString())).thenReturn(queryResult);
-
+		when(mockSynapse.lookupChild(anyString(), eq(testFileName))).thenReturn(file.getId());
+		when(mockSynapse.getEntityById(file.getId())).thenReturn(file);
 		String fileEntityId = synapseClient.getFileEntityIdWithSameName(
 				testFileName, "parentEntityId");
 		assertEquals(fileEntityId, file.getId());

@@ -28,7 +28,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.SynapsePersistable;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
@@ -54,7 +53,7 @@ import com.google.inject.Inject;
  * 
  * Case B will be the most common case.
  */
-public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter, SynapsePersistable, ProgressingFileUploadHandler {
+public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter, ProgressingFileUploadHandler {
 	
 	public static final long OLD_BROWSER_MAX_SIZE = (long)ClientProperties.MB * 5; //5MB
 	private UploaderView view;
@@ -599,8 +598,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 
 	
-	@Override
-	@SuppressWarnings("unchecked")
 	public void addCancelHandler(CancelHandler handler) {
 		handlerManager.addHandler(CancelEvent.getType(), handler);
 	}
@@ -610,7 +607,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		handlerManager = new HandlerManager(this);
 	}
 
-	@Override
 	public void addPersistSuccessHandler(EntityUpdatedHandler handler) {
 		handlerManager.addHandler(EntityUpdatedEvent.getType(), handler);
 	}

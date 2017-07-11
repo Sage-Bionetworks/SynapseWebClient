@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -40,7 +41,16 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public static final String VERIFYING_ETAG_MESSAGE = "Verifying that the recent changes have propagated through the system...";
 	public static final String RUNNING_QUERY_MESSAGE = "Running query...";
 	public static final String QUERY_CANCELED = "Query canceled";
-	// Mask to get all parts of a query.
+	/**
+	 * Masks for requesting what should be included in the query bundle.
+	 */
+	public static final long BUNDLE_MASK_QUERY_RESULTS = 0x1;
+	public static final long BUNDLE_MASK_QUERY_COUNT = 0x2;
+	public static final long BUNDLE_MASK_QUERY_SELECT_COLUMNS = 0x4;
+	public static final long BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE = 0x8;
+	public static final long BUNDLE_MASK_QUERY_COLUMN_MODELS = 0x10;
+	public static final long BUNDLE_MASK_QUERY_FACETS = 0x20;
+
 	private static final Long ALL_PARTS_MASK = new Long(255);
 	SynapseClientAsync synapseClient;
 	TableQueryResultView view;
@@ -50,7 +60,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultEditorWidget queryResultEditor;
 	Query startingQuery;
 	boolean isEditable;
-	boolean isView;
+	TableType tableType;
 	QueryResultsListener queryListener;
 	JobTrackingWidget progressWidget;
 	SynapseAlert synapseAlert;
@@ -111,9 +121,9 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param is table a file view?
 	 * @param listener Listener for query start and finish events.
 	 */
-	public void configure(Query query, boolean isEditable, boolean isView, QueryResultsListener listener){
+	public void configure(Query query, boolean isEditable, TableType tableType, QueryResultsListener listener){
 		this.isEditable = isEditable;
-		this.isView = isView;
+		this.tableType = tableType;
 		this.startingQuery = query;
 		this.queryListener = listener;
 		runQuery();
@@ -129,7 +139,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		if (viewEtag == null) {
 			// run the job
 			QueryBundleRequest qbr = new QueryBundleRequest();
-			qbr.setPartMask(ALL_PARTS_MASK);
+			// do not ask for query count
+			qbr.setPartMask(BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_FACETS);
 			qbr.setQuery(this.startingQuery);
 			qbr.setEntityId(entityId);
 			this.progressWidget.startAndTrackJob(RUNNING_QUERY_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
@@ -227,7 +238,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setErrorVisible(false);
 		this.view.setProgressWidgetVisible(false);
 		// configure the page widget
-		this.pageViewerWidget.configure(bundle, this.startingQuery, sortItems, false, isView, null, this, facetChangedHandler, resetFacetsHandler);
+		this.pageViewerWidget.configure(bundle, this.startingQuery, sortItems, false, tableType, null, this, facetChangedHandler, resetFacetsHandler);
 		this.view.setTableVisible(true);
 		fireFinishEvent(true, isQueryResultEditable());
 	}
@@ -305,7 +316,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			this.queryResultEditor = ginInjector.createNewQueryResultEditorWidget();
 			view.setEditorWidget(this.queryResultEditor);
 		}
-		this.queryResultEditor.showEditor(bundle, isView, new Callback() {
+		this.queryResultEditor.showEditor(bundle, tableType, new Callback() {
 			@Override
 			public void invoke() {
 				runQuery();

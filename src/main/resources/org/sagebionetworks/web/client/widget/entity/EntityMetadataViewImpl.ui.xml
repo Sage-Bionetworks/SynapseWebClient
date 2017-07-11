@@ -12,7 +12,7 @@
 		<g:HTMLPanel ui:field="detailedMetadata">
 		    <bh:Div>
 		    	<bh:Span addStyleNames="boldText margin-right-5" text="Synapse ID:" />
-		    	<g:TextBox ui:field="idField" width="100px" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
+		    	<g:TextBox ui:field="idField" width="130px" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
 		    	<bh:Br addStyleNames="visible-xs visible-sm"/>
    				<bh:Span ui:field="doiPanel"/><bh:Br addStyleNames="visible-xs visible-sm"/>
 		    	<bh:Span ui:field="dataUseContainer" addStyleNames="margin-right-5">

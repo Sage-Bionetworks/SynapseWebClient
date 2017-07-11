@@ -5,12 +5,12 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 
 import com.google.gwt.place.shared.Place;
@@ -19,30 +19,35 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidgetView.Presenter {
-
+	public static final String ACCEPTED_REQUEST_MESSAGE = "Accepted Request";
 	private OpenMembershipRequestsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 	private Callback teamUpdatedCallback;
 	private SynapseClientAsync synapseClient;
 	private String teamId;
 	private GWTWrapper gwt;
+	private SynapseAlert synAlert;
+	private PopupUtilsView popupUtils;
 	
 	@Inject
 	public OpenMembershipRequestsWidget(OpenMembershipRequestsWidgetView view, 
 			SynapseClientAsync synapseClient, 
-			GlobalApplicationState globalApplicationState, 
-			AuthenticationController authenticationController,
-			GWTWrapper gwt) {
+			GlobalApplicationState globalApplicationState,
+			GWTWrapper gwt,
+			SynapseAlert synAlert,
+			PopupUtilsView popupUtils) {
 		this.view = view;
+		this.popupUtils = popupUtils;
+		this.synAlert = synAlert;
 		view.setPresenter(this);
+		view.setSynAlert(synAlert);
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.gwt = gwt;
 	}
 
 	public void configure(String teamId, Callback teamUpdatedCallback) {
+		synAlert.clear();
 		this.teamId = teamId;
 		this.teamUpdatedCallback = teamUpdatedCallback;
 		//using the given team, try to show all pending membership requests (or nothing if empty)
@@ -65,14 +70,11 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
+				synAlert.handleException(caught);
 			}
 		});
 	};
 
-	@Override
 	public void clear() {
 		view.clear();
 	}
@@ -84,25 +86,22 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 	
 	@Override
 	public void acceptRequest(String userId) {
-		//invite user id to team (to complete handshake), then update open membership request list
-		synapseClient.inviteMember(userId, teamId, "", gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
+		synAlert.clear();
+		//try to add user id to team (since we know there's an open membership request). then update open membership request list
+		synapseClient.addTeamMember(userId, teamId, "", gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo("Accepted Request","");
+				popupUtils.showInfo(ACCEPTED_REQUEST_MESSAGE,"");
 				teamUpdatedCallback.invoke();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view)) {					
-					view.showErrorMessage(caught.getMessage());
-				} 
+				synAlert.handleException(caught);
 			}
 		});
-		
 	}
 	
 	public Widget asWidget() {
-		view.setPresenter(this);
 		return view.asWidget();
 	}
 	

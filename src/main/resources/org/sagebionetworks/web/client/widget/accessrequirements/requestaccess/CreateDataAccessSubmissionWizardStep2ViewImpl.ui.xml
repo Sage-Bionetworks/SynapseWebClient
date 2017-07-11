@@ -3,6 +3,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div>
@@ -12,14 +13,15 @@
 		<bh:Div>
 			<b:FormGroup>
 				<b:FormLabel>Accessors</b:FormLabel>
+				<bh:Div ui:field="validatedUserProfileNote" visible="false" >
+					<bh:Italic text="All accessors must have a " />
+					<w:HelpWidget helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile." text="validated user profile"
+						href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile" addMoreInfoStyleNames="font-italic" iconStyles="hide"/>
+				</bh:Div>
 				<b:Panel>
 					<b:PanelBody>
 						<bh:Div ui:field="accessorsContainer" />
 						<bh:Div ui:field="peopleSuggestContainer" />
-						<b:Alert ui:field="revokeAccessNote" type="WARNING" addStyleNames="margin-top-10">
-							<bh:Strong text="Note &nbsp;" />
-							<bh:Text text=" Removing a user from this request does not automatically revoke access for that user.  To revoke access, please send a request to the Access and Compliance Team (ACT)"/>
-						</b:Alert>
 					</b:PanelBody>
 				</b:Panel>
 			</b:FormGroup>

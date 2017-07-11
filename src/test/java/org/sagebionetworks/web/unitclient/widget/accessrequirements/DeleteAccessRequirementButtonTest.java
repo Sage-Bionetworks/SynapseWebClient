@@ -13,15 +13,17 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
@@ -53,20 +55,21 @@ public class DeleteAccessRequirementButtonTest {
 	AccessRequirement mockAccessRequirement;
 	@Mock
 	RestrictableObjectDescriptor mockSubject;
-	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
-
+	@Mock
+	CookieProvider mockCookies;
+	@Mock
+	Callback mockRefreshCallback;
 	ClickHandler onButtonClickHandler;
 	public static final Long AR_ID = 98L;
 	
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new DeleteAccessRequirementButton(mockButton, mockIsACTMemberAsyncHandler, mockGlobalApplicationState, mockSynapseClient, mockPopupUtilsView);
+		widget = new DeleteAccessRequirementButton(mockButton, mockIsACTMemberAsyncHandler, mockSynapseClient, mockPopupUtilsView, mockCookies);
 		verify(mockButton).addClickHandler(clickHandlerCaptor.capture());
 		onButtonClickHandler = clickHandlerCaptor.getValue();
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteAccessRequirement(anyLong(), any(AsyncCallback.class));
@@ -85,9 +88,10 @@ public class DeleteAccessRequirementButtonTest {
 	
 	@Test
 	public void testConfigureWithAR() {
-		widget.configure(mockAccessRequirement);
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		widget.configure(mockAccessRequirement, mockRefreshCallback);
 		verify(mockButton).setText(DELETE_ACCESS_REQUIREMENT_BUTTON_TEXT);
-		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
+		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
 		
 		CallbackP<Boolean> isACTMemberCallback = callbackPCaptor.getValue();
 		// invoking with false should hide the button again
@@ -105,12 +109,28 @@ public class DeleteAccessRequirementButtonTest {
 		deleteConfirmedCallback.invoke();
 		verify(mockSynapseClient).deleteAccessRequirement(eq(AR_ID), any(AsyncCallback.class));
 		verify(mockPopupUtilsView).showInfo(eq(DELETED_ACCESS_REQUIREMENT_SUCCESS_MESSAGE), anyString());
-		verify(mockGlobalApplicationState).refreshPage();
+		verify(mockRefreshCallback).invoke();
+	}
+	
+
+	@Test
+	public void testConfigureWithARNotInAlpha() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn(null);
+		widget.configure(mockAccessRequirement, mockRefreshCallback);
+		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
+		
+		CallbackP<Boolean> isACTMemberCallback = callbackPCaptor.getValue();
+		// invoking with false should hide the button again
+		isACTMemberCallback.invoke(false);
+		verify(mockButton, times(2)).setVisible(false);
+		
+		isACTMemberCallback.invoke(true);
+		verify(mockButton, times(3)).setVisible(false);
 	}
 	
 	@Test
 	public void testFailureToDelete() {
-		widget.configure(mockAccessRequirement);
+		widget.configure(mockAccessRequirement, mockRefreshCallback);
 		String errorMessage = "error";
 		Exception ex = new Exception(errorMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).deleteAccessRequirement(anyLong(), any(AsyncCallback.class));

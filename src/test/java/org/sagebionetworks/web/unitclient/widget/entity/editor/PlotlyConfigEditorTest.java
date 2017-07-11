@@ -88,7 +88,6 @@ public class PlotlyConfigEditorTest {
 	
 	@Test
 	public void testConstruction() {
-		verify(mockView).add(mockFinder);
 		verify(mockView).setSynAlert(mockSynAlert);
 		verify(mockView).setPresenter(editor);
 		verify(mockView).setShowHideButton(mockShowHideAdvancedButton);

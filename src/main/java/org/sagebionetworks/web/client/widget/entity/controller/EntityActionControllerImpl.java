@@ -53,6 +53,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.Act
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -165,12 +166,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			});
 		}
 		return selectTeamModal;
-	}
-	private UserProfileClientAsync getUserProfileClient() {
-		if (userProfileClient == null) {
-			userProfileClient = ginInjector.getUserProfileClientAsync();
-		}
-		return userProfileClient;
 	}
 	
 	private ChallengeClientAsync getChallengeClient() {
@@ -331,7 +326,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, false);	
 		actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
 		if (authenticationController.isLoggedIn()) {
-			isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+			isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 				@Override
 				public void invoke(Boolean isACT) {
 					if (isACT) {
@@ -348,7 +343,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, false);	
 		actionMenu.setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, this);
 		if (authenticationController.isLoggedIn()) {
-			isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+			isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 				@Override
 				public void invoke(Boolean isACT) {
 					if (isACT) {
@@ -656,7 +651,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionEnabled(Action.SHARE, true);
 		actionMenu.setActionVisible(Action.SHARE, true);
 		actionMenu.setActionListener(Action.SHARE, this);
-		if(permissions.getCanPublicRead()){
+		GlobalApplicationState globalAppState = getGlobalApplicationState();
+		if(PublicPrivateBadge.isPublic(entityBundle.getBenefactorAcl(), globalAppState.getPublicPrincipalIds())){
 			actionMenu.setActionIcon(Action.SHARE, IconType.GLOBE);
 		}else{
 			actionMenu.setActionIcon(Action.SHARE, IconType.LOCK);

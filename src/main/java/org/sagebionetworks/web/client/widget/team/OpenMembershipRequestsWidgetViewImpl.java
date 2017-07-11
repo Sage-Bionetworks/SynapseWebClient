@@ -4,63 +4,59 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.constants.ColumnSize;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class OpenMembershipRequestsWidgetViewImpl extends FlowPanel implements
-		OpenMembershipRequestsWidgetView {
+public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipRequestsWidgetView {
+
+	public interface Binder extends UiBinder<Widget, OpenMembershipRequestsWidgetViewImpl> {}
+
+	@UiField
+	Div mainContainer;
+	@UiField
+	Div synAlertContainer;
+	Widget widget;
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
 	private PortalGinInjector ginInjector;
-	private FlowPanel mainContainer;
 	
 	@Inject
-	public OpenMembershipRequestsWidgetViewImpl(SageImageBundle sageImageBundle, PortalGinInjector ginInjector) {
-		this.sageImageBundle = sageImageBundle;
+	public OpenMembershipRequestsWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
+		widget = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
-		mainContainer = new FlowPanel();
 		mainContainer.addStyleName("highlight-box");
 		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_JOIN_REQUESTS);
 	}
 	
-	
-	@Override
-	public void showLoading() {
-		clear();
-		add(DisplayUtils.getLoadingWidget(sageImageBundle));
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
 
 	@Override
+	public void clear() {
+		mainContainer.clear();
+	}
+	
+	@Override
 	public void configure(List<UserProfile> profiles, List<String> requestMessages) {
 		clear();
-		mainContainer.clear();
+		mainContainer.setVisible(false);
 		FlowPanel singleRow = DisplayUtils.createRowContainerFlowPanel();
 		for (int i = 0; i < profiles.size(); i++) {
 			FlowPanel lc = new FlowPanel();
@@ -86,9 +82,19 @@ public class OpenMembershipRequestsWidgetViewImpl extends FlowPanel implements
 			lc.add(buttonContainer);
 			
 			singleRow.add(lc);
+			mainContainer.setVisible(true);
 		}
 		mainContainer.add(singleRow);
-		if (profiles.size() > 0)
-			add(mainContainer);
+	}
+	
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return widget;
 	}
 }

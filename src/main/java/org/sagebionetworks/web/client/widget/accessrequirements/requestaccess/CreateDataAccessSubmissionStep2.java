@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.dataaccess.AccessType;
+import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.repo.model.dataaccess.Renewal;
 import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.ValidationUtils;
@@ -42,11 +43,12 @@ import com.google.inject.Inject;
 public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	public static final String SAVED_PROGRESS_MESSAGE = "Saved your progress.";
 	public static final String SAVE_CHANGES_MESSAGE = "Would you want to save your recent changes?";
-	public static final String SUCCESSFULLY_SUBMITTED_MESSAGE = "Your data access request has been successfully submitted for review.";
+	public static final String SUCCESSFULLY_SUBMITTED_TITLE = "Thank you for requesting data through Synapse.";
+	public static final String SUCCESSFULLY_SUBMITTED_MESSAGE = "Your request for access to data is being processed. You will be contacted when you have access to the data.";
 	CreateDataAccessSubmissionWizardStep2View view;
 	PortalGinInjector ginInjector;
 	DataAccessClientAsync client;
-	ACTAccessRequirement ar;
+	ManagedACTAccessRequirement ar;
 	ModalPresenter modalPresenter;
 	ResearchProject researchProject;
 	FileHandleWidget templateFileRenderer;
@@ -54,10 +56,10 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	SynapseJSNIUtils jsniUtils;
 	AuthenticationController authController;
 	RequestInterface dataAccessRequest;
-	UserBadgeList accessorsList;
+	UserBadgeList accessorChangesList;
 	private SynapseSuggestBox peopleSuggestWidget;
 	FileHandleList otherDocuments;
-	
+	PopupUtilsView popupUtils;
 	@Inject
 	public CreateDataAccessSubmissionStep2(
 			CreateDataAccessSubmissionWizardStep2View view,
@@ -71,7 +73,8 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			UserBadgeList accessorsList,
 			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider,
-			FileHandleList otherDocuments) {
+			FileHandleList otherDocuments,
+			PopupUtilsView popupUtils) {
 		super();
 		this.view = view;
 		this.client = client;
@@ -79,8 +82,9 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;
 		this.authController = authController;
-		this.accessorsList = accessorsList;
+		this.accessorChangesList = accessorsList;
 		this.otherDocuments = otherDocuments;
+		this.popupUtils = popupUtils;
 		otherDocuments.configure()
 			.setUploadButtonText("Browse...")
 			.setCanDelete(true)
@@ -112,17 +116,11 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
 			public void invoke(SynapseSuggestion suggestion) {
 				peopleSuggestWidget.clear();
-				CreateDataAccessSubmissionStep2.this.accessorsList.addUserBadge(suggestion.getId());
+				AccessorChange change = new AccessorChange();
+				change.setUserId(suggestion.getId());
+				change.setType(AccessType.GAIN_ACCESS);
+				CreateDataAccessSubmissionStep2.this.accessorChangesList.addAccessorChange(change);
 			};
-		});
-		accessorsList.setUserIdsDeletedCallback(new CallbackP<List<String>>() {
-			@Override
-			public void invoke(List<String> param) {
-				if (dataAccessRequest instanceof Renewal) {
-					// notify user that removing a user does not revoke access, with link to inform ACT
-					CreateDataAccessSubmissionStep2.this.view.setRevokeNoteVisible(true);
-				}
-			}
 		});
 	}
 	
@@ -152,17 +150,17 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	/**
 	 * Configure this widget before use.
 	 */
-	public void configure(ResearchProject researchProject, ACTAccessRequirement ar) {
+	public void configure(ResearchProject researchProject, ManagedACTAccessRequirement ar) {
 		this.ar = ar;
 		this.researchProject = researchProject;
 		view.setIRBVisible(ValidationUtils.isTrue(ar.getIsIRBApprovalRequired()));
 		view.setDUCVisible(ValidationUtils.isTrue(ar.getIsDUCRequired()));
 		otherDocuments.clear();
-		accessorsList.clear();
+		accessorChangesList.clear();
 		view.setPublicationsVisible(false);
 		view.setSummaryOfUseVisible(false);
-		view.setRevokeNoteVisible(false);
 		peopleSuggestWidget.clear();
+		view.setValidatedUserProfileNoteVisible(ar.getIsValidatedProfileRequired());
 		view.setOtherDocumentUploadVisible(ValidationUtils.isTrue(ar.getAreOtherAttachmentsRequired()));
 		boolean isDucTemplate = ar.getDucTemplateFileHandleId() != null;
 		view.setDUCTemplateVisible(isDucTemplate);
@@ -229,21 +227,37 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	}
 	
 	public void initAccessors() {
-		Set<String> uniqueAccessors = new HashSet<String>();
-		uniqueAccessors.add(authController.getCurrentUserPrincipalId());
-		if (dataAccessRequest.getAccessors() != null) {
-			uniqueAccessors.addAll(dataAccessRequest.getAccessors());
+		boolean submitterFound = false;
+		if (dataAccessRequest.getAccessorChanges() != null) {
+			for (AccessorChange change : dataAccessRequest.getAccessorChanges()) {
+				if (change.getUserId().equals(authController.getCurrentUserPrincipalId())) {
+					submitterFound = true;
+					accessorChangesList.addSubmitterAccessorChange(change);	
+				} else {
+					accessorChangesList.addAccessorChange(change);	
+				}
+			}
 		}
-		for (String userId : uniqueAccessors) {
-			accessorsList.addUserBadge(userId);
+		if (!submitterFound) {
+			AccessorChange submitterChange = new AccessorChange();
+			submitterChange.setUserId(authController.getCurrentUserPrincipalId());
+			submitterChange.setType(AccessType.GAIN_ACCESS);
+			accessorChangesList.addSubmitterAccessorChange(submitterChange);
 		}
 	}
 	
-	private void updateDataAccessRequest(final boolean isSubmit) {
+	public void updateDataAccessRequest(final boolean isSubmit) {
 		modalPresenter.setLoading(true);
-		dataAccessRequest.setAccessors(accessorsList.getUserIds());
+		dataAccessRequest.setAccessorChanges(accessorChangesList.getAccessorChanges());
 		dataAccessRequest.setAttachments(otherDocuments.getFileHandleIds());
 		dataAccessRequest.setResearchProjectId(researchProject.getId());
+
+		boolean isRenewal = dataAccessRequest instanceof Renewal;
+		if (isRenewal) {
+			((Renewal)dataAccessRequest).setPublication(view.getPublications());
+			((Renewal)dataAccessRequest).setSummaryOfUse(view.getSummaryOfUse());
+		}
+
 		client.updateDataAccessRequest(dataAccessRequest, new AsyncCallback<RequestInterface>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -256,7 +270,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 				if (isSubmit) {
 					submitDataAccessRequest();
 				} else {
-					view.showInfo(SAVED_PROGRESS_MESSAGE);
+					popupUtils.showInfo(SAVED_PROGRESS_MESSAGE, "");
 					modalPresenter.setLoading(false);
 					modalPresenter.onFinished();
 				}
@@ -273,7 +287,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(SUCCESSFULLY_SUBMITTED_MESSAGE);
+				popupUtils.showInfoDialog(SUCCESSFULLY_SUBMITTED_TITLE, SUCCESSFULLY_SUBMITTED_MESSAGE, null);
 				modalPresenter.setLoading(false);
 				modalPresenter.onFinished();
 			}
@@ -303,7 +317,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			public void onCanceled() {
 				// check to see if the user would like to discard changes.
 				// if saving, then update the DataAccessRequest/DataAccessRenewal (but do not submit)
-				view.showConfirmDialog("Save?",SAVE_CHANGES_MESSAGE, new Callback() {
+				popupUtils.showConfirmDialog("Save?",SAVE_CHANGES_MESSAGE, new Callback() {
 					@Override
 					public void invoke() {
 						updateDataAccessRequest(false);

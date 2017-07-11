@@ -5,6 +5,7 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
+		<bh:Div ui:field="synAlertContainer" />
 		<b:Row addStyleNames="margin-bottom-5">
 			<b:Column size="XS_12 SM_1 MD_3" push="SM_11 MD_9">
 				<b:ButtonGroup pull="RIGHT">
@@ -22,15 +23,13 @@
 					<b:Button ui:field="addTable" icon="PLUS">Add Table</b:Button>
 					<b:Button ui:field="uploadTable" icon="UPLOAD">Upload Table</b:Button>
 					<b:Button ui:field="addFileView" visible="false" />
+					<b:Button ui:field="addProjectView" visible="false" />
 			</b:ButtonToolBar>
 			</b:Column>
 		</b:Row>
 		
 		<b:ListGroup ui:field="tablesList" />
 		<bh:Div ui:field="loadMoreWidgetContainer"/>
-				
-		<!-- Slot for the create table model dialog -->
-		<g:SimplePanel ui:field="createTableModalPanel" />
 		<!-- Slot for the upload table model dialog -->
 		<g:SimplePanel ui:field="uploadTableModalPanel" />
 		<!-- Slot for the create file view wizard -->

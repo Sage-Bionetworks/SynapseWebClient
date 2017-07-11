@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ACL;
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
 import static org.sagebionetworks.repo.model.EntityBundle.DOI;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
@@ -211,7 +212,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     public void configureProject() {
     	view.setLoadingVisible(true);
     	hideTabs();
-    	int mask = ENTITY | ANNOTATIONS | PERMISSIONS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA | ACL;
+    	int mask = ENTITY | ANNOTATIONS | PERMISSIONS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA | ACL | BENEFACTOR_ACL;
 		projectBundle = null;
 		projectBundleLoadError = null;
 		view.setProjectInformationVisible(false);

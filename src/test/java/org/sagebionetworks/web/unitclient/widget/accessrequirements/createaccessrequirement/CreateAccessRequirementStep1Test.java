@@ -1,10 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.createaccessrequirement;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -16,29 +22,22 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirementInterface;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
-import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateACTAccessRequirementStep2;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1View;
-import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateTermsOfUseAccessRequirementStep2;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionStep2;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateResearchProjectStep1;
-import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateResearchProjectWizardStep1View;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateBasicAccessRequirementStep2;
+import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateManagedACTAccessRequirementStep2;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
-import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.IsWidget;
 
 public class CreateAccessRequirementStep1Test {
 	
@@ -46,16 +45,16 @@ public class CreateAccessRequirementStep1Test {
 	@Mock
 	CreateAccessRequirementStep1View mockView;
 	@Mock
-	CreateACTAccessRequirementStep2 mockActStep2;
+	CreateManagedACTAccessRequirementStep2 mockActStep2;
 	@Mock
-	CreateTermsOfUseAccessRequirementStep2 mockTouStep2;
+	CreateBasicAccessRequirementStep2 mockTouStep2;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
 	ModalPresenter mockModalPresenter;
 	
 	@Mock
-	ACTAccessRequirement mockACTAccessRequirement;
+	ManagedACTAccessRequirement mockACTAccessRequirement;
 	@Mock
 	TermsOfUseAccessRequirement mockTermsOfUseAccessRequirement;
 	
@@ -133,7 +132,7 @@ public class CreateAccessRequirementStep1Test {
 		verify(mockSynapseClient).createOrUpdateAccessRequirement(arCaptor.capture(),  any(AsyncCallback.class));
 		AccessRequirement ar = arCaptor.getValue();
 		// in here, we have the view tell us that TermsOfUse was selected (not ACT).
-		assertTrue(ar instanceof TermsOfUseAccessRequirement);
+		assertTrue(ar instanceof SelfSignAccessRequirement);
 		assertEquals(ACCESS_TYPE.PARTICIPATE, ar.getAccessType());
 		assertEquals(1, ar.getSubjectIds().size());
 		assertEquals(mockTeamRestrictableObjectDescriptor, ar.getSubjectIds().get(0));
@@ -141,9 +140,18 @@ public class CreateAccessRequirementStep1Test {
 		verify(mockTouStep2).configure(mockTermsOfUseAccessRequirement);
 		verify(mockModalPresenter).setNextActivePage(mockTouStep2);
 	}
-	
+
+	@Test
+	public void testConfigureWithEmptySubjectList() {
+		widget.configure(mockACTAccessRequirement);
+		widget.onPrimary();
+		
+		verify(mockModalPresenter).setErrorMessage(EMPTY_SUBJECT_LIST_ERROR_MESSAGE);
+	}
+
 	@Test
 	public void testConfigureWithACTAccessRequirement() {
+		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(Collections.singletonList(mockEntityRestrictableObjectDescriptor));
 		widget.configure(mockACTAccessRequirement);
 		// on save, we should be updating the ar we passed in
 		widget.onPrimary();
@@ -154,6 +162,7 @@ public class CreateAccessRequirementStep1Test {
 	
 	@Test
 	public void testConfigureWithToUAccessRequirement() {
+		when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(Collections.singletonList(mockEntityRestrictableObjectDescriptor));
 		widget.configure(mockTermsOfUseAccessRequirement);
 		// on save, we should be updating the ar we passed in
 		//also verify any errors are shown

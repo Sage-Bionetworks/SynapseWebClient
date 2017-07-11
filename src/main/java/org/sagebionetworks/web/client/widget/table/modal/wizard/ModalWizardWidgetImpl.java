@@ -128,5 +128,4 @@ public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardVie
 	public List<WizardCallback> getCallbacks() {
 		return callbacks;
 	}
-
 }

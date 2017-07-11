@@ -29,27 +29,6 @@ public interface SynapseJSNIUtils {
 	
 	public void loadTableSorters();
 	
-	public String convertDateToSmallString(Date toFormat);
-	/**
-	 * Return a friendly relative date string.  Like "4 hours ago"
-	 * @param toFormat
-	 * @return
-	 */
-	public String getRelativeTime(Date toFormat);
-	/**
-	 * Return a friendly calendar date string.  Like "Yesterday at 3:32 PM"
-	 * @param toFormat
-	 * @return
-	 */
-	public String getCalendarTime(Date toFormat);
-	/**
-	 * Return a friendly calendar date string.  Like "January 20, 2016 3:47 PM"
-	 * @param toFormat
-	 * @return
-	 */
-	public String getLongFriendlyDate(Date toFormat);
-	
-	
 	public String getBaseFileHandleUrl();
 	
 	public String getBaseProfileAttachmentUrl();

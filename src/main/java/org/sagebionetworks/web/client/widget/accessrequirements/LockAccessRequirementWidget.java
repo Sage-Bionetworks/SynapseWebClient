@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import org.sagebionetworks.repo.model.LockAccessRequirement;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -23,9 +24,9 @@ public class LockAccessRequirementWidget implements IsWidget {
 		view.setSubjectsWidget(subjectsWidget);
 	}
 	
-	public void setRequirement(LockAccessRequirement ar) {
+	public void setRequirement(LockAccessRequirement ar, Callback refreshCallback) {
 		this.ar = ar;
-		deleteAccessRequirementButton.configure(ar);
+		deleteAccessRequirementButton.configure(ar, refreshCallback);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
 	}
 	

@@ -22,8 +22,8 @@ import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
@@ -65,36 +65,72 @@ public class IsACTMemberAsyncHandlerTest {
 	@Test
 	public void testAnonymous() {
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
-		widget.isACTMember(mockCallback);
+		widget.isACTActionAvailable(mockCallback);
 		verify(mockCallback).invoke(false);
 	}
 	@Test
 	public void testCache() {
 		when(mockSessionStorage.getItem(SESSION_KEY_PREFIX + CURRENT_USER_ID)).thenReturn(Boolean.TRUE.toString());
-		widget.isACTMember(mockCallback);
+		widget.isACTActionAvailable(mockCallback);
 		verify(mockCallback).invoke(true);
+		// if hiding ACT UI, should invoke false
+		widget.setACTActionVisible(false);
+		widget.isACTActionAvailable(mockCallback);
+		verify(mockCallback).invoke(false);
+		
+		reset(mockCallback);
 		
 		when(mockSessionStorage.getItem(SESSION_KEY_PREFIX + CURRENT_USER_ID)).thenReturn(Boolean.FALSE.toString());
-		widget.isACTMember(mockCallback);
+		widget.isACTActionAvailable(mockCallback);
 		verify(mockCallback).invoke(false);
+		widget.setACTActionVisible(true);
+		widget.isACTActionAvailable(mockCallback);
+		verify(mockCallback, times(2)).invoke(false);
 	}
 	
 	@Test
 	public void testRpcSuccess() {
-		Boolean isACTMember = false;
+		Boolean isACTMember = true;
+		when(mockUserBundle.getIsACTMember()).thenReturn(isACTMember);
+		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
+		widget.isACTActionAvailable(mockCallback);
+		verify(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
+		verify(mockSessionStorage).setItem(SESSION_KEY_PREFIX + CURRENT_USER_ID, isACTMember.toString());
+		verify(mockCallback).invoke(isACTMember);
+	}
+	
+	@Test
+	public void testRpcSuccessHideACTAction() {
+		// Is in ACT, but hide ACT UI.  Answer to isACTActionAvailable should be false.
+		widget.setACTActionVisible(false);
+		Boolean isACTMember = true;
+		when(mockUserBundle.getIsACTMember()).thenReturn(isACTMember);
+		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
+		widget.isACTActionAvailable(mockCallback);
+		verify(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
+		verify(mockSessionStorage).setItem(SESSION_KEY_PREFIX + CURRENT_USER_ID, isACTMember.toString());
+		verify(mockCallback).invoke(false);
+	}
+	
+	@Test
+	public void testIsMember() {
+		// Is in ACT, but hide ACT UI.  Answer to isACTMember should be true.
+		widget.setACTActionVisible(false);
+		Boolean isACTMember = true;
 		when(mockUserBundle.getIsACTMember()).thenReturn(isACTMember);
 		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
 		widget.isACTMember(mockCallback);
 		verify(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
 		verify(mockSessionStorage).setItem(SESSION_KEY_PREFIX + CURRENT_USER_ID, isACTMember.toString());
-		verify(mockCallback).invoke(isACTMember);
+		verify(mockCallback).invoke(true);
 	}
+
 	@Test
 	public void testRpcFailure() {
 		String message = "an error occurred";
 		Exception ex = new Exception(message);
 		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
-		widget.isACTMember(mockCallback);
+		widget.isACTActionAvailable(mockCallback);
 		verify(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
 		verify(mockJsniUtils).consoleError(message);
 		verify(mockCallback).invoke(false);

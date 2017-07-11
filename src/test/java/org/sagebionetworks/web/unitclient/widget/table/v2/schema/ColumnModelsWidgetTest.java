@@ -37,8 +37,8 @@ import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
@@ -90,7 +90,7 @@ public class ColumnModelsWidgetTest {
 	@Mock
 	TableUpdateRequest mockTableUpdateRequest;
 	@Mock
-	FileViewDefaultColumns mockFileViewDefaultColumns;
+	ViewDefaultColumns mockFileViewDefaultColumns;
 	@Captor
 	ArgumentCaptor<ViewScope> viewScopeCaptor;
 	@Mock
@@ -183,7 +183,8 @@ public class ColumnModelsWidgetTest {
 	@Test
 	public void testGetDefaultColumnsForView() {
 		boolean isEditable = true;
-		AsyncMockStubber.callSuccessWith(mockDefaultColumnModels).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
+		when(mockFileViewDefaultColumns.getDefaultFileViewColumns(anyBoolean())).thenReturn(mockDefaultColumnModels);
+		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.file);
 		when(mockBundle.getEntity()).thenReturn(mockView);
 		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
 		widget.configure(mockBundle, isEditable, mockUpdateHandler);
@@ -192,17 +193,15 @@ public class ColumnModelsWidgetTest {
 	}
 	
 	@Test
-	public void testConfigureViewFailure() {
+	public void testGetDefaultColumnsForProjectView() {
 		boolean isEditable = true;
-		String error = "error message getting default column models";
-		Exception ex = new Exception(error);
+		when(mockFileViewDefaultColumns.getDefaultProjectViewColumns(anyBoolean())).thenReturn(mockDefaultColumnModels);
+		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.project);
 		when(mockBundle.getEntity()).thenReturn(mockView);
-		AsyncMockStubber.callFailureWith(ex).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
 		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
 		widget.configure(mockBundle, isEditable, mockUpdateHandler);
 		widget.getDefaultColumnsForView();
-		verify(mockBaseView).hideErrors();
-		verify(mockBaseView).showError(error);
+		verify(mockEditor).addColumns(mockDefaultColumnModels);
 	}
 	
 	@Test

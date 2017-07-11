@@ -256,7 +256,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	
 	@Override
 	public void changeClicked() {
-		isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean isACT) {
 				if (isACT) {

@@ -26,7 +26,7 @@ import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidgetView;
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;

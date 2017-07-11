@@ -29,12 +29,13 @@ public interface ACTDataAccessSubmissionWidgetView extends IsWidget {
 	void showRejectButton();
 	void showApproveButton();
 	void setSubmittedBy(IsWidget w);
-	
+	void setShowEmailButton(IsWidget w);
 	void setDucColumnVisible(boolean visible);
 	void setIrbColumnVisible(boolean visible);
 	void setOtherAttachmentsColumnVisible(boolean visible);
 	void setRenewalColumnsVisible(boolean visible);
 	void hideActions();
+	
 	/**
 	 * Presenter interface
 	 */

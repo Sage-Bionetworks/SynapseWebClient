@@ -25,7 +25,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsWidget;
-import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
 import org.sagebionetworks.web.shared.ChallengeTeamBundle;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;

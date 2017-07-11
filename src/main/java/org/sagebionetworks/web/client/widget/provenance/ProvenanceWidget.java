@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -77,6 +78,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	List<String> lookupVersion;
 	ProvGraph currentGraph;
 	ClientCache clientCache;
+	DateTimeUtils dateTimeUtils;
 	
 	@Inject
 	public ProvenanceWidget(ProvenanceWidgetView view, SynapseClientAsync synapseClient,
@@ -85,7 +87,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			AdapterFactory adapterFactory,
 			SynapseJSNIUtils synapseJSNIUtils,
 			JsoProvider jsoProvider, 
-			ClientCache clientCache) {
+			ClientCache clientCache,
+			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
@@ -94,6 +97,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.jsoProvider = jsoProvider;
 		this.clientCache = clientCache;
+		this.dateTimeUtils = dateTimeUtils;
 		view.setPresenter(this);
 	}
 
@@ -178,7 +182,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			
 	@Override
 	public void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback) {
-		ProvUtils.getInfo(nodeId, synapseClient, adapterFactory, clientCache, idToNode, callback);
+		ProvUtils.getInfo(nodeId, synapseClient, adapterFactory, clientCache, dateTimeUtils, idToNode, callback);
 	}
 	
 	@SuppressWarnings("unchecked")

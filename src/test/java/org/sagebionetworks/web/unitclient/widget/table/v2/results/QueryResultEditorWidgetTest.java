@@ -38,6 +38,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
@@ -87,7 +88,7 @@ public class QueryResultEditorWidgetTest {
 	@Mock
 	ClientCache mockClientCache;
 	List<TableUpdateResponse> tableUpdateResults;
-	boolean isView;
+	TableType tableType;
 	public static final String ENTITY_ID = "syn999";
 	@Before
 	public void before() throws JSONObjectAdapterException{
@@ -125,7 +126,7 @@ public class QueryResultEditorWidgetTest {
 		tableUpdateResults = new ArrayList<TableUpdateResponse>();
 		when(mockTableUpdateTransactionResponse.getResults()).thenReturn(tableUpdateResults);
 		// by default, edit Table results (not a view)
-		isView = false;
+		tableType = TableType.table;
 	}
 	
 	@Test
@@ -169,7 +170,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnEdit(){
-		widget.showEditor(bundle, isView, mockCallback);
+		widget.showEditor(bundle, tableType, mockCallback);
 		verify(mockView).setErrorMessageVisible(false);
 		verify(mockView).hideProgress();
 		verify(mockView).setSaveButtonLoading(false);
@@ -182,8 +183,8 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnEditView(){
-		isView = true;
-		widget.showEditor(bundle, isView, mockCallback);
+		tableType = TableType.fileview;
+		widget.showEditor(bundle, tableType, mockCallback);
 		verify(mockView).setAddRowButtonVisible(false);
 		verify(mockView).setButtonToolbarVisible(false);
 	}
@@ -191,7 +192,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelNoChanges(){
-		widget.showEditor(bundle, isView, mockCallback);
+		widget.showEditor(bundle, tableType, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// No changes
@@ -202,7 +203,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelWithChangesConfirmOkay(){
-		widget.showEditor(bundle, isView, mockCallback);
+		widget.showEditor(bundle, tableType, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -218,7 +219,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnCancelWithChangesConfirmCanceld(){
-		widget.showEditor(bundle, isView, mockCallback);
+		widget.showEditor(bundle, tableType, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -234,7 +235,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveNoChanges(){
-		widget.showEditor(bundle, isView, mockCallback);
+		widget.showEditor(bundle, tableType, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		
@@ -251,7 +252,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesNotValid(){
-		widget.showEditor(bundle, isView, mockCallback);
+		widget.showEditor(bundle, tableType, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -274,7 +275,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChangesValidJobSuccessful(){
-		widget.showEditor(bundle, isView, mockCallback);
+		widget.showEditor(bundle, tableType, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -310,8 +311,8 @@ public class QueryResultEditorWidgetTest {
 
 	@Test
 	public void testOnSaveWithChangesValidJobSuccessfulIsView(){
-		isView = true;
-		widget.showEditor(bundle, isView, mockCallback);
+		tableType = TableType.projectview;
+		widget.showEditor(bundle, tableType, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -350,7 +351,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobFailed(){
-		widget.showEditor(bundle, isView, mockCallback);
+		widget.showEditor(bundle, tableType, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes
@@ -385,7 +386,7 @@ public class QueryResultEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveWithChagnesValidJobCanceled(){
-		widget.showEditor(bundle, isView, mockCallback);
+		widget.showEditor(bundle, tableType, mockCallback);
 		reset(mockView);
 		reset(mockGlobalState);
 		// make changes

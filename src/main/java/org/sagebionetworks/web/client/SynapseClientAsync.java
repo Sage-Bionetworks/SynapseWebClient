@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -17,11 +16,9 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
@@ -39,7 +36,6 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDestination;
@@ -54,9 +50,7 @@ import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
-import org.sagebionetworks.repo.model.table.RowReferenceSet;
 import org.sagebionetworks.repo.model.table.SortItem;
-import org.sagebionetworks.repo.model.table.TableFileHandleResults;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.repo.model.table.ViewType;
@@ -66,7 +60,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
-import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
@@ -74,7 +67,6 @@ import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
-import org.sagebionetworks.web.shared.SerializableWhitelist;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -87,8 +79,6 @@ public interface SynapseClientAsync {
 
 	void getEntity(String entityId, AsyncCallback<Entity> callback);
 	
-	void getProject(String projectId,AsyncCallback<Project> callback);
-	
 	void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<Entity> callback);
 	
 	void getEntityBundle(String entityId, int partsMask, AsyncCallback<EntityBundle> callback);
@@ -100,13 +90,8 @@ public interface SynapseClientAsync {
 	void getEntityVersions(String entityId, int offset, int limit,
 			AsyncCallback<PaginatedResults<VersionInfo>> callback);
 
-	void getEntityPath(String entityId, AsyncCallback<EntityPath> callback);
-
 	void search(SearchQuery searchQuery, AsyncCallback<SearchResults> callback);
-
-	void junk(SerializableWhitelist l,
-			AsyncCallback<SerializableWhitelist> callback);
-
+	
 	void logDebug(String message, AsyncCallback<Void> callback);
 
 	void logError(String message, AsyncCallback<Void> callback);
@@ -127,9 +112,6 @@ public interface SynapseClientAsync {
 	void createOrUpdateEntity(Entity entity, Annotations annos,
 			boolean isNew, AsyncCallback<String> callback);
 	
-	void getEntityTypeBatch(List<String> entityIds,
-			AsyncCallback<PaginatedResults<EntityHeader>> callback);
-	
 	void getEntityHeaderBatch(ReferenceList referenceList,
 			AsyncCallback<PaginatedResults<EntityHeader>> callback);
 
@@ -141,8 +123,6 @@ public interface SynapseClientAsync {
 
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
-	void getUserProfile(AsyncCallback<UserProfile> callback);
-	
 	void getUserProfile(String userId, AsyncCallback<UserProfile> callback);
 	
 	void listUserProfiles(List<String> userIds,
@@ -168,31 +148,18 @@ public interface SynapseClientAsync {
 	
 	public void createAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
 	
-	public void updateAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
-	
 	public void updateAcl(AccessControlList acl, boolean recursive, AsyncCallback<AccessControlList> callback);
 	
-	public void updateTeamAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
 	public void getTeamAcl(String teamId, AsyncCallback<AccessControlList> callback);
 	
 	public void deleteAcl(String ownerEntityId, AsyncCallback<AccessControlList> callback);
 
-	public void hasAccess(String ownerEntityId, String accessType, AsyncCallback<Boolean> callback);
-	
 	public void hasAccess(String ownerId, String ownerType, String accessType,AsyncCallback<Boolean> callback);
 	
 	void createOrUpdateAccessRequirement(AccessRequirement arEW,
 			AsyncCallback<AccessRequirement> callback);
 
-	@Deprecated
-	void createLockAccessRequirement(String entityId,
-			AsyncCallback<Void> callback);
-	
-	public void getUnmetAccessRequirements(String entityId, ACCESS_TYPE accessType, AsyncCallback<AccessRequirementsTransport> callback);
-	
 	public void getTeamAccessRequirements(String teamId, AsyncCallback<List<AccessRequirement>> callback);
-	void getAllEntityUploadAccessRequirements(String entityId,
-			AsyncCallback<PaginatedResults<AccessRequirement>> callback);
 	
 	void createAccessApproval(AccessApproval aaEW,
 			AsyncCallback<AccessApproval> callback);
@@ -211,15 +178,8 @@ public interface SynapseClientAsync {
 	
 	public void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
 	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
-	public void getFileEndpoint(AsyncCallback<String> callback);
-
-	 void createV2WikiPage(String ownerId, String ownerType, V2WikiPage page,
-			AsyncCallback<V2WikiPage> callback);
-    void getV2WikiPage(WikiPageKey key, AsyncCallback<V2WikiPage> callback);
-    void getVersionOfV2WikiPage(WikiPageKey key, Long version,
-			AsyncCallback<V2WikiPage> callback);
-    void updateV2WikiPage(String ownerId, String ownerType, V2WikiPage wikiPag,
-			AsyncCallback<V2WikiPage> callback);
+	
+	void getV2WikiPage(WikiPageKey key, AsyncCallback<V2WikiPage> callback);
     void restoreV2WikiPage(String ownerId, String ownerType, String wikiId,
 			Long versionToUpdate, AsyncCallback<V2WikiPage> callback);
     public void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
@@ -229,14 +189,9 @@ public interface SynapseClientAsync {
     public void updateV2WikiOrderHint(V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback);
     void getV2WikiAttachmentHandles(WikiPageKey key,
 			AsyncCallback<FileHandleResults> callback);
-    void getVersionOfV2WikiAttachmentHandles(WikiPageKey key, Long version,
-			AsyncCallback<FileHandleResults> callback);
     void getV2WikiHistory(WikiPageKey key, Long limit, Long offset,
 			AsyncCallback<PaginatedResults<V2WikiHistorySnapshot>> callback);
 
-	public void getMarkdown(WikiPageKey key, AsyncCallback<String> callback);
-	public void getVersionOfMarkdown(WikiPageKey key, Long version, AsyncCallback<String> callback);
-	
 	public void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	public void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback);
@@ -297,8 +252,6 @@ public interface SynapseClientAsync {
 			AsyncCallback<Doi> callback);
 	void createDoi(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 	
-	void getFileEntityTemporaryUrlForVersion(String entityId, Long versionNumber, AsyncCallback<String> callback);
-	
 	void getSynapseVersions(AsyncCallback<String> callback);
 
 	void getSynapseProperties(AsyncCallback<HashMap<String, String>> callback);
@@ -321,8 +274,6 @@ public interface SynapseClientAsync {
 	void getPageNameToWikiKeyMap(AsyncCallback<HashMap<String, WikiPageKey>> callback);
 
 	void deleteApiKey(AsyncCallback<String> callback);
-
-	void deleteRowsFromTable(String toDelete, AsyncCallback<String> callback);
 	
 	/**
 	 * Set a table's schema. Creates any necessary ColumnModels (for create and update), and figures out necessary ColumnChanges to transform oldSchema into newSchema.
@@ -356,11 +307,7 @@ public interface SynapseClientAsync {
 	 */
 	void getSortFromTableQuery(String sql, AsyncCallback<List<SortItem>> callback);
 
-	void purgeTrashForUser(String entityId, AsyncCallback<Void> callback);
-	
 	void purgeTrashForUser(AsyncCallback<Void> callback);
-
-	void moveToTrash(String entityId, AsyncCallback<Void> callback);
 
 	void restoreFromTrash(String entityId, String newParentId, AsyncCallback<Void> callback);
 	
@@ -379,8 +326,6 @@ public interface SynapseClientAsync {
 	void createEntity(Entity entity,
 			AsyncCallback<Entity> callback);
 
-	void getFileHandle(String fileHandleId, AsyncCallback<FileHandle> callback);
-	
 	void createFileHandleURL(String fileHandleId, AsyncCallback<String> callback);
 
 	void createTableColumns(List<ColumnModel> value,
@@ -413,9 +358,6 @@ public interface SynapseClientAsync {
 	
 	void getHost(String urlString, AsyncCallback<String> callback);
 
-	void getTableFileHandle(RowReferenceSet set,
-			AsyncCallback<TableFileHandleResults> callback);
-
 	void updateEntity(Entity toUpdate, AsyncCallback<Entity> callback);
 	void updateFileEntity(FileEntity toUpdate, FileHandleCopyRequest copyRequest, AsyncCallback<Entity> callback);
 	
@@ -437,8 +379,6 @@ public interface SynapseClientAsync {
 	void hexDecodeLogEntry(String encodedLogEntry,
 			AsyncCallback<LogEntry> callback);
 
-	void hexEncodeLogEntry(LogEntry logEntry, AsyncCallback<String> callback);
-	
 	void isTeamMember(String userId, Long groupPrincipalId, AsyncCallback<Boolean> callback);
 	
 	void setIsTeamAdmin(String currentUserId, String targetUserId,
@@ -454,7 +394,6 @@ public interface SynapseClientAsync {
 	void getFileHandleAndUrlBatch(BatchFileRequest request, AsyncCallback<BatchFileResult> asyncCallback);
 	
 	void deleteAccessRequirement(Long accessRequirementId, AsyncCallback<Void> callback);
-	void deleteAccessApproval(Long approvalId, AsyncCallback<Void> callback);
 	
 	void deleteAccessApprovals(String accessRequirement, String accessorId, AsyncCallback<Void> asyncCallback);
 
@@ -479,4 +418,7 @@ public interface SynapseClientAsync {
 	void isChallenge(String id, AsyncCallback<Boolean> callback);
 
 	void getProjectDisplay(String projectId, AsyncCallback<ProjectDisplayBundle> callback);
+
+	void addTeamMember(String userGroupId, String teamId, String message, String hostPageBaseURL,
+			AsyncCallback<Void> callback);
 }

@@ -19,9 +19,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
-import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 
@@ -40,7 +40,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	private PreflightController preflightController;
 	private TableListWidgetView view;
 	private SynapseClientAsync synapseClient;
-	private CreateTableModalWidget createTableModalWidget;
 	private UploadTableModalWidget uploadTableModalWidget;
 	private CreateTableViewWizard createTableViewWizard;
 	private boolean canEdit;
@@ -50,29 +49,30 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	private CookieProvider cookies;
 	WizardCallback refreshTablesCallback;
 	private LoadMoreWidgetContainer loadMoreWidget;
+	private SynapseAlert synAlert;
 	
 	@Inject
 	public TableListWidget(PreflightController preflightController,
 			TableListWidgetView view,
 			SynapseClientAsync synapseClient,
-			CreateTableModalWidget createTableModalWidget,
 			UploadTableModalWidget uploadTableModalWidget,
 			CookieProvider cookies,
 			CreateTableViewWizard createTableViewWizard,
-			LoadMoreWidgetContainer loadMoreWidget) {
+			LoadMoreWidgetContainer loadMoreWidget, 
+			SynapseAlert synAlert) {
 		this.preflightController = preflightController;
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.createTableModalWidget = createTableModalWidget;
 		this.uploadTableModalWidget = uploadTableModalWidget;
 		this.createTableViewWizard = createTableViewWizard;
 		this.loadMoreWidget = loadMoreWidget;
 		this.cookies = cookies;
+		this.synAlert = synAlert;
 		this.view.setPresenter(this);
-		this.view.addCreateTableModal(createTableModalWidget);
 		this.view.setLoadMoreWidget(loadMoreWidget);
 		this.view.addUploadTableModal(uploadTableModalWidget);
 		this.view.addWizard(createTableViewWizard.asWidget());
+		view.setSynAlert(synAlert);
 		refreshTablesCallback = new WizardCallback() {
 			@Override
 			public void onFinished() {
@@ -100,7 +100,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	public void configure(EntityBundle parentBundle) {
 		this.parentBundle = parentBundle;
 		this.canEdit = parentBundle.getPermissions().getCanEdit();
-		this.createTableModalWidget.configure(parentBundle.getEntity().getId(), this);
 		this.uploadTableModalWidget.configure(parentBundle.getEntity().getId(), null);
 		view.resetSortUI();
 		loadData();
@@ -142,6 +141,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	 * @param offset The offset used by the query.
 	 */
 	private void loadMore(){
+		synAlert.clear();
 		synapseClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
 			public void onSuccess(EntityChildrenResponse result) {
 				query.setNextPageToken(result.getNextPageToken());
@@ -150,7 +150,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 			};
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
+				synAlert.handleException(caught);
 			}
 		});
 	}
@@ -163,6 +163,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 		view.setAddTableVisible(this.canEdit);
 		view.setUploadTableVisible(this.canEdit);
 		view.setAddFileViewVisible(this.canEdit);
+		view.setAddProjectViewVisible(DisplayUtils.isInTestWebsite(cookies) && this.canEdit);
 	}
     
 	@Override
@@ -201,7 +202,25 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	 * Called after all pre-flight checks are performed on a file view.
 	 */
 	private void postCheckCreateFileView() {
-		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.view);
+		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.fileview);
+		this.createTableViewWizard.showModal(refreshTablesCallback);
+	}
+	
+	@Override
+	public void onAddProjectView() {
+		preflightController.checkCreateEntity(parentBundle, EntityView.class.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postCheckCreateProjectView();
+			}
+		});
+	}
+	
+	/**
+	 * Called after all pre-flight checks are performed on a project view.
+	 */
+	private void postCheckCreateProjectView() {
+		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.projectview);
 		this.createTableViewWizard.showModal(refreshTablesCallback);
 	}
 	
@@ -220,13 +239,8 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	 * Called after all pre-flight checks are performed on a table.
 	 */
 	private void postCheckCreateTable(){
-		// use new wizard if in alpha mode
-		if (DisplayUtils.isInTestWebsite(cookies)) {
-			this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.table);
-			this.createTableViewWizard.showModal(refreshTablesCallback);
-		} else {
-			this.createTableModalWidget.showCreateModal();	
-		}
+		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.table);
+		this.createTableViewWizard.showModal(refreshTablesCallback);
 	}
 	
 

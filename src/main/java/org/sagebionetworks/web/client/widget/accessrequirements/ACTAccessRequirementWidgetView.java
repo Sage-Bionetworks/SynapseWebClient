@@ -17,32 +17,24 @@ public interface ACTAccessRequirementWidgetView extends IsWidget, SupportsLazyLo
 	void setTerms(String arText);
 	void showWikiTermsUI();
 	void setWikiTermsWidget(Widget wikiWidget);
-	void showRequestSubmittedByOtherUser();
 	void showApprovedHeading();
 	void showUnapprovedHeading();
-	void showRequestSubmittedMessage();
 	void showRequestApprovedMessage();
-	void showRequestRejectedMessage(String reason);
-	void showCancelRequestButton();
-	void showUpdateRequestButton();
-	void showRequestAccessButton();
 	void resetState();
-	void setDataAccessRequestWizard(IsWidget w);
+	void showRequestAccessButton();
 	void setEditAccessRequirementWidget(IsWidget w);
 	void setDeleteAccessRequirementWidget(IsWidget w);
-	void setRevokeUserAccessWidget(IsWidget w);
-	void setSubmitterUserBadge(IsWidget w);
-	void setManageAccessWidget(IsWidget w);
 	void setSubjectsWidget(IsWidget w);
 	void setVisible(boolean visible);
 	void setSynAlert(IsWidget w);
 	void hideButtonContainers();
-	void setManageAccessWidgetContainerVisible(boolean visible);
+	void setManageAccessWidget(IsWidget w);
+	void setConvertAccessRequirementWidget(IsWidget w);
+	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void onCancelRequest();
 		void onRequestAccess();
 	}
 }

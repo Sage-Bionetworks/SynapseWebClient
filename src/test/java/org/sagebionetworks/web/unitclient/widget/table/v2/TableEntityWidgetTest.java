@@ -29,6 +29,7 @@ import org.sagebionetworks.repo.model.table.FacetType;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -39,6 +40,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.table.v2.QueryInputWidget;
@@ -118,10 +120,11 @@ public class TableEntityWidgetTest {
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(query);
 	}
 	
-	private void configureBundleWithView() {
+	private void configureBundleWithView(ViewType viewType) {
 		EntityView view = new EntityView();
 		view.setId("syn456");
 		view.setColumnIds(TableModelTestUtils.getColumnModelIds(columns));
+		view.setType(viewType);
 		entityBundle.setEntity(view);
 	}
 
@@ -209,7 +212,7 @@ public class TableEntityWidgetTest {
 	@Test
 	public void testConfigureViewEdit(){
 		boolean canEdit = true;
-		configureBundleWithView();
+		configureBundleWithView(ViewType.file);
 		
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		
@@ -223,7 +226,7 @@ public class TableEntityWidgetTest {
 	@Test
 	public void testConfigureViewNoEdit(){
 		boolean canEdit = false;
-		configureBundleWithView();
+		configureBundleWithView(ViewType.file);
 		
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		
@@ -290,7 +293,7 @@ public class TableEntityWidgetTest {
 
 	@Test
 	public void testViewQueryExecutionFinishedSuccess(){
-		configureBundleWithView();
+		configureBundleWithView(ViewType.file);
 		boolean canEdit = true;
 		boolean wasExecutionSuccess = true;
 		boolean resultsEditable = true;
@@ -342,7 +345,7 @@ public class TableEntityWidgetTest {
 	
 	@Test
 	public void testOnExecuteQuery(){
-		boolean isView = false;
+		TableType tableType = TableType.table;
 		boolean canEdit = true;
 		// Start with a query that is not on the first page
 		Query startQuery = new Query();
@@ -352,7 +355,7 @@ public class TableEntityWidgetTest {
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		// Start query get passed to the results
-		verify(mockQueryResultsWidget).configure(startQuery, canEdit, isView, widget);
+		verify(mockQueryResultsWidget).configure(startQuery, canEdit, tableType, widget);
 		reset(mockQueryResultsWidget);
 		// Set new sql
 		String newSQL = "select 1,2,3 from syn123";
@@ -362,13 +365,13 @@ public class TableEntityWidgetTest {
 		expected.setSql(newSQL);
 		expected.setLimit(TableEntityWidget.DEFAULT_LIMIT);
 		expected.setOffset(TableEntityWidget.DEFAULT_OFFSET);
-		verify(mockQueryResultsWidget).configure(expected, canEdit, isView, widget);
+		verify(mockQueryResultsWidget).configure(expected, canEdit, tableType, widget);
 	}
 
 	@Test
 	public void testOnExecuteViewQuery(){
-		boolean isView = true;
-		configureBundleWithView();
+		TableType tableType = TableType.projectview;
+		configureBundleWithView(ViewType.project);
 		boolean canEdit = true;
 		// Start with a query that is not on the first page
 		Query startQuery = new Query();
@@ -378,7 +381,7 @@ public class TableEntityWidgetTest {
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		// Start query get passed to the results
-		verify(mockQueryResultsWidget).configure(startQuery, canEdit, isView, widget);
+		verify(mockQueryResultsWidget).configure(startQuery, canEdit, tableType, widget);
 	}
 	
 	@Test
@@ -442,7 +445,6 @@ public class TableEntityWidgetTest {
 	@Test
 	public void testOnStartingnewQuery(){
 		boolean canEdit = true;
-		boolean isView = false;
 		// Start with a query that is not on the first page
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
@@ -458,13 +460,13 @@ public class TableEntityWidgetTest {
 		// Should get passed to the input widget
 		verify(mockQueryInputWidget).configure(newQuery.getSql(), widget, canEdit);
 		// Should not be sent to the results as that is where it came from.
-		verify(mockQueryResultsWidget, never()).configure(any(Query.class), anyBoolean(), eq(isView), any(QueryResultsListener.class));
+		verify(mockQueryResultsWidget, never()).configure(any(Query.class), anyBoolean(), any(TableType.class), any(QueryResultsListener.class));
 	}
 	
 
 	@Test
 	public void testCanEditViewResults(){
-		configureBundleWithView();
+		configureBundleWithView(ViewType.file);
 		//we can edit the view, but verify that the query input widget should be told that editing results is not possible
 		boolean canEdit = true;
 		// Start with a query that is not on the first page
@@ -497,7 +499,7 @@ public class TableEntityWidgetTest {
 	
 	@Test
 	public void testInitSimpleSearchUI(){
-		configureBundleWithView();
+		configureBundleWithView(ViewType.file);
 		// mark a column as being faceted
 		columns.get(0).setFacetType(FacetType.enumeration);
 		boolean canEdit = false;
@@ -522,7 +524,7 @@ public class TableEntityWidgetTest {
 		// change to advanced (verify sql that has facet selection info sql used)
 		widget.onShowAdvancedSearch();
 		verifyAdvancedSearchUI();
-		verify(mockQueryResultsWidget).configure(queryCaptor.capture(), eq(canEdit), eq(true), eq(widget));
+		verify(mockQueryResultsWidget).configure(queryCaptor.capture(), eq(canEdit), eq(TableType.fileview), eq(widget));
 		Query query = queryCaptor.getValue();
 		assertEquals(facetBasedSql, query.getSql());
 		assertNull(query.getSelectedFacets());
@@ -531,7 +533,7 @@ public class TableEntityWidgetTest {
 	@Test
 	public void testInitAdvancedQueryStateUI1(){
 		// simple query, but no facets
-		configureBundleWithView();
+		configureBundleWithView(ViewType.file);
 		boolean canEdit = false;
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
@@ -548,7 +550,7 @@ public class TableEntityWidgetTest {
 	@Test
 	public void testInitAdvancedQueryStateUI2(){
 		// facet, but not a simple query
-		configureBundleWithView();
+		configureBundleWithView(ViewType.project);
 		columns.get(0).setFacetType(FacetType.enumeration);
 		boolean canEdit = false;
 		Query startQuery = new Query();
@@ -566,13 +568,13 @@ public class TableEntityWidgetTest {
 		callbackCaptor.getValue().invoke();
 		verifySimpleSearchUI();
 		// reset query
-		verify(mockQueryResultsWidget).configure(startQuery, canEdit, true, widget);
+		verify(mockQueryResultsWidget).configure(startQuery, canEdit, TableType.projectview, widget);
 	}
 	
 	@Test
 	public void testInitAdvancedQueryStateUI3(){
 		// facet, but not a simple query
-		configureBundleWithView();
+		configureBundleWithView(ViewType.file);
 		columns.get(0).setFacetType(FacetType.enumeration);
 		boolean canEdit = false;
 		Query startQuery = new Query();

@@ -123,7 +123,6 @@ public class ProvenanceEditorWidgetTest {
 		verify(mockView).setSynAlertWidget(mockSynAlert);
 		verify(mockView).setUsedProvenanceList(mockProvenanceList);
 		verify(mockView).setExecutedProvenanceList(mockProvenanceList);
-		verify(mockView).setEntityFinder(mockEntityFinder);
 		verify(mockView).setURLDialog(mockUrlDialog);
 		verify(mockView).setPresenter(presenter);
 	}

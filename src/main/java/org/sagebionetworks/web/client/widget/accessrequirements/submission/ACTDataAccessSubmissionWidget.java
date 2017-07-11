@@ -1,19 +1,20 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.dataaccess.AccessApprovalResult;
-import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalRequest;
-import org.sagebionetworks.repo.model.dataaccess.BatchAccessApprovalResult;
+import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -37,6 +38,8 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	FileHandleWidget irbFileRenderer;
 	SynapseJSNIUtils jsniUtils;
 	PortalGinInjector ginInjector;
+	DateTimeUtils dateTimeUtils;
+	ShowEmailsButton showEmailsButton;
 	
 	@Inject
 	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, 
@@ -47,13 +50,17 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 			FileHandleWidget irbFileRenderer,
 			FileHandleList otherDocuments,
 			SynapseJSNIUtils jsniUtils,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			DateTimeUtils dateTimeUtils,
+			ShowEmailsButton showEmailsButton) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.dataAccessClient = dataAccessClient;
 		this.promptDialog = promptDialog;
 		this.jsniUtils = jsniUtils;
 		this.ginInjector = ginInjector;
+		this.dateTimeUtils = dateTimeUtils;
+		this.showEmailsButton = showEmailsButton;
 		
 		otherDocuments.configure()
 			.setCanDelete(false)
@@ -68,6 +75,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setPromptModal(promptDialog);
 		view.setOtherAttachmentWidget(otherDocuments);
 		view.setSynAlert(synAlert);
+		view.setShowEmailButton(showEmailsButton);
 		promptDialog.configure("Reason", "Rejection reason:", "", new Callback() {
 			@Override
 			public void invoke() {
@@ -93,8 +101,8 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 			default:
 		}
 		view.clearAccessors();
-		if (submission.getAccessors() != null) {
-			getApprovalState(submission.getAccessors());
+		if (submission.getAccessorChanges() != null) {
+			addAccessorUserBadges(submission.getAccessorChanges());
 		}
 		otherDocuments.clear();
 		if (submission.getAttachments() != null) {
@@ -121,34 +129,32 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setProjectLead(submission.getResearchProjectSnapshot().getProjectLead());
 		view.setPublications(submission.getPublication());
 		view.setSummaryOfUse(submission.getSummaryOfUse());
-		view.setSubmittedOn(jsniUtils.convertDateToSmallString(submission.getSubmittedOn()));
+		view.setSubmittedOn(dateTimeUtils.convertDateToSmallString(submission.getSubmittedOn()));
+		view.setRenewalColumnsVisible(submission.getIsRenewalSubmission());
 		UserBadge badge = ginInjector.getUserBadgeWidget();
 		badge.configure(submission.getSubmittedBy());
 		view.setSubmittedBy(badge);
+		configureShowEmailsButton(submission.getAccessorChanges());
 	}
 	
-	public void getApprovalState(List<String> accessorIds) {
-		BatchAccessApprovalRequest request = new BatchAccessApprovalRequest();
-		request.setAccessRequirementId(submission.getAccessRequirementId());
-		request.setUserIds(accessorIds);
-		dataAccessClient.getAccessApprovalInfo(request, new AsyncCallback<BatchAccessApprovalResult>() {
-			@Override
-			public void onSuccess(BatchAccessApprovalResult result) {
-				for (AccessApprovalResult approvalResult : result.getResults()) {
-					UserBadgeItem badge = ginInjector.getUserBadgeItem();
-					badge.configure(approvalResult.getUserId());
-					badge.setSelectVisible(false);
-					//set access requirement approval icon visibility 
-					badge.setMetRequirementIconVisible(approvalResult.getHasApproval());
-					view.addAccessors(badge);
-				}
+	public void configureShowEmailsButton(List<AccessorChange> accessorChanges) {
+		List<String> userIds = new ArrayList<>();
+		if (accessorChanges != null) {
+			for (AccessorChange accessorChange : accessorChanges) {
+				userIds.add(accessorChange.getUserId());
 			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-		});
+		}
+		showEmailsButton.configure(userIds);
+	}
+	
+	public void addAccessorUserBadges(List<AccessorChange> accessorChanges) {
+		for (AccessorChange change : accessorChanges) {
+			UserBadgeItem badge = ginInjector.getUserBadgeItem();
+			badge.configure(change);
+			badge.setSelectVisible(false);
+			badge.setAccessTypeDropdownEnabled(false);
+			view.addAccessors(badge);
+		}
 	}
 	
 	private FileHandleAssociation getFileHandleAssociation(String fileHandleId) {
@@ -203,8 +209,5 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	}
 	public void setOtherAttachmentsColumnVisible(boolean visible) {
 		view.setOtherAttachmentsColumnVisible(visible);
-	}
-	public void setRenewalColumnsVisible(boolean visible) {
-		view.setRenewalColumnsVisible(visible);
 	}
 }

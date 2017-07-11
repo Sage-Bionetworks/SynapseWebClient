@@ -1,32 +1,37 @@
 package org.sagebionetworks.web.unitclient.widget.pagination;
 
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+
 import org.junit.Before;
 import org.junit.Test;
-import static org.mockito.Mockito.*;
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 
 public class BasicPaginationWidgetTest {
 	
+	@Mock
 	PageChangeListener mockPageChangeListener;
+	@Mock
 	BasicPaginationView mockView;
+	
 	BasicPaginationWidget widget;
 	
 	@Before
 	public void before(){
-		mockView = Mockito.mock(BasicPaginationView.class);
-		mockPageChangeListener = Mockito.mock(PageChangeListener.class);
+		MockitoAnnotations.initMocks(this);
 		widget = new BasicPaginationWidget(mockView);
 	}
 	
 	@Test
-	public void testCountZero(){
+	public void testZeroRows(){
 		long limit = 10;
 		long offset = 0;
-		long count = 0;
-		widget.configure(limit, offset, count, mockPageChangeListener);
+		long currentRowCount = 0;
+		widget.configure(limit, offset, currentRowCount, mockPageChangeListener);
 		verify(mockView).setNextVisible(false);
 		verify(mockView).setPreviousVisible(false);
 		long currentPageNumber = 1;
@@ -37,32 +42,21 @@ public class BasicPaginationWidgetTest {
 	public void testOnePage(){
 		long limit = 10;
 		long offset = 0;
-		long count = 10;
-		widget.configure(limit, offset, count, mockPageChangeListener);
-		verify(mockView).setNextVisible(false);
+		long currentRowCount = 10;
+		widget.configure(limit, offset, currentRowCount, mockPageChangeListener);
+		//full page of results, will show next page button (even if these are all of the results)
+		verify(mockView).setNextVisible(true);
 		verify(mockView).setPreviousVisible(false);
 		long currentPageNumber = 1;
 		verify(mockView).setCurrentPage(currentPageNumber);
 	}
 	
 	@Test
-	public void testOneOfThreePages(){
-		long limit = 10;
-		long offset = limit*0;
-		long count = 21;
-		widget.configure(limit, offset, count, mockPageChangeListener);
-		verify(mockView).setNextVisible(true);
-		verify(mockView).setPreviousVisible(false);
-		long currentPageNumber = 1;
-		verify(mockView).setCurrentPage(currentPageNumber);
-	}
-
-	@Test
 	public void testTwoOfThreePages(){
 		long limit = 10;
 		long offset = limit*1;
-		long count = 21;
-		widget.configure(limit, offset, count, mockPageChangeListener);
+		long currentRowCount = 10;
+		widget.configure(limit, offset, currentRowCount, mockPageChangeListener);
 		verify(mockView).setNextVisible(true);
 		verify(mockView).setPreviousVisible(true);
 		long currentPageNumber = 2;
@@ -73,8 +67,8 @@ public class BasicPaginationWidgetTest {
 	public void testThreeOfThreePages(){
 		long limit = 10;
 		long offset = limit*2;
-		long count = 21;
-		widget.configure(limit, offset, count, mockPageChangeListener);
+		long currentRowCount = 1;
+		widget.configure(limit, offset, currentRowCount, mockPageChangeListener);
 		verify(mockView).setNextVisible(false);
 		verify(mockView).setPreviousVisible(true);
 		long currentPageNumber = 3;
@@ -85,8 +79,8 @@ public class BasicPaginationWidgetTest {
 	public void testOnNext(){
 		long limit = 10;
 		long offset = limit*1;
-		long count = 21;
-		widget.configure(limit, offset, count, mockPageChangeListener);
+		long currentRowCount = 10;
+		widget.configure(limit, offset, currentRowCount, mockPageChangeListener);
 		verify(mockView).setNextVisible(true);
 		verify(mockView).setPreviousVisible(true);
 		reset(mockView);
@@ -101,8 +95,8 @@ public class BasicPaginationWidgetTest {
 	public void testOnPrevious(){
 		long limit = 10;
 		long offset = limit*1;
-		long count = 21;
-		widget.configure(limit, offset, count, mockPageChangeListener);
+		long currentRowCount = 10;
+		widget.configure(limit, offset, currentRowCount, mockPageChangeListener);
 		verify(mockView).setNextVisible(true);
 		verify(mockView).setPreviousVisible(true);
 		reset(mockView);

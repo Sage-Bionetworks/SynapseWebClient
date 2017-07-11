@@ -5,8 +5,8 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
@@ -27,12 +27,12 @@ public class CreateAccessRequirementButton implements IsWidget {
 	public PortalGinInjector ginInjector;
 	RestrictableObjectDescriptor subject;
 	AccessRequirement ar;
+	Callback refreshCallback;
 	
 	@Inject
 	public CreateAccessRequirementButton(Button button, 
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			final PortalGinInjector ginInjector,
-			final GlobalApplicationState globalAppState) {
+			final PortalGinInjector ginInjector) {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.ginInjector = ginInjector;
@@ -50,40 +50,42 @@ public class CreateAccessRequirementButton implements IsWidget {
 				wizard.showModal(new WizardCallback() {
 					@Override
 					public void onFinished() {
-						globalAppState.refreshPage();
+						refreshCallback.invoke();
 					}
 					
 					@Override
 					public void onCanceled() {
-						globalAppState.refreshPage();
+						refreshCallback.invoke();
 					}
 				});
 			}
 		});
 	}	
 	
-	public void configure(AccessRequirement ar) {
+	public void configure(AccessRequirement ar, Callback refreshCallback) {
 		button.setText(EDIT_ACCESS_REQUIREMENT_BUTTON_TEXT);
 		button.setSize(ButtonSize.DEFAULT);
 		button.setType(ButtonType.DEFAULT);
 		button.setIcon(IconType.EDIT);
+		this.refreshCallback = refreshCallback;
 		this.subject = null;
 		this.ar = ar;
 		showIfACTMember();
 	}
 	
-	public void configure(RestrictableObjectDescriptor subject) {
+	public void configure(RestrictableObjectDescriptor subject, Callback refreshCallback) {
 		button.setText(CREATE_NEW_ACCESS_REQUIREMENT_BUTTON_TEXT);
 		button.setSize(ButtonSize.LARGE);
 		button.setType(ButtonType.PRIMARY);
 		button.setIcon(IconType.PLUS);
+		this.refreshCallback = refreshCallback;
 		this.subject = subject;
 		this.ar = null;
 		showIfACTMember();
 	}
 	
 	private void showIfACTMember() {
-		isACTMemberAsyncHandler.isACTMember(new CallbackP<Boolean>() {
+		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean isACTMember) {
 				button.setVisible(isACTMember);

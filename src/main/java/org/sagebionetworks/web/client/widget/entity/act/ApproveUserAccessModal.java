@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.sagebionetworks.repo.model.ACTAccessApproval;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -35,7 +34,6 @@ import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -253,7 +251,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		}
 		accessRequirement = view.getAccessRequirement();
 		view.setApproveProcessing(true);
-		ACTAccessApproval aa  = new ACTAccessApproval();
+		AccessApproval aa  = new AccessApproval();
 		aa.setAccessorId(userId);  //user id
 		aa.setRequirementId(Long.parseLong(accessRequirement)); //requirement id
 		synapseClient.createAccessApproval(aa, new AsyncCallback<AccessApproval>() {

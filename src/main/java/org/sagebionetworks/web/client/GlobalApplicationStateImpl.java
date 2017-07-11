@@ -8,13 +8,14 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
+import static org.sagebionetworks.web.client.cookie.CookieKeys.*;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
@@ -24,6 +25,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
@@ -48,6 +50,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private ClientCache localStorage;
 	private GWTWrapper gwt;
 	private boolean isShowingVersionAlert;
+	private DateTimeUtils dateTimeUtils;
+	private PublicPrincipalIds publicPrincipalIds;
+	
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -57,7 +62,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			SynapseJSNIUtils synapseJSNIUtils, 
 			ClientLogger logger,
 			ClientCache localStorage, 
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			DateTimeUtils dateTimeUtils) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
@@ -65,6 +71,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.logger = logger;
 		this.localStorage = localStorage;
+		this.dateTimeUtils = dateTimeUtils;
 		this.gwt = gwt;
 		this.view = view;
 		isEditing = false;
@@ -137,17 +144,17 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	@Override
 	public Place getLastPlace(Place defaultPlace) {
-		String historyValue = cookieProvider.getCookie(CookieKeys.LAST_PLACE);
+		String historyValue = cookieProvider.getCookie(LAST_PLACE);
 		return getPlaceFromHistoryValue(historyValue, fixIfNull(defaultPlace));
 	}
 	
 	@Override
 	public void clearLastPlace() {
-		cookieProvider.removeCookie(CookieKeys.LAST_PLACE);
+		cookieProvider.removeCookie(LAST_PLACE);
 	}
 	@Override
 	public void clearCurrentPlace() {
-		cookieProvider.removeCookie(CookieKeys.CURRENT_PLACE);
+		cookieProvider.removeCookie(CURRENT_PLACE);
 	}
 	
 	@Override
@@ -168,19 +175,19 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void setLastPlace(Place lastPlace) {
 		Date expires = new Date(System.currentTimeMillis() + (1000*60*60*2)); // store for 2 hours (we don't want to lose this state while a user registers for Synapse)
-		cookieProvider.setCookie(CookieKeys.LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace), expires);
+		cookieProvider.setCookie(LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace), expires);
 	}
 
 	@Override
 	public Place getCurrentPlace() {
-		String historyValue = cookieProvider.getCookie(CookieKeys.CURRENT_PLACE);
+		String historyValue = cookieProvider.getCookie(CURRENT_PLACE);
 		return getPlaceFromHistoryValue(historyValue, AppActivityMapper.getDefaultPlace());		
 	}
 
 	@Override
 	public void setCurrentPlace(Place currentPlace) {		
 		Date expires = new Date(System.currentTimeMillis() + 300000); // store for 5 minutes
-		cookieProvider.setCookie(CookieKeys.CURRENT_PLACE, appPlaceHistoryMapper.getToken(currentPlace), expires);
+		cookieProvider.setCookie(CURRENT_PLACE, appPlaceHistoryMapper.getToken(currentPlace), expires);
 	}
 
 	@Override
@@ -280,6 +287,10 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		}
 		initWikiEntitiesAndVersions(c);
 		view.initGlobalViewProperties();
+		String showInUTC = cookieProvider.getCookie(SHOW_DATETIME_IN_UTC);
+		if (showInUTC != null) {
+			setShowUTCTime(Boolean.parseBoolean(showInUTC));
+		}
 	}
 	
 	public void initSynapsePropertiesFromServer(final Callback c) {
@@ -287,9 +298,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
 				for (String key : properties.keySet()) {
-					localStorage.put(key, properties.get(key), DateUtils.getYearFromNow().getTime());
+					localStorage.put(key, properties.get(key), DateTimeUtilsImpl.getYearFromNow().getTime());
 				}
-				localStorage.put(PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateUtils.getWeekFromNow().getTime());
+				localStorage.put(PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateTimeUtilsImpl.getWeekFromNow().getTime());
 			}
 			
 			@Override
@@ -403,5 +414,41 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		}
 		Place currentPlace = appPlaceHistoryMapper.getPlace(place); 
 		getPlaceChanger().goTo(currentPlace);
+	}
+	
+	@Override
+	public void setShowUTCTime(boolean showUTC) {
+		Date yearFromNow = new Date();
+		CalendarUtil.addMonthsToDate(yearFromNow, 12);
+		cookieProvider.setCookie(SHOW_DATETIME_IN_UTC, Boolean.toString(showUTC), yearFromNow);
+		dateTimeUtils.setShowUTCTime(showUTC);
+	}
+	
+	@Override
+	public boolean isShowingUTCTime() {
+		return dateTimeUtils.isShowingUTCTime();
+	}
+	
+	private static Integer timezoneOffsetMs = null;
+	/**
+	 * 
+	 * @return the time difference between UTC time and local time, in milliseconds
+	 */
+	public static Integer getTimezoneOffsetMs() {
+		if (timezoneOffsetMs == null) {
+			timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
+		}
+		return timezoneOffsetMs;
+	}
+	
+	@Override
+	public PublicPrincipalIds getPublicPrincipalIds() {
+		if (publicPrincipalIds == null) {
+			publicPrincipalIds = new PublicPrincipalIds();
+			publicPrincipalIds.setPublicAclPrincipalId(Long.parseLong(getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
+			publicPrincipalIds.setAnonymousUserId(Long.parseLong(getSynapseProperty(WebConstants.ANONYMOUS_USER_PRINCIPAL_ID)));
+			publicPrincipalIds.setAuthenticatedAclPrincipalId(Long.parseLong(getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)));	
+		}
+		return publicPrincipalIds;
 	}
 }

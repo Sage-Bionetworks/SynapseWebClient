@@ -17,13 +17,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
-import org.sagebionetworks.repo.model.dataaccess.TermsOfUseAccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.DeleteAccessRequirementButton;
+import org.sagebionetworks.web.client.widget.accessrequirements.ReviewAccessorsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidgetView;
@@ -67,7 +69,12 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Mock
-	TermsOfUseAccessRequirementStatus mockDataAccessSubmissionStatus;
+	BasicAccessRequirementStatus mockDataAccessSubmissionStatus;
+	@Mock
+	ReviewAccessorsButton mockManageAccessButton;
+	@Mock
+	Callback mockRefreshCallback;
+	GlobalApplicationState mockGlobalApplicationState;
 	
 	Callback lazyLoadDataCallback;
 
@@ -75,7 +82,17 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new TermsOfUseAccessRequirementWidget(mockView, mockAuthController, mockDataAccessClient, mockSynapseClient, mockWikiPageWidget, mockSynAlert, mockSubjectsWidget, mockCreateAccessRequirementButton, mockDeleteAccessRequirementButton, mockLazyLoadHelper);
+		widget = new TermsOfUseAccessRequirementWidget(mockView, 
+				mockAuthController, 
+				mockDataAccessClient, 
+				mockSynapseClient, 
+				mockWikiPageWidget, 
+				mockSynAlert, 
+				mockSubjectsWidget, 
+				mockCreateAccessRequirementButton, 
+				mockDeleteAccessRequirementButton, 
+				mockLazyLoadHelper,
+				mockManageAccessButton);
 		when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
@@ -96,17 +113,17 @@ public class TermsOfUseAccessRequirementWidgetTest {
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		String tou = "must do things before access is allowed";
 		when(mockTermsOfUseAccessRequirement.getTermsOfUse()).thenReturn(tou);
-		widget.setRequirement(mockTermsOfUseAccessRequirement);
+		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		verify(mockView).setTerms(tou);
 		verify(mockView).showTermsUI();
-		verify(mockCreateAccessRequirementButton).configure(mockTermsOfUseAccessRequirement);
-		verify(mockDeleteAccessRequirementButton).configure(mockTermsOfUseAccessRequirement);
+		verify(mockCreateAccessRequirementButton).configure(mockTermsOfUseAccessRequirement, mockRefreshCallback);
+		verify(mockDeleteAccessRequirementButton).configure(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		boolean isHideIfLoadError = true;
 		verify(mockSubjectsWidget).configure(mockSubjectIds, isHideIfLoadError);
 	}
 	@Test
 	public void testSetRequirementWithWikiTerms() {
-		widget.setRequirement(mockTermsOfUseAccessRequirement);
+		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class), eq(false));
 		verify(mockView, never()).setTerms(anyString());
 		verify(mockView, never()).showTermsUI();
@@ -114,7 +131,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	
 	@Test
 	public void testApprovedState() {
-		widget.setRequirement(mockTermsOfUseAccessRequirement);
+		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(true);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showApprovedHeading();
@@ -122,7 +139,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	
 	@Test
 	public void testUnApprovedState() {
-		widget.setRequirement(mockTermsOfUseAccessRequirement);
+		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
 		lazyLoadDataCallback.invoke();
 		verify(mockView).showUnapprovedHeading();

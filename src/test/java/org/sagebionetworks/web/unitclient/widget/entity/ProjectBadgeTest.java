@@ -35,11 +35,9 @@ import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadgeView;
 import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ProjectBadgeTest {
@@ -87,7 +85,6 @@ public class ProjectBadgeTest {
 	}
 	
 	private void setupEntity(Project entity, Date lastActivityDate) throws JSONObjectAdapterException {
-		AsyncMockStubber.callSuccessWith(entity).when(mockSynapseClient).getProject(anyString(), any(AsyncCallback.class));
 		ProjectHeader header = new ProjectHeader();
 		header.setId(entity.getId());
 		header.setName(entity.getName());

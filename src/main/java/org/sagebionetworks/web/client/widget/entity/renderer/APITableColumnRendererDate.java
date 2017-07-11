@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -20,13 +21,13 @@ import com.google.inject.Inject;
 public class APITableColumnRendererDate implements APITableColumnRenderer {
 
 	private DateTimeFormat standardFormatter;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	private String outputColumnName;
 	private Map<String, List<String>> outputColumnData;
+	private DateTimeUtils dateTimeUtils;
 	
 	@Inject
-	public APITableColumnRendererDate(SynapseJSNIUtils synapseJSNIUtils, GWTWrapper gwt) {
-		this.synapseJSNIUtils = synapseJSNIUtils;
+	public APITableColumnRendererDate(GWTWrapper gwt, DateTimeUtils dateTimeUtils) {
+		this.dateTimeUtils = dateTimeUtils;
 		standardFormatter = gwt.getDateTimeFormat(PredefinedFormat.ISO_8601);
 	}
 	
@@ -57,7 +58,7 @@ public class APITableColumnRendererDate implements APITableColumnRenderer {
 					isMsFromEpoch = false;
 					date = standardFormatter.parse(colValue);
 				}
-				outputValues.add(synapseJSNIUtils.convertDateToSmallString(date));
+				outputValues.add(dateTimeUtils.convertDateToSmallString(date));
 			}
 		}
 		outputColumnData.put(outputColumnName, outputValues);

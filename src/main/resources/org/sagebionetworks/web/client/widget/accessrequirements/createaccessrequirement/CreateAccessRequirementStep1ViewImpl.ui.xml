@@ -11,10 +11,6 @@
 			<b:FormGroup>
 				<b:FormLabel>Resources</b:FormLabel>
 				<bh:Div ui:field="subjectsContainer"/>
-				<b:ButtonGroup>
-					<b:Radio name="resourcetype" ui:field="entityButton" text="Entities" value="true" />
-					<b:Radio name="resourcetype" ui:field="teamButton" text="Teams" />
-				</b:ButtonGroup>
 				<b:InputGroup ui:field="entityUI">
 					<b:TextBox ui:field="entityIds" placeholder="Enter Synapse IDs (i.e. 'syn123, syn456')"
 						autoComplete="false" />
@@ -36,7 +32,8 @@
 			</b:FormGroup>
 			<b:FormGroup ui:field="arTypeUI">
 				<b:FormLabel>Access requirement type</b:FormLabel>
-				<b:Radio ui:field="actTypeButton" text="Controlled" name="accessRequirementType" value="true"/>
+				<b:Radio ui:field="managedActTypeButton" text="Controlled - requests are in Synapse" name="accessRequirementType" value="true"/>
+				<b:Radio ui:field="actTypeButton" text="Controlled - requests are handled outside of Synapse (Jira/email/spreadsheets, legacy requirement)" name="accessRequirementType"/>
 				<b:Radio ui:field="termsOfUseButton" text="Click wrap" name="accessRequirementType" />
 			</b:FormGroup>
 		</bh:Div>

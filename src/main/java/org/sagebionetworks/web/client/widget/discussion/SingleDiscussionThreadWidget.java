@@ -14,11 +14,11 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.Topic;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -45,7 +45,7 @@ import com.google.inject.Inject;
 public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidgetView.Presenter{
 
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
-	private static final Boolean DEFAULT_ASCENDING = true;
+	public static final Boolean DEFAULT_ASCENDING = true;
 	public static final Long LIMIT = 5L;
 	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
 
@@ -62,7 +62,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
 	PortalGinInjector ginInjector;
-	SynapseJSNIUtils jsniUtils;
+	DateTimeUtils dateTimeUtils;
 	UserBadge authorWidget;
 	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
@@ -98,7 +98,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			UserBadge authorWidget,
 			DiscussionForumClientAsync discussionForumClientAsync,
 			PortalGinInjector ginInjector,
-			SynapseJSNIUtils jsniUtils,
+			DateTimeUtils dateTimeUtils,
 			RequestBuilderWrapper requestBuilder,
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState,
@@ -112,7 +112,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
-		this.jsniUtils = jsniUtils;
+		this.dateTimeUtils = dateTimeUtils;
 		this.synAlert = synAlert;
 		this.authorWidget = authorWidget;
 		this.discussionForumClientAsync = discussionForumClientAsync;
@@ -220,7 +220,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.clear();
 		repliesContainer.clear();
 		view.setTitle(title);
-		view.setCreatedOn(CREATED_ON_PREFIX+jsniUtils.getRelativeTime(bundle.getCreatedOn()));
+		view.setCreatedOn(CREATED_ON_PREFIX+dateTimeUtils.getRelativeTime(bundle.getCreatedOn()));
 		view.setEditedLabelVisible(bundle.getIsEdited());
 		boolean isDeleted = bundle.getIsDeleted();
 		view.setDeletedThreadVisible(isDeleted);
@@ -351,7 +351,12 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		loadMore();
 		watchReplyCount();
 	}
-
+	
+	public void setSortDirection(Boolean ascending) {
+		this.ascending = ascending;
+		configureReplies();
+	}
+	
 	@Override
 	public void loadMore() {
 		synAlert.clear();

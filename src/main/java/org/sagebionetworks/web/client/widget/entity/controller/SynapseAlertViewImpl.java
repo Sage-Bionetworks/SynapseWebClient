@@ -34,6 +34,8 @@ public class SynapseAlertViewImpl implements
 	Button okButton;
 	@UiField
 	Button cancelButton;
+	@UiField
+	Button reloadButton;
 	
 	@UiField
 	Strong alertText;
@@ -60,8 +62,18 @@ public class SynapseAlertViewImpl implements
 				jiraDialog.hide();
 			}
 		});
+		reloadButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				reload();
+			}
+		});
 	}
 	
+	@Override
+	public void setRetryButtonVisible(boolean visible) {
+		reloadButton.setVisible(visible);
+	}
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
@@ -94,6 +106,7 @@ public class SynapseAlertViewImpl implements
 		alertText.setText("");
 		loginAlert.setVisible(false);
 		widget.setVisible(false);
+		reloadButton.setVisible(false);
 	}
 	
 	@Override

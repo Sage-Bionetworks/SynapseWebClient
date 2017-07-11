@@ -7,9 +7,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -57,8 +55,8 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 		this.parentId = parentId;
 		this.tableType = type;
 		boolean canEdit = true;
-		view.setScopeWidgetVisible(TableType.view.equals(type));
-		entityContainerList.configure(new ArrayList<String>(), canEdit);
+		view.setScopeWidgetVisible(!TableType.table.equals(type));
+		entityContainerList.configure(new ArrayList<String>(), canEdit, type);
 		view.setName("");
 	}
 	
@@ -69,14 +67,15 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 	private void createFileViewEntity(final String name) {
 		modalPresenter.setLoading(true);
 		Table table;
-		if (TableType.view.equals(tableType)) {
+		if (TableType.table.equals(tableType)) {
+			table = new TableEntity();
+		}
+		else {
 			table = new EntityView();
 			List<String> scopeIds = entityContainerList.getEntityIds();
 			((EntityView)table).setScopeIds(scopeIds);
-			((EntityView)table).setType(ViewType.file);
-		} else {
-			table = new TableEntity();
-		}
+			((EntityView)table).setType(tableType.getViewType());	
+		} 
 		table.setName(name);
 		table.setParentId(parentId);
 		synapseClient.createEntity(table, new AsyncCallback<Entity>() {

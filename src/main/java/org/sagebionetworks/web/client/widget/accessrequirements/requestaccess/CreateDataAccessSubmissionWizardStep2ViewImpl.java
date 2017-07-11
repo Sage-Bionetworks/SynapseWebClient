@@ -1,12 +1,8 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
-import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -53,7 +49,7 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	@UiField
 	FormGroup ducTemplateUI;
 	@UiField
-	Alert revokeAccessNote;
+	Div validatedUserProfileNote;
 	
 	@Inject
 	public CreateDataAccessSubmissionWizardStep2ViewImpl(Binder binder){
@@ -138,18 +134,6 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 	}
 	
 	@Override
-	public void showInfo(String message) {
-		DisplayUtils.showInfo(message, "");
-	}
-	@Override
-	public void showConfirmDialog(
-			String title, 
-			String message,
-			Callback yesCallback
-			) {
-		DisplayUtils.showConfirmDialog(title, message, yesCallback);
-	}
-	@Override
 	public void setPeopleSuggestWidget(IsWidget w) {
 		peopleSuggestContainer.clear();
 		peopleSuggestContainer.add(w);
@@ -159,7 +143,7 @@ public class CreateDataAccessSubmissionWizardStep2ViewImpl implements CreateData
 		ducTemplateUI.setVisible(visible);
 	}
 	@Override
-	public void setRevokeNoteVisible(boolean visible) {
-		revokeAccessNote.setVisible(visible);	
+	public void setValidatedUserProfileNoteVisible(boolean visible) {
+		validatedUserProfileNote.setVisible(visible);	
 	}
 }

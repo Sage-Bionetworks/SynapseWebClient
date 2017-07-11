@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -32,7 +33,10 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransfo
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
+import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -47,25 +51,25 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private EntityHeader entityHeader;
 	private AnnotationTransformer transformer;
 	private UserBadge modifiedByUserBadge;
-	private SynapseJSNIUtils synapseJSNIUtils;
 	private SynapseClientAsync synapseClient;
 	private CallbackP<String> customEntityClickHandler;
 	private FileDownloadButton fileDownloadButton;
 	private LazyLoadHelper lazyLoadHelper;
+	private DateTimeUtils dateTimeUtils;
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
 			AnnotationTransformer transformer,
 			UserBadge modifiedByUserBadge,
-			SynapseJSNIUtils synapseJSNIUtils,
 			SynapseClientAsync synapseClient,
 			FileDownloadButton fileDownloadButton,
-			LazyLoadHelper lazyLoadHelper) {
+			LazyLoadHelper lazyLoadHelper,
+			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
 		this.modifiedByUserBadge = modifiedByUserBadge;
-		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.dateTimeUtils = dateTimeUtils;
 		this.synapseClient = synapseClient;
 		this.fileDownloadButton = fileDownloadButton;
 		this.lazyLoadHelper = lazyLoadHelper;
@@ -129,7 +133,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		
 		view.setSize(getContentSize(handles));
 		view.setMd5(getContentMd5(handles));
-		if(eb.getPermissions().getCanPublicRead()) {
+		if (PublicPrivateBadge.isPublic(eb.getBenefactorAcl(), globalAppState.getPublicPrincipalIds())) {
 			view.showPublicIcon();
 		} else {
 			view.showPrivateIcon();
@@ -159,7 +163,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		}
 		
 		if (eb.getEntity().getModifiedOn() != null) {
-			String modifiedOnString = synapseJSNIUtils.convertDateToSmallString(eb.getEntity().getModifiedOn());
+			String modifiedOnString = dateTimeUtils.convertDateToSmallString(eb.getEntity().getModifiedOn());
 			view.setModifiedOn(modifiedOnString);
 		} else {
 			view.setModifiedOn("");

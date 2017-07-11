@@ -16,10 +16,11 @@ import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidgetView;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidgetView;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementWizard;
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessRequestWizard;
@@ -50,17 +51,17 @@ public class CreateAccessRequirementButtonTest {
 	AccessRequirement mockAccessRequirement;
 	@Mock
 	RestrictableObjectDescriptor mockSubject;
-	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
 	@Captor
 	ArgumentCaptor<ModalWizardWidget.WizardCallback> wizardCallbackCallback;
+	@Mock
+	Callback mockRefreshCallback;
 	
 	ClickHandler onButtonClickHandler;
 	
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new CreateAccessRequirementButton(mockButton, mockIsACTMemberAsyncHandler, mockGinInjector, mockGlobalApplicationState);
+		widget = new CreateAccessRequirementButton(mockButton, mockIsACTMemberAsyncHandler, mockGinInjector);
 		when(mockGinInjector.getCreateAccessRequirementWizard()).thenReturn(mockCreateAccessRequirementWizard);
 		verify(mockButton).addClickHandler(clickHandlerCaptor.capture());
 		onButtonClickHandler = clickHandlerCaptor.getValue();
@@ -73,9 +74,9 @@ public class CreateAccessRequirementButtonTest {
 
 	@Test
 	public void testConfigureWithAR() {
-		widget.configure(mockAccessRequirement);
+		widget.configure(mockAccessRequirement, mockRefreshCallback);
 		verify(mockButton).setText(CreateAccessRequirementButton.EDIT_ACCESS_REQUIREMENT_BUTTON_TEXT);
-		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
+		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
 		
 		CallbackP<Boolean> isACTMemberCallback = callbackPCaptor.getValue();
 		// invoking with false should hide the button again
@@ -90,14 +91,14 @@ public class CreateAccessRequirementButtonTest {
 		verify(mockCreateAccessRequirementWizard).configure(mockAccessRequirement);
 		verify(mockCreateAccessRequirementWizard).showModal(wizardCallbackCallback.capture());
 		wizardCallbackCallback.getValue().onFinished();
-		verify(mockGlobalApplicationState).refreshPage();
+		verify(mockRefreshCallback).invoke();
 	}
 	
 	@Test
 	public void testConfigureWithSubject() {
-		widget.configure(mockSubject);
+		widget.configure(mockSubject, mockRefreshCallback);
 		verify(mockButton).setText(CreateAccessRequirementButton.CREATE_NEW_ACCESS_REQUIREMENT_BUTTON_TEXT);
-		verify(mockIsACTMemberAsyncHandler).isACTMember(callbackPCaptor.capture());
+		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPCaptor.capture());
 		
 		// configured with a subject, when clicked it should pop up the wizard pointing to the new subject
 		onButtonClickHandler.onClick(null);
@@ -108,11 +109,11 @@ public class CreateAccessRequirementButtonTest {
 
 	@Test
 	public void testOnCancelRefreshPage() {
-		widget.configure(mockAccessRequirement);
+		widget.configure(mockAccessRequirement, mockRefreshCallback);
 		onButtonClickHandler.onClick(null);
 		verify(mockCreateAccessRequirementWizard).configure(mockAccessRequirement);
 		verify(mockCreateAccessRequirementWizard).showModal(wizardCallbackCallback.capture());
 		wizardCallbackCallback.getValue().onCanceled();
-		verify(mockGlobalApplicationState).refreshPage();
+		verify(mockRefreshCallback).invoke();
 	}
 }

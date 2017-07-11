@@ -38,7 +38,6 @@ public interface ModalWizardWidget extends IsWidget {
 	void setHelp(String helpMarkdown, String helpUrl);
 	
 	void addCallback(WizardCallback callback);
-	
 	/**
 	 * Callback for wizard completion events.
 	 */

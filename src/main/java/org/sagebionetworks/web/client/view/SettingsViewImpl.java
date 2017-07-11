@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Panel;
@@ -55,7 +56,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	Panel apiKeyUI;
 	@UiField
 	org.gwtbootstrap3.client.ui.Button editProfileButton;
-	
+	@UiField
+	Div dateTimeFormatPanel;
 	@UiField
 	FlowPanel forgotPasswordContainer;
 	Anchor forgotPasswordLink;
@@ -111,6 +113,13 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	Div passwordStrengthContainer;
 
+	@UiField
+	AnchorListItem dateFormatLocal;
+	@UiField
+	AnchorListItem dateFormatUTC;
+	@UiField
+	Button dateFormatDropdown;
+	
 	private Presenter presenter;
 	
 	@Inject
@@ -156,6 +165,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		changeSynapsePasswordHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Change Synapse Password");
 		apiKeyHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Synapse API Key");
 		editProfilePanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Profile");
+		dateTimeFormatPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Date/Time Format");
 		
 		newEmailField.addKeyDownHandler(new KeyDownHandler() {
 			@Override
@@ -190,6 +200,22 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 				presenter.passwordChanged(password1Field.getText());
 			}
 		});
+		
+		dateFormatLocal.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				dateFormatDropdown.setText(dateFormatLocal.getText());
+				presenter.setShowUTCTime(false);
+			}
+		});
+		dateFormatUTC.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				dateFormatDropdown.setText(dateFormatUTC.getText());
+				presenter.setShowUTCTime(true);
+			}
+		});
+
 	}
 
 
@@ -399,5 +425,13 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void setPasswordStrengthWidget(Widget w) {
 		passwordStrengthContainer.clear();
 		passwordStrengthContainer.add(w);
+	}
+	@Override
+	public void setShowingUTCTime() {
+		dateFormatDropdown.setText(dateFormatUTC.getText());
+	}
+	@Override
+	public void setShowingLocalTime() {
+		dateFormatDropdown.setText(dateFormatLocal.getText());
 	}
 }

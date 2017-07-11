@@ -7,7 +7,6 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	
-	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	
 	<g:HTMLPanel>
@@ -18,13 +17,13 @@
 	       		<b:Column size="SM_12" addStyleNames="margin-bottom-10">
 					<g:HTMLPanel>
 						<div>
-							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.lsdfa.org/" target="_new"><g:Image resource='{sageImageBundle.lsdfLogo}' styleName='padding-5' /></a></div>                            
-							<!-- image needs to be updated <div class="img-thumbnail margin-bottom-5"><a href="http://www.cancer.gov/" target="_new"><g:Image resource='{sageImageBundle.nciLogo}' styleName='padding-5' /></a></div> -->                                                       
-							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image resource='{sageImageBundle.nhlbiLogo}' styleName='padding-5' /></a></div>                                                       
-							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.sloan.org/" target="_new"><g:Image resource='{sageImageBundle.sloanLogo}' styleName='padding-5' /></a></div>                                                       
-							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.nia.nih.gov/" target="_new"><g:Image resource='{sageImageBundle.niaLogo}' styleName='padding-5' /></a></div>
-							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image resource='{sageImageBundle.nimhLogo}' styleName='padding-5' /></a></div>
-							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.ctf.org/" target="_new"><g:Image resource='{sageImageBundle.ctfLogo}' styleName='padding-5' /></a></div>
+							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.lsdfa.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/LSDF_logo.jpg' styleName='padding-5' /></a></div>                            
+							<!-- image needs to be updated <div class="img-thumbnail margin-bottom-5"><a href="http://www.cancer.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/NCI_logo.jpg' styleName='padding-5' /></a></div> -->                                                       
+							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/NHLBI_logo.jpg' styleName='padding-5' /></a></div>                                                       
+							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.sloan.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/Sloan_logo.jpg' styleName='padding-5' /></a></div>                                                       
+							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.nia.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/NIA_logo.jpg' styleName='padding-5' /></a></div>
+							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/NIMH_logo.jpg' styleName='padding-5' /></a></div>
+							<div class="img-thumbnail margin-bottom-5 margin-right-5"><a href="http://www.ctf.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/CTF_logo.png' styleName='padding-5' /></a></div>
 						</div>
 					</g:HTMLPanel>
 				</b:Column>
@@ -48,6 +47,7 @@
 							</t:TableData>
 							<t:TableData paddingRight="2" addStyleNames="text-align-right">
 								<bh:Div addStyleNames="displayInline margin-left-10">
+									<bh:Span ui:field="hideACTActionsContainer"/>
 									<g:Label addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-2 displayInline" text="portal: " />
 									<bh:Span ui:field="portalVersionSpan" addStyleNames="margin-top-5 margin-bottom-5 color-white" />
 									<g:Label addStyleNames="margin-top-5 margin-bottom-5 color-white margin-left-10 displayInline" text="repo: " />

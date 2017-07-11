@@ -5,8 +5,9 @@ import java.util.List;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.DivView;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 
@@ -18,12 +19,16 @@ public class SubjectsWidget implements IsWidget {
 	
 	DivView view;
 	PortalGinInjector ginInjector;
+	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	
 	@Inject
 	public SubjectsWidget(DivView view, 
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
 		this.view = view;
 		this.ginInjector = ginInjector;
+		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
+		view.setVisible(false);
 	}
 
 	@Override
@@ -31,7 +36,19 @@ public class SubjectsWidget implements IsWidget {
 		return this.view.asWidget();
 	}
 
-	public void configure(List<RestrictableObjectDescriptor> subjects, boolean hideIfLoadError) {
+	public void configure(final List<RestrictableObjectDescriptor> subjects, final boolean hideIfLoadError) {
+		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
+			@Override
+			public void invoke(Boolean isACT) {
+				view.setVisible(isACT);
+				if (isACT) {
+					configureAfterACTCheck(subjects, hideIfLoadError);
+				}
+			}
+		});
+	}
+	
+	private void configureAfterACTCheck(List<RestrictableObjectDescriptor> subjects, boolean hideIfLoadError) {
 		view.clear();
 		for (RestrictableObjectDescriptor rod : subjects) {
 			if (rod.getType().equals(RestrictableObjectType.ENTITY)) {
@@ -45,6 +62,7 @@ public class SubjectsWidget implements IsWidget {
 				view.add(teamBadge.asWidget());
 			}
 		}
+
 	}
 	
 }

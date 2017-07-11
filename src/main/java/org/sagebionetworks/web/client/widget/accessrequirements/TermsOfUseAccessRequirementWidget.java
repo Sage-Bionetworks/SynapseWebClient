@@ -2,11 +2,11 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
-import org.sagebionetworks.repo.model.dataaccess.TermsOfUseAccessRequirementStatus;
+import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -32,7 +32,8 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	DeleteAccessRequirementButton deleteAccessRequirementButton;
 	SubjectsWidget subjectsWidget;
 	LazyLoadHelper lazyLoadHelper;
-	
+	Callback refreshCallback;
+	ReviewAccessorsButton manageAccessButton;
 	@Inject
 	public TermsOfUseAccessRequirementWidget(TermsOfUseAccessRequirementWidgetView view,
 			AuthenticationController authController,
@@ -43,7 +44,8 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			SubjectsWidget subjectsWidget,
 			CreateAccessRequirementButton createAccessRequirementButton,
 			DeleteAccessRequirementButton deleteAccessRequirementButton,
-			LazyLoadHelper lazyLoadHelper) {
+			LazyLoadHelper lazyLoadHelper,
+			ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.dataAccessClient = dataAccessClient;
@@ -54,12 +56,14 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		this.createAccessRequirementButton = createAccessRequirementButton;
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		this.lazyLoadHelper = lazyLoadHelper;
+		this.manageAccessButton = manageAccessButton;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
 		view.setEditAccessRequirementWidget(createAccessRequirementButton);
 		view.setDeleteAccessRequirementWidget(deleteAccessRequirementButton);
 		view.setSubjectsWidget(subjectsWidget);
+		view.setManageAccessWidget(manageAccessButton);
 		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -71,8 +75,9 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	}
 	
 	
-	public void setRequirement(final TermsOfUseAccessRequirement ar) {
+	public void setRequirement(final TermsOfUseAccessRequirement ar, Callback refreshCallback) {
 		this.ar = ar;
+		this.refreshCallback = refreshCallback;
 		synapseClient.getRootWikiId(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -87,13 +92,14 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 	 			view.showWikiTermsUI();
 			}
 		});
-		createAccessRequirementButton.configure(ar);
-		deleteAccessRequirementButton.configure(ar);
+		createAccessRequirementButton.configure(ar, refreshCallback);
+		deleteAccessRequirementButton.configure(ar, refreshCallback);
 		subjectsWidget.configure(ar.getSubjectIds(), true);
+		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
 	}
 	
-	public void setDataAccessSubmissionStatus(TermsOfUseAccessRequirementStatus status) {
+	public void setDataAccessSubmissionStatus(BasicAccessRequirementStatus status) {
 		// set up view based on DataAccessSubmission state
 		view.resetState();
 		if (status.getIsApproved()) {
@@ -113,7 +119,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			}
 			@Override
 			public void onSuccess(AccessRequirementStatus status) {
-				setDataAccessSubmissionStatus((TermsOfUseAccessRequirementStatus)status);
+				setDataAccessSubmissionStatus((BasicAccessRequirementStatus)status);
 			}
 		});
 	}
@@ -129,10 +135,10 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			}
 			@Override
 			public void onSuccess(AccessApproval result) {
-				refreshApprovalState();
+				refreshCallback.invoke();
 			}
 		};
-		TermsOfUseAccessApproval approval = new TermsOfUseAccessApproval();
+		AccessApproval approval = new AccessApproval();
 		approval.setAccessorId(authController.getCurrentUserPrincipalId());
 		approval.setRequirementId(ar.getId());
 		synapseClient.createAccessApproval(approval, callback);

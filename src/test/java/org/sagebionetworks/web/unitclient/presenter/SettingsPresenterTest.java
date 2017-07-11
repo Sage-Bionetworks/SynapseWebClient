@@ -336,6 +336,7 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testConfigure() {
+		when(mockGlobalApplicationState.isShowingUTCTime()).thenReturn(false);
 		presenter.configure();
 		verify(mockSynAlert, times(5)).clear();
 		verify(mockPasswordStrengthWidget).setVisible(false);
@@ -343,6 +344,14 @@ public class SettingsPresenterTest {
 		verify(mockSubscriptionListWidget).configure();
 		verify(mockView).updateNotificationCheckbox(profile);
 		verify(mockAuthenticationController).updateCachedProfile(profile);
+		verify(mockView).setShowingLocalTime();
+	}
+	
+	@Test
+	public void testConfigureIsShowingUTCTime() {
+		when(mockGlobalApplicationState.isShowingUTCTime()).thenReturn(true);
+		presenter.configure();
+		verify(mockView).setShowingUTCTime();
 	}
 	
 	@Test
@@ -466,5 +475,11 @@ public class SettingsPresenterTest {
 		verify(mockView).setCurrentPasswordInError(false);
 		verify(mockView).setPassword1InError(false);
 		verify(mockView).setPassword2InError(false);
+	}
+	
+	@Test
+	public void testSetShowUTCTime() {
+		presenter.setShowUTCTime(true);
+		verify(mockGlobalApplicationState).setShowUTCTime(true);
 	}
 }

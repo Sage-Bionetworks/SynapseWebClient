@@ -1,14 +1,14 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.getTableType;
+
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
@@ -62,7 +63,7 @@ public class TableEntityWidget implements IsWidget,
 	String tableId;
 	TableBundle tableBundle;
 	boolean canEdit, canEditResults;
-	boolean isView;
+	TableType tableType;
 	QueryChangeHandler queryChangeHandler;
 	TableQueryResultWidget queryResultsWidget;
 	QueryInputWidget queryInputWidget;
@@ -114,7 +115,7 @@ public class TableEntityWidget implements IsWidget,
 			QueryChangeHandler qch, ActionMenuWidget actionMenu) {
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
-		this.isView = table instanceof EntityView;
+		this.tableType = getTableType(table);
 		this.tableId = bundle.getEntity().getId();
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
@@ -136,7 +137,7 @@ public class TableEntityWidget implements IsWidget,
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
-		this.actionMenu.setActionVisible(Action.TOGGLE_VIEW_SCOPE, isView);
+		this.actionMenu.setActionVisible(Action.TOGGLE_VIEW_SCOPE, !TableType.table.equals(tableType));
 		this.actionMenu.setBasicDivderVisible(canEditResults);
 		// Listen to action events.
 		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
@@ -203,7 +204,7 @@ public class TableEntityWidget implements IsWidget,
 		this.view.setQueryResultsVisible(true);
 		this.view.setTableMessageVisible(false);
 		if(!isFromResults){
-			this.queryResultsWidget.configure(query, this.canEditResults, this.isView, this);
+			this.queryResultsWidget.configure(query, this.canEditResults, tableType, this);
 		}
 	}
 

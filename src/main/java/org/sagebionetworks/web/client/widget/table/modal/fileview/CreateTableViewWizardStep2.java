@@ -14,7 +14,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
@@ -48,7 +47,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
 	 */
 	boolean changingSelection = false;
-	FileViewDefaultColumns fileViewDefaultColumns;
+	ViewDefaultColumns fileViewDefaultColumns;
 	/**
 	 * New presenter with its view.
 	 * @param view
@@ -58,7 +57,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			ColumnModelsEditorWidget editor, 
 			SynapseClientAsync synapseClient, 
 			JobTrackingWidget jobTrackingWidget,
-			FileViewDefaultColumns fileViewDefaultColumns){
+			ViewDefaultColumns fileViewDefaultColumns){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.editor = editor;
@@ -88,7 +87,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		
 		editor.configure(tableType, new ArrayList<ColumnModel>());
 		
-		boolean isView = TableType.view.equals(tableType);
+		boolean isView = !TableType.table.equals(tableType);
 		this.editor.setAddDefaultViewColumnsButtonVisible(isView);
 		this.editor.setAddAnnotationColumnsButtonVisible(isView);
 		if (isView) {
@@ -99,21 +98,17 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	
 	public void getDefaultColumnsForView() {
 		boolean clearIds = true;
-		fileViewDefaultColumns.getDefaultColumns(clearIds, new AsyncCallback<List<ColumnModel>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				presenter.setErrorMessage(caught.getMessage());
-			}
-			@Override
-			public void onSuccess(List<ColumnModel> columns) {
-				editor.addColumns(columns);
-			}
-		});
+		if (TableType.fileview.equals(tableType)) {
+			editor.addColumns(fileViewDefaultColumns.getDefaultFileViewColumns(clearIds));	
+		} else if (TableType.projectview.equals(tableType)) {
+			editor.addColumns(fileViewDefaultColumns.getDefaultProjectViewColumns(clearIds));
+		}
 	}
 	
 	public void getPossibleColumnModelsForViewScope(String nextPageToken) {
 		ViewScope scope = new ViewScope();
 		scope.setScope(((EntityView)entity).getScopeIds());
+		scope.setViewType(tableType.getViewType());
 		synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken, new AsyncCallback<ColumnModelPage>() {
 			@Override
 			public void onFailure(Throwable caught) {

@@ -1,12 +1,14 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace.ACCESS_REQUIREMENT_ID_PARAM;
@@ -15,6 +17,7 @@ import static org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace
 import static org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter.SHOW_AR_TEXT;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -23,7 +26,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
@@ -32,8 +35,11 @@ import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -41,13 +47,16 @@ import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
+import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -69,7 +78,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	@Mock
 	LoadMoreWidgetContainer mockLoadMoreContainer;
 	@Mock
-	ACTAccessRequirementWidget mockACTAccessRequirementWidget;
+	ManagedACTAccessRequirementWidget mockACTAccessRequirementWidget;
 	@Mock
 	Button mockButton;
 	@Mock
@@ -78,7 +87,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	DataAccessClientAsync mockDataAccessClient;
 	
 	@Mock
-	ACTAccessRequirement mockACTAccessRequirement;
+	ManagedACTAccessRequirement mockACTAccessRequirement;
 	@Mock
 	SubmissionPage mockDataAccessSubmissionPage;
 	@Mock
@@ -91,6 +100,14 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	SubjectsWidget mockSubjectsWidget;
 	@Mock
 	List<RestrictableObjectDescriptor> mockSubjects;
+	@Mock
+	GWTWrapper mockGWT;
+	@Mock
+	DateTimeFormat mockDateTimeFormat;
+	@Mock
+	PlaceChanger mockPlaceChanger;
+	@Captor
+	ArgumentCaptor<Place> placeCaptor;
 	public static final String FILE_HANDLE_ID = "9999";
 	public static final Long AR_ID = 76555L;
 	public static final String NEXT_PAGE_TOKEN = "abc678";
@@ -98,7 +115,8 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockGlobalApplicationState, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockDataAccessClient, mockSubjectsWidget);
+		when(mockGWT.getDateTimeFormat(any(PredefinedFormat.class))).thenReturn(mockDateTimeFormat);
+		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockGlobalApplicationState, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockDataAccessClient, mockSubjectsWidget, mockGWT);
 		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionPage).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 		when(mockDataAccessSubmissionPage.getResults()).thenReturn(Collections.singletonList(mockDataAccessSubmission));
@@ -107,6 +125,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
 		when(mockGinInjector.getACTDataAccessSubmissionWidget()).thenReturn(mockACTDataAccessSubmissionWidget);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjects);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}	
 	
 	@Test
@@ -133,7 +152,8 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockACTAccessRequirement.getAreOtherAttachmentsRequired()).thenReturn(true);
-		when(mockACTAccessRequirement.getIsAnnualReviewRequired()).thenReturn(false);
+		Long expirationPeriod = 0L;
+		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(expirationPeriod);
 		when(mockACTAccessRequirement.getIsCertifiedUserRequired()).thenReturn(true);
 		when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(false);
 		when(mockACTAccessRequirement.getIsIDUPublic()).thenReturn(true);
@@ -151,14 +171,14 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
 		verify(mockSubjectsWidget).configure(mockSubjects, true);
 		verify(mockView).setAreOtherAttachmentsRequired(true);
-		verify(mockView).setIsAnnualReviewRequired(false);
+		verify(mockView).setExpirationPeriod(expirationPeriod);
 		verify(mockView).setIsCertifiedUserRequired(true);
 		verify(mockView).setIsDUCRequired(false);
 		verify(mockView).setIsIDUPublic(true);
 		verify(mockView).setIsIRBApprovalRequired(false);
 		verify(mockView).setIsValidatedProfileRequired(true);
 		
-		verify(mockACTAccessRequirementWidget).setRequirement(mockACTAccessRequirement);
+		verify(mockACTAccessRequirementWidget).setRequirement(eq(mockACTAccessRequirement), any(Callback.class));
 		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq((String)null), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 
 		//verify DataAccessSubmission widget is created/configured for the submission (based on the mockACTAccessRequirement configuration)
@@ -166,7 +186,6 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockACTDataAccessSubmissionWidget).setDucColumnVisible(false);
 		verify(mockACTDataAccessSubmissionWidget).setIrbColumnVisible(false);
 		verify(mockACTDataAccessSubmissionWidget).setOtherAttachmentsColumnVisible(true);
-		verify(mockACTDataAccessSubmissionWidget).setRenewalColumnsVisible(false);
 		verify(mockLoadMoreContainer).setIsMore(true);
 		
 		//verify final load of empty page
@@ -175,6 +194,22 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		presenter.loadMore();
 		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq(NEXT_PAGE_TOKEN), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockLoadMoreContainer).setIsMore(false);
+		verify(mockView).setProjectedExpirationDateVisible(false);
+		verify(mockView, never()).setProjectedExpirationDateVisible(true);
+	}
+	
+	@Test
+	public void testProjectedExpiration() {
+		String formattedDateTime = "In the future";
+		when(mockDateTimeFormat.format(any(Date.class))).thenReturn(formattedDateTime);
+		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID.toString());
+		
+		Long expirationPeriod = 1111L;
+		when(mockACTAccessRequirement.getExpirationPeriod()).thenReturn(expirationPeriod);
+		presenter.setPlace(mockPlace);
+		verify(mockView).setProjectedExpirationDateVisible(false);
+		verify(mockView).setProjectedExpirationDateVisible(true);
+		verify(mockView).setProjectedExpirationDate(formattedDateTime);
 	}
 	
 	@Test
@@ -184,5 +219,17 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		presenter.loadData();
 		verify(mockSynAlert).handleException(ex);
 		verify(mockLoadMoreContainer).setIsMore(false);
+	}
+	
+	@Test
+	public void testOnReviewAccessors() {
+		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID.toString());
+		presenter.setPlace(mockPlace);
+		
+		presenter.onReviewAccessors();
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Place place = placeCaptor.getValue();
+		assertTrue(place instanceof ACTAccessApprovalsPlace);
+		assertEquals(AR_ID.toString(), ((ACTAccessApprovalsPlace)place).getParam(ACTAccessApprovalsPlace.ACCESS_REQUIREMENT_ID_PARAM));
 	}
 }

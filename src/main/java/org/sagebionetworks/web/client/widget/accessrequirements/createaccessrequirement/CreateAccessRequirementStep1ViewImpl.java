@@ -34,19 +34,18 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	FormGroup arTypeUI;
 	
 	@UiField
+	Radio managedActTypeButton;
+	@UiField
 	Radio actTypeButton;
 	@UiField
 	Radio termsOfUseButton;
 	Presenter presenter;
 	
 	@UiField
-	Radio entityButton;
-	@UiField
-	Radio teamButton;
-	@UiField
 	InputGroup teamUI;
 	@UiField
 	InputGroup entityUI;
+	
 	@Inject
 	public CreateAccessRequirementStep1ViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
@@ -64,33 +63,16 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 			}
 		});
 		
-		entityButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				showEntityUI();
-			}
-		});
-		
-		teamButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				showTeamUI();
-			}
-		});
 	}
 	
 	private void showEntityUI() {
 		entityUI.setVisible(true);
 		teamUI.setVisible(false);
-		entityButton.setValue(true, false);
-		teamButton.setValue(false, false);
 	}
 	
 	private void showTeamUI() {
 		entityUI.setVisible(false);
 		teamUI.setVisible(true);
-		entityButton.setValue(false, false);
-		teamButton.setValue(true, false);
 	}
 	
 	@Override
@@ -126,6 +108,10 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 	@Override
 	public boolean isACTAccessRequirementType() {
 		return actTypeButton.getValue();
+	}
+	@Override
+	public boolean isManagedACTAccessRequirementType() {
+		return managedActTypeButton.getValue();
 	}
 	
 	@Override

@@ -8,6 +8,7 @@ import static org.mockito.Matchers.*;
 import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.*;
 import static org.sagebionetworks.web.client.ClientProperties.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -170,12 +171,8 @@ public class PlotlyWidgetTest {
 		request = queryBundleRequestCaptor.getValue();
 		assertEquals(LIMIT, request.getQuery().getOffset());
 		
-		String progressMessage = "processing result x/y";
-		when(mockAsynchronousJobStatus.getProgressMessage()).thenReturn(progressMessage);
-		jobTrackerCallbackCaptor.getValue().onUpdate(mockAsynchronousJobStatus);
 		verify(mockView, times(2)).setLoadingMessage(stringCaptor.capture());
 		String loadingMessage = stringCaptor.getValue();
-		assertTrue(loadingMessage.contains(progressMessage));
 		assertTrue(loadingMessage.contains(LIMIT.toString()));
 		
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
@@ -248,5 +245,35 @@ public class PlotlyWidgetTest {
 		verify(mockView).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
 	}	
 
-	
+
+	@Test
+	public void testTransformWithFill() {
+		/**
+		 * 
+		 * Test the following table data
+			| x | fill | y1  |
+			|---|------|----|
+			| 1 | a    | 40 |
+			| 1 | b    | 50 |
+			| 2 | a    | 60 |
+		 * 
+		 * For each y, there should be a new series for each fill value.
+		 * So this should result in 2 series, one for 'a' and one for 'b'.
+		 */
+		String xAxisColumnName = "x";
+		String y1ColumnName = "y1";
+		
+		String fillColumnName = "fill";
+		GraphType graphType = GraphType.BAR;
+		Map<String, List<String>> graphData = new HashMap<>();
+		graphData.put(xAxisColumnName, Arrays.asList("1", "1", "2"));
+		graphData.put(fillColumnName, Arrays.asList("a", "b", "a"));
+		graphData.put(y1ColumnName, Arrays.asList("40", "50", "60"));
+		PlotlyTrace[] traces = PlotlyWidget.transform(xAxisColumnName, fillColumnName, graphType, graphData);
+		assertEquals(2, traces.length);
+		PlotlyTrace a = traces[0].getName().equals("a") ? traces[0] : traces[1];
+		assertEquals(2, a.getX().length);
+		assertEquals("40", a.getY()[0]);
+		assertEquals("60", a.getY()[1]);
+	}
 }

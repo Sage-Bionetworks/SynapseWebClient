@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -52,7 +53,7 @@ public class QueryResultEditorWidget implements
 	GlobalApplicationState globalApplicationState;
 	Callback callback;
 	String tableId;
-	boolean isView;
+	TableType tableType;
 	String etagColumnId;
 	
 	@Inject
@@ -81,18 +82,19 @@ public class QueryResultEditorWidget implements
 	 * 
 	 * @param bundle
 	 */
-	public void showEditor(QueryResultBundle bundle, boolean isView, Callback callback) {
+	public void showEditor(QueryResultBundle bundle, TableType tableType, Callback callback) {
 		this.callback = callback;
 		this.startingBundle = bundle;
-		this.isView = isView;
+		this.tableType = tableType;
 		this.view.setErrorMessageVisible(false);
 		// configure the widget
-		pageWidget.configure(bundle, null, null, true, isView, this, null, null, null);
+		pageWidget.configure(bundle, null, null, true, tableType, this, null, null, null);
 		setJobRunning(false);
 		this.globalApplicationState.setIsEditing(true);
 		this.view.setSaveButtonLoading(false);
-		view.setAddRowButtonVisible(!isView);
-		view.setButtonToolbarVisible(!isView);
+		boolean isTable = TableType.table.equals(tableType);
+		view.setAddRowButtonVisible(isTable);
+		view.setButtonToolbarVisible(isTable);
 		view.showEditor();
 		this.tableId = QueryBundleUtils.getTableId(bundle);
 		this.etagColumnId = getEtagColumnId();
@@ -140,7 +142,7 @@ public class QueryResultEditorWidget implements
 		PartialRowSet prs = RowSetUtils.buildDelta(startingBundle.getQueryResult()
 				.getQueryResults(), pageWidget.extractRowSet(), pageWidget
 				.extractHeaders());
-		if (isView) {
+		if (!TableType.table.equals(tableType)) {
 			removeEtagOnlyRows(etagColumnId, prs);
 		}
 		return prs;
@@ -308,7 +310,7 @@ public class QueryResultEditorWidget implements
 						if (!errors.isEmpty()){
 							view.showErrorDialog("<h4>Unable to update the following files</h4>" + errors);
 						}
-						if (isView) {
+						if (!TableType.table.equals(tableType)) {
 							int successIndex = getFirstIndexOfEntityUpdateResultSuccess(response);
 							if (successIndex > -1) {
 								Map<String, String> values = prs.getRows().get(successIndex).getValues();

@@ -33,43 +33,24 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	@UiField
 	HTML terms;
 	@UiField
-	Alert requestSubmittedMessage;
-	@UiField
-	Alert requestApprovedMessage;
-	@UiField
-	Alert requestRejectedMessage;
-	@UiField
-	Button cancelRequestButton;
-	@UiField
-	Button updateRequestButton;
-	@UiField
 	Button requestAccessButton;
-	@UiField
-	Div requestDataAccessWizardContainer;
 	@UiField
 	Div editAccessRequirementContainer;
 	@UiField
 	Div deleteAccessRequirementContainer;
-	@UiField
-	Div manageAccessContainer;
 	
 	@UiField
 	Div subjectsWidgetContainer;
 	@UiField
 	Div synAlertContainer;
 	@UiField
-	Div requestSubmittedByOther;
-	@UiField
-	Div submitterUserBadgeContainer;
-	@UiField
-	Div cancelRequestButtonContainer;
-	@UiField
-	Div updateRequestButtonContainer;
-	@UiField
 	Div requestAccessButtonContainer;
 	@UiField
-	Div revokeAccessButtonContainer;
-	
+	Alert requestApprovedMessage;
+	@UiField
+	Div manageAccessContainer;
+	@UiField
+	Div convertAccessRequirementContainer;
 	Callback onAttachCallback;
 	public interface Binder extends UiBinder<Widget, ACTAccessRequirementWidgetViewImpl> {
 	}
@@ -80,18 +61,6 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	@Inject
 	public ACTAccessRequirementWidgetViewImpl(Binder binder){
 		this.w = binder.createAndBindUi(this);
-		cancelRequestButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onCancelRequest();
-			}
-		});
-		updateRequestButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRequestAccess();
-			}
-		});
 		requestAccessButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -149,59 +118,16 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	}
 	
 	@Override
-	public void showCancelRequestButton() {
-		cancelRequestButton.setVisible(true);
-	}
-	@Override
 	public void showRequestAccessButton() {
 		requestAccessButton.setVisible(true);
-	}
-	@Override
-	public void showRequestApprovedMessage() {
-		requestApprovedMessage.setVisible(true);
-	}
-	@Override
-	public void showRequestRejectedMessage(String reason) {
-		requestRejectedMessage.setText("Rejected : " + reason);
-		requestRejectedMessage.setVisible(true);
-	}
-	@Override
-	public void showRequestSubmittedMessage() {
-		requestSubmittedMessage.setVisible(true);
-	}
-	@Override
-	public void showUpdateRequestButton() {
-		updateRequestButton.setVisible(true);
-	}
-	
-	@Override
-	public void setDataAccessRequestWizard(IsWidget w) {
-		requestDataAccessWizardContainer.clear();
-		requestDataAccessWizardContainer.add(w);
 	}
 	
 	@Override
 	public void resetState() {
 		approvedHeading.setVisible(false);
 		unapprovedHeading.setVisible(false);
-		requestSubmittedMessage.setVisible(false);
-		requestApprovedMessage.setVisible(false);
-		requestRejectedMessage.setVisible(false);
-		cancelRequestButton.setVisible(false);
-		updateRequestButton.setVisible(false);
 		requestAccessButton.setVisible(false);
-		requestSubmittedByOther.setVisible(false);
-	}
-	
-	@Override
-	public void setSubmitterUserBadge(IsWidget w) {
-		submitterUserBadgeContainer.clear();
-		submitterUserBadgeContainer.add(w);
-	}
-	
-	@Override
-	public void showRequestSubmittedByOtherUser() {
-		requestSubmittedByOther.setVisible(true);
+		requestApprovedMessage.setVisible(false);
 	}
 	
 	@Override
@@ -215,11 +141,6 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 		deleteAccessRequirementContainer.add(w);
 	}
 	@Override
-	public void setRevokeUserAccessWidget(IsWidget w) {
-		revokeAccessButtonContainer.clear();
-		revokeAccessButtonContainer.add(w);
-	}
-	@Override
 	public void setSubjectsWidget(IsWidget w) {
 		subjectsWidgetContainer.clear();
 		subjectsWidgetContainer.add(w);
@@ -227,12 +148,6 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	@Override
 	public void setVisible(boolean visible) {
 		w.setVisible(visible);
-	}
-	
-	@Override
-	public void setManageAccessWidget(IsWidget w) {
-		manageAccessContainer.clear();
-		manageAccessContainer.add(w);
 	}
 	@Override
 	public void setSynAlert(IsWidget w) {
@@ -253,18 +168,23 @@ public class ACTAccessRequirementWidgetViewImpl implements ACTAccessRequirementW
 	}
 	
 	@Override
-	public void setManageAccessWidgetContainerVisible(boolean visible) {
-		manageAccessContainer.setVisible(visible);
-	}
-	
-	@Override
 	public void hideButtonContainers() {
-		manageAccessContainer.setVisible(false);
 		editAccessRequirementContainer.setVisible(false);
 		deleteAccessRequirementContainer.setVisible(false);
-		cancelRequestButtonContainer.setVisible(false);
-		updateRequestButtonContainer.setVisible(false);
 		requestAccessButtonContainer.setVisible(false);
-		revokeAccessButtonContainer.setVisible(false);
+	}
+	@Override
+	public void showRequestApprovedMessage() {
+		requestApprovedMessage.setVisible(true);
+	}
+	@Override
+	public void setManageAccessWidget(IsWidget w) {
+		manageAccessContainer.clear();
+		manageAccessContainer.add(w);
+	}
+	@Override
+	public void setConvertAccessRequirementWidget(IsWidget w) {
+		convertAccessRequirementContainer.clear();
+		convertAccessRequirementContainer.add(w);
 	}
 }

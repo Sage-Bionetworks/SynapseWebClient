@@ -9,8 +9,11 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.Well;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateEvent;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateHandler;
@@ -77,15 +80,19 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	@UiField
 	CheckBox otherAttachmentsCheckbox;
 	@UiField
-	CheckBox annualRenewalCheckbox;
-	@UiField
 	CheckBox intendedDataUsePublicCheckbox;
 	@UiField
 	Div subjectsContainer;
 	@UiField
-	Div hasRequestUI;
-	@UiField
 	AnchorListItem backLink;
+	@UiField
+	AnchorListItem reviewAccessorsLink;
+	@UiField
+	TextBox expirationPeriodTextbox;
+	@UiField
+	Well expirationDateUI;
+	@UiField
+	Strong expirationDate;
 	
 	private Presenter presenter;
 	private Header headerWidget;
@@ -137,6 +144,12 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onCreatedOnClick();
+			}
+		});
+		reviewAccessorsLink.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onReviewAccessors();
 			}
 		});
 	}
@@ -235,11 +248,6 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	}
 
 	@Override
-	public void setIsAnnualReviewRequired(boolean value) {
-		annualRenewalCheckbox.setValue(value);
-	}
-
-	@Override
 	public void setIsCertifiedUserRequired(boolean value) {
 		certifiedCheckbox.setValue(value);
 	}
@@ -269,7 +277,17 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 		subjectsContainer.add(w);
 	}
 	@Override
-	public void setHasRequestUIVisible(boolean visible) {
-		hasRequestUI.setVisible(visible);
+	public void setExpirationPeriod(Long value) {
+		expirationPeriodTextbox.setValue(value.toString());
+	}
+	
+	@Override
+	public void setProjectedExpirationDate(String date) {
+		expirationDate.setText(date);
+	}
+	
+	@Override
+	public void setProjectedExpirationDateVisible(boolean visible) {
+		expirationDateUI.setVisible(visible);
 	}
 }

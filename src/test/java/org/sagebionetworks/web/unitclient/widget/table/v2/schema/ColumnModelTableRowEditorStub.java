@@ -15,6 +15,7 @@ public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub imple
 
 	private boolean isValid = true;
 	private boolean isSetToBeDefaultFileViewColumn=false;
+	private boolean canHaveDefault = true;
 	@Override
 	public IsWidget getWidget(int index) {
 		// TODO Auto-generated method stub
@@ -55,4 +56,14 @@ public class ColumnModelTableRowEditorStub extends ColumnModelTableRowStub imple
 	public boolean isSetToBeDefaultFileViewColumn() {
 		return isSetToBeDefaultFileViewColumn;
 	}
+
+	@Override
+	public void setCanHaveDefault(boolean canHaveDefault) {
+		this.canHaveDefault = canHaveDefault;
+	}
+	
+	public boolean canHaveDefault() {
+		return canHaveDefault;
+	}
+	
 }

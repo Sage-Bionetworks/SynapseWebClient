@@ -4,7 +4,6 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Date;
@@ -15,9 +14,11 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
@@ -28,9 +29,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class APITableColumnRendererDateTest {
 		
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
 	
 	APITableColumnRendererDate renderer;
-	SynapseJSNIUtils mockJsniUtils;
 	GWTWrapper mockGwt;
 	Map<String, List<String>> columnData;
 	APITableColumnConfig config;
@@ -40,13 +42,13 @@ public class APITableColumnRendererDateTest {
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
-		mockJsniUtils = mock(SynapseJSNIUtils.class);
+		MockitoAnnotations.initMocks(this);
 		mockGwt = mock(GWTWrapper.class);
 		DateTimeFormat mockDateTimeFormat = mock(DateTimeFormat.class);
 		when(mockGwt.getDateTimeFormat(PredefinedFormat.ISO_8601)).thenReturn(mockDateTimeFormat);
 		when(mockDateTimeFormat.format(any(Date.class))).thenReturn(formattedDate);
-		when(mockJsniUtils.convertDateToSmallString(any(Date.class))).thenReturn(formattedDate);
-		renderer = new APITableColumnRendererDate(mockJsniUtils, mockGwt);
+		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(formattedDate);
+		renderer = new APITableColumnRendererDate(mockGwt, mockDateTimeUtils);
 		columnData = new HashMap<String, List<String>>();
 		config = new APITableColumnConfig();
 		HashSet<String> inputColumnNames = new HashSet<String>();

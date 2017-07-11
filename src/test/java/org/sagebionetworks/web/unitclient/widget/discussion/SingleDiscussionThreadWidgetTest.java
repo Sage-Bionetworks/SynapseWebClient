@@ -35,6 +35,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.Topic;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -80,7 +81,7 @@ public class SingleDiscussionThreadWidgetTest {
 	@Mock
 	ReplyWidget mockReplyWidget;
 	@Mock
-	SynapseJSNIUtils mockJsniUtils;
+	DateTimeUtils mockDateTimeUtils;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
@@ -144,7 +145,7 @@ public class SingleDiscussionThreadWidgetTest {
 		when(mockGinInjector.getReplyCountAlert()).thenReturn(mockRefreshAlert);
 		discussionThreadWidget = new SingleDiscussionThreadWidget(mockView, mockSynAlert,
 				mockAuthorWidget, mockDiscussionForumClientAsync, mockGinInjector,
-				mockJsniUtils, mockRequestBuilder, mockAuthController,
+				mockDateTimeUtils, mockRequestBuilder, mockAuthController,
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
 				mockRepliesContainer, mockSubscribeButtonWidget, mockNewReplyWidget,
 				mockNewReplyWidget, mockSubscribersWidget);
@@ -880,5 +881,32 @@ public class SingleDiscussionThreadWidgetTest {
 		discussionThreadWidget.reconfigureThread();
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
+	}
+	
+
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testSetSortDirection() {
+		// configure widget
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		boolean ascending = SingleDiscussionThreadWidget.DEFAULT_ASCENDING;
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
+				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		
+		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), eq(ascending),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
+		
+		//toggle sort direction and verify rpc uses new value.
+		ascending = !ascending;
+		discussionThreadWidget.setSortDirection(ascending);
+		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
+				anyLong(), anyLong(), any(DiscussionReplyOrder.class), eq(ascending),
+				any(DiscussionFilter.class), any(AsyncCallback.class));
 	}
 }

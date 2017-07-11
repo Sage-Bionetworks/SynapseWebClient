@@ -40,11 +40,11 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	Button addTable;
 	@UiField
 	Button addFileView;
+	@UiField
+	Button addProjectView;
 	
 	@UiField
 	Button uploadTable;
-	@UiField
-	SimplePanel createTableModalPanel;
 	@UiField
 	SimplePanel uploadTableModalPanel;
 	@UiField
@@ -61,6 +61,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	AnchorListItem nameDesc;
 	@UiField
 	Button sortButton;
+	@UiField
+	Div synAlertContainer;
 	
 	HTMLPanel panel;
 	Presenter presenter;
@@ -72,6 +74,9 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 		this.ginInjector = ginInjector;
 		HTML html = new HTML("<i class=\"fa fa-plus\" ></i>&nbsp;Add File View" + DisplayConstants.BETA_BADGE_HTML);
 		addFileView.add(html);
+		html = new HTML("<i class=\"fa fa-plus\" ></i>&nbsp;Add Project View" + DisplayConstants.BETA_BADGE_HTML);
+		addProjectView.add(html);
+		
 		createdOnDesc.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -150,6 +155,12 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 				presenter.onUploadTable();
 			}
 		});
+		addProjectView.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onAddProjectView();
+			}
+		});
 	}
 	
 	@Override
@@ -185,15 +196,14 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void setAddFileViewVisible(boolean visible) {
 		addFileView.setVisible(visible);
 	}
+	@Override
+	public void setAddProjectViewVisible(boolean visible) {
+		addProjectView.setVisible(visible);
+	}
 	
 	@Override
 	public void setUploadTableVisible(boolean visibile) {
 		this.uploadTable.setVisible(visibile);
-	}
-
-	@Override
-	public void addCreateTableModal(IsWidget createTableModal) {
-		this.createTableModalPanel.add(createTableModal);
 	}
 
 	@Override
@@ -207,5 +217,10 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 		fileViewWizardContainer.add(wizard);
 	}
 	
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
+	}
 
 }

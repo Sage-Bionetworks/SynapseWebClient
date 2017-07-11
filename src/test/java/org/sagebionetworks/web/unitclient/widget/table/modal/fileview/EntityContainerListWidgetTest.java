@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -61,8 +62,6 @@ public class EntityContainerListWidgetTest {
 	@Test
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
-		boolean showVersions = false;
-		verify(mockEntityFinder).configureMulti(eq(EntityFilter.CONTAINER), eq(showVersions), any(SelectedHandler.class));
 	}
 	
 	@Test
@@ -70,7 +69,7 @@ public class EntityContainerListWidgetTest {
 		// configure with pre-defined entity id list
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		boolean canEdit = true;
-		widget.configure(Collections.singletonList(headerId), canEdit);
+		widget.configure(Collections.singletonList(headerId), canEdit, TableType.fileview);
 		verify(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		verify(mockView).setAddButtonVisible(true);
 		verify(mockView).setNoContainers(false);
@@ -81,6 +80,9 @@ public class EntityContainerListWidgetTest {
 		assertTrue(widget.getEntityIds().contains(headerId));
 		widget.onRemoveProject(headerId);
 		assertTrue(widget.getEntityIds().isEmpty());
+
+		boolean showVersions = false;
+		verify(mockEntityFinder).configureMulti(eq(EntityFilter.CONTAINER), eq(showVersions), any(SelectedHandler.class));
 	}
 	
 	@Test
@@ -88,11 +90,14 @@ public class EntityContainerListWidgetTest {
 		// SWC-3562: old ids should be cleared when widget is re-configured
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		boolean canEdit = true;
-		widget.configure(Collections.singletonList(headerId), canEdit);
+		widget.configure(Collections.singletonList(headerId), canEdit, TableType.projectview);
 		assertTrue(widget.getEntityIds().contains(headerId));
 		assertEquals(1, widget.getEntityIds().size());
 		
-		widget.configure(Collections.singletonList(headerId), canEdit);
+		boolean showVersions = false;
+		verify(mockEntityFinder).configureMulti(eq(EntityFilter.PROJECT), eq(showVersions), any(SelectedHandler.class));
+		
+		widget.configure(Collections.singletonList(headerId), canEdit, TableType.fileview);
 		assertTrue(widget.getEntityIds().contains(headerId));
 		assertEquals(1, widget.getEntityIds().size());
 	}
@@ -102,7 +107,7 @@ public class EntityContainerListWidgetTest {
 		entityHeaders.clear();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		boolean canEdit = false;
-		widget.configure(Collections.EMPTY_LIST, canEdit);
+		widget.configure(Collections.EMPTY_LIST, canEdit, TableType.fileview);
 		verify(mockSynapseClient, never()).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		verify(mockView).setAddButtonVisible(false);
 		verify(mockView).setNoContainers(true);
@@ -118,7 +123,7 @@ public class EntityContainerListWidgetTest {
 		Exception ex = new Exception("error!"); 
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		boolean canEdit = false;
-		widget.configure(Collections.singletonList(headerId), canEdit);
+		widget.configure(Collections.singletonList(headerId), canEdit, TableType.fileview);
 		verify(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).clear();
 		verify(mockSynapseAlert).handleException(ex);

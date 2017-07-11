@@ -1055,7 +1055,8 @@ a.shortBtn {
 	max-width: none;
 }
 
-.color-white, .color-white:hover, .color-white:visited, .color-white:focus {
+.color-white, .color-white:hover, .color-white:visited, .color-white:focus, 
+#rootPanel .color-white, #rootPanel .color-white:hover, #rootPanel .color-white:visited, #rootPanel .color-white:focus {
 	color: white;
 }
 
@@ -1221,6 +1222,12 @@ h1, h2, h3, h4, h5, h6 {
 
 .boldText {
 	font-weight: bold;	
+}
+.strikeout-links a {
+	text-decoration: line-through; 
+}
+.lightgrey-links a {
+	color: #909090; 
 }
 
 .scroll-x {
@@ -1430,6 +1437,11 @@ h1, h2, h3, h4, h5, h6 {
 	max-height: 200px;
 }
 
+.max-height-100 {
+	max-height: 100px;
+}
+
+
 .wikifilepreview {
 	width: 940px;
 }
@@ -1615,7 +1627,7 @@ ol.lowerroman {
 	padding-bottom: 4px !important;
 }
 
-.padding-5 {
+.padding-5, #rootPanel .padding-5 {
 	padding: 5px;
 }
 
@@ -1631,7 +1643,7 @@ ol.lowerroman {
 	padding: 30px;
 }
 
-.padding-2 {
+.padding-2, #rootPanel .padding-2 {
 	padding: 2px;
 }
 
@@ -2115,6 +2127,10 @@ a.projectTitle:hover {
     padding-bottom: 99999px;  
 }
 
+.padding-right-2, #rootPanel .padding-right-2 {
+	padding-right: 2px;
+}
+
 .padding-right-5 {
 	padding-right: 5px;
 }
@@ -2124,6 +2140,10 @@ a.projectTitle:hover {
 
 .padding-left-0 {
 	padding-left: 0px;
+}
+
+.padding-left-2, #rootPanel .padding-left-2 {
+	padding-left: 2px;
 }
 
 .padding-left-0-imp {

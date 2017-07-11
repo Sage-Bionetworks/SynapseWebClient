@@ -7,12 +7,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.sagebionetworks.repo.model.QueryResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.FacetColumnResult;
 import org.sagebionetworks.repo.model.table.Query;
+import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -20,9 +23,11 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -43,7 +48,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	List<RowWidget> rows;
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	String tableId;
-	boolean isView;
+	TableType tableType;
 	FacetsWidget facetsWidget;
 	Callback resetFacetsHandler;
 	/*
@@ -77,17 +82,18 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			Query query, 
 			List<SortItem> sortList, 
 			boolean isEditable, 
-			boolean isView, 
+			TableType tableType, 
 			RowSelectionListener rowSelectionListener, 
 			final PagingAndSortingListener pageChangeListener,
 			CallbackP<FacetColumnRequest> facetChangedHandler,
 			Callback resetFacetsHandler){
-		this.isView = isView;
+		this.tableType = tableType;
 		this.rowSelectionListener = rowSelectionListener;
 		this.resetFacetsHandler = resetFacetsHandler;
+		Integer rowCount = bundle.getQueryResult().getQueryResults().getRows().size();
 		// The pagination widget is only visible if a listener was provider
-		if(pageChangeListener != null){
-			this.paginationWidget.configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), pageChangeListener);
+		if(pageChangeListener != null) {
+			this.paginationWidget.configure(query.getLimit(), query.getOffset(), rowCount.longValue(), pageChangeListener);
 			view.setPaginationWidgetVisible(true);
 		}else {
 			view.setPaginationWidgetVisible(false);
@@ -148,7 +154,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			facetsWidget.configure(facets, facetChangedHandler, types);
 		}
 		view.setTableHeaders(headers);
-		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());
+		rows = new ArrayList<RowWidget>(rowCount);
 		// Build the rows for this table
 		for(Row row: bundle.getQueryResult().getQueryResults().getRows()){
 			// Create the row 
@@ -169,7 +175,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		if(rowSelectionListener != null){
 			listner = this;
 		}
-		rowWidget.configure(tableId, types, isEditor, isView, row, listner);
+		rowWidget.configure(tableId, types, isEditor, tableType, row, listner);
 		rows.add(rowWidget);
 		view.addRow(rowWidget);
 		if(keyboardNavigationHandler != null){

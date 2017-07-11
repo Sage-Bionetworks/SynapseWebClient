@@ -11,6 +11,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface CreateAccessRequirementStep1View extends IsWidget {
 	
 	void setSubjects(IsWidget w);
+	boolean isManagedACTAccessRequirementType();
 	boolean isACTAccessRequirementType(); 
 	boolean isTermsOfUseAccessRequirementType();
 	void setPresenter(Presenter p);
