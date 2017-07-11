@@ -132,6 +132,8 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 		//create table header
 		THead thead = new THead();
 		TableRow headerRow = new TableRow();
+		headerRow.setHeight("30px");
+		headerRow.addStyleName("border-bottom-1");
 		if (canEdit) {
 			TableHeader th = new TableHeader();
 			th.setText("Restore");
