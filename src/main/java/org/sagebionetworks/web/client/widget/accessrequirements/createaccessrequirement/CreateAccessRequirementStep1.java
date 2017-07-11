@@ -9,8 +9,10 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptorResponse;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
@@ -36,6 +38,7 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	AccessRequirement accessRequirement;
 	SynapseClientAsync synapseClient;
 	SubjectsWidget subjectsWidget;
+	DataAccessClientAsync dataAccessClient;
 	
 	@Inject
 	public CreateAccessRequirementStep1(
@@ -43,13 +46,15 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 			CreateManagedACTAccessRequirementStep2 actStep2,
 			CreateBasicAccessRequirementStep2 touStep2,
 			SynapseClientAsync synapseClient,
-			SubjectsWidget subjectsWidget) {
+			SubjectsWidget subjectsWidget,
+			DataAccessClientAsync dataAccessClient) {
 		super();
 		this.view = view;
 		this.actStep2 = actStep2;
 		this.basicStep2 = touStep2;
 		this.subjectsWidget = subjectsWidget;
 		this.synapseClient = synapseClient;
+		this.dataAccessClient = dataAccessClient;
 		view.setSubjects(subjectsWidget);
 		view.setPresenter(this);
 	}
@@ -104,12 +109,33 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	public void configure(AccessRequirement ar) {
 		accessRequirement = ar;
 		view.setAccessRequirementTypeSelectionVisible(false);
-		setSubjects(accessRequirement.getSubjectIds());
+		subjects = new ArrayList<RestrictableObjectDescriptor>();
+		populateSubjects(ar.getId().toString(), null);
+	}
+	
+	public void populateSubjects(final String requirementId, String nextPageToken) {
+		dataAccessClient.getSubjects(requirementId, nextPageToken, new AsyncCallback<RestrictableObjectDescriptorResponse>() {
+			@Override
+			public void onSuccess(RestrictableObjectDescriptorResponse response) {
+				subjects.addAll(response.getSubjects());
+				if (response.getNextPageToken() != null) {
+					populateSubjects(requirementId, response.getNextPageToken());
+				} else {
+					setSubjects(subjects);
+				}
+			};
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				modalPresenter.setErrorMessage(caught.getMessage());
+			}
+		});
 	}
 	
 	private void setSubjects(List<RestrictableObjectDescriptor> initialSubjects) {
 		subjects = initialSubjects;
-		subjectsWidget.configure(subjects, false);
+		subjectsWidget.clear();
+		subjectsWidget.addSubjects(initialSubjects, false);
 		String subjectIds = getSubjectIds(subjects);
 		if (subjects.size() > 0) {
 			if (subjects.get(0).getType().equals(RestrictableObjectType.ENTITY)) {

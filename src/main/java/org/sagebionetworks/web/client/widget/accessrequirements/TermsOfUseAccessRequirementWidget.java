@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -94,7 +93,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		});
 		createAccessRequirementButton.configure(ar, refreshCallback);
 		deleteAccessRequirementButton.configure(ar, refreshCallback);
-		subjectsWidget.configure(ar.getSubjectIds(), true);
+		subjectsWidget.configure(ar.getId().toString(), true);
 		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
 	}

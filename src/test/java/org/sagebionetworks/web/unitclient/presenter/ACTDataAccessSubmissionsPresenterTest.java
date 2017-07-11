@@ -28,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptorResponse;
 import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionOrder;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionPage;
@@ -108,6 +109,8 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	PlaceChanger mockPlaceChanger;
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
+	@Mock
+	RestrictableObjectDescriptorResponse mockRestrictableObjectDescriptorResponse;
 	public static final String FILE_HANDLE_ID = "9999";
 	public static final Long AR_ID = 76555L;
 	public static final String NEXT_PAGE_TOKEN = "abc678";
@@ -124,7 +127,9 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
 		when(mockGinInjector.getACTDataAccessSubmissionWidget()).thenReturn(mockACTDataAccessSubmissionWidget);
-		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjects);
+		
+		AsyncMockStubber.callSuccessWith(mockRestrictableObjectDescriptorResponse).when(mockDataAccessClient).getSubjects(anyString(), anyString(), any(AsyncCallback.class));
+		when(mockRestrictableObjectDescriptorResponse.getSubjects()).thenReturn(mockSubjects);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}	
 	
@@ -169,7 +174,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		assertEquals(FileHandleAssociateType.AccessRequirementAttachment, fha.getAssociateObjectType());
 		assertEquals(AR_ID.toString(), fha.getAssociateObjectId());
 		assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
-		verify(mockSubjectsWidget).configure(mockSubjects, true);
+		verify(mockSubjectsWidget).configure(AR_ID.toString(), true);
 		verify(mockView).setAreOtherAttachmentsRequired(true);
 		verify(mockView).setExpirationPeriod(expirationPeriod);
 		verify(mockView).setIsCertifiedUserRequired(true);

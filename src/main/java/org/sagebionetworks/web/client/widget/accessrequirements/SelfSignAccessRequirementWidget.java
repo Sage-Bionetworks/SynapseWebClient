@@ -110,7 +110,7 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 		});
 		createAccessRequirementButton.configure(ar, refreshCallback);
 		deleteAccessRequirementButton.configure(ar, refreshCallback);
-		subjectsWidget.configure(ar.getSubjectIds(), true);
+		subjectsWidget.configure(ar.getId().toString(), true);
 		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
 	}

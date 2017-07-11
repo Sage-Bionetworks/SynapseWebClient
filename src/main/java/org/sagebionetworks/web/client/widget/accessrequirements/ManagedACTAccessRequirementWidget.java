@@ -119,7 +119,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		deleteAccessRequirementButton.configure(ar, refreshCallback);
 		reviewAccessRequestsButton.configure(ar);
 		manageAccessButton.configure(ar);
-		subjectsWidget.configure(ar.getSubjectIds(), true);
+		subjectsWidget.configure(ar.getId().toString(), true);
 		lazyLoadHelper.setIsConfigured();
 	}
 	
