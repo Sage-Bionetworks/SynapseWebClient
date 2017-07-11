@@ -4,22 +4,26 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
+import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
+import org.sagebionetworks.web.client.view.bootstrap.table.THead;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 
-import com.google.gwt.cell.client.ActionCell;
-import com.google.gwt.cell.client.Cell;
-import com.google.gwt.cell.client.DateCell;
-import com.google.gwt.cell.client.TextCell;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
-import com.google.gwt.user.cellview.client.CellTable;
-import com.google.gwt.user.cellview.client.Column;
-import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -27,7 +31,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryWidgetView {
-	CellTable<HistoryEntry> historyTable;
 	Button loadMoreHistoryButton;
 	HTMLPanel inlineErrorMessagePanel;
 	FlowPanel historyPanel;
@@ -40,9 +43,11 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 	private boolean isFirstGetHistory;
 	private int offset;
 	private int resultSize;
-
+	DateTimeUtils dateTimeUtils;
+	
 	@Inject
-	public WikiHistoryWidgetViewImpl() {
+	public WikiHistoryWidgetViewImpl(DateTimeUtils dateTimeUtils) {
+		this.dateTimeUtils = dateTimeUtils;
 	}
 	
 	private static class HistoryEntry {
@@ -85,16 +90,8 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 		// We have all the data to create entries for the table
 		createHistoryEntries();
 		// Create or build upon the history widget
-		if(isFirstGetHistory) {
-			isFirstGetHistory = false;
-			createHistoryWidget();
-		} else {
-			historyTable.setRowCount(historyEntries.size());
-			// Set the range to display all of retrieved history so far
-		    historyTable.setVisibleRange(0, historyEntries.size());
-		    // Push in data
-		    historyTable.setRowData(0, historyEntries);
-		}
+		isFirstGetHistory = false;
+		createHistoryWidget();
 	}
 	
 	private void createHistoryEntries() {
@@ -119,101 +116,107 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 			hideHistoryWidget();
 		}
 		
-		historyTable = new CellTable<HistoryEntry>();
+		Table historyTable = new Table();
+		historyTable.setWidth("100%");
 
-		loadMoreHistoryButton = DisplayUtils.createIconButton("Load more history", DisplayUtils.ButtonType.DEFAULT, null);
-		loadMoreHistoryButton.setStyleName("wikiHistoryButton", true);
-		loadMoreHistoryButton.setStyleName("margin-top-10", true);
+		loadMoreHistoryButton = new Button("Load more history");
+		loadMoreHistoryButton.addStyleName("margin-top-10");
 		loadMoreHistoryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 		        offset += resultSize;
 		        presenter.configureNextPage(new Long(offset), new Long(10));
 			}
-			
 		});
 		
-	    // Restore if edit permissions granted
-	    if(canEdit) {
-		    ActionCell<HistoryEntry> restoreCell = new ActionCell<HistoryEntry>("Restore", new ActionCell.Delegate<HistoryEntry>() {
-		        @Override
-		        public void execute(HistoryEntry object) {
-		        	showRestorationWarning(new Long(object.version));
-		        }
-		    }) {
-		    	@Override
-		        public void render(Cell.Context context, HistoryEntry value, SafeHtmlBuilder sb) {
-		        	if(value.version.equals(currentVersion)) {
-		        		sb.appendHtmlConstant("<span>(Current Wiki)</span>");
-		        	} else {
-		        		sb.appendHtmlConstant("<button>Restore</button>");
-		        	}
-		        }
-		    };
-		    
-		    Column<HistoryEntry, HistoryEntry> restoreColumn = new Column<HistoryEntry, HistoryEntry>(restoreCell) {
-				@Override
-				public HistoryEntry getValue(HistoryEntry object) {
-					return object;
-				}
-			};
-			historyTable.addColumn(restoreColumn, "Restore");
-	    }
+		//create table header
+		THead thead = new THead();
+		TableRow headerRow = new TableRow();
+		if (canEdit) {
+			TableHeader th = new TableHeader();
+			th.setText("Restore");
+			headerRow.add(th);
+		}
 		
-	    // Preview
-	    ActionCell<HistoryEntry> previewCell = new ActionCell<HistoryEntry>("Preview", new ActionCell.Delegate<HistoryEntry>() {
-	        @Override
-	        public void execute(HistoryEntry object) {
-	        	actionHandler.previewClicked(new Long(object.version), new Long(currentVersion));
-	        }
-	    });
-	    
-	    Column<HistoryEntry, HistoryEntry> previewColumn = new Column<HistoryEntry, HistoryEntry>(previewCell) {
-			@Override
-			public HistoryEntry getValue(HistoryEntry object) {
-				return object;
+		TableHeader th = new TableHeader();
+		th.setText("Preview");
+		headerRow.add(th);
+		
+		th = new TableHeader();
+		th.setText("Version");
+		headerRow.add(th);
+		
+		th = new TableHeader();
+		th.setText("Modified By");
+		headerRow.add(th);
+		
+		th = new TableHeader();
+		th.setText("Modified On");
+		headerRow.add(th);
+		
+		thead.add(headerRow);
+		historyTable.add(thead);
+		
+		TBody tBody = new TBody();
+		for (final HistoryEntry entry : historyEntries) {
+			TableRow row = new TableRow();
+			row.setHeight("30px");
+			row.addStyleName("border-bottom-1");
+			tBody.add(row);
+			TableData td;
+			
+			// Restore if edit permissions granted
+		    if (canEdit) {
+				td = new TableData();
+				td.setWidth("100px");
+				if(entry.version.equals(currentVersion)) {
+					td.add(new Span("(Current Wiki)"));
+	        	} else {
+	        		Button button = new Button("Restore");
+	        		button.setSize(ButtonSize.EXTRA_SMALL);
+	        		button.addClickHandler(new ClickHandler() {
+						@Override
+						public void onClick(ClickEvent event) {
+							showRestorationWarning(new Long(entry.version));
+						}
+					});
+	        		td.add(button);
+	        	}
+				row.add(td);
 			}
-		};
-	    
-		// Version
-	    Column<HistoryEntry, String> versionColumn = new Column<HistoryEntry, String>(
-	        new TextCell()) {
-	      @Override
-	      public String getValue(HistoryEntry object) {
-	        return object.version;
-	      }
-	    };
-	    
-	    // Modified by
-	    Column<HistoryEntry, String> modifiedByColumn = new Column<HistoryEntry, String>(
-	        new TextCell()) {
-	      @Override
-	      public String getValue(HistoryEntry object) {
-	        return object.user;
-	      }
-	    };
-	    
-	    // Modified on
-	    Column<HistoryEntry, Date> modifiedOnColumn = new Column<HistoryEntry, Date>(
-	        new DateCell()) {
-	      @Override
-	      public Date getValue(HistoryEntry object) {
-	        return object.modifiedOn;
-	      }
-	    };
+		    
+		    // Preview
+		    td = new TableData();
+		    td.setWidth("100px");
+			Button button = new Button("Preview");
+			button.setSize(ButtonSize.EXTRA_SMALL);
+    		button.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					actionHandler.previewClicked(new Long(entry.version), new Long(currentVersion));
+				}
+			});
+    		td.add(button);
+        	row.add(td);
+        	
+        	// Version
+        	td = new TableData();
+			td.add(new Text(entry.version));
+        	row.add(td);
+        	
+        	// Modified by
+        	td = new TableData();
+			td.add(new Text(entry.user));
+        	row.add(td);
 
-	    historyTable.addColumn(previewColumn, "Preview");
-		historyTable.addColumn(versionColumn, "Version");
-		historyTable.addColumn(modifiedByColumn, "Modified By");
-		historyTable.addColumn(modifiedOnColumn, "Modified On");
-		
+        	// Modified on
+        	td = new TableData();
+			td.add(new Text(dateTimeUtils.convertDateToSmallString(entry.modifiedOn)));
+        	row.add(td);
+		}
+		historyTable.add(tBody);
 		historyTable.setVisible(true);
-		historyTable.setRowCount(historyEntries.size());
 		
-		// Set the range to display in the table at one time
-	    historyTable.setVisibleRange(0, historyEntries.size());
-	    historyTable.setRowData(0, historyEntries);
-	    
 		historyPanel = new FlowPanel();
 		historyPanel.add(wrapWidget(historyTable, "margin-top-5"));
 		historyPanel.add(loadMoreHistoryButton);
