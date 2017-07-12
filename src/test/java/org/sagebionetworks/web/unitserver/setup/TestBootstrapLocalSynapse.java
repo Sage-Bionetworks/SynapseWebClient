@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptorResponse;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -144,7 +145,8 @@ public class TestBootstrapLocalSynapse {
 		if(vcpr != null && vcpr.getTotalNumberOfResults() > 0){
 			for(AccessRequirement ar: vcpr.getResults()){
 				if(ar.getAccessType().equals(type)){
-					for(RestrictableObjectDescriptor erod: ar.getSubjectIds()){
+					RestrictableObjectDescriptorResponse response = synapseClient.getSubjects(ar.getId().toString(), null);
+					for(RestrictableObjectDescriptor erod: response.getSubjects()){
 						if(erod.getId().equals(entityId)){
 							// Restriction already set.
 							return;
