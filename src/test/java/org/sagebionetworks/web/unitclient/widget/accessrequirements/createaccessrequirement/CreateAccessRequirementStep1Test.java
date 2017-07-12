@@ -183,6 +183,17 @@ public class CreateAccessRequirementStep1Test {
 	}
 	
 	@Test
+	public void testGetSubjectsFailure() {
+		String errorMessage = "errors";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockDataAccessClient).getSubjects(anyString(), anyString(), any(AsyncCallback.class));
+		
+		widget.configure(mockACTAccessRequirement);
+		
+		verify(mockModalPresenter).setErrorMessage(errorMessage);
+	}
+
+	
+	@Test
 	public void testGetSubjectIds() {
 		RestrictableObjectDescriptor mockSubject1 = mock(RestrictableObjectDescriptor.class);
 		RestrictableObjectDescriptor mockSubject2 = mock(RestrictableObjectDescriptor.class);

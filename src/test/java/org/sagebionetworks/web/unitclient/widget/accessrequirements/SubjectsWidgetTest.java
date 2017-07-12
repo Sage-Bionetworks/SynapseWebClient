@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -50,7 +51,8 @@ public class SubjectsWidgetTest {
 	ArgumentCaptor<CallbackP<Boolean>> callbackCaptor;
 	@Mock
 	RestrictableObjectDescriptorResponse mockRestrictableObjectDescriptorResponse;
-	
+	@Mock
+	SynapseAlert mockSynapseAlert;
 	public static final String ID = "876787";
 	
 	@Before
@@ -62,6 +64,7 @@ public class SubjectsWidgetTest {
 				mockDataAccessClient);
 		when(mockGinInjector.createEntityIdCellRenderer()).thenReturn(mockEntityIdCellRendererImpl);
 		when(mockGinInjector.getTeamBadgeWidget()).thenReturn(mockTeamBadge);
+		when(mockGinInjector.getSynapseAlertWidget()).thenReturn(mockSynapseAlert);
 		when(mockRestrictableObjectDescriptor.getId()).thenReturn(ID);
 		AsyncMockStubber.callSuccessWith(mockRestrictableObjectDescriptorResponse).when(mockDataAccessClient).getSubjects(anyString(), anyString(), any(AsyncCallback.class));
 	}
@@ -104,5 +107,18 @@ public class SubjectsWidgetTest {
 		verify(mockGinInjector).getTeamBadgeWidget();
 		verify(mockTeamBadge).configure(ID);
 	}
-
+	@Test
+	public void testGetSubjectsFailure() {
+		Exception ex = new Exception();
+		AsyncMockStubber.callFailureWith(ex).when(mockDataAccessClient).getSubjects(anyString(), anyString(), any(AsyncCallback.class));
+		
+		widget.configure(ID, false);
+		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackCaptor.capture());
+		CallbackP<Boolean> callback = callbackCaptor.getValue();
+		callback.invoke(true);
+		
+		verify(mockGinInjector).getSynapseAlertWidget();
+		verify(mockSynapseAlert).handleException(ex);
+		verify(mockView).add(mockSynapseAlert);
+	}
 }
