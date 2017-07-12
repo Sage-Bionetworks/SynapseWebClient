@@ -46,9 +46,9 @@
 			<b:Alert ui:field="alert" type="DANGER" visible="false" />
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="primaryButton" type="PRIMARY" dataLoadingText="Saving..." >Save</b:Button>
 			<b:Button ui:field="defaultButton" type="DEFAULT"
 				dataDismiss="MODAL">Cancel</b:Button>
+			<b:Button ui:field="primaryButton" type="PRIMARY" dataLoadingText="Saving..." >Save</b:Button>
 		</b:ModalFooter>
 	</b:Modal>
 </ui:UiBinder>
