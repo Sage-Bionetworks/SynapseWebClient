@@ -7,6 +7,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
@@ -248,18 +249,18 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 								banner += "/" + externalUploadDestination.getBaseKey();
 						}
 						updateS3UploadBannerView(banner);
-					//TODO: support new direct to s3(-like) storage
-//					} else if (uploadDestinations.get(0) instanceof S3DirectUploadDestination) {
-//						S3DirectUploadDestination externalUploadDestination = (S3DirectUploadDestination) uploadDestinations.get(0);
-//						storageLocationId = externalUploadDestination.getStorageLocationId();
-//						currentUploadType = externalUploadDestination.getUploadType();
-//						String banner = externalUploadDestination.getBanner();
-//						if (!DisplayUtils.isDefined(banner)) {
-//							banner = "Uploading to " + externalUploadDestination.getEndpoint();
-//							if (externalUploadDestination.getBaseKey() != null)
-//								banner += "/" + externalUploadDestination.getBaseKey();
-//						}
-//						view.showUploadingToS3DirectStorage(endpoint, banner);
+					// direct to s3(-like) storage
+					} else if (uploadDestinations.get(0) instanceof ExternalObjectStoreUploadDestination) {
+						ExternalObjectStoreUploadDestination externalUploadDestination = (ExternalObjectStoreUploadDestination) uploadDestinations.get(0);
+						storageLocationId = externalUploadDestination.getStorageLocationId();
+						currentUploadType = externalUploadDestination.getUploadType();
+						String banner = externalUploadDestination.getBanner();
+						if (!DisplayUtils.isDefined(banner)) {
+							banner = "Uploading to " + externalUploadDestination.getEndpoint();
+							if (externalUploadDestination.getKeyPrefixUUID() != null)
+								banner += "/" + externalUploadDestination.getKeyPrefixUUID();
+						}
+						view.showUploadingToS3DirectStorage(externalUploadDestination.getEndpoint(), banner);
 					} else {
 						//unsupported upload destination type
 						onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported upload destination: " + uploadDestinations.get(0).getClass().getName()));
