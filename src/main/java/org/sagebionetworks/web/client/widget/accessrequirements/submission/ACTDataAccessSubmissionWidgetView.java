@@ -35,6 +35,7 @@ public interface ACTDataAccessSubmissionWidgetView extends IsWidget {
 	void setOtherAttachmentsColumnVisible(boolean visible);
 	void setRenewalColumnsVisible(boolean visible);
 	void hideActions();
+	void showMoreInfoDialog();
 	
 	/**
 	 * Presenter interface
@@ -42,6 +43,7 @@ public interface ACTDataAccessSubmissionWidgetView extends IsWidget {
 	public interface Presenter {
 		void onApprove();
 		void onReject();
+		void onMoreInfo();
 	}
 
 }

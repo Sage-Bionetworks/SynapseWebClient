@@ -6,6 +6,10 @@
 	xmlns:bd="urn:import:org.gwtbootstrap3.extras.datetimepicker.client.ui">
 	<bh:Div>
 		<g:SimplePanel ui:field="header" />
+		<b:NavPills addStyleNames="margin-left-35 margin-right-10 margin-top-5">
+			<b:AnchorListItem text="ACT data access dashboard" href="#!ACTDataAccessSubmissionDashboard:default"/>
+		</b:NavPills>
+		
 		<b:Heading size="H3" text="Review current access" addStyleNames="margin-left-35 margin-right-10 margin-bottom-20" />
 		<bh:Div ui:field="showHideAccessRequirementButtonContainer" pull="RIGHT" addStyleNames="moveup-35 margin-right-10"/>
 		<bh:Div ui:field="synAlertContainer" />

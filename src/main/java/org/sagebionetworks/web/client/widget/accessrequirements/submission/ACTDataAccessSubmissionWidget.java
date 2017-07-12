@@ -100,6 +100,23 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 			case REJECTED:
 			default:
 		}
+		
+		view.setInstitution(submission.getResearchProjectSnapshot().getInstitution());
+		view.setIntendedDataUse(submission.getResearchProjectSnapshot().getIntendedDataUseStatement());
+		view.setIsRenewal(submission.getIsRenewalSubmission());
+		view.setProjectLead(submission.getResearchProjectSnapshot().getProjectLead());
+		view.setPublications(submission.getPublication());
+		view.setSummaryOfUse(submission.getSummaryOfUse());
+		view.setSubmittedOn(dateTimeUtils.convertDateToSmallString(submission.getSubmittedOn()));
+		view.setRenewalColumnsVisible(submission.getIsRenewalSubmission());
+		UserBadge badge = ginInjector.getUserBadgeWidget();
+		badge.configure(submission.getSubmittedBy());
+		view.setSubmittedBy(badge);
+		configureShowEmailsButton(submission.getAccessorChanges());
+	}
+	
+	@Override
+	public void onMoreInfo() {
 		view.clearAccessors();
 		if (submission.getAccessorChanges() != null) {
 			addAccessorUserBadges(submission.getAccessorChanges());
@@ -123,18 +140,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		} else {
 			irbFileRenderer.setVisible(false);
 		}
-		view.setInstitution(submission.getResearchProjectSnapshot().getInstitution());
-		view.setIntendedDataUse(submission.getResearchProjectSnapshot().getIntendedDataUseStatement());
-		view.setIsRenewal(submission.getIsRenewalSubmission());
-		view.setProjectLead(submission.getResearchProjectSnapshot().getProjectLead());
-		view.setPublications(submission.getPublication());
-		view.setSummaryOfUse(submission.getSummaryOfUse());
-		view.setSubmittedOn(dateTimeUtils.convertDateToSmallString(submission.getSubmittedOn()));
-		view.setRenewalColumnsVisible(submission.getIsRenewalSubmission());
-		UserBadge badge = ginInjector.getUserBadgeWidget();
-		badge.configure(submission.getSubmittedBy());
-		view.setSubmittedBy(badge);
-		configureShowEmailsButton(submission.getAccessorChanges());
+		view.showMoreInfoDialog();
 	}
 	
 	public void configureShowEmailsButton(List<AccessorChange> accessorChanges) {

@@ -165,6 +165,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockDataAccessSubmission.getIrbFileHandleId()).thenReturn(fileHandleId4);
 		
 		widget.configure(mockDataAccessSubmission);
+		widget.onMoreInfo();
 		
 		verify(mockView).hideActions();
 		// verify accessors
@@ -220,6 +221,12 @@ public class ACTDataAccessSubmissionWidgetTest {
 		
 		widget.configure(mockDataAccessSubmission);
 		
+		verify(mockView, never()).clearAccessors();
+		verify(mockGinInjector, never()).getUserBadgeItem();
+		verify(mockView, never()).addAccessors(any(IsWidget.class));
+		
+		widget.onMoreInfo();
+		
 		verify(mockView).hideActions();
 		// verify accessors
 		verify(mockView).clearAccessors();
@@ -239,7 +246,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).showApproveButton();
 		verify(mockView).showRejectButton();
 		
-
+		widget.onMoreInfo();
 		// no duc or irb, verify they are hidden
 		verify(mockIrbFileRenderer).setVisible(false);
 		verify(mockDucFileRenderer).setVisible(false);
