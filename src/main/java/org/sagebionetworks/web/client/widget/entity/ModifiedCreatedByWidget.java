@@ -5,10 +5,11 @@ import java.util.Date;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ModifiedCreatedByWidget implements ModifiedCreatedByWidgetView.Presenter {
+public class ModifiedCreatedByWidget implements IsWidget {
 
 	private ModifiedCreatedByWidgetView view;
 	private UserBadge createdByBadge;
@@ -39,7 +40,12 @@ public class ModifiedCreatedByWidget implements ModifiedCreatedByWidgetView.Pres
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
+	public void setCreatedByUIVisible(boolean visible) {
+		view.setCreatedByUIVisible(visible);
+	}
+	public void setModifiedByUIVisible(boolean visible) {
+		view.setModifiedByUIVisible(visible);
+	}
 	public void setVisible(boolean isVisible) {
 		view.setVisible(isVisible);
 	}

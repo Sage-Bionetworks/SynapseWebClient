@@ -44,6 +44,7 @@ public class MarkdownWidgetViewImpl implements MarkdownWidgetView {
 	@Override
 	public void setEmptyVisible(boolean isVisible) {
 		emptyPanel.setVisible(isVisible);
+		contentPanel.setVisible(!isVisible);
 	}
 
 	@Override

@@ -105,6 +105,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		view.setMarkdownWidget(markdownWidget);
 		view.setBreadcrumbWidget(breadcrumb);
 		view.setModifiedCreatedBy(modifiedCreatedBy);
+		modifiedCreatedBy.setCreatedByUIVisible(false);
 	}
 	
 	public void clear(){
