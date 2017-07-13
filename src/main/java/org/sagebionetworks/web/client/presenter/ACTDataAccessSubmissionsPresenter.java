@@ -190,7 +190,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 						view.setIsValidatedProfileRequired(actAccessRequirement.getIsValidatedProfileRequired());
 						
 						actAccessRequirementWidget.setRequirement(actAccessRequirement, refreshCallback);
-						subjectsWidget.configure(actAccessRequirement.getSubjectIds(), true);
+						subjectsWidget.configure(actAccessRequirement.getSubjectIds());
 						
 						loadData();
 					} else {

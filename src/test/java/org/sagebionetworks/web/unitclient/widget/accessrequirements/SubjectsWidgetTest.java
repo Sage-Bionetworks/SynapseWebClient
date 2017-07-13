@@ -61,10 +61,9 @@ public class SubjectsWidgetTest {
 
 	@Test
 	public void testConfigureEntity() {
-		boolean hideIfLoadError = true;
 		when(mockRestrictableObjectDescriptor.getType()).thenReturn(RestrictableObjectType.ENTITY);
 		
-		widget.configure(Collections.singletonList(mockRestrictableObjectDescriptor), hideIfLoadError);
+		widget.configure(Collections.singletonList(mockRestrictableObjectDescriptor));
 		
 		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackCaptor.capture());
 		CallbackP<Boolean> callback = callbackCaptor.getValue();
@@ -76,13 +75,13 @@ public class SubjectsWidgetTest {
 		//verify widget created if ACT
 		callback.invoke(true);
 		verify(mockGinInjector).createEntityIdCellRenderer();
-		verify(mockEntityIdCellRendererImpl).setValue(ID, hideIfLoadError);
+		verify(mockEntityIdCellRendererImpl).setValue(ID, false);
 	}
 	
 	@Test
 	public void testConfigureTeam() {
 		when(mockRestrictableObjectDescriptor.getType()).thenReturn(RestrictableObjectType.TEAM);
-		widget.configure(Collections.singletonList(mockRestrictableObjectDescriptor), false);
+		widget.configure(Collections.singletonList(mockRestrictableObjectDescriptor));
 		
 		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackCaptor.capture());
 		CallbackP<Boolean> callback = callbackCaptor.getValue();

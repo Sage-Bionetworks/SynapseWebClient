@@ -169,7 +169,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		assertEquals(FileHandleAssociateType.AccessRequirementAttachment, fha.getAssociateObjectType());
 		assertEquals(AR_ID.toString(), fha.getAssociateObjectId());
 		assertEquals(FILE_HANDLE_ID, fha.getFileHandleId());
-		verify(mockSubjectsWidget).configure(mockSubjects, true);
+		verify(mockSubjectsWidget).configure(mockSubjects);
 		verify(mockView).setAreOtherAttachmentsRequired(true);
 		verify(mockView).setExpirationPeriod(expirationPeriod);
 		verify(mockView).setIsCertifiedUserRequired(true);
