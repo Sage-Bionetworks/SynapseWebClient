@@ -25,6 +25,7 @@ public class SubjectsWidget implements IsWidget {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
+		view.addStyleName("margin-bottom-5");
 		view.setVisible(false);
 	}
 
