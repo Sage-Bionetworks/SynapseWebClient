@@ -1345,6 +1345,9 @@ h1, h2, h3, h4, h5, h6 {
 .markdowntable.border {
     border: 2px solid #dddddd;
 }
+.markdowntable.center {
+	margin: auto;
+}
 
 /* Wrap styles will apply to short tables */
 .markdowntableWrap {
