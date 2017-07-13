@@ -44,16 +44,6 @@ public class SubjectsWidget implements IsWidget {
 			}
 		});
 	}
-
-	public void setDeleteCallback(final CallbackP<RestrictableObjectDescriptor> subjectDeletedCallback) {
-		subjectWidgetDeletedCallback = new CallbackP<SubjectWidget>() {
-			@Override
-			public void invoke(SubjectWidget subjectWidget) {
-				view.remove(subjectWidget);
-				subjectDeletedCallback.invoke(subjectWidget.getRestrictableObjectDescriptor());
-			}
-		};
-	}
 	
 	private void configureAfterACTCheck(List<RestrictableObjectDescriptor> subjects) {
 		view.clear();
@@ -63,5 +53,14 @@ public class SubjectsWidget implements IsWidget {
 			view.add(subjectWidget);
 		}
 	}
-	
+
+	public void setDeleteCallback(final CallbackP<RestrictableObjectDescriptor> subjectDeletedCallback) {
+		subjectWidgetDeletedCallback = new CallbackP<SubjectWidget>() {
+			@Override
+			public void invoke(SubjectWidget subjectWidget) {
+				view.remove(subjectWidget);
+				subjectDeletedCallback.invoke(subjectWidget.getRestrictableObjectDescriptor());
+			}
+		};
+	}	
 }

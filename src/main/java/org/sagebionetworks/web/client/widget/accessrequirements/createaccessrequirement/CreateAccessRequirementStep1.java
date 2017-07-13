@@ -37,7 +37,6 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	AccessRequirement accessRequirement;
 	SynapseClientAsync synapseClient;
 	SubjectsWidget subjectsWidget;
-	CallbackP<RestrictableObjectDescriptor> deleteSubjectCallback;
 	
 	@Inject
 	public CreateAccessRequirementStep1(
@@ -54,13 +53,14 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 		this.synapseClient = synapseClient;
 		view.setSubjects(subjectsWidget);
 		view.setPresenter(this);
-		deleteSubjectCallback = new CallbackP<RestrictableObjectDescriptor>() {
+		CallbackP<RestrictableObjectDescriptor> deleteSubjectCallback = new CallbackP<RestrictableObjectDescriptor>() {
 			@Override
 			public void invoke(RestrictableObjectDescriptor subject) {
 				subjects.remove(subject);
 				refreshSubjects();
 			}
 		};
+		subjectsWidget.setDeleteCallback(deleteSubjectCallback);
 	}
 	
 	@Override
@@ -129,12 +129,12 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 		if (subjects.size() > 0) {
 			if (subjects.get(0).getType().equals(RestrictableObjectType.ENTITY)) {
 				currentAccessType = ACCESS_TYPE.DOWNLOAD;
+				view.setEntityIdsString("");
 			} else {
 				currentAccessType = ACCESS_TYPE.PARTICIPATE;
+				view.setTeamIdsString("");
 			}
 		}
-		view.setEntityIdsString("");
-		view.setTeamIdsString("");
 	}
 	
 	public String getSubjectIds(List<RestrictableObjectDescriptor> subjects) {

@@ -2,10 +2,9 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	>
-	<bh:Span>
+	<bh:Span addStyleNames="margin-right-10">
 		<bh:Span ui:field="container" />
-		<b:Tooltip title="Delete subject">
-			<b:Button icon="TIMES" ui:field="deleteButton" size="SMALL" addStyleNames="displayInline margin-left-3" />
-		</b:Tooltip>
+		<b:Button icon="TIMES" ui:field="deleteButton" size="EXTRA_SMALL" type="DANGER" addStyleNames="displayInline margin-left-3" />
+		
 	</bh:Span>
 </ui:UiBinder>
