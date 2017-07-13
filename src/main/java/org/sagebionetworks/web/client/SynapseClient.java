@@ -492,4 +492,8 @@ public interface SynapseClient extends XsrfProtectedService {
 	void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException;
 
 	void addTeamMember(String userGroupId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
+
+	Long getOpenMembershipInvitationCount() throws RestServiceException;
+
+	Long getOpenMembershipRequestCount() throws RestServiceException;
 }

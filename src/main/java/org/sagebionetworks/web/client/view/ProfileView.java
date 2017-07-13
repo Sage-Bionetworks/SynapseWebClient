@@ -80,8 +80,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void createTeam(final String teamName);
 		void goTo(Place place);
 		void refreshTeams();
-		void updateTeamInvites(List<OpenUserInvitationBundle> invites);
-		void addMembershipRequests(int count);
 		void tabClicked(ProfileArea areaTab);
 		void unbindOrcId();
 		void certificationBadgeClicked();
@@ -91,7 +89,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void onImportLinkedIn();
 		void setGetCertifiedDismissed();
 		void resort(SortOptionEnum sortOption);
-		void refreshTeamInvites();
 		void newVerificationSubmissionClicked();
 		void editVerificationSubmissionClicked();
 		void setVerifyDismissed();
