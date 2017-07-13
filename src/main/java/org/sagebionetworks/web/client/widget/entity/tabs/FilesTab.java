@@ -394,7 +394,7 @@ public class FilesTab {
 				FilesTab.this.metadata.setAnnotationsVisible(annotationsShown);
 			}
 		});
-		fileHistoryShown = false;
+		fileHistoryShown = shownVersionNumber != null;
 		actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
