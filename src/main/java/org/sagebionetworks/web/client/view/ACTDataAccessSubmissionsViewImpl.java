@@ -84,10 +84,6 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	@UiField
 	Div subjectsContainer;
 	@UiField
-	AnchorListItem backLink;
-	@UiField
-	AnchorListItem reviewAccessorsLink;
-	@UiField
 	TextBox expirationPeriodTextbox;
 	@UiField
 	Well expirationDateUI;
@@ -110,12 +106,6 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 		headerWidget.configure(false);
 		header.add(headerWidget.asWidget());
 		footer.add(footerWidget.asWidget());
-		backLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onBack();
-			}
-		});
 		clearStateFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -144,12 +134,6 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onCreatedOnClick();
-			}
-		});
-		reviewAccessorsLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onReviewAccessors();
 			}
 		});
 	}

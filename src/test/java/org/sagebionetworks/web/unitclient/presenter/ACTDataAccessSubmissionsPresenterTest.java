@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
@@ -39,7 +38,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -219,17 +217,5 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		presenter.loadData();
 		verify(mockSynAlert).handleException(ex);
 		verify(mockLoadMoreContainer).setIsMore(false);
-	}
-	
-	@Test
-	public void testOnReviewAccessors() {
-		when(mockPlace.getParam(ACCESS_REQUIREMENT_ID_PARAM)).thenReturn(AR_ID.toString());
-		presenter.setPlace(mockPlace);
-		
-		presenter.onReviewAccessors();
-		verify(mockPlaceChanger).goTo(placeCaptor.capture());
-		Place place = placeCaptor.getValue();
-		assertTrue(place instanceof ACTAccessApprovalsPlace);
-		assertEquals(AR_ID.toString(), ((ACTAccessApprovalsPlace)place).getParam(ACTAccessApprovalsPlace.ACCESS_REQUIREMENT_ID_PARAM));
 	}
 }
