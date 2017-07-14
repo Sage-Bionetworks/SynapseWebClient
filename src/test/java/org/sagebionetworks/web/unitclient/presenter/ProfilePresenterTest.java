@@ -943,7 +943,6 @@ public class ProfilePresenterTest {
 		profilePresenter.getTeamBundles("12345",true);
 		verify(mockSynapseClient).getTeamsForUser(eq("12345"), anyBoolean(), any(AsyncCallback.class));
 		verify(mockTeamListWidget).addTeam(any(Team.class), any(Long.class));
-		verify(mockView).setTeamNotificationCount(anyString());
 	}
 	
 	@Test
@@ -973,7 +972,6 @@ public class ProfilePresenterTest {
 		//when request count is >0, should set the request count in the view
 		AsyncMockStubber.callSuccessWith(setupUserTeamBundles(mockSynapseClient, 5L, 1)).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.getTeamBundles("12345", true);
-		verify(mockView).setTeamNotificationCount("5");
 		verify(mockView, times(0)).showErrorMessage(anyString());
 	}
 	
@@ -1109,51 +1107,55 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testUpdateTeamInvites() {
-		//reset team invite count
-		profilePresenter.setInviteCount(0);
-		int inviteCount = 3;
-		List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
-		for (int i = 0; i < inviteCount; i++) {
-			invites.add(new OpenUserInvitationBundle());	
-		}
-		profilePresenter.updateTeamInvites(invites);
+		profilePresenter.setIsOwner(true);
+		Long inviteCount = 3L;
+		AsyncMockStubber.callSuccessWith(inviteCount).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		profilePresenter.updateMembershipInvitationCount();
 		
-		assertEquals(inviteCount, profilePresenter.getInviteCount());
-		verify(mockView).setTeamNotificationCount(eq(Integer.toString(inviteCount)));
+		assertEquals(inviteCount.intValue(), profilePresenter.getInviteCount());
+		verify(mockView).setTeamNotificationCount(eq(Long.toString(inviteCount)));
 	}
 	
 	@Test
 	public void testAddMembershipRequests() {
-		int beforeNotificationCount = 12; 
-		profilePresenter.setOpenRequestCount(beforeNotificationCount);
-		int expectedAfterNotificationCount = 1;
-		profilePresenter.addMembershipRequests(expectedAfterNotificationCount);
+		profilePresenter.setIsOwner(true);
+		Long beforeNotificationCount = 12L; 
+		AsyncMockStubber.callSuccessWith(beforeNotificationCount).when(mockSynapseClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
+		profilePresenter.updateMembershipRequestCount();
+		verify(mockView).setTeamNotificationCount(Long.toString(beforeNotificationCount));
 		
-		assertEquals(expectedAfterNotificationCount, profilePresenter.getOpenRequestCount());
-		verify(mockView).setTeamNotificationCount(eq(Integer.toString(expectedAfterNotificationCount)));
+		Long inviteCount = 10L;
+		AsyncMockStubber.callSuccessWith(inviteCount).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		profilePresenter.updateMembershipInvitationCount();
+		
+		verify(mockView).setTeamNotificationCount(eq(Long.toString(beforeNotificationCount + inviteCount)));
 	}
 	
 	@Test
 	public void testUpdateTeamInvitesZero() {
-		profilePresenter.setInviteCount(0);
-		profilePresenter.updateTeamInvites(new ArrayList<OpenUserInvitationBundle>());
-		
+		profilePresenter.setIsOwner(true);
+		AsyncMockStubber.callSuccessWith(0L).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		profilePresenter.updateMembershipInvitationCount();
+		verify(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		assertEquals(0, profilePresenter.getInviteCount());
 		verify(mockView, never()).setTeamNotificationCount(anyString());
 	}
 	
 	@Test
 	public void testAddMembershipRequestsZero() {
-		profilePresenter.setOpenRequestCount(0);
-		profilePresenter.addMembershipRequests(0);
+		profilePresenter.setIsOwner(true);
+		AsyncMockStubber.callSuccessWith(0L).when(mockSynapseClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
+		profilePresenter.updateMembershipRequestCount();
+		verify(mockSynapseClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
 		assertEquals(0, profilePresenter.getOpenRequestCount());
 		verify(mockView, never()).setTeamNotificationCount(anyString());
 	}
 	
 	@Test
-	public void testRefreshTeamsOwnerTeamsAndInvitesAddingNotifications() {
+	public void testRefreshTeamsOwnerTeamsAndInvites() {
 		int totalNotifications = 12; // must be even for tests to pass
 		int inviteCount = totalNotifications/2;
+		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
 		for (int i = 0; i < inviteCount; i++) {
 			invites.add(new OpenUserInvitationBundle());	
@@ -1161,14 +1163,10 @@ public class ProfilePresenterTest {
 		setupUserTeamBundles(mockSynapseClient, totalNotifications/2, 1);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.refreshTeams();
-		ArgumentCaptor<CallbackP> updateTeamInvitesCallback = ArgumentCaptor.forClass(CallbackP.class);
 		ArgumentCaptor<Callback> refreshTeamsCallback = ArgumentCaptor.forClass(Callback.class);
-		verify(mockTeamInviteWidget).configure(refreshTeamsCallback.capture(), updateTeamInvitesCallback.capture());
-		updateTeamInvitesCallback.getValue().invoke(invites);
-		//updates total notifications when finding team request updates and team invite updates
-		verify(mockView).setTeamNotificationCount(String.valueOf(totalNotifications/2));
+		verify(mockTeamInviteWidget).configure(refreshTeamsCallback.capture(), eq((CallbackP)null));
+		//updates total notifications when refreshing teams
 		verify(mockView).setTeamNotificationCount(String.valueOf(totalNotifications));
-		verify(mockView).clearTeamNotificationCount();
 		verify(mockView).addTeamsFilterTeam(any(Team.class));
 		verify(mockTeamListWidget).addTeam(any(Team.class), any(Long.class));
 		//heretofore, have verified proper behavior without adding
@@ -1180,12 +1178,10 @@ public class ProfilePresenterTest {
 		//doubling number of teams
 		setupUserTeamBundles(mockSynapseClient, totalNotifications/2, 2);
 		profilePresenter.refreshTeams();
-		verify(mockTeamInviteWidget, times(2)).configure(refreshTeamsCallback.capture(), updateTeamInvitesCallback.capture());
-		updateTeamInvitesCallback.getValue().invoke(invites);
+		verify(mockTeamInviteWidget, times(2)).configure(refreshTeamsCallback.capture(), eq((CallbackP)null));
+		
 		//invites are still set
-		verify(mockView).setTeamNotificationCount(String.valueOf(totalNotifications * 3 / 2));
-		verify(mockView).setTeamNotificationCount(String.valueOf(totalNotifications * 2));
-		verify(mockView, times(2)).clearTeamNotificationCount();
+		verify(mockView, atLeastOnce()).setTeamNotificationCount(String.valueOf(totalNotifications));
 		//called twice more, one for each added team
 		verify(mockView, times(3)).addTeamsFilterTeam(any(Team.class));
 		verify(mockTeamListWidget, times(3)).addTeam(any(Team.class), any(Long.class));
@@ -1198,10 +1194,8 @@ public class ProfilePresenterTest {
 		setupUserTeamBundles(mockSynapseClient, 0, 0);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.refreshTeams();
-		ArgumentCaptor<CallbackP> updateTeamInvitesCallback = ArgumentCaptor.forClass(CallbackP.class);
 		ArgumentCaptor<Callback> refreshTeamsCallback = ArgumentCaptor.forClass(Callback.class);
-		verify(mockTeamInviteWidget).configure(refreshTeamsCallback.capture(), updateTeamInvitesCallback.capture());
-		updateTeamInvitesCallback.getValue().invoke(invites);
+		verify(mockTeamInviteWidget).configure(refreshTeamsCallback.capture(), eq((CallbackP)null));
 		verify(mockView, never()).setTeamNotificationCount(String.valueOf(totalNotifications));
 		verify(mockTeamListWidget).showEmpty();
 	}
@@ -1209,6 +1203,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testRefreshTeamsOwnerOnlyTeams() {
 		int totalNotifications = 12; // must be even for tests to pass
+		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		int inviteCount = 0;
 		List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
 		for (int i = 0; i < inviteCount; i++) {
@@ -1217,13 +1212,10 @@ public class ProfilePresenterTest {
 		setupUserTeamBundles(mockSynapseClient, totalNotifications, 1);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.refreshTeams();
-		ArgumentCaptor<CallbackP> updateTeamInvitesCallback = ArgumentCaptor.forClass(CallbackP.class);
 		ArgumentCaptor<Callback> refreshTeamsCallback = ArgumentCaptor.forClass(Callback.class);
-		verify(mockTeamInviteWidget).configure(refreshTeamsCallback.capture(), updateTeamInvitesCallback.capture());
-		updateTeamInvitesCallback.getValue().invoke(invites);
+		verify(mockTeamInviteWidget).configure(refreshTeamsCallback.capture(), eq((CallbackP)null));
 		//called by updateTeamInvites due to second switch, even if invites doesn't change
-		verify(mockView, times(2)).setTeamNotificationCount(String.valueOf(totalNotifications));
-		verify(mockView).clearTeamNotificationCount();
+		verify(mockView).setTeamNotificationCount(String.valueOf(totalNotifications));
 		verify(mockView).addTeamsFilterTeam(any(Team.class));
 		verify(mockTeamListWidget).addTeam(any(Team.class), any(Long.class));
 	}
@@ -1231,6 +1223,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testRefreshTeamsOwnerOnlyInvites() {
 		int totalNotifications = 12; // must be even for tests to pass
+		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		int inviteCount = totalNotifications;
 		List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
 		for (int i = 0; i < inviteCount; i++) {
@@ -1239,12 +1232,9 @@ public class ProfilePresenterTest {
 		setupUserTeamBundles(mockSynapseClient, 0, 1);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.refreshTeams();
-		ArgumentCaptor<CallbackP> updateTeamInvitesCallback = ArgumentCaptor.forClass(CallbackP.class);
 		ArgumentCaptor<Callback> refreshTeamsCallback = ArgumentCaptor.forClass(Callback.class);
-		verify(mockTeamInviteWidget).configure(refreshTeamsCallback.capture(), updateTeamInvitesCallback.capture());
-		updateTeamInvitesCallback.getValue().invoke(invites);
+		verify(mockTeamInviteWidget).configure(refreshTeamsCallback.capture(), eq((CallbackP)null));
 		verify(mockView).setTeamNotificationCount(String.valueOf(totalNotifications));
-		verify(mockView).clearTeamNotificationCount();
 		verify(mockView).addTeamsFilterTeam(any(Team.class));
 		verify(mockTeamListWidget).addTeam(any(Team.class), any(Long.class));
 	}

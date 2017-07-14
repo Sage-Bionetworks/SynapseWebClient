@@ -421,4 +421,8 @@ public interface SynapseClientAsync {
 
 	void addTeamMember(String userGroupId, String teamId, String message, String hostPageBaseURL,
 			AsyncCallback<Void> callback);
+
+	void getOpenMembershipInvitationCount(AsyncCallback<Long> callback);
+
+	void getOpenMembershipRequestCount(AsyncCallback<Long> callback);
 }
