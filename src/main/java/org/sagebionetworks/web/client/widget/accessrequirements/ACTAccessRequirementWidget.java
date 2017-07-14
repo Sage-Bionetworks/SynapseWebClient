@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptorResponse;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
@@ -111,7 +112,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		});
 		createAccessRequirementButton.configure(ar, refreshCallback);
 		deleteAccessRequirementButton.configure(ar, refreshCallback);
-		subjectsWidget.configure(ar.getSubjectIds(), true);
+		subjectsWidget.configure(ar.getId().toString(), true);
 		manageAccessButton.configure(ar);
 		convertACTAccessRequirementButton.configure(ar, refreshCallback);
 		lazyLoadHelper.setIsConfigured();
@@ -149,6 +150,24 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	@Override
 	public void onRequestAccess() {
 		// request access via Jira
+		// get a subject id
+		synAlert.clear();
+		dataAccessClient.getSubjects(ar.getId().toString(), null, new AsyncCallback<RestrictableObjectDescriptorResponse>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			@Override
+			public void onSuccess(RestrictableObjectDescriptorResponse response) {
+				if (!response.getSubjects().isEmpty()) {
+					onRequestAccess(response.getSubjects().get(0).getId());
+				}
+			}
+		});
+		
+	}
+	
+	public void onRequestAccess(String subjectId) {
 		UserProfile userProfile = authController.getCurrentUserSessionData().getProfile();
 		if (userProfile==null) throw new IllegalStateException("UserProfile is null");
 		String primaryEmail = DisplayUtils.getPrimaryEmail(userProfile);
@@ -156,7 +175,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 				userProfile.getOwnerId(), 
 				DisplayUtils.getDisplayName(userProfile), 
 				primaryEmail, 
-				ar.getSubjectIds().get(0).getId(), 
+				subjectId,
 				ar.getId().toString());
 		popupUtils.openInNewWindow(createJiraIssueURL);
 	}

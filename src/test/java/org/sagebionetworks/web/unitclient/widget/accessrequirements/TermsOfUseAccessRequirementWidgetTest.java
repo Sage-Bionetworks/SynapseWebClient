@@ -63,8 +63,6 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	@Mock
 	SubjectsWidget mockSubjectsWidget;
 	@Mock
-	List<RestrictableObjectDescriptor> mockSubjectIds;
-	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
@@ -79,6 +77,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	Callback lazyLoadDataCallback;
 
 	public final static String ROOT_WIKI_ID = "777";
+	public final static Long AR_ID = 978682L;
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
@@ -93,7 +92,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 				mockDeleteAccessRequirementButton, 
 				mockLazyLoadHelper,
 				mockManageAccessButton);
-		when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
+		when(mockTermsOfUseAccessRequirement.getId()).thenReturn(AR_ID);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
 		lazyLoadDataCallback = callbackCaptor.getValue();
@@ -119,7 +118,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 		verify(mockCreateAccessRequirementButton).configure(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		verify(mockDeleteAccessRequirementButton).configure(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		boolean isHideIfLoadError = true;
-		verify(mockSubjectsWidget).configure(mockSubjectIds, isHideIfLoadError);
+		verify(mockSubjectsWidget).configure(AR_ID.toString(), isHideIfLoadError);
 	}
 	@Test
 	public void testSetRequirementWithWikiTerms() {

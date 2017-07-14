@@ -2,7 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.accessrequirements.createacces
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -24,10 +24,12 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptorResponse;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirementInterface;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1;
@@ -64,6 +66,10 @@ public class CreateAccessRequirementStep1Test {
 	RestrictableObjectDescriptor mockTeamRestrictableObjectDescriptor;
 	@Mock
 	SubjectsWidget mockSubjectsWidget;
+	@Mock
+	DataAccessClientAsync mockDataAccessClient;
+	@Mock
+	RestrictableObjectDescriptorResponse mockRestrictableObjectDescriptorResponse;
 	@Captor
 	ArgumentCaptor<AccessRequirement> arCaptor;
 	@Captor
@@ -84,7 +90,7 @@ public class CreateAccessRequirementStep1Test {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new CreateAccessRequirementStep1(mockView, mockActStep2, mockTouStep2, mockSynapseClient, mockSubjectsWidget);
+		widget = new CreateAccessRequirementStep1(mockView, mockActStep2, mockTouStep2, mockSynapseClient, mockSubjectsWidget, mockDataAccessClient);
 		widget.setModalPresenter(mockModalPresenter);
 		when(mockView.getTeamIds()).thenReturn(VIEW_TEAM_IDS);
 		when(mockView.getEntityIds()).thenReturn(VIEW_ENTITY_IDS);
@@ -95,14 +101,12 @@ public class CreateAccessRequirementStep1Test {
 		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockSynapseClient).createOrUpdateAccessRequirement(any(AccessRequirement.class),  any(AsyncCallback.class));
 		
 		when(mockView.isACTAccessRequirementType()).thenReturn(true);
-		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(new ArrayList<RestrictableObjectDescriptor>());
-		when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(new ArrayList<RestrictableObjectDescriptor>());
 	}
 
 	@Test
 	public void testConfigureWithEntityRod() {
 		widget.configure(mockEntityRestrictableObjectDescriptor);
-		verify(mockSubjectsWidget).configure(listCaptor.capture(), eq(IS_HIDE_SUBJECT_IF_LOAD_ERROR));
+		verify(mockSubjectsWidget).addSubjects(listCaptor.capture(), eq(IS_HIDE_SUBJECT_IF_LOAD_ERROR));
 		assertEquals(mockEntityRestrictableObjectDescriptor, listCaptor.getValue().get(0));
 		//go to the next page
 		widget.onPrimary();
@@ -121,7 +125,7 @@ public class CreateAccessRequirementStep1Test {
 	@Test
 	public void testConfigureWithTeamRod() {
 		widget.configure(mockTeamRestrictableObjectDescriptor);
-		verify(mockSubjectsWidget).configure(listCaptor.capture(), eq(IS_HIDE_SUBJECT_IF_LOAD_ERROR));
+		verify(mockSubjectsWidget).addSubjects(listCaptor.capture(), eq(IS_HIDE_SUBJECT_IF_LOAD_ERROR));
 		assertEquals(mockTeamRestrictableObjectDescriptor, listCaptor.getValue().get(0));
 		
 		when(mockView.isACTAccessRequirementType()).thenReturn(false);
@@ -151,7 +155,8 @@ public class CreateAccessRequirementStep1Test {
 
 	@Test
 	public void testConfigureWithACTAccessRequirement() {
-		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(Collections.singletonList(mockEntityRestrictableObjectDescriptor));
+		AsyncMockStubber.callSuccessWith(mockRestrictableObjectDescriptorResponse).when(mockDataAccessClient).getSubjects(anyString(), anyString(), any(AsyncCallback.class));
+		when(mockRestrictableObjectDescriptorResponse.getSubjects()).thenReturn(Collections.singletonList(mockEntityRestrictableObjectDescriptor));
 		widget.configure(mockACTAccessRequirement);
 		// on save, we should be updating the ar we passed in
 		widget.onPrimary();
@@ -162,7 +167,8 @@ public class CreateAccessRequirementStep1Test {
 	
 	@Test
 	public void testConfigureWithToUAccessRequirement() {
-		when(mockTermsOfUseAccessRequirement.getSubjectIds()).thenReturn(Collections.singletonList(mockEntityRestrictableObjectDescriptor));
+		AsyncMockStubber.callSuccessWith(mockRestrictableObjectDescriptorResponse).when(mockDataAccessClient).getSubjects(anyString(), anyString(), any(AsyncCallback.class));
+		when(mockRestrictableObjectDescriptorResponse.getSubjects()).thenReturn(Collections.singletonList(mockEntityRestrictableObjectDescriptor));
 		widget.configure(mockTermsOfUseAccessRequirement);
 		// on save, we should be updating the ar we passed in
 		//also verify any errors are shown
@@ -175,6 +181,17 @@ public class CreateAccessRequirementStep1Test {
 		verify(mockSynapseClient).createOrUpdateAccessRequirement(eq(mockTermsOfUseAccessRequirement),  any(AsyncCallback.class));
 		verify(mockModalPresenter).setErrorMessage(error);
 	}
+	
+	@Test
+	public void testGetSubjectsFailure() {
+		String errorMessage = "errors";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockDataAccessClient).getSubjects(anyString(), anyString(), any(AsyncCallback.class));
+		
+		widget.configure(mockACTAccessRequirement);
+		
+		verify(mockModalPresenter).setErrorMessage(errorMessage);
+	}
+
 	
 	@Test
 	public void testGetSubjectIds() {

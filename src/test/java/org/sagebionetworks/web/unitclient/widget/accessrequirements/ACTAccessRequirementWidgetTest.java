@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -8,7 +7,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -18,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptorResponse;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
@@ -73,8 +72,6 @@ public class ACTAccessRequirementWidgetTest {
 	SubjectsWidget mockSubjectsWidget;
 	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
-	@Mock
-	List<RestrictableObjectDescriptor> mockSubjectIds;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Mock
@@ -97,10 +94,15 @@ public class ACTAccessRequirementWidgetTest {
 	ConvertACTAccessRequirementButton mockConvertACTAccessRequirementButton;
 	@Mock
 	Callback mockRefreshCallback;
+	@Mock
+	RestrictableObjectDescriptorResponse mockRestrictableObjectDescriptorResponse;
+	@Mock
+	RestrictableObjectDescriptor mockRestrictableObjectDescriptor;
 	
 	Callback lazyLoadDataCallback;
 	
 	public final static String ROOT_WIKI_ID = "777";
+	public final static Long AR_ID = 978682L;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -122,7 +124,6 @@ public class ACTAccessRequirementWidgetTest {
 				mockManageAccessButton,
 				mockConvertACTAccessRequirementButton);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
-		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
 		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
 		lazyLoadDataCallback = callbackCaptor.getValue();
@@ -131,7 +132,7 @@ public class ACTAccessRequirementWidgetTest {
 		when(mockAuthController.getCurrentUserSessionData()).thenReturn(mockUserSessionData);
 		when(mockUserSessionData.getProfile()).thenReturn(mockProfile);
 		when(mockProfile.getEmails()).thenReturn(Collections.singletonList("email@email.com"));
-		when(mockSubjectIds.get(anyInt())).thenReturn(new RestrictableObjectDescriptor());
+		when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
 	}
 
 	@Test
@@ -153,7 +154,7 @@ public class ACTAccessRequirementWidgetTest {
 		verify(mockCreateAccessRequirementButton).configure(mockACTAccessRequirement, mockRefreshCallback);
 		verify(mockDeleteAccessRequirementButton).configure(mockACTAccessRequirement, mockRefreshCallback);
 		boolean isHideIfLoadError = true;
-		verify(mockSubjectsWidget).configure(mockSubjectIds, isHideIfLoadError);
+		verify(mockSubjectsWidget).configure(AR_ID.toString(), isHideIfLoadError);
 		verify(mockLazyLoadHelper).setIsConfigured();
 	}
 	@Test
@@ -209,7 +210,8 @@ public class ACTAccessRequirementWidgetTest {
 		lazyLoadDataCallback.invoke();
 		String requestAccessURLString = "requestAccessURLString";
 		when(mockJiraURLHelper.createRequestAccessIssue(any(String.class),any(String.class),any(String.class),any(String.class),any(String.class))).thenReturn(requestAccessURLString);
-		
+		AsyncMockStubber.callSuccessWith(mockRestrictableObjectDescriptorResponse).when(mockDataAccessClient).getSubjects(eq(AR_ID.toString()), anyString(), any(AsyncCallback.class));
+		when(mockRestrictableObjectDescriptorResponse.getSubjects()).thenReturn(Collections.singletonList(mockRestrictableObjectDescriptor));
 		widget.onRequestAccess();
 		
 		verify(mockPopupUtils).openInNewWindow(requestAccessURLString);
