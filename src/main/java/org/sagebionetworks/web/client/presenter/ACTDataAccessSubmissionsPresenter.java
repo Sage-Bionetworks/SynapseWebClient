@@ -23,7 +23,6 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
@@ -298,14 +297,5 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	public void onCreatedOnClick() {
 		isSortedAsc = !isSortedAsc;
 		loadData();
-	}
-	@Override
-	public void onBack() {
-		globalAppState.gotoLastPlace();
-	}
-	@Override
-	public void onReviewAccessors() {
-		ACTAccessApprovalsPlace place = new ACTAccessApprovalsPlace(ACTAccessApprovalsPlace.ACCESS_REQUIREMENT_ID_PARAM + "=" + actAccessRequirementId);
-		globalAppState.getPlaceChanger().goTo(place);
 	}
 }
