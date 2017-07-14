@@ -15,7 +15,7 @@
 					<b:TextBox ui:field="entityIds" placeholder="Enter Synapse IDs (i.e. 'syn123, syn456')"
 						autoComplete="false" />
 					<b:InputGroupButton>
-						<b:Button ui:field="synapseMultiIdButton" text="Set Entities" />
+						<b:Button ui:field="synapseMultiIdButton" text="Add Entities" icon="PLUS" />
 					</b:InputGroupButton>
 					<w:HelpWidget helpMarkdown="Enter Synapse IDs (i.e. `syn123, syn456`)" 
 								 addStyleNames="margin-left-5 moveup-10" placement="LEFT"/>
@@ -24,7 +24,7 @@
 					<b:TextBox ui:field="teamIds" placeholder="Enter Team IDs (i.e. '123, 456')"
 						autoComplete="false" />
 					<b:InputGroupButton>
-						<b:Button ui:field="teamMultiIdButton" text="Set Teams" />
+						<b:Button ui:field="teamMultiIdButton" text="Add Teams" icon="PLUS" />
 					</b:InputGroupButton>
 					<w:HelpWidget helpMarkdown="Enter Team IDs (i.e. `123, 456`)" 
 								 addStyleNames="margin-left-5 moveup-10" placement="LEFT"/>

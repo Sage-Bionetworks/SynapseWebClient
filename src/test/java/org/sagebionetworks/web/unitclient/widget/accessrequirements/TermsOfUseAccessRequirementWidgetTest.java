@@ -118,8 +118,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 		verify(mockView).showTermsUI();
 		verify(mockCreateAccessRequirementButton).configure(mockTermsOfUseAccessRequirement, mockRefreshCallback);
 		verify(mockDeleteAccessRequirementButton).configure(mockTermsOfUseAccessRequirement, mockRefreshCallback);
-		boolean isHideIfLoadError = true;
-		verify(mockSubjectsWidget).configure(mockSubjectIds, isHideIfLoadError);
+		verify(mockSubjectsWidget).configure(mockSubjectIds);
 	}
 	@Test
 	public void testSetRequirementWithWikiTerms() {

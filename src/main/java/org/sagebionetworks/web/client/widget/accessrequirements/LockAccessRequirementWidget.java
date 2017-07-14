@@ -27,7 +27,7 @@ public class LockAccessRequirementWidget implements IsWidget {
 	public void setRequirement(LockAccessRequirement ar, Callback refreshCallback) {
 		this.ar = ar;
 		deleteAccessRequirementButton.configure(ar, refreshCallback);
-		subjectsWidget.configure(ar.getSubjectIds(), true);
+		subjectsWidget.configure(ar.getSubjectIds());
 	}
 	
 	public void addStyleNames(String styleNames) {

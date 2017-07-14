@@ -152,8 +152,7 @@ public class ACTAccessRequirementWidgetTest {
 		verify(mockView).showTermsUI();
 		verify(mockCreateAccessRequirementButton).configure(mockACTAccessRequirement, mockRefreshCallback);
 		verify(mockDeleteAccessRequirementButton).configure(mockACTAccessRequirement, mockRefreshCallback);
-		boolean isHideIfLoadError = true;
-		verify(mockSubjectsWidget).configure(mockSubjectIds, isHideIfLoadError);
+		verify(mockSubjectsWidget).configure(mockSubjectIds);
 		verify(mockLazyLoadHelper).setIsConfigured();
 	}
 	@Test
