@@ -5,8 +5,8 @@ import com.google.gwt.place.shared.Prefix;
 
 public class AccessRequirementsPlace extends ParameterizedPlace{
 	
-	public static final String ENTITY_ID_PARAM = "ID";
-	public static final String TEAM_ID_PARAM = "teamID";
+	public static final String ID_PARAM = "ID";
+	public static final String TYPE_PARAM = "TYPE";
 	
 	public AccessRequirementsPlace(String token) {
 		super(token);

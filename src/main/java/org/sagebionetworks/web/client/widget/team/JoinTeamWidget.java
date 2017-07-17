@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirementInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -121,7 +122,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.buttonText = buttonText;
 		view.clear();
 		synAlert.clear();
-		accessRequirementsUrl = "#!AccessRequirements:"+AccessRequirementsPlace.TEAM_ID_PARAM+"="+teamId;
+		accessRequirementsUrl = "#!AccessRequirements:"+AccessRequirementsPlace.ID_PARAM + "=" + teamId + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.TEAM.toString();
 		if (buttonText != null && !buttonText.isEmpty()) {
 			view.setJoinButtonsText(buttonText);
 		}
