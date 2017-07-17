@@ -40,6 +40,15 @@ public interface StorageLocationWidgetView {
 	
 	void selectExternalS3Storage();
 	boolean isExternalS3StorageSelected();
+	void selectExternalObjectStore();
+	boolean isExternalObjectStoreSelected();
+	void setExternalObjectStoreBanner(String banner);
+	String getExternalObjectStoreBanner();
+	void setExternalObjectStoreBucket(String bucket);
+	String getExternalObjectStoreBucket();
+	void setExternalObjectStoreEndpointUrl(String url);
+	String getExternalObjectStoreEndpointUrl();
+	
 	String getBucket();
 	void setBucket(String bucket);
 	String getBaseKey();

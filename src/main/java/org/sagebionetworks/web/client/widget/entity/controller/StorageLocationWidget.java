@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.file.UploadType;
+import org.sagebionetworks.repo.model.project.ExternalObjectStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
@@ -89,6 +90,12 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 						view.setBucket(setting.getBucket().trim());
 						view.setExternalS3Banner(setting.getBanner().trim());
 						view.selectExternalS3Storage();
+					} else if (location instanceof ExternalObjectStorageLocationSetting) {
+						ExternalObjectStorageLocationSetting setting = (ExternalObjectStorageLocationSetting) location;
+						view.setExternalObjectStoreBanner(setting.getBanner().trim());
+						view.setExternalObjectStoreBucket(setting.getBucket().trim());
+						view.setExternalObjectStoreEndpointUrl(setting.getEndpointUrl().trim());
+						view.selectExternalObjectStore();
 					} else if (location instanceof ExternalStorageLocationSetting) {
 						view.setSFTPVisible(true);
 						ExternalStorageLocationSetting setting= (ExternalStorageLocationSetting) location;
@@ -151,6 +158,13 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			setting.setBanner(view.getExternalS3Banner().trim());
 			setting.setBucket(view.getBucket().trim());
 			setting.setBaseKey(view.getBaseKey().trim());
+			setting.setUploadType(UploadType.S3);
+			return setting;
+		} else if (view.isExternalObjectStoreSelected()) {
+			ExternalObjectStorageLocationSetting setting = new ExternalObjectStorageLocationSetting();
+			setting.setBanner(view.getExternalObjectStoreBanner().trim());
+			setting.setBucket(view.getExternalObjectStoreBucket().trim());
+			setting.setEndpointUrl(view.getExternalObjectStoreEndpointUrl().trim());
 			setting.setUploadType(UploadType.S3);
 			return setting;
 		} else if (view.isSFTPStorageSelected()) {

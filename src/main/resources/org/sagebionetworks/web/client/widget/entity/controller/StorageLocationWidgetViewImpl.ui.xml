@@ -17,6 +17,7 @@
 			     <b:FormGroup>
 			     	<b:Radio ui:field="synapseStorageButton" name="storageLocationRadio" text="Synapse Storage" addStyleNames="font-size-18"/>
 			     	<b:Radio ui:field="externalS3Button" name="storageLocationRadio" text="Amazon S3 Bucket" addStyleNames="font-size-18" />
+			     	<b:Radio ui:field="externalObjectStoreButton"  name="storageLocationRadio"  text="External Object Store" addStyleNames="font-size-18" />
 			     	<bh:Div addStyleNames="margin-left-20" ui:field="s3Collapse">
 			     		<bh:Div addStyleNames="margin-bottom-10">
 			     			<b:Anchor href="http://docs.synapse.org/articles/custom_storage_location.html" icon="QUESTION_CIRCLE" target="_blank" text="More info..." />
@@ -36,8 +37,28 @@
 							</b:InputGroupButton>
 							<b:TextBox ui:field="externalS3BannerField" addStyleNames="margin-bottom-10 hide-resize padding-left-10" />
 						</b:InputGroup>
-				     	
 					</bh:Div>
+					<bh:Div addStyleNames="margin-left-20" ui:field="externalObjectStoreCollapse">
+			     		<bh:Div addStyleNames="margin-bottom-10">
+			     			<b:Anchor href="http://docs.synapse.org/articles/custom_storage_location.html" icon="QUESTION_CIRCLE" target="_blank" text="More info..." />
+			     		</bh:Div>
+						<b:FormLabel>Bucket</b:FormLabel>
+				     	<b:TextBox ui:field="externalObjectStoreBucket" addStyleNames="margin-bottom-10 hide-resize "/>
+				     	<b:FormLabel>Endpoint URL</b:FormLabel>
+				     	<b:TextBox ui:field="externalObjectStoreEndpoint" addStyleNames="margin-bottom-10 hide-resize "/>
+				     	<b:FormLabel>Banner</b:FormLabel>
+
+						<b:InputGroup width="100%">
+							<b:InputGroupButton>
+								<b:Button ui:field="externalObjectStoreBannerDropdownButton"
+									dataToggle="DROPDOWN" height="28px" />
+								<b:DropDownMenu ui:field="externalObjectStoreBannerOptions">
+								</b:DropDownMenu>
+							</b:InputGroupButton>
+							<b:TextBox ui:field="externalObjectStoreBannerField" addStyleNames="margin-bottom-10 hide-resize padding-left-10" />
+						</b:InputGroup>
+					</bh:Div>
+					
 			     	<b:Radio ui:field="sftpButton" name="storageLocationRadio" text="SFTP Server" addStyleNames="font-size-18"/>
 			     	<bh:Div addStyleNames="margin-left-20" ui:field="sftpCollapse">
 			         	<b:FormLabel for="sftpUrlField" >URL</b:FormLabel>

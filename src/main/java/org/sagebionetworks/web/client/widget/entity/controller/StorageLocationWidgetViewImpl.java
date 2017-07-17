@@ -58,6 +58,8 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	Radio externalS3Button;
 	@UiField
 	Radio sftpButton;
+	@UiField
+	Radio externalObjectStoreButton;
 	
 	@UiField
 	Button saveButton;
@@ -69,6 +71,19 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	Div s3Collapse;
 	@UiField
 	Div sftpCollapse;
+	@UiField
+	Div externalObjectStoreCollapse;
+	
+	@UiField
+	TextBox externalObjectStoreBucket;
+	@UiField
+	TextBox externalObjectStoreEndpoint;
+	@UiField
+	Button externalObjectStoreBannerDropdownButton;
+	@UiField
+	DropDownMenu externalObjectStoreBannerOptions;
+	@UiField
+	TextBox externalObjectStoreBannerField;
 	
 	Widget widget;
 	Presenter presenter;
@@ -92,24 +107,36 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 		synapseStorageButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				s3Collapse.setVisible(false);
-				sftpCollapse.setVisible(false);
+				hideCollapses();
 			}
 		});
 		externalS3Button.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				hideCollapses();
 				s3Collapse.setVisible(true);
-				sftpCollapse.setVisible(false);
 			}
 		});
 		sftpButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				s3Collapse.setVisible(false);
+				hideCollapses();
 				sftpCollapse.setVisible(true);
 			}
 		});
+		externalObjectStoreButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				hideCollapses();
+				externalObjectStoreCollapse.setVisible(true);
+			}
+		});
+	}
+	
+	private void hideCollapses() {
+		externalObjectStoreCollapse.setVisible(false);
+		s3Collapse.setVisible(false);
+		sftpCollapse.setVisible(false);
 	}
 	
 	@Override
@@ -129,6 +156,9 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	
 	@Override
 	public void clear() {
+		externalObjectStoreBucket.setText("");
+		externalObjectStoreEndpoint.setText("");
+		externalObjectStoreBannerField.setText("");
 		bucketField.setText("");
 		baseKeyField.setText("");
 		sftpUrlField.setText("sftp://");
@@ -138,6 +168,7 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 		s3Collapse.setVisible(false);
 		sftpCollapse.setVisible(false);
 		externalS3BannerOptions.clear();
+		externalObjectStoreBannerOptions.clear();
 		sftpBannerOptions.clear();
 	}
 
@@ -153,9 +184,8 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 
 	@Override
 	public void selectSynapseStorage() {
+		hideCollapses();
 		synapseStorageButton.setValue(true);
-		s3Collapse.setVisible(false);
-		sftpCollapse.setVisible(false);
 	}
 
 	@Override
@@ -165,9 +195,9 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 
 	@Override
 	public void selectExternalS3Storage() {
+		hideCollapses();
 		externalS3Button.setValue(true);
 		s3Collapse.setVisible(true);
-		sftpCollapse.setVisible(false);
 	}
 
 	@Override
@@ -182,11 +212,45 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 
 	@Override
 	public void selectSFTPStorage() {
+		hideCollapses();
 		sftpButton.setValue(true);
-		s3Collapse.setVisible(false);
 		sftpCollapse.setVisible(true);
 	}
 
+	@Override
+	public String getExternalObjectStoreBanner() {
+		return externalObjectStoreBannerField.getValue();
+	}
+	@Override
+	public String getExternalObjectStoreBucket() {
+		return externalObjectStoreBucket.getValue();
+	}
+	@Override
+	public String getExternalObjectStoreEndpointUrl() {
+		return externalObjectStoreEndpoint.getValue();
+	}
+	@Override
+	public boolean isExternalObjectStoreSelected() {
+		return externalObjectStoreButton.getValue();
+	}
+	@Override
+	public void selectExternalObjectStore() {
+		hideCollapses();
+		externalObjectStoreButton.setValue(true);
+		externalObjectStoreCollapse.setVisible(true);
+	}
+	@Override
+	public void setExternalObjectStoreBanner(String banner) {
+		externalObjectStoreBannerField.setValue(banner);
+	}
+	@Override
+	public void setExternalObjectStoreBucket(String bucket) {
+		externalObjectStoreBucket.setValue(bucket);
+	}
+	@Override
+	public void setExternalObjectStoreEndpointUrl(String url) {
+		externalObjectStoreEndpoint.setValue(url);
+	}
 	@Override
 	public boolean isSFTPStorageSelected() {
 		return sftpButton.getValue();
@@ -238,6 +302,7 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	public void setBannerSuggestions(List<String> banners) {
 		addBannerOptions(sftpBannerField, sftpBannerOptions, banners);
 		addBannerOptions(externalS3BannerField, externalS3BannerOptions, banners);
+		addBannerOptions(externalObjectStoreBannerField, externalObjectStoreBannerOptions, banners);
 	}
 	
 	private void addBannerOptions(final TextBox field, DropDownMenu menu, List<String> banners) {
@@ -259,6 +324,7 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	public void setBannerDropdownVisible(boolean isVisible) {
 		externalS3BannerDropdownButton.setVisible(isVisible);
 		sftpBannerDropdownButton.setVisible(isVisible);
+		externalObjectStoreBannerDropdownButton.setVisible(isVisible);
 	}
 	@Override
 	public void setSFTPVisible(boolean visible) {
