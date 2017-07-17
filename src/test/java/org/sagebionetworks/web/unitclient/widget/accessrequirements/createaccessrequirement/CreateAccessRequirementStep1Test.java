@@ -80,7 +80,6 @@ public class CreateAccessRequirementStep1Test {
 	public static final String ROD_ENTITY_ID = "syn97992";
 	public static final String ROD_TEAM_ID = "87654";
 	
-	public static final boolean IS_HIDE_SUBJECT_IF_LOAD_ERROR = false;
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
@@ -102,7 +101,7 @@ public class CreateAccessRequirementStep1Test {
 	@Test
 	public void testConfigureWithEntityRod() {
 		widget.configure(mockEntityRestrictableObjectDescriptor);
-		verify(mockSubjectsWidget).configure(listCaptor.capture(), eq(IS_HIDE_SUBJECT_IF_LOAD_ERROR));
+		verify(mockSubjectsWidget).configure(listCaptor.capture());
 		assertEquals(mockEntityRestrictableObjectDescriptor, listCaptor.getValue().get(0));
 		//go to the next page
 		widget.onPrimary();
@@ -121,7 +120,7 @@ public class CreateAccessRequirementStep1Test {
 	@Test
 	public void testConfigureWithTeamRod() {
 		widget.configure(mockTeamRestrictableObjectDescriptor);
-		verify(mockSubjectsWidget).configure(listCaptor.capture(), eq(IS_HIDE_SUBJECT_IF_LOAD_ERROR));
+		verify(mockSubjectsWidget).configure(listCaptor.capture());
 		assertEquals(mockTeamRestrictableObjectDescriptor, listCaptor.getValue().get(0));
 		
 		when(mockView.isACTAccessRequirementType()).thenReturn(false);

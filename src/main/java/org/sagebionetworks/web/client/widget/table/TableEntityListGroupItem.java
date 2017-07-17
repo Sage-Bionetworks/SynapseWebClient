@@ -3,24 +3,20 @@ package org.sagebionetworks.web.client.widget.table;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.LinkedGroupItemText;
 import org.gwtbootstrap3.client.ui.ListGroupItem;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
-import org.gwtbootstrap3.client.ui.html.Br;
 import org.gwtbootstrap3.client.ui.html.ClearFix;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.user.client.ui.TextBox;
 
 /**
  * Simple list item for an entity.
@@ -65,6 +61,17 @@ public class TableEntityListGroupItem extends ListGroupItem {
 //		hiddenOnXs.add(modifiedByUserBadge);
 //		modifiedByUserBadge.asWidget().addStyleName("movedown-9");
 		
+		final TextBox synIdTextBox = new TextBox();
+		synIdTextBox.addStyleName("hidden-xs right border-none noBackground margin-right-15");
+		synIdTextBox.setReadOnly(true);
+		synIdTextBox.setWidth("130px");
+		synIdTextBox.setValue(header.getId());
+		synIdTextBox.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				synIdTextBox.selectAll();
+			}
+		});
 		anchor = new Anchor("#!Synapse:"+header.getId());
 		anchor.setTarget("_blank");
 		anchor.setIcon(IconType.EXTERNAL_LINK);
@@ -75,6 +82,7 @@ public class TableEntityListGroupItem extends ListGroupItem {
 		div.add(iconHeading);
 		div.add(heading);
 		div.add(anchor);
+		div.add(synIdTextBox);
 //		div.add(createdOnDiv);
 		this.add(div); 
 	}

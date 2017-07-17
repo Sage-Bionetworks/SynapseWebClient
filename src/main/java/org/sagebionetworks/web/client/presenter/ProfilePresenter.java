@@ -52,7 +52,6 @@ import org.sagebionetworks.web.client.widget.verification.VerificationSubmission
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.LinkedInInfo;
-import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
@@ -185,7 +184,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		refreshTeamsCallback = new Callback() {
 			@Override
 			public void invoke() {
-				refreshTeams();
+				refreshTeamsForFilter();
 			}
 		};
 	}
@@ -567,32 +566,68 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		currentProjectSort = sort;
 		view.setSortText(sort.sortText);
 		refreshProjects();
-	}	
+	}
+	
+	public void refreshTeamsForFilter() {
+		updateMembershipInvitationCount();
+		updateMembershipRequestCount();
+		getTeamBundles(currentUserId, false);
+	}
 	
 	@Override
 	public void refreshTeams() {
-		view.clearTeamNotificationCount();
-		if (isOwner)
-			refreshTeamInvites();
+		updateMembershipInvitationCount();
+		updateMembershipRequestCount();
+		refreshTeamInvites();
 		getTeamBundles(currentUserId, isOwner);
 	}
 	
-	@Override
 	public void refreshTeamInvites() {
-		CallbackP<List<OpenUserInvitationBundle>> openTeamInvitationsCallback = new CallbackP<List<OpenUserInvitationBundle>>() {
-			@Override
-			public void invoke(List<OpenUserInvitationBundle> invites) {
-				updateTeamInvites(invites);
-			}
-		};
-		openInvitesWidget.configure(new Callback() {
-			@Override
-			public void invoke() {
-				//refresh the teams after joining one
-				refreshTeams();
-			}
-		}, openTeamInvitationsCallback);
+		if (isOwner) {
+			openInvitesWidget.configure(new Callback() {
+				@Override
+				public void invoke() {
+					//refresh the teams after joining one
+					refreshTeams();
+				}
+			}, null);
+		}
 	}
+	
+	public void updateMembershipRequestCount() {
+		if (isOwner) {
+			openRequestCount = 0;
+			synapseClient.getOpenMembershipRequestCount(new AsyncCallback<Long>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					teamSynAlert.handleException(caught);
+				}
+				
+				@Override
+				public void onSuccess(Long count) {
+					setMembershipRequestsCount(count.intValue());
+				}
+			});
+		}
+	}
+	
+	public void updateMembershipInvitationCount() {
+		if (isOwner) {
+			inviteCount = 0;
+			synapseClient.getOpenMembershipInvitationCount(new AsyncCallback<Long>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					teamSynAlert.handleException(caught);
+				}
+				
+				@Override
+				public void onSuccess(Long count) {
+					setTeamInvitationsCount(count.intValue());
+				}
+			});
+		}
+	}
+	
 	
 	public void getTeamBundles(String userId, final boolean includeRequestCount) {
 		teamSynAlert.clear();
@@ -603,7 +638,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			public void onSuccess(List<TeamRequestBundle> teamsRequestBundles) {
 				myTeamsWidget.clear();
 				if (teamsRequestBundles != null && teamsRequestBundles.size() > 0) {
-					int totalRequestCount = 0;
 					view.addMyTeamProjectsFilter();
 					for (TeamRequestBundle teamAndRequest: teamsRequestBundles) {
 						// requests will always be 0 or greater
@@ -611,12 +645,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						Team team = teamAndRequest.getTeam();
 						myTeamsWidget.addTeam(team, requestCount);
 						view.addTeamsFilterTeam(team);
-						totalRequestCount += requestCount;
 					}
 					view.setTeamsFilterVisible(true);
-					if (includeRequestCount) {
-						addMembershipRequests(totalRequestCount);
-					}
 				} else {
 					myTeamsWidget.showEmpty();
 					view.setTeamsFilterVisible(false);
@@ -630,7 +660,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 		});
 	}
-	
 	
 	public void getMoreChallenges() {
 		challengeSynAlert.clear();
@@ -932,21 +961,22 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	@Override
-	public void updateTeamInvites(List<OpenUserInvitationBundle> invites) {
-		if (invites != null && invites.size() != inviteCount) {
-			inviteCount = invites.size();
-		}
-		if (openRequestCount + inviteCount > 0)
-			view.setTeamNotificationCount(Integer.toString(openRequestCount + inviteCount));
+	public void setTeamInvitationsCount(int count) {
+		inviteCount = count;
+		refreshTeamNotificationCount();
 	}
 
-	@Override
-	public void addMembershipRequests(int count) {
-		if (count != openRequestCount) 
-			openRequestCount = count;		
-		if (openRequestCount + inviteCount > 0)
+	public void setMembershipRequestsCount(int count) {
+		openRequestCount = count;		
+		refreshTeamNotificationCount();
+	}
+	
+	public void refreshTeamNotificationCount() {
+		if (openRequestCount + inviteCount > 0) {
 			view.setTeamNotificationCount(Integer.toString(openRequestCount + inviteCount));
+		} else {
+			view.clearTeamNotificationCount();
+		}
 	}
 	
 	/**

@@ -111,9 +111,14 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 		moreInfoButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				dialog.show();
+				presenter.onMoreInfo();
 			}
 		});
+	}
+	
+	@Override
+	public void showMoreInfoDialog() {
+		dialog.show();
 	}
 	
 	@Override

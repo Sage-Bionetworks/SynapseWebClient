@@ -111,7 +111,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		});
 		createAccessRequirementButton.configure(ar, refreshCallback);
 		deleteAccessRequirementButton.configure(ar, refreshCallback);
-		subjectsWidget.configure(ar.getSubjectIds(), true);
+		subjectsWidget.configure(ar.getSubjectIds());
 		manageAccessButton.configure(ar);
 		convertACTAccessRequirementButton.configure(ar, refreshCallback);
 		lazyLoadHelper.setIsConfigured();

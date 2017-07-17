@@ -94,7 +94,7 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		});
 		createAccessRequirementButton.configure(ar, refreshCallback);
 		deleteAccessRequirementButton.configure(ar, refreshCallback);
-		subjectsWidget.configure(ar.getSubjectIds(), true);
+		subjectsWidget.configure(ar.getSubjectIds());
 		manageAccessButton.configure(ar);
 		lazyLoadHelper.setIsConfigured();
 	}
@@ -110,7 +110,6 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 		}
 	}
 	
-
 	public void refreshApprovalState() {
 		dataAccessClient.getAccessRequirementStatus(ar.getId().toString(), new AsyncCallback<AccessRequirementStatus>() {
 			@Override

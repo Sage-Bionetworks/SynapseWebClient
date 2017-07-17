@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.accessrequirements.SubjectsWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 
@@ -52,6 +53,14 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 		this.synapseClient = synapseClient;
 		view.setSubjects(subjectsWidget);
 		view.setPresenter(this);
+		CallbackP<RestrictableObjectDescriptor> deleteSubjectCallback = new CallbackP<RestrictableObjectDescriptor>() {
+			@Override
+			public void invoke(RestrictableObjectDescriptor subject) {
+				subjects.remove(subject);
+				refreshSubjects();
+			}
+		};
+		subjectsWidget.setDeleteCallback(deleteSubjectCallback);
 	}
 	
 	@Override
@@ -68,7 +77,8 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 				newSubjects.add(newSubject);
 			}
 		}
-		setSubjects(newSubjects);
+		subjects.addAll(newSubjects);
+		refreshSubjects();
 	}
 	
 	@Override
@@ -85,7 +95,8 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 				newSubjects.add(newSubject);
 			}
 		}
-		setSubjects(newSubjects);
+		subjects.addAll(newSubjects);
+		refreshSubjects();
 	}
 	
 	
@@ -107,20 +118,25 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 		setSubjects(accessRequirement.getSubjectIds());
 	}
 	
+	private void refreshSubjects() {
+		setSubjects(subjects);
+	}
+	
 	private void setSubjects(List<RestrictableObjectDescriptor> initialSubjects) {
 		subjects = initialSubjects;
-		subjectsWidget.configure(subjects, false);
-		String subjectIds = getSubjectIds(subjects);
+		subjectsWidget.configure(subjects);
+		
 		if (subjects.size() > 0) {
 			if (subjects.get(0).getType().equals(RestrictableObjectType.ENTITY)) {
 				currentAccessType = ACCESS_TYPE.DOWNLOAD;
-				view.setEntityIdsString(subjectIds);
+				view.setEntityIdsString("");
 			} else {
 				currentAccessType = ACCESS_TYPE.PARTICIPATE;
-				view.setTeamIdsString(subjectIds);
+				view.setTeamIdsString("");
 			}
 		}
 	}
+	
 	public String getSubjectIds(List<RestrictableObjectDescriptor> subjects) {
 		StringBuilder sb = new StringBuilder();
 		for (Iterator iterator = subjects.iterator(); iterator.hasNext();) {

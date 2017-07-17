@@ -148,6 +148,7 @@ public class WikiPageWidgetTest {
 		// once to clear, once after loading shown
 		verify(mockView, times(2)).setLoadingVisible(false);
 		verify(mockView).scrollWikiHeadingIntoView();
+		verify(mockModifiedCreatedBy).setCreatedByUIVisible(false);
 	}
 	
 	@Test
