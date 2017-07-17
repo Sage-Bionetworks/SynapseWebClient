@@ -38,6 +38,7 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDestination;
@@ -496,4 +497,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	Long getOpenMembershipInvitationCount() throws RestServiceException;
 
 	Long getOpenMembershipRequestCount() throws RestServiceException;
+
+	String createExternalObjectStoreFileHandle(ExternalObjectStoreFileHandle fileHandle) throws RestServiceException;
 }

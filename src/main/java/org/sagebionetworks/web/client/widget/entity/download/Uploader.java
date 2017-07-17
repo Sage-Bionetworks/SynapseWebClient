@@ -80,6 +80,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private ClientLogger logger;
 	private Long storageLocationId;
 	private S3DirectUploader s3DirectUploader;
+	private String bucketName, endpointUrl, keyPrefixUUID;
 	
 	@Inject
 	public Uploader(
@@ -140,6 +141,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.parentEntityId = null;
 		this.currentUploadType = null;
 		this.currentExternalUploadUrl = null;
+		bucketName = null;
+		keyPrefixUUID = null;
+		endpointUrl = null;
 		resetUploadProgress();
 	}
 
@@ -255,12 +259,15 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						storageLocationId = externalUploadDestination.getStorageLocationId();
 						currentUploadType = externalUploadDestination.getUploadType();
 						String banner = externalUploadDestination.getBanner();
+						endpointUrl = externalUploadDestination.getEndpointUrl();
+						bucketName = externalUploadDestination.getBucket();
+						keyPrefixUUID = externalUploadDestination.getKeyPrefixUUID();
 						if (!DisplayUtils.isDefined(banner)) {
-							banner = "Uploading to " + externalUploadDestination.getEndpoint();
-							if (externalUploadDestination.getKeyPrefixUUID() != null)
-								banner += "/" + externalUploadDestination.getKeyPrefixUUID();
+							banner = "Uploading to " + endpointUrl + " " + bucketName;
+							if (keyPrefixUUID != null)
+								banner += "/" + keyPrefixUUID;
 						}
-						view.showUploadingToS3DirectStorage(externalUploadDestination.getEndpoint(), banner);
+						view.showUploadingToS3DirectStorage(endpointUrl, banner);
 					} else {
 						//unsupported upload destination type
 						onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported upload destination: " + uploadDestinations.get(0).getClass().getName()));
@@ -460,14 +467,14 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	private void directUploadStep2(String fileName) {
-		//TODO: use S3 direct uploader
-		
-//		if (isDirectS3Download) {
-//			s3DirectUploader.configure(view.getS3DirectAccessKey(), view.getS3DirectSecretKey(), bucketName, endpoint);
-//			s3DirectUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);
-//		} else {
+		//use S3 direct uploader
+		if (endpointUrl != null) {
+			String targetBucket = bucketName + keyPrefixUUID == null ? "" : keyPrefixUUID;
+			s3DirectUploader.configure(view.getS3DirectAccessKey(), view.getS3DirectSecretKey(), targetBucket, endpointUrl);
+			s3DirectUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);
+		} else {
 			this.multiPartUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);	
-//		}
+		}
 	}
 
 	private void handleCancelledFileUpload() {

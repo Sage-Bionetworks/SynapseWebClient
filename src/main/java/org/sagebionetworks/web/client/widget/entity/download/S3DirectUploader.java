@@ -3,9 +3,11 @@ package org.sagebionetworks.web.client.widget.entity.download;
 import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.PLEASE_SELECT_A_FILE;
 import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.fixDefaultContentType;
 
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
@@ -14,6 +16,7 @@ import org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.i18n.client.NumberFormat;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 /**
@@ -29,13 +32,15 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 	String bucketName;
 	String endpoint;
 	String fileName; 
-	String contentType; 
+	String contentType;
+	String md5;
 	JavaScriptObject blob; 
 	ProgressingFileUploadHandler handler; 
 	Long storageLocationId;
 	HasAttachHandlers view;
 	NumberFormat percentFormat;
 	SynapseClientAsync synapseClient;
+	
 	
 	@Inject
 	public S3DirectUploader(AwsSdk awsSdk, 
@@ -67,9 +72,26 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 	public void uploadSuccess() {
 		if (handler != null && view.isAttached()) {
 			//success!
-			//TODO: create a new file handle and tell the handler about the new handle
-//			synapseClient.createS3FileHandle();
-//			handler.uploadSuccess(fileHandleId);
+			//create a new file handle and tell the handler about the new handle
+			ExternalObjectStoreFileHandle fileHandle = new ExternalObjectStoreFileHandle();
+			fileHandle.setContentMd5(md5);
+			Double fileSize = synapseJsniUtils.getFileSize(blob); 
+			fileHandle.setContentSize(fileSize.longValue());
+			fileHandle.setContentType(contentType);
+			fileHandle.setFileKey(bucketName + "/" + fileName);
+			fileHandle.setFileName(fileName);
+			fileHandle.setStorageLocationId(storageLocationId);
+			synapseClient.createExternalObjectStoreFileHandle(fileHandle, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String fileHandleId) {
+					handler.uploadSuccess(fileHandleId);
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					handler.uploadFailed(caught.getMessage());
+				}
+			});
 		}
 	}
 	
@@ -84,18 +106,24 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 		this.endpoint = endpoint;
 	}
 	
-	public void uploadFile(String fileInputId, int fileIndex, ProgressingFileUploadHandler handler, Long storageLocationId, HasAttachHandlers view) {
-		String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
+	public void uploadFile(final String fileInputId, final int fileIndex, final ProgressingFileUploadHandler handler, final Long storageLocationId, final HasAttachHandlers view) {
+		final String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
 		if(names == null || names.length < 1){
 			handler.uploadFailed(PLEASE_SELECT_A_FILE);
 			return;
 		}
-		String fileName = names[fileIndex];
-
-		JavaScriptObject blob = synapseJsniUtils.getFileBlob(fileIndex, fileInputId);
-		String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(fileInputId, fileIndex), fileName);
 		
-		uploadFile(fileName, contentType, blob, handler, storageLocationId, view);
+		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
+			@Override
+			public void setMD5(String hexValue) {
+				md5 = hexValue;
+				
+				String fileName = names[fileIndex];
+				JavaScriptObject blob = synapseJsniUtils.getFileBlob(fileIndex, fileInputId);
+				String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(fileInputId, fileIndex), fileName);
+				uploadFile(fileName, contentType, blob, handler, storageLocationId, view);
+			}
+		});
 	}
 	
 	public void uploadFile(

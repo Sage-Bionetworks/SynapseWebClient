@@ -36,6 +36,7 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDestination;
@@ -425,4 +426,11 @@ public interface SynapseClientAsync {
 	void getOpenMembershipInvitationCount(AsyncCallback<Long> callback);
 
 	void getOpenMembershipRequestCount(AsyncCallback<Long> callback);
+
+	/**
+	 * If successful, will return the new file handle ID
+	 * @param fileHandle
+	 * @param callback
+	 */
+	void createExternalObjectStoreFileHandle(ExternalObjectStoreFileHandle fileHandle, AsyncCallback<String> callback);
 }
