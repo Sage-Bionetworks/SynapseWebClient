@@ -91,16 +91,14 @@ public class FileTitleBarTest {
 
 	@Test
 	public void testSetS3DescriptionForSynapseStorage() {
-		fileTitleBar.setEntityBundle(mockBundle);
-		fileTitleBar.setS3Description();
+		fileTitleBar.configure(mockBundle);
 		verify(mockView).setFileLocation("| Synapse Storage");
 	}
 
 	@Test
 	public void testSetS3DescriptionForExternalS3() {
 		handle.setStorageLocationId(2L);
-		fileTitleBar.setEntityBundle(mockBundle);
-		fileTitleBar.setS3Description();
+		fileTitleBar.configure(mockBundle);
 		verify(mockView).setFileLocation("| s3://" + handle.getBucketName() + "/" + handle.getKey());
 	}
 	
