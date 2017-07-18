@@ -40,7 +40,7 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 	HasAttachHandlers view;
 	NumberFormat percentFormat;
 	SynapseClientAsync synapseClient;
-	
+	String keyPrefixUUID;
 	
 	@Inject
 	public S3DirectUploader(AwsSdk awsSdk, 
@@ -78,7 +78,7 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 			Double fileSize = synapseJsniUtils.getFileSize(blob); 
 			fileHandle.setContentSize(fileSize.longValue());
 			fileHandle.setContentType(contentType);
-			fileHandle.setFileKey(bucketName + "/" + fileName);
+			fileHandle.setFileKey(bucketName + "/" + keyPrefixUUID + "/" + fileName);
 			fileHandle.setFileName(fileName);
 			fileHandle.setStorageLocationId(storageLocationId);
 			synapseClient.createExternalObjectStoreFileHandle(fileHandle, new AsyncCallback<String>() {
@@ -106,20 +106,19 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 		this.endpoint = endpoint;
 	}
 	
-	public void uploadFile(final String fileInputId, final int fileIndex, final ProgressingFileUploadHandler handler, final Long storageLocationId, final HasAttachHandlers view) {
+	public void uploadFile(final String fileInputId, final int fileIndex, final ProgressingFileUploadHandler handler, final String keyPrefixUUID, final Long storageLocationId, final HasAttachHandlers view) {
 		final String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
 		if(names == null || names.length < 1){
 			handler.uploadFailed(PLEASE_SELECT_A_FILE);
 			return;
 		}
-		
+		this.keyPrefixUUID = keyPrefixUUID;
+		blob = synapseJsniUtils.getFileBlob(fileIndex, fileInputId);
 		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
 			@Override
 			public void setMD5(String hexValue) {
 				md5 = hexValue;
-				
 				String fileName = names[fileIndex];
-				JavaScriptObject blob = synapseJsniUtils.getFileBlob(fileIndex, fileInputId);
 				String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(fileInputId, fileIndex), fileName);
 				uploadFile(fileName, contentType, blob, handler, storageLocationId, view);
 			}
@@ -150,6 +149,6 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 	}
 	
 	private void upload(JavaScriptObject s3) {
-		awsSdk.upload(fileName, blob, contentType, s3, this);
+		awsSdk.upload(keyPrefixUUID + "/" + fileName, blob, contentType, s3, this);
 	}
 }

@@ -40,6 +40,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -469,9 +470,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private void directUploadStep2(String fileName) {
 		//use S3 direct uploader
 		if (endpointUrl != null) {
-			String targetBucket = bucketName + keyPrefixUUID == null ? "" : keyPrefixUUID;
-			s3DirectUploader.configure(view.getS3DirectAccessKey(), view.getS3DirectSecretKey(), targetBucket, endpointUrl);
-			s3DirectUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);
+			s3DirectUploader.configure(view.getS3DirectAccessKey(), view.getS3DirectSecretKey(), bucketName, endpointUrl);
+			s3DirectUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, keyPrefixUUID, storageLocationId, view);
 		} else {
 			this.multiPartUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);	
 		}
