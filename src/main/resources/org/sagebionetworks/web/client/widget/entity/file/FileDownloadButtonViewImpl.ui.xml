@@ -25,7 +25,7 @@
   			<bh:Span ui:field="clientsHelpContainer"/>
   		</bh:Span>
   		<bh:Span ui:field="synAlertContainer"/>
-  		<b:Modal ui:field="s3DirectLoginDialog" closable="true" dataKeyboard="false">
+  		<b:Modal ui:field="s3DirectLoginDialog" title="Download" closable="true" dataKeyboard="false">
 			<b:ModalBody>
 				<bh:Div ui:field="s3DirectLoginDialogBody"/>
 			</b:ModalBody>

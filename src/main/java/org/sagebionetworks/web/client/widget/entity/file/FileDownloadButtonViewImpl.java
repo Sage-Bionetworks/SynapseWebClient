@@ -88,6 +88,7 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 		s3DirectLoginDialogButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				s3DirectLoginDialog.hide();
 				presenter.onS3DirectDownloadClicked(awsLoginView.getAccessKey(), awsLoginView.getSecretKey());
 			}
 		});

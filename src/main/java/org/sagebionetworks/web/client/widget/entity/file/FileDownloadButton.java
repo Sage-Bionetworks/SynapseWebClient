@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -29,6 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -56,6 +58,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	boolean isHidingClientHelp = false;
 	AwsSdk awsSdk;
 	PopupUtilsView popupUtilsView;
+	FileHandle dataFileHandle;
 	
 	@Inject
 	public FileDownloadButton(FileDownloadButtonView view, 
@@ -106,6 +109,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		view.clear();
 		this.entityBundle = bundle;
 		view.setClientsHelpVisible(false);
+		dataFileHandle = null;
 		
 		if (!authController.isLoggedIn()) {
 			view.setDirectDownloadLink(LOGIN_PLACE_LINK);
@@ -115,29 +119,31 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 			view.setDirectDownloadLink(ACCESS_REQUIREMENTS_LINK+bundle.getEntity().getId());
 			view.setDirectDownloadLinkVisible(true);
 		} else {
-//			if (isS3DirectDownload) {
-				//TODO:
-//				view.setLicensedDownloadLinkVisible(true);
-//			} else {			
-			String directDownloadUrl = getDirectDownloadUrl();
-			if (directDownloadUrl != null) {
-				//special case, if this starts with sftp proxy, then handle
-				String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
-				if (directDownloadUrl.startsWith(sftpProxy)) {
-					view.setAuthorizedDirectDownloadLinkVisible(true);
-					loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
-					FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
-					String url = ((ExternalFileHandle) fileHandle).getExternalURL();
-					queryForSftpLoginInstructions(url);
+			dataFileHandle = getFileHandle();
+			if (dataFileHandle != null) {
+				if (dataFileHandle instanceof ExternalObjectStoreFileHandle) {
+					view.setLicensedDownloadLinkVisible(true);
 				} else {
-					view.setDirectDownloadLink(directDownloadUrl);
-					view.setDirectDownloadLinkVisible(true);
-					if (!isHidingClientHelp) {
-						view.setClientsHelpVisible(true);	
+					String fileNameOverride = entityBundle.getFileName();
+					String directDownloadUrl = getDirectDownloadURL((FileEntity)entityBundle.getEntity(), dataFileHandle, fileNameOverride);
+					
+					//special case, if this starts with sftp proxy, then handle
+					String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
+					if (directDownloadUrl.startsWith(sftpProxy)) {
+						view.setAuthorizedDirectDownloadLinkVisible(true);
+						loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
+						FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
+						String url = ((ExternalFileHandle) fileHandle).getExternalURL();
+						queryForSftpLoginInstructions(url);
+					} else {
+						view.setDirectDownloadLink(directDownloadUrl);
+						view.setDirectDownloadLinkVisible(true);
+						if (!isHidingClientHelp) {
+							view.setClientsHelpVisible(true);	
+						}
 					}
 				}
 			}
-//			}
 		}
 		
 		FileClientsHelp clientsHelp = ginInjector.getFileClientsHelp();
@@ -145,16 +151,11 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		clientsHelp.configure(entityBundle.getEntity().getId());
 	}
 	
-	public String getDirectDownloadUrl() {
+	public FileHandle getFileHandle() {
 		if(entityBundle != null && entityBundle.getEntity() != null) {
 			if (entityBundle.getEntity() instanceof FileEntity) {
-				FileEntity fileEntity = (FileEntity)entityBundle.getEntity();
 				if (authController.isLoggedIn()) {
-					FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
-					if (fileHandle != null) {
-						String fileNameOverride = entityBundle.getFileName();
-						return getDirectDownloadURL(fileEntity, fileHandle, fileNameOverride);
-					}
+					return DisplayUtils.getFileHandle(entityBundle);
 				}
 			}
 		}
@@ -215,20 +216,22 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	
 	@Override
 	public void onLicensedDownloadClick() {
-//		//TODO: ask for credentials, use bucket/endpoint info from storage location (from file handle??)
-//		view.showS3DirectLoginDialog(endpoint);
+		//ask for credentials, use bucket/endpoint info from storage location
+		ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
+		view.showS3DirectLoginDialog(objectStoreFileHandle.getEndpointUrl());
 	}
 	
 	@Override
 	public void onS3DirectDownloadClicked(String accessKeyId, String secretAccessKey) {
+		final ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
 		CallbackP<JavaScriptObject> s3Callback = new CallbackP<JavaScriptObject>() {
 			@Override
 			public void invoke(JavaScriptObject s3) {
-//				String presignedUrl = awsSdk.getPresignedURL(key, bucketName, s3);
-//				popupUtilsView.openInNewWindow(presignedUrl);
+				String presignedUrl = awsSdk.getPresignedURL(objectStoreFileHandle.getFileKey(), objectStoreFileHandle.getBucket(), s3);
+				popupUtilsView.openInNewWindow(presignedUrl);
 			}
 		};
-//		awsSdk.getS3(accessKeyId, secretAccessKey, bucketName, endpoint, s3Callback);	
+		awsSdk.getS3(accessKeyId, secretAccessKey, objectStoreFileHandle.getBucket(), objectStoreFileHandle.getEndpointUrl(), s3Callback);	
 	}
 	
 	@Override

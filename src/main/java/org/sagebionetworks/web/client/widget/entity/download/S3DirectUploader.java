@@ -78,7 +78,7 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 			Double fileSize = synapseJsniUtils.getFileSize(blob); 
 			fileHandle.setContentSize(fileSize.longValue());
 			fileHandle.setContentType(contentType);
-			fileHandle.setFileKey(bucketName + "/" + keyPrefixUUID + "/" + fileName);
+			fileHandle.setFileKey(keyPrefixUUID + "/" + fileName);
 			fileHandle.setFileName(fileName);
 			fileHandle.setStorageLocationId(storageLocationId);
 			synapseClient.createExternalObjectStoreFileHandle(fileHandle, new AsyncCallback<String>() {

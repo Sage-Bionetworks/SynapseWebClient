@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
+import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
@@ -76,7 +77,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	
 	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
 		PreviewFileType previewFileType = PreviewFileType.NONE;
-		if (previewHandle == null && originalFileHandle != null) {
+		if (previewHandle == null && originalFileHandle != null && originalFileHandle instanceof S3FileHandle) {
 			String contentType = originalFileHandle.getContentType();
 			if (contentType != null) {
 				if (DisplayUtils.isRecognizedImageContentType(contentType)) {
