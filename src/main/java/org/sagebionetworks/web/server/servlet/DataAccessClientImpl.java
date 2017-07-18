@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.client.exceptions.SynapseException;
@@ -8,6 +7,7 @@ import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.BatchAccessApprovalInfoRequest;
 import org.sagebionetworks.repo.model.BatchAccessApprovalInfoResponse;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptorResponse;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.dataaccess.AccessRequirementConversionRequ
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
+import org.sagebionetworks.repo.model.dataaccess.CreateSubmissionRequest;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -71,10 +72,17 @@ public class DataAccessClientImpl extends SynapseClientBase implements DataAcces
 	}
 	
 	@Override
-	public void submitDataAccessRequest(RequestInterface dataAccessRequest) throws RestServiceException {
+	public void submitDataAccessRequest(CreateSubmissionRequest createSubmissionRequest, Long arId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			synapseClient.submitRequest(dataAccessRequest.getId(), dataAccessRequest.getEtag());
+			if (createSubmissionRequest.getSubjectId() == null) {
+				// no context (for example, on an ACT dashboard) - pick the first subject to direct the user to.
+				RestrictableObjectDescriptorResponse response = synapseClient.getSubjects(arId.toString(), null);
+				RestrictableObjectDescriptor subject = response.getSubjects().get(0);
+				createSubmissionRequest.setSubjectId(subject.getId());
+				createSubmissionRequest.setSubjectType(subject.getType());
+			}
+			synapseClient.submitRequest(createSubmissionRequest);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

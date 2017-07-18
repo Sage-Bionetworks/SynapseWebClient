@@ -23,6 +23,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
@@ -158,7 +159,9 @@ public class ACTAccessApprovalsPresenterTest {
 		
 		verify(mockSynAlert, atLeast(1)).clear();
 		verify(mockView).setExpiresBeforeDate(now);
-		verify(mockAccessRequirementWidget).configure(AR_ID);
+		// not requesting access to any subject in particular.
+		RestrictableObjectDescriptor targetSubject = null;
+		verify(mockAccessRequirementWidget).configure(AR_ID, targetSubject);
 		verify(mockDataAccessClient).listAccessorGroup(accessorGroupRequestCaptor.capture(), any(AsyncCallback.class));
 		AccessorGroupRequest request = accessorGroupRequestCaptor.getValue();
 		assertEquals(now, request.getExpireBefore());

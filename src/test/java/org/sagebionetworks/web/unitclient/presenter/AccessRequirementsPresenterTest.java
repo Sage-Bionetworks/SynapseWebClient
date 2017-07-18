@@ -157,7 +157,7 @@ public class AccessRequirementsPresenterTest {
 		assertEquals(RestrictableObjectType.ENTITY, subject.getType());
 		verify(mockEntityIdCellRenderer).setValue(ENTITY_ID);
 		
-		verify(mockAccessRequirementWidget, times(4)).configure(any(AccessRequirement.class), any(Callback.class));
+		verify(mockAccessRequirementWidget, times(4)).configure(any(AccessRequirement.class), any(RestrictableObjectDescriptor.class), any(Callback.class));
 
 		verify(mockEmptyResultsDiv, never()).setVisible(true);
 		verify(mockMetAccessRequirementsDiv, times(2)).add(any(IsWidget.class));

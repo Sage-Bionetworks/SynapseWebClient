@@ -161,7 +161,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 
 	public IsWidget getAccessRequirementWidget(AccessRequirement ar) {
 		AccessRequirementWidget w = ginInjector.getAccessRequirementWidget();
-		w.configure(ar, refreshCallback);
+		w.configure(ar, subject, refreshCallback);
 		return w;
 	}
 

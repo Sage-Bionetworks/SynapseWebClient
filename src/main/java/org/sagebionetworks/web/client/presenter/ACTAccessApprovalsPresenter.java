@@ -149,7 +149,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		view.setClearAccessRequirementFilterButtonVisible(isAccessRequirementId);
 		if (isAccessRequirementId) {
 			accessorGroupRequest.setAccessRequirementId(accessRequirementId);
-			accessRequirementWidget.configure(accessRequirementId);
+			accessRequirementWidget.configure(accessRequirementId, null);
 		}
 		accessorGroupRequest.setSubmitterId(submitterId);
 		loadData();
