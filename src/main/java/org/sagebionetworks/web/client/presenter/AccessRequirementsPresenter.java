@@ -103,27 +103,23 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 	public void setPlace(AccessRequirementsPlace place) {
 		this.place = place;
 		view.initHeaderAndFooter();
-		String entityId = place.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM);
-		String teamId = place.getParam(AccessRequirementsPlace.TEAM_ID_PARAM);
+		String id = place.getParam(AccessRequirementsPlace.ID_PARAM);
+		String typeString = place.getParam(AccessRequirementsPlace.TYPE_PARAM);
+		RestrictableObjectType type = RestrictableObjectType.valueOf(typeString);
 		synAlert.clear();
 		subject = new RestrictableObjectDescriptor();
-		if (entityId != null) {
+		subject.setType(type);
+		subject.setId(id);
+		if (RestrictableObjectType.ENTITY.equals(type)) {
 			teamBadge.setVisible(false);
 			entityIdRenderer.setVisible(true);
-			subject.setId(entityId);
-			subject.setType(RestrictableObjectType.ENTITY);
-			entityIdRenderer.setValue(entityId);
-			loadData();
-		} else if (teamId != null) {
+			entityIdRenderer.setValue(id);
+		} else {
 			teamBadge.setVisible(true);
 			entityIdRenderer.setVisible(false);
-			subject.setId(teamId);
-			subject.setType(RestrictableObjectType.TEAM);
-			teamBadge.configure(teamId);
-			loadData();
-		} else {
-			synAlert.showError("Synapse id not found in parameters.");
+			teamBadge.configure(id);
 		}
+		loadData();
 	}
 	
 	public void loadData() {

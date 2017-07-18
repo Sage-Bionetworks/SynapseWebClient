@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
@@ -826,7 +827,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onManageAccessRequirements() {
-		AccessRequirementsPlace place = new AccessRequirementsPlace(AccessRequirementsPlace.ENTITY_ID_PARAM + "=" + entity.getId());
+		AccessRequirementsPlace place = new AccessRequirementsPlace(AccessRequirementsPlace.ID_PARAM + "=" + entity.getId() + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
 		getGlobalApplicationState().getPlaceChanger().goTo(place);
 	}
 	

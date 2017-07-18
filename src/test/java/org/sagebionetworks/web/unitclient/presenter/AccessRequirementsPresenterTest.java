@@ -2,10 +2,11 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -36,13 +37,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.view.PlaceView;
-import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.CreateAccessRequirementButton;
-import org.sagebionetworks.web.client.widget.accessrequirements.LockAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.ManagedACTAccessRequirementWidget;
-import org.sagebionetworks.web.client.widget.accessrequirements.TermsOfUseAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
@@ -150,7 +146,9 @@ public class AccessRequirementsPresenterTest {
 	
 	@Test
 	public void testLoadDataEntity() {
-		when(mockPlace.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM)).thenReturn(ENTITY_ID);
+		when(mockPlace.getParam(AccessRequirementsPlace.ID_PARAM)).thenReturn(ENTITY_ID);
+		when(mockPlace.getParam(AccessRequirementsPlace.TYPE_PARAM)).thenReturn(RestrictableObjectType.ENTITY.toString());
+
 		presenter.setPlace(mockPlace);
 		verify(mockDataAccessClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
 		verify(mockDataAccessClient).getAccessRequirementStatus(any(BatchAccessApprovalInfoRequest.class), any(AsyncCallback.class));
@@ -172,7 +170,8 @@ public class AccessRequirementsPresenterTest {
 	public void testLoadDataEntityEmptyResults() {
 		accessRequirements.clear();
 		accessRequirementApprovalStatus.clear();
-		when(mockPlace.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM)).thenReturn(ENTITY_ID);
+		when(mockPlace.getParam(AccessRequirementsPlace.ID_PARAM)).thenReturn(ENTITY_ID);
+		when(mockPlace.getParam(AccessRequirementsPlace.TYPE_PARAM)).thenReturn(RestrictableObjectType.ENTITY.toString());
 		presenter.setPlace(mockPlace);
 		verify(mockDataAccessClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
 		verify(mockEmptyResultsDiv).setVisible(true);
@@ -182,14 +181,17 @@ public class AccessRequirementsPresenterTest {
 	public void testLoadDataEntityFailure() {
 		Exception ex = new Exception("failed");
 		AsyncMockStubber.callFailureWith(ex).when(mockDataAccessClient).getAccessRequirements(any(RestrictableObjectDescriptor.class), anyLong(), anyLong(), any(AsyncCallback.class));
-		when(mockPlace.getParam(AccessRequirementsPlace.ENTITY_ID_PARAM)).thenReturn(ENTITY_ID);
+		when(mockPlace.getParam(AccessRequirementsPlace.ID_PARAM)).thenReturn(ENTITY_ID);
+		when(mockPlace.getParam(AccessRequirementsPlace.TYPE_PARAM)).thenReturn(RestrictableObjectType.ENTITY.toString());
+
 		presenter.setPlace(mockPlace);
 		verify(mockSynAlert).handleException(ex);
 	}	
 	
 	@Test
 	public void testLoadDataTeam() {
-		when(mockPlace.getParam(AccessRequirementsPlace.TEAM_ID_PARAM)).thenReturn(TEAM_ID);
+		when(mockPlace.getParam(AccessRequirementsPlace.ID_PARAM)).thenReturn(TEAM_ID);
+		when(mockPlace.getParam(AccessRequirementsPlace.TYPE_PARAM)).thenReturn(RestrictableObjectType.TEAM.toString());
 		presenter.setPlace(mockPlace);
 		verify(mockDataAccessClient).getAccessRequirements(subjectCaptor.capture(), eq(AccessRequirementsPresenter.LIMIT), eq(0L), any(AsyncCallback.class));
 		RestrictableObjectDescriptor subject = subjectCaptor.getValue();

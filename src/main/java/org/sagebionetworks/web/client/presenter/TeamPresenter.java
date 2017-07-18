@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -252,7 +253,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	}
 	@Override
 	public void onManageAccess() {
-		AccessRequirementsPlace place = new AccessRequirementsPlace(AccessRequirementsPlace.TEAM_ID_PARAM + "=" + team.getId());
+		AccessRequirementsPlace place = new AccessRequirementsPlace(AccessRequirementsPlace.ID_PARAM + "=" + team.getId() + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.TEAM.toString());
 		goTo(place);
 	}
 }
