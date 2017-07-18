@@ -134,7 +134,7 @@ public class FileDownloadButtonTest {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockEntityBundle.getFileHandles()).thenReturn(null);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		assertNull(widget.getDirectDownloadUrl());
+		assertNull(widget.getFileHandle());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -145,7 +145,7 @@ public class FileDownloadButtonTest {
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		verify(mockView).setDirectDownloadLink(FileDownloadButton.LOGIN_PLACE_LINK);
 		verify(mockView).setDirectDownloadLinkVisible(true);
-		assertNull(widget.getDirectDownloadUrl());
+		assertNull(widget.getFileHandle());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -163,7 +163,7 @@ public class FileDownloadButtonTest {
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(fileHandleId);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		assertNotNull(widget.getDirectDownloadUrl());
+		assertNotNull(widget.getFileHandle());
 		verify(mockView).setDirectDownloadLink("http://mytestbasefilehandleurl/filehandle?entityId=syn210&preview=false&proxy=false&xsrfToken=null&version=0");
 		verify(mockView).setDirectDownloadLinkVisible(true);
 		
@@ -211,7 +211,7 @@ public class FileDownloadButtonTest {
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(fileHandleId);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		assertNotNull(widget.getDirectDownloadUrl());
+		assertNotNull(widget.getFileHandle());
 		verify(mockView).setDirectDownloadLink(url);
 		verify(mockView).setDirectDownloadLinkVisible(true);
 	}
@@ -242,7 +242,7 @@ public class FileDownloadButtonTest {
 		
 		verify(mockView).setDirectDownloadLink(FileDownloadButton.ACCESS_REQUIREMENTS_LINK + ENTITY_ID);
 		verify(mockView).setDirectDownloadLinkVisible(true);
-		assertNull(widget.getDirectDownloadUrl());
+		assertNull(widget.getFileHandle());
 	}
 
 	@Test

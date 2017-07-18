@@ -52,7 +52,10 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 	Div s3DirectLoginDialogBody;
 	@UiField
 	Button s3DirectLoginDialogButton;
-	
+	@UiField
+	Modal s3DirectDownloadDialog;
+	@UiField
+	Button s3DirectDownloadButton;
 	AwsLoginView awsLoginView;
 	
 	boolean isExtraSmall;
@@ -89,7 +92,14 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 			@Override
 			public void onClick(ClickEvent event) {
 				s3DirectLoginDialog.hide();
-				presenter.onS3DirectDownloadClicked(awsLoginView.getAccessKey(), awsLoginView.getSecretKey());
+				presenter.onS3DirectDownloadLoginClicked(awsLoginView.getAccessKey(), awsLoginView.getSecretKey());
+			}
+		});
+		s3DirectDownloadButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				s3DirectDownloadDialog.hide();
+				presenter.onS3DirectDownloadClicked();
 			}
 		});
 	}
@@ -176,5 +186,9 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 		awsLoginView.clear();
 		awsLoginView.setEndpoint(SafeHtmlUtils.htmlEscape(endpoint));
 		s3DirectLoginDialog.show();
+	}
+	@Override
+	public void showS3DirectDownloadDialog() {
+		s3DirectDownloadDialog.show();
 	}
 }

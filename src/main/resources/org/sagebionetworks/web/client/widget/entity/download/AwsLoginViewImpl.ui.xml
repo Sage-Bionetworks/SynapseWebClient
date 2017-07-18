@@ -10,14 +10,16 @@
 				<bh:Strong ui:field="endpointField" addStyleNames="margin-left-5"/>
 			</b:Heading>
 			<bh:Italic text="Keys are used to locally sign a web request.  They are not transmitted or stored by Synapse." />
-			<b:FormGroup addStyleNames="margin-top-10">
-				<b:FormLabel>Access Key</b:FormLabel>
-				<b:Input type="PASSWORD" ui:field="accessKeyField"/>
-			</b:FormGroup>
-			<b:FormGroup>
-				<b:FormLabel>Secret Key</b:FormLabel>
-				<b:Input type="PASSWORD" ui:field="secretKeyField"/>
-			</b:FormGroup>
+			<b:Form>
+				<b:FormGroup addStyleNames="margin-top-10">
+					<b:FormLabel>Access Key</b:FormLabel>
+					<b:Input type="TEXT" name="username" ui:field="accessKeyField" />
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel>Secret Key</b:FormLabel>
+					<b:Input type="PASSWORD" name="password" ui:field="secretKeyField"/>
+				</b:FormGroup>
+			</b:Form>
 		</b:PanelBody>
 	</b:Panel>
 </ui:UiBinder>

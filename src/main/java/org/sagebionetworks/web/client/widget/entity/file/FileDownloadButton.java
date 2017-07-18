@@ -30,7 +30,6 @@ import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -59,6 +58,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	AwsSdk awsSdk;
 	PopupUtilsView popupUtilsView;
 	FileHandle dataFileHandle;
+	JavaScriptObject s3;
 	
 	@Inject
 	public FileDownloadButton(FileDownloadButtonView view, 
@@ -110,6 +110,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		this.entityBundle = bundle;
 		view.setClientsHelpVisible(false);
 		dataFileHandle = null;
+		s3 = null;
 		
 		if (!authController.isLoggedIn()) {
 			view.setDirectDownloadLink(LOGIN_PLACE_LINK);
@@ -222,16 +223,25 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	}
 	
 	@Override
-	public void onS3DirectDownloadClicked(String accessKeyId, String secretAccessKey) {
+	public void onS3DirectDownloadLoginClicked(String accessKeyId, String secretAccessKey) {
 		final ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
 		CallbackP<JavaScriptObject> s3Callback = new CallbackP<JavaScriptObject>() {
 			@Override
-			public void invoke(JavaScriptObject s3) {
-				String presignedUrl = awsSdk.getPresignedURL(objectStoreFileHandle.getFileKey(), objectStoreFileHandle.getBucket(), s3);
-				popupUtilsView.openInNewWindow(presignedUrl);
+			public void invoke(JavaScriptObject s3JsObject) {
+				s3 = s3JsObject;
+				// NOTE: most browsers block the popup because the button click event is not directly associated to the login popup.
+				// Show the direct download button after authorization succeeds.
+				view.showS3DirectDownloadDialog();
 			}
 		};
 		awsSdk.getS3(accessKeyId, secretAccessKey, objectStoreFileHandle.getBucket(), objectStoreFileHandle.getEndpointUrl(), s3Callback);	
+	}
+	
+	@Override
+	public void onS3DirectDownloadClicked() {
+		ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
+		String presignedUrl = awsSdk.getPresignedURL(objectStoreFileHandle.getFileKey(), objectStoreFileHandle.getBucket(), s3);
+		popupUtilsView.openInNewWindow(presignedUrl);
 	}
 	
 	@Override

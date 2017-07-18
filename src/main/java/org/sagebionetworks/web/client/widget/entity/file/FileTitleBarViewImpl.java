@@ -82,56 +82,41 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	}
 	
 	@Override
-	public void createTitlebar(
-			EntityBundle entityBundle, 
-			EntityType entityType, 
-			AuthenticationController authenticationController) {
-		Entity entity = entityBundle.getEntity();
-
+	public void createTitlebar(Entity entity) {
 		favoriteWidget.configure(entity.getId());
-		
 		md5Link.clear();
 		md5LinkContainer.clear();
 		md5LinkContainer.add(md5Link);
-
 		entityIcon.setType(EntityTypeUtils.getIconTypeForEntity(entity));
-		
-		//fileHandle is null if user can't access the filehandle associated with this file entity
-		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
-		boolean isFilenamePanelVisible = fileHandle != null;
-		fileNameContainer.setVisible(isFilenamePanelVisible);
-		entityName.setText(entity.getName());
-		if (isFilenamePanelVisible) {
-			fileName.setInnerText(entityBundle.getFileName());
-			//don't ask for the size if it's external, just display that this is external data
-			boolean isExternalFile = fileHandle instanceof ExternalFileHandle;
-			UIObject.setVisible(externalUrlUI, isExternalFile);
-			if (isExternalFile) {
-				ExternalFileHandle externalFileHandle = (ExternalFileHandle)fileHandle;
-				externalUrl.setInnerText(externalFileHandle.getExternalURL());
-				if (externalFileHandle.getContentSize() != null) {
-					fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(externalFileHandle.getContentSize().doubleValue(), true));
-				} else {
-					fileSize.setInnerText("");	
-				}
-				
-				fileLocation.setInnerText("| External Storage");
-				String md5 = externalFileHandle.getContentMd5();
-				if (md5 != null) {
-					md5Link.configure(md5);
-				}
-			}
-			else if (fileHandle instanceof S3FileHandleInterface){
-				final S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
-				presenter.setS3Description();
-
-				fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true));
-				final String md5 = s3FileHandle.getContentMd5();
-				if (md5 != null) {
-					md5Link.configure(md5);
-				} 
-			}
-		}
+	}
+	
+	@Override
+	public void setExternalUrlUIVisible(boolean visible) {
+		UIObject.setVisible(externalUrlUI, visible);	
+	}
+	@Override
+	public void setFilenameContainerVisible(boolean visible) {
+		fileNameContainer.setVisible(visible);
+	}
+	@Override
+	public void setFilename(String fileNameString) {
+		fileName.setInnerText(fileNameString);	
+	}
+	@Override
+	public void setFileSize(String fileSizeString) {
+		fileSize.setInnerText(fileSizeString);
+	}
+	@Override
+	public void setMd5(String md5) {
+		md5Link.configure(md5);	
+	}
+	@Override
+	public void setEntityName(String name) {
+		entityName.setText(name);
+	}
+	@Override
+	public void setExternalUrl(String url) {
+		externalUrl.setInnerText(url);
 	}
 	
 	@Override

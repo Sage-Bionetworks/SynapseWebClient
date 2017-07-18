@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityType;
-import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -40,11 +40,34 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	public void configure(EntityBundle bundle) {
 		view.setPresenter(this);
 		this.entityBundle = bundle;
-
-		// Get EntityType
-		EntityType entityType = EntityTypeUtils.getEntityTypeForClass(bundle.getEntity().getClass());
-		view.createTitlebar(bundle, entityType, authenticationController);
+		
+		view.setExternalUrlUIVisible(false);
+		view.setFileSize("");
+		
+		view.createTitlebar(bundle.getEntity());
 		fileDownloadButton.configure(bundle);
+		
+		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
+		boolean isFilenamePanelVisible = fileHandle != null;
+		view.setFilenameContainerVisible(isFilenamePanelVisible);
+		view.setEntityName(bundle.getEntity().getName());
+		if (isFilenamePanelVisible) {
+			if (fileHandle.getContentMd5() != null) {
+				view.setMd5(fileHandle.getContentMd5());
+			}
+			if (fileHandle.getContentSize() != null) {
+				view.setFileSize("| "+DisplayUtils.getFriendlySize(fileHandle.getContentSize().doubleValue(), true));
+			}
+			view.setFilename(entityBundle.getFileName());
+			//don't ask for the size if it's external, just display that this is external data
+			if (fileHandle instanceof ExternalFileHandle) {
+				configureExternalFile((ExternalFileHandle)fileHandle);
+			} else if (fileHandle instanceof S3FileHandleInterface){
+				configureS3File((S3FileHandleInterface)fileHandle);
+			} else if (fileHandle instanceof ExternalObjectStoreFileHandle) {
+				configureExternalObjectStore((ExternalObjectStoreFileHandle)fileHandle);
+			}
+		}
 	}
 	
 	/**
@@ -91,30 +114,31 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		String dataFileHandleId = fileEntity.getDataFileHandleId();
 		return (dataFileHandleId != null && dataFileHandleId.length() > 0);
 	}
-
-	@Override
-	public void setS3Description() {
-		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
-		if (fileHandle instanceof S3FileHandleInterface){
-			S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
-			Long synapseStorageLocationId = Long.valueOf(globalAppState.getSynapseProperty("org.sagebionetworks.portal.synapse_storage_id"));
-			// Uploads to Synapse Storage often do not get their storage location field back-filled,
-			// so null also indicates a Synapse-Stored file
-			if (s3FileHandle.getStorageLocationId() == null || 
-					synapseStorageLocationId.equals(s3FileHandle.getStorageLocationId())) {
-				view.setFileLocation("| Synapse Storage");				
-			} else {
-				String description = "| s3://" + s3FileHandle.getBucketName() + "/";
-				if (s3FileHandle.getKey() != null) {
-					description += s3FileHandle.getKey();
-				};
-				view.setFileLocation(description);
-			}
-		}
+	public void configureExternalFile(ExternalFileHandle externalFileHandle) {
+		view.setExternalUrlUIVisible(true);
+		view.setExternalUrl(externalFileHandle.getExternalURL());
+		view.setFileLocation("| External Storage");
 	}
 
-
-	/*
-	 * Private Methods
-	 */
+	public void configureS3File(S3FileHandleInterface s3FileHandle) {
+		Long synapseStorageLocationId = Long.valueOf(globalAppState.getSynapseProperty("org.sagebionetworks.portal.synapse_storage_id"));
+		// Uploads to Synapse Storage often do not get their storage location field back-filled,
+		// so null also indicates a Synapse-Stored file
+		if (s3FileHandle.getStorageLocationId() == null || 
+				synapseStorageLocationId.equals(s3FileHandle.getStorageLocationId())) {
+			view.setFileLocation("| Synapse Storage");				
+		} else {
+			String description = "| s3://" + s3FileHandle.getBucketName() + "/";
+			if (s3FileHandle.getKey() != null) {
+				description += s3FileHandle.getKey();
+			};
+			view.setFileLocation(description);
+		}
+	}
+	
+	public void configureExternalObjectStore(ExternalObjectStoreFileHandle externalFileHandle) {
+		view.setExternalUrlUIVisible(true);
+		view.setExternalUrl(externalFileHandle.getEndpointUrl() + "/" + externalFileHandle.getBucket() + "/" + externalFileHandle.getFileKey());
+		view.setFileLocation("| External Object Store");
+	}
 }
