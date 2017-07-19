@@ -106,44 +106,37 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 		this.endpoint = endpoint;
 	}
 	
-	public void uploadFile(final String fileInputId, final int fileIndex, final ProgressingFileUploadHandler handler, final String keyPrefixUUID, final Long storageLocationId, final HasAttachHandlers view) {
+	public void uploadFile(final String fileInputId, 
+			final int fileIndex, 
+			final ProgressingFileUploadHandler handler, 
+			final String keyPrefixUUID, 
+			final Long storageLocationId, 
+			final HasAttachHandlers view) {
+		this.handler = handler;
+		this.storageLocationId = storageLocationId;
+		this.keyPrefixUUID = keyPrefixUUID;
+		this.view = view;
+		
 		final String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
 		if(names == null || names.length < 1){
 			handler.uploadFailed(PLEASE_SELECT_A_FILE);
 			return;
 		}
-		this.keyPrefixUUID = keyPrefixUUID;
-		blob = synapseJsniUtils.getFileBlob(fileIndex, fileInputId);
+		this.fileName = names[fileIndex];
+		this.blob = synapseJsniUtils.getFileBlob(fileIndex, fileInputId);
+		contentType = fixDefaultContentType(synapseJsniUtils.getContentType(fileInputId, fileIndex), fileName);
+		
 		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
 			@Override
 			public void setMD5(String hexValue) {
 				md5 = hexValue;
-				String fileName = names[fileIndex];
-				String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(fileInputId, fileIndex), fileName);
-				uploadFile(fileName, contentType, blob, handler, storageLocationId, view);
-			}
-		});
-	}
-	
-	public void uploadFile(
-			String fileName, 
-			String contentType, 
-			JavaScriptObject blob, 
-			ProgressingFileUploadHandler handler, 
-			Long storageLocationId, 
-			HasAttachHandlers view) {
-		this.fileName = fileName;
-		this.contentType = contentType;
-		this.blob = blob;
-		this.handler = handler;
-		this.storageLocationId = storageLocationId;
-		this.view = view;
-		// on final success, create new file handle and send the id back (via the handler)
-		awsSdk.getS3(accessKeyId, secretAccessKey, bucketName, endpoint, new CallbackP<JavaScriptObject>() {
-			@Override
-			public void invoke(JavaScriptObject s3) {
-				// attempt the upload
-				upload(s3);
+				awsSdk.getS3(accessKeyId, secretAccessKey, bucketName, endpoint, new CallbackP<JavaScriptObject>() {
+					@Override
+					public void invoke(JavaScriptObject s3) {
+						// attempt the upload
+						upload(s3);
+					}
+				});
 			}
 		});
 	}
