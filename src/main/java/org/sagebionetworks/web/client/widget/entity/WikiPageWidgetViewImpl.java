@@ -54,7 +54,9 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	Alert diffVersionAlert;
 	
 	@UiField
-	SimplePanel modifiedCreatedByPanel;
+	Italic createdOnText;
+	@UiField
+	Italic modifiedOnText;
 	
 	@UiField
 	Button wikiHistoryButton;
@@ -289,7 +291,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	@Override
-	public void setModifiedCreatedBy(IsWidget modifiedCreatedBy) {
-		modifiedCreatedByPanel.setWidget(modifiedCreatedBy);
+	public void setCreatedOn(String date) {
+		createdOnText.setText(date);
+	}
+	@Override
+	public void setModifiedOn(String date) {
+		modifiedOnText.setText(date);
 	}
 }

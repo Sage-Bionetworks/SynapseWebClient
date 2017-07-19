@@ -9,7 +9,7 @@ import com.google.gwt.user.datepicker.client.CalendarUtil;
 
 public class DateTimeUtilsImpl implements DateTimeUtils {
 	private DateTimeFormat dateOnly = DateTimeFormat.getFormat("MM/dd/yyyy");
-	private static final String SMALL_DATE_FORMAT = "MM/dd/yyyy hh:mm:ssaa";
+	private static final String SMALL_DATE_FORMAT = "MM/dd/yyyy h:mm:ss aa";
 	private DateTimeFormat smallDateFormat = DateTimeFormat.getFormat(SMALL_DATE_FORMAT);
 	private DateTimeFormat smallDateFormatUTC = DateTimeFormat.getFormat(SMALL_DATE_FORMAT + " 'UTC'");
 	private static final String LONG_DATE_FORMAT = "EEEE, MMMM d, yyyy h:mm a";
