@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -43,6 +45,9 @@ public class FileTitleBarTest {
 	FileDownloadButton mockFileDownloadButton;
 	@Mock
 	EntityUpdatedHandler mockEntityUpdatedHandler;
+	@Mock
+	ExternalObjectStoreFileHandle mockExternalObjectStoreFileHandle;
+	
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
@@ -114,5 +119,21 @@ public class FileTitleBarTest {
 	public void testSetEntityUpdateHandler() {
 		fileTitleBar.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockFileDownloadButton).setEntityUpdatedHandler(mockEntityUpdatedHandler);
+	}
+	
+	@Test
+	public void testExternalObjectStoreFileHandle() {
+		String md5 = "878ac";
+		Long contentSize = 73483L;
+		when(mockExternalObjectStoreFileHandle.getContentMd5()).thenReturn(md5);
+		when(mockExternalObjectStoreFileHandle.getContentSize()).thenReturn();
+		when(mockExternalObjectStoreFileHandle.).thenReturn();
+		when(mockExternalObjectStoreFileHandle.).thenReturn();
+		when(mockExternalObjectStoreFileHandle.).thenReturn();
+		when(mockExternalObjectStoreFileHandle.).thenReturn();
+		
+		Mockito.when(mockBundle.getFileHandles()).thenReturn(Collections.singletonList((FileHandle)mockExternalObjectStoreFileHandle));
+		fileTitleBar.configure(mockBundle);
+		verify(mockFileDownloadButton).configure(mockBundle);
 	}
 }

@@ -43,7 +43,9 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		this.cookies = cookies;
 		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
-		view.setSFTPVisible(DisplayUtils.isInTestWebsite(cookies));
+		boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
+		view.setSFTPVisible(isInAlpha);
+		view.setExternalObjectStoreVisible(isInAlpha);
 	}
 	
 	@Override

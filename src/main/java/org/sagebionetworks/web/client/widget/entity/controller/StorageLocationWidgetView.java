@@ -48,6 +48,7 @@ public interface StorageLocationWidgetView {
 	String getExternalObjectStoreBucket();
 	void setExternalObjectStoreEndpointUrl(String url);
 	String getExternalObjectStoreEndpointUrl();
+	void setExternalObjectStoreVisible(boolean visible);
 	
 	String getBucket();
 	void setBucket(String bucket);

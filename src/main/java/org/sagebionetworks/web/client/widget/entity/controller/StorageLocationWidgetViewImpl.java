@@ -330,4 +330,8 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	public void setSFTPVisible(boolean visible) {
 		sftpButton.setVisible(visible);
 	}
+	@Override
+	public void setExternalObjectStoreVisible(boolean visible) {
+		externalObjectStoreButton.setVisible(visible);
+	}
 }
