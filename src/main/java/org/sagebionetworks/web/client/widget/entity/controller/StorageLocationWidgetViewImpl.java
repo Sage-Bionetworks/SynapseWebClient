@@ -85,6 +85,12 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	@UiField
 	TextBox externalObjectStoreBannerField;
 	
+	@UiField
+	Div loadingUI;
+	@UiField
+	Div contentUI;
+
+	
 	Widget widget;
 	Presenter presenter;
 	
@@ -333,5 +339,10 @@ public class StorageLocationWidgetViewImpl implements StorageLocationWidgetView 
 	@Override
 	public void setExternalObjectStoreVisible(boolean visible) {
 		externalObjectStoreButton.setVisible(visible);
+	}
+	@Override
+	public void setLoading(boolean isLoading) {
+		loadingUI.setVisible(isLoading);
+		contentUI.setVisible(!isLoading);
 	}
 }

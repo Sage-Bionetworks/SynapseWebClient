@@ -43,9 +43,6 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		this.cookies = cookies;
 		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
-		boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
-		view.setSFTPVisible(isInAlpha);
-		view.setExternalObjectStoreVisible(isInAlpha);
 	}
 	
 	@Override
@@ -53,8 +50,12 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		this.entityBundle = entityBundle;
 		this.entityUpdatedHandler = entityUpdatedHandler;
 		clear();
+		view.setLoading(true);
 		getStorageLocationSetting();
 		getMyLocationSettingBanners();
+		boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
+		view.setSFTPVisible(isInAlpha);
+		view.setExternalObjectStoreVisible(isInAlpha);
 	}
 	
 	public void getMyLocationSettingBanners() {
@@ -80,6 +81,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				// unable to get storage location
 				// if this is a proxy, then upload is not supported.  Let the user set back to default Synapse.
 				view.showErrorMessage(caught.getMessage());
+				view.setLoading(false);
 			}
 			
 			@Override
@@ -107,6 +109,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 						view.selectSFTPStorage();
 					}
 				}
+				view.setLoading(false);
 			}
 		});
 	}
