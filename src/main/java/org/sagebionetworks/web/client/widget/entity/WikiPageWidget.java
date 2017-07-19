@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -66,7 +67,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	private MarkdownWidget markdownWidget;
 	private Breadcrumb breadcrumb;
 	private WikiSubpagesWidget wikiSubpages;
-	private ModifiedCreatedByWidget modifiedCreatedBy;
 	private SessionStorage sessionStorage;
 	private AuthenticationController authController;
 	private AdapterFactory adapterFactory;
@@ -75,17 +75,18 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		public void pageUpdated();
 		public void noWikiFound();
 	}
-
+	private DateTimeUtils dateTimeUtils;
+	
 	@Inject
 	public WikiPageWidget(WikiPageWidgetView view,
 			SynapseClientAsync synapseClient,
 			StuAlert stuAlert, WikiHistoryWidget historyWidget,
 			MarkdownWidget markdownWidget, Breadcrumb breadcrumb,
 			WikiSubpagesWidget wikiSubpages, PortalGinInjector ginInjector,
-			ModifiedCreatedByWidget modifiedCreatedBy,
 			SessionStorage sessionStorage,
 			AuthenticationController authController,
-			AdapterFactory adapterFactory
+			AdapterFactory adapterFactory,
+			DateTimeUtils dateTimeUtils
 			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -94,18 +95,16 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		this.markdownWidget = markdownWidget;
 		this.wikiSubpages = wikiSubpages;
 		this.breadcrumb = breadcrumb;
-		this.modifiedCreatedBy = modifiedCreatedBy;
 		this.stuAlert = stuAlert;
 		this.sessionStorage = sessionStorage;
 		this.authController = authController;
 		this.adapterFactory = adapterFactory;
+		this.dateTimeUtils = dateTimeUtils;
 		view.setPresenter(this);
 		view.setSynapseAlertWidget(stuAlert.asWidget());
 		view.setWikiHistoryWidget(historyWidget);
 		view.setMarkdownWidget(markdownWidget);
 		view.setBreadcrumbWidget(breadcrumb);
-		view.setModifiedCreatedBy(modifiedCreatedBy);
-		modifiedCreatedBy.setCreatedByUIVisible(false);
 	}
 	
 	public void clear(){
@@ -429,7 +428,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		resetWikiMarkdown(currentPage.getMarkdown());
 		configureWikiTitle(isRootWiki, currentPage.getTitle());
 		configureHistoryWidget(canEdit);
-		modifiedCreatedBy.configure(result.getCreatedOn(), result.getCreatedBy(), result.getModifiedOn(), result.getModifiedBy());
+		view.setCreatedOn(dateTimeUtils.convertDateToSmallString(result.getCreatedOn()));
+		view.setModifiedOn(dateTimeUtils.convertDateToSmallString(result.getModifiedOn()));
 	}
 	
 	@Override
