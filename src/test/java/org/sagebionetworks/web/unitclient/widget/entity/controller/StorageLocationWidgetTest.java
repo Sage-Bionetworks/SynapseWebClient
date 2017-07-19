@@ -79,6 +79,7 @@ public class StorageLocationWidgetTest {
 		verify(mockView).setPresenter(widget);
 		verify(mockSynAlert).clear();
 		verify(mockView).clear();
+		verify(mockView).setLoading(true);
 	}
 
 	@Test
@@ -115,7 +116,9 @@ public class StorageLocationWidgetTest {
 		widget.getStorageLocationSetting();
 		//should remain set to the default config
 		verify(mockView).setSFTPVisible(anyBoolean());
+		verify(mockView).setLoading(false);
 		verifyNoMoreInteractions(mockView);
+		
 	}
 	
 	@Test
@@ -124,6 +127,7 @@ public class StorageLocationWidgetTest {
 		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).getStorageLocationSetting(anyString(), any(AsyncCallback.class));
 		widget.getStorageLocationSetting();
 		verify(mockView).showErrorMessage(error);
+		verify(mockView).setLoading(false);
 	}
 	
 	@Test
