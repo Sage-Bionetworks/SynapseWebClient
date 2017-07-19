@@ -72,7 +72,7 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 			public void onClick(ClickEvent event) {
 				//if there is an href, ignore it
 				event.preventDefault();
-				presenter.onLicensedDownloadClick();
+				presenter.onUnauthenticatedS3DirectDownloadClicked();
 			}
 		};
 		s3DirectLoginDialogBody.add(awsLoginView);
@@ -92,14 +92,14 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 			@Override
 			public void onClick(ClickEvent event) {
 				s3DirectLoginDialog.hide();
-				presenter.onS3DirectDownloadLoginClicked(awsLoginView.getAccessKey(), awsLoginView.getSecretKey());
+				presenter.onLoginS3DirectDownloadClicked(awsLoginView.getAccessKey(), awsLoginView.getSecretKey());
 			}
 		});
 		s3DirectDownloadButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				s3DirectDownloadDialog.hide();
-				presenter.onS3DirectDownloadClicked();
+				presenter.onAuthenticatedS3DirectDownloadClicked();
 			}
 		});
 	}
@@ -137,7 +137,7 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 		directDownloadLink2.setVisible(visible && isExtraSmall);
 	}
 	@Override
-	public void setLicensedDownloadLinkVisible(boolean visible) {
+	public void setUnauthenticatedS3DirectDownloadLinkVisible(boolean visible) {
 		licensedDownloadLink.setVisible(visible && !isExtraSmall);
 		licensedDownloadLink2.setVisible(visible && isExtraSmall);
 	}
@@ -182,7 +182,7 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 		licensedDownloadButton.addClassName(size.getCssName());
 	}
 	@Override
-	public void showS3DirectLoginDialog(String endpoint) {
+	public void showLoginS3DirectDownloadDialog(String endpoint) {
 		awsLoginView.clear();
 		awsLoginView.setEndpoint(SafeHtmlUtils.htmlEscape(endpoint));
 		s3DirectLoginDialog.show();

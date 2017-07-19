@@ -123,7 +123,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 			dataFileHandle = getFileHandle();
 			if (dataFileHandle != null) {
 				if (dataFileHandle instanceof ExternalObjectStoreFileHandle) {
-					view.setLicensedDownloadLinkVisible(true);
+					view.setUnauthenticatedS3DirectDownloadLinkVisible(true);
 				} else {
 					String fileNameOverride = entityBundle.getFileName();
 					String directDownloadUrl = getDirectDownloadURL((FileEntity)entityBundle.getEntity(), dataFileHandle, fileNameOverride);
@@ -216,14 +216,14 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	}
 	
 	@Override
-	public void onLicensedDownloadClick() {
+	public void onUnauthenticatedS3DirectDownloadClicked() {
 		//ask for credentials, use bucket/endpoint info from storage location
 		ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
-		view.showS3DirectLoginDialog(objectStoreFileHandle.getEndpointUrl());
+		view.showLoginS3DirectDownloadDialog(objectStoreFileHandle.getEndpointUrl());
 	}
 	
 	@Override
-	public void onS3DirectDownloadLoginClicked(String accessKeyId, String secretAccessKey) {
+	public void onLoginS3DirectDownloadClicked(String accessKeyId, String secretAccessKey) {
 		final ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
 		CallbackP<JavaScriptObject> s3Callback = new CallbackP<JavaScriptObject>() {
 			@Override
@@ -238,7 +238,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	}
 	
 	@Override
-	public void onS3DirectDownloadClicked() {
+	public void onAuthenticatedS3DirectDownloadClicked() {
 		ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
 		String presignedUrl = awsSdk.getPresignedURL(objectStoreFileHandle.getFileKey(), objectStoreFileHandle.getBucket(), s3);
 		popupUtilsView.openInNewWindow(presignedUrl);
