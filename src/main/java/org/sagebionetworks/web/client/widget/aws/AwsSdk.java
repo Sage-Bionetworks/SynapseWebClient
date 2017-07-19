@@ -79,20 +79,23 @@ public class AwsSdk {
 
 	public String getPresignedURL(String key,
 			String bucketName,
+			String fileName,
 			JavaScriptObject s3
 			) {
-		return _getPresignedURL(key, bucketName, s3);
+		return _getPresignedURL(key, bucketName, fileName, s3);
 	}
 
 	private static native String _getPresignedURL(
 			String key,
 			String bucketName,
+			String fileName,
 			JavaScriptObject s3) 
 	/*-{
 		var params = {
 			Bucket: bucketName,
 	        Key: key,
-	        Expires: 20
+	        Expires: 20,
+	        ResponseContentDisposition: 'attachment; filename="' + fileName + '"' 
 	    };
 		return s3.getSignedUrl('getObject', params);
 	}-*/;

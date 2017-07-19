@@ -251,12 +251,14 @@ public class FileDownloadButtonTest {
 		String endpointUrl = "https://test.test.test";
 		String bucket = "bucket";
 		String fileKey = "9876/test.txt";
+		String fileName = "file.txt";
 		
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(dataFileHandleId);
 		when(mockObjectStoreFileHandle.getId()).thenReturn(dataFileHandleId);
 		when(mockObjectStoreFileHandle.getEndpointUrl()).thenReturn(endpointUrl);
 		when(mockObjectStoreFileHandle.getFileKey()).thenReturn(fileKey);
 		when(mockObjectStoreFileHandle.getBucket()).thenReturn(bucket);
+		when(mockObjectStoreFileHandle.getFileName()).thenReturn(fileName);
 		fileHandles.add(mockObjectStoreFileHandle);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
@@ -278,9 +280,9 @@ public class FileDownloadButtonTest {
 		
 		//simulate user clicking the last button
 		String presignedUrl = "https://yourstorage/test.txt?signature=a&expiration=b";
-		when(mockAwsSdk.getPresignedURL(anyString(), anyString(), any(JavaScriptObject.class))).thenReturn(presignedUrl);
+		when(mockAwsSdk.getPresignedURL(anyString(), anyString(), anyString(), any(JavaScriptObject.class))).thenReturn(presignedUrl);
 		widget.onAuthenticatedS3DirectDownloadClicked();
-		verify(mockAwsSdk).getPresignedURL(fileKey, bucket, mockS3);
+		verify(mockAwsSdk).getPresignedURL(fileKey, bucket, fileName, mockS3);
 		verify(mockPopupUtilsView).openInNewWindow(presignedUrl);
 	}
 	

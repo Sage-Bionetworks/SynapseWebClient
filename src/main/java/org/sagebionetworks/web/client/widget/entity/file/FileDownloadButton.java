@@ -240,7 +240,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	@Override
 	public void onAuthenticatedS3DirectDownloadClicked() {
 		ExternalObjectStoreFileHandle objectStoreFileHandle = (ExternalObjectStoreFileHandle) dataFileHandle;
-		String presignedUrl = awsSdk.getPresignedURL(objectStoreFileHandle.getFileKey(), objectStoreFileHandle.getBucket(), s3);
+		String presignedUrl = awsSdk.getPresignedURL(objectStoreFileHandle.getFileKey(), objectStoreFileHandle.getBucket(), objectStoreFileHandle.getFileName(), s3);
 		popupUtilsView.openInNewWindow(presignedUrl);
 	}
 	
