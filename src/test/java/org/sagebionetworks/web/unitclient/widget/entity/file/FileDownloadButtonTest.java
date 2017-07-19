@@ -2,11 +2,11 @@ package org.sagebionetworks.web.unitclient.widget.entity.file;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -15,6 +15,8 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
@@ -22,6 +24,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
@@ -29,6 +32,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -36,6 +40,8 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
@@ -45,6 +51,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -70,6 +77,8 @@ public class FileDownloadButtonTest {
 	@Mock
 	ExternalFileHandle mockFileHandle;
 	@Mock
+	ExternalObjectStoreFileHandle mockObjectStoreFileHandle;
+	@Mock
 	FileClientsHelp mockFileClientsHelp;
 	@Mock
 	EntityUpdatedHandler mockEntityUpdatedHandler;
@@ -89,6 +98,15 @@ public class FileDownloadButtonTest {
 	PlaceChanger mockPlaceChanger;
 	@Mock
 	RestrictionInformationResponse mockRestrictionInformation;
+	@Mock
+	AwsSdk mockAwsSdk;
+	@Mock
+	PopupUtilsView mockPopupUtilsView;
+	@Mock
+	JavaScriptObject mockS3;
+	@Captor
+	ArgumentCaptor<CallbackP> callbackPCaptor;
+	
 	FileDownloadButton widget;
 	List<FileHandle> fileHandles;
 	
@@ -100,7 +118,7 @@ public class FileDownloadButtonTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		widget = new FileDownloadButton(mockView, mockSynapseClient, mockLoginModalWidget, mockGlobalAppState, mockSynAlert, mockGinInjector,
-				mockDataAccessClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies);
+				mockDataAccessClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies, mockAwsSdk, mockPopupUtilsView);
 		when(mockGlobalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(SFTP_ENDPOINT);
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);
@@ -127,7 +145,7 @@ public class FileDownloadButtonTest {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockEntityBundle.getFileHandles()).thenReturn(null);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		assertNull(widget.getDirectDownloadUrl());
+		assertNull(widget.getFileHandle());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -138,7 +156,7 @@ public class FileDownloadButtonTest {
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		verify(mockView).setDirectDownloadLink(FileDownloadButton.LOGIN_PLACE_LINK);
 		verify(mockView).setDirectDownloadLinkVisible(true);
-		assertNull(widget.getDirectDownloadUrl());
+		assertNull(widget.getFileHandle());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -156,7 +174,7 @@ public class FileDownloadButtonTest {
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(fileHandleId);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		assertNotNull(widget.getDirectDownloadUrl());
+		assertNotNull(widget.getFileHandle());
 		verify(mockView).setDirectDownloadLink("http://mytestbasefilehandleurl/filehandle?entityId=syn210&preview=false&proxy=false&xsrfToken=null&version=0");
 		verify(mockView).setDirectDownloadLinkVisible(true);
 		
@@ -204,7 +222,7 @@ public class FileDownloadButtonTest {
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(fileHandleId);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		assertNotNull(widget.getDirectDownloadUrl());
+		assertNotNull(widget.getFileHandle());
 		verify(mockView).setDirectDownloadLink(url);
 		verify(mockView).setDirectDownloadLinkVisible(true);
 	}
@@ -228,6 +246,47 @@ public class FileDownloadButtonTest {
 	}
 	
 	@Test
+	public void testConfigureExternalObjectStoreFileHandle() {
+		String dataFileHandleId = "3333";
+		String endpointUrl = "https://test.test.test";
+		String bucket = "bucket";
+		String fileKey = "9876/test.txt";
+		String fileName = "file.txt";
+		
+		when(mockFileEntity.getDataFileHandleId()).thenReturn(dataFileHandleId);
+		when(mockObjectStoreFileHandle.getId()).thenReturn(dataFileHandleId);
+		when(mockObjectStoreFileHandle.getEndpointUrl()).thenReturn(endpointUrl);
+		when(mockObjectStoreFileHandle.getFileKey()).thenReturn(fileKey);
+		when(mockObjectStoreFileHandle.getBucket()).thenReturn(bucket);
+		when(mockObjectStoreFileHandle.getFileName()).thenReturn(fileName);
+		fileHandles.add(mockObjectStoreFileHandle);
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		widget.configure(mockEntityBundle, mockRestrictionInformation);
+		verify(mockView).setUnauthenticatedS3DirectDownloadLinkVisible(true);
+		
+		//under this configuration, try clicking the download button (verify login dialog shown)
+		widget.onUnauthenticatedS3DirectDownloadClicked();
+		verify(mockView).showLoginS3DirectDownloadDialog(endpointUrl);
+		
+		//after login
+		String accessKeyId = "87652";
+		String secretAccessKey = "12345";
+		widget.onLoginS3DirectDownloadClicked(accessKeyId, secretAccessKey);
+		
+		verify(mockAwsSdk).getS3(eq(accessKeyId), eq(secretAccessKey), eq(bucket), eq(endpointUrl), callbackPCaptor.capture());
+		callbackPCaptor.getValue().invoke(mockS3);
+		//after s3 connection is established, show the final DOWNLOAD button
+		verify(mockView).showS3DirectDownloadDialog();
+		
+		//simulate user clicking the last button
+		String presignedUrl = "https://yourstorage/test.txt?signature=a&expiration=b";
+		when(mockAwsSdk.getPresignedURL(anyString(), anyString(), anyString(), any(JavaScriptObject.class))).thenReturn(presignedUrl);
+		widget.onAuthenticatedS3DirectDownloadClicked();
+		verify(mockAwsSdk).getPresignedURL(fileKey, bucket, fileName, mockS3);
+		verify(mockPopupUtilsView).openInNewWindow(presignedUrl);
+	}
+	
+	@Test
 	public void testLicensedDownloadLink() {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockRestrictionInformation.getHasUnmetAccessRequirement()).thenReturn(true);
@@ -235,7 +294,7 @@ public class FileDownloadButtonTest {
 		
 		verify(mockView).setDirectDownloadLink(FileDownloadButton.ACCESS_REQUIREMENTS_LINK + ENTITY_ID);
 		verify(mockView).setDirectDownloadLinkVisible(true);
-		assertNull(widget.getDirectDownloadUrl());
+		assertNull(widget.getFileHandle());
 	}
 
 	@Test

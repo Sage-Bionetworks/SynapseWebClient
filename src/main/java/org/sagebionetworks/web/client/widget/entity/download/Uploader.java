@@ -7,6 +7,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
@@ -39,6 +40,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -78,7 +80,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private String currentExternalUploadUrl;
 	private ClientLogger logger;
 	private Long storageLocationId;
-
+	private S3DirectUploader s3DirectUploader;
+	private String bucketName, endpointUrl, keyPrefixUUID;
+	
 	@Inject
 	public Uploader(
 			UploaderView view, 			
@@ -88,7 +92,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			AuthenticationController authenticationController,
 			MultipartUploader multiPartUploader,
 			GlobalApplicationState globalAppState,
-			ClientLogger logger
+			ClientLogger logger,
+			S3DirectUploader s3DirectUploader
 			) {
 	
 		this.view = view;		
@@ -99,6 +104,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.authenticationController = authenticationController;
 		this.globalAppState = globalAppState;
 		this.multiPartUploader = multiPartUploader;
+		this.s3DirectUploader = s3DirectUploader;
 		this.logger = logger;
 		view.setPresenter(this);
 		clearHandlers();
@@ -136,6 +142,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.parentEntityId = null;
 		this.currentUploadType = null;
 		this.currentExternalUploadUrl = null;
+		bucketName = null;
+		keyPrefixUUID = null;
+		endpointUrl = null;
 		resetUploadProgress();
 	}
 
@@ -245,7 +254,21 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 								banner += "/" + externalUploadDestination.getBaseKey();
 						}
 						updateS3UploadBannerView(banner);
-
+					// direct to s3(-like) storage
+					} else if (uploadDestinations.get(0) instanceof ExternalObjectStoreUploadDestination) {
+						ExternalObjectStoreUploadDestination externalUploadDestination = (ExternalObjectStoreUploadDestination) uploadDestinations.get(0);
+						storageLocationId = externalUploadDestination.getStorageLocationId();
+						currentUploadType = externalUploadDestination.getUploadType();
+						String banner = externalUploadDestination.getBanner();
+						endpointUrl = externalUploadDestination.getEndpointUrl();
+						bucketName = externalUploadDestination.getBucket();
+						keyPrefixUUID = externalUploadDestination.getKeyPrefixUUID();
+						if (!DisplayUtils.isDefined(banner)) {
+							banner = "Uploading to " + endpointUrl + " " + bucketName;
+							if (keyPrefixUUID != null)
+								banner += "/" + keyPrefixUUID;
+						}
+						view.showUploadingToS3DirectStorage(endpointUrl, banner);
 					} else {
 						//unsupported upload destination type
 						onFailure(new org.sagebionetworks.web.client.exceptions.IllegalArgumentException("Unsupported upload destination: " + uploadDestinations.get(0).getClass().getName()));
@@ -444,8 +467,14 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
-	private void directUploadStep2(String fileName) {
-		this.multiPartUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);
+	public void directUploadStep2(String fileName) {
+		//use S3 direct uploader
+		if (endpointUrl != null) {
+			s3DirectUploader.configure(view.getS3DirectAccessKey(), view.getS3DirectSecretKey(), bucketName, endpointUrl);
+			s3DirectUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, keyPrefixUUID, storageLocationId, view);
+		} else {
+			this.multiPartUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);	
+		}
 	}
 
 	private void handleCancelledFileUpload() {

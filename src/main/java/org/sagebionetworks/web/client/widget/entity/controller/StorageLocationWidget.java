@@ -5,6 +5,7 @@ import java.util.List;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.file.UploadType;
+import org.sagebionetworks.repo.model.project.ExternalObjectStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
@@ -15,6 +16,7 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -41,7 +43,6 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		this.cookies = cookies;
 		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
-		view.setSFTPVisible(DisplayUtils.isInTestWebsite(cookies));
 	}
 	
 	@Override
@@ -49,7 +50,12 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 		this.entityBundle = entityBundle;
 		this.entityUpdatedHandler = entityUpdatedHandler;
 		clear();
+		view.setLoading(true);
+		getStorageLocationSetting();
 		getMyLocationSettingBanners();
+		boolean isInAlpha = DisplayUtils.isInTestWebsite(cookies);
+		view.setSFTPVisible(isInAlpha);
+		view.setExternalObjectStoreVisible(isInAlpha);
 	}
 	
 	public void getMyLocationSettingBanners() {
@@ -62,7 +68,6 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			public void onSuccess(List<String> banners) {
 				view.setBannerDropdownVisible(!banners.isEmpty());
 				view.setBannerSuggestions(banners);
-				getStorageLocationSetting();
 			};
 		});
 	}
@@ -76,6 +81,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				// unable to get storage location
 				// if this is a proxy, then upload is not supported.  Let the user set back to default Synapse.
 				view.showErrorMessage(caught.getMessage());
+				view.setLoading(false);
 			}
 			
 			@Override
@@ -89,6 +95,12 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 						view.setBucket(setting.getBucket().trim());
 						view.setExternalS3Banner(setting.getBanner().trim());
 						view.selectExternalS3Storage();
+					} else if (location instanceof ExternalObjectStorageLocationSetting) {
+						ExternalObjectStorageLocationSetting setting = (ExternalObjectStorageLocationSetting) location;
+						view.setExternalObjectStoreBanner(setting.getBanner().trim());
+						view.setExternalObjectStoreBucket(setting.getBucket().trim());
+						view.setExternalObjectStoreEndpointUrl(setting.getEndpointUrl().trim());
+						view.selectExternalObjectStore();
 					} else if (location instanceof ExternalStorageLocationSetting) {
 						view.setSFTPVisible(true);
 						ExternalStorageLocationSetting setting= (ExternalStorageLocationSetting) location;
@@ -97,6 +109,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 						view.selectSFTPStorage();
 					}
 				}
+				view.setLoading(false);
 			}
 		});
 	}
@@ -151,6 +164,13 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			setting.setBanner(view.getExternalS3Banner().trim());
 			setting.setBucket(view.getBucket().trim());
 			setting.setBaseKey(view.getBaseKey().trim());
+			setting.setUploadType(UploadType.S3);
+			return setting;
+		} else if (view.isExternalObjectStoreSelected()) {
+			ExternalObjectStorageLocationSetting setting = new ExternalObjectStorageLocationSetting();
+			setting.setBanner(view.getExternalObjectStoreBanner().trim());
+			setting.setBucket(view.getExternalObjectStoreBucket().trim());
+			setting.setEndpointUrl(view.getExternalObjectStoreEndpointUrl().trim());
 			setting.setUploadType(UploadType.S3);
 			return setting;
 		} else if (view.isSFTPStorageSelected()) {

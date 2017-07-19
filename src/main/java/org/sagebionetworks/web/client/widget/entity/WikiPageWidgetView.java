@@ -48,6 +48,8 @@ public interface WikiPageWidgetView extends IsWidget {
 	public void setDiffVersionAlertVisible(boolean isVisible);
 	public void setBreadcrumbsVisible(boolean isVisible);
 	public void setModifiedCreatedByHistoryPanelVisible(boolean isVisible);
+	void setCreatedOn(String date);
+	void setModifiedOn(String date);
 	public void setNoWikiCannotEditMessageVisible(boolean isVisible);
 	public void setMarkdownVisible(boolean isVisible);
 	public void setMainPanelVisible(boolean isVisible);
@@ -58,5 +60,4 @@ public interface WikiPageWidgetView extends IsWidget {
 	void showInfo(String title, String message);
 	public void clear();
 	void addStyleName(String style);
-	public void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
 }

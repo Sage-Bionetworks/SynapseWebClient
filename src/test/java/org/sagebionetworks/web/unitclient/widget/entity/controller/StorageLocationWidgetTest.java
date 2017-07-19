@@ -11,12 +11,15 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.file.UploadType;
+import org.sagebionetworks.repo.model.project.ExternalObjectStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.ExternalStorageLocationSetting;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
@@ -55,6 +58,8 @@ public class StorageLocationWidgetTest {
 	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
 	CookieProvider mockCookies;
+	@Captor
+	ArgumentCaptor<StorageLocationSetting> locationSettingCaptor;
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
@@ -74,6 +79,7 @@ public class StorageLocationWidgetTest {
 		verify(mockView).setPresenter(widget);
 		verify(mockSynAlert).clear();
 		verify(mockView).clear();
+		verify(mockView).setLoading(true);
 	}
 
 	@Test
@@ -110,7 +116,9 @@ public class StorageLocationWidgetTest {
 		widget.getStorageLocationSetting();
 		//should remain set to the default config
 		verify(mockView).setSFTPVisible(anyBoolean());
+		verify(mockView).setLoading(false);
 		verifyNoMoreInteractions(mockView);
+		
 	}
 	
 	@Test
@@ -119,6 +127,7 @@ public class StorageLocationWidgetTest {
 		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).getStorageLocationSetting(anyString(), any(AsyncCallback.class));
 		widget.getStorageLocationSetting();
 		verify(mockView).showErrorMessage(error);
+		verify(mockView).setLoading(false);
 	}
 	
 	@Test
@@ -168,6 +177,23 @@ public class StorageLocationWidgetTest {
 	}
 	
 	@Test
+	public void testGetStorageLocationSettingExternalObjectStore() {
+		ExternalObjectStorageLocationSetting setting = new ExternalObjectStorageLocationSetting();
+		String endpointUrl = "something.gov";
+		String bucket = "mybucket";
+		String banner = "upload to a sftp site";
+		setting.setBanner(banner);
+		setting.setBucket(bucket);
+		setting.setEndpointUrl(endpointUrl);
+		AsyncMockStubber.callSuccessWith(setting).when(mockSynapseClient).getStorageLocationSetting(anyString(), any(AsyncCallback.class));
+		widget.getStorageLocationSetting();
+		verify(mockView).setExternalObjectStoreBanner(banner);
+		verify(mockView).setExternalObjectStoreBucket(bucket);
+		verify(mockView).setExternalObjectStoreEndpointUrl(endpointUrl);
+		verify(mockView).selectExternalObjectStore();
+	}
+	
+	@Test
 	public void testShow() {
 		widget.show();
 		verify(mockView).show();
@@ -191,6 +217,33 @@ public class StorageLocationWidgetTest {
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
 		verify(mockView).hide();
 	}
+	
+	@Test
+	public void testOnSaveExternalObjectStore() {
+		when(mockView.isExternalS3StorageSelected()).thenReturn(false);
+		when(mockView.isSFTPStorageSelected()).thenReturn(false);
+		when(mockView.isSynapseStorageSelected()).thenReturn(false);
+		when(mockView.isExternalObjectStoreSelected()).thenReturn(true);
+		String banner = "hello object store";
+		String bucket = "need a bucket";
+		String endpointUrl = "http://test";
+		when(mockView.getExternalObjectStoreBanner()).thenReturn(banner);
+		when(mockView.getExternalObjectStoreBucket()).thenReturn(bucket);
+		when(mockView.getExternalObjectStoreEndpointUrl()).thenReturn(endpointUrl);
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).createStorageLocationSetting(anyString(), any(StorageLocationSetting.class), any(AsyncCallback.class));
+		
+		widget.onSave();
+		
+		verify(mockSynapseClient).createStorageLocationSetting(anyString(), locationSettingCaptor.capture(), any(AsyncCallback.class));
+		ExternalObjectStorageLocationSetting setting = (ExternalObjectStorageLocationSetting)locationSettingCaptor.getValue();
+		assertEquals(banner, setting.getBanner());
+		assertEquals(endpointUrl, setting.getEndpointUrl());
+		assertEquals(bucket, setting.getBucket());
+		assertEquals(UploadType.S3, setting.getUploadType());
+		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+		verify(mockView).hide();
+	}
+
 	
 	@Test
 	public void testOnSaveSynapseStorageFailure() {

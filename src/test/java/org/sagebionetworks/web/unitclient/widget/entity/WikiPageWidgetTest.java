@@ -33,6 +33,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -81,7 +82,7 @@ public class WikiPageWidgetTest {
 	@Mock
 	WikiSubpagesWidget mockSubpages;
 	@Mock
-	ModifiedCreatedByWidget mockModifiedCreatedBy;
+	DateTimeUtils mockDateTimeUtils;
 	@Mock
 	PortalGinInjector mockInjector;
 	@Mock
@@ -102,7 +103,7 @@ public class WikiPageWidgetTest {
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
 		presenter = new WikiPageWidget(mockView, mockSynapseClient, mockStuAlert, mockHistoryWidget, mockMarkdownWidget,
-				mockBreadcrumb, mockSubpages, mockInjector, mockModifiedCreatedBy, mockSessionStorage, mockAuthController, adapterFactory);
+				mockBreadcrumb, mockSubpages, mockInjector, mockSessionStorage, mockAuthController, adapterFactory, mockDateTimeUtils);
 		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
 		headers.setTotalNumberOfResults(1);
 		List<EntityHeader> resultHeaderList = new ArrayList<EntityHeader>();
@@ -133,6 +134,8 @@ public class WikiPageWidgetTest {
 		boolean showSubpages = true;
 		boolean canEdit = true;
 		String suffix = "-test-suffix";
+		String formattedDate = "today";
+		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(formattedDate);
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
@@ -144,11 +147,11 @@ public class WikiPageWidgetTest {
 		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), any(CallbackP.class));
 		verify(mockView).setWikiSubpagesWidget(mockSubpages);
 		verify(mockView).setModifiedCreatedByHistoryPanelVisible(true);
-		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
+		verify(mockView).setModifiedOn(formattedDate);
+		verify(mockView).setCreatedOn(formattedDate);
 		// once to clear, once after loading shown
 		verify(mockView, times(2)).setLoadingVisible(false);
 		verify(mockView).scrollWikiHeadingIntoView();
-		verify(mockModifiedCreatedBy).setCreatedByUIVisible(false);
 	}
 	
 	@Test
@@ -259,7 +262,8 @@ public class WikiPageWidgetTest {
 		verify(mockView, times(2)).scrollWikiHeadingIntoView();
 		verify(mockCallbackP).invoke(anyString());
 		//also verify that the created by and modified by are updated when wiki page is reloaded
-		verify(mockModifiedCreatedBy, times(2)).configure(any(Date.class), anyString(), any(Date.class), anyString());
+		verify(mockView, times(2)).setModifiedOn(anyString());
+		verify(mockView, times(2)).setCreatedOn(anyString());
 	}
 
 	@Test
