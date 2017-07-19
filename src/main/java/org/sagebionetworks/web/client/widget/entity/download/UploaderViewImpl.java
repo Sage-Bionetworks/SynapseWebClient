@@ -111,15 +111,19 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	private HandlerRegistration messageHandler;
 	FormGroup externalNameFormGroup;
+	AwsLoginView awsLoginView;
+	
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
 			SageImageBundle sageImageBundle,
 			SharingAndDataUseConditionWidget sharingDataUseWidget,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			AwsLoginView awsLoginView) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.sageImageBundle = sageImageBundle;
 		this.sharingDataUseWidget = sharingDataUseWidget;
 		this.ginInjector = ginInjector;
+		this.awsLoginView = awsLoginView;
 		
 		this.progressContainer = new Progress();
 		progressContainer.setMarginTop(10);
@@ -517,10 +521,13 @@ public class UploaderViewImpl extends FlowPanel implements
 		externalPassword.setStyleName("form-control margin-bottom-5");
 		externalUsername.setVisible(false);
 		externalPassword.setVisible(false);
+		awsLoginView.setVisible(false);
 		
 		formFieldsPanel.add(externalUsername);
 		formFieldsPanel.add(externalPassword);
+		formFieldsPanel.add(awsLoginView);
 		formFieldsPanel.add(fileInputPanel);
+		
 		configureUploadButton(); // upload tab first by default
 		
 		formPanel.setWidget(formFieldsPanel);
@@ -536,6 +543,27 @@ public class UploaderViewImpl extends FlowPanel implements
 		uploadPanel.add(row);
 	}
 
+	@Override
+	public void showUploadingToS3DirectStorage(String endpoint, String banner) {
+		awsLoginView.clear();
+		uploadDestinationContainer.clear();
+		String escapedEndpoint = SafeHtmlUtils.htmlEscape(endpoint);
+		awsLoginView.setEndpoint(escapedEndpoint);
+		if (banner != null)
+			uploadDestinationContainer.add(new HTML(SafeHtmlUtils.htmlEscape(banner)));
+		awsLoginView.setVisible(true);
+	}
+	
+	@Override
+	public String getS3DirectAccessKey() {
+		return awsLoginView.getAccessKey();
+	}
+	
+	@Override
+	public String getS3DirectSecretKey() {
+		return awsLoginView.getSecretKey();
+	}
+	
 	@Override
 	public void showUploadingToExternalStorage(String host, String banner) {
 		uploadDestinationContainer.clear();
