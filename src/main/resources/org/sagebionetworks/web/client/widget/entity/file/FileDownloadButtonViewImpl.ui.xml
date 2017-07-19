@@ -34,7 +34,7 @@
 				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
-		<b:Modal ui:field="s3DirectDownloadDialog" title="Login Successful" closable="true" dataKeyboard="false">
+		<b:Modal ui:field="s3DirectDownloadDialog" title="Ready to download" closable="true" dataKeyboard="false">
 			<b:ModalBody>
 				<b:Button ui:field="s3DirectDownloadButton" type="PRIMARY" size="LARGE" icon="DOWNLOAD" width="100%">Download</b:Button>
 			</b:ModalBody>
