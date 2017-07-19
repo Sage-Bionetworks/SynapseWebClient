@@ -20,6 +20,7 @@ import static org.mockito.Mockito.when;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -40,6 +41,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.attachment.UploadResult;
 import org.sagebionetworks.repo.model.attachment.UploadStatus;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
@@ -65,6 +67,7 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.download.S3DirectUploader;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
+import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -96,6 +99,9 @@ public class UploaderTest {
 	String parentEntityId;
 	private Long storageLocationId;
 	String md5 = "e10e3f4491440ce7b48edc97f03307bb";
+	@Mock
+	ExternalObjectStoreUploadDestination mockExternalObjectStoreUploadDestination;
+	
 	@Before
 	public void before() throws Exception {
 		MockitoAnnotations.initMocks(this);
@@ -463,6 +469,39 @@ public class UploaderTest {
 		AsyncMockStubber.callSuccessWith(destinations).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertEquals(uploader.getStorageLocationId(), storageLocationId);
+	}
+	
+	@Test
+	public void testQueryForUploadDestinationsWithUploadToExternalObjectStore() {
+		String banner = "banner";
+		String endpoint = "endpointUrl";
+		String bucket = "mr.h";
+		String keyPrefixUUID = "keyPrefixUUID";
+		UploadType uploadType = UploadType.S3;
+		String fileName = "f.txt";
+		when(mockExternalObjectStoreUploadDestination.getBanner()).thenReturn(banner);
+		when(mockExternalObjectStoreUploadDestination.getStorageLocationId()).thenReturn(storageLocationId);
+		when(mockExternalObjectStoreUploadDestination.getUploadType()).thenReturn(uploadType);
+		when(mockExternalObjectStoreUploadDestination.getEndpointUrl()).thenReturn(endpoint);
+		when(mockExternalObjectStoreUploadDestination.getBucket()).thenReturn(bucket);
+		when(mockExternalObjectStoreUploadDestination.getKeyPrefixUUID()).thenReturn(keyPrefixUUID);
+		
+		AsyncMockStubber.callSuccessWith(Collections.singletonList(mockExternalObjectStoreUploadDestination)).when(synapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		uploader.queryForUploadDestination();
+		assertEquals(uploader.getStorageLocationId(), storageLocationId);
+		assertEquals(uploader.getCurrentUploadType(), uploadType);
+		verify(view).showUploadingToS3DirectStorage(endpoint, banner);
+		
+		String accessKey = "abc";
+		String secretKey = "123";
+		when(view.getS3DirectAccessKey()).thenReturn(accessKey);
+		when(view.getS3DirectSecretKey()).thenReturn(secretKey);
+
+		uploader.directUploadStep2(fileName);
+		
+		verify(mockS3DirectUploader).configure(accessKey, secretKey, bucket, endpoint);
+		verify(mockS3DirectUploader).uploadFile(UploaderViewImpl.FILE_FIELD_ID, 0, uploader, keyPrefixUUID, storageLocationId, view);
+		
 	}
 
 	@Test

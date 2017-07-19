@@ -467,7 +467,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		}
 	}
 	
-	private void directUploadStep2(String fileName) {
+	public void directUploadStep2(String fileName) {
 		//use S3 direct uploader
 		if (endpointUrl != null) {
 			s3DirectUploader.configure(view.getS3DirectAccessKey(), view.getS3DirectSecretKey(), bucketName, endpointUrl);
