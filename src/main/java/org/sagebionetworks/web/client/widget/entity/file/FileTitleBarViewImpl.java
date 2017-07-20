@@ -2,17 +2,12 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityType;
-import org.sagebionetworks.repo.model.file.ExternalFileHandle;
-import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
 import com.google.gwt.core.client.GWT;
@@ -60,6 +55,14 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	Heading entityName;
 	@UiField
 	Span fileDownloadButtonContainer;
+	@UiField
+	Div externalObjectStoreUI;
+	@UiField
+	Span endpoint;
+	@UiField
+	Span bucket;
+	@UiField
+	Span fileKey;
 	
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
@@ -156,5 +159,15 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	public void setFileDownloadButton(Widget w) {
 		fileDownloadButtonContainer.clear();
 		fileDownloadButtonContainer.add(w);
+	}
+	@Override
+	public void setExternalObjectStoreUIVisible(boolean visible) {
+		externalObjectStoreUI.setVisible(visible);
+	}
+	@Override
+	public void setExternalObjectStoreInfo(String endpointValue, String bucketValue, String fileKeyValue) {
+		endpoint.setText(endpointValue);
+		bucket.setText(bucketValue);
+		fileKey.setText(fileKeyValue);
 	}
 }

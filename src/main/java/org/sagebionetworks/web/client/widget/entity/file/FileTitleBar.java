@@ -42,6 +42,7 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		this.entityBundle = bundle;
 		
 		view.setExternalUrlUIVisible(false);
+		view.setExternalObjectStoreUIVisible(false);
 		view.setFileSize("");
 		
 		view.createTitlebar(bundle.getEntity());
@@ -137,8 +138,8 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	}
 	
 	public void configureExternalObjectStore(ExternalObjectStoreFileHandle externalFileHandle) {
-		view.setExternalUrlUIVisible(true);
-		view.setExternalUrl(externalFileHandle.getEndpointUrl() + "/" + externalFileHandle.getBucket() + "/" + externalFileHandle.getFileKey());
+		view.setExternalObjectStoreUIVisible(true);
+		view.setExternalObjectStoreInfo(externalFileHandle.getEndpointUrl(), externalFileHandle.getBucket(), externalFileHandle.getFileKey());
 		view.setFileLocation("| External Object Store");
 	}
 }
