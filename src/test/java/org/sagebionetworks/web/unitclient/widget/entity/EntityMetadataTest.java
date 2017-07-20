@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
@@ -228,6 +229,23 @@ public class EntityMetadataTest {
 		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		widget.configureStorageLocation(en);
 		verify(mockView).setUploadDestinationText("testUrl.com");
+		verify(mockView).setUploadDestinationPanelVisible(false);
+		verify(mockView).setUploadDestinationPanelVisible(true);
+	}
+	
+	@Test
+	public void testConfigureStorageLocationExternalObjectStore() {
+		String endpointUrl = "https://externalobjectstore";
+		String bucket = "mybucket";
+		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
+		ExternalObjectStoreUploadDestination exS3Destination = new ExternalObjectStoreUploadDestination();
+		exS3Destination.setUploadType(UploadType.S3);
+		exS3Destination.setEndpointUrl(endpointUrl);
+		exS3Destination.setBucket(bucket);
+		uploadDestinations.add(exS3Destination);
+		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		widget.configureStorageLocation(en);
+		verify(mockView).setUploadDestinationText(endpointUrl + "/" + bucket);
 		verify(mockView).setUploadDestinationPanelVisible(false);
 		verify(mockView).setUploadDestinationPanelVisible(true);
 	}
