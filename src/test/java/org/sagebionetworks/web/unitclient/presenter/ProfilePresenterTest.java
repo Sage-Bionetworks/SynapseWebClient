@@ -79,6 +79,7 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
+import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
@@ -154,7 +155,10 @@ public class ProfilePresenterTest {
 	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
-
+	@Mock
+	PromptModalView mockPromptForProjectNameDialog;
+	@Mock
+	PromptModalView mockPromptForTeamNameDialog;
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
 	
@@ -179,9 +183,25 @@ public class ProfilePresenterTest {
 		mockTeamInviteWidget = mock(OpenTeamInvitationsWidget.class);
 		mockSynAlert = mock(SynapseAlert.class);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
-		profilePresenter = new ProfilePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, 
-				mockSynapseClient, mockChallengeClient, mockCookies, mockUserProfileModalWidget, mockLinkedInServic, mockGwt, mockTeamListWidget, mockTeamInviteWidget, 
-				mockInjector, mockUserProfileClient,mockVerificationSubmissionModal, mockIsACTMemberAsyncHandler, mockDateTimeUtils);
+		profilePresenter = new ProfilePresenter(mockView, 
+				mockAuthenticationController, 
+				mockGlobalApplicationState, 
+				mockSynapseClient, 
+				mockChallengeClient, 
+				mockCookies, 
+				mockUserProfileModalWidget, 
+				mockLinkedInServic, 
+				mockGwt, 
+				mockTeamListWidget, 
+				mockTeamInviteWidget, 
+				mockInjector, 
+				mockUserProfileClient,
+				mockVerificationSubmissionModal,
+				mockIsACTMemberAsyncHandler,
+				mockDateTimeUtils,
+				mockPromptForProjectNameDialog,
+				mockPromptForTeamNameDialog
+				);
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
@@ -779,7 +799,8 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testCreateProject() {
-		profilePresenter.createProject("valid name");
+		when(mockPromptForProjectNameDialog.getValue()).thenReturn("valid name");
+		profilePresenter.createProjectAfterPrompt();
 		verify(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 		//inform user of success, and go to new project page
 		verify(mockView).showInfo(anyString(), anyString());
@@ -788,29 +809,34 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testCreateProjectEmptyName() {
-		profilePresenter.createProject("");
+		when(mockPromptForProjectNameDialog.getValue()).thenReturn("");
+		profilePresenter.createProjectAfterPrompt();
 		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
-		verify(mockSynAlert).showError(anyString());
-		Mockito.reset(mockSynAlert);
+		verify(mockPromptForProjectNameDialog).showError(anyString());
+		Mockito.reset(mockPromptForProjectNameDialog);
 		
-		profilePresenter.createProject(null);
+		when(mockPromptForProjectNameDialog.getValue()).thenReturn(null);
+		profilePresenter.createProjectAfterPrompt();
 		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
-		verify(mockSynAlert).showError(anyString());
+		verify(mockPromptForProjectNameDialog).showError(anyString());
 	}
 
 	@Test
 	public void testCreateProjectError() {
-		Exception caught = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
-		profilePresenter.createProject("valid name");
-		verify(mockSynAlert).handleException(caught);
+		when(mockPromptForProjectNameDialog.getValue()).thenReturn("valid name");
+		profilePresenter.createProjectAfterPrompt();
+		String errorMessage = "unhandled";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
+		profilePresenter.createProjectAfterPrompt();
+		verify(mockPromptForProjectNameDialog).showError(errorMessage);
 	}
 	
 	@Test
 	public void testCreateProjectNameConflictError() {
 		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
-		profilePresenter.createProject("valid name");
-		verify(mockSynAlert).showError(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));
+		when(mockPromptForProjectNameDialog.getValue()).thenReturn("valid name");
+		profilePresenter.createProjectAfterPrompt();
+		verify(mockPromptForProjectNameDialog).showError(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));
 	}
 	
 	// Project Sorting tests
@@ -860,7 +886,8 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testCreateTeam() {
-		profilePresenter.createTeam("valid name");
+		when(mockPromptForTeamNameDialog.getValue()).thenReturn("valid name");
+		profilePresenter.createTeamAfterPrompt();
 		verify(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
 		//inform user of success, and go to new team page
 		verify(mockView).showInfo(anyString(), anyString());
@@ -869,28 +896,32 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testCreateTeamEmptyName() {
-		profilePresenter.createTeam("");
+		when(mockPromptForTeamNameDialog.getValue()).thenReturn("");
+		profilePresenter.createTeamAfterPrompt();
 		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
-		verify(mockSynAlert).showError(anyString());
-		Mockito.reset(mockSynAlert);	
-		profilePresenter.createTeam(null);
+		verify(mockPromptForTeamNameDialog).showError(anyString());
+		Mockito.reset(mockPromptForTeamNameDialog);
+		when(mockPromptForTeamNameDialog.getValue()).thenReturn(null);
+		profilePresenter.createTeamAfterPrompt();
 		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
-		verify(mockSynAlert).showError(anyString());
+		verify(mockPromptForTeamNameDialog).showError(anyString());
 	}
 
 	@Test
 	public void testCreateTeamError() {
-		Exception caught = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
-		profilePresenter.createTeam("valid name");
-		verify(mockSynAlert).handleException(caught);
+		String errorMessage = "unhandled";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		when(mockPromptForTeamNameDialog.getValue()).thenReturn("valid name");
+		profilePresenter.createTeamAfterPrompt();
+		verify(mockPromptForTeamNameDialog).showError(errorMessage);
 	}
 	
 	@Test
 	public void testCreateTeamNameConflictError() {
 		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
-		profilePresenter.createTeam("valid name");
-		verify(mockSynAlert).showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
+		when(mockPromptForTeamNameDialog.getValue()).thenReturn("valid name");
+		profilePresenter.createTeamAfterPrompt();
+		verify(mockPromptForTeamNameDialog).showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 	}
 	
 	

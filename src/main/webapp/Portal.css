@@ -265,7 +265,7 @@ End Synapse color scheme
 }
 
 /* File browser input box needs more fine-tuned selector for override*/
-.border-none, input[type=text][readonly].border-none {
+.border-none, input[type=text][readonly].border-none, #rootPanel .border-none {
 	border: none;
 }
 .userProfileImage {
