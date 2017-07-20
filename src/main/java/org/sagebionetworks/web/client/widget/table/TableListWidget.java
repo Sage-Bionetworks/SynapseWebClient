@@ -163,7 +163,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 		view.setAddTableVisible(this.canEdit);
 		view.setUploadTableVisible(this.canEdit);
 		view.setAddFileViewVisible(this.canEdit);
-		view.setAddProjectViewVisible(DisplayUtils.isInTestWebsite(cookies) && this.canEdit);
+		view.setAddProjectViewVisible(this.canEdit);
 	}
     
 	@Override

@@ -114,6 +114,7 @@ public class TableListWidgetTest {
 	
 	@Test
 	public void testConfigureCanEdit(){
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
 		widget.configure(parentBundle);
 		verify(mockView).setAddTableVisible(true);
 		verify(mockView).setUploadTableVisible(true);
@@ -128,16 +129,6 @@ public class TableListWidgetTest {
 		verify(mockView).setAddTableVisible(false);
 		verify(mockView).setUploadTableVisible(false);
 		verify(mockView).setAddFileViewVisible(false);
-		verify(mockView).setAddProjectViewVisible(false);
-	}
-	
-	@Test
-	public void testNoAlphaMode(){
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn(null);
-		widget.configure(parentBundle);
-		verify(mockView).setAddTableVisible(true);
-		verify(mockView).setUploadTableVisible(true);
-		verify(mockView).setAddFileViewVisible(true);
 		verify(mockView).setAddProjectViewVisible(false);
 	}
 	
