@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
@@ -141,6 +142,10 @@ public class EntityMetadata implements Presenter {
 						if (externalUploadDestination.getBaseKey() != null) {
 							description += externalUploadDestination.getBaseKey();
 						};
+						view.setUploadDestinationText(description);
+					} else if (uploadDestinations.get(0) instanceof ExternalObjectStoreUploadDestination) {
+						ExternalObjectStoreUploadDestination destination = (ExternalObjectStoreUploadDestination) uploadDestinations.get(0);
+						String description = destination.getEndpointUrl() + "/" + destination.getBucket();
 						view.setUploadDestinationText(description);
 					}
 					view.setUploadDestinationPanelVisible(true);
