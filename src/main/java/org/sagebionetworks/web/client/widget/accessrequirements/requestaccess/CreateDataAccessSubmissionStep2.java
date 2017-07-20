@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
+import org.sagebionetworks.repo.model.dataaccess.CreateSubmissionRequest;
 import org.sagebionetworks.repo.model.dataaccess.Renewal;
 import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -60,6 +62,8 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	private SynapseSuggestBox peopleSuggestWidget;
 	FileHandleList otherDocuments;
 	PopupUtilsView popupUtils;
+	RestrictableObjectDescriptor targetSubject;
+	
 	@Inject
 	public CreateDataAccessSubmissionStep2(
 			CreateDataAccessSubmissionWizardStep2View view,
@@ -150,9 +154,10 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	/**
 	 * Configure this widget before use.
 	 */
-	public void configure(ResearchProject researchProject, ManagedACTAccessRequirement ar) {
+	public void configure(ResearchProject researchProject, ManagedACTAccessRequirement ar, RestrictableObjectDescriptor targetSubject) {
 		this.ar = ar;
 		this.researchProject = researchProject;
+		this.targetSubject = targetSubject;
 		view.setIRBVisible(ValidationUtils.isTrue(ar.getIsIRBApprovalRequired()));
 		view.setDUCVisible(ValidationUtils.isTrue(ar.getIsDUCRequired()));
 		otherDocuments.clear();
@@ -279,7 +284,14 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	}
 
 	public void submitDataAccessRequest() {
-		client.submitDataAccessRequest(dataAccessRequest, new AsyncCallback<Void>() {
+		CreateSubmissionRequest submissionRequest = new CreateSubmissionRequest();
+		submissionRequest.setRequestId(dataAccessRequest.getId());
+		submissionRequest.setRequestEtag(dataAccessRequest.getEtag());
+		if (targetSubject != null) {
+			submissionRequest.setSubjectId(targetSubject.getId());
+			submissionRequest.setSubjectType(targetSubject.getType());
+		}
+		client.submitDataAccessRequest(submissionRequest, ar.getId(), new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				modalPresenter.setErrorMessage(caught.getMessage());

@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.dataaccess.AccessRequirementConversionRequ
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
+import org.sagebionetworks.repo.model.dataaccess.CreateSubmissionRequest;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -41,7 +42,7 @@ public interface DataAccessClient extends XsrfProtectedService {
 	Submission updateDataAccessSubmissionState(String submissionId, SubmissionState newState,
 			String reason) throws RestServiceException;
 	OpenSubmissionPage getOpenSubmissions(String nextPageToken) throws RestServiceException;
-	void submitDataAccessRequest(RequestInterface dataAccessRequest) throws RestServiceException;
+	void submitDataAccessRequest(CreateSubmissionRequest dataAccessRequest, Long arId) throws RestServiceException;
 	BatchAccessApprovalInfoResponse getAccessRequirementStatus(BatchAccessApprovalInfoRequest request) throws RestServiceException;
 	AccessorGroupResponse listAccessorGroup(AccessorGroupRequest request) throws RestServiceException;
 	void revokeGroup(String accessRequirementId, String submitterId) throws RestServiceException;

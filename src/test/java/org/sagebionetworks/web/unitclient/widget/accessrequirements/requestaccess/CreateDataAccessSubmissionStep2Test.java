@@ -25,8 +25,11 @@ import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
+import org.sagebionetworks.repo.model.dataaccess.CreateSubmissionRequest;
 import org.sagebionetworks.repo.model.dataaccess.Renewal;
 import org.sagebionetworks.repo.model.dataaccess.Request;
 import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
@@ -124,6 +127,10 @@ public class CreateDataAccessSubmissionStep2Test {
 	ArgumentCaptor<AccessorChange> accessorChangeCaptor;
 	@Mock
 	PopupUtilsView mockPopupUtils;
+	@Mock
+	RestrictableObjectDescriptor mockSubject;
+	@Captor
+	ArgumentCaptor<CreateSubmissionRequest> submissionRequestCaptor;
 	
 	public static final String FILE_HANDLE_ID = "543345";
 	public static final String FILE_HANDLE_ID2 = "2";
@@ -133,6 +140,10 @@ public class CreateDataAccessSubmissionStep2Test {
 	public static final String DATA_ACCESS_REQUEST_ID = "55555";
 	public static final String CURRENT_USER_ID = "9878987";
 	public static final String USER_ID2 = "7777777";
+	public static final String DATA_ACCESS_REQUEST_ETAG = "xxxxxx";
+	
+	public static final String TARGET_SUBJECT_ID = "syn1";
+	public static final RestrictableObjectType TARGET_SUBJECT_TYPE = RestrictableObjectType.ENTITY;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -164,10 +175,12 @@ public class CreateDataAccessSubmissionStep2Test {
 		when(mockGinInjector.getFileHandleWidget()).thenReturn(mockFileHandleWidget);
 		when(mockACTAccessRequirement.getId()).thenReturn(ACCESS_REQUIREMENT_ID);
 		when(mockDataAccessRequest.getId()).thenReturn(DATA_ACCESS_REQUEST_ID);
+		when(mockDataAccessRequest.getEtag()).thenReturn(DATA_ACCESS_REQUEST_ETAG);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CURRENT_USER_ID);
-		
+		when(mockSubject.getId()).thenReturn(TARGET_SUBJECT_ID);
+		when(mockSubject.getType()).thenReturn(TARGET_SUBJECT_TYPE);
 		AsyncMockStubber.callSuccessWith(mockDataAccessRequest).when(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockClient).submitDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockClient).submitDataAccessRequest(any(CreateSubmissionRequest.class), anyLong(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -186,7 +199,7 @@ public class CreateDataAccessSubmissionStep2Test {
 	
 	@Test
 	public void testUploadDuc() {
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		verify(mockDucUploader).configure(anyString(), callbackPCaptor.capture());
 		CallbackP<FileUpload> callback = callbackPCaptor.getValue();
 		callback.invoke(mockFileUpload);
@@ -198,7 +211,7 @@ public class CreateDataAccessSubmissionStep2Test {
 	}
 	@Test
 	public void testUploadIrb() {
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		verify(mockIrbUploader).configure(anyString(), callbackPCaptor.capture());
 		CallbackP<FileUpload> callback = callbackPCaptor.getValue();
 		callback.invoke(mockFileUpload);
@@ -211,7 +224,7 @@ public class CreateDataAccessSubmissionStep2Test {
 	
 	@Test
 	public void testUserSynapseSuggestion() {
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		verify(mockPeopleSuggestBox).addItemSelectedHandler(callbackPUserSuggestionCaptor.capture());
 		CallbackP<SynapseSuggestion> callback = callbackPUserSuggestionCaptor.getValue();
 		callback.invoke(mockSynapseSuggestion);
@@ -228,7 +241,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(true);
 		when(mockACTAccessRequirement.getAreOtherAttachmentsRequired()).thenReturn(true);
 		when(mockACTAccessRequirement.getDucTemplateFileHandleId()).thenReturn(FILE_HANDLE_ID);
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		verify(mockView).setValidatedUserProfileNoteVisible(true);
 		verify(mockView).setIRBVisible(true);
 		verify(mockView).setDUCVisible(true);
@@ -252,7 +265,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		String error = "error getting data access request";
 		Exception ex = new Exception(error);
 		AsyncMockStubber.callFailureWith(ex).when(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
 		verify(mockModalPresenter).setErrorMessage(error);
 	}
@@ -260,7 +273,7 @@ public class CreateDataAccessSubmissionStep2Test {
 	@Test
 	public void testConfigureWithRenewal() {
 		AsyncMockStubber.callSuccessWith(mockDataAccessRenewal).when(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		
 		verify(mockView).setPublicationsVisible(true);
 		verify(mockView).setSummaryOfUseVisible(true);
@@ -283,7 +296,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(false);
 		when(mockDataAccessRequest.getDucFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockACTAccessRequirement.getIsDUCRequired()).thenReturn(true);
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		verify(mockView).setValidatedUserProfileNoteVisible(false);
 		verify(mockView).setIRBVisible(false);
 		verify(mockView).setDUCVisible(true);
@@ -306,7 +319,7 @@ public class CreateDataAccessSubmissionStep2Test {
 	public void testConfigureWithIrb() {
 		when(mockDataAccessRequest.getIrbFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockACTAccessRequirement.getIsIRBApprovalRequired()).thenReturn(true);
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		verify(mockView).setIRBVisible(true);
 		verify(mockView).setDUCVisible(false);
 		verify(mockView, times(2)).setPublicationsVisible(false);
@@ -331,7 +344,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		otherDocumentIds.add(FILE_HANDLE_ID2);
 		when(mockDataAccessRequest.getAttachments()).thenReturn(otherDocumentIds);
 		when(mockACTAccessRequirement.getAreOtherAttachmentsRequired()).thenReturn(true);
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		verify(mockView).setIRBVisible(false);
 		verify(mockView).setDUCVisible(false);
 		verify(mockView, times(2)).setPublicationsVisible(false);
@@ -362,7 +375,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		change2.setType(AccessType.RENEW_ACCESS);
 		accessorUserIds.add(change2);
 		when(mockDataAccessRequest.getAccessorChanges()).thenReturn(accessorUserIds);
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		verify(mockClient).getDataAccessRequest(anyLong(),  any(AsyncCallback.class));
 		verify(mockAccessorsList).addSubmitterAccessorChange(change1);
 		verify(mockAccessorsList).addAccessorChange(change2);
@@ -370,7 +383,7 @@ public class CreateDataAccessSubmissionStep2Test {
 	
 	@Test
 	public void testSubmit() {
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		when(mockAccessorsList.getAccessorChanges()).thenReturn(mockAccessorChanges);
 		when(mockOtherDocuments.getFileHandleIds()).thenReturn(mockOtherFileHandleIds);
 		widget.onPrimary();
@@ -380,7 +393,12 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
 		
 		//submitted (primary button was clicked)
-		verify(mockClient).submitDataAccessRequest(eq(mockDataAccessRequest), any(AsyncCallback.class));
+		verify(mockClient).submitDataAccessRequest(submissionRequestCaptor.capture(), eq(ACCESS_REQUIREMENT_ID), any(AsyncCallback.class));
+		CreateSubmissionRequest submissionRequest = submissionRequestCaptor.getValue();
+		assertEquals(TARGET_SUBJECT_ID, submissionRequest.getSubjectId());
+		assertEquals(TARGET_SUBJECT_TYPE, submissionRequest.getSubjectType());
+		assertEquals(DATA_ACCESS_REQUEST_ID, submissionRequest.getRequestId());
+		assertEquals(DATA_ACCESS_REQUEST_ETAG, submissionRequest.getRequestEtag());
 		
 		verify(mockPopupUtils).showInfoDialog(SUCCESSFULLY_SUBMITTED_TITLE, SUCCESSFULLY_SUBMITTED_MESSAGE, null);
 		InOrder order = inOrder(mockModalPresenter);
@@ -392,7 +410,7 @@ public class CreateDataAccessSubmissionStep2Test {
 
 	@Test
 	public void testSubmitFailure() {
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		String error = "error submitting data access request";
 		Exception ex = new Exception(error);
 		AsyncMockStubber.callFailureWith(ex).when(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
@@ -403,7 +421,7 @@ public class CreateDataAccessSubmissionStep2Test {
 	
 	@Test
 	public void testSave() {
-		widget.configure(mockResearchProject, mockACTAccessRequirement);
+		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		when(mockAccessorsList.getAccessorChanges()).thenReturn(mockAccessorChanges);
 		when(mockOtherDocuments.getFileHandleIds()).thenReturn(mockOtherFileHandleIds);
 		verify(mockModalPresenter).addCallback(wizardCallbackCaptor.capture());
@@ -418,7 +436,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockDataAccessRequest).setAccessorChanges(mockAccessorChanges);
 		verify(mockDataAccessRequest).setAttachments(mockOtherFileHandleIds);
 		verify(mockClient).updateDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
-		verify(mockClient, never()).submitDataAccessRequest(any(RequestInterface.class), any(AsyncCallback.class));
+		verify(mockClient, never()).submitDataAccessRequest(any(CreateSubmissionRequest.class), anyLong(), any(AsyncCallback.class));
 		
 		verify(mockPopupUtils).showInfo(CreateDataAccessSubmissionStep2.SAVED_PROGRESS_MESSAGE, "");
 		InOrder order = inOrder(mockModalPresenter);

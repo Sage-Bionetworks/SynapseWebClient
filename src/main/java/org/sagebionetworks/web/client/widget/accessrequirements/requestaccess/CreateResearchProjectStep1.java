@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -24,6 +25,7 @@ public class CreateResearchProjectStep1 implements ModalPage {
 	ModalPresenter modalPresenter;
 	CreateDataAccessSubmissionStep2 step2;
 	ResearchProject researchProject;
+	RestrictableObjectDescriptor targetSubject;
 	
 	@Inject
 	public CreateResearchProjectStep1(
@@ -41,8 +43,9 @@ public class CreateResearchProjectStep1 implements ModalPage {
 	 * 
 	 * @param parentId
 	 */
-	public void configure(ManagedACTAccessRequirement ar) {
+	public void configure(ManagedACTAccessRequirement ar, RestrictableObjectDescriptor targetSubject) {
 		this.ar = ar;
+		this.targetSubject = targetSubject;
 		view.setIDUPublicNoteVisible(ar.getIsIDUPublic());
 		client.getResearchProject(ar.getId(), new AsyncCallback<ResearchProject>() {
 			@Override
@@ -80,7 +83,7 @@ public class CreateResearchProjectStep1 implements ModalPage {
 			}
 			@Override
 			public void onSuccess(ResearchProject researchProject) {
-				step2.configure(researchProject, ar);
+				step2.configure(researchProject, ar, targetSubject);
 				modalPresenter.setNextActivePage(step2);
 			}
 		});

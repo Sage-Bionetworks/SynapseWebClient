@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.dataaccess.AccessRequirementConversionRequ
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
+import org.sagebionetworks.repo.model.dataaccess.CreateSubmissionRequest;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
 import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
@@ -28,7 +29,7 @@ public interface DataAccessClientAsync {
 	void getDataAccessRequest(Long id, AsyncCallback<RequestInterface> asyncCallback);
 	void updateDataAccessRequest(RequestInterface dataAccessRequest,
 			AsyncCallback<RequestInterface> asyncCallback);
-	void submitDataAccessRequest(RequestInterface dataAccessRequest, AsyncCallback<Void> asyncCallback); 
+	void submitDataAccessRequest(CreateSubmissionRequest dataAccessRequest, Long arId, AsyncCallback<Void> asyncCallback); 
 
 	void getAccessRequirement(Long requirementId, AsyncCallback<AccessRequirement> callback);
 	void getDataAccessSubmissions(Long accessRequirementId, String nextPageToken, SubmissionState stateFilter,

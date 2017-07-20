@@ -104,6 +104,9 @@ public class ManagedACTAccessRequirementWidgetTest {
 	ReviewAccessorsButton mockManageAccessButton;
 	@Mock
 	Callback mockRefreshCallback;
+	@Mock
+	RestrictableObjectDescriptor mockSubject;
+	
 	Callback lazyLoadDataCallback;
 	
 	public final static String ROOT_WIKI_ID = "777";
@@ -280,10 +283,11 @@ public class ManagedACTAccessRequirementWidgetTest {
 	public void testRequestAccess() {
 		when(mockDataAccessSubmissionStatus.getCurrentSubmissionStatus()).thenReturn(null);
 		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
+		widget.setTargetSubject(mockSubject);
 		lazyLoadDataCallback.invoke();
 		
 		widget.onRequestAccess();
-		verify(mockCreateDataAccessRequestWizard).configure(mockACTAccessRequirement);
+		verify(mockCreateDataAccessRequestWizard).configure(mockACTAccessRequirement, mockSubject);
 		verify(mockCreateDataAccessRequestWizard).showModal(any(WizardCallback.class));
 	}
 	

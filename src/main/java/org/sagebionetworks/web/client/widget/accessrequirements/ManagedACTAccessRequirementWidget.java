@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.accessrequirements;
 
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.ManagedACTAccessRequirementStatus;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionStatus;
@@ -44,6 +45,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 	UserBadge submitterUserBadge;
 	DateTimeUtils dateTimeUtils;
 	ReviewAccessorsButton manageAccessButton;
+	RestrictableObjectDescriptor targetSubject;
 	
 	@Inject
 	public ManagedACTAccessRequirementWidget(ManagedACTAccessRequirementWidgetView view, 
@@ -121,6 +123,10 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		manageAccessButton.configure(ar);
 		subjectsWidget.configure(ar.getSubjectIds());
 		lazyLoadHelper.setIsConfigured();
+	}
+	
+	public void setTargetSubject(RestrictableObjectDescriptor targetSubject) {
+		this.targetSubject = targetSubject;
 	}
 	
 	public void setDataAccessSubmissionStatus(ManagedACTAccessRequirementStatus status) {
@@ -213,7 +219,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		//pop up DataAccessRequest dialog
 		CreateDataAccessRequestWizard wizard = ginInjector.getCreateDataAccessRequestWizard();
 		view.setDataAccessRequestWizard(wizard);
-		wizard.configure(ar);
+		wizard.configure(ar, targetSubject);
 		wizard.showModal(new WizardCallback() {
 			//In any case, the state may have changed, so refresh this AR
 			@Override

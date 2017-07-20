@@ -16,6 +16,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -44,6 +45,9 @@ public class CreateResearchProjectStep1Test {
 	ManagedACTAccessRequirement mockACTAccessRequirement;
 	@Captor
 	ArgumentCaptor<ResearchProject> researchProjectCaptor;
+	@Mock
+	RestrictableObjectDescriptor mockSubject;
+	
 	public static final String INSTITUTION = "MIT";
 	public static final String INTENDED_DUS = "Do no harm.";
 	public static final String PROJECT_LEAD = "Megamind";
@@ -81,7 +85,7 @@ public class CreateResearchProjectStep1Test {
 	public void testConfigure() {
 		boolean isIDUPublic = true;
 		when(mockACTAccessRequirement.getIsIDUPublic()).thenReturn(isIDUPublic);
-		widget.configure(mockACTAccessRequirement);
+		widget.configure(mockACTAccessRequirement, mockSubject);
 		verify(mockView).setIDUPublicNoteVisible(isIDUPublic);
 		verify(mockClient).getResearchProject(anyLong(),  any(AsyncCallback.class));
 		verify(mockView).setInstitution(INSTITUTION);
@@ -93,7 +97,7 @@ public class CreateResearchProjectStep1Test {
 	public void testConfigureNewResearchProject() {
 		AsyncMockStubber.callSuccessWith(mock(ResearchProject.class)).when(mockClient).getResearchProject(anyLong(),  any(AsyncCallback.class));
 		
-		widget.configure(mockACTAccessRequirement);
+		widget.configure(mockACTAccessRequirement, mockSubject);
 		verify(mockClient).getResearchProject(anyLong(),  any(AsyncCallback.class));
 		verify(mockView, never()).setInstitution(INSTITUTION);
 		verify(mockView, never()).setIntendedDataUseStatement(INTENDED_DUS);
@@ -108,7 +112,7 @@ public class CreateResearchProjectStep1Test {
 		Exception ex = new Exception(error);
 		AsyncMockStubber.callFailureWith(ex).when(mockClient).getResearchProject(anyLong(),  any(AsyncCallback.class));
 		
-		widget.configure(mockACTAccessRequirement);
+		widget.configure(mockACTAccessRequirement, mockSubject);
 		verify(mockView).setIDUPublicNoteVisible(isIDUPublic);
 		verify(mockClient).getResearchProject(anyLong(),  any(AsyncCallback.class));
 		verify(mockModalPresenter).setErrorMessage(error);
@@ -116,7 +120,7 @@ public class CreateResearchProjectStep1Test {
 	
 	@Test
 	public void testNext() {
-		widget.configure(mockACTAccessRequirement);
+		widget.configure(mockACTAccessRequirement, mockSubject);
 		widget.onPrimary();
 		verify(mockModalPresenter).setLoading(true);
 		//verify research project values were updated from the view
@@ -127,7 +131,7 @@ public class CreateResearchProjectStep1Test {
 		verify(mockResearchProject).setIntendedDataUseStatement(INTENDED_DUS2);
 		verify(mockResearchProject).setProjectLead(PROJECT_LEAD2);
 		
-		verify(mockStep2).configure(mockResearchProject, mockACTAccessRequirement);
+		verify(mockStep2).configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		verify(mockModalPresenter).setNextActivePage(mockStep2);
 	}
 	
@@ -155,7 +159,7 @@ public class CreateResearchProjectStep1Test {
 		Exception ex = new Exception(error);
 		AsyncMockStubber.callFailureWith(ex).when(mockClient).updateResearchProject(any(ResearchProject.class),  any(AsyncCallback.class));
 		
-		widget.configure(mockACTAccessRequirement);
+		widget.configure(mockACTAccessRequirement, mockSubject);
 		widget.onPrimary();
 		verify(mockModalPresenter).setLoading(true);
 		verify(mockClient).updateResearchProject(any(ResearchProject.class),  any(AsyncCallback.class));

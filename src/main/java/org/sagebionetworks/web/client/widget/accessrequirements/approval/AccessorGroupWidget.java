@@ -99,7 +99,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 	
 	@Override
 	public void onShowAccessRequirement() {
-		accessRequirementWidget.configure(accessorGroup.getAccessRequirementId());
+		accessRequirementWidget.configure(accessorGroup.getAccessRequirementId(), null);
 		view.showAccessRequirementDialog();
 	}
 	

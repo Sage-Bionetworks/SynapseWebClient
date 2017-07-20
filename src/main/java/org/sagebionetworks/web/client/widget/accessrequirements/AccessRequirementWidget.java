@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.LockAccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
+import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
@@ -32,7 +33,7 @@ public class AccessRequirementWidget implements IsWidget{
 		this.div = div;
 	}
 	
-	public void configure(final String accessRequirementId) {
+	public void configure(final String accessRequirementId, final RestrictableObjectDescriptor targetSubject) {
 		dataAccessClient.getAccessRequirement(Long.parseLong(accessRequirementId), new AsyncCallback<AccessRequirement>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -43,10 +44,10 @@ public class AccessRequirementWidget implements IsWidget{
 				Callback refreshCallback = new Callback() {
 					@Override
 					public void invoke() {
-						configure(accessRequirementId);
+						configure(accessRequirementId, targetSubject);
 					}
 				};
-				configure(requirement, refreshCallback);
+				configure(requirement, targetSubject, refreshCallback);
 			}
 		});
 	}
@@ -62,11 +63,12 @@ public class AccessRequirementWidget implements IsWidget{
 		div.add(synAlert);
 	}
 	
-	public void configure(AccessRequirement requirement, Callback refreshCallback) {
+	public void configure(AccessRequirement requirement, RestrictableObjectDescriptor targetSubject, Callback refreshCallback) {
 		div.clear();
 		if (requirement instanceof ManagedACTAccessRequirement) {
 			ManagedACTAccessRequirementWidget w = ginInjector.getManagedACTAccessRequirementWidget();
 			w.setRequirement((ManagedACTAccessRequirement) requirement, refreshCallback);
+			w.setTargetSubject(targetSubject);
 			if (isHideButtons) {
 				w.hideButtons();
 			}
