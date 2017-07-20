@@ -33,7 +33,7 @@
 					<bh:Span ui:field="endpoint" addStyleNames="margin-right-5"/>
 					<bh:Strong text="Bucket:" addStyleNames="margin-right-5"/>
 					<bh:Span ui:field="bucket" addStyleNames="margin-right-5"/>
-					<bh:Strong text="File Key:" addStyleNames="margin-right-5"/>
+					<bh:Strong text="File key:" addStyleNames="margin-right-5"/>
 					<bh:Span ui:field="fileKey"/>
 				</bh:Div>
 
