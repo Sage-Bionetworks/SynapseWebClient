@@ -138,7 +138,7 @@ public class FileTitleBarTest {
 		Mockito.when(mockBundle.getFileHandles()).thenReturn(Collections.singletonList((FileHandle)mockExternalObjectStoreFileHandle));
 		fileTitleBar.configure(mockBundle);
 		verify(mockFileDownloadButton).configure(mockBundle);
-		verify(mockView).setExternalUrlUIVisible(true);
-		verify(mockView).setExternalUrl(endpoint + "/" + bucket + "/" + fileKey);
+		verify(mockView).setExternalObjectStoreUIVisible(true);
+		verify(mockView).setExternalObjectStoreInfo(endpoint, bucket, fileKey);
 	}
 }
