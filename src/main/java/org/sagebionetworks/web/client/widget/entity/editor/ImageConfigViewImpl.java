@@ -102,7 +102,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		findEntitiesButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				entityFinder.configure(EntityFilter.ALL_BUT_LINK, false, new SelectedHandler<Reference>() {					
+				entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {					
 					@Override
 					public void onSelected(Reference selected) {
 						entityField.setValue(DisplayUtils.createEntityVersionString(selected));
@@ -255,9 +255,13 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	
 	@Override
 	public String getSynapseId() {
-		return entityField.getValue();
+		return DisplayUtils.parseEntityVersionString(entityField.getValue()).getTargetId();
 	}
 	
+	@Override
+	public Long getVersion() {
+		return DisplayUtils.parseEntityVersionString(entityField.getValue()).getTargetVersionNumber();
+	}
 	@Override
 	public void showSynapseTab() {
 		synapseTabListItem.setActive(true);
