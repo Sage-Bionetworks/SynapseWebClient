@@ -29,11 +29,15 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.descriptor = widgetDescriptor;
 		String synapseId = descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY);
+		Long version = null;
+		if (descriptor.containsKey(WidgetConstants.WIDGET_ENTITY_VERSION_KEY)) {
+			version = Long.parseLong(descriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY));
+		}
 		view.configure(wikiKey,
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY),
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY),
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY),
-				synapseId, authenticationController.isLoggedIn(), wikiVersionInView,
+				synapseId, version, authenticationController.isLoggedIn(), wikiVersionInView,
 				authenticationController.getCurrentXsrfToken());
 		
 		String responsiveValue = descriptor.get(WidgetConstants.IMAGE_WIDGET_RESPONSIVE_KEY);

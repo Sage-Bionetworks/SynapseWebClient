@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.WikiAttachments;
@@ -63,7 +64,13 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 			// existing synapse id
 			view.setWikiFilesTabVisible(false);
 			view.showSynapseTab();
-			view.setSynapseId(descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
+			String synId = descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY);
+			Long version = null;
+			if (descriptor.containsKey(WidgetConstants.WIDGET_ENTITY_VERSION_KEY)) {
+				version = Long.parseLong(descriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY));
+			}
+			view.setSynapseId(DisplayUtils.createEntityVersionString(synId, version));
+			descriptor.put(WidgetConstants.WIDGET_ENTITY_VERSION_KEY, version.toString());
 		} else {
 			view.showWikiFilesTab();
 			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
@@ -105,6 +112,10 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		if (!view.isExternal()) {
 			if (view.isSynapseEntity()) {
 				descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, view.getSynapseId());
+				Long version = view.getVersion();
+				if (version != null) {
+					descriptor.put(WidgetConstants.WIDGET_ENTITY_VERSION_KEY, version.toString());
+				}
 			} else if (!fileHandleIds.isEmpty()) {
 				descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, file.getFileMeta().getFileName());
 			} else {

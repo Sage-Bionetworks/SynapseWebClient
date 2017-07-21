@@ -30,6 +30,7 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public Integer getScale();
 	public void setScale(Integer scale);
 	public String getSynapseId();
+	public Long getVersion();
 	
 	public void setSynapseId(String synapseId);
 	public void setAlignment(String alignment);

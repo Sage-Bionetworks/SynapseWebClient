@@ -2,7 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -50,7 +50,7 @@ public class ImageWidgetTest {
 	@Test
 	public void testConfigure() {
 		widget.configure(wikiKey,descriptor, null, null);
-		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), anyString(), anyBoolean(), any(Long.class), eq(xsrfToken));
+		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), anyString(), anyLong(), anyBoolean(), any(Long.class), eq(xsrfToken));
 	}
 	
 	@Test
