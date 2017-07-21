@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
+import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
@@ -118,6 +119,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public Callback refreshTeamsCallback;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	public DateTimeUtils dateTimeUtils;
+	public PromptModalView promptForProjectNameDialog;
+	public PromptModalView promptForTeamNameDialog;
+	
 	@Inject
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
@@ -134,7 +138,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			UserProfileClientAsync userProfileClient,
 			VerificationSubmissionWidget verificationModal,
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
-			DateTimeUtils dateTimeUtils) {
+			DateTimeUtils dateTimeUtils,
+			PromptModalView promptForProjectNameDialog,
+			PromptModalView promptForTeamNameDialog) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -152,6 +158,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.verificationModal = verificationModal;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.dateTimeUtils = dateTimeUtils;
+		this.promptForProjectNameDialog = promptForProjectNameDialog;
+		this.promptForTeamNameDialog = promptForTeamNameDialog;
 		
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
@@ -187,6 +195,18 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				refreshTeamsForFilter();
 			}
 		};
+		promptForProjectNameDialog.setPresenter(new PromptModalView.Presenter() {
+			@Override
+			public void onPrimary() {
+				createProjectAfterPrompt();
+			}
+		});
+		promptForTeamNameDialog.setPresenter(new PromptModalView.Presenter() {
+			@Override
+			public void onPrimary() {
+				createTeamAfterPrompt();
+			}
+		});
 	}
 
 	public SettingsPresenter getSettingsPresenter() {
@@ -795,17 +815,24 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	
 	@Override
-	public void createProject(final String name) {
-		projectSynAlert.clear();
+	public void createProject() {
+		//prompt for project name
+		promptForProjectNameDialog.configure("Create a New Project", "Project Name", "OK", "");
+		promptForProjectNameDialog.show();
+	}
+	
+	public void createProjectAfterPrompt() {
+		final String name = promptForProjectNameDialog.getValue();
 		//validate project name
 		if (!DisplayUtils.isDefined(name)) {
-			projectSynAlert.showError(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
+			promptForProjectNameDialog.showError(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
 			return;
 		}
 		
 		CreateEntityUtil.createProject(name, synapseClient, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newProjectId) {
+				promptForProjectNameDialog.hide();
 				view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
 				globalApplicationState.getPlaceChanger().goTo(new Synapse(newProjectId));						
 			}
@@ -813,27 +840,33 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof ConflictException) {
-					projectSynAlert.showError(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
+					promptForProjectNameDialog.showError(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
 				} else {
-					projectSynAlert.handleException(caught);
+					promptForProjectNameDialog.showError(caught.getMessage());
 				}
 			}
 		});
 	}
-	
 
 	@Override
-	public void createTeam(final String teamName) {
-		teamSynAlert.clear();
+	public void createTeam() {
+		// prompt for team name
+		promptForTeamNameDialog.configure("Create a New Team", "Team Name", "OK", "");
+		promptForTeamNameDialog.show();
+	}
+	
+	public void createTeamAfterPrompt() {
+		final String teamName = promptForTeamNameDialog.getValue();
 		//validate team name
 		if (!DisplayUtils.isDefined(teamName)) {
-			teamSynAlert.showError(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
+			promptForTeamNameDialog.showError(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
 			return;
 		}
 
 		synapseClient.createTeam(teamName, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newTeamId) {
+				promptForTeamNameDialog.hide();
 				view.showInfo(DisplayConstants.LABEL_TEAM_CREATED, teamName);
 				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(newTeamId));						
 			}
@@ -841,13 +874,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof ConflictException) {
-					teamSynAlert.showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
+					promptForTeamNameDialog.showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 				} else {
-					teamSynAlert.handleException(caught);
+					promptForTeamNameDialog.showError(caught.getMessage());
 				}
 			}
-		});
-
+		});		
 	}
 	
 	private boolean checkIsLoggedIn() {

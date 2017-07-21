@@ -76,8 +76,8 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void showProfileButtonClicked();
 		void hideProfileButtonClicked();
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
-		void createProject(String name);
-		void createTeam(final String teamName);
+		void createProject();
+		void createTeam();
 		void goTo(Place place);
 		void refreshTeams();
 		void tabClicked(ProfileArea areaTab);

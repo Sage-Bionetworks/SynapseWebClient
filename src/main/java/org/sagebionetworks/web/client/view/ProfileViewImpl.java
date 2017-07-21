@@ -159,7 +159,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DropDownMenu teamFiltersDropDownMenu;
 	
 	@UiField
-	TextBox createProjectTextBox;
+	TextBox projectSearchTextBox;
 	@UiField
 	Button createProjectButton;
 	@UiField
@@ -184,7 +184,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	//Teams tab
 	@UiField
-	TextBox createTeamTextBox;
+	TextBox teamSearchTextBox;
 	@UiField
 	Button createTeamButton;
 	@UiField
@@ -299,34 +299,34 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 		picturePanel.clear();
 		initTabs();
-		createProjectTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
+		projectSearchTextBox.getElement().setAttribute("placeholder", "Project name");
 		createProjectButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.createProject(createProjectTextBox.getValue());
+				presenter.createProject();
 			}
 		});
-		createProjectTextBox.addKeyDownHandler(new KeyDownHandler() {
+		projectSearchTextBox.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					createProjectButton.click();
+					projectSearchButton.click();
 				}
 			}
 		});
-		createTeamTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_TEAM_NAME);
+		teamSearchTextBox.getElement().setAttribute("placeholder", "Team name");
 		createTeamButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.createTeam(createTeamTextBox.getValue());
+				presenter.createTeam();
 			}
 		});
 		
-		createTeamTextBox.addKeyDownHandler(new KeyDownHandler() {
+		teamSearchTextBox.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					createTeamButton.click();
+					teamSearchButton.click();
 				}
 			}
 		});
@@ -334,14 +334,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		teamSearchButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.goTo(new TeamSearch(""));
+				presenter.goTo(new TeamSearch(teamSearchTextBox.getValue()));
 			}
 		});
 		
 		projectSearchButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.goTo(new Search(""));
+				presenter.goTo(new Search(projectSearchTextBox.getValue()));
 			}
 		});
 		alertFocusPanel.addClickHandler(new ClickHandler() {
@@ -805,8 +805,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
 		DisplayUtils.hide(challengesListItem);
-		createTeamTextBox.setValue("");
-		createProjectTextBox.setValue("");
+		teamSearchTextBox.setValue("");
+		projectSearchTextBox.setValue("");
 		
 		//reset tab link text (remove any notifications)
 		clearTeamNotificationCount();
