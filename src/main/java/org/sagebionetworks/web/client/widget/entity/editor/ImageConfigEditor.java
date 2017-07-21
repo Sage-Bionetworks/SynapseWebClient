@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -59,7 +60,6 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		if (wikiKey != null) {
 			wikiAttachments.configure(wikiKey);
 		}
-		
 		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
 			// existing synapse id
 			view.setWikiFilesTabVisible(false);
@@ -70,7 +70,6 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 				version = Long.parseLong(descriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY));
 			}
 			view.setSynapseId(DisplayUtils.createEntityVersionString(synId, version));
-			descriptor.put(WidgetConstants.WIDGET_ENTITY_VERSION_KEY, version.toString());
 		} else {
 			view.showWikiFilesTab();
 			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
