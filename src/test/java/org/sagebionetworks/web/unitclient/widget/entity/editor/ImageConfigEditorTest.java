@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -128,7 +129,20 @@ public class ImageConfigEditorTest {
 		verify(mockView).showSynapseTab();
 		verify(mockView).setSynapseId(synId);
 	}
-
+	
+	@Test
+	public void testSynapseIdWithVersionBased() {
+		String synId = "syn9876";
+		String version = "4";
+		reset(mockView);
+		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
+		descriptor.put(WidgetConstants.WIDGET_ENTITY_VERSION_KEY, version);
+		editor.configure(wikiKey, descriptor, mockCallback);
+		verify(mockView).setWikiFilesTabVisible(false);
+		verify(mockView).showSynapseTab();
+		verify(mockView).setSynapseId(synId + WebConstants.ENTITY_VERSION_STRING + version);
+	}
+	
 	@Test
 	public void testUploadFileClickedSuccess() {
 		verify(mockView).initView();
@@ -194,6 +208,22 @@ public class ImageConfigEditorTest {
 		assertNull(editor.getTextToInsert());
 	}
 
+	@Test
+	public void testIsFromSynapseId() {
+			when(mockView.isExternal()).thenReturn(false);
+	        when(mockView.isSynapseEntity()).thenReturn(true);
+	        String synId = "syn1293";
+	        Long version = 92L;
+	        when(mockView.getSynapseId()).thenReturn(synId);
+	        when(mockView.getVersion()).thenReturn(version);
+	        Map<String,String> descriptor = new HashMap<String, String>();
+	        editor.configure(wikiKey, descriptor, mockCallback);
+	        editor.updateDescriptorFromView();
+	        verify(mockView).checkParams();
+	        assertEquals(synId, descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY));
+	        assertEquals(version.toString(), descriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY));
+	}
+	
 	@Test
 	public void testIsFromAttachments() {
 	        when(mockView.isSynapseEntity()).thenReturn(false);

@@ -72,4 +72,24 @@ public class ImageWidgetTest {
 		verify(mockView).addStyleName(ImageWidget.MAX_WIDTH_NONE);
 	}
 	
+	@Test
+	public void testConfigureFromSynapseId() {
+		descriptor.clear();
+		String synId = "syn239";
+		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
+		widget.configure(wikiKey,descriptor, null, null);
+		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), eq(synId), eq((Long)null), anyBoolean(), any(Long.class), eq(xsrfToken));
+	}
+
+	@Test
+	public void testConfigureFromSynapseIdWithVersion() {
+		descriptor.clear();
+		String synId = "syn239";
+		Long version = 999L;
+		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
+		descriptor.put(WidgetConstants.WIDGET_ENTITY_VERSION_KEY, version.toString());
+		widget.configure(wikiKey,descriptor, null, null);
+		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), eq(synId), eq(version), anyBoolean(), any(Long.class), eq(xsrfToken));
+	}
+	
 }
