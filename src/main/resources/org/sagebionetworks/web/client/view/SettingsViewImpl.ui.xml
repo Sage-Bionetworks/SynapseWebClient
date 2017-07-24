@@ -14,18 +14,8 @@
 						<b:Button ui:field="editProfileButton" icon="EDIT" >Edit Profile</b:Button>
 					</bh:Div>
 					<bh:Div ui:field="emailSettingsPanel" addStyleNames="highlight-box">
-					    <g:FlowPanel ui:field="emailsPanel" addStyleNames="margin-left-10">
-					    </g:FlowPanel>
-					    <bh:Div ui:field="changeEmailUI" visible="false" addStyleNames="margin-top-10">
-						    <bh:Span addStyleNames="input-group">
-						      <g:TextBox ui:field="newEmailField" styleName="form-control" />
-						      <bh:Span addStyleNames="input-group-btn">
-						           <b:Button ui:field="addEmailButton">Change Email</b:Button>
-						      </bh:Span>
-						    </bh:Span>
-						</bh:Div>
-						<g:SimplePanel ui:field="addressSynAlertPanel" styleName="margin-top-10"/>
-						<g:FlowPanel styleName="margin-left-10">
+						<bh:Div ui:field="emailsPanel" />
+					    <g:FlowPanel styleName="margin-left-10">
 					       <b:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" addStyleNames="margin-0-imp"/> 
 					    </g:FlowPanel>
 					    <g:SimplePanel ui:field="notificationSynAlertPanel"/>

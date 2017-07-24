@@ -1,17 +1,13 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.List;
-
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
@@ -20,9 +16,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
+import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -36,37 +32,38 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private UserAccountServiceAsync userService;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
-	private GWTWrapper gwt;
 	private SynapseAlert apiSynAlert;
 	private SynapseAlert notificationSynAlert;
-	private SynapseAlert addressSynAlert;
 	private SynapseAlert passwordSynAlert;
 	private PortalGinInjector ginInjector;
 	private UserProfileModalWidget userProfileModalWidget;
 	private SubscriptionListWidget subscriptionListWidget;
 	private PasswordStrengthWidget passwordStrengthWidget;
+	private EmailAddressesWidget emailAddressesWidget;
 	@Inject
 	public SettingsPresenter(SettingsView view,
 			AuthenticationController authenticationController,
 			UserAccountServiceAsync userService,
 			GlobalApplicationState globalApplicationState,
-			SynapseClientAsync synapseClient, GWTWrapper gwt,
+			SynapseClientAsync synapseClient,
 			PortalGinInjector ginInjector,
 			UserProfileModalWidget userProfileModalWidget,
 			SubscriptionListWidget subscriptionListWidget,
-			PasswordStrengthWidget passwordStrengthWidget) {
+			PasswordStrengthWidget passwordStrengthWidget,
+			EmailAddressesWidget emailAddressesWidget) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
 		this.ginInjector = ginInjector;
-		this.gwt = gwt;
 		this.userProfileModalWidget = userProfileModalWidget;
 		this.subscriptionListWidget = subscriptionListWidget;
 		this.passwordStrengthWidget = passwordStrengthWidget;
+		this.emailAddressesWidget = emailAddressesWidget;
 		view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
 		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());
+		view.setEmailAddressesWidget(emailAddressesWidget);
 		view.setPresenter(this);
 		setSynAlertWidgets();
 	}
@@ -74,11 +71,9 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private void setSynAlertWidgets() {
 		apiSynAlert = ginInjector.getSynapseAlertWidget();
 		notificationSynAlert = ginInjector.getSynapseAlertWidget();
-		addressSynAlert = ginInjector.getSynapseAlertWidget();
 		passwordSynAlert = ginInjector.getSynapseAlertWidget();
 		view.setAPISynAlertWidget(apiSynAlert);
 		view.setNotificationSynAlertWidget(notificationSynAlert);
-		view.setAddressSynAlertWidget(addressSynAlert);
 		view.setPasswordSynAlertWidget(passwordSynAlert);
 	}
 
@@ -156,39 +151,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		}
 	}
 
-	public void getUserNotificationEmail() {
-		addressSynAlert.clear();
-		AsyncCallback<String> callback = new AsyncCallback<String>() {
-			@Override
-			public void onSuccess(String notificationEmail) {
-				view.showNotificationEmailAddress(notificationEmail);
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				addressSynAlert.handleException(caught);
-			}
-		};
-		synapseClient.getNotificationEmail(callback);
-	}
-
-	public void setUserNotificationEmail(final String email) {
-		addressSynAlert.clear();
-		AsyncCallback<Void> callback = new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void callback) {
-				// reload profile
-				goTo(new Profile(Profile.EDIT_PROFILE_TOKEN));
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				addressSynAlert.handleException(caught);
-			}
-		};
-		synapseClient.setNotificationEmail(email, callback);
-	}
-
 	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
@@ -241,7 +203,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		view.clear();
 		apiSynAlert.clear();
 		notificationSynAlert.clear();
-		addressSynAlert.clear();
+		emailAddressesWidget.clear();
 		passwordSynAlert.clear();
 		passwordStrengthWidget.setVisible(false);
 	}
@@ -249,11 +211,10 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	public void configure() {
 		clear();
 		if (authenticationController.isLoggedIn()) {
-			getUserNotificationEmail();
-			
 			AsyncCallback<UserProfile> callback = new AsyncCallback<UserProfile>() {
 				@Override
 				public void onSuccess(UserProfile result) {
+					emailAddressesWidget.configure(result);
 					authenticationController.updateCachedProfile(result);
 					view.updateNotificationCheckbox(result);	
 				}
@@ -302,51 +263,6 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			}
 		};
 		synapseClient.deleteApiKey(callback);
-	}
-
-	@Override
-	public void addEmail(String emailAddress) {
-		addressSynAlert.clear();
-		emailAddress = emailAddress.trim();
-		// Is this email already in the profile email list?
-		// If so, just update it as the new notification email. Otherwise, kick
-		// off the verification process.
-		List<String> emailAddresses = authenticationController.getCurrentUserSessionData().getProfile().getEmails();
-		if (emailAddresses == null || emailAddresses.isEmpty())
-			throw new IllegalStateException("UserProfile email list is empty");
-		for (String email : emailAddresses) {
-			if (email.equalsIgnoreCase(emailAddress)) {
-				// update the notification email
-				setUserNotificationEmail(emailAddress);
-				return;
-			}
-		}
-		// did not find in the list
-		additionalEmailValidation(emailAddress);
-	}
-
-	public void additionalEmailValidation(String emailAddress) {
-		// need to validate
-		//first, does it look like an email address?
-		if (!ValidationUtils.isValidEmail(emailAddress)) {
-			addressSynAlert.showError(WebConstants.INVALID_EMAIL_MESSAGE);
-			return;
-		}
-
-		String callbackUrl = gwt.getHostPageBaseURL() + "#!Account:";
-		synapseClient.additionalEmailValidation(
-				authenticationController.getCurrentUserPrincipalId(),
-				emailAddress, callbackUrl, new AsyncCallback<Void>() {
-					@Override
-					public void onSuccess(Void result) {
-						view.showEmailChangeSuccess(DisplayConstants.EMAIL_ADDED);
-					}
-
-					@Override
-					public void onFailure(Throwable caught) {
-						addressSynAlert.handleException(caught);
-					}
-				});
 	}
 	
 	public Widget asWidget() {
