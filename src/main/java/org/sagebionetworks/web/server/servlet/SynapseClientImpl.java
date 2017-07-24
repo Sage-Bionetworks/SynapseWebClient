@@ -1763,12 +1763,15 @@ public class SynapseClientImpl extends SynapseClientBase implements
 							ZERO_OFFSET);
 			// and ask for the team info for each invite, and fill that in the
 			// bundle
-
+			List<Long> userIds = new ArrayList<>();
+			for (MembershipRequest request : requests.getResults()) {
+				userIds.add(Long.parseLong(request.getUserId()));
+			}
+			Map<String, UserProfile> userId2UserProfile = getUserProfiles(userIds, synapseClient);
 			ArrayList<MembershipRequestBundle> returnList = new ArrayList<MembershipRequestBundle>();
 			// now go through and create a MembershipRequestBundle for each pair
-
 			for (MembershipRequest request : requests.getResults()) {
-				UserProfile profile = synapseClient.getUserProfile(request.getUserId());
+				UserProfile profile = userId2UserProfile.get(request.getUserId());
 				MembershipRequestBundle b = new MembershipRequestBundle(profile, request);
 				returnList.add(b);
 			}
@@ -1776,6 +1779,15 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
+	}
+	
+	private Map<String, UserProfile> getUserProfiles(List<Long> userIds, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		Map<String, UserProfile> userId2UserProfile = new HashMap<>();
+		List<UserProfile> profiles = synapseClient.listUserProfiles(userIds);
+		for (UserProfile userProfile : profiles) {
+			userId2UserProfile.put(userProfile.getOwnerId(), userProfile);
+		}
+		return userId2UserProfile;
 	}
 
 	private boolean isTeamAdmin(String currentUserId, String teamId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
@@ -1849,11 +1861,15 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			// now go through and create a MembershipInvitationBundle for each
 			// pair
 
+			List<Long> userIds = new ArrayList<>();
 			for (MembershipInvtnSubmission invite : invitations.getResults()) {
-				UserProfile profile = synapseClient.getUserProfile(invite
-						.getInviteeId());
-				OpenTeamInvitationBundle b = new OpenTeamInvitationBundle(invite,
-						profile);
+				userIds.add(Long.parseLong(invite.getInviteeId()));
+			}
+			Map<String, UserProfile> userId2UserProfile = getUserProfiles(userIds, synapseClient);
+			
+			for (MembershipInvtnSubmission invite : invitations.getResults()) {
+				UserProfile profile = userId2UserProfile.get(invite.getInviteeId());
+				OpenTeamInvitationBundle b = new OpenTeamInvitationBundle(invite, profile);
 				returnList.add(b);
 			}
 
