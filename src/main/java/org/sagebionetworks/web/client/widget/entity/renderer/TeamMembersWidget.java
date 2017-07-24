@@ -48,7 +48,6 @@ public class TeamMembersWidget implements WidgetRendererPresenter, PageChangeLis
 	
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
-		synAlert.clear();
 		this.descriptor = widgetDescriptor;
 		teamId = descriptor.get(WidgetConstants.TEAM_ID_KEY);
 		descriptor = widgetDescriptor;

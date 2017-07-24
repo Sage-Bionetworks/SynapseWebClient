@@ -5,8 +5,9 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,10 +21,13 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
-import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidgetView;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -36,11 +40,17 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class TeamMembersWidgetTest {
 	
 	@Mock
-	UserListView mockView;
+	TeamMembersWidgetView mockView;
 	@Mock
 	BasicPaginationWidget mockPaginationWidget;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
+	SynapseAlert mockSynAlert;
+	@Mock
+	PortalGinInjector mockGinInjector;
+	@Mock
+	TeamMemberRowWidget mockRow;
 	
 	TeamMembersWidget widget;
 	Map<String, String> descriptor;
@@ -51,12 +61,14 @@ public class TeamMembersWidgetTest {
 	@Before
 	public void before() throws RestServiceException, JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
-		mockView = mock(UserListView.class);
-		widget = new TeamMembersWidget(mockView, mockPaginationWidget, mockSynapseClient);
-		verify(mockView).setPresenter(widget);
+		widget = new TeamMembersWidget(mockView, 
+				mockPaginationWidget, 
+				mockSynapseClient, 
+				mockSynAlert, 
+				mockGinInjector);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.TEAM_ID_KEY, TEAM_ID);
-		
+		when(mockGinInjector.getTeamMemberRowWidget()).thenReturn(mockRow);
 		AsyncMockStubber.callSuccessWith(getTestUserProfilePagedResults()).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 
@@ -83,14 +95,15 @@ public class TeamMembersWidgetTest {
 	public void testHappyCaseConfigure() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		
-		verify(mockView).hideErrors();
-		verify(mockView).showLoading();
-		verify(mockView).clearUsers();
+		verify(mockSynAlert).clear();
+		verify(mockView).setLoadingVisible(true);
+		verify(mockView).clearRows();
 		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).hideLoading();
+		verify(mockView).setLoadingVisible(false);
 		verify(mockPaginationWidget).configure(anyLong(), anyLong(), anyLong(), eq(widget));
 		
-		verify(mockView).addUser(testProfile);
+		verify(mockView).addRow(mockRow);
+		verify(mockRow).configure(testProfile);
 	}
 	
 
@@ -99,25 +112,23 @@ public class TeamMembersWidgetTest {
 		AsyncMockStubber.callSuccessWith(getEmptyUserProfilePagedResults()).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		
-		verify(mockView).hideErrors();
-		verify(mockView).showLoading();
-		verify(mockView).clearUsers();
+		verify(mockView).clearRows();
 		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).hideLoading();
-		verify(mockView).showNoUsers();
+		verify(mockView, never()).addRow(mockRow);
 	}
 	
 	@Test
-	public void testGetChallengeTeamsFailure() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+	public void testGetTeamMembersFailure() throws Exception {
+		Exception ex = new Exception("unhandled");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
-		
-		verify(mockView).hideErrors();
-		verify(mockView).showLoading();
-		verify(mockView).clearUsers();
+		verify(mockSynAlert).clear();
+		verify(mockView).setLoadingVisible(true);
+		verify(mockView).clearRows();
 		verify(mockSynapseClient).getTeamMembers(anyString(), anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).hideLoading();
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockView).setLoadingVisible(false);
+		
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test
