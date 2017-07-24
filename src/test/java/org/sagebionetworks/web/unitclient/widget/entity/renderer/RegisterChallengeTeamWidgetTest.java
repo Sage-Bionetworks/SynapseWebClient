@@ -68,7 +68,6 @@ public class RegisterChallengeTeamWidgetTest {
 	public void testHappyCaseConfigureLoggedIn() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		verify(mockView).setButtonText(CUSTOM_BUTTON_TEXT);
-		verify(mockView).setButtonVisible(true);
 		
 		widget.onClick();
 		//add dialog to view
@@ -83,7 +82,6 @@ public class RegisterChallengeTeamWidgetTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), descriptor, null, null);
 		verify(mockView).setButtonText(CUSTOM_BUTTON_TEXT);
-		verify(mockView).setButtonVisible(false);
 		
 		//on click, should show anonymous join message
 		widget.onClick();
