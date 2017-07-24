@@ -418,6 +418,10 @@ import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidg
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountView;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.UserListView;
 import org.sagebionetworks.web.client.widget.entity.renderer.UserListViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidgetView;
@@ -1422,5 +1426,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SelfSignAccessRequirementWidgetView.class).to(SelfSignAccessRequirementWidgetViewImpl.class);
 		bind(SubjectWidgetView.class).to(SubjectWidgetViewImpl.class);
 		bind(AwsLoginView.class).to(AwsLoginViewImpl.class);
+		bind(TeamMemberRowWidgetView.class).to(TeamMemberRowWidgetViewImpl.class);
+		bind(TeamMembersWidgetView.class).to(TeamMembersWidgetViewImpl.class);
 	}
 }
