@@ -166,6 +166,7 @@ import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
+import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -202,7 +203,7 @@ public class SynapseClientImplTest {
 	SynapseClient mockSynapse;
 	SynapseClientImpl synapseClient;
 	String entityId = "123";
-	String inviteeUserId = "900";
+	public static final String USER_ID = "900";
 	UserProfile inviteeUserProfile;
 	ExampleEntity entity;
 	Annotations annos;
@@ -224,6 +225,8 @@ public class SynapseClientImplTest {
 	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
 	MembershipInvtnSubmission testInvitation;
+	@Mock
+	MembershipRequest mockMembershipRequest;
 	PaginatedResults mockPaginatedMembershipRequest;
 	Activity mockActivity;
 
@@ -577,7 +580,7 @@ public class SynapseClientImplTest {
 		ArrayList<MembershipInvtnSubmission> testInvitations = new ArrayList<MembershipInvtnSubmission>();
 		testInvitation = new MembershipInvtnSubmission();
 		testInvitation.setId("628319");
-		testInvitation.setInviteeId(inviteeUserId);
+		testInvitation.setInviteeId(USER_ID);
 		testInvitations.add(testInvitation);
 		PaginatedResults<MembershipInvtnSubmission> paginatedInvitations = new PaginatedResults<MembershipInvtnSubmission>();
 		paginatedInvitations.setResults(testInvitations);
@@ -588,11 +591,27 @@ public class SynapseClientImplTest {
 
 		inviteeUserProfile = new UserProfile();
 		inviteeUserProfile.setUserName("Invitee User");
-		inviteeUserProfile.setOwnerId(inviteeUserId);
-		when(mockSynapse.getUserProfile(eq(inviteeUserId))).thenReturn(
-				inviteeUserProfile);
-
+		inviteeUserProfile.setOwnerId(USER_ID);
+		when(mockSynapse.listUserProfiles(anyList())).thenReturn(Collections.singletonList(inviteeUserProfile));
 	}
+	
+	private void setupOpenTeamRequest() throws SynapseException {
+		ArrayList<MembershipRequest> testInvitations = new ArrayList<MembershipRequest>();
+		when(mockMembershipRequest.getTeamId()).thenReturn("111");
+		when(mockMembershipRequest.getUserId()).thenReturn(USER_ID);
+		testInvitations.add(mockMembershipRequest);
+		PaginatedResults<MembershipRequest> paginatedInvitations = new PaginatedResults<MembershipRequest>();
+		paginatedInvitations.setResults(testInvitations);
+		when(
+				mockSynapse.getOpenMembershipRequests(anyString(),
+						anyString(), anyLong(), anyLong())).thenReturn(paginatedInvitations);
+
+		inviteeUserProfile = new UserProfile();
+		inviteeUserProfile.setUserName("User requesting membership");
+		inviteeUserProfile.setOwnerId(USER_ID);
+		when(mockSynapse.listUserProfiles(anyList())).thenReturn(Collections.singletonList(inviteeUserProfile));
+	}
+
 
 	@Test
 	public void testGetEntityBundleAll() throws RestServiceException {
@@ -1388,6 +1407,24 @@ public class SynapseClientImplTest {
 		assertEquals(inviteeUserProfile, invitationBundle.getUserProfile());
 		assertEquals(testInvitation, invitationBundle.getMembershipInvtnSubmission());
 	}
+	
+	@Test
+	public void testGetOpenRequests() throws SynapseException,
+			RestServiceException, JSONObjectAdapterException {
+		setupOpenTeamRequest();
+		String teamId = "132";
+		List<MembershipRequestBundle> bundles = synapseClient
+				.getOpenRequests(teamId);
+		verify(mockSynapse).getOpenMembershipRequests(eq(teamId),
+				anyString(), anyLong(), anyLong());
+		// we set this up so that a single request would be returned. Verify that
+		// it is the one we're looking for
+		assertEquals(1, bundles.size());
+		MembershipRequestBundle bundle = bundles.get(0);
+		assertEquals(inviteeUserProfile, bundle.getUserProfile());
+		assertEquals(mockMembershipRequest, bundle.getMembershipRequest());
+	}
+
 
 	@Test
 	public void testGetTeamBundle() throws SynapseException,
