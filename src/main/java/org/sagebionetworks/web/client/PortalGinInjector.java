@@ -160,6 +160,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationW
 import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TableOfContentsWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VimeoWidget;
@@ -554,4 +555,5 @@ public interface PortalGinInjector extends Ginjector {
 	public SelfSignAccessRequirementWidget getSelfSignAccessRequirementWidget();
 	
 	public SubjectWidget getSubjectWidget();
+	public TeamMemberRowWidget getTeamMemberRowWidget();
 }
