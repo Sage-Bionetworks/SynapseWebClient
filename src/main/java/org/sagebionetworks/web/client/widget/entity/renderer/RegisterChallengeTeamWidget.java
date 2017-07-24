@@ -53,7 +53,6 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 		
 		view.setButtonText(buttonText);
 		descriptor = widgetDescriptor;
-		view.setButtonVisible(authenticationController.isLoggedIn());
 	}
 	
 	@Override
