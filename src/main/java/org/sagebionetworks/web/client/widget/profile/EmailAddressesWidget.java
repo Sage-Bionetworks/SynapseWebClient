@@ -94,6 +94,8 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 	}
 
 	public void refresh() {
+		clear();
+		view.setLoadingVisible(true);
 		synapseClient.getUserProfile(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(UserProfile result) {

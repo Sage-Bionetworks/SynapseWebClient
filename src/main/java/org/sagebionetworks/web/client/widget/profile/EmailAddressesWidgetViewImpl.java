@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Strong;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -82,9 +83,7 @@ public class EmailAddressesWidgetViewImpl implements EmailAddressesWidgetView {
 	@Override
 	public void addPrimaryEmail(String email) {
 		Div emailDiv = new Div();
-		Span emailSpan = new Span();
-		emailSpan.setText(email + " (Primary)");
-		emailDiv.add(emailSpan);
+		emailDiv.add(new Strong(email + " (Primary)"));
 		emailsPanel.add(emailDiv);
 	}
 	
