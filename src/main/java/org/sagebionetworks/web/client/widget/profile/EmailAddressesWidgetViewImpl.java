@@ -51,9 +51,10 @@ public class EmailAddressesWidgetViewImpl implements EmailAddressesWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onAddEmail(newEmailTextBox.getValue());
+				newEmailTextBox.setValue("");
 			}
 		});
-		newEmailTextBox.getElement().setAttribute("placeholder", "Enter new email address");
+		newEmailTextBox.getElement().setAttribute("placeholder", "New email address");
 	}
 	@Override
 	public Widget asWidget() {
@@ -90,10 +91,11 @@ public class EmailAddressesWidgetViewImpl implements EmailAddressesWidgetView {
 	@Override
 	public void addSecondaryEmail(final String email) {
 		Div emailDiv = new Div();
+		emailDiv.addStyleName("margin-top-5");
 		Span emailSpan = new Span();
 		emailSpan.setText(email);
 		emailDiv.add(emailSpan);
-		Button makePrimaryButton = new Button("Make primary", IconType.TIMES, new ClickHandler() {
+		Button makePrimaryButton = new Button("Make primary", IconType.ENVELOPE, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onMakePrimary(email);
@@ -109,6 +111,7 @@ public class EmailAddressesWidgetViewImpl implements EmailAddressesWidgetView {
 			}
 		});
 		deleteButton.addStyleName("margin-left-5");
+		deleteButton.setHeight("21px");
 		deleteButton.setType(ButtonType.DANGER);
 		deleteButton.setSize(ButtonSize.EXTRA_SMALL);
 		emailDiv.add(deleteButton);

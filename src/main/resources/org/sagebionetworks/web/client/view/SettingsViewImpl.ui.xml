@@ -15,7 +15,7 @@
 					</bh:Div>
 					<bh:Div ui:field="emailSettingsPanel" addStyleNames="highlight-box">
 						<bh:Div ui:field="emailsPanel" />
-					    <g:FlowPanel styleName="margin-left-10">
+					    <g:FlowPanel styleName="margin-left-10 margin-top-10">
 					       <b:CheckBox ui:field="emailNotificationsCheckbox" text="Allow Synapse to send me email notifications" addStyleNames="margin-0-imp"/> 
 					    </g:FlowPanel>
 					    <g:SimplePanel ui:field="notificationSynAlertPanel"/>

@@ -15,7 +15,7 @@
 		</bh:Div>
 
 		<bh:Div ui:field="emailsPanel" addStyleNames="margin-left-10"/>
-		<bh:Div ui:field="changeEmailUI" visible="false" addStyleNames="margin-top-10">
+		<bh:Div ui:field="changeEmailUI" addStyleNames="margin-top-10 margin-left-10">
 		    <bh:Span addStyleNames="input-group">
 		      <g:TextBox ui:field="newEmailTextBox" styleName="form-control" />
 		      <bh:Span addStyleNames="input-group-btn">
