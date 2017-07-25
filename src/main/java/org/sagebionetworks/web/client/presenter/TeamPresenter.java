@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidg
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidget;
 import org.sagebionetworks.web.shared.TeamBundle;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -175,7 +176,8 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				view.setPublicJoinVisible(canPublicJoin);
 				view.setTotalMemberCount(result.getTotalMemberCount().toString());
 				view.setMediaObjectPanel(team, authenticationController.getCurrentXsrfToken());
-				view.setTeamEmailAddress(getTeamEmail(team.getName()));
+				boolean canSendEmail = teamMembershipStatus != null && teamMembershipStatus.getCanSendEmail();
+				view.setTeamEmailAddress(getTeamEmail(team.getName(), canSendEmail));
 				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
 				
 				if (teamMembershipStatus == null || !teamMembershipStatus.getIsMember()) {
@@ -206,8 +208,8 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		view.showMapModal();
 	}
 	
-	public String getTeamEmail(String teamName) {
-		if (authenticationController.isLoggedIn()) {
+	public String getTeamEmail(String teamName, boolean canSendEmail) {
+		if (authenticationController.isLoggedIn() && canSendEmail) {
 			//strip out any non-word character.  Not a (letter, number, underscore)
 			return teamName.replaceAll("\\W", "") + "@synapse.org";
 		} else {
