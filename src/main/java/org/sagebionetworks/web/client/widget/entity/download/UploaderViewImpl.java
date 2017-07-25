@@ -240,6 +240,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		fileUploadInput.setValue(null);
 		fileUploadLabel.setText("");
 		uploadSpeedLabel.setHTML("");
+		awsLoginView.clear();
 	}
 	
 	@Override
@@ -313,6 +314,8 @@ public class UploaderViewImpl extends FlowPanel implements
 			externalPassword.setVisible(false);
 			externalPassword.getElement().setAttribute("placeholder", "Password");
 		}
+		awsLoginView.clear();
+		awsLoginView.setVisible(false);
 	}
 	
 	@Override
