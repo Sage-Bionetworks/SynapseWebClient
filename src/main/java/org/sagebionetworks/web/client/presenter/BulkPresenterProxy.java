@@ -46,6 +46,7 @@ import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
 
@@ -77,13 +78,18 @@ public class BulkPresenterProxy extends AbstractActivity {
 	GWTWrapper gwt;
 	SynapseJSNIUtils jsniUtils;
 	AsyncCallback<VersionState> versionCheckCallback;
+	AuthenticationController authController;
+	
 	@Inject
-	public BulkPresenterProxy(GlobalApplicationState globalApplicationState,
+	public BulkPresenterProxy(
+			GlobalApplicationState globalApplicationState,
 			GWTWrapper gwt,
-			SynapseJSNIUtils jsniUtils) {
+			SynapseJSNIUtils jsniUtils,
+			AuthenticationController authController) {
 		this.globalApplicationState = globalApplicationState;
 		this.gwt = gwt;
 		this.jsniUtils = jsniUtils;
+		this.authController = authController;
 		versionCheckCallback = new AsyncCallback<VersionState>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -103,6 +109,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 	@Override
 	public void start(final AcceptsOneWidget panel, final EventBus eventBus) {
 		globalApplicationState.checkVersionCompatibility(versionCheckCallback);
+		authController.checkForUserChange();
 		globalApplicationState.setIsEditing(false);
 		// detect prefetch
 		if (panel == null && eventBus == null) return;

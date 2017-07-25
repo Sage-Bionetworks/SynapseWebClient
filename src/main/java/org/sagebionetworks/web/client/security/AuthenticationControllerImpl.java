@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.security;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -22,6 +23,7 @@ import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.XsrfToken;
 import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
@@ -268,5 +270,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public String getCurrentXsrfToken() {
 		return localStorage.get(XSRF_TOKEN_KEY);
+	}
+	
+	@Override
+	public void checkForUserChange() {
+		String currentSession = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
+		String localSession = getCurrentUserSessionToken();
+		if (!Objects.equals(currentSession, localSession)) {
+			Window.Location.reload();	
+		}
 	}
 }
