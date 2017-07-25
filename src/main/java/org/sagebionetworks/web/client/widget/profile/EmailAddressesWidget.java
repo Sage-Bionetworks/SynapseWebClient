@@ -131,6 +131,7 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 	public void additionalEmailValidation(String emailAddress) {
 		// need to validate
 		//first, does it look like an email address?
+		emailAddress = emailAddress.trim();
 		if (!ValidationUtils.isValidEmail(emailAddress)) {
 			synAlert.showError(WebConstants.INVALID_EMAIL_MESSAGE);
 			return;
@@ -139,7 +140,7 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 		String callbackUrl = gwt.getHostPageBaseURL() + "#!Account:";
 		synapseClient.additionalEmailValidation(
 				authenticationController.getCurrentUserPrincipalId(),
-				emailAddress.trim(), callbackUrl, new AsyncCallback<Void>() {
+				emailAddress, callbackUrl, new AsyncCallback<Void>() {
 					@Override
 					public void onSuccess(Void result) {
 						popupUtils.showInfo(DisplayConstants.EMAIL_ADDED, "");
