@@ -23,11 +23,11 @@
 					</b:InputGroup>
 				</t:TableData>
 				<t:TableData width="250px" paddingRight="5">
-					<b:Tooltip title="How to download all files">
-						<b:Button ui:field="downloadFilesButton" icon="FILES_O" height="34px" addStyleNames="margin-left-5" pull="RIGHT" />
-					</b:Tooltip>
 					<b:Tooltip title="Download query results">
 						<b:Button ui:field="downloadResultsButton" icon="DOWNLOAD" height="34px" addStyleNames="margin-left-5" pull="RIGHT" />
+					</b:Tooltip>
+					<b:Tooltip title="How to download all files">
+						<b:Button ui:field="downloadFilesButton" icon="FILES_O" height="34px" addStyleNames="margin-left-5" pull="RIGHT" />
 					</b:Tooltip>
 					<b:Tooltip title="Edit query results">
 						<b:Button ui:field="editResultsButton" icon="EDIT" height="34px" addStyleNames="margin-left-5" pull="RIGHT"/>
