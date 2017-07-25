@@ -164,6 +164,8 @@ import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelpImpl;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelpImpl;
+import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
+import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelpImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetView;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidgetView;
@@ -1428,5 +1430,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AwsLoginView.class).to(AwsLoginViewImpl.class);
 		bind(TeamMemberRowWidgetView.class).to(TeamMemberRowWidgetViewImpl.class);
 		bind(TeamMembersWidgetView.class).to(TeamMembersWidgetViewImpl.class);
+		bind(FileViewClientsHelp.class).to(FileViewClientsHelpImpl.class);
 	}
 }
