@@ -271,6 +271,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				createVersionChooser(entityId);
 			}
 		}, false);
+		entitySearchBoxContainer.clear();
 		entitySearchBoxContainer.add(entitySearchBox.asWidget());
 		
 		// list entry
