@@ -168,8 +168,8 @@ public class TeamPresenterTest {
 		verify(mockView).setMediaObjectPanel(mockTeam, xsrfToken);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
-		verify(mockOpenMembershipRequestsWidget).configure(eq(teamId), any(Callback.class));
-		verify(mockOpenUserInvitationsWidget).configure(eq(teamId), any(Callback.class));
+		verify(mockOpenMembershipRequestsWidget).setVisible(true);
+		verify(mockOpenUserInvitationsWidget).setVisible(true);
 		verify(mockView).showAdminMenuItems();
 		verify(mockView).setTeamEmailAddress(anyString());
 		//never
