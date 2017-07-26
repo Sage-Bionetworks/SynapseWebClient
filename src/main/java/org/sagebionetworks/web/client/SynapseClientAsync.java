@@ -144,6 +144,7 @@ public interface SynapseClientAsync {
 	void getNotificationEmail(AsyncCallback<String> callback);
 	
 	void setNotificationEmail(String email, AsyncCallback<Void> callback);
+	void removeEmail(String email, AsyncCallback<Void> callback);
 	
 	public void getEntityBenefactorAcl(String id, AsyncCallback<AccessControlList> callback);
 	

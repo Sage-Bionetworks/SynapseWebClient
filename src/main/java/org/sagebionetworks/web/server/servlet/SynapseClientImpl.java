@@ -769,6 +769,16 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
+	
+	@Override
+	public void removeEmail(String email) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.removeEmail(email);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 
 	public AccessControlList getBenefactorAcl(String id) throws RestServiceException {
 		EntityBundle bundle = getEntityBundle(id, EntityBundle.BENEFACTOR_ACL);
