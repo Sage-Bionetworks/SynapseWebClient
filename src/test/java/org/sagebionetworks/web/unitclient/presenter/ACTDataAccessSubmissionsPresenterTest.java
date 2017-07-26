@@ -35,8 +35,6 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter;
@@ -72,8 +70,6 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
-	@Mock
 	LoadMoreWidgetContainer mockLoadMoreContainer;
 	@Mock
 	ManagedACTAccessRequirementWidget mockACTAccessRequirementWidget;
@@ -102,8 +98,6 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	GWTWrapper mockGWT;
 	@Mock
 	DateTimeFormat mockDateTimeFormat;
-	@Mock
-	PlaceChanger mockPlaceChanger;
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
 	public static final String FILE_HANDLE_ID = "9999";
@@ -114,7 +108,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
 		when(mockGWT.getDateTimeFormat(any(PredefinedFormat.class))).thenReturn(mockDateTimeFormat);
-		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockGlobalApplicationState, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockDataAccessClient, mockSubjectsWidget, mockGWT);
+		presenter = new ACTDataAccessSubmissionsPresenter(mockView, mockSynAlert, mockGinInjector, mockLoadMoreContainer, mockACTAccessRequirementWidget, mockButton, mockDucTemplateFileHandleWidget, mockDataAccessClient, mockSubjectsWidget, mockGWT);
 		AsyncMockStubber.callSuccessWith(mockACTAccessRequirement).when(mockDataAccessClient).getAccessRequirement(anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionPage).when(mockDataAccessClient).getDataAccessSubmissions(anyLong(), anyString(), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 		when(mockDataAccessSubmissionPage.getResults()).thenReturn(Collections.singletonList(mockDataAccessSubmission));
@@ -123,7 +117,6 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		when(mockACTAccessRequirement.getId()).thenReturn(AR_ID);
 		when(mockGinInjector.getACTDataAccessSubmissionWidget()).thenReturn(mockACTDataAccessSubmissionWidget);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjects);
-		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}	
 	
 	@Test
@@ -177,6 +170,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockView).setIsValidatedProfileRequired(true);
 		
 		verify(mockACTAccessRequirementWidget).setRequirement(eq(mockACTAccessRequirement), any(Callback.class));
+		verify(mockLoadMoreContainer).setIsProcessing(true);
 		verify(mockDataAccessClient).getDataAccessSubmissions(anyLong(), eq((String)null), any(SubmissionState.class), any(SubmissionOrder.class), anyBoolean(), any(AsyncCallback.class));
 
 		//verify DataAccessSubmission widget is created/configured for the submission (based on the mockACTAccessRequirement configuration)
@@ -185,6 +179,7 @@ public class ACTDataAccessSubmissionsPresenterTest {
 		verify(mockACTDataAccessSubmissionWidget).setIrbColumnVisible(false);
 		verify(mockACTDataAccessSubmissionWidget).setOtherAttachmentsColumnVisible(true);
 		verify(mockLoadMoreContainer).setIsMore(true);
+		verify(mockLoadMoreContainer).setIsProcessing(false);
 		
 		//verify final load of empty page
 		when(mockDataAccessSubmissionPage.getResults()).thenReturn(Collections.EMPTY_LIST);
