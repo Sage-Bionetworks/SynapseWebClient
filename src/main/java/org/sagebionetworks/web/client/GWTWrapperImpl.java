@@ -26,7 +26,7 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 public class GWTWrapperImpl implements GWTWrapper {
 
 	private final static RegExp PATTERN_WHITE_SPACE = RegExp.compile("^\\s+$");
-	public int scrollTop = 0;
+	public int scrollTop = -1;
 	@Override
 	public String getHostPageBaseURL() {
 		return GWT.getHostPageBaseURL();
@@ -171,9 +171,9 @@ public class GWTWrapperImpl implements GWTWrapper {
 	
 	@Override
 	public void restoreWindowPosition() {
-		if (scrollTop > 0) {
+		if (scrollTop >= 0) {
 			Window.scrollTo(0, scrollTop);
-			scrollTop = 0;	
+			scrollTop = -1;	
 		}
 	}
 }
