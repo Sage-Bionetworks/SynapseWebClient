@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -29,13 +30,17 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	private List<UserProfile> profiles;
 	private List<MembershipInvtnSubmission> invitations;
 	private SynapseAlert synAlert;
+	private GWTWrapper gwt;
+	
 	@Inject
 	public OpenUserInvitationsWidget(OpenUserInvitationsWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalApplicationState,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			GWTWrapper gwt) {
 		this.view = view;
 		this.synAlert = synAlert;
+		this.gwt = gwt;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert);
 		this.synapseClient = synapseClient;
@@ -48,6 +53,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 
 	@Override
 	public void removeInvitation(String invitationId) {
+		gwt.saveWindowPosition();
 		synAlert.clear();
 		synapseClient.deleteMembershipInvitation(invitationId, new AsyncCallback<Void>() {
 			@Override
@@ -89,6 +95,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 				
 				//show the more button if we maxed out the return results
 				view.setMoreResultsVisible(result.size() == INVITATION_BATCH_LIMIT);
+				gwt.restoreWindowPosition();
 			}
 			
 			@Override
@@ -111,4 +118,8 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		return view.asWidget();
 	}
 	
+	public void setVisible(boolean visible) {
+		view.asWidget().setVisible(visible);
+	}
+
 }

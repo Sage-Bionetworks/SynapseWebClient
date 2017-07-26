@@ -76,7 +76,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		memberSearchContainer.clear();
 		SimplePanel container;
 		Row horizontalTable = new Row();
-		
+		horizontalTable.addStyleName("margin-bottom-5");
 	    searchField = new TextBox();
 	    searchField.setWidth("300px");
 	    searchField.addStyleName("form-control");
