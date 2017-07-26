@@ -1,14 +1,8 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static junit.framework.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -253,12 +247,18 @@ public class TeamPresenterTest {
 
 	@Test
 	public void testGetTeamEmail() {
+		boolean canSendEmail = true;
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		assertEquals("basic@synapse.org", presenter.getTeamEmail("basic"));
-		assertEquals("StandardCaseHere@synapse.org", presenter.getTeamEmail("Standard Case Here"));
-		assertEquals("unlikelycase@synapse.org", presenter.getTeamEmail(" \n\r unlikely\t case "));
-		assertEquals("Another_UnlikelyCase@synapse.org", presenter.getTeamEmail(" %^$##* Another_Unlikely\t &*#$)(!!@~Case "));
+		assertEquals("basic@synapse.org", presenter.getTeamEmail("basic", canSendEmail));
+		assertEquals("StandardCaseHere@synapse.org", presenter.getTeamEmail("Standard Case Here", canSendEmail));
+		assertEquals("unlikelycase@synapse.org", presenter.getTeamEmail(" \n\r unlikely\t case ", canSendEmail));
+		assertEquals("Another_UnlikelyCase@synapse.org", presenter.getTeamEmail(" %^$##* Another_Unlikely\t &*#$)(!!@~Case ", canSendEmail));
+		
+		canSendEmail = false;
+		assertEquals("", presenter.getTeamEmail("basic", canSendEmail));
+		
+		canSendEmail = true;
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		assertEquals("", presenter.getTeamEmail("basic"));
+		assertEquals("", presenter.getTeamEmail("basic", canSendEmail));
 	}
 }
