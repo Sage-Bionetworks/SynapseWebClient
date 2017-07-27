@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -112,7 +111,6 @@ public class TablePageViewImpl implements TablePageView {
 	
 	@Override
 	public void setFacetsVisible(boolean visible) {
-		GWT.debugger();
 		facetsWidgetContainer.setVisible(visible);
 	}
 }

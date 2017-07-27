@@ -95,7 +95,8 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
-				entityActionController.configure(actionMenu, bundle, true, bundle.getRootWikiId(), null);
+				boolean isCurrentVersion = true;
+				entityActionController.configure(actionMenu, bundle, isCurrentVersion, bundle.getRootWikiId(), null);
 				boolean canEdit = false;
 				tableEntityWidget.configure(bundle, canEdit, TableQueryResultWikiWidget.this, actionMenu);
 				configureActions();
@@ -107,14 +108,14 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 			}			
 		};
 		
-		final String tableId = QueryBundleUtils.getTableIdFromSql(query.getSql());
+		String tableId = QueryBundleUtils.getTableIdFromSql(query.getSql());
 		synapseClient.getEntityBundle(tableId, mask, callback);
 	}
 	public void configureActions() {
 		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
-		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
+		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, false);
 		this.actionMenu.setActionVisible(Action.TOGGLE_VIEW_SCOPE, false);
 	}
 	
