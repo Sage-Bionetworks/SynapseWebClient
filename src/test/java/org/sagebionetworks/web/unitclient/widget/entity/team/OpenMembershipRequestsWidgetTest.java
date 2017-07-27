@@ -84,6 +84,7 @@ public class OpenMembershipRequestsWidgetTest {
 		verify(mockSynAlert).clear();
 		verify(mockSynapseClient).getOpenRequests(eq(TEAM_ID), any(AsyncCallback.class));
 		verify(mockView).configure(anyList(), anyList());
+		verify(mockGwt).restoreWindowPosition();
 	}
 	
 	@Test
@@ -101,6 +102,7 @@ public class OpenMembershipRequestsWidgetTest {
 	public void testAcceptRequest() {
 		widget.configure(TEAM_ID, mockCallback);
 		widget.acceptRequest(USER_ID);
+		verify(mockGwt).saveWindowPosition();
 		verify(mockSynapseClient).addTeamMember(eq(USER_ID), eq(TEAM_ID), anyString(), eq(HOST_PAGE_URL), any(AsyncCallback.class));
 		verify(mockPopupUtils).showInfo(OpenMembershipRequestsWidget.ACCEPTED_REQUEST_MESSAGE, "");
 		verify(mockCallback).invoke();

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.mockito.Mockito.verify;
+
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -24,7 +26,6 @@ import org.sagebionetworks.web.client.widget.team.controller.TeamDeleteModalWidg
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamLeaveModalWidget;
 import org.sagebionetworks.web.shared.TeamBundle;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -125,8 +126,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	public void clear() {
 		memberListWidget.clear();
 		joinTeamWidget.clear();
-		openMembershipRequestsWidget.clear();
-		openUserInvitationsWidget.clear();
 		view.clear();
 	}
 	
@@ -136,14 +135,17 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
         return null;
     }
 	
-
 	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
 	private void refresh() {
-		refresh(team.getId());
+		openMembershipRequestsWidget.setVisible(false);
+		openUserInvitationsWidget.setVisible(false);
+		refresh(currentTeamId);
+		refreshOpenMembershipRequests();
+		refreshOpenUserInvitations();
 	}
 	
 	@Override
@@ -179,7 +181,9 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				boolean canSendEmail = teamMembershipStatus != null && teamMembershipStatus.getCanSendEmail();
 				view.setTeamEmailAddress(getTeamEmail(team.getName(), canSendEmail));
 				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
-				
+				openMembershipRequestsWidget.setVisible(isAdmin);
+				openUserInvitationsWidget.setVisible(isAdmin);
+
 				if (teamMembershipStatus == null || !teamMembershipStatus.getIsMember()) {
 					//not a member, add Join widget
 					joinTeamWidget.configure(teamId, false, teamMembershipStatus,
@@ -188,8 +192,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 					view.setCommandsVisible(true);
 					view.showMemberMenuItems();
 					if (isAdmin) {
-						openMembershipRequestsWidget.configure(teamId, refreshCallback);
-						openUserInvitationsWidget.configure(teamId, refreshCallback);
 						view.showAdminMenuItems();
 					}
 				}
@@ -200,6 +202,33 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			}
 		});
 	}
+	
+	public void refreshOpenMembershipRequests() {
+		openMembershipRequestsWidget.clear();
+		
+		Callback refreshOpenMembershipRequestsCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refresh(currentTeamId);
+				openMembershipRequestsWidget.configure(currentTeamId, this);
+			}
+		};
+		openMembershipRequestsWidget.configure(currentTeamId, refreshOpenMembershipRequestsCallback);
+	}
+	
+	public void refreshOpenUserInvitations() {
+		openUserInvitationsWidget.clear();
+
+		Callback refreshOpenUserInvitationsCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refresh(currentTeamId);
+				openUserInvitationsWidget.configure(currentTeamId, this);
+			}
+		};
+		openUserInvitationsWidget.configure(currentTeamId, refreshOpenUserInvitationsCallback);
+	}
+
 	
 	@Override
 	public void onShowMap() {
@@ -218,8 +247,9 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	}
 	
 	private void showView(org.sagebionetworks.web.client.place.Team place) {
-		String teamId = place.getTeamId();
-		refresh(teamId);
+		currentTeamId = place.getTeamId();
+		//full refresh
+		refresh();
 	}
 	
 	@Override

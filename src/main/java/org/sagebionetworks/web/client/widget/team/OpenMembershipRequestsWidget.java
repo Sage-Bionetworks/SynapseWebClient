@@ -66,6 +66,7 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 					profiles.add(b.getUserProfile());
 				}
 				view.configure(profiles, requestMessages);
+				gwt.restoreWindowPosition();
 			}
 			
 			@Override
@@ -86,6 +87,7 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 	
 	@Override
 	public void acceptRequest(String userId) {
+		gwt.saveWindowPosition();
 		synAlert.clear();
 		//try to add user id to team (since we know there's an open membership request). then update open membership request list
 		synapseClient.addTeamMember(userId, teamId, "", gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
@@ -103,6 +105,10 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 	
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	public void setVisible(boolean visible) {
+		view.asWidget().setVisible(visible);
 	}
 	
 }

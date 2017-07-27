@@ -56,4 +56,6 @@ public interface GWTWrapper {
 	HasRpcToken asHasRpcToken(Object service);
 
 	String getUniqueElementId();
+	void saveWindowPosition();
+	void restoreWindowPosition();
 }

@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -48,6 +49,8 @@ public class OpenUserInvitationsWidgetTest {
 	MembershipInvtnSubmission testInvite;
 	@Mock
 	SynapseAlert mockSynapseAlert;
+	@Mock
+	GWTWrapper mockGWT;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -56,7 +59,7 @@ public class OpenUserInvitationsWidgetTest {
 		mockView = mock(OpenUserInvitationsWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
-		widget = new OpenUserInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseAlert);
+		widget = new OpenUserInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseAlert, mockGWT);
 		
 		
 		testProfile = new UserProfile();
@@ -93,6 +96,7 @@ public class OpenUserInvitationsWidgetTest {
 		widget.configure(teamId, mockTeamUpdatedCallback);
 		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).configure(anyList(), anyList());
+		verify(mockGWT).restoreWindowPosition();
 	}
 	@Test
 	public void testConfigureFailure() throws Exception {
@@ -109,6 +113,7 @@ public class OpenUserInvitationsWidgetTest {
 		String invitationId = "123";
 		widget.configure(teamId, mockTeamUpdatedCallback);
 		widget.removeInvitation(invitationId);
+		verify(mockGWT).saveWindowPosition();
 		verify(mockSynapseClient).deleteMembershipInvitation(eq(invitationId), any(AsyncCallback.class));
 		verify(mockTeamUpdatedCallback).invoke();
 		verify(mockView).configure(anyList(), anyList());
