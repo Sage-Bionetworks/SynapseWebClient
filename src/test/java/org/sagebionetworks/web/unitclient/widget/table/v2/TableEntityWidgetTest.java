@@ -35,6 +35,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
+import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -83,6 +84,8 @@ public class TableEntityWidgetTest {
 	ArgumentCaptor<Query> queryCaptor;
 	
 	String facetBasedSql = "select * from syn123 where x>1";
+	@Mock
+	FileViewClientsHelp mockFileViewClientsHelp;
 	
 	@Before
 	public void before(){
@@ -106,7 +109,16 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget, mockUploadTableModalWidget, mockPreflightController, mockCopyTextModal, mockSynapseClient);
+		widget = new TableEntityWidget(
+				mockView, 
+				mockQueryResultsWidget, 
+				mockQueryInputWidget, 
+				mockDownloadTableQueryModalWidget, 
+				mockUploadTableModalWidget, 
+				mockPreflightController, 
+				mockCopyTextModal, 
+				mockSynapseClient, 
+				mockFileViewClientsHelp);
 		
 		AsyncMockStubber.callSuccessWith(facetBasedSql).when(mockSynapseClient).generateSqlWithFacets(anyString(), anyList(), anyList(), any(AsyncCallback.class));
 		// The test bundle
