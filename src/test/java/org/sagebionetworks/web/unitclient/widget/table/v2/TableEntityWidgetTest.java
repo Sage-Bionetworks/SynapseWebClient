@@ -206,6 +206,8 @@ public class TableEntityWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
 		
 		verify(mockActionMenu).setBasicDivderVisible(true);
+		// download files help not visible for Table, only Views
+		verify(mockQueryInputWidget).setDownloadFilesVisible(false);
 	}
 	
 	@Test
@@ -234,6 +236,8 @@ public class TableEntityWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
 		
 		verify(mockActionMenu).setBasicDivderVisible(true);
+		// TODO: SWC-3729: verify shown for file view, after UX issues have been worked out with users.
+		verify(mockQueryInputWidget).setDownloadFilesVisible(false);
 	}
 	@Test
 	public void testConfigureViewNoEdit(){
@@ -603,5 +607,18 @@ public class TableEntityWidgetTest {
 		widget.onShowSimpleSearch();
 		verify(mockView, never()).showConfirmDialog(eq(TableEntityWidget.RESET_SEARCH_QUERY), eq(TableEntityWidget.RESET_SEARCH_QUERY_MESSAGE), any(Callback.class));
 		verifySimpleSearchUI();
+	}
+	
+	@Test
+	public void testOnShowDownloadFiles() {
+		Query startQuery = new Query();
+		startQuery.setSql(facetBasedSql);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
+		
+		widget.onShowDownloadFiles();
+		
+		verify(mockFileViewClientsHelp).setQuery(facetBasedSql);
+		verify(mockFileViewClientsHelp).show();
 	}
 }

@@ -1,11 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
-import static org.sagebionetworks.repo.model.EntityBundle.DOI;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
 
@@ -85,13 +81,14 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		query.setOffset(offset);
 		String sql = descriptor.get(WidgetConstants.TABLE_QUERY_KEY);
 		query.setSql(sql);
-		configureTableQueryResultWidget(query);
+		String tableId = QueryBundleUtils.getTableIdFromSql(query.getSql());
+		configureTableQueryResultWidget(tableId);
 	}
 	
-	public void configureTableQueryResultWidget(final Query query) {
+	public void configureTableQueryResultWidget(String tableId) {
 		synAlert.clear();
 		
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | DOI | TABLE_DATA | BENEFACTOR_ACL;
+		int mask = ENTITY | PERMISSIONS | TABLE_DATA | BENEFACTOR_ACL;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
@@ -108,7 +105,6 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 			}			
 		};
 		
-		String tableId = QueryBundleUtils.getTableIdFromSql(query.getSql());
 		synapseClient.getEntityBundle(tableId, mask, callback);
 	}
 	public void hideEditActions() {
