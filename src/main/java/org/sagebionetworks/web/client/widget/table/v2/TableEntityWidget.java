@@ -120,7 +120,9 @@ public class TableEntityWidget implements IsWidget,
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
 		this.tableType = getTableType(table);
-		queryInputWidget.setDownloadFilesVisible(TableType.fileview.equals(tableType));
+		//TODO: SWC-3729: show this after UX issues have been worked out with users.
+//		queryInputWidget.setDownloadFilesVisible(TableType.fileview.equals(tableType));
+		queryInputWidget.setDownloadFilesVisible(false);
 		this.tableId = bundle.getEntity().getId();
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;

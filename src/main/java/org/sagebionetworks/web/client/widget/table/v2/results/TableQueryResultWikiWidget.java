@@ -79,7 +79,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		} catch (Exception e) {
 			synapseJsniUtils.consoleError("Could not set query offset: " + e.getMessage());
 		}
-		
+		hideEditActions();
 		query = new Query();
 		query.setLimit(limit);
 		query.setOffset(offset);
@@ -99,7 +99,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 				entityActionController.configure(actionMenu, bundle, isCurrentVersion, bundle.getRootWikiId(), null);
 				boolean canEdit = false;
 				tableEntityWidget.configure(bundle, canEdit, TableQueryResultWikiWidget.this, actionMenu);
-				configureActions();
+				hideEditActions();
 			}
 			
 			@Override
@@ -111,10 +111,9 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		String tableId = QueryBundleUtils.getTableIdFromSql(query.getSql());
 		synapseClient.getEntityBundle(tableId, mask, callback);
 	}
-	public void configureActions() {
+	public void hideEditActions() {
 		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
-		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, false);
 		this.actionMenu.setActionVisible(Action.TOGGLE_VIEW_SCOPE, false);
 	}
