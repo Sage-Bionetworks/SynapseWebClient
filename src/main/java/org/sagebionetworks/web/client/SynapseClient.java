@@ -499,4 +499,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	Long getOpenMembershipRequestCount() throws RestServiceException;
 
 	String createExternalObjectStoreFileHandle(ExternalObjectStoreFileHandle fileHandle) throws RestServiceException;
+
+	void removeEmail(String email) throws RestServiceException;
 }

@@ -124,8 +124,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	public void clear() {
 		memberListWidget.clear();
 		joinTeamWidget.clear();
-		openMembershipRequestsWidget.clear();
-		openUserInvitationsWidget.clear();
 		view.clear();
 	}
 	
@@ -135,14 +133,17 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
         return null;
     }
 	
-
 	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
 	private void refresh() {
-		refresh(team.getId());
+		openMembershipRequestsWidget.setVisible(false);
+		openUserInvitationsWidget.setVisible(false);
+		refresh(currentTeamId);
+		refreshOpenMembershipRequests();
+		refreshOpenUserInvitations();
 	}
 	
 	@Override
@@ -175,9 +176,12 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				view.setPublicJoinVisible(canPublicJoin);
 				view.setTotalMemberCount(result.getTotalMemberCount().toString());
 				view.setMediaObjectPanel(team, authenticationController.getCurrentXsrfToken());
-				view.setTeamEmailAddress(getTeamEmail(team.getName()));
+				boolean canSendEmail = teamMembershipStatus != null && teamMembershipStatus.getCanSendEmail();
+				view.setTeamEmailAddress(getTeamEmail(team.getName(), canSendEmail));
 				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
-				
+				openMembershipRequestsWidget.setVisible(isAdmin);
+				openUserInvitationsWidget.setVisible(isAdmin);
+
 				if (teamMembershipStatus == null || !teamMembershipStatus.getIsMember()) {
 					//not a member, add Join widget
 					joinTeamWidget.configure(teamId, false, teamMembershipStatus,
@@ -186,8 +190,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 					view.setCommandsVisible(true);
 					view.showMemberMenuItems();
 					if (isAdmin) {
-						openMembershipRequestsWidget.configure(teamId, refreshCallback);
-						openUserInvitationsWidget.configure(teamId, refreshCallback);
 						view.showAdminMenuItems();
 					}
 				}
@@ -199,6 +201,33 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		});
 	}
 	
+	public void refreshOpenMembershipRequests() {
+		openMembershipRequestsWidget.clear();
+		
+		Callback refreshOpenMembershipRequestsCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refresh(currentTeamId);
+				openMembershipRequestsWidget.configure(currentTeamId, this);
+			}
+		};
+		openMembershipRequestsWidget.configure(currentTeamId, refreshOpenMembershipRequestsCallback);
+	}
+	
+	public void refreshOpenUserInvitations() {
+		openUserInvitationsWidget.clear();
+
+		Callback refreshOpenUserInvitationsCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refresh(currentTeamId);
+				openUserInvitationsWidget.configure(currentTeamId, this);
+			}
+		};
+		openUserInvitationsWidget.configure(currentTeamId, refreshOpenUserInvitationsCallback);
+	}
+
+	
 	@Override
 	public void onShowMap() {
 		map.setHeight((view.getClientHeight() - 200) + "px");
@@ -206,8 +235,8 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		view.showMapModal();
 	}
 	
-	public String getTeamEmail(String teamName) {
-		if (authenticationController.isLoggedIn()) {
+	public String getTeamEmail(String teamName, boolean canSendEmail) {
+		if (authenticationController.isLoggedIn() && canSendEmail) {
 			//strip out any non-word character.  Not a (letter, number, underscore)
 			return teamName.replaceAll("\\W", "") + "@synapse.org";
 		} else {
@@ -216,8 +245,9 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	}
 	
 	private void showView(org.sagebionetworks.web.client.place.Team place) {
-		String teamId = place.getTeamId();
-		refresh(teamId);
+		currentTeamId = place.getTeamId();
+		//full refresh
+		refresh();
 	}
 	
 	@Override

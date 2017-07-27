@@ -488,6 +488,8 @@ import org.sagebionetworks.web.client.widget.login.ZxcvbnWrapper;
 import org.sagebionetworks.web.client.widget.login.ZxcvbnWrapperImpl;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationView;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationViewImpl;
+import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidgetView;
+import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedView;
 import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedViewImpl;
 import org.sagebionetworks.web.client.widget.profile.ProfileImageView;
@@ -1431,5 +1433,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TeamMemberRowWidgetView.class).to(TeamMemberRowWidgetViewImpl.class);
 		bind(TeamMembersWidgetView.class).to(TeamMembersWidgetViewImpl.class);
 		bind(FileViewClientsHelp.class).to(FileViewClientsHelpImpl.class);
+		bind(EmailAddressesWidgetView.class).to(EmailAddressesWidgetViewImpl.class);
 	}
 }

@@ -21,7 +21,6 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -35,6 +34,7 @@ import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDa
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -51,7 +51,6 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
 	DataAccessClientAsync dataAccessClient;
-	private GlobalApplicationState globalAppState;
 	LoadMoreWidgetContainer loadMoreContainer;
 	ManagedACTAccessRequirementWidget actAccessRequirementWidget;
 	boolean isAccessRequirementVisible;
@@ -74,7 +73,6 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 			final ACTDataAccessSubmissionsView view,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
-			GlobalApplicationState globalAppState,
 			LoadMoreWidgetContainer loadMoreContainer,
 			ManagedACTAccessRequirementWidget actAccessRequirementWidget,
 			final Button showHideAccessRequirementButton,
@@ -91,7 +89,6 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 		this.actAccessRequirementWidget = actAccessRequirementWidget;
 		actAccessRequirementWidget.setReviewAccessRequestsVisible(false);
 		this.subjectsWidget = subjectsWidget;
-		this.globalAppState = globalAppState;
 		this.ducTemplateFileHandleWidget = ducTemplateFileHandleWidget;
 		dateFormat = gwt.getDateTimeFormat(PredefinedFormat.DATE_FULL);
 		states = new ArrayList<String>();
@@ -218,6 +215,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 	}
 
 	public void loadMore() {
+		loadMoreContainer.setIsProcessing(true);
 		synAlert.clear();
 		// ask for data access submissions once call is available, and create a widget to render.
 		dataAccessClient.getDataAccessSubmissions(actAccessRequirementId, nextPageToken, stateFilter, SubmissionOrder.CREATED_ON, isSortedAsc, new AsyncCallback<SubmissionPage>() {
@@ -225,6 +223,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 				loadMoreContainer.setIsMore(false);
+				loadMoreContainer.setIsProcessing(false);
 			}
 			
 			public void onSuccess(SubmissionPage submissionPage) {
@@ -239,6 +238,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 					loadMoreContainer.add(w.asWidget());
 				}
 				loadMoreContainer.setIsMore(nextPageToken != null);
+				loadMoreContainer.setIsProcessing(false);
 			};
 		});
 	}
