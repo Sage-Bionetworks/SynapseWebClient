@@ -96,6 +96,7 @@ public class OpenUserInvitationsWidgetTest {
 		widget.configure(teamId, mockTeamUpdatedCallback);
 		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).configure(anyList(), anyList());
+		verify(mockGWT).restoreWindowPosition();
 	}
 	@Test
 	public void testConfigureFailure() throws Exception {
@@ -112,6 +113,7 @@ public class OpenUserInvitationsWidgetTest {
 		String invitationId = "123";
 		widget.configure(teamId, mockTeamUpdatedCallback);
 		widget.removeInvitation(invitationId);
+		verify(mockGWT).saveWindowPosition();
 		verify(mockSynapseClient).deleteMembershipInvitation(eq(invitationId), any(AsyncCallback.class));
 		verify(mockTeamUpdatedCallback).invoke();
 		verify(mockView).configure(anyList(), anyList());

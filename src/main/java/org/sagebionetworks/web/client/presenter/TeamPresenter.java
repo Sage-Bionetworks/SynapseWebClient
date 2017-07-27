@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.mockito.Mockito.verify;
+
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -179,7 +181,9 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				boolean canSendEmail = teamMembershipStatus != null && teamMembershipStatus.getCanSendEmail();
 				view.setTeamEmailAddress(getTeamEmail(team.getName(), canSendEmail));
 				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
-				
+				openMembershipRequestsWidget.setVisible(isAdmin);
+				openUserInvitationsWidget.setVisible(isAdmin);
+
 				if (teamMembershipStatus == null || !teamMembershipStatus.getIsMember()) {
 					//not a member, add Join widget
 					joinTeamWidget.configure(teamId, false, teamMembershipStatus,
@@ -187,8 +191,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				} else {
 					view.setCommandsVisible(true);
 					view.showMemberMenuItems();
-					openMembershipRequestsWidget.setVisible(isAdmin);
-					openUserInvitationsWidget.setVisible(isAdmin);
 					if (isAdmin) {
 						view.showAdminMenuItems();
 					}

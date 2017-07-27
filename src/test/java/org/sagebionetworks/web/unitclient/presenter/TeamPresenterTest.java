@@ -80,6 +80,8 @@ public class TeamPresenterTest {
 	
 	@Captor
 	ArgumentCaptor<CallbackP<Boolean>> callbackPcaptor;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
 	
 	@Before
 	public void setup() {
@@ -206,7 +208,8 @@ public class TeamPresenterTest {
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockJoinWidget).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
-		
+		verify(mockOpenMembershipRequestsWidget).setVisible(false);
+		verify(mockOpenUserInvitationsWidget).setVisible(false);
 		//never
 		verify(mockView, never()).showMemberMenuItems();
 		verify(mockOpenMembershipRequestsWidget, never()).configure(eq(teamId), any(Callback.class));
@@ -243,6 +246,8 @@ public class TeamPresenterTest {
 		verify(mockGoogleMap).setHeight(anyString());
 		verify(mockGoogleMap).configure(teamId);
 		verify(mockView).showMapModal();
+		verify(mockOpenMembershipRequestsWidget).setVisible(false);
+		verify(mockOpenUserInvitationsWidget).setVisible(false);
 	}
 
 	@Test
@@ -261,4 +266,33 @@ public class TeamPresenterTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		assertEquals("", presenter.getTeamEmail("basic", canSendEmail));
 	}
+	
+	@Test
+	public void testRefreshOpenMembershipRequests() {
+		presenter.refreshOpenMembershipRequests();
+		verify(mockOpenMembershipRequestsWidget).clear();
+		verify(mockOpenMembershipRequestsWidget).configure(anyString(), callbackCaptor.capture());
+		Callback callback = callbackCaptor.getValue();
+		callback.invoke();
+		// reconfigured widget, and refreshed
+		verify(mockOpenMembershipRequestsWidget, times(2)).configure(anyString(), eq(callback));
+		verify(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		// never reconfigures open invites (no need to refresh)
+		verify(mockOpenUserInvitationsWidget, never()).configure(anyString(), eq(callback));
+	}
+	
+	@Test
+	public void testRefreshOpenUserInvitations() {
+		presenter.refreshOpenUserInvitations();
+		verify(mockOpenUserInvitationsWidget).clear();
+		verify(mockOpenUserInvitationsWidget).configure(anyString(), callbackCaptor.capture());
+		Callback callback = callbackCaptor.getValue();
+		callback.invoke();
+		// reconfigured widget, and refreshed
+		verify(mockOpenUserInvitationsWidget, times(2)).configure(anyString(), eq(callback));
+		verify(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		// never reconfigures open membership requests (no need to refresh)
+		verify(mockOpenMembershipRequestsWidget, never()).configure(anyString(), eq(callback));
+	}
+
 }
