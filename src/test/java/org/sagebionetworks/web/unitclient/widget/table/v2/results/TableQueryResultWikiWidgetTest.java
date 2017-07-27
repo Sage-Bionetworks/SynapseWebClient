@@ -4,9 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
 import java.util.HashMap;
@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
@@ -106,6 +107,11 @@ public class TableQueryResultWikiWidgetTest {
 		verify(mockEntityActionController).configure(mockActionMenu, mockEntityBundle, isCurrentVersion, wikiPageRootId, entityUpdatedHandler);
 		boolean canEdit = false;
 		verify(mockTableEntityWidget).configure(mockEntityBundle, canEdit, widget, mockActionMenu);
+		
+		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.EDIT_TABLE_DATA, false);
+		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, false);
+		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.TOGGLE_VIEW_SCOPE, false);
 	}
 	
 	@Test
