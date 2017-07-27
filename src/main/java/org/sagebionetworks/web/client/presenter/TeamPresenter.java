@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.presenter;
 
-import static org.mockito.Mockito.verify;
-
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
