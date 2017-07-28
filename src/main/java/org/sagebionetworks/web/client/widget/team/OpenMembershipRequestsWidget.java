@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -28,6 +29,7 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 	private GWTWrapper gwt;
 	private SynapseAlert synAlert;
 	private PopupUtilsView popupUtils;
+	private DateTimeUtils dateTimeUtils;
 	
 	@Inject
 	public OpenMembershipRequestsWidget(OpenMembershipRequestsWidgetView view, 
@@ -35,10 +37,12 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 			GlobalApplicationState globalApplicationState,
 			GWTWrapper gwt,
 			SynapseAlert synAlert,
-			PopupUtilsView popupUtils) {
+			PopupUtilsView popupUtils,
+			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.popupUtils = popupUtils;
 		this.synAlert = synAlert;
+		this.dateTimeUtils = dateTimeUtils;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert);
 		this.synapseClient = synapseClient;
@@ -57,6 +61,7 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 				//create the associated object list, and pass to the view to render
 				List<UserProfile> profiles = new ArrayList<UserProfile>();
 				List<String> requestMessages = new ArrayList<String>();
+				List<String> createdOnDates = new ArrayList<String>();
 				for (MembershipRequestBundle b : result) {
 					String requestMessage = "";
 					MembershipRequest request = b.getMembershipRequest();
@@ -64,8 +69,9 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 						requestMessage = request.getMessage();
 					requestMessages.add(requestMessage);
 					profiles.add(b.getUserProfile());
+					createdOnDates.add(dateTimeUtils.convertDateToSmallString(request.getCreatedOn()));
 				}
-				view.configure(profiles, requestMessages);
+				view.configure(profiles, requestMessages, createdOnDates);
 				gwt.restoreWindowPosition();
 			}
 			

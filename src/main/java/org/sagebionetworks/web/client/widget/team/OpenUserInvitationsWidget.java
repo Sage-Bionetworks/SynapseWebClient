@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -29,18 +30,21 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	private Integer currentOffset;
 	private List<UserProfile> profiles;
 	private List<MembershipInvtnSubmission> invitations;
+	private List<String> createdOnDates;
 	private SynapseAlert synAlert;
 	private GWTWrapper gwt;
-	
+	private DateTimeUtils dateTimeUtils;
 	@Inject
 	public OpenUserInvitationsWidget(OpenUserInvitationsWidgetView view, 
 			SynapseClientAsync synapseClient, 
 			GlobalApplicationState globalApplicationState,
 			SynapseAlert synAlert,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.gwt = gwt;
+		this.dateTimeUtils = dateTimeUtils;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert);
 		this.synapseClient = synapseClient;
@@ -73,6 +77,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		this.teamRefreshCallback = teamRefreshCallback;
 		profiles = new ArrayList<UserProfile>();
 		invitations = new ArrayList<MembershipInvtnSubmission>();
+		createdOnDates = new ArrayList<>();
 		currentOffset = 0;
 		getNextBatch();
 	};
@@ -90,8 +95,10 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 				for (OpenTeamInvitationBundle b : result) {
 					invitations.add(b.getMembershipInvtnSubmission());
 					profiles.add(b.getUserProfile());
+					String createdOn = dateTimeUtils.convertDateToSmallString(b.getMembershipInvtnSubmission().getCreatedOn());
+					createdOnDates.add(createdOn);
 				}
-				view.configure(profiles, invitations);
+				view.configure(profiles, invitations, createdOnDates);
 				
 				//show the more button if we maxed out the return results
 				view.setMoreResultsVisible(result.size() == INVITATION_BATCH_LIMIT);

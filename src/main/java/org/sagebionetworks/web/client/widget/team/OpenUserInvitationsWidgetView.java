@@ -20,7 +20,7 @@ public interface OpenUserInvitationsWidgetView extends IsWidget {
 	/**
 	 * shows nothing if membershipRequests is empty.
 	 */
-	public void configure(List<UserProfile> profiles, List<MembershipInvtnSubmission> invitations);
+	public void configure(List<UserProfile> profiles, List<MembershipInvtnSubmission> invitations, List<String> createdOnDates);
 	
 	public void setMoreResultsVisible(boolean isVisible);
 	
