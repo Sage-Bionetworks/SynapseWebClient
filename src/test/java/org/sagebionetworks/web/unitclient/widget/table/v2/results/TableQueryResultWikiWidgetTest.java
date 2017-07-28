@@ -1,38 +1,34 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isNull;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
-import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
-import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWikiWidgetView;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -45,8 +41,9 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class TableQueryResultWikiWidgetTest {
 	TableQueryResultWikiWidget widget;
-	TableQueryResultWidget mockTableQueryResultWidget;
+	@Mock
 	TableQueryResultWikiWidgetView mockView;
+	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	@Mock
@@ -54,24 +51,33 @@ public class TableQueryResultWikiWidgetTest {
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
-	TableEntity mockTableEntity;
+	TableEntityWidget mockTableEntityWidget;
 	@Mock
-	EntityView mockEntityView;
+	ActionMenuWidget mockActionMenu;
+	@Mock
+	EntityActionController mockEntityActionController;
+	@Mock
+	EntityBundle mockEntityBundle;
+	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		mockTableQueryResultWidget = mock(TableQueryResultWidget.class);
-		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockView = mock(TableQueryResultWikiWidgetView.class);
-		widget = new TableQueryResultWikiWidget(mockView, mockTableQueryResultWidget, mockSynapseJSNIUtils, mockSynapseClient, mockSynAlert);
+		widget = new TableQueryResultWikiWidget(mockView, 
+				mockTableEntityWidget,
+				mockActionMenu,
+				mockEntityActionController,
+				mockSynapseJSNIUtils, 
+				mockSynapseClient, 
+				mockSynAlert);
+		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testConstruction() {
 		verify(mockView).setTableQueryResultWidget(any(Widget.class));
 		verify(mockView).setSynAlert(any(Widget.class));
+		verify(mockActionMenu).addControllerWidget(any(Widget.class));
 	}
-
 	
 	@Test
 	public void testAsWidget() {
@@ -80,53 +86,37 @@ public class TableQueryResultWikiWidgetTest {
 	}
 	
 	@Test
-	public void testConfigureIsTable() {
-		AsyncMockStubber.callSuccessWith(mockTableEntity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
-		TableType tableType = TableType.table;
+	public void testConfigure() {
 		Map<String, String> descriptor = new HashMap<String, String>();
-		String sql = "my query string";
+		String tableId = "syn12345";
+		String sql = "select * from " + tableId;
 		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
-		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockSynAlert).clear();
-		ArgumentCaptor<Query> captor = ArgumentCaptor.forClass(Query.class);
-		verify(mockTableQueryResultWidget).configure(captor.capture(), eq(false), eq(tableType), (QueryResultsListener)isNull());
 		
-		Query capturedQuery = captor.getValue();
-		assertEquals(sql, capturedQuery.getSql());
-		assertEquals((Long)TableEntityWidget.DEFAULT_LIMIT, capturedQuery.getLimit());
-		assertEquals((Long)TableEntityWidget.DEFAULT_OFFSET, capturedQuery.getOffset());
-	}
-	
-	@Test
-	public void testConfigureIsView() {
-		AsyncMockStubber.callSuccessWith(mockEntityView).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
-		when(mockEntityView.getType()).thenReturn(ViewType.file);
-		
-		TableType tableType = TableType.fileview;
-		Map<String, String> descriptor = new HashMap<String, String>();
-		String sql = "my query string";
-		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
 		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockSynAlert).clear();
-		verify(mockTableQueryResultWidget).configure(any(Query.class), eq(false), eq(tableType), (QueryResultsListener)isNull());
-	}
-	@Test
-	public void testConfigureIsProjectView() {
-		AsyncMockStubber.callSuccessWith(mockEntityView).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
-		when(mockEntityView.getType()).thenReturn(ViewType.project);
 		
-		TableType tableType = TableType.projectview;
-		Map<String, String> descriptor = new HashMap<String, String>();
-		String sql = "my query string";
-		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
-		widget.configure(wikiKey, descriptor, null, null);
+		verify(mockSynapseClient).getEntityBundle(eq(tableId), anyInt(), any(AsyncCallback.class));
 		verify(mockSynAlert).clear();
-		verify(mockTableQueryResultWidget).configure(any(Query.class), eq(false), eq(tableType), (QueryResultsListener)isNull());
+		Query query = widget.getQueryString();
+		assertEquals(sql, query.getSql());
+		assertEquals((Long)TableEntityWidget.DEFAULT_LIMIT, query.getLimit());
+		assertEquals((Long)TableEntityWidget.DEFAULT_OFFSET, query.getOffset());
+		
+		boolean isCurrentVersion = true;
+		String wikiPageRootId = null;
+		EntityUpdatedHandler entityUpdatedHandler = null;
+		verify(mockEntityActionController).configure(mockActionMenu, mockEntityBundle, isCurrentVersion, wikiPageRootId, entityUpdatedHandler);
+		boolean canEdit = false;
+		verify(mockTableEntityWidget).configure(mockEntityBundle, canEdit, widget, mockActionMenu);
+		
+		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.EDIT_TABLE_DATA, false);
+		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, false);
+		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.TOGGLE_VIEW_SCOPE, false);
 	}
 	
 	@Test
 	public void testConfigureNotFound() {
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		Map<String, String> descriptor = new HashMap<String, String>();
 		String sql = "my query string";
 		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
@@ -138,7 +128,6 @@ public class TableQueryResultWikiWidgetTest {
 	
 	@Test
 	public void testConfigureNonDefaultLimitOffset() {
-		AsyncMockStubber.callSuccessWith(mockTableEntity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 		Map<String, String> descriptor = new HashMap<String, String>();
 		String sql = "my query string";
 		String limit = "8080";
@@ -147,19 +136,17 @@ public class TableQueryResultWikiWidgetTest {
 		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
 		descriptor.put(WidgetConstants.TABLE_OFFSET_KEY, offset);
 		descriptor.put(WidgetConstants.TABLE_LIMIT_KEY, limit);
-		widget.configure(wikiKey, descriptor, null, null);
-		ArgumentCaptor<Query> captor = ArgumentCaptor.forClass(Query.class);
-		verify(mockTableQueryResultWidget).configure(captor.capture(), eq(false), eq(TableType.table), (QueryResultsListener)isNull());
 		
-		Query capturedQuery = captor.getValue();
-		assertEquals(sql, capturedQuery.getSql());
-		assertEquals(Long.valueOf(8080L), capturedQuery.getLimit());
-		assertEquals(Long.valueOf(333L), capturedQuery.getOffset());
+		widget.configure(wikiKey, descriptor, null, null);
+		
+		Query query = widget.getQueryString();
+		assertEquals(sql, query.getSql());
+		assertEquals(Long.valueOf(8080L), query.getLimit());
+		assertEquals(Long.valueOf(333L), query.getOffset());
 	}
 	
 	@Test
 	public void testInvalidLimitOffset() {
-		AsyncMockStubber.callSuccessWith(mockTableEntity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
 		Map<String, String> descriptor = new HashMap<String, String>();
 		String sql = "my query string";
 		String limit = "abc";
@@ -168,15 +155,14 @@ public class TableQueryResultWikiWidgetTest {
 		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
 		descriptor.put(WidgetConstants.TABLE_OFFSET_KEY, offset);
 		descriptor.put(WidgetConstants.TABLE_LIMIT_KEY, limit);
-		widget.configure(wikiKey, descriptor, null, null);
-		ArgumentCaptor<Query> captor = ArgumentCaptor.forClass(Query.class);
-		verify(mockTableQueryResultWidget).configure(captor.capture(), eq(false), eq(TableType.table), (QueryResultsListener)isNull());
 		
-		Query capturedQuery = captor.getValue();
-		assertEquals(sql, capturedQuery.getSql());
+		widget.configure(wikiKey, descriptor, null, null);
+		
+		Query query = widget.getQueryString();
+		assertEquals(sql, query.getSql());
 		//should have been set to default values
-		assertEquals((Long)TableEntityWidget.DEFAULT_LIMIT, capturedQuery.getLimit());
-		assertEquals((Long)TableEntityWidget.DEFAULT_OFFSET, capturedQuery.getOffset());
+		assertEquals((Long)TableEntityWidget.DEFAULT_LIMIT, query.getLimit());
+		assertEquals((Long)TableEntityWidget.DEFAULT_OFFSET, query.getOffset());
 		
 		//log both errors to the console
 		verify(mockSynapseJSNIUtils, times(2)).consoleError(anyString());

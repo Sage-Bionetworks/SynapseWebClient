@@ -8,6 +8,7 @@ import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -41,8 +42,8 @@ import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -57,10 +58,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.TablePageWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Business logic unit tests for the TablePageWidget.
@@ -249,6 +247,7 @@ public class TablePageWidgetTest {
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(false);
 		assertEquals(bundle.getColumnModels().size()+1, sortHeaders.size());
+		verify(mockView).setFacetsVisible(true);
 	}
 	
 	@Test
@@ -464,5 +463,16 @@ public class TablePageWidgetTest {
 		// Set on cell to be invalid
 		cellStubs.get(3).setIsValid(false);
 		assertFalse(widget.isValid());
+	}
+	
+	@Test
+	public void testConfigureFacetsAvailableNotVisible(){
+		boolean isEditable = false;
+		//facets would have been shown, but force advanced mode.
+		widget.setFacetsVisible(false);
+		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
+		verify(mockFacetsWidget, never()).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
+		verify(mockView, never()).setFacetsVisible(true);
+		verify(mockView, atLeastOnce()).setFacetsVisible(false);
 	}
 }

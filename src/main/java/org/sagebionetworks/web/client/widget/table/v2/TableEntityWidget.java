@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
+import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -70,6 +71,7 @@ public class TableEntityWidget implements IsWidget,
 	Query currentQuery;
 	CopyTextModal copyTextModal;
 	SynapseClientAsync synapseClient;
+	FileViewClientsHelp fileViewClientsHelp;
 	
 	@Inject
 	public TableEntityWidget(TableEntityWidgetView view,
@@ -79,7 +81,8 @@ public class TableEntityWidget implements IsWidget,
 			UploadTableModalWidget uploadTableModalWidget,
 			PreflightController preflightController,
 			CopyTextModal copyTextModal, 
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			FileViewClientsHelp fileViewClientsHelp) {
 		this.view = view;
 		this.downloadTableQueryModalWidget = downloadTableQueryModalWidget;
 		this.uploadTableModalWidget = uploadTableModalWidget;
@@ -88,6 +91,7 @@ public class TableEntityWidget implements IsWidget,
 		this.preflightController = preflightController;
 		this.copyTextModal = copyTextModal;
 		this.synapseClient = synapseClient;
+		this.fileViewClientsHelp = fileViewClientsHelp;
 		copyTextModal.setTitle("Query:");
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
@@ -116,6 +120,9 @@ public class TableEntityWidget implements IsWidget,
 		this.entityBundle = bundle;
 		Entity table = bundle.getEntity();
 		this.tableType = getTableType(table);
+		//TODO: SWC-3729: show this after UX issues have been worked out with users.
+//		queryInputWidget.setDownloadFilesVisible(TableType.fileview.equals(tableType));
+		queryInputWidget.setDownloadFilesVisible(false);
 		this.tableId = bundle.getEntity().getId();
 		this.tableBundle = bundle.getTableBundle();
 		this.canEdit = canEdit;
@@ -485,5 +492,23 @@ public class TableEntityWidget implements IsWidget,
 			}
 		};
 		generateSqlWithFacets(callback);
+	}
+	
+	@Override
+	public void onShowDownloadFiles() {
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String sql) {
+				fileViewClientsHelp.setQuery(sql);
+				fileViewClientsHelp.show();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		};
+		generateSqlWithFacets(callback);
+			
 	}
 }

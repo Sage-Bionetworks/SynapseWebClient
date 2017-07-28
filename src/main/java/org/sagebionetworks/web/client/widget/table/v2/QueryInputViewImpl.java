@@ -51,7 +51,8 @@ public class QueryInputViewImpl implements QueryInputView{
 	Button downloadResultsButton;
 	@UiField
 	Button showQueryButton;
-	
+	@UiField
+	Button downloadFilesButton;
 	HTMLPanel panel;
 	Presenter presenter;
 	
@@ -102,6 +103,12 @@ public class QueryInputViewImpl implements QueryInputView{
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onShowQuery();
+			}
+		});
+		downloadFilesButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onDownloadFiles();
 			}
 		});
 	}
@@ -172,5 +179,8 @@ public class QueryInputViewImpl implements QueryInputView{
 	public void setShowQueryVisible(boolean visible) {
 		showQueryButton.setVisible(visible);
 	}
-
+	@Override
+	public void setDownloadFilesVisible(boolean visible) {
+		downloadFilesButton.setVisible(visible);
+	}
 }

@@ -35,6 +35,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
+import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -83,6 +84,8 @@ public class TableEntityWidgetTest {
 	ArgumentCaptor<Query> queryCaptor;
 	
 	String facetBasedSql = "select * from syn123 where x>1";
+	@Mock
+	FileViewClientsHelp mockFileViewClientsHelp;
 	
 	@Before
 	public void before(){
@@ -106,7 +109,16 @@ public class TableEntityWidgetTest {
 		tableBundle = new TableBundle();
 		tableBundle.setMaxRowsPerPage(4L);
 		tableBundle.setColumnModels(columns);
-		widget = new TableEntityWidget(mockView, mockQueryResultsWidget, mockQueryInputWidget, mockDownloadTableQueryModalWidget, mockUploadTableModalWidget, mockPreflightController, mockCopyTextModal, mockSynapseClient);
+		widget = new TableEntityWidget(
+				mockView, 
+				mockQueryResultsWidget, 
+				mockQueryInputWidget, 
+				mockDownloadTableQueryModalWidget, 
+				mockUploadTableModalWidget, 
+				mockPreflightController, 
+				mockCopyTextModal, 
+				mockSynapseClient, 
+				mockFileViewClientsHelp);
 		
 		AsyncMockStubber.callSuccessWith(facetBasedSql).when(mockSynapseClient).generateSqlWithFacets(anyString(), anyList(), anyList(), any(AsyncCallback.class));
 		// The test bundle
@@ -194,6 +206,8 @@ public class TableEntityWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
 		
 		verify(mockActionMenu).setBasicDivderVisible(true);
+		// download files help not visible for Table, only Views
+		verify(mockQueryInputWidget).setDownloadFilesVisible(false);
 	}
 	
 	@Test
@@ -222,6 +236,8 @@ public class TableEntityWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
 		
 		verify(mockActionMenu).setBasicDivderVisible(true);
+		// TODO: SWC-3729: verify shown for file view, after UX issues have been worked out with users.
+		verify(mockQueryInputWidget).setDownloadFilesVisible(false);
 	}
 	@Test
 	public void testConfigureViewNoEdit(){
@@ -591,5 +607,18 @@ public class TableEntityWidgetTest {
 		widget.onShowSimpleSearch();
 		verify(mockView, never()).showConfirmDialog(eq(TableEntityWidget.RESET_SEARCH_QUERY), eq(TableEntityWidget.RESET_SEARCH_QUERY_MESSAGE), any(Callback.class));
 		verifySimpleSearchUI();
+	}
+	
+	@Test
+	public void testOnShowDownloadFiles() {
+		Query startQuery = new Query();
+		startQuery.setSql(facetBasedSql);
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
+		
+		widget.onShowDownloadFiles();
+		
+		verify(mockFileViewClientsHelp).setQuery(facetBasedSql);
+		verify(mockFileViewClientsHelp).show();
 	}
 }

@@ -1,17 +1,24 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.getTableType;
+import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
 
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -20,27 +27,35 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class TableQueryResultWikiWidget implements WidgetRendererPresenter{
+public class TableQueryResultWikiWidget implements WidgetRendererPresenter, QueryChangeHandler {
 
-	TableQueryResultWidget tableQueryResultWidget;
+	TableEntityWidget tableEntityWidget;
 	SynapseJSNIUtils synapseJsniUtils;
 	TableQueryResultWikiWidgetView view;
 	SynapseClientAsync synapseClient;
 	SynapseAlert synAlert;
+	ActionMenuWidget actionMenu;
+	EntityActionController entityActionController;
+	Query query;
 	
 	@Inject
 	public TableQueryResultWikiWidget(TableQueryResultWikiWidgetView view, 
-			TableQueryResultWidget tableQueryResultWidget, 
+			TableEntityWidget tableEntityWidget, 
+			ActionMenuWidget actionMenu,
+			EntityActionController entityActionController,
 			SynapseJSNIUtils synapseJsniUtils,
 			SynapseClientAsync synapseClient,
 			SynapseAlert synAlert) {
 		this.view = view;
-		this.tableQueryResultWidget = tableQueryResultWidget;
+		this.tableEntityWidget = tableEntityWidget;
+		this.actionMenu = actionMenu;
+		this.entityActionController = entityActionController;
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
-		view.setTableQueryResultWidget(tableQueryResultWidget.asWidget());
+		view.setTableQueryResultWidget(tableEntityWidget.asWidget());
 		this.synapseJsniUtils = synapseJsniUtils;
 		view.setSynAlert(synAlert.asWidget());
+		actionMenu.addControllerWidget(entityActionController.asWidget());
 	}
 	
 	@Override
@@ -60,28 +75,54 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter{
 		} catch (Exception e) {
 			synapseJsniUtils.consoleError("Could not set query offset: " + e.getMessage());
 		}
-		
-		Query query = new Query();
+		hideEditActions();
+		query = new Query();
 		query.setLimit(limit);
 		query.setOffset(offset);
 		String sql = descriptor.get(WidgetConstants.TABLE_QUERY_KEY);
 		query.setSql(sql);
-		configureTableQueryResultWidget(query);
+		String tableId = QueryBundleUtils.getTableIdFromSql(query.getSql());
+		configureTableQueryResultWidget(tableId);
 	}
 	
-	public void configureTableQueryResultWidget(final Query query) {
+	public void configureTableQueryResultWidget(String tableId) {
 		synAlert.clear();
-		final String tableId = QueryBundleUtils.getTableIdFromSql(query.getSql());
-		synapseClient.getEntity(tableId, new AsyncCallback<Entity>() {
+		
+		int mask = ENTITY | PERMISSIONS | TABLE_DATA | BENEFACTOR_ACL;
+		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
+			@Override
+			public void onSuccess(EntityBundle bundle) {
+				boolean isCurrentVersion = true;
+				entityActionController.configure(actionMenu, bundle, isCurrentVersion, bundle.getRootWikiId(), null);
+				boolean canEdit = false;
+				tableEntityWidget.configure(bundle, canEdit, TableQueryResultWikiWidget.this, actionMenu);
+				hideEditActions();
+			}
+			
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
-			}
-			public void onSuccess(Entity tableEntity) {
-				TableType tableType = getTableType(tableEntity);
-				tableQueryResultWidget.configure(query, false, tableType, null);
-			};
-		});
+			}			
+		};
+		
+		synapseClient.getEntityBundle(tableId, mask, callback);
+	}
+	public void hideEditActions() {
+		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
+		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, false);
+		this.actionMenu.setActionVisible(Action.TOGGLE_VIEW_SCOPE, false);
+	}
+	
+	@Override
+	public Query getQueryString() {
+		return query;
+	}
+	@Override
+	public void onQueryChange(Query newQuery) {
+	}
+	@Override
+	public void onPersistSuccess(EntityUpdatedEvent event) {
 	}
 	@Override
 	public Widget asWidget() {
