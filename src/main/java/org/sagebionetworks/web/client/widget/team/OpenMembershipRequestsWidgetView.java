@@ -20,7 +20,9 @@ public interface OpenMembershipRequestsWidgetView extends IsWidget {
 	/**
 	 * shows nothing if membershipRequests is empty.
 	 */
-	public void configure(List<UserProfile> profiles, List<String> requestMessages);
+	public void configure(List<UserProfile> profiles, 
+			List<String> requestMessages, 
+			List<String> createdOnDates);
 	public interface Presenter {
 		//use to go to user profile page
 		void goTo(Place place);

@@ -2,15 +2,23 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Italic;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
-import org.sagebionetworks.web.client.widget.user.BadgeSize;
+import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -18,8 +26,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
-import com.google.gwt.user.client.ui.Button;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -36,11 +42,15 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	private Presenter presenter;
 	private PortalGinInjector ginInjector;
 	private UnorderedListPanel ulPanel;
-	
+	private DateTimeUtils dateTimeUtils;
 	@Inject
-	public OpenUserInvitationsWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
+	public OpenUserInvitationsWidgetViewImpl(
+			Binder binder, 
+			PortalGinInjector ginInjector,
+			DateTimeUtils dateTimeUtils) {
 		widget = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
+		this.dateTimeUtils = dateTimeUtils;
 		mainContainer.addStyleName("highlight-box");
 		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_INVITATIONS);
 	}
@@ -53,44 +63,58 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	@Override
 	public void configure(List<UserProfile> profiles, List<MembershipInvtnSubmission> invitations) {
 		clear();
-		FlowPanel singleRow = DisplayUtils.createRowContainerFlowPanel();
+		Table table = new Table();
+		table.setWidth("100%");
+		
 		mainContainer.setVisible(false);
+		mainContainer.add(table);
 		for (int i = 0; i < profiles.size(); i++) {
-			FlowPanel rowPanel = new FlowPanel();
-			rowPanel.addStyleName("col-md-12");
-			FlowPanel left = new FlowPanel();
-			left.addStyleName("col-xs-9 col-sm-10 col-md-11");
-			FlowPanel right = new FlowPanel();
-			right.addStyleName("col-xs-3 col-sm-2 col-md-1");
-			rowPanel.add(left);
-			rowPanel.add(right);
+			TableRow tr = new TableRow();
+			table.add(tr);
+			if (i < profiles.size() - 1) {
+				tr.addStyleName("border-bottom-1");	
+			}
 			
 			final UserProfile profile = profiles.get(i);
 			UserBadge renderer = ginInjector.getUserBadgeWidget();
 			MembershipInvtnSubmission invite = invitations.get(i);
 			final String inviteId = invite.getId();
 			String inviteMessage = invite.getMessage() != null ? invite.getMessage() : "";
-			renderer.configure(profile, inviteMessage);
-			renderer.setSize(BadgeSize.LARGE);
-			Widget rendererWidget = renderer.asWidget();
-			rendererWidget.addStyleName("margin-top-15");
-			left.add(rendererWidget);
+			String createdOn = dateTimeUtils.convertDateToSmallString(invite.getCreatedOn());
+			
+			renderer.configure(profile);
+			
+			Div inviteDiv = new Div();
+			inviteDiv.add(new Text(inviteMessage));
+			
+			Div createdOnDiv = new Div();
+			createdOnDiv.add(new Italic(createdOn));
 			
 			//Remove invitation button
-			Button leaveButton = DisplayUtils.createButton("Remove", ButtonType.DANGER);
-			leaveButton.addStyleName("pull-right margin-left-5");
+			Button leaveButton = new Button("Remove");
+			leaveButton.setType(ButtonType.DANGER);
+			leaveButton.setSize(ButtonSize.EXTRA_SMALL);
+			leaveButton.setPull(Pull.RIGHT);
 			leaveButton.addClickHandler(new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
 					presenter.removeInvitation(inviteId);
 				}
 			});
-			right.add(leaveButton);
 			
-			singleRow.add(rowPanel);
+			TableData td = new TableData();
+			td.addStyleName("padding-5");
+			td.add(renderer);
+			td.add(inviteDiv);
+			td.add(createdOnDiv);
+			tr.add(td);
+			
+			td = new TableData();
+			td.add(leaveButton);
+			tr.add(td);
+			
 			mainContainer.setVisible(true);
 		}
-		mainContainer.add(singleRow);
 		ulPanel = new UnorderedListPanel();
 		if (profiles.size() > 0) {
 			ulPanel.addStyleName("pager");
