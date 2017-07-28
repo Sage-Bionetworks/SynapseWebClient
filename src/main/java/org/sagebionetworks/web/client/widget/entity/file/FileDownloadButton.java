@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -117,7 +118,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 			view.setDirectDownloadLinkVisible(true);
 		} else if (restrictionInformation.getHasUnmetAccessRequirement()) {
 			// if in alpha, send to access requirements
-			view.setDirectDownloadLink(ACCESS_REQUIREMENTS_LINK+bundle.getEntity().getId());
+			view.setDirectDownloadLink(ACCESS_REQUIREMENTS_LINK+bundle.getEntity().getId() + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
 			view.setDirectDownloadLinkVisible(true);
 		} else {
 			dataFileHandle = getFileHandle();
