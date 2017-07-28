@@ -41,7 +41,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	GlobalApplicationState globalApplicationState;
 	SynapseJSNIUtils synapseJSNIUtils;
 	boolean isShowCompany;
-	String description;
 	boolean useCachedImage;
 	private ClientCache clientCache;
 	public static final String[] COLORS = {"chocolate","black","firebrick","maroon","olive","limegreen","forestgreen","darkturquoise","teal","blue","navy","darkmagenta","purple", "stateblue","orangered","forestblue", "blueviolet"};
@@ -98,9 +97,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		String displayName = DisplayUtils.getDisplayName(profile);
 		String shortDisplayName = maxNameLength == null ? displayName : DisplayUtils.stubStrPartialWord(displayName, maxNameLength); 
 		view.setDisplayName(displayName, shortDisplayName);
-		if (description != null) {
-			view.showDescription(description);
-		} else if (isShowCompany) {
+		if (isShowCompany) {
 			view.showDescription(profile.getCompany());
 		}
 		
@@ -109,11 +106,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		}
 		useCachedImage = true;
 		configurePicture();
-	}
-	
-	public void configure(UserProfile profile, String description) {
-		this.description = description;
-		configure(profile);
 	}
 	
 	public void setOpenNewWindow(boolean value) {
@@ -210,12 +202,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		this.isShowCompany = isShowCompany;
 		configure(principalId);
 	}
-
-	
-	public void configure(String principalId, String description) {
-		this.description = description;
-		configure(principalId);
-	}
 	
 	public void loadBadge() {
 		if (profile == null) {
@@ -307,7 +293,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	
 	public void clearState() {
 		profile = null;
-		description = null;
 		customClickHandler = null;
 		isShowCompany = false;
 		maxNameLength = null;

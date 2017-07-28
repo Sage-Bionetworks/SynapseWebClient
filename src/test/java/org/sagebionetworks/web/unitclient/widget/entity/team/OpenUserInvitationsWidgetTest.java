@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 
@@ -15,12 +15,14 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -51,6 +53,8 @@ public class OpenUserInvitationsWidgetTest {
 	SynapseAlert mockSynapseAlert;
 	@Mock
 	GWTWrapper mockGWT;
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -59,7 +63,12 @@ public class OpenUserInvitationsWidgetTest {
 		mockView = mock(OpenUserInvitationsWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockTeamUpdatedCallback = mock(Callback.class);
-		widget = new OpenUserInvitationsWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseAlert, mockGWT);
+		widget = new OpenUserInvitationsWidget(mockView, 
+				mockSynapseClient, 
+				mockGlobalApplicationState, 
+				mockSynapseAlert, 
+				mockGWT, 
+				mockDateTimeUtils);
 		
 		
 		testProfile = new UserProfile();
@@ -83,7 +92,10 @@ public class OpenUserInvitationsWidgetTest {
 	private void setupGetOpenTeamInvitations(int mockInvitationReturnCount) {
 		List<OpenTeamInvitationBundle> testReturn = new ArrayList<OpenTeamInvitationBundle>();
 		for (int i = 0; i < mockInvitationReturnCount; i++) {
-			testReturn.add(new OpenTeamInvitationBundle());	
+			OpenTeamInvitationBundle mockBundle = mock(OpenTeamInvitationBundle.class);
+			MembershipInvtnSubmission mockSubmission = mock(MembershipInvtnSubmission.class);
+			when(mockBundle.getMembershipInvtnSubmission()).thenReturn(mockSubmission);
+			testReturn.add(mockBundle);	
 		}
 		
 		AsyncMockStubber.callSuccessWith(testReturn).when(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(),anyInt(),any(AsyncCallback.class));
@@ -95,7 +107,7 @@ public class OpenUserInvitationsWidgetTest {
 	public void testConfigure() throws Exception {
 		widget.configure(teamId, mockTeamUpdatedCallback);
 		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView).configure(anyList(), anyList());
+		verify(mockView).configure(anyList(), anyList(), anyList());
 		verify(mockGWT).restoreWindowPosition();
 	}
 	@Test
@@ -116,7 +128,7 @@ public class OpenUserInvitationsWidgetTest {
 		verify(mockGWT).saveWindowPosition();
 		verify(mockSynapseClient).deleteMembershipInvitation(eq(invitationId), any(AsyncCallback.class));
 		verify(mockTeamUpdatedCallback).invoke();
-		verify(mockView).configure(anyList(), anyList());
+		verify(mockView).configure(anyList(), anyList(), anyList());
 	}
 	
 	@Test

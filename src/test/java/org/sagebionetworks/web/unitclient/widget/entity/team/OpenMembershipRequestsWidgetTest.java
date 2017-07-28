@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.dataaccess.AccessType;
 import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -52,6 +53,9 @@ public class OpenMembershipRequestsWidgetTest {
 	PopupUtilsView mockPopupUtils;
 	@Mock
 	Callback mockCallback;
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
+	
 	List<MembershipRequestBundle> membershipRequests;
 	public static final String TEAM_ID = "8765";
 	public static final String USER_ID = "999181";
@@ -65,7 +69,8 @@ public class OpenMembershipRequestsWidgetTest {
 				mockGlobalApplicationState, 
 				mockGwt, 
 				mockSynAlert, 
-				mockPopupUtils);
+				mockPopupUtils,
+				mockDateTimeUtils);
 		membershipRequests = new ArrayList<>();
 		AsyncMockStubber.callSuccessWith(membershipRequests).when(mockSynapseClient).getOpenRequests(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).addTeamMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
@@ -83,7 +88,7 @@ public class OpenMembershipRequestsWidgetTest {
 		widget.configure(TEAM_ID, mockCallback);
 		verify(mockSynAlert).clear();
 		verify(mockSynapseClient).getOpenRequests(eq(TEAM_ID), any(AsyncCallback.class));
-		verify(mockView).configure(anyList(), anyList());
+		verify(mockView).configure(anyList(), anyList(), anyList());
 		verify(mockGwt).restoreWindowPosition();
 	}
 	
@@ -94,7 +99,7 @@ public class OpenMembershipRequestsWidgetTest {
 		widget.configure(TEAM_ID, mockCallback);
 		verify(mockSynAlert).clear();
 		verify(mockSynapseClient).getOpenRequests(eq(TEAM_ID), any(AsyncCallback.class));
-		verify(mockView, never()).configure(anyList(), anyList());
+		verify(mockView, never()).configure(anyList(), anyList(), anyList());
 		verify(mockSynAlert).handleException(ex);
 	}
 	

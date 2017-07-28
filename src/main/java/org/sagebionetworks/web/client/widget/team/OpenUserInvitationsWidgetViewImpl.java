@@ -42,7 +42,7 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	private Presenter presenter;
 	private PortalGinInjector ginInjector;
 	private UnorderedListPanel ulPanel;
-	private DateTimeUtils dateTimeUtils;
+	
 	@Inject
 	public OpenUserInvitationsWidgetViewImpl(
 			Binder binder, 
@@ -50,7 +50,6 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 			DateTimeUtils dateTimeUtils) {
 		widget = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
-		this.dateTimeUtils = dateTimeUtils;
 		mainContainer.addStyleName("highlight-box");
 		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_INVITATIONS);
 	}
@@ -61,7 +60,7 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	}
 
 	@Override
-	public void configure(List<UserProfile> profiles, List<MembershipInvtnSubmission> invitations) {
+	public void configure(List<UserProfile> profiles, List<MembershipInvtnSubmission> invitations, List<String> createdOnDates) {
 		clear();
 		Table table = new Table();
 		table.setWidth("100%");
@@ -80,7 +79,7 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 			MembershipInvtnSubmission invite = invitations.get(i);
 			final String inviteId = invite.getId();
 			String inviteMessage = invite.getMessage() != null ? invite.getMessage() : "";
-			String createdOn = dateTimeUtils.convertDateToSmallString(invite.getCreatedOn());
+			String createdOn = createdOnDates.get(i);
 			
 			renderer.configure(profile);
 			
