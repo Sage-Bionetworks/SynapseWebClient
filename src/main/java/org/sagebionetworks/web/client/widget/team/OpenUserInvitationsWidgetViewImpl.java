@@ -8,11 +8,9 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
@@ -46,8 +44,7 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	@Inject
 	public OpenUserInvitationsWidgetViewImpl(
 			Binder binder, 
-			PortalGinInjector ginInjector,
-			DateTimeUtils dateTimeUtils) {
+			PortalGinInjector ginInjector) {
 		widget = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
 		mainContainer.addStyleName("highlight-box");
