@@ -59,8 +59,7 @@ public class AwsSdk {
 		var params = {
 	        Key: key,
 	        ContentType: contentType,
-	        Body: file,
-	        ACL: 'bucket-owner-full-control'
+	        Body: file
 	    };
 
 		s3.upload(params).on('httpUploadProgress', function(evt) {
