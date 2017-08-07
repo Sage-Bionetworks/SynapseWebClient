@@ -250,16 +250,23 @@ public class TableEntityWidget implements IsWidget,
 	}
 	
 	private void showSimpleSearchUI() {
-		view.setAdvancedSearchLinkVisbile(true);
-		view.setSimpleSearchLinkVisbile(false);
+		view.setAdvancedSearchLinkVisible(true);
+		view.setSimpleSearchLinkVisible(false);
 		queryResultsWidget.setFacetsVisible(true);
 		queryInputWidget.setShowQueryVisible(true);
 		queryInputWidget.setQueryInputVisible(false);
 	}
 	
+	public void hideFiltering() {
+		queryInputWidget.setVisible(false);
+		queryResultsWidget.setFacetsVisible(false);
+		view.setSimpleSearchLinkVisible(false);
+		view.setAdvancedSearchLinkVisible(false);
+	}
+	
 	private void showAdvancedSearchUI() {
-		view.setAdvancedSearchLinkVisbile(false);
-		view.setSimpleSearchLinkVisbile(true);
+		view.setAdvancedSearchLinkVisible(false);
+		view.setSimpleSearchLinkVisible(true);
 		queryResultsWidget.setFacetsVisible(false);
 		queryInputWidget.setShowQueryVisible(false);
 		queryInputWidget.setQueryInputVisible(true);
@@ -511,4 +518,6 @@ public class TableEntityWidget implements IsWidget,
 		generateSqlWithFacets(callback);
 			
 	}
+	
+	
 }

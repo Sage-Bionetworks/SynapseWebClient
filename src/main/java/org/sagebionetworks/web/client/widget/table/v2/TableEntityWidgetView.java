@@ -107,6 +107,6 @@ public interface TableEntityWidgetView extends IsWidget {
 	
 	void showErrorMessage(String message);
 	void showConfirmDialog(String title, String confirmationMessage, Callback yesCallback);
-	void setSimpleSearchLinkVisbile(boolean visible);
-	void setAdvancedSearchLinkVisbile(boolean visible);
+	void setSimpleSearchLinkVisible(boolean visible);
+	void setAdvancedSearchLinkVisible(boolean visible);
 }

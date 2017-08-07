@@ -194,12 +194,12 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	}
 	
 	@Override
-	public void setAdvancedSearchLinkVisbile(boolean visible) {
+	public void setAdvancedSearchLinkVisible(boolean visible) {
 		showAdvancedSearch.setVisible(visible);
 	}
 	
 	@Override
-	public void setSimpleSearchLinkVisbile(boolean visible) {
+	public void setSimpleSearchLinkVisible(boolean visible) {
 		showSimpleSearch.setVisible(visible);
 	}
 }

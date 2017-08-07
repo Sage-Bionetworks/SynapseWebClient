@@ -159,4 +159,8 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	public void onDownloadFiles() {
 		queryInputListener.onShowDownloadFiles();
 	}
+	
+	public void setVisible(boolean visible) {
+		view.asWidget().setVisible(visible);
+	}
 }

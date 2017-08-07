@@ -37,6 +37,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 	ActionMenuWidget actionMenu;
 	EntityActionController entityActionController;
 	Query query;
+	boolean isQueryVisible;
 	
 	@Inject
 	public TableQueryResultWikiWidget(TableQueryResultWikiWidgetView view, 
@@ -75,6 +76,12 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		} catch (Exception e) {
 			synapseJsniUtils.consoleError("Could not set query offset: " + e.getMessage());
 		}
+		
+		isQueryVisible = true;
+		if (descriptor.containsKey(WidgetConstants.QUERY_VISIBLE)) {
+			isQueryVisible = Boolean.parseBoolean(descriptor.get(WidgetConstants.QUERY_VISIBLE));
+		}
+		
 		hideEditActions();
 		query = new Query();
 		query.setLimit(limit);
@@ -107,11 +114,15 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 		
 		synapseClient.getEntityBundle(tableId, mask, callback);
 	}
+	
 	public void hideEditActions() {
 		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, false);
 		this.actionMenu.setActionVisible(Action.TOGGLE_VIEW_SCOPE, false);
+		if (!isQueryVisible) {
+			tableEntityWidget.hideFiltering();
+		}
 	}
 	
 	@Override

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -11,10 +12,10 @@ import com.google.inject.Inject;
 public class TableQueryResultWikiViewImpl implements TableQueryResultWikiView {
 	public interface TableQueryResultViewUiBinder extends UiBinder<Widget, TableQueryResultWikiViewImpl> {}
 	private Widget widget;
-	private Presenter presenter;
 	@UiField
 	TextBox queryField;
-	
+	@UiField
+	CheckBox isQueryVisible;
 	@Inject
 	public TableQueryResultWikiViewImpl(TableQueryResultViewUiBinder binder) {
 		widget = binder.createAndBindUi(this);
@@ -36,16 +37,20 @@ public class TableQueryResultWikiViewImpl implements TableQueryResultWikiView {
 	public void setSql(String sql) {
 		queryField.setValue(sql);
 	}
+	@Override
+	public Boolean isQueryVisible() {
+		return isQueryVisible.getValue();
+	}
+	
+	@Override
+	public void setQueryVisible(boolean value) {
+		isQueryVisible.setValue(value);
+	}
 	
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}	
-	
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
 		
 	@Override
 	public void showErrorMessage(String message) {
