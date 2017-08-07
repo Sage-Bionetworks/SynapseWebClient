@@ -11,14 +11,13 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-public class TableQueryResultWikiEditor implements TableQueryResultWikiView.Presenter, WidgetEditorPresenter {
+public class TableQueryResultWikiEditor implements WidgetEditorPresenter {
 	
 	private TableQueryResultWikiView view;
 	private Map<String, String> descriptor;
 	@Inject
 	public TableQueryResultWikiEditor(TableQueryResultWikiView view) {
 		this.view = view;
-		view.setPresenter(this);
 		view.initView();
 	}
 	@Override
@@ -27,6 +26,12 @@ public class TableQueryResultWikiEditor implements TableQueryResultWikiView.Pres
 		String sql = descriptor.get(WidgetConstants.TABLE_QUERY_KEY);
 		if (sql != null)
 			view.setSql(sql);
+		boolean isQueryVisible = true;
+		String isQueryVisibleString = descriptor.get(WidgetConstants.QUERY_VISIBLE);
+		if (isQueryVisibleString != null) {
+			isQueryVisible = Boolean.parseBoolean(isQueryVisibleString);
+		}
+		view.setQueryVisible(isQueryVisible);
 	}
 	
 	public void clearState() {
@@ -46,6 +51,7 @@ public class TableQueryResultWikiEditor implements TableQueryResultWikiView.Pres
 			throw new IllegalArgumentException("Query is required");
 		}
 		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
+		descriptor.put(WidgetConstants.QUERY_VISIBLE, view.isQueryVisible().toString());
 	}
 	
 	

@@ -2,7 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -498,16 +498,16 @@ public class TableEntityWidgetTest {
 	
 	
 	private void verifySimpleSearchUI() {
-		verify(mockView).setAdvancedSearchLinkVisbile(true);
-		verify(mockView).setSimpleSearchLinkVisbile(false);
+		verify(mockView).setAdvancedSearchLinkVisible(true);
+		verify(mockView).setSimpleSearchLinkVisible(false);
 		verify(mockQueryResultsWidget).setFacetsVisible(true);
 		verify(mockQueryInputWidget).setShowQueryVisible(true);
 		verify(mockQueryInputWidget).setQueryInputVisible(false);
 	}
 	
 	private void verifyAdvancedSearchUI() {
-		verify(mockView).setAdvancedSearchLinkVisbile(false);
-		verify(mockView).setSimpleSearchLinkVisbile(true);
+		verify(mockView).setAdvancedSearchLinkVisible(false);
+		verify(mockView).setSimpleSearchLinkVisible(true);
 		verify(mockQueryResultsWidget).setFacetsVisible(false);
 		verify(mockQueryInputWidget).setShowQueryVisible(false);
 		verify(mockQueryInputWidget).setQueryInputVisible(true);
@@ -620,5 +620,17 @@ public class TableEntityWidgetTest {
 		
 		verify(mockFileViewClientsHelp).setQuery(facetBasedSql);
 		verify(mockFileViewClientsHelp).show();
+	}
+	
+	@Test
+	public void testHideFiltering() {
+		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
+		
+		widget.hideFiltering();
+		
+		verify(mockQueryInputWidget).setVisible(false);
+		verify(mockQueryResultsWidget, atLeastOnce()).setFacetsVisible(false);
+		verify(mockView).setSimpleSearchLinkVisible(false);
+		verify(mockView, atLeastOnce()).setAdvancedSearchLinkVisible(false);
 	}
 }
