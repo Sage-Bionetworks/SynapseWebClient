@@ -14,6 +14,9 @@
 						<b:TextBox ui:field="queryField" name="query" b:id="query" placeholder="SELECT * FROM syn12345"/>
 					</g:FlowPanel>
 				</b:FormGroup>
+				<b:FormGroup>
+					<b:CheckBox ui:field="isQueryVisible" text="Show this query in the wiki table"/>
+				</b:FormGroup>
 			</b:FieldSet>
 		</bh:Div>
 	</bh:Div>

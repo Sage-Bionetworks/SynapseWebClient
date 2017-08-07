@@ -112,6 +112,7 @@ public class TableQueryResultWikiWidgetTest {
 		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.EDIT_TABLE_DATA, false);
 		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, false);
 		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.TOGGLE_VIEW_SCOPE, false);
+		verify(mockTableEntityWidget, never()).hideFiltering();
 	}
 	
 	@Test
@@ -143,6 +144,36 @@ public class TableQueryResultWikiWidgetTest {
 		assertEquals(sql, query.getSql());
 		assertEquals(Long.valueOf(8080L), query.getLimit());
 		assertEquals(Long.valueOf(333L), query.getOffset());
+	}
+	
+	@Test
+	public void testConfigureQueryVisible() {
+		Map<String, String> descriptor = new HashMap<String, String>();
+		String sql = "my query string";
+		
+		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
+		descriptor.put(WidgetConstants.QUERY_VISIBLE, Boolean.TRUE.toString());
+		
+		widget.configure(wikiKey, descriptor, null, null);
+		
+		Query query = widget.getQueryString();
+		assertEquals(sql, query.getSql());
+		verify(mockTableEntityWidget, never()).hideFiltering();
+	}
+	
+	@Test
+	public void testConfigureQueryNotVisible() {
+		Map<String, String> descriptor = new HashMap<String, String>();
+		String sql = "my query string";
+		
+		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);
+		descriptor.put(WidgetConstants.QUERY_VISIBLE, Boolean.FALSE.toString());
+		
+		widget.configure(wikiKey, descriptor, null, null);
+		
+		Query query = widget.getQueryString();
+		assertEquals(sql, query.getSql());
+		verify(mockTableEntityWidget, times(2)).hideFiltering();
 	}
 	
 	@Test

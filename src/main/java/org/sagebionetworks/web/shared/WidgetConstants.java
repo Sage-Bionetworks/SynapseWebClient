@@ -222,6 +222,7 @@ public class WidgetConstants {
 	public static final String TABLE_OFFSET_KEY = "offset";
 	public static final String TABLE_QUERY_KEY = "query";
 	public static final String FILL_COLUMN_NAME = "fill";
+	public static final String QUERY_VISIBLE = "showquery";
 	
 	public static final String TITLE = "title";
 	public static final String X_AXIS_TITLE = "xtitle";
