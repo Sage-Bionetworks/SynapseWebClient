@@ -16,6 +16,7 @@ import com.google.inject.Inject;
 
 public class FileCellRendererImpl implements FileCellRenderer {
 	
+	public static final String FILE_SYNAPSE_ID_UNAVAILABLE = "File Synapse ID is unavailable in the row.";
 	public static final String UNABLE_TO_LOAD_FILE_DATA = "Unable to load file data";
 	FileCellRendererView view;
 	String fileHandleId;
@@ -37,7 +38,7 @@ public class FileCellRendererImpl implements FileCellRenderer {
 	}
 
 	@Override
-	public void setValue(final String value) {
+	public void setValue(String value) {
 		fileHandleId = StringUtils.trimWithEmptyAsNull(value);
 		if(fileHandleId == null){
 			view.setLoadingVisible(false);
@@ -50,7 +51,13 @@ public class FileCellRendererImpl implements FileCellRenderer {
 				association.setAssociateObjectId(address.getTableId());
 			} else {
 				association.setAssociateObjectType(FileHandleAssociateType.FileEntity);
-				association.setAssociateObjectId(address.getRowId().toString());
+				if (address.getRowId() != null) {
+					association.setAssociateObjectId(address.getRowId().toString());
+				} else {
+					view.setLoadingVisible(false);
+					view.setErrorText(FILE_SYNAPSE_ID_UNAVAILABLE);
+					return;
+				}
 			}
 			fileHandleAsynHandler.getFileHandle(association, new AsyncCallback<FileResult>() {
 				

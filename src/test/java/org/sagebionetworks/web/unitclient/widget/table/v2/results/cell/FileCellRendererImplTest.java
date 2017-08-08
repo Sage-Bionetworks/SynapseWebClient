@@ -95,6 +95,18 @@ public class FileCellRendererImplTest {
 	}
 	
 	@Test
+	public void testCreateAnchorHrefFileViewMissingRowId(){
+		tableType = TableType.fileview;
+		rowId = null;
+		address = new CellAddress(tableId, column, rowId, rowVersion, tableType);
+		renderer.setCellAddresss(address);
+		renderer.setValue(fileHandleId);
+		verify(mockFileHandleAsyncHandler, never()).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		verify(mockView).setLoadingVisible(false);
+		verify(mockView).setErrorText(FileCellRendererImpl.FILE_SYNAPSE_ID_UNAVAILABLE);
+	}
+	
+	@Test
 	public void testSetValueSuccessAttached(){
 		when(mockView.isAttached()).thenReturn(true);
 		renderer.setValue(fileHandleId);

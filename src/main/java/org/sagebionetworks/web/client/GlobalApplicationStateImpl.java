@@ -89,6 +89,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	public void handleUncaughtException(Throwable e) {
 		try {
+			GWT.debugger();
 			Throwable unwrapped = unwrap(e);
 			logger.errorToRepositoryServices(UNCAUGHT_JS_EXCEPTION, unwrapped);
 		} catch (Throwable t) {
