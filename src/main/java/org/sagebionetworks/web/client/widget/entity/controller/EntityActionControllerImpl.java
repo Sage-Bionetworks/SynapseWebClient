@@ -902,6 +902,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		link.setParentId(target);
 		Reference ref = new Reference();
 		ref.setTargetId(entityBundle.getEntity().getId());
+		Long targetVersionNumber = null;
+		if (!isCurrentVersion && entityBundle.getEntity() instanceof Versionable) {
+			targetVersionNumber = ((Versionable)entityBundle.getEntity()).getVersionNumber();
+		}
+		ref.setTargetVersionNumber(targetVersionNumber);
 		link.setLinksTo(ref); // links to this entity
 		link.setLinksToClassName(entityBundle.getEntity().getEntityType());
 		link.setName(entityBundle.getEntity().getName()); // copy name of this entity as default

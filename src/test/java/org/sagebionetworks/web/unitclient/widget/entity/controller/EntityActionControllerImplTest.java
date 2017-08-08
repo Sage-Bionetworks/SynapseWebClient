@@ -60,6 +60,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserBundle;
+import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.Doi;
@@ -1160,10 +1161,15 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testCreateLink(){
-		entityBundle.getEntity().setId("syn123");
+		String entityId = "syn123";
+		Entity entity = entityBundle.getEntity();
+		entity.setId(entityId);
+		Long entityVersion = 42L;
+		((Versionable)entity).setVersionNumber(entityVersion);
 		ArgumentCaptor<Entity> argument = ArgumentCaptor.forClass(Entity.class);
 		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseClient).createEntity(argument.capture(), any(AsyncCallback.class));
-		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		boolean isCurrentVersion = false;
+		controller.configure(mockActionMenu, entityBundle, isCurrentVersion, wikiPageId, mockEntityUpdatedHandler);
 		String target = "syn9876";
 		controller.createLink(target);
 		verify(mockView, never()).showErrorMessage(anyString());
@@ -1176,7 +1182,33 @@ public class EntityActionControllerImplTest {
 		assertEquals(entityBundle.getEntity().getName(), link.getName());
 		Reference ref = link.getLinksTo();
 		assertNotNull(ref);
-		assertEquals(entityBundle.getEntity().getId(), ref.getTargetId());
+		assertEquals(entityId, ref.getTargetId());
+		assertEquals(entityVersion, ref.getTargetVersionNumber());
+	}
+	
+	@Test
+	public void testCreateLinkCurrentVersion(){
+		String entityId = "syn123";
+		Entity entity = entityBundle.getEntity();
+		entity.setId(entityId);
+		Long entityVersion = 42L;
+		((Versionable)entity).setVersionNumber(entityVersion);
+		ArgumentCaptor<Entity> argument = ArgumentCaptor.forClass(Entity.class);
+		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseClient).createEntity(argument.capture(), any(AsyncCallback.class));
+		boolean isCurrentVersion = true;
+		controller.configure(mockActionMenu, entityBundle, isCurrentVersion, wikiPageId, mockEntityUpdatedHandler);
+		String target = "syn9876";
+		controller.createLink(target);
+		Entity capture = argument.getValue();
+		assertNotNull(capture);
+		assertTrue(capture instanceof Link);
+		Link link = (Link) capture;
+		assertEquals(target, link.getParentId());
+		assertEquals(entityBundle.getEntity().getName(), link.getName());
+		Reference ref = link.getLinksTo();
+		assertNotNull(ref);
+		assertEquals(entityId, ref.getTargetId());
+		assertNull(ref.getTargetVersionNumber());
 	}
 	
 	@Test
