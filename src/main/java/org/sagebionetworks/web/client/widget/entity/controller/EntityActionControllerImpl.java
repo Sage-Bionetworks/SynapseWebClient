@@ -832,6 +832,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void onChangeStorageLocation() {
+		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				postChangeStorageLocation();
+			}
+		});
+	}
+	
+	private void postChangeStorageLocation() {
 		getStorageLocationWidget().configure(this.entityBundle, entityUpdateHandler);
 		getStorageLocationWidget().show();
 	}
