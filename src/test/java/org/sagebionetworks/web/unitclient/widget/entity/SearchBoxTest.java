@@ -2,6 +2,8 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -13,9 +15,11 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.search.SearchBoxView;
-
+import static org.junit.Assert.*;
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class SearchBoxTest {
@@ -40,7 +44,8 @@ public class SearchBoxTest {
 	
 	@Mock
 	PlaceChanger mockPlaceChanger;
-	
+	@Captor
+	ArgumentCaptor<Place> placeCaptor;
 	SearchBox presenter;
 	
 	@Before
@@ -82,6 +87,18 @@ public class SearchBoxTest {
 		presenter.search("syn123");
 		Mockito.verify(mockJSONObjectAdapter, Mockito.atLeastOnce()).createNew();
 	}
+	
+	@Test
+	public void testSearchDoi() {
+		String synId = "syn123.4";
+		presenter.search("10.7303/" + synId);
+		Mockito.verify(mockGlobalApplicationState).getPlaceChanger();
+		Mockito.verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Place place = placeCaptor.getValue();
+		assertTrue(place instanceof Synapse);
+		assertEquals(synId, ((Synapse)place).toToken());
+	}
+
 	
 	@Test
 	public void testSearchEmpty() {
