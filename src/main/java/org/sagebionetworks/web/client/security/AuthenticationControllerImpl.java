@@ -151,6 +151,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		if(token == null) {
 			sessionStorage.clear();
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
+			pendoSdk.initialize("");
 			return;
 		}
 		
