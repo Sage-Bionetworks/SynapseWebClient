@@ -31,11 +31,11 @@ public class PendoSdk {
 		}
 	}
 
-	public void initialize(final String sessionToken) {
+	public void initialize(final String userId) {
 		initJs(new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				_initialize(sessionToken);
+				_initialize(userId);
 			}
 
 			@Override
@@ -45,12 +45,12 @@ public class PendoSdk {
 	}
 
 	private static native void _initialize(
-			String sessionToken) /*-{
+			String userId) /*-{
 		// Call this whenever information about your visitors becomes available
 	    // Please use Strings, Numbers, or Bools for value types.
 	    $wnd.pendo.initialize({
 	      visitor: {
-	        id:             sessionToken   // Required if user is logged in
+	        id:             userId   // Required if user is logged in
 	        // email:        // Optional
 	        // role:         // Optional
 	

@@ -22,7 +22,6 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -54,7 +53,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private SubscriptionClientAsync subscriptionClient;
 	private XsrfTokenServiceAsync xsrfTokenService;
 	private GWTWrapper gwt;
-	private PendoSdk pendoSdk;
 	
 	@Inject
 	public AuthenticationControllerImpl(
@@ -67,8 +65,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			SynapseClientAsync synapseClient,
 			GWTWrapper gwt,
 			ChallengeClientAsync challengeClient,
-			SubscriptionClientAsync subscriptionClient,
-			PendoSdk pendoSdk){
+			SubscriptionClientAsync subscriptionClient){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		this.sessionStorage = sessionStorage;
@@ -79,7 +76,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		this.challengeClient = challengeClient;
 		this.subscriptionClient = subscriptionClient;
 		this.gwt = gwt;
-		this.pendoSdk = pendoSdk;
 		gwt.asServiceDefTarget(xsrfTokenService).setServiceEntryPoint(gwt.getModuleBaseURL() + "xsrf");
 	}
 
@@ -127,7 +123,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		localStorage.clear();
 		initSynapsePropertiesFromServer();
 		sessionStorage.clear();
-		pendoSdk.initialize("");
 		currentUser = null;
 	}
 
@@ -164,7 +159,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				currentUser = userSessionData;
 				localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
 				updateXsrfToken(userSessionData, callback);
-				pendoSdk.initialize(userSessionData.getSession().getSessionToken());
 			}
 			@Override
 			public void onFailure(Throwable caught) {

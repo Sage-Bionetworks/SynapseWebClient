@@ -79,8 +79,6 @@ public class AuthenticationControllerImplTest {
 	SubscriptionClientAsync mockSubscriptionClient;
 	@Mock
 	ChallengeClientAsync mockChallengeClient;
-	@Mock
-	PendoSdk mockPendoSdk;
 	String xsrfToken = "12barbaz34";
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	HashMap<String, String> serverProperties;
@@ -101,7 +99,7 @@ public class AuthenticationControllerImplTest {
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
 		when(mockGWT.asHasRpcToken(any())).thenReturn(mockServiceHasRpcToken);
 		when(mockGWT.asServiceDefTarget(any())).thenReturn(mockServiceDefTarget);
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockXsrfTokenService, mockSynapseClient, mockGWT, mockChallengeClient, mockSubscriptionClient, mockPendoSdk);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockXsrfTokenService, mockSynapseClient, mockGWT, mockChallengeClient, mockSubscriptionClient);
 		serverProperties = new HashMap<String, String>();
 		AsyncMockStubber.callSuccessWith(serverProperties).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 	}
