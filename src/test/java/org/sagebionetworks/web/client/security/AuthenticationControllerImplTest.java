@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -78,6 +79,8 @@ public class AuthenticationControllerImplTest {
 	SubscriptionClientAsync mockSubscriptionClient;
 	@Mock
 	ChallengeClientAsync mockChallengeClient;
+	@Mock
+	PendoSdk mockPendoSdk;
 	String xsrfToken = "12barbaz34";
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	HashMap<String, String> serverProperties;
@@ -98,7 +101,7 @@ public class AuthenticationControllerImplTest {
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
 		when(mockGWT.asHasRpcToken(any())).thenReturn(mockServiceHasRpcToken);
 		when(mockGWT.asServiceDefTarget(any())).thenReturn(mockServiceDefTarget);
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockXsrfTokenService, mockSynapseClient, mockGWT, mockChallengeClient, mockSubscriptionClient);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockXsrfTokenService, mockSynapseClient, mockGWT, mockChallengeClient, mockSubscriptionClient, mockPendoSdk);
 		serverProperties = new HashMap<String, String>();
 		AsyncMockStubber.callSuccessWith(serverProperties).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 	}
