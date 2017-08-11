@@ -13,7 +13,9 @@
 		<bh:Div>
 			<bh:Div ui:field="chartContainer" />
 		</bh:Div>
-		
+		<bh:Div>
+			<b:Anchor ui:field="sourceDataAnchor" text="source data" target="_blank"/>
+		</bh:Div>
 		<bh:Div ui:field="synAlertContainer"/>
 	</bh:Div>
 </ui:UiBinder>
