@@ -26,6 +26,7 @@
 				    <b:AnchorListItem ui:field="linkLink" text="Link"/>
 				    <b:AnchorListItem ui:field="provenanceGraphLink" text="Provenance Graph"/>
 				    <b:AnchorListItem ui:field="referenceLink" text="Reference"/>
+				    <b:AnchorListItem ui:field="graphLink" icon="BAR_CHART" text="Simple Plot" iconPosition="RIGHT" />
 				    <b:AnchorListItem ui:field="submitToEvaluationLink" text="Submit to Evaluation"/>
 				    <b:AnchorListItem ui:field="tableLink" text="Table: Paste tabular data"/>
 				    <b:AnchorListItem ui:field="synapseTableLink" text="Table: Query on a Synapse Table/View"/>
@@ -48,7 +49,6 @@
 					    <b:AnchorListItem ui:field="bookmarkLink" text="Bookmark" />
 					    <b:AnchorListItem ui:field="challengeParticipantsLink" text="Challenge Participants List" />
 					    <b:AnchorListItem ui:field="challengeTeamsLink" text="Challenge Teams List" />
-					    <b:AnchorListItem ui:field="graphLink" icon="BAR_CHART" text="Simple Plot" />
 					    <b:AnchorListItem ui:field="cytoscapeJsLink" text="Cytoscape JS Graph" />
 					    <b:AnchorListItem ui:field="externalWebsiteLink" text="External Website" />
 					    <b:AnchorListItem ui:field="registerChallengeTeamLink" text="Register Challenge Team Button" />
