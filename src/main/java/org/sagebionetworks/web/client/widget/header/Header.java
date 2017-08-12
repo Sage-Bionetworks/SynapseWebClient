@@ -115,6 +115,8 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
 		if (authenticationController.isLoggedIn()) {
 			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId());
+		} else {
+			pendoSdk.initialize("anonymous");
 		}
 	}
 
