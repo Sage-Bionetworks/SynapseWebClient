@@ -3,7 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -88,6 +88,8 @@ public class TableQueryResultWidgetTest {
 	GWTWrapper mockGWT;
 	@Mock
 	AsynchronousProgressWidget mockJobTrackingWidget;
+	@Mock
+	AsynchronousProgressWidget mockJobTrackingWidget2;
 	@Captor
 	ArgumentCaptor<AsynchronousProgressHandler> asyncProgressHandlerCaptor;
 	@Captor
@@ -104,7 +106,7 @@ public class TableQueryResultWidgetTest {
 		mockGinInjector = Mockito.mock(PortalGinInjector.class);
 		mockQueryResultEditor = Mockito.mock(QueryResultEditorWidget.class);
 		mockSynapseAlert = Mockito.mock(SynapseAlert.class);
-		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockJobTrackingWidget);
+		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockJobTrackingWidget, mockJobTrackingWidget2);
 		when(mockGinInjector.createNewTablePageWidget()).thenReturn(mockPageWidget);
 		when(mockGinInjector.createNewQueryResultEditorWidget()).thenReturn(mockQueryResultEditor);
 		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert, mockClientCache, mockGWT);
@@ -146,15 +148,24 @@ public class TableQueryResultWidgetTest {
 		// Make the call that changes it all.
 		widget.configure(query, isEditable, tableType, mockListner);
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
-		// invoke a success
-		asyncProgressHandlerCaptor.getValue().onComplete(bundle);
+		AsynchronousProgressHandler progressHandler1 = asyncProgressHandlerCaptor.getValue();
+		// reconfigure before previous job is done (verify previous job is no longer tracked, it uses a new tracking widget).
+		widget.configure(query, isEditable, tableType, mockListner);
+		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
+		AsynchronousProgressHandler progressHandler2 = asyncProgressHandlerCaptor.getValue();
+		// verify invoking a success on the first job is a no-op
+		progressHandler1.onComplete(bundle);
+		verify(mockPageWidget, never()).configure(any(QueryResultBundle.class), any(Query.class), anyList(), anyBoolean(), any(TableType.class), any(RowSelectionListener.class), any(TableQueryResultWidget.class), any(CallbackP.class), any(Callback.class));
 		
-		verify(mockView, times(2)).setErrorVisible(false);
-		verify(mockView).setProgressWidgetVisible(true);
+		// invoke a success on the current job, and verify results sent to subwidgets
+		progressHandler2.onComplete(bundle);
+		
+		verify(mockView, times(3)).setErrorVisible(false);
+		verify(mockView, times(2)).setProgressWidgetVisible(true);
 		// Hidden while running query.
-		verify(mockPageWidget).setTableVisible(false);
+		verify(mockPageWidget, times(2)).setTableVisible(false);
 		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(tableType), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture(), callbackCaptor.capture());
-		verify(mockListner).queryExecutionStarted();
+		verify(mockListner, times(2)).queryExecutionStarted();
 		// Shown on success.
 		verify(mockPageWidget).setTableVisible(true);
 		verify(mockListner).queryExecutionFinished(true, true);
@@ -303,7 +314,7 @@ public class TableQueryResultWidgetTest {
 		when(mockClientCache.get(ENTITY_ID + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY)).thenReturn(null);
 		asyncProgressHandlerCaptor.getValue().onComplete(bundle);
 		verify(mockClientCache).remove(ENTITY_ID + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
-		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
+		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
 	}
 	
 	@Test
@@ -322,7 +333,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockGWT).scheduleExecution(callbackCaptor.capture(), eq(TableQueryResultWidget.ETAG_CHECK_DELAY_MS));
 		// manually invoke callback (usually would occur after the delay)
 		callbackCaptor.getValue().invoke();
-		verify(mockJobTrackingWidget, times(2)).startAndTrackJob(eq(TableQueryResultWidget.VERIFYING_ETAG_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
+		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.VERIFYING_ETAG_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
 	}
 	
 }
