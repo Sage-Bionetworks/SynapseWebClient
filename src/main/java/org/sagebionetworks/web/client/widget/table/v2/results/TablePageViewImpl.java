@@ -113,4 +113,8 @@ public class TablePageViewImpl implements TablePageView {
 	public void setFacetsVisible(boolean visible) {
 		facetsWidgetContainer.setVisible(visible);
 	}
+	@Override
+	public void setTableVisible(boolean visible) {
+		tablePanel.setVisible(visible);
+	}
 }

@@ -247,7 +247,7 @@ public class TablePageWidgetTest {
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(false);
 		assertEquals(bundle.getColumnModels().size()+1, sortHeaders.size());
-		verify(mockView).setFacetsVisible(true);
+		verify(mockView, times(2)).setFacetsVisible(true);
 	}
 	
 	@Test
