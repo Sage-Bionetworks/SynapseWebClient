@@ -56,6 +56,15 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 		this.onFacetRequest = onFacetRequest;
 		view.setColumnName(facet.getColumnName());
 		int i = 0;
+		int max = MAX_VISIBLE_FACET_VALUES;
+		for (int j = MAX_VISIBLE_FACET_VALUES; j < facet.getFacetValues().size(); j++) {
+			//if any facet is selected beyond the max visible count, then show them all
+			if (facet.getFacetValues().get(j).getIsSelected()) {
+				max = Integer.MAX_VALUE;
+				break;
+			}
+		}
+		
 		for (FacetColumnResultValueCount valueCount : facet.getFacetValues()) {
 			if (valueCount.getIsSelected()) {
 				facetValues.add(valueCount.getValue());
@@ -73,14 +82,14 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 				displayWidget = view.getSpanWithText(valueCount.getValue());
 			}
 			
-			if (i < MAX_VISIBLE_FACET_VALUES) {
+			if (i < max) {
 				view.addValue(valueCount.getIsSelected(), displayWidget, valueCount.getCount(), valueCount.getValue());	
 			} else {
 				view.addValueToOverflow(valueCount.getIsSelected(), displayWidget, valueCount.getCount(), valueCount.getValue());
 			}
 			i++;
 		}
-		if (facet.getFacetValues().size() > MAX_VISIBLE_FACET_VALUES) {
+		if (facet.getFacetValues().size() > max) {
 			view.setShowAllButtonText(SHOW_ALL + facet.getFacetValues().size());
 			view.setShowAllButtonVisible(true);
 		} else {
