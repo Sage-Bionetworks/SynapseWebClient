@@ -40,7 +40,7 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
-import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
@@ -87,7 +87,7 @@ public class TableQueryResultWidgetTest {
 	@Mock
 	GWTWrapper mockGWT;
 	@Mock
-	JobTrackingWidget mockJobTrackingWidget;
+	AsynchronousProgressWidget mockJobTrackingWidget;
 	@Captor
 	ArgumentCaptor<AsynchronousProgressHandler> asyncProgressHandlerCaptor;
 	@Captor
@@ -152,11 +152,11 @@ public class TableQueryResultWidgetTest {
 		verify(mockView, times(2)).setErrorVisible(false);
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
-		verify(mockView).setTableVisible(false);
+		verify(mockPageWidget).setTableVisible(false);
 		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(tableType), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture(), callbackCaptor.capture());
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
-		verify(mockView).setTableVisible(true);
+		verify(mockPageWidget).setTableVisible(true);
 		verify(mockListner).queryExecutionFinished(true, true);
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setSynapseAlertWidget(any(Widget.class));
@@ -202,11 +202,11 @@ public class TableQueryResultWidgetTest {
 		verify(mockView, times(2)).setErrorVisible(false);
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
-		verify(mockView).setTableVisible(false);
+		verify(mockPageWidget).setTableVisible(false);
 		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(tableType), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture(), any(Callback.class));
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
-		verify(mockView).setTableVisible(true);
+		verify(mockPageWidget).setTableVisible(true);
 		verify(mockListner).queryExecutionFinished(true, true);
 		verify(mockView).setProgressWidgetVisible(false);	
 	}
@@ -225,11 +225,11 @@ public class TableQueryResultWidgetTest {
 		verify(mockView, times(2)).setErrorVisible(false);
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
-		verify(mockView).setTableVisible(false);
+		verify(mockPageWidget).setTableVisible(false);
 		verify(mockPageWidget).configure(eq(bundle), eq(widget.getStartingQuery()), eq(sortList), eq(false), eq(tableType), any(RowSelectionListener.class), eq(widget), mockFacetChangedHandlerCaptor.capture(), any(Callback.class));
 		verify(mockListner).queryExecutionStarted();
 		// Shown on success.
-		verify(mockView).setTableVisible(true);
+		verify(mockPageWidget).setTableVisible(true);
 		verify(mockListner).queryExecutionFinished(true, false);
 		verify(mockView).setProgressWidgetVisible(false);	
 	}
@@ -247,13 +247,13 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setErrorVisible(false);
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
-		verify(mockView, times(2)).setTableVisible(false);
+		verify(mockPageWidget, times(2)).setTableVisible(false);
 		verify(mockListner).queryExecutionStarted();
 		// After a cancel
 		verify(mockListner).queryExecutionFinished(false, false);
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
-		verify(mockView, times(2)).setTableVisible(false);
+		verify(mockPageWidget, times(2)).setTableVisible(false);
 		verify(mockSynapseAlert).showError(TableQueryResultWidget.QUERY_CANCELED);
 	}
 	
@@ -272,13 +272,13 @@ public class TableQueryResultWidgetTest {
 		verify(mockView).setErrorVisible(false);
 		verify(mockView).setProgressWidgetVisible(true);
 		// Hidden while running query.
-		verify(mockView, times(2)).setTableVisible(false);
+		verify(mockPageWidget, times(2)).setTableVisible(false);
 		verify(mockListner).queryExecutionStarted();
 		// After a cancel
 		verify(mockListner).queryExecutionFinished(false, false);
 		verify(mockView).setProgressWidgetVisible(false);
 		verify(mockView).setErrorVisible(true);
-		verify(mockView, times(2)).setTableVisible(false);
+		verify(mockPageWidget, times(2)).setTableVisible(false);
 		// note that if not logged in, synapse alert will show prompt the user to login in order to run the query.
 		verify(mockSynapseAlert).handleException(error);
 	}

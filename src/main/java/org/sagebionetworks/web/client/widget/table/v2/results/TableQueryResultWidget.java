@@ -20,11 +20,13 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -62,12 +64,12 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	boolean isEditable;
 	TableType tableType;
 	QueryResultsListener queryListener;
-	JobTrackingWidget progressWidget;
 	SynapseAlert synapseAlert;
 	CallbackP<FacetColumnRequest> facetChangedHandler;
 	Callback resetFacetsHandler;
 	ClientCache clientCache;
 	GWTWrapper gwt;
+	int currentJobIndex = 0;
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, 
 			SynapseClientAsync synapseClient, 
@@ -79,13 +81,11 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();
-		this.progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
 		this.synapseAlert = synapseAlert;
 		this.clientCache = clientCache;
 		this.gwt = gwt;
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
-		this.view.setProgressWidget(this.progressWidget);
 		this.view.setSynapseAlertWidget(synapseAlert.asWidget());
 		resetFacetsHandler = new Callback() {
 			@Override
@@ -128,11 +128,14 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.queryListener = listener;
 		runQuery();
 	}
-
 	private void runQuery() {
+		currentJobIndex++;
+		runQuery(currentJobIndex);
+	}
+	private void runQuery(final int jobIndex) {
 		this.view.setErrorVisible(false);
 		fireStartEvent();
-		this.view.setTableVisible(false);
+		pageViewerWidget.setTableVisible(false);
 		this.view.setProgressWidgetVisible(true);
 		String entityId = QueryBundleUtils.getTableId(this.startingQuery);
 		String viewEtag = clientCache.get(entityId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
@@ -143,28 +146,35 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			qbr.setPartMask(BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_FACETS);
 			qbr.setQuery(this.startingQuery);
 			qbr.setEntityId(entityId);
-			this.progressWidget.startAndTrackJob(RUNNING_QUERY_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
+			AsynchronousProgressWidget progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
+			this.view.setProgressWidget(progressWidget);
+			progressWidget.startAndTrackJob(RUNNING_QUERY_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
 				
 				@Override
 				public void onFailure(Throwable failure) {
-					showError(failure);
+					if (currentJobIndex == jobIndex) {
+						showError(failure);	
+					}
 				}
 				
 				@Override
 				public void onComplete(AsynchronousResponseBody response) {
-					setQueryResults((QueryResultBundle) response);
+					if (currentJobIndex == jobIndex) {
+						setQueryResults((QueryResultBundle) response);
+					}
 				}
 				
 				@Override
 				public void onCancel() {
-					showError(QUERY_CANCELED);
+					if (currentJobIndex == jobIndex) {
+						showError(QUERY_CANCELED);
+					}
 				}
 			});
 		} else {
 			verifyOldEtagIsNotInView(entityId, viewEtag);
 		}
 	}
-	
 	/**
 	 * Look for the given etag in the given file view.  If it is still there, wait a few seconds and try again.  
 	 * If the etag is not in the view, then remove the clientCache key and run the query (since this indicates that the user change was propagated to the replicated layer)
@@ -182,7 +192,9 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		query.setIsConsistent(true);
 		qbr.setQuery(query);
 		qbr.setEntityId(fileViewEntityId);
-		this.progressWidget.startAndTrackJob(VERIFYING_ETAG_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
+		AsynchronousProgressWidget progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
+		this.view.setProgressWidget(progressWidget);
+		progressWidget.startAndTrackJob(VERIFYING_ETAG_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				showError(failure);
@@ -239,7 +251,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setProgressWidgetVisible(false);
 		// configure the page widget
 		this.pageViewerWidget.configure(bundle, this.startingQuery, sortItems, false, tableType, null, this, facetChangedHandler, resetFacetsHandler);
-		this.view.setTableVisible(true);
+		pageViewerWidget.setTableVisible(true);
 		fireFinishEvent(true, isQueryResultEditable());
 	}
 
@@ -299,7 +311,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	}
 	
 	private void setupErrorState() {
-		this.view.setTableVisible(false);
+		pageViewerWidget.setTableVisible(false);
 		this.view.setProgressWidgetVisible(false);
 		fireFinishEvent(false, false);
 		this.view.setErrorVisible(true);
