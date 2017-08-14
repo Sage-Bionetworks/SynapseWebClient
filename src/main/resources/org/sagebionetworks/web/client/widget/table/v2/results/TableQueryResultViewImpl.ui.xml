@@ -9,11 +9,8 @@
 		<b:Panel>
 			<b:PanelBody>
 				<g:SimplePanel ui:field="synapseAlertContainer"/>
-				
-				<g:SimplePanel ui:field="tablePanel" />
-				
 				<g:SimplePanel ui:field="progressPanel" />
-				
+				<g:SimplePanel ui:field="tablePanel" />
 				<g:SimplePanel ui:field="rowEditorModalPanel"/>
 			</b:PanelBody>
 		</b:Panel>
