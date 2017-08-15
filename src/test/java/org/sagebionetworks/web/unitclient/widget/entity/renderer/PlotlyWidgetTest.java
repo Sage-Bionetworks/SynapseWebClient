@@ -20,6 +20,7 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -39,6 +40,7 @@ import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandle
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetView;
+import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -67,6 +69,8 @@ public class PlotlyWidgetTest {
 	Row mockRow;
 	@Mock
 	ResourceLoader mockResourceLoader;
+	@Mock
+	QueryTokenProvider mockQueryTokenProvider;
 	
 	List<SelectColumn> selectColumns;
 	List<Row> rows;
@@ -94,7 +98,12 @@ public class PlotlyWidgetTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		widget = new PlotlyWidget(mockView, mockSynAlert, mockJobTracker, mockResourceLoader);
+		widget = new PlotlyWidget(
+				mockView, 
+				mockSynAlert, 
+				mockJobTracker, 
+				mockResourceLoader, 
+				mockQueryTokenProvider);
 		params = new HashMap<>();
 		selectColumns = new ArrayList<>();
 		rows = new ArrayList<>();
@@ -125,13 +134,16 @@ public class PlotlyWidgetTest {
 	
 	@Test
 	public void testConfigure() {
+		String queryToken = "encoded sql which is passed to place";
+		when(mockQueryTokenProvider.queryToToken(any(Query.class))).thenReturn(queryToken);
 		WikiPageKey pageKey = null;
 		String xAxisLabel = "X Axis";
 		String yAxisLabel = "Y Axis";
 		GraphType type = GraphType.BAR;
 		BarMode mode = BarMode.STACK;
 		String plotTitle = "Plot Title";
-		String sql = "select x, y1, y2 from syn12345 where x>2";
+		String tableId = "syn12345";
+		String sql = "select x, y1, y2 from "+tableId+" where x>2";
 		params.put(TABLE_QUERY_KEY, sql);
 		params.put(TITLE, plotTitle);
 		params.put(X_AXIS_TITLE, xAxisLabel);
@@ -149,6 +161,11 @@ public class PlotlyWidgetTest {
 		when(mockQueryResultBundle.getQueryCount()).thenReturn(LIMIT + 1);
 		
 		widget.configure(pageKey, params, null, null);
+		
+		verify(mockView).setSourceDataLink(stringCaptor.capture());
+		String sourceDataLink = stringCaptor.getValue();
+		assertTrue(sourceDataLink.contains(tableId));
+		assertTrue(sourceDataLink.contains(queryToken));
 		
 		//verify query params, and plot configuration based on results
 		verify(mockView).setLoadingVisible(true);

@@ -578,8 +578,16 @@ public class TableEntityWidgetTest {
 		
 		//now test the confirmation when switching to simple search mode
 		widget.onShowSimpleSearch();
-		
 		verify(mockView).showConfirmDialog(eq(TableEntityWidget.RESET_SEARCH_QUERY), eq(TableEntityWidget.RESET_SEARCH_QUERY_MESSAGE), callbackCaptor.capture());
+		
+		startQuery.setSql(" select pos, count(*) as c from syn123 group BY pos    ");
+		widget.onShowSimpleSearch();
+		verify(mockView, times(2)).showConfirmDialog(eq(TableEntityWidget.RESET_SEARCH_QUERY), eq(TableEntityWidget.RESET_SEARCH_QUERY_MESSAGE), callbackCaptor.capture());
+		
+		startQuery.setSql(" select * FROM syn123 LIMIT 2 offset 1 ");
+		widget.onShowSimpleSearch();
+		verify(mockView, times(3)).showConfirmDialog(eq(TableEntityWidget.RESET_SEARCH_QUERY), eq(TableEntityWidget.RESET_SEARCH_QUERY_MESSAGE), callbackCaptor.capture());
+		
 		//on confirmation, show simple search ui
 		callbackCaptor.getValue().invoke();
 		verifySimpleSearchUI();
@@ -601,7 +609,7 @@ public class TableEntityWidgetTest {
 		verifyAdvancedSearchUI();
 
 		// simple query
-		startQuery.setSql("select * from syn123 order by x desc");
+		startQuery.setSql("select * from syn123");
 		
 		//no confirmation necessary
 		widget.onShowSimpleSearch();

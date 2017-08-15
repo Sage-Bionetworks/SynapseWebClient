@@ -27,6 +27,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
+import com.google.gwt.regexp.shared.MatchResult;
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -46,6 +48,7 @@ public class TableEntityWidget implements IsWidget,
 
 	public static final String NO_FACETS_SIMPLE_SEARCH_UNSUPPORTED = "In order to use simple search, you must first set columns to be facets in the schema editor.";
 	public static final String RESET_SEARCH_QUERY_MESSAGE = "The search query will be reset. Are you sure that you would like to switch to simple search mode?";
+	
 	public static final String RESET_SEARCH_QUERY = "Reset search query?";
 	public static final long DEFAULT_OFFSET = 0L;
 	public static final String SELECT_FROM = "SELECT * FROM ";
@@ -53,6 +56,9 @@ public class TableEntityWidget implements IsWidget,
 	public static final String NO_COLUMNS_NOT_EDITABLE = "This table does not have any columns.";
 	public static final long DEFAULT_LIMIT = 25;
 	public static final int MAX_SORT_COLUMNS = 3;
+	// Look for: 
+	// beginning of the line, any character, whitespace, "from", whitespace, "syn<number>", optional "dot notation", whitespace, end of line.
+	public static final RegExp SIMPLE_QUERY_REGEX = RegExp.compile("^.*(\\s+from\\s+syn([0-9]+[.]?[0-9]*)+)\\s*$", "i");
 
 	DownloadTableQueryModalWidget downloadTableQueryModalWidget;
 	UploadTableModalWidget uploadTableModalWidget;
@@ -216,8 +222,8 @@ public class TableEntityWidget implements IsWidget,
 	}
 
 	private void initSimpleAdvancedQueryState() {
-		boolean isWhereClause = isWhereClause();
-		if (!isWhereClause) {
+		boolean isAdvancedQuery = isAdvancedQuery();
+		if (!isAdvancedQuery) {
 			// show simple search if facets are available.
 			boolean isFacets = isFacets();
 			if (isFacets) {
@@ -242,11 +248,14 @@ public class TableEntityWidget implements IsWidget,
 		return false;
 	}
 	
-	private boolean isWhereClause() {
+	private boolean isAdvancedQuery() {
 		if (currentQuery == null || currentQuery.getSql() == null) {
 			return false;
 		}
-		return currentQuery.getSql().toUpperCase().contains(" WHERE ");
+		// is there anything after the synID (where, group by, having, order by, limit, ...)?
+		MatchResult match = SIMPLE_QUERY_REGEX.exec(currentQuery.getSql());
+		// if match is null, then this sql is more complex
+		return match == null;
 	}
 	
 	private void showSimpleSearchUI() {
@@ -276,7 +285,7 @@ public class TableEntityWidget implements IsWidget,
 	public void onShowSimpleSearch() {
 		if (isFacets()) {
 			// does the current query have a where clause?
-			if (isWhereClause()) {
+			if (isAdvancedQuery()) {
 				// we must wipe it out.  Confirm with the user that this is acceptable.
 				view.showConfirmDialog(RESET_SEARCH_QUERY, RESET_SEARCH_QUERY_MESSAGE, new Callback() {
 					@Override

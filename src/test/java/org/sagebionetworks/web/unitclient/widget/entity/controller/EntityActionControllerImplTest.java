@@ -1249,6 +1249,25 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
+	public void testOnChangeStorageLocation(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		controller.onAction(Action.CHANGE_STORAGE_LOCATION);
+		verify(mockStorageLocationWidget).configure(this.entityBundle, mockEntityUpdatedHandler);
+		verify(mockStorageLocationWidget).show();
+	}
+	
+	@Test
+	public void testOnChangeStorageLocationNoUpload(){
+		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		controller.onAction(Action.CHANGE_STORAGE_LOCATION);
+		verify(mockStorageLocationWidget, never()).configure(any(EntityBundle.class), any(EntityUpdatedHandler.class));
+		verify(mockStorageLocationWidget, never()).show();
+	}
+
+	
+	@Test
 	public void testOnUploadNewFileNoUpload(){
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
