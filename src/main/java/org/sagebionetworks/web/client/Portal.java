@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.activity.shared.ActivityManager;
@@ -75,7 +76,7 @@ public class Portal implements EntryPoint {
 						final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
 						historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());						
 						Header header = ginjector.getHeader();
-						Header footer = ginjector.getHeader();
+						Footer footer = ginjector.getFooter();
 						RootPanel.get("rootPanel").add(appWidget);
 						RootPanel.get("headerPanel").add(header);
 						RootPanel.get("footerPanel").add(footer);

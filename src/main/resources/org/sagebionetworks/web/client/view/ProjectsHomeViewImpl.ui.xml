@@ -154,5 +154,6 @@
 					</div>
 				</div>
 			</div>
+		</div> <!-- close class="container" -->
 	</g:HTMLPanel>
 </ui:UiBinder> 
