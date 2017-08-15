@@ -7,9 +7,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<g:HTMLPanel>
-	    <div class="color-line"></div>
-		<g:SimplePanel ui:field="header" />
-		<div class="separator separator-header-page"></div>
+	    <div class="separator separator-header-page"></div>
 	    <div class="margin-top-left-10 margin-right-15">
 	        <b:Row>
 	            <b:Column size="MD_9">
@@ -64,9 +62,7 @@
 		   	</div>
 		   	<div>
 		   	</div>
-		    <div class="clear"></div>
         </div>
-		<g:SimplePanel ui:field="footer" />
 		
 	</g:HTMLPanel>
 </ui:UiBinder> 

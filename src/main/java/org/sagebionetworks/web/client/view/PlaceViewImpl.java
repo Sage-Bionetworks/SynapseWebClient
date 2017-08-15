@@ -17,11 +17,6 @@ import com.google.inject.Inject;
 public class PlaceViewImpl implements PlaceView {
 
 	public interface PlaceViewImplUiBinder extends UiBinder<Widget, PlaceViewImpl> {}
-
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
 	
 	@UiField
 	Div above;
@@ -32,20 +27,15 @@ public class PlaceViewImpl implements PlaceView {
 	@UiField
 	Heading title;
 	private Header headerWidget;
-	private Footer footerWidget;
 	
 	Widget widget;
 	@Inject
 	public PlaceViewImpl(PlaceViewImplUiBinder binder,
-			Header headerWidget, 
-			Footer footerWidget
+			Header headerWidget
 			) {
 		widget = binder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 	}
 	
 	@Override
@@ -55,11 +45,7 @@ public class PlaceViewImpl implements PlaceView {
 	
 	@Override
 	public void initHeaderAndFooter() {
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

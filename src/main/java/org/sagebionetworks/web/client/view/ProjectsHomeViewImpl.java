@@ -3,9 +3,7 @@ package org.sagebionetworks.web.client.view;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -29,49 +27,29 @@ import com.google.inject.Inject;
 public class ProjectsHomeViewImpl extends Composite implements ProjectsHomeView {
 
 	public interface ProjectsHomeViewImplUiBinder extends UiBinder<Widget, ProjectsHomeViewImpl> {}
-
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
 	@UiField
 	SimplePanel createProjectPanel;
 	@UiField
 	SimplePanel synAlertPanel;
 		
 	private Presenter presenter;
-	private IconsImageBundle icons;
 	private Header headerWidget;
-	private Footer footerWidget;
-
-	
 	@Inject
 	public ProjectsHomeViewImpl(ProjectsHomeViewImplUiBinder binder,
-			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
+			Header headerWidget,
 			SageImageBundle imageBundle) {		
 		initWidget(binder.createAndBindUi(this));
-
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
-		this.icons = icons;
-		
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 	}
 
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
-		
 		addCreateProject();		
 	}
 

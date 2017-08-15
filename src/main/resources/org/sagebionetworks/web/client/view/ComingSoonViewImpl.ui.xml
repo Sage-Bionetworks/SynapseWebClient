@@ -16,8 +16,6 @@
 	</ui:style>
 
 	<g:HTMLPanel>
-		<!-- HEADER -->
-		<g:SimplePanel ui:field="header" />
 		<g:FlowPanel addStyleNames="margin-bottom-60 margin-top-100">
 			<w:HelpWidget text="Optional help link text" helpMarkdown="This contains basic help." href="http://link/to/more/help" placement="BOTTOM" />
 			<w:HelpWidget helpMarkdown="This contains **very basic** markdown, perhaps with a [link](http://www.jayhodgson.com)."/>
@@ -29,6 +27,5 @@
 		
 		This page is coming soon.
 		<div class="clear"></div>
-		<g:SimplePanel ui:field="footer" />	    
 	</g:HTMLPanel>
 </ui:UiBinder> 

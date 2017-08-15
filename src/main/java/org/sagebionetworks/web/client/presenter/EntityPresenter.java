@@ -27,7 +27,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -56,7 +55,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private String areaToken;
 	private CookieProvider cookies;
 	private Header headerWidget;
-	Footer footerWidget;
 	private EntityPageTop entityPageTop;
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
 	private GWTWrapper gwt;
@@ -68,10 +66,9 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 			SynapseClientAsync synapseClient, CookieProvider cookies,
 			StuAlert synAlert,
 			EntityPageTop entityPageTop, Header headerWidget,
-			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget,
+			OpenTeamInvitationsWidget openTeamInvitesWidget,
 			GWTWrapper gwt) {
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.entityPageTop = entityPageTop;
 		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		this.view = view;
@@ -146,8 +143,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		headerWidget.refresh();
 		//place widgets and configure
 		view.setEntityPageTopWidget(entityPageTop);
-		view.setFooterWidget(footerWidget);
-		view.setHeaderWidget(headerWidget);
 		view.setOpenTeamInvitesWidget(openTeamInvitesWidget);
 		view.setSynAlertWidget(synAlert.asWidget());
 		// Hide the view panel contents until async callback completes

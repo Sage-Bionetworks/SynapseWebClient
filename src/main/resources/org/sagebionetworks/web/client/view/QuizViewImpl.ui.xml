@@ -8,7 +8,6 @@
 	
 	<g:HTMLPanel>
         <div class="clear"></div>
-		<g:SimplePanel ui:field="header" />
         <div class="separator margin-top-10-imp"></div>
     	<g:SimplePanel ui:field="synAlertPanel" addStyleNames="margin-left-10 margin-right-10"/>
     	<div class="container margin-top-10"> 
@@ -49,9 +48,5 @@
 				</div>
 			</g:HTMLPanel>
 		</div> <!-- close class="container" -->
-<!-- start footer -->
-		<div class="clear"></div>
-		<g:SimplePanel ui:field="footer" />
-<!-- end footer -->
 	</g:HTMLPanel>
 </ui:UiBinder> 

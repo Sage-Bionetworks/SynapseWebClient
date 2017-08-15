@@ -4,8 +4,6 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	<g:HTMLPanel>
-		<g:SimplePanel ui:field="header" />
-
 		<div class="margin-top-15 margin-left-35 margin-right-40">
 			<div class="row">
 				<div class="col-md-9 col-md-push-3">
@@ -37,10 +35,8 @@
 						<g:SimplePanel ui:field="facetPanel" />
 					</div>
 				</g:HTMLPanel>
-				<div class="clear"></div>
 			</div>
 		</div>
-		<g:SimplePanel ui:field="footer" />
 
 	</g:HTMLPanel>
 </ui:UiBinder> 

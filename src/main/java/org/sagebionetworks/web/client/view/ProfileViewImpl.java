@@ -63,12 +63,6 @@ import com.google.inject.Inject;
 public class ProfileViewImpl extends Composite implements ProfileView {
 
 	public interface ProfileViewImplUiBinder extends UiBinder<Widget, ProfileViewImpl> {}
-	
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
-	
 	@UiField
 	 Div viewProfilePanel;
 	 @UiField
@@ -278,24 +272,18 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	//View profile widgets
 	private static HTML defaultProfilePicture = new HTML(DisplayUtils.getFontAwesomeIcon("user font-size-150 lightGreyText"));
-	
-	private Footer footerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
-			Header headerWidget, 
-			Footer footerWidget, 
+			Header headerWidget,
 			SageImageBundle sageImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.sageImageBundle = sageImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 		picturePanel.clear();
 		initTabs();
@@ -552,11 +540,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

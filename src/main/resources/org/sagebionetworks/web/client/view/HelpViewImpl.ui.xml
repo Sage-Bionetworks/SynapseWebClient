@@ -11,13 +11,8 @@
 		vertical-align: top;
 		}
 	</ui:style>
-
-
-	<ui:with field='icons'
-		type='org.sagebionetworks.web.client.IconsImageBundle' />
-
+	
 	<g:HTMLPanel>
-		<g:SimplePanel ui:field="header" />
 		<div class="row margin-top-left-10 margin-right-15 margin-bottom-20">
 	        <div class="row">
 		    	<g:FlowPanel ui:field="mainContainer" styleName="margin-left-35 margin-right-40"/>
@@ -25,8 +20,6 @@
 	    	
 		    <div class="clear"></div>
         </div>
-		
-		<g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>
 
 </ui:UiBinder> 

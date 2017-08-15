@@ -25,19 +25,12 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class NewAccountViewImpl extends Composite implements NewAccountView {
 
 	public interface NewAccountViewImplUiBinder extends UiBinder<Widget, NewAccountViewImpl> {}
-
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
-	
 	
 	@UiField
 	TextBox emailField;
@@ -82,18 +75,13 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	
 	private Presenter presenter;
 	private Header headerWidget;
-	private Footer footerWidget;
 	
 	@Inject
 	public NewAccountViewImpl(NewAccountViewImplUiBinder binder,
-			Header headerWidget, Footer footerWidget,
-			SageImageBundle imageBundle) {		
+			Header headerWidget) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		init();
 	}
 	
@@ -168,11 +156,7 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

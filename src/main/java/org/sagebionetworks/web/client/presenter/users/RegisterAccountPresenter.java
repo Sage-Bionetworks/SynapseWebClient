@@ -19,15 +19,13 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	
 	private RegisterWidget registerWidget;
 	private Header headerWidget;
-	private Footer footerWidget;
 	
 	@Inject
 	public RegisterAccountPresenter(RegisterAccountView view,
 			RegisterWidget registerWidget,
-			Header headerWidget, Footer footerWidget) {
+			Header headerWidget) {
 		this.view = view;
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.registerWidget = registerWidget;
 	}
 
@@ -43,8 +41,6 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 		view.setRegisterWidget(registerWidget.asWidget());
 		headerWidget.configure(false);
 		headerWidget.refresh();
-		view.setFooterWidget(footerWidget.asWidget());
-		view.setHeaderWidget(headerWidget.asWidget());
 	}
 
 	@Override

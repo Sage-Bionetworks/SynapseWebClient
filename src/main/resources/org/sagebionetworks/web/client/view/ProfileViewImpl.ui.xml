@@ -11,7 +11,6 @@
     <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
     
 	<g:HTMLPanel>
-		<g:SimplePanel ui:field="header" />
 		<div class="separator margin-top-10-imp"></div>
 		<g:HTMLPanel>
 			<b:Alert type="INFO" ui:field="getCertifiedAlert" dismissable="true">
@@ -268,9 +267,5 @@
 				<p>&nbsp;</p>
 			</div>
 		</g:HTMLPanel>
-		<!-- start footer -->
-		<div class="clear"></div>
-		<g:SimplePanel ui:field="footer" />
-		<!-- end footer -->
 	</g:HTMLPanel>
 </ui:UiBinder> 

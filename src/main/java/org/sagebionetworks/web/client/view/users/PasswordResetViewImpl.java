@@ -3,9 +3,7 @@ package org.sagebionetworks.web.client.view.users;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.dom.client.DivElement;
@@ -34,11 +32,6 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	public interface PasswordResetViewImplUiBinder extends UiBinder<Widget, PasswordResetViewImpl> {}
 	
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
-
 	@UiField
 	DivElement resetPasswordForm;
 	@UiField
@@ -83,25 +76,20 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	
 	private Presenter presenter;
 	private Header headerWidget;
-	private Footer footerWidget;
 	private SageImageBundle sageImageBundle;
 	
 	private boolean isShowingResetUI;
 	
 	@Inject
 	public PasswordResetViewImpl(PasswordResetViewImplUiBinder binder,
-			Header headerWidget, Footer footerWidget,
-			IconsImageBundle iconsImageBundle,
+			Header headerWidget,
 			SageImageBundle sageImageBundle) {		
 		initWidget(binder.createAndBindUi(this));
 
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		init();
 		
 		loadingPanel.setVisible(false);
@@ -253,12 +241,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		DisplayUtils.hideFormError(emailAddress, emailAddressError);
 		DisplayUtils.hideFormError(password1, password1Error);
 		DisplayUtils.hideFormError(password2, password2Error);
-		
-		header.clear();
-		footer.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 	}
 
 	@Override

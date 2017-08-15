@@ -29,7 +29,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -62,8 +61,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	private static final int HIT_DESCRIPTION_LENGTH_CHAR = 270;
 	private static final int FACET_NAME_LENGTH_CHAR = 21;
-	private static final int MAX_PAGES_IN_PAGINATION = 10;
-	private static final int MAX_RESULTS_PER_PAGE = 10;
 	private static final int MINUTE_IN_SEC = 60;
 	private static final int HOUR_IN_SEC = MINUTE_IN_SEC * 60;
 	private static final int DAY_IN_SEC = HOUR_IN_SEC * 24;
@@ -80,11 +77,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 	public interface SearchViewImplUiBinder extends
 			UiBinder<Widget, SearchViewImpl> {
 	}
-
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
 	@UiField
 	SimplePanel resultsPanel;
 	@UiField
@@ -104,26 +96,21 @@ public class SearchViewImpl extends Composite implements SearchView {
 	Button searchButton;
 	private List<Button> facetButtons;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private Footer footerWidget;
 	private PortalGinInjector ginInjector;
 	DateTimeUtils dateTimeUtils;
 	@Inject
 	public SearchViewImpl(SearchViewImplUiBinder binder, 
 			Header headerWidget,
-			Footer footerWidget,
 			SynapseJSNIUtils synapseJSNIUtils, 
 			PortalGinInjector ginInjector,
 			DateTimeUtils dateTimeUtils) {
 		initWidget(binder.createAndBindUi(this));
 		
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.ginInjector = ginInjector;
 		this.dateTimeUtils = dateTimeUtils;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		searchButton.addClickHandler(new ClickHandler() {				
 			@Override
 			public void onClick(ClickEvent event) {					
@@ -143,11 +130,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		headerWidget.setSearchVisible(false);		
 		Window.scrollTo(0, 0); // scroll user to top of page

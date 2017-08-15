@@ -8,7 +8,6 @@
 	
 	<bh:Div>
 		<bh:Div addStyleNames="color-line" />
-		<g:SimplePanel ui:field="header" />
 		<b:Container addStyleNames="min-height-200 margin-top-60">
 			<bh:Span ui:field="loadingUI" addStyleNames="center-block center">
 				<g:Image resource='{sageImageBundle.loading31}' />
@@ -63,7 +62,6 @@
 				</b:Column>
 			</b:Row>
 		</b:Container>
-		<g:SimplePanel ui:field="footer" />
 	</bh:Div>
 
 </ui:UiBinder> 

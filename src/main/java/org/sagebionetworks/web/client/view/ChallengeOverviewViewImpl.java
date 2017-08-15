@@ -2,10 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -22,46 +19,28 @@ public class ChallengeOverviewViewImpl extends Composite implements ChallengeOve
 	public interface ChallengeOverviewViewImplUiBinder extends UiBinder<Widget, ChallengeOverviewViewImpl> {}
 
 	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
-	@UiField
 	SimplePanel content;
 	
 	private Presenter presenter;
-	private IconsImageBundle icons;
 	private Header headerWidget;
-	private Footer footerWidget;
 	private WikiPageWidget wikiPage;
 	
 	@Inject
 	public ChallengeOverviewViewImpl(ChallengeOverviewViewImplUiBinder binder,
-			Header headerWidget, Footer footerWidget, IconsImageBundle icons,
-			SageImageBundle imageBundle, WikiPageWidget wikiPage) {		
+			Header headerWidget, WikiPageWidget wikiPage) {		
 		initWidget(binder.createAndBindUi(this));
 
-		this.icons = icons;
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.wikiPage = wikiPage;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 	}
-
-
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
-
 	}
 
 	@Override
