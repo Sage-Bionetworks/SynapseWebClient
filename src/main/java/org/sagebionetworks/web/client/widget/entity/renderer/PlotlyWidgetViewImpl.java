@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
@@ -31,6 +32,8 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	Widget w;
 	Presenter presenter;
 	HandlerRegistration resizeHandler;
+	@UiField
+	Anchor sourceDataAnchor;
 	
 	@Inject
 	public PlotlyWidgetViewImpl(Binder binder) {
@@ -86,7 +89,10 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		  barmode: barMode
 		};
 		
-		$wnd.Plotly.plot(el, xyData, layout);
+		// note: we'd like to just hide the "save and edit plot in cloud" command, 
+		// but the parameter provided in the docs (showLink: false) has no effect.
+		// hide the entire bar by setting displayModeBar to false.
+		$wnd.Plotly.plot(el, xyData, layout, {displayModeBar: false});
 	}-*/;
 
 	@Override
@@ -100,5 +106,10 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	@Override
 	public boolean isAttached() {
 		return w.isAttached();
+	}
+	
+	@Override
+	public void setSourceDataLink(String url) {
+		sourceDataAnchor.setHref(url);
 	}
 }

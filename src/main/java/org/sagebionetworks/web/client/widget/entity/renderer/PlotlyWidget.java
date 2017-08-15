@@ -8,7 +8,8 @@ import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
-
+import static org.sagebionetworks.web.client.widget.entity.tabs.TablesTab.*;
+import static org.sagebionetworks.web.client.place.Synapse.EntityArea.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,6 +26,7 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.web.client.ArrayUtils;
+
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.plotly.PlotlyTrace;
@@ -35,6 +37,8 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+
+import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -67,16 +71,19 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	Map<String, List<String>> graphData;
 	String xAxisColumnName, fillColumnName;
 	private ResourceLoader resourceLoader;
+	QueryTokenProvider queryTokenProvider;
 	
 	@Inject
 	public PlotlyWidget(PlotlyWidgetView view,
 			SynapseAlert synAlert,
 			AsynchronousJobTracker jobTracker,
-			ResourceLoader resourceLoader) {
+			ResourceLoader resourceLoader,
+			QueryTokenProvider queryTokenProvider) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.jobTracker = jobTracker;
 		this.resourceLoader = resourceLoader;
+		this.queryTokenProvider = queryTokenProvider;
 		view.setSynAlertWidget(synAlert);
 		view.setPresenter(this);
 	}
@@ -119,6 +126,14 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		qbr.setPartMask(ALL_PARTS_MASK);
 		qbr.setQuery(query);
 		qbr.setEntityId(QueryBundleUtils.getTableId(query));
+		
+		String queryToken = queryTokenProvider.queryToToken(query);
+		view.setSourceDataLink(
+				"#!Synapse:" + 
+				qbr.getEntityId() + "/" + 
+				TABLES.toString().toLowerCase() + "/" + 
+				TABLE_QUERY_PREFIX + 
+				queryToken);
 		
 		getMoreResults();
 	}
