@@ -31,11 +31,11 @@ public class PendoSdk {
 		}
 	}
 
-	public void initialize(final String userId) {
+	public void initialize(final String userId, final String email) {
 		initJs(new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				_initialize(userId);
+				_initialize(userId, email);
 			}
 
 			@Override
@@ -45,13 +45,14 @@ public class PendoSdk {
 	}
 
 	private static native void _initialize(
-			String userId) /*-{
+			String userId,
+			String synapseEmail) /*-{
 		// Call this whenever information about your visitors becomes available
 	    // Please use Strings, Numbers, or Bools for value types.
 	    $wnd.pendo.initialize({
 	      visitor: {
-	        id:             userId   // Required if user is logged in
-	        // email:        // Optional
+	        id: userId,   // Required if user is logged in
+	        email: synapseEmail// Optional
 	        // role:         // Optional
 	
 	        // You can add any additional visitor level key-values here,
