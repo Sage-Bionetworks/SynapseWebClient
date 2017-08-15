@@ -24,6 +24,9 @@ import com.google.inject.Inject;
 
 public class Header implements HeaderView.Presenter, IsWidget {
 
+	public static final String N_A = "n/a";
+	public static final String ANONYMOUS = "anonymous";
+	public static final String SYNAPSE_ORG = "@synapse.org";
 	public static final String GET_SATISFACTION_SUPPORT_SITE = "http://support.sagebase.org";
 	public static final String WWW_SYNAPSE_ORG = "www.synapse.org";
 
@@ -114,9 +117,10 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setProjectFavoriteWidget(favWidget);
 		view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
 		if (authenticationController.isLoggedIn()) {
-			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId());
+			String userName = userSessionData.getProfile().getUserName();
+			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
 		} else {
-			pendoSdk.initialize("anonymous");
+			pendoSdk.initialize(ANONYMOUS, N_A);
 		}
 	}
 
