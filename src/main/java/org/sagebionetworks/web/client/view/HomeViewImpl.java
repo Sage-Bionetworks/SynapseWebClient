@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
@@ -38,11 +37,6 @@ import com.google.inject.Inject;
 public class HomeViewImpl extends Composite implements HomeView {
 	
 	public interface HomeViewImplUiBinder extends UiBinder<Widget, HomeViewImpl> {}
-	
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
 	@UiField
 	SimplePanel newsFeed;
 	@UiField
@@ -89,7 +83,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	
 	private Presenter presenter;
 	private Header headerWidget;
-	private Footer footerWidget;
 	UserBadge userBadge;
 	HorizontalPanel myDashboardButtonContents;
 	LoginWidget loginWidget;
@@ -97,7 +90,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
 			Header headerWidget,
-			Footer footerWidget, 
 			final GlobalApplicationState globalApplicationState,
 			final AuthenticationController authController,
 			UserBadge userBadge,
@@ -105,7 +97,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 			LoginWidget loginWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.userBadge = userBadge;
 		this.loginWidget = loginWidget;
 		userBadge.setSize(BadgeSize.DEFAULT_PICTURE_ONLY);
@@ -118,8 +109,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 		addUserPicturePanel();
 		
 		headerWidget.configure(true);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		
 		dashboardBtn.addClickHandler(new ClickHandler() {			
 			@Override
@@ -271,11 +260,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	
 	@Override
 	public void refresh() {
-		header.clear();
 		headerWidget.configure(true);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		clear();
 	}

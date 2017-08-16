@@ -5,7 +5,6 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:bd="urn:import:org.gwtbootstrap3.extras.datetimepicker.client.ui">
 	<bh:Div>
-		<g:SimplePanel ui:field="header" />
 		<b:NavPills addStyleNames="margin-left-35 margin-right-10 margin-top-5">
 			<b:AnchorListItem text="ACT data access dashboard" href="#!ACTDataAccessSubmissionDashboard:default"/>
 		</b:NavPills>
@@ -99,6 +98,5 @@
 			<bh:Div ui:field="tableData" addStyleNames="margin-bottom-20" />
 		</bh:Div>
 		<bh:Div addStyleNames="clear" />
-		<g:SimplePanel ui:field="footer" />
 	</bh:Div>
 </ui:UiBinder> 

@@ -20,38 +20,25 @@ public class AccountViewImpl extends Composite implements AccountView {
 	public interface AccountViewImplUiBinder extends UiBinder<Widget, AccountViewImpl> {}
 
 	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
-	@UiField
 	FlowPanel mainContainer;
 	
 	private Presenter presenter;
 	private Header headerWidget;
-	private Footer footerWidget;
 	
 	@Inject
 	public AccountViewImpl(AccountViewImplUiBinder binder,
-			Header headerWidget, Footer footerWidget,
-			SageImageBundle imageBundle) {		
+			Header headerWidget) {		
 		initWidget(binder.createAndBindUi(this));
 		
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 	}
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
 		mainContainer.clear();
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

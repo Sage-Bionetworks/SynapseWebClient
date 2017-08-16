@@ -468,10 +468,12 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationListView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationListViewImpl;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterViewImpl;
+import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.footer.FooterView;
 import org.sagebionetworks.web.client.widget.footer.FooterViewImpl;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMapView;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMapViewImpl;
+import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.HeaderViewImpl;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetView;
@@ -751,8 +753,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ResourceLoader.class).to(ResourceLoaderImpl.class);
 		
 		// Header & Footer
+		bind(Header.class).in(Singleton.class);
 		bind(HeaderViewImpl.class).in(Singleton.class);
 		bind(HeaderView.class).to(HeaderViewImpl.class);
+		bind(Footer.class).in(Singleton.class);
 		bind(FooterViewImpl.class).in(Singleton.class);
 		bind(FooterView.class).to(FooterViewImpl.class);
 		

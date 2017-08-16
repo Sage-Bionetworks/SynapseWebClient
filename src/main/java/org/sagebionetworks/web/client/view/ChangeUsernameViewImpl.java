@@ -32,10 +32,6 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 	public interface ChangeUsernameViewImplUiBinder extends UiBinder<Widget, ChangeUsernameViewImpl> {}
 
 	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
-	@UiField
 	Button changeUsernameButton;
 	@UiField
 	TextBox username;
@@ -44,18 +40,13 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 	
 	private Presenter presenter;
 	private Header headerWidget;
-	private Footer footerWidget;
 	
 	@Inject
 	public ChangeUsernameViewImpl(ChangeUsernameViewImplUiBinder binder,
-			Header headerWidget, Footer footerWidget,
-			SageImageBundle imageBundle) {
+			Header headerWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		username.getElement().setAttribute("placeholder", "Username");
 		changeUsernameButton.setText(DisplayConstants.SAVE_BUTTON_LABEL);
 		username.addKeyDownHandler(new KeyDownHandler() {				
@@ -77,11 +68,7 @@ public class ChangeUsernameViewImpl extends Composite implements ChangeUsernameV
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

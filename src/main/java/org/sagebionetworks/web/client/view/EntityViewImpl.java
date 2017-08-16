@@ -17,10 +17,6 @@ public class EntityViewImpl implements EntityView {
 	public interface EntityViewImplUiBinder extends UiBinder<Widget, EntityViewImpl> {}
 
 	@UiField
-	SimplePanel headerPanel;
-	@UiField
-	SimplePanel footerPanel;
-	@UiField
 	SimplePanel entityPageTopPanel;
 	@UiField
 	SimplePanel openInvitesPanel;
@@ -39,18 +35,6 @@ public class EntityViewImpl implements EntityView {
 		Window.scrollTo(0, 0); // scroll user to top of page
 		// TODO : need to dynamically set the header widget
 		//headerWidget.setMenuItemActive(MenuItems.PROJECTS);
-	}
-
-	@Override
-	public void setHeaderWidget(IsWidget headerWidget) {
-		headerPanel.clear();
-		headerPanel.setWidget(headerWidget);
-	}
-	
-	@Override
-	public void setFooterWidget(IsWidget footerWidget) {
-		footerPanel.clear();
-		footerPanel.setWidget(footerWidget);
 	}
 
 	@Override

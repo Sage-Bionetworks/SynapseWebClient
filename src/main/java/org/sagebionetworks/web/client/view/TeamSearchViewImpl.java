@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.TeamSearch;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -23,11 +22,6 @@ import com.google.inject.Inject;
 
 public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	public interface TeamSearchViewImplUiBinder extends UiBinder<Widget, TeamSearchViewImpl> {}
-	
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
 	@UiField
 	FlowPanel mainContainer;
 	@UiField
@@ -40,22 +34,17 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	SimplePanel synAlertPanel;
 	
 	private Header headerWidget;
-	private Footer footerWidget;
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
 	
 	@Inject
 	public TeamSearchViewImpl(TeamSearchViewImplUiBinder binder,
 			Header headerWidget, 
-			Footer footerWidget, 
 			SynapseJSNIUtils synapseJsniUtils) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.synapseJsniUtils = synapseJsniUtils;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		configureSearchBox();
 	}
 	
@@ -68,11 +57,7 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

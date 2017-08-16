@@ -44,10 +44,6 @@ public class TrashViewImpl extends Composite implements TrashView {
 	public interface TrashViewImplUiBinder extends UiBinder<Widget, TrashViewImpl> {}
 	
 	private static final int HEADER_CHECKBOX_IDX = 0;
-	private static final int HEADER_NAME_IDX = 1;
-	private static final int HEADER_DELETED_ON_IDX = 2;
-	private static final int HEADER_RESTORE_IDX = 3;
-	
 	private static final String RESTORE_BUTTON_TEXT = "Restore";
 	
 	private static final String DELETE_SELECTED_CONFIRM_TITLE = "Delete selected items from your Trash?";
@@ -57,10 +53,6 @@ public class TrashViewImpl extends Composite implements TrashView {
 	
 	private static final int MAX_PAGES_IN_PAGINATION = 10;
 	
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
 	@UiField
 	Button deleteAllButton;
 	@UiField
@@ -82,7 +74,6 @@ public class TrashViewImpl extends Composite implements TrashView {
 	
 	private Presenter presenter;
 	private Header headerWidget;
-	private Footer footerWidget;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private Map<TrashedEntity, Integer> trash2Row;
 	private Set<TrashedEntity> selectedTrash;
@@ -94,12 +85,8 @@ public class TrashViewImpl extends Composite implements TrashView {
 			SynapseJSNIUtils synapseJsniUtils) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.synapseJsniUtils = synapseJsniUtils;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
-		
 		trash2Row = new HashMap<TrashedEntity, Integer>();
 		selectedTrash = new HashSet<TrashedEntity>();
 		checkBoxes = new HashSet<CheckBox>();
@@ -164,11 +151,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		clear();
 		Window.scrollTo(0, 0); // scroll user to top of page

@@ -3,18 +3,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view">
 
-	<ui:style>
-		.important {
-		font-weight: bold;
-		}
-
-		.rowTop {
-		vertical-align: top;
-		}
-	</ui:style>
-
 	<g:HTMLPanel>
-		<g:SimplePanel ui:field="header" />
 		<div class="container">
 			<ul class="breadcrumbs">
 				<li>
@@ -165,12 +154,6 @@
 					</div>
 				</div>
 			</div>
-
-			<!-- start footer -->
-			<div class="clear"></div>
 		</div> <!-- close class="container" -->
-		<g:SimplePanel ui:field="footer" />
-		<!-- end footer -->
-
 	</g:HTMLPanel>
 </ui:UiBinder> 

@@ -5,26 +5,18 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class SynapseStandaloneWikiViewImpl implements SynapseStandaloneWikiView {
 
 	public interface SynapseStandaloneWikiViewImplUiBinder extends UiBinder<Widget, SynapseStandaloneWikiViewImpl> {}
-	
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
-	
 	@UiField
 	Div markdownContainer;
 	
@@ -39,21 +31,17 @@ public class SynapseStandaloneWikiViewImpl implements SynapseStandaloneWikiView 
 	
 	private Presenter presenter;
 	private Header headerWidget;
-	private Footer footerWidget;
 	
 	private MarkdownWidget markdownWidget;
 	
 	@Inject
 	public SynapseStandaloneWikiViewImpl(SynapseStandaloneWikiViewImplUiBinder binder, MarkdownWidget markdownWidget,
-			Header headerWidget, Footer footerWidget) {		
+			Header headerWidget) {		
 		widget = binder.createAndBindUi(this);
 		
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.markdownWidget = markdownWidget;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		markdownContainer.add(markdownWidget.asWidget());
 	}
 
@@ -67,11 +55,7 @@ public class SynapseStandaloneWikiViewImpl implements SynapseStandaloneWikiView 
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

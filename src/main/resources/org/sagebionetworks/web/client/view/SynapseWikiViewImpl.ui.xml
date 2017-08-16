@@ -7,12 +7,10 @@
 	>
 	
 	<bh:Div>
-		<g:SimplePanel ui:field="header" />
 		<b:Row>
 			<b:Column size="XS_12">
 				<g:FlowPanel ui:field="mainContainer" addStyleNames="margin-10"/>
 			</b:Column>
 		</b:Row>
-		<g:SimplePanel ui:field="footer" />
 	</bh:Div>
 </ui:UiBinder> 

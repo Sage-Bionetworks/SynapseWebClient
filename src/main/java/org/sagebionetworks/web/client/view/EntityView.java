@@ -18,8 +18,6 @@ public interface EntityView extends IsWidget {
 	 * @param entity
 	 * @param entityMetadata 
 	 */
-	void setFooterWidget(IsWidget footerWidget);
-	void setHeaderWidget(IsWidget headerWidget);
 	void setEntityPageTopWidget(IsWidget entityPageTopWidget);
 	void setOpenTeamInvitesWidget(IsWidget openTeamInvitesWidgetWidget);
 	void setSynAlertWidget(IsWidget synAlert);
