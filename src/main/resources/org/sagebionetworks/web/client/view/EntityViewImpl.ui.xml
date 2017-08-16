@@ -8,12 +8,12 @@
 
 	<g:HTMLPanel>
 		<g:SimplePanel ui:field="synAlertContainer"/>
-		<g:HTMLPanel ui:field="loadingUI" addStyleNames="center-block center min-height-500 margin-top-100">
+		<g:HTMLPanel ui:field="loadingUI" addStyleNames="center-block center margin-top-100">
 			<g:Image resource='{sageImageBundle.loading31}' />
 			&nbsp;Loading...
 		</g:HTMLPanel>
 		
-		<g:SimplePanel ui:field="entityPageTopPanel"  addStyleNames="min-height-500"/>
+		<g:SimplePanel ui:field="entityPageTopPanel"/>
 		<b:Heading ui:field="accessDependentMessage"  size="H4" text="Access could be dependent upon membership in one of the following Teams"
 		     addStyleNames="margin-top-100 margin-left-15" visible="false"/>
    		<g:SimplePanel ui:field="openInvitesPanel" addStyleNames="margin-left-10 margin-bottom-10 margin-right-10" visible="false"/>	    

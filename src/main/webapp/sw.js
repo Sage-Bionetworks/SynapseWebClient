@@ -1,7 +1,9 @@
 // spin up service worker to install progressive web app, but it does nothing.
 this.addEventListener('fetch', function(event) {
   event.respondWith(
-    console.log('service worker responds with cached data.');
+    fetch(event.request).catch(function() {
+      return caches.match(event.request);
+    })
   );
 });
 console.log('service worker started');
