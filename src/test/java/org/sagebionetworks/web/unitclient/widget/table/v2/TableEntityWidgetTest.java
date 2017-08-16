@@ -548,9 +548,9 @@ public class TableEntityWidgetTest {
 	
 	@Test
 	public void testInitAdvancedQueryStateUI1(){
-		// simple query, but no facets
+		// simple query, no facets, but user can edit
 		configureBundleWithView(ViewType.file);
-		boolean canEdit = false;
+		boolean canEdit = true;
 		Query startQuery = new Query();
 		startQuery.setSql("select * from syn123");
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
@@ -615,6 +615,24 @@ public class TableEntityWidgetTest {
 		widget.onShowSimpleSearch();
 		verify(mockView, never()).showConfirmDialog(eq(TableEntityWidget.RESET_SEARCH_QUERY), eq(TableEntityWidget.RESET_SEARCH_QUERY_MESSAGE), any(Callback.class));
 		verifySimpleSearchUI();
+	}
+
+	@Test
+	public void testInitAdvancedQueryStateUI4(){
+		// simple query, no facets, and user can't edit
+		configureBundleWithView(ViewType.file);
+		boolean canEdit = false;
+		Query startQuery = new Query();
+		startQuery.setSql("select * from syn123");
+		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
+		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
+		
+		// verifyAdvancedSearchUI, but simple search link is not shown
+		verify(mockView).setAdvancedSearchLinkVisible(false);
+		verify(mockView).setSimpleSearchLinkVisible(false);
+		verify(mockQueryResultsWidget).setFacetsVisible(false);
+		verify(mockQueryInputWidget).setShowQueryVisible(false);
+		verify(mockQueryInputWidget).setQueryInputVisible(true);
 	}
 	
 	@Test
