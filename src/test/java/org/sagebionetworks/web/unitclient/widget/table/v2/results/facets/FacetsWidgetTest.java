@@ -64,6 +64,7 @@ public class FacetsWidgetTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		widget = new FacetsWidget(mockView, mockGinInjector);
+		verify(mockView).addStyleName(anyString());
 		facets = new ArrayList<FacetColumnResult>();
 		columnModels = new ArrayList<ColumnModel>();
 		facetValues = new ArrayList<FacetColumnResultValueCount>();

@@ -11,7 +11,7 @@
 				<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
 				&nbsp;Loading...
 			</g:HTMLPanel>
-			<b:Row addStyleNames="margin-left-15 margin-right-15 padding-top-15" ui:field="projectMetaContainer" visible="false">
+			<b:Row addStyleNames="margin-left-15 margin-right-15 padding-top-15 projectMetadata" ui:field="projectMetaContainer" visible="false">
 				<b:Column size="XS_12">
 					<bh:Div addStyleNames="margin-left-15 margin-right-15">
 						<g:SimplePanel ui:field="projectActionMenuContainer"/>

@@ -25,6 +25,7 @@ public class FacetsWidget implements IsWidget {
 	@Inject
 	public FacetsWidget(DivView view, PortalGinInjector ginInjector) {
 		this.view = view;
+		view.addStyleName("facetsWidget");
 		this.ginInjector = ginInjector;
 	}
 	

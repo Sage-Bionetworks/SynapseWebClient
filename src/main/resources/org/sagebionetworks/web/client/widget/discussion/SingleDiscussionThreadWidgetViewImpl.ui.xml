@@ -6,7 +6,7 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
-	<bh:Div addStyleNames="overflow-x-hidden">
+	<bh:Div addStyleNames="discussionThread overflow-x-hidden">
 		<bh:Div ui:field="refreshAlertContainer"></bh:Div>
 		<bh:Div addStyleNames="overflow-x-hidden">
 			<bh:Div ui:field="deletedThread" visible="false">

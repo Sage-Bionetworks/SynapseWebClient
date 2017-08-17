@@ -60,6 +60,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 		restrictionWidgetV2.setShowIfProject(true);
 		restrictionWidgetV2.setShowFlagLink(false);
 		this.accessControlListModalWidget = accessControlListModalWidget;
+		this.addStyleName("sharingAndDataUseConditions");
 		container = new FlowPanel();
 		container.addStyleName("margin-top-left-10");
 		this.add(container);

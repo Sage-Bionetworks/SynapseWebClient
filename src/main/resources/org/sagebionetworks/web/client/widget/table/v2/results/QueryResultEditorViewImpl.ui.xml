@@ -6,7 +6,7 @@
 	<bh:Div>
 		<b:Modal ui:field="editRowsModal" title="Edit Rows" closable="true"
 			dataBackdrop="STATIC" dataKeyboard="false" b:id="editRowsModal"
-			size="LARGE" addStyleNames="modal-fullscreen">
+			size="LARGE" addStyleNames="queryResultEditor modal-fullscreen">
 			<b:ModalBody>
 				<g:HTMLPanel>
 					<g:HTMLPanel ui:field="editorPanel">
