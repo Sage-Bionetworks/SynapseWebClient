@@ -67,7 +67,6 @@
 			head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css");
 			head.load("//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/default.min.css");
 			head.load("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css");
-			head.load("js/register-service-worker.js");
 	   	</script>
 	   	<!-- xss.min.js from https://github.com/leizongmin/js-xss -->
 		
@@ -108,15 +107,16 @@
 			<div id="alertWrapper">
 				<div id="alertContainer"></div>
 			</div>
-			<div id="headerPanel"></div>
-			<div id="rootPanel"></div>
-			<div id="footerPanel"></div>
 			<div id="initialLoadingUI" style="padding-top:180px">
 				<svg width='60px' height='60px' style="margin:auto; display:block;" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid" class="uil-spin"><rect x="0" y="0" width="100" height="100" fill="none" class="bk"></rect><g transform="translate(50 50)"><g transform="rotate(0) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#1e7098"><animate attributeName="opacity" from="1" to="0.1" begin="-1.13s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-1.13s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(45) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#1e7098"><animate attributeName="opacity" from="1" to="0.1" begin="-0.97s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0.97s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(90) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#1e7098"><animate attributeName="opacity" from="1" to="0.1" begin="-0.81s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0.81s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(135) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#1e7098"><animate attributeName="opacity" from="1" to="0.1" begin="-0.65s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0.65s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(180) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#1e7098"><animate attributeName="opacity" from="1" to="0.1" begin="-0.48s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0.48s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(225) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#1e7098"><animate attributeName="opacity" from="1" to="0.1" begin="-0.32s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0.32s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(270) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#1e7098"><animate attributeName="opacity" from="1" to="0.1" begin="-0.16s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0.16s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g><g transform="rotate(315) translate(34 0)"><circle cx="0" cy="0" r=5 fill="#1e7098"><animate attributeName="opacity" from="1" to="0.1" begin="-0s" dur="1.3s" repeatCount="indefinite"></animate><animateTransform attributeName="transform" type="scale" from="2" to="1" begin="-0s" dur="1.3s" repeatCount="indefinite"></animateTransform></circle></g></g></svg>
 				<center>
 					<h4 style="color:#1e7098; margin-top:10px; font-family:Sans-serif">Loading...</h4>
 				</center>
 			</div>
+			<div id="headerPanel"></div>
+			<div id="rootPanel"></div>
+			<div id="footerPanel"></div>
+			
 		</div>
 		<div class="clear"></div>
 	</body>
