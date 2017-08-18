@@ -17,7 +17,6 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -29,7 +28,6 @@ import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FitImage;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
@@ -488,7 +486,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setProfileSynAlertWidget(Widget profileSynAlert) {
-		profileSynAlertPanel.setWidget(profileSynAlert);
+		profileSynAlertPanel.clear();
+		profileSynAlertPanel.add(profileSynAlert);
 	}
 	
 	@Override
@@ -505,7 +504,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setTeamSynAlertWidget(Widget teamSynAlert) {
-		teamSynAlertPanel.setWidget(teamSynAlert);
+		teamSynAlertPanel.clear();
+		teamSynAlertPanel.add(teamSynAlert);
 	}
 	
 	public void clearSortOptions() {
@@ -564,6 +564,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void setProfile(UserProfile profile, boolean isOwner) {
 		viewProfilePanel.setVisible(true);
 		fillInProfileView(profile);
+		picturePanel.clear();
 		picturePanel.add(getProfilePicture(profile, synapseJSNIUtils));
 		if (!isOwner) {
 			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
