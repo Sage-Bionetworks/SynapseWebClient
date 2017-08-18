@@ -9,12 +9,12 @@
 				<bh:Div ui:field="facetsWidgetPanel"/>
 				<bh:ClearFix />
 				<bh:Div>
-					<b:Button addStyleNames="margin-top-20" text="Clear all" size="EXTRA_SMALL" type="DANGER" ui:field="clearFacetsButton" icon="FILTER"/>
+					<b:Button addStyleNames="clearFacetsButton margin-top-20" text="Clear all" size="EXTRA_SMALL" type="DANGER" ui:field="clearFacetsButton" icon="FILTER"/>
 				</bh:Div>
 			</bh:Div>
 		</g:ScrollPanel>
 		
-		<bh:Div ui:field="tablePanel">
+		<bh:Div ui:field="tablePanel" addStyleNames="tablePage">
 			<g:ScrollPanel>
 				<bh:Div>
 					<t:Table styleName="table table-striped table-condensed">

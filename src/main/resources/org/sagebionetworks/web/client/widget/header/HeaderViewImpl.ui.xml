@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
 	
-	<b:Container fluid="true">
+	<b:Container addStyleNames="header" fluid="true">
 		<b:Row ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg">
 			<b:Column size="XS_12">
 		        <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 displayInline">

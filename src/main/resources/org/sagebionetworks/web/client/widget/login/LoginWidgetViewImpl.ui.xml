@@ -3,7 +3,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:d="urn:import:com.google.gwt.dom.client"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 
-	<g:HTMLPanel>
+	<g:HTMLPanel addStyleNames="loginWidget">
 		<div>
 			<g:SimplePanel ui:field="googleSSOContainer">
 				<b:Button icon="GOOGLE" ui:field="googleSignInButton" iconSize="LARGE" size="LARGE" iconFixedWidth="true">Sign

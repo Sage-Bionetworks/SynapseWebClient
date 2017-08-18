@@ -13,7 +13,7 @@
 	<g:HTMLPanel>
 		<div class="separator margin-top-10-imp"></div>
 		<g:HTMLPanel>
-			<b:Alert type="INFO" ui:field="getCertifiedAlert" dismissable="true">
+			<b:Alert addStyleNames="getCertifiedAlert" type="INFO" ui:field="getCertifiedAlert" dismissable="true">
 				<g:FocusPanel ui:field="alertFocusPanel" addStyleNames="imageButton">
 					<t:Table>
 						<t:TableRow>
@@ -33,7 +33,7 @@
 			
 			<div class="container-fluid margin-10">
 				<div class="row margin-top-5">
-				    <div ui:field="profileUI" class="col-md-5 col-xs-12">
+				    <div ui:field="profileUI" class="profileUI col-md-5 col-xs-12">
 				        <div class="padding-15 light-border">
 				        	<b:Container fluid="true">
 				        	    <b:Row ui:field="profilePictureLoadingUI" visible="false">
@@ -125,7 +125,7 @@
 				        </div>
 				        <b:Button ui:field="hideProfileButton" size="EXTRA_SMALL" pull="RIGHT" icon="CHEVRON_LEFT" text="Hide Profile" addStyleNames="margin-top-5" visible="false" />
 				    </div>
-				    <div ui:field="dashboardUI" class="col-md-7 col-xs-12">
+				    <div ui:field="dashboardUI" class="dashboardUI col-md-7 col-xs-12">
 				    	<b:Button ui:field="showProfileButton" size="EXTRA_SMALL" icon="CHEVRON_RIGHT" text="Show Profile" visible="false"/>
 				    	<div class="container-fluid">
 					    	<div class="row" ui:field="navtabContainer">
@@ -168,14 +168,14 @@
 								<div class="tab-background padding-10" ui:field="projectsTabContainer">
 									<div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
 									    <div class="col-xs-12 col-sm-8">
-								    		<b:InputGroup>
+								    		<b:InputGroup addStyleNames="projectSearch">
 												<g:TextBox ui:field="projectSearchTextBox" width="100%" height="34px" />
 												<b:InputGroupButton>
 													<b:Button ui:field="projectSearchButton" text="Search All Projects" icon="SEARCH"/>
 												</b:InputGroupButton>
 											</b:InputGroup>
 										</div>
-										<div class="col-xs-12 col-sm-4">
+										<div class="col-xs-12 col-sm-4 createProject">
 										    <b:Button ui:field="createProjectButton" type="DEFAULT" icon="PLUS" pull="RIGHT" text="Create a New Project" />
 										</div>
 										<b:Column size="XS_12">
@@ -237,14 +237,14 @@
 							    <div class="tab-background padding-10 container-fluid" ui:field="teamsTabContainer">
 							    	<div ui:field="createTeamUI" class="margin-bottom-10 margin-top-10 row">
 									    <div class="col-xs-12 col-sm-8">
-								    		<b:InputGroup>
+								    		<b:InputGroup addStyleNames="teamSearch">
 												<g:TextBox ui:field="teamSearchTextBox" width="100%" height="34px" />
 												<b:InputGroupButton>
 													<b:Button ui:field="teamSearchButton" text="Search All Teams" icon="SEARCH"/>
 												</b:InputGroupButton>
 											</b:InputGroup>
 										</div>
-										 <div class="col-xs-12 col-sm-4">
+										 <div class="col-xs-12 col-sm-4 createTeam">
 										    <b:Button ui:field="createTeamButton" type="DEFAULT" icon="PLUS" pull="RIGHT" text="Create a New Team" />
 										</div>
 										<b:Column size="XS_12">
