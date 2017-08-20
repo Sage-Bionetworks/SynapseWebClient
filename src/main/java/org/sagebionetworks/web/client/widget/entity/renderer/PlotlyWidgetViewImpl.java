@@ -89,7 +89,10 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		  barmode: barMode
 		};
 		
-		$wnd.Plotly.plot(el, xyData, layout);
+		// note: we'd like to just hide the "save and edit plot in cloud" command, 
+		// but the parameter provided in the docs (showLink: false) has no effect.
+		// hide the entire bar by setting displayModeBar to false.
+		$wnd.Plotly.plot(el, xyData, layout, {displayModeBar: false});
 	}-*/;
 
 	@Override
