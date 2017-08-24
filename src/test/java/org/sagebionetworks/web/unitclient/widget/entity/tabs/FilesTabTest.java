@@ -345,6 +345,7 @@ public class FilesTabTest {
 
 		verify(mockDiscussionThreadListWidget).configure(fileEntityId, null, null);
 		verify(mockView).setDiscussionThreadListWidgetVisible(true);
+		verify(mockEntityActionController).setIsShowingVersion(true);
 	}
 	
 
@@ -408,6 +409,7 @@ public class FilesTabTest {
 		assertNull(place.getAreaToken());
 
 		verify(mockView, atLeastOnce()).setDiscussionThreadListWidgetVisible(false);
+		verify(mockEntityActionController).setIsShowingVersion(false);
 	}
 
 	@Test

@@ -404,6 +404,7 @@ public class FilesTab {
 			}
 		});
 		controller.configure(actionMenu, bundle, isMostRecentVersion, bundle.getRootWikiId(), handler);
+		controller.setIsShowingVersion(shownVersionNumber != null);
 	}
 	
 	/**
