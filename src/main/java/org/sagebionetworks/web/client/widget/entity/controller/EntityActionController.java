@@ -44,4 +44,5 @@ public interface EntityActionController extends IsWidget {
 
 	void onProjectDisplay();
 
+	void setIsShowingVersion(boolean isShowingVersion);
 }
