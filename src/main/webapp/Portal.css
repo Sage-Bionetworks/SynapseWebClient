@@ -1008,11 +1008,6 @@ a.shortBtn {
 	border-color: #3a5bdc !important;
 }
 
-.markdownEditor {
-    font-family: Lucida Console, monospace !important;
-    font-size: 13px;
-}
-
 .markdown {
 	word-wrap: break-word;
 	overflow-x: auto;
