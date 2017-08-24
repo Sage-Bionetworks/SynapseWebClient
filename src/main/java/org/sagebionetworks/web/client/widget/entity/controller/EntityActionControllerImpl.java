@@ -125,6 +125,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	UserProfileClientAsync userProfileClient;
 	PortalGinInjector ginInjector;
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
+	boolean isShowingVersion = false;
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -912,7 +913,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		Reference ref = new Reference();
 		ref.setTargetId(entityBundle.getEntity().getId());
 		Long targetVersionNumber = null;
-		if (!isCurrentVersion && entityBundle.getEntity() instanceof Versionable) {
+		if (isShowingVersion && entityBundle.getEntity() instanceof Versionable) {
 			targetVersionNumber = ((Versionable)entityBundle.getEntity()).getVersionNumber();
 		}
 		ref.setTargetVersionNumber(targetVersionNumber);
@@ -1280,5 +1281,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+
+	@Override
+	public void setIsShowingVersion(boolean isShowingVersion) {
+		this.isShowingVersion = isShowingVersion;
 	}
 }
