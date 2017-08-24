@@ -7,7 +7,6 @@
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	
 	<bh:Div>
-		<g:SimplePanel ui:field="header" />
 		<b:Container>
 			<b:Container fluid="true">
 				<b:Row>
@@ -31,7 +30,6 @@
 				</b:Row>
 			</b:Container>
 		</b:Container>
-		<g:SimplePanel ui:field="footer" />
 	</bh:Div>
 
 </ui:UiBinder> 

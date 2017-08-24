@@ -24,13 +24,6 @@ public interface TableQueryResultView extends IsWidget {
 	void setPresenter(Presenter presenter);
 
 	/**
-	 * Show or hide the table.
-	 * 
-	 * @param b
-	 */
-	void setTableVisible(boolean visible);
-
-	/**
 	 * Bind the page widget to this view.
 	 * 
 	 * @param pageWidget

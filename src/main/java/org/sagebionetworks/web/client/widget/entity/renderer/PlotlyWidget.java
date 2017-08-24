@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -266,6 +267,9 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	public static PlotlyTrace[] transform(String xAxisColumnName, String fillColumnName, GraphType graphType, Map<String, List<String>> graphData) {
 		String[] xData = ArrayUtils.getStringArray(graphData.remove(xAxisColumnName));
 		String[] fillColumnData = ArrayUtils.getStringArray(graphData.remove(fillColumnName));
+		if (xAxisColumnName.equals(fillColumnName)) {
+			fillColumnData = xData;
+		}
 		
 		Set<String> uniqueFillColumnDataValues = new HashSet<>();
 		//get the unique values of the fill column

@@ -32,9 +32,7 @@ public class RegisterAccountPresenterTest {
 	RegisterWidget mockRegisterWidget;
 	@Mock
 	Header mockHeader;
-	@Mock
-	Footer mockFooter;
-	
+
 	@Mock
 	EventBus mockEventBus;
 	@Mock
@@ -43,7 +41,7 @@ public class RegisterAccountPresenterTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockRegisterWidget, mockHeader, mockFooter );			
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockRegisterWidget, mockHeader);			
 	}
 	
 	@Test
@@ -63,7 +61,5 @@ public class RegisterAccountPresenterTest {
 		verify(mockView).setRegisterWidget(any(Widget.class));
 		verify(mockHeader).configure(false);
 		verify(mockHeader).refresh();
-		verify(mockView).setFooterWidget(any(Widget.class));
-		verify(mockView).setHeaderWidget(any(Widget.class));
 	}
 }

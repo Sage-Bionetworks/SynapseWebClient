@@ -2,9 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
-import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -14,11 +12,9 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -35,11 +31,6 @@ import com.google.inject.Inject;
 public class TeamViewImpl extends Composite implements TeamView {
 
 	public interface TeamViewImplUiBinder extends UiBinder<Widget, TeamViewImpl> {}
-
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
 	@UiField
 	HTMLPanel mainContainer;
 	@UiField
@@ -90,7 +81,6 @@ public class TeamViewImpl extends Composite implements TeamView {
 	private Presenter presenter;
 	private SageImageBundle sageImageBundle;
 	private Header headerWidget;
-	private Footer footerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private GWTWrapper gwt;
 	@Inject
@@ -98,19 +88,15 @@ public class TeamViewImpl extends Composite implements TeamView {
 			SageImageBundle sageImageBundle,
 			InviteWidget inviteWidget, 
 			Header headerWidget, 
-			Footer footerWidget, 
 			SynapseJSNIUtils synapseJSNIUtils,
 			GWTWrapper gwt) {
 		initWidget(binder.createAndBindUi(this));
 		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.gwt = gwt;
 		setDropdownHandlers();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		showMapLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -219,11 +205,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

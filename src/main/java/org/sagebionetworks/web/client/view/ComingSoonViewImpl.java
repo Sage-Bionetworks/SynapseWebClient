@@ -26,10 +26,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	public interface ComingSoonViewImplUiBinder extends UiBinder<Widget, ComingSoonViewImpl> {}
 
 	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
-	@UiField
 	Div widgetContainer;
 	@UiField
 	Div chart;
@@ -37,7 +33,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	private Presenter presenter;
 	
 	private Header headerWidget;
-	private Footer footerWidget;
 	ProvenanceWidget provenanceWidget;
 	SynapseJSNIUtils synapseJSNIUtils;
 	JiraURLHelper jiraErrorHelper;
@@ -54,14 +49,11 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 			GoogleMap map) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseClient = synapseClient;
 		this.jiraErrorHelper = jiraErrorHelper;
 		this.authenticationController = authenticationController;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		widgetContainer.add(map.asWidget());
 //		map.configure();
 	}
@@ -72,11 +64,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		//provenanceWidget.setHeight(400);
 //		((LayoutContainer)provenanceWidget.asWidget()).setAutoHeight(true);
 		
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

@@ -132,7 +132,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		progressContainer.add(progressBar);
 		uploadSpeedLabel.addStyleName("margin-left-5");
 		progressContainer.add(uploadSpeedLabel);
-		
+		this.addStyleName("uploader");
 		this.formPanel = new FormPanel();
 		this.externalLinkFormPanel = new Form();
 		

@@ -47,8 +47,6 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.Forum;
-import org.sagebionetworks.repo.model.entity.Direction;
-import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -491,8 +489,6 @@ public class CrawlFilter implements Filter {
 		types.add(EntityType.file);
 		types.add(EntityType.folder);
 		newQuery.setIncludeTypes(types);
-		newQuery.setSortBy(SortBy.CREATED_ON);
-		newQuery.setSortDirection(Direction.DESC);
 		return newQuery;
 	}
 	

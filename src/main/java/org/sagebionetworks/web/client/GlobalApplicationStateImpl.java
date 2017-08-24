@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -225,7 +226,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void checkVersionCompatibility(final AsyncCallback<VersionState> callback) {
 		//have we checked recently?
 		String cachedVersion = localStorage.get(RECENTLY_CHECKED_SYNAPSE_VERSION);
-		if (cachedVersion != null) {
+		if (synapseVersion != null && cachedVersion != null) {
 			if (callback != null) {
 				callback.onSuccess(new VersionState(synapseVersion, false));
 			}
@@ -237,6 +238,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String versions) {
+				if (synapseVersion == null) {
+					synapseVersion = versions;
+				}
 				boolean isVersionChange = false;
 				//synapse version is set on app load
 				if(!synapseVersion.equals(versions)) {

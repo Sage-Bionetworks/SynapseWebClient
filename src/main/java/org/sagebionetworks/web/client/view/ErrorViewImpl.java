@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Lead;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -14,11 +13,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ErrorViewImpl implements ErrorView {
-	
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
 	@UiField
 	SimplePanel synAlertContainer;
 	@UiField
@@ -28,34 +22,25 @@ public class ErrorViewImpl implements ErrorView {
 
 	private Presenter presenter;
 	private Header headerWidget;
-	private Footer footerWidget;
 	
 	public interface Binder extends UiBinder<Widget, ErrorViewImpl> {}
 	public Widget widget;
 	
 	@Inject
 	public ErrorViewImpl(Binder uiBinder,
-			Header headerWidget, Footer footerWidget) {
+			Header headerWidget) {
 		widget = uiBinder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 	}
 
 	@Override
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}
-	
 	
 	@Override
 	public void showErrorMessage(String message) {

@@ -18,7 +18,6 @@ import org.gwtbootstrap3.extras.datetimepicker.client.ui.DateTimePicker;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateEvent;
 import org.gwtbootstrap3.extras.datetimepicker.client.ui.base.events.ChangeDateHandler;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -27,19 +26,12 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmissionsView {
 
 	public interface ACTViewImplUiBinder extends UiBinder<Widget, ACTDataAccessSubmissionsViewImpl> {}
-
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
-	
 	@UiField
 	DropDownMenu stateDropdownMenu;
 	@UiField
@@ -92,20 +84,15 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	
 	private Presenter presenter;
 	private Header headerWidget;
-	private Footer footerWidget;
 	
 	Widget widget;
 	@Inject
 	public ACTDataAccessSubmissionsViewImpl(ACTViewImplUiBinder binder,
-			Header headerWidget, 
-			Footer footerWidget
+			Header headerWidget
 			) {
 		widget = binder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		clearStateFilter.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -141,11 +128,7 @@ public class ACTDataAccessSubmissionsViewImpl implements ACTDataAccessSubmission
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

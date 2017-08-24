@@ -1,20 +1,25 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -42,16 +47,12 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
@@ -69,7 +70,6 @@ public class EntityPresenterTest {
 	OpenTeamInvitationsWidget mockOpenInviteWidget;
 	Header mockHeaderWidget;
 	EntityPageTop mockEntityPageTop;
-	Footer mockFooterWidget;
 	String EntityId = "1";
 	Synapse place = new Synapse("Synapse:"+ EntityId);
 	Entity EntityModel1;
@@ -98,9 +98,8 @@ public class EntityPresenterTest {
 		mockOpenInviteWidget = mock(OpenTeamInvitationsWidget.class);
 		mockHeaderWidget = mock(Header.class);
 		mockEntityPageTop = mock(EntityPageTop.class);
-		mockFooterWidget = mock(Footer.class);
 		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient,
-				mockCookies, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockFooterWidget, mockOpenInviteWidget, gwtWrapper);
+				mockCookies, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockOpenInviteWidget, gwtWrapper);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);
@@ -138,8 +137,6 @@ public class EntityPresenterTest {
 		verify(mockEntityPageTop, atLeastOnce()).clearState();
 		verify(mockEntityPageTop).configure(eq(eb.getEntity()), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
-		verify(mockView).setFooterWidget(mockFooterWidget);
-		verify(mockView).setHeaderWidget(mockHeaderWidget);
 		verify(mockView).setOpenTeamInvitesWidget(mockOpenInviteWidget);
 		verify(mockHeaderWidget).refresh();
 		verify(mockHeaderWidget).configure(eq(false), any(EntityHeader.class));

@@ -17,7 +17,6 @@
 		type='org.sagebionetworks.web.client.IconsImageBundle' />
 
 	<g:HTMLPanel>
-		<g:SimplePanel ui:field="header" />
 		<div class="row margin-top-left-10 margin-right-15 margin-bottom-20">
 	        <div class="row">
 		    	<g:FlowPanel ui:field="mainContainer" styleName="col-md-12 margin-left-10"/>
@@ -25,8 +24,6 @@
 	    	
 		    <div class="clear"></div>
         </div>
-		
-		<g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>
 
 </ui:UiBinder> 

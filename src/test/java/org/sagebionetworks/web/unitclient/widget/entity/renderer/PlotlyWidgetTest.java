@@ -262,7 +262,6 @@ public class PlotlyWidgetTest {
 		verify(mockView).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
 	}	
 
-
 	@Test
 	public void testTransformWithFill() {
 		/**
@@ -292,5 +291,23 @@ public class PlotlyWidgetTest {
 		assertEquals(2, a.getX().length);
 		assertEquals("40", a.getY()[0]);
 		assertEquals("60", a.getY()[1]);
+	}
+	
+	@Test
+	public void testTransformWithXColumnFill() {
+		String xAxisColumnName = "x";
+		String y1ColumnName = "y1";
+		
+		String fillColumnName = xAxisColumnName;
+		GraphType graphType = GraphType.BAR;
+		Map<String, List<String>> graphData = new HashMap<>();
+		graphData.put(xAxisColumnName, Arrays.asList("1", "1", "2"));
+		graphData.put(y1ColumnName, Arrays.asList("40", "50", "60"));
+		PlotlyTrace[] traces = PlotlyWidget.transform(xAxisColumnName, fillColumnName, graphType, graphData);
+		assertEquals(2, traces.length);
+		PlotlyTrace a = traces[0].getName().equals("1") ? traces[0] : traces[1];
+		assertEquals(2, a.getX().length);
+		assertEquals("40", a.getY()[0]);
+		assertEquals("50", a.getY()[1]);
 	}
 }

@@ -386,6 +386,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
 			}
 			else if (lowercaseFilename.endsWith(".txt")) {
 				contentType = ContentTypeUtils.PLAIN_TEXT;
+			} else {
+				// fall back to the least specific official MIME type...
+				contentType = ContentTypeUtils.APPLICATION_OCTET_STREAM;
 			}
 		}
 		return contentType;

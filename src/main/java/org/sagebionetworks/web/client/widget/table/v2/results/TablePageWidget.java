@@ -154,6 +154,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		
 		if (isFacetsSupported) {
 			facetsWidget.configure(facets, facetChangedHandler, types);
+			view.setFacetsVisible(facetsWidget.isShowingFacets());
 		}
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(rowCount);
@@ -324,5 +325,8 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		if (resetFacetsHandler != null) {
 			resetFacetsHandler.invoke();
 		}
+	}
+	public void setTableVisible(boolean visible) {
+		view.setTableVisible(visible);
 	}
 }

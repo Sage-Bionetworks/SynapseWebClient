@@ -4,8 +4,7 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	<g:HTMLPanel>
-	    <g:SimplePanel ui:field="header" />
-		<div class="col-md-12 margin-top-15 margin-bottom-40"><h3>Search People</h3></div>
+	   <div class="col-md-12 margin-top-15 margin-bottom-40"><h3>Search People</h3></div>
 		<b:Container addStyleNames="margin-top-15">
 		    <b:Row>
 				<b:InputGroup>
@@ -26,6 +25,5 @@
 			</b:Row>
         </b:Container>
         <g:SimplePanel ui:field="searchBoxPanel"></g:SimplePanel>
-        <g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>
 </ui:UiBinder> 

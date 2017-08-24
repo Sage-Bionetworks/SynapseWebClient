@@ -6,9 +6,7 @@ import org.gwtbootstrap3.client.ui.Panel;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.dom.client.SpanElement;
@@ -22,12 +20,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class CertificateViewImpl extends Composite implements CertificateView {
-	
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
-	
 	@UiField
 	SimplePanel errorContainer;	
 	@UiField
@@ -45,21 +37,16 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 	private Presenter presenter;
 	private CertificateWidget certificateWidget;
 	private Header headerWidget;
-	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, CertificateViewImpl> {}
 	
 	@Inject
 	public CertificateViewImpl(Binder uiBinder,
-			Header headerWidget, 
-			Footer footerWidget,
+			Header headerWidget,
 			CertificateWidget certificateWidget) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.certificateWidget = certificateWidget;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		certificateContainer.setWidget(certificateWidget.asWidget());
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -72,11 +59,7 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 	@Override
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		DisplayUtils.scrollToTop();
 	}
 	

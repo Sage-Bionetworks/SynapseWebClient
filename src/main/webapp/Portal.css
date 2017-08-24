@@ -24,6 +24,21 @@ a:focus{color:#1e7098; text-decoration:underline;}
 	color: #1e7098;
 }
 
+/**
+sticky footer
+**/
+#rootPanel {
+  /** set the min height of the root panel to subtract the height of the header and footer **/
+  min-height: calc(100vh - 250px);
+}
+#footerPanel {
+  height: 150px;
+}
+/**
+end sticky footer
+**/
+
+
 .pagination>.active>a,.pagination>.active>span,.pagination>.active>a:hover,.pagination>.active>span:hover,.pagination>.active>a:focus,.pagination>.active>span:focus
 {
 	background-color: #1e7098;
@@ -676,9 +691,6 @@ a.shortBtn {
 	height:	50px;
 }
 
-.min-height-500 {
-	min-height: 500px;
-}
 .min-height-400 {
 	min-height: 400px;
 }
@@ -994,11 +1006,6 @@ a.shortBtn {
 
 .dropable {
 	border-color: #3a5bdc !important;
-}
-
-.markdownEditor {
-    font-family: Lucida Console, monospace !important;
-    font-size: 13px;
 }
 
 .markdown {

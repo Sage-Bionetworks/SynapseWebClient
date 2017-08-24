@@ -7,11 +7,9 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	
-	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
-	
-	<g:HTMLPanel>
-
+	<g:HTMLPanel addStyleNames="footer">
 		<!-- FOOTER -->	
+		<bh:ClearFix />
 		<b:Container fluid="true">
 	        <b:Row addStyleNames="synapse-blue-bg margin-top-30 padding-15">
 	       		<b:Column size="SM_12" addStyleNames="margin-bottom-10">

@@ -1170,6 +1170,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseClient).createEntity(argument.capture(), any(AsyncCallback.class));
 		boolean isCurrentVersion = false;
 		controller.configure(mockActionMenu, entityBundle, isCurrentVersion, wikiPageId, mockEntityUpdatedHandler);
+		controller.setIsShowingVersion(true);
 		String target = "syn9876";
 		controller.createLink(target);
 		verify(mockView, never()).showErrorMessage(anyString());
@@ -1195,8 +1196,8 @@ public class EntityActionControllerImplTest {
 		((Versionable)entity).setVersionNumber(entityVersion);
 		ArgumentCaptor<Entity> argument = ArgumentCaptor.forClass(Entity.class);
 		AsyncMockStubber.callSuccessWith(new Link()).when(mockSynapseClient).createEntity(argument.capture(), any(AsyncCallback.class));
-		boolean isCurrentVersion = true;
-		controller.configure(mockActionMenu, entityBundle, isCurrentVersion, wikiPageId, mockEntityUpdatedHandler);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, mockEntityUpdatedHandler);
+		controller.setIsShowingVersion(false);
 		String target = "syn9876";
 		controller.createLink(target);
 		Entity capture = argument.getValue();

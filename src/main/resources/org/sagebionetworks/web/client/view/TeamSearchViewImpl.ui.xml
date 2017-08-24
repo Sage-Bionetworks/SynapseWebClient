@@ -4,7 +4,6 @@
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
 	<g:HTMLPanel>
-	    <g:SimplePanel ui:field="header" />
 		<div class="col-md-12 margin-top-15 margin-bottom-40"><h3>Search Teams</h3></div>
 		<b:Container addStyleNames="margin-top-15">
 		    <b:Row>
@@ -22,10 +21,6 @@
 	       	<b:Row>
 				<g:SimplePanel ui:field="paginationPanel"/>
 			</b:Row>
-			<b:Row>
-				<b:Container addStyleNames="clear"></b:Container>
-			</b:Row>
         </b:Container>
-        <g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>
 </ui:UiBinder> 

@@ -35,11 +35,6 @@ import com.google.inject.Inject;
 public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 
 	public interface ACTViewImplUiBinder extends UiBinder<Widget, ACTAccessApprovalsViewImpl> {}
-
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
 	@UiField
 	DateTimePicker expiresBeforeDatePicker;
 	@UiField
@@ -65,20 +60,15 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	
 	private Presenter presenter;
 	private Header headerWidget;
-	private Footer footerWidget;
 	
 	Widget widget;
 	@Inject
 	public ACTAccessApprovalsViewImpl(ACTViewImplUiBinder binder,
-			Header headerWidget, 
-			Footer footerWidget
+			Header headerWidget
 			) {
 		widget = binder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		
 		clearDateFilter.addClickHandler(new ClickHandler() {
 			@Override
@@ -110,11 +100,7 @@ public class ACTAccessApprovalsViewImpl implements ACTAccessApprovalsView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

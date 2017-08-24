@@ -3,7 +3,7 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
-	<bh:Div addStyleNames="displayInlineTable">
+	<bh:Div addStyleNames="searchBox displayInlineTable">
 		<b:InputGroup>
 			<g:TextBox ui:field="searchField" height="28px" />
 			<b:InputGroupButton>

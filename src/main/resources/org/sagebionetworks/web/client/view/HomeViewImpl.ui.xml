@@ -10,9 +10,6 @@
  	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
  	
 	<g:HTMLPanel>
-		<!-- HEADER -->
-		<g:SimplePanel ui:field="header"/>
-		
 		<b:Container fluid="true">
 			<b:Row>
 				<b:Column size="SM_4" addStyleNames="margin-top-40 ">
@@ -414,7 +411,5 @@
 				</b:Column>				
 			</b:Row>
 		</b:Container>
-		
-		<g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>
 </ui:UiBinder> 

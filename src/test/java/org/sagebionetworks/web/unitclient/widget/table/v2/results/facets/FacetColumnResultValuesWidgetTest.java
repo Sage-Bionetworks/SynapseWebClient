@@ -162,6 +162,21 @@ public class FacetColumnResultValuesWidgetTest {
 	}
 	
 	@Test
+	public void testSelectedFacetInOverflow() {
+		int numberOfFacets = FacetColumnResultValuesWidget.MAX_VISIBLE_FACET_VALUES + 20;
+		for (int i = 0; i < numberOfFacets; i++) {
+			FacetColumnResultValueCount valuesCount = Mockito.mock(FacetColumnResultValueCount.class);
+			//the FacetColumnResultValuesWidget.MAX_VISIBLE_FACET_VALUES facet is selected (boundary case)
+			when(valuesCount.getIsSelected()).thenReturn(i==FacetColumnResultValuesWidget.MAX_VISIBLE_FACET_VALUES);
+			facetValues.add(valuesCount);
+		}
+		widget.configure(mockFacet, ColumnType.INTEGER, mockOnFacetRequest);
+		verify(mockView).setColumnName(COLUMN_NAME);
+		verify(mockView, times(numberOfFacets)).addValue(anyBoolean(), any(Widget.class), anyLong(), anyString());
+		verify(mockView).setShowAllButtonVisible(false);
+	}
+	
+	@Test
 	public void testOnFacetAdd() {
 		facetValues.add(valueCount);
 		widget.configure(mockFacet, ColumnType.INTEGER, mockOnFacetRequest);

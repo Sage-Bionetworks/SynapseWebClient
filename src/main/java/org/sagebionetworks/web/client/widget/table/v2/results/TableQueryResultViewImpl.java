@@ -41,12 +41,7 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	public void setPresenter(Presenter presenterin) {
 		this.presenter = presenterin;
 	}
-
-	@Override
-	public void setTableVisible(boolean visible) {
-		tablePanel.setVisible(visible);
-	}
-
+	
 	@Override
 	public void setPageWidget(TablePageWidget pageWidget) {
 		tablePanel.add(pageWidget);
@@ -69,7 +64,8 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 
 	@Override
 	public void setProgressWidget(JobTrackingWidget progressWidget) {
-		this.progressPanel.add(progressWidget);
+		progressPanel.clear();
+		progressPanel.add(progressWidget);
 	}
 
 	@Override
