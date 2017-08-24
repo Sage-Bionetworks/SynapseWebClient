@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.*;
+import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -309,29 +310,34 @@ public class MultipartUploaderTest {
 		
 		//if the content type coming from the browser field is set, 
 		//then this method should never override it
-		assertEquals(inputContentType, uploader.fixDefaultContentType(inputContentType, inputFilename));
+		assertEquals(inputContentType, fixDefaultContentType(inputContentType, inputFilename));
 		
 		//but if the field reports a null or empty content type, then this method should fix it
 		inputContentType = "";
-		assertEquals(ContentTypeUtils.PLAIN_TEXT, uploader.fixDefaultContentType(inputContentType, inputFilename));
+		assertEquals(ContentTypeUtils.PLAIN_TEXT, fixDefaultContentType(inputContentType, inputFilename));
 		
 		inputContentType = null;
-		assertEquals(ContentTypeUtils.PLAIN_TEXT, uploader.fixDefaultContentType(inputContentType, inputFilename));
+		assertEquals(ContentTypeUtils.PLAIN_TEXT, fixDefaultContentType(inputContentType, inputFilename));
 		
 		//should fix tab delimited files too
 		inputFilename = "file.tab";
-		assertEquals(WebConstants.TEXT_TAB_SEPARATED_VALUES, uploader.fixDefaultContentType(inputContentType, inputFilename));
+		assertEquals(WebConstants.TEXT_TAB_SEPARATED_VALUES, fixDefaultContentType(inputContentType, inputFilename));
 		
 		inputFilename = "file.tsv";
-		assertEquals(WebConstants.TEXT_TAB_SEPARATED_VALUES, uploader.fixDefaultContentType(inputContentType, inputFilename));
+		assertEquals(WebConstants.TEXT_TAB_SEPARATED_VALUES, fixDefaultContentType(inputContentType, inputFilename));
 		
 		// should fix CSV files as well
 		inputFilename = "file.CSV";
-		assertEquals(WebConstants.TEXT_COMMA_SEPARATED_VALUES, uploader.fixDefaultContentType(inputContentType, inputFilename));
+		assertEquals(WebConstants.TEXT_COMMA_SEPARATED_VALUES, fixDefaultContentType(inputContentType, inputFilename));
 		
 		// should fix text files as well
 		inputFilename = "file.TXT";
-		assertEquals(ContentTypeUtils.PLAIN_TEXT, uploader.fixDefaultContentType(inputContentType, inputFilename));
+		assertEquals(ContentTypeUtils.PLAIN_TEXT, fixDefaultContentType(inputContentType, inputFilename));
+		
+		// test default
+		inputContentType = null;
+		inputFilename = "";
+		assertEquals(ContentTypeUtils.APPLICATION_OCTET_STREAM, fixDefaultContentType(inputContentType, inputFilename));
 	}
 	
 	@Test
