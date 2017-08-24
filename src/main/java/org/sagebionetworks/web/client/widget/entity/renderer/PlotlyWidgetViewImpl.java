@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.plotly.PlotlyTrace;
@@ -111,5 +110,10 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	@Override
 	public void setSourceDataLink(String url) {
 		sourceDataAnchor.setHref(url);
+	}
+	
+	@Override
+	public void setSourceDataLinkVisible(boolean visible) {
+		sourceDataAnchor.setVisible(visible);
 	}
 }

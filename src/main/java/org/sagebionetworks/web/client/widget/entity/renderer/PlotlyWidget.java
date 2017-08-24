@@ -129,6 +129,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		qbr.setEntityId(QueryBundleUtils.getTableId(query));
 		
 		String queryToken = queryTokenProvider.queryToToken(query);
+		view.setSourceDataLinkVisible(false);
 		view.setSourceDataLink(
 				"#!Synapse:" + 
 				qbr.getEntityId() + "/" + 
@@ -238,6 +239,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		} catch (Throwable ex) {
 			synAlert.showError("Error showing plot: " + ex.getMessage());
 		}
+		view.setSourceDataLinkVisible(true);
 	}
 	
 	

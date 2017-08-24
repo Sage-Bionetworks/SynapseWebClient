@@ -10,7 +10,7 @@
 		    	<b:Button ui:field="markdownPreviewButton" size="EXTRA_SMALL" height="22px" text="Preview" type="PRIMARY" addStyleNames="margin-left-2"/>
 		    	<bh:Span addStyleNames="border-left-1 margin-left-5 margin-right-5"/>
 		        <b:Tooltip placement="BOTTOM" title="Edit an existing Synapse Widget (must place cursor on widget markdown to enable)">
-		        	<b:Button ui:field="editWidgetButton" icon="EDIT" size="EXTRA_SMALL" height="22px"/>
+		        	<b:Button ui:field="editWidgetButton" icon="EDIT" size="EXTRA_SMALL" height="22px" text="Edit Synapse Widget"/>
 		        </b:Tooltip>
 		        <b:ButtonGroup>
 				  <b:Button dataToggle="DROPDOWN" size="EXTRA_SMALL" icon="PLUS_CIRCLE">Insert</b:Button>
