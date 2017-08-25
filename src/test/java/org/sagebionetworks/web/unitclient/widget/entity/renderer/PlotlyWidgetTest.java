@@ -163,6 +163,8 @@ public class PlotlyWidgetTest {
 		widget.configure(pageKey, params, null, null);
 		
 		verify(mockView).setSourceDataLink(stringCaptor.capture());
+		verify(mockView).setSourceDataLinkVisible(false);
+		verify(mockView, never()).setSourceDataLinkVisible(true);
 		String sourceDataLink = stringCaptor.getValue();
 		assertTrue(sourceDataLink.contains(tableId));
 		assertTrue(sourceDataLink.contains(queryToken));
@@ -197,6 +199,8 @@ public class PlotlyWidgetTest {
 		PlotlyTrace[] traceArray = plotlyTraceArrayCaptor.getValue();
 		assertTrue(traceArray.length > 0);
 		assertEquals(type.toString().toLowerCase(), traceArray[0].getType());
+		verify(mockView).setSourceDataLinkVisible(true);
+		
 	}
 	
 	@Test
