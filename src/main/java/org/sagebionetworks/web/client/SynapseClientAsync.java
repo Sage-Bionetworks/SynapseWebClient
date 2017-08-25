@@ -82,10 +82,6 @@ public interface SynapseClientAsync {
 	
 	void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<Entity> callback);
 	
-	void getEntityBundle(String entityId, int partsMask, AsyncCallback<EntityBundle> callback);
-	
-	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundle> callback);
-
 	void getEntityBundlePlusForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundlePlus> callback);
 	
 	void getEntityVersions(String entityId, int offset, int limit,

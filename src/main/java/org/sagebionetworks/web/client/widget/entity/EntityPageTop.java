@@ -47,7 +47,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -234,9 +233,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				showSelectedTabs();
 			}
 		};
-		GWT.debugger();
 		synapseJavascriptClient.getEntityBundle(projectHeader.getId(), mask, callback);
-//		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
     }
     
     public void showSelectedTabs() {

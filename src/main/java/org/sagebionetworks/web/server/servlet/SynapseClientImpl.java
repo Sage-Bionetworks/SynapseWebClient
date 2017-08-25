@@ -2063,7 +2063,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 
 	@Override
 	public HashMap<String, String> getSynapseProperties(){
-		return PortalPropertiesHolder.getPropertiesMap();
+		HashMap<String, String> properties = PortalPropertiesHolder.getPropertiesMap();
+		properties.put(WebConstants.REPO_SERVICE_URL_KEY, getRepositoryServiceUrl());
+		return properties;
 	}
 
 	public static class PortalPropertiesHolder {
@@ -2091,8 +2093,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				propsMap = new HashMap<String, String>();
 				for (Entry<Object, Object> entry : props.entrySet()) {
 					propsMap.put(entry.getKey().toString(), entry.getValue().toString());
-	}
+				}
 			}
+			
 			return propsMap;
 		}
 	}
@@ -2985,5 +2988,4 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
 }

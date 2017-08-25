@@ -117,24 +117,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	public Entity updateEntity(Entity toUpdate) throws RestServiceException;
 	
 	/**
-	 * Get a bundle of information about an entity in a single call
-	 * @param entityId
-	 * @return
-	 * @throws RestServiceException 
-	 * @throws SynapseException 
-	 */
-	public EntityBundle getEntityBundle(String entityId, int partsMask) throws RestServiceException;
-
-	/**
-	 * Get a bundle of information about an entity in a single call
-	 * @param entityId
-	 * @return
-	 * @throws RestServiceException 
-	 * @throws SynapseException 
-	 */
-	public EntityBundle getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask) throws RestServiceException;
-
-	/**
 	 * Log a debug message in the server-side log.
 	 * @param message
 	 */
