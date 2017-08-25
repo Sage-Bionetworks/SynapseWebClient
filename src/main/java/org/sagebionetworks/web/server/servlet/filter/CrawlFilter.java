@@ -82,7 +82,8 @@ public class CrawlFilter implements Filter {
 	ServletContext sc;
 
 	private final Supplier<String> homePageCached = Suppliers.memoizeWithExpiration(homePageSupplier(), 1, TimeUnit.DAYS);
-
+	public static final int MAX_CHILD_PAGES = 5;
+	
 	public String getCachedHomePageHtml() {
 		return homePageCached.get();
 	}
@@ -297,15 +298,18 @@ public class CrawlFilter implements Filter {
 		}
 		
 		//and ask for all children
+		// only show the first few pages. 
 		EntityChildrenRequest request = createGetChildrenQuery(entityId);
 		EntityChildrenResponse childList;
+		int i = 0;
 		do {
 			childList = synapseClient.getEntityChildren(request);
 			for (EntityHeader childId : childList.getPage()) {
-				html.append("<a href=\"https://www.synapse.org/#!Synapse:"+childId.getId()+"\">"+childId.getName()+"</a><br />");
+				html.append("<a href=\"https://www.synapse.org/#!Synapse:"+childId.getId()+"\">"+childId.getId()+"</a><br />");
 			}
 			request.setNextPageToken(childList.getNextPageToken());
-		} while (childList.getNextPageToken() != null);
+			i++;
+		} while (i < MAX_CHILD_PAGES && childList.getNextPageToken() != null);
 		html.append("</body></html>");
 		return html.toString();
 	}
