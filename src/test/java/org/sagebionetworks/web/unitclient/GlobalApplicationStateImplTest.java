@@ -5,7 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -353,6 +353,18 @@ public class GlobalApplicationStateImplTest {
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
 		verify(mockGWT).replaceItem(newToken, false);
+	}
+	
+	@Test
+	public void testReplaceCurrentPlaceFailure(){
+		String error = "failure to push current place!";
+		doThrow(new RuntimeException(error)).when(mockGWT).replaceItem(anyString(), anyBoolean());
+		String newToken = "/some/new/token";
+		Place mockPlace = mock(Place.class);
+		when(mockAppPlaceHistoryMapper.getToken(mockPlace)).thenReturn(newToken);
+		globalApplicationState.replaceCurrentPlace(mockPlace);
+		verify(mockGWT).replaceItem(newToken, false);
+		verify(mockSynapseJSNIUtils).consoleError(error);
 	}
 
 	@Test
