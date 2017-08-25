@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -46,6 +47,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -57,6 +59,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityBundle projectBundle;
 	private Throwable projectBundleLoadError;
 	private Entity entity;
+	private SynapseJavascriptClient synapseJavascriptClient;
 	
 	private Synapse.EntityArea area;
 	private String initialAreaToken;
@@ -100,7 +103,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			EntityActionController controller,
 			ActionMenuWidget actionMenu,
 			CookieProvider cookies,
-			ClientCache storage) {
+			ClientCache storage,
+			SynapseJavascriptClient synapseJavascriptClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
@@ -116,7 +120,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.actionMenu = actionMenu;
 		this.cookies = cookies;
 		this.storage = storage;
-		
+		this.synapseJavascriptClient = synapseJavascriptClient;
 		initTabs();
 		view.setTabs(tabs.asWidget());
 		view.setProjectMetadata(projectMetadata.asWidget());
@@ -230,7 +234,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				showSelectedTabs();
 			}
 		};
-		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
+		GWT.debugger();
+		synapseJavascriptClient.getEntityBundle(projectHeader.getId(), mask, callback);
+//		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
     }
     
     public void showSelectedTabs() {

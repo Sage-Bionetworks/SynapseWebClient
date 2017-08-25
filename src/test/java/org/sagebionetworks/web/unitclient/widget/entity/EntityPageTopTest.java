@@ -31,6 +31,7 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -123,6 +124,8 @@ public class EntityPageTopTest {
 	CookieProvider mockCookies;
 	@Mock
 	ClientCache mockStorage;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Captor
 	ArgumentCaptor<WikiPageWidget.Callback> wikiCallbackCaptor; 
 	
@@ -144,9 +147,10 @@ public class EntityPageTopTest {
 		when(mockDockerTab.asTab()).thenReturn(mockDockerInnerTab);
 		pageTop = new EntityPageTop(mockView, mockSynapseClientAsync, mockAuthController, mockTabs, mockEntityMetadata,
 				mockWikiTab, mockFilesTab, mockTablesTab, mockChallengeTab, mockDiscussionTab, mockDockerTab,
-				mockEntityActionController, mockActionMenuWidget, mockCookies, mockStorage);
+				mockEntityActionController, mockActionMenuWidget, mockCookies, mockStorage, mockSynapseJavascriptClient);
 		pageTop.setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		
 		when(mockProjectBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
 		when(mockProjectBundle.getRootWikiId()).thenReturn(projectWikiId);
@@ -328,7 +332,7 @@ public class EntityPageTopTest {
 	@Test
 	public void testConfigureWithFileAndFailureToLoadProject(){
 		Exception projectLoadError = new Exception("failed to load project");
-		AsyncMockStubber.callFailureWith(projectLoadError).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(projectLoadError).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		Synapse.EntityArea area = null;
 		String areaToken = null;
 		Long versionNumber = 5L;
