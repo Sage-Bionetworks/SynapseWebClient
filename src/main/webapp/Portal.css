@@ -1535,32 +1535,24 @@ This is the icon table cell (gwt TreeItem exposes very little to the outside, so
 }
 
 /**table of contents styling **/
-/** .8em to 1.2em **/
 .toc-indent0 {
-	font-size: 1.2em;
 	margin-left: 5px;
 }
 .toc-indent1 {
-	font-size: 1.1em;
 	margin-left: 35px;
 }
 .toc-indent2 {
-	font-size: 1.0em;
 	margin-left: 65px;
 }
 .toc-indent3 {
-	font-size: 0.9em;
 	margin-left: 95px;
 }
 .toc-indent4 {
-	font-size: .8em;
 	margin-left: 125px;
 }
 .toc-indent5 {
-	font-size: .8em;
 	margin-left: 150px;
 }
-
 
 strong {
 	font-weight: bold;
