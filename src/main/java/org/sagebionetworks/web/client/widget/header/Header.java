@@ -15,8 +15,8 @@ import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
+import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -24,6 +24,9 @@ import com.google.inject.Inject;
 
 public class Header implements HeaderView.Presenter, IsWidget {
 
+	public static final String N_A = "n/a";
+	public static final String ANONYMOUS = "anonymous";
+	public static final String SYNAPSE_ORG = "@synapse.org";
 	public static final String GET_SATISFACTION_SUPPORT_SITE = "http://support.sagebase.org";
 	public static final String WWW_SYNAPSE_ORG = "www.synapse.org";
 
@@ -38,11 +41,13 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private FavoriteWidget favWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private StuAnnouncementWidget stuAnnouncementWidget;
+	private PendoSdk pendoSdk;
 	
 	@Inject
 	public Header(HeaderView view, AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient,
-			FavoriteWidget favWidget, SynapseJSNIUtils synapseJSNIUtils, StuAnnouncementWidget stuAnnouncementWidget) {
+			FavoriteWidget favWidget, SynapseJSNIUtils synapseJSNIUtils, StuAnnouncementWidget stuAnnouncementWidget,
+			PendoSdk pendoSdk) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -51,6 +56,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.clear();
 		this.stuAnnouncementWidget = stuAnnouncementWidget;
+		this.pendoSdk = pendoSdk;
 		view.setPresenter(this);
 		stuAnnouncementWidget.init();
 		initStagingAlert();
@@ -110,6 +116,12 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setSearchVisible(true);
 		view.setProjectFavoriteWidget(favWidget);
 		view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
+		if (authenticationController.isLoggedIn()) {
+			String userName = userSessionData.getProfile().getUserName();
+			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
+		} else {
+			pendoSdk.initialize(ANONYMOUS, N_A);
+		}
 	}
 
 	@Override

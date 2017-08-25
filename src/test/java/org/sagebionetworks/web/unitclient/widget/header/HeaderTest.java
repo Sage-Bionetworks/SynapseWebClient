@@ -9,6 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.header.Header.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -38,6 +40,7 @@ import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidget;
+import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
@@ -59,6 +62,12 @@ public class HeaderTest {
 	CookieProvider mockCookies;
 	@Mock
 	StuAnnouncementWidget mockStuAnnouncementWidget;
+	@Mock
+	PendoSdk mockPendoSdk;
+	@Mock
+	UserSessionData mockUserSessionData;
+	@Mock
+	UserProfile mockUserProfile;
 	
 	@Before
 	public void setup(){
@@ -73,10 +82,11 @@ public class HeaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget, mockPendoSdk);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
+		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
 	}
 
 	@Test
@@ -240,5 +250,35 @@ public class HeaderTest {
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("localhost");
 		header.initStagingAlert();
 		verify(mockView).setStagingAlertVisible(true);
+	}
+	
+	@Test
+	public void testRefresh() {
+		String userId = "10001";
+		String userName = "testuser";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUserSessionData);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
+		when(mockUserProfile.getUserName()).thenReturn(userName);
+		
+		header.refresh();
+		
+		verify(mockView).setUser(mockUserSessionData);
+		verify(mockView).refresh();
+		verify(mockView).setSearchVisible(true);
+		verify(mockPendoSdk).initialize(userId, userName + SYNAPSE_ORG);
+	}
+	
+
+	@Test
+	public void testRefreshAnonymous() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		
+		header.refresh();
+		
+		verify(mockView).setUser(null);
+		verify(mockView).refresh();
+		verify(mockView).setSearchVisible(true);
+		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);
 	}
 }
