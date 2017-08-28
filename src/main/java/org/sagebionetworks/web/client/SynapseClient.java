@@ -14,7 +14,6 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -173,14 +172,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	 * @throws RestServiceException 
 	 */
 	public List<UserProfile> listUserProfiles(List<String> userIds) throws RestServiceException;
-	
-	/**
-	 * Return the specified team object in json string
-	 * @param teamId
-	 * @return
-	 * @throws RestServiceException
-	 */
-	public Team getTeam(String teamId) throws RestServiceException;
 	
 	/**
 	 * Batch get headers for users/groups matching a list of Synapse IDs.

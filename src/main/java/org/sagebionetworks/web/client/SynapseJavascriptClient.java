@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client;
 
-import static org.sagebionetworks.client.SynapseClientImpl.*;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -30,6 +30,7 @@ public class SynapseJavascriptClient {
 	public static final String SYNAPSE_ENCODING_CHARSET = "UTF-8";
 	public static final String APPLICATION_JSON_CHARSET_UTF8 = "application/json; charset="+SYNAPSE_ENCODING_CHARSET;
 	public static final String REPO_SUFFIX_VERSION = "/version";
+	protected static final String TEAM = "/team";
 	
 	public String repoServiceUrl; 
 	@Inject
@@ -97,7 +98,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, final AsyncCallback<EntityBundle> callback) {
-		String url = repoServiceUrl + ENTITY_URI_PATH + "/"+ entityId + ENTITY_BUNDLE_PATH + partsMask;
+		String url = repoServiceUrl + ENTITY_URI_PATH + "/" + entityId + ENTITY_BUNDLE_PATH + partsMask;
 		if (versionNumber != null) {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
@@ -106,6 +107,21 @@ public class SynapseJavascriptClient {
 			public void invoke(JSONObjectAdapter json) {
 				try {
 					callback.onSuccess(new EntityBundle(json));
+				} catch (JSONObjectAdapterException e) {
+					callback.onFailure(e);
+				}
+			}
+		};
+		doGet(url, wrapCallback(constructCallback, callback));
+	}
+	
+	public void getTeam(String teamId, final AsyncCallback<Team> callback) {
+		String url = repoServiceUrl + TEAM + "/" + teamId;
+		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
+			@Override
+			public void invoke(JSONObjectAdapter json) {
+				try {
+					callback.onSuccess(new Team(json));
 				} catch (JSONObjectAdapterException e) {
 					callback.onFailure(e);
 				}

@@ -16,6 +16,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.TeamBadgeView;
@@ -30,8 +31,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  */
 public class TeamBadgeTest {
 
-	SynapseClientAsync mockSynapseClient;
-	TeamBadgeView mockView;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+ 	TeamBadgeView mockView;
 	TeamBadge badge;
 	Team team;
 	String principalId = "id1";
@@ -48,9 +50,8 @@ public class TeamBadgeTest {
 		team = new Team();
 		team.setName("name");
 		team.setId(principalId);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockView = mock(TeamBadgeView.class);
-		badge = new TeamBadge(mockView, mockSynapseClient, mockAuthController);
+		badge = new TeamBadge(mockView, mockSynapseJavascriptClient, mockAuthController);
 		when(mockAuthController.getCurrentXsrfToken()).thenReturn(xsrfToken);
 	}
 	
@@ -63,7 +64,7 @@ public class TeamBadgeTest {
 
 	@Test
 	public void testConfigureAsyncCustomClickHandler() throws Exception {
-		AsyncMockStubber.callSuccessWith(team).when(mockSynapseClient).getTeam(eq(principalId), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(team).when(mockSynapseJavascriptClient).getTeam(eq(principalId), any(AsyncCallback.class));
 		badge.setMaxNameLength(max);
 		badge.configure(principalId, mockClickHandler);
 		verify(mockView).setTeam(team, max, xsrfToken, mockClickHandler);
@@ -71,7 +72,7 @@ public class TeamBadgeTest {
 	
 	@Test
 	public void testConfigureAsync() throws Exception {
-		AsyncMockStubber.callSuccessWith(team).when(mockSynapseClient).getTeam(eq(principalId), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(team).when(mockSynapseJavascriptClient).getTeam(eq(principalId), any(AsyncCallback.class));
 		badge.setMaxNameLength(max);
 		badge.configure(team);
 		verify(mockView).setTeam(team, max, xsrfToken, null);
@@ -79,7 +80,7 @@ public class TeamBadgeTest {
 	
 	@Test
 	public void testConfigureAsyncFail() throws Exception {
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getTeam(eq(principalId), any(AsyncCallback.class));		
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseJavascriptClient).getTeam(eq(principalId), any(AsyncCallback.class));		
 		badge.configure(principalId);
 		verify(mockView).showLoadError(principalId);
 	}

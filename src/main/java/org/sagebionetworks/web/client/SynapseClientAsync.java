@@ -12,7 +12,6 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -124,8 +123,6 @@ public interface SynapseClientAsync {
 	
 	void listUserProfiles(List<String> userIds,
 			AsyncCallback<List<UserProfile>> callback);
-	
-	void getTeam(String teamId, AsyncCallback<Team> callback);
 	
 	void getUserGroupHeadersById(ArrayList<String> ids, AsyncCallback<UserGroupHeaderResponsePage> headers);
 	
