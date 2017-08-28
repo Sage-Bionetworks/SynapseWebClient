@@ -98,6 +98,26 @@ public class AwsSdk {
 	    };
 		return s3.getSignedUrl('getObject', params);
 	}-*/;
+	
+	public String deleteObject(
+			String key,
+			String bucketName,
+			JavaScriptObject s3
+			) {
+		return _deleteObject(key, bucketName, s3);
+	}
+
+	private static native String _deleteObject(
+			String key,
+			String bucketName,
+			JavaScriptObject s3) 
+	/*-{
+		var params = {
+			Bucket: bucketName,
+			Key: key
+	    };
+		return s3.deleteObject(params);
+	}-*/;
 
 
 	public void getS3(

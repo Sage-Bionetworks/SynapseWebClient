@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -39,6 +40,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
+import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
@@ -61,12 +63,13 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityActionControllerImpl implements EntityActionController, ActionListener {
+public class EntityActionControllerImpl implements EntityActionController, EntityActionControllerView.Presenter, ActionListener {
 	
 	public static final String THE_ROOT_WIKI_PAGE_AND_ALL_SUBPAGES = "the root wiki page and all subpages?";
 
@@ -126,6 +129,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	PortalGinInjector ginInjector;
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	boolean isShowingVersion = false;
+	ExternalObjectStoreFileHandle currentExternalObjectStoreFileHandle;
+	AwsSdk awsSdk;
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -133,7 +138,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			PortalGinInjector ginInjector,
 			AuthenticationController authenticationController,
 			CookieProvider cookies,
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
+			AwsSdk awsSdk) {
 		super();
 		this.view = view;
 		this.ginInjector = ginInjector;
@@ -141,6 +147,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.authenticationController = authenticationController;
 		this.cookies = cookies;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
+		this.awsSdk = awsSdk;
 	}
 	
 	private ApproveUserAccessModal getApproveUserAccessModal() {
@@ -278,6 +285,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
 		this.isCurrentVersion = isCurrentVersion;
 		this.enityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
+		currentExternalObjectStoreFileHandle = null;
 		
 		if (!isUserAuthenticated) {
 			actionMenu.setToolsButtonVisible(false);
@@ -1224,13 +1232,42 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				postCheckDeleteEntity();
 			}
 		});
-		
 	}
 
 	/**
 	 * After all checks have been made we can do the actual entity delete.
 	 */
 	public void postCheckDeleteEntity() {
+		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
+		if (fileHandle instanceof ExternalObjectStoreFileHandle) {
+			currentExternalObjectStoreFileHandle = (ExternalObjectStoreFileHandle)fileHandle;
+			view.showAwsLoginDialog();
+		} else {
+			deleteEntity();
+		}
+	}
+	
+	@Override
+	public void onAwsLogin() {
+		String accessKeyId = view.getS3DirectAccessKey();
+		String secretAccessKey = view.getS3DirectSecretKey();
+		final String bucketName = currentExternalObjectStoreFileHandle.getBucket();
+		String endpoint = currentExternalObjectStoreFileHandle.getEndpointUrl();
+		// try to delete underlying file
+		awsSdk.getS3(accessKeyId, secretAccessKey, bucketName, endpoint, new CallbackP<JavaScriptObject>() {
+			public void invoke(JavaScriptObject s3) {
+				String key = currentExternalObjectStoreFileHandle.getFileKey();
+				try {
+					awsSdk.deleteObject(key, bucketName, s3);
+					deleteEntity();
+				} catch (Exception e) {
+					view.showErrorMessage(e.getMessage());
+				}
+			};
+		});
+	}
+	
+	public void deleteEntity() {
 		final String entityId = this.entityBundle.getEntity().getId();
 		getSynapseClient().deleteEntityById(entityId, new AsyncCallback<Void>() {
 			@Override

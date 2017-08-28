@@ -89,6 +89,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
+import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -183,6 +184,8 @@ public class EntityActionControllerImplTest {
 	PublicPrincipalIds mockPublicPrincipalIds;
 	@Mock
 	AccessControlList mockACL;
+	@Mock
+	AwsSdk mockAwsSdk;
 	Set<ResourceAccess> resourceAccessSet;
 	
 	public static final String SELECTED_TEAM_ID = "987654";
@@ -240,7 +243,8 @@ public class EntityActionControllerImplTest {
 				mockPortalGinInjector,
 				mockAuthenticationController, 
 				mockCookies,
-				mockIsACTMemberAsyncHandler);
+				mockIsACTMemberAsyncHandler,
+				mockAwsSdk);
 		
 		parentId = "syn456";
 		entityId = "syn123";
