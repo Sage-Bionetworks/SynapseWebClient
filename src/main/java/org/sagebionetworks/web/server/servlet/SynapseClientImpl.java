@@ -40,7 +40,6 @@ import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.Count;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -88,7 +87,6 @@ import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
-import org.sagebionetworks.repo.model.file.ExternalFileHandleInterface;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
@@ -292,7 +290,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} 
 	}
 
-	@Override
 	public EntityBundle getEntityBundle(String entityId, int partsMask)
 			throws RestServiceException {
 		try {
@@ -303,7 +300,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	@Override
 	public EntityBundle getEntityBundleForVersion(String entityId,
 			Long versionNumber, int partsMask) throws RestServiceException {
 		try {
@@ -328,9 +324,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 						.getResults().get(0).getVersionNumber();
 				if (versionNumber == null || latestVersionNumber.equals(versionNumber)) {
 					versionNumber = latestVersionNumber;
-					eb = getEntityBundle(entityId, partsMask);
+					eb = synapseClient.getEntityBundle(entityId, partsMask);
 				} else {
-					eb = getEntityBundleForVersion(entityId, versionNumber, partsMask);	
+					eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);	
 				}
 				ebp.setLatestVersionNumber(latestVersionNumber);
 			} else {
@@ -781,8 +777,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	public AccessControlList getBenefactorAcl(String id) throws RestServiceException {
-		EntityBundle bundle = getEntityBundle(id, EntityBundle.BENEFACTOR_ACL);
-		return bundle.getBenefactorAcl();
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getEntityBundle(id, EntityBundle.BENEFACTOR_ACL).getBenefactorAcl();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
 	}
 
 	@Override

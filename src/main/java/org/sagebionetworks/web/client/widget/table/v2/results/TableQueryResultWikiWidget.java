@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -32,7 +33,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 	TableEntityWidget tableEntityWidget;
 	SynapseJSNIUtils synapseJsniUtils;
 	TableQueryResultWikiWidgetView view;
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	SynapseAlert synAlert;
 	ActionMenuWidget actionMenu;
 	EntityActionController entityActionController;
@@ -45,13 +46,13 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 			ActionMenuWidget actionMenu,
 			EntityActionController entityActionController,
 			SynapseJSNIUtils synapseJsniUtils,
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert) {
 		this.view = view;
 		this.tableEntityWidget = tableEntityWidget;
 		this.actionMenu = actionMenu;
 		this.entityActionController = entityActionController;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		view.setTableQueryResultWidget(tableEntityWidget.asWidget());
 		this.synapseJsniUtils = synapseJsniUtils;
@@ -112,7 +113,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 			}			
 		};
 		
-		synapseClient.getEntityBundle(tableId, mask, callback);
+		jsClient.getEntityBundle(tableId, mask, callback);
 	}
 	
 	public void hideEditActions() {

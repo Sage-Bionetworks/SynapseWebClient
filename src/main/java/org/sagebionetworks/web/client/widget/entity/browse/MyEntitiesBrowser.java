@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -36,6 +37,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private SelectedHandler selectedHandler;
 	private Place cachedPlace;
 	private String cachedUserId;
@@ -49,12 +51,13 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 			AuthenticationController authenticationController,
 			final GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
-		
+		this.jsClient = jsClient;
 		// default selection behavior is to do nothing
 		this.selectedHandler = new SelectedHandler() {			
 			@Override
@@ -139,7 +142,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		if (isSynapsePlace) {
 			String entityId = ((Synapse) currentPlace).getEntityId();
 			int mask = ENTITY_PATH;
-			synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundle>() {
+			jsClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					view.showErrorMessage(caught.getMessage());

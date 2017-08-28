@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
@@ -41,13 +42,19 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 	private List<String> outputColumnNames;
 	private Map<String, List<String>> outputColumnData;
 	private List<String> sourceColumnData;
-	
+	SynapseJavascriptClient jsClient;
 	@Inject
-	public APITableColumnRendererEntityIdAnnotations(AdapterFactory factory, EntitySchemaCache cache, SynapseClientAsync synapseClient, AnnotationTransformer transformer) {
+	public APITableColumnRendererEntityIdAnnotations(
+			AdapterFactory factory, 
+			EntitySchemaCache cache, 
+			SynapseClientAsync synapseClient, 
+			AnnotationTransformer transformer,
+			SynapseJavascriptClient jsClient) {
 		this.synapseClient = synapseClient;
 		this.factory = factory;
 		this.cache = cache;
 		this.transformer = transformer;
+		this.jsClient = jsClient;
 	}
 	
 	@Override
@@ -108,7 +115,7 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 					columnDataInit(columnData, currentIndex+1);
 			}
 		};
-		synapseClient.getEntityBundle(columnData.get(currentIndex), ENTITY| ANNOTATIONS, callback);
+		jsClient.getEntityBundle(columnData.get(currentIndex), ENTITY| ANNOTATIONS, callback);
 	}
 	
 	private APITableInitializedColumnRenderer getOutputColumnRenderer() {

@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -41,7 +42,6 @@ public class DockerTab implements DockerTabView.Presenter{
 	DockerRepoListWidget dockerRepoListWidget;
 	Breadcrumb breadcrumb;
 	PortalGinInjector ginInjector;
-	SynapseClientAsync synapseClient;
 	StuAlert synAlert;
 
 	Entity entity;
@@ -51,9 +51,11 @@ public class DockerTab implements DockerTabView.Presenter{
 	String areaToken;
 	EntityUpdatedHandler handler;
 	CallbackP<Boolean> showProjectInfoCallack;
-
+	SynapseJavascriptClient jsClient;
 	@Inject
-	public DockerTab(Tab tab, PortalGinInjector ginInjector) {
+	public DockerTab(
+			Tab tab, 
+			PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
 		tab.configure(DOCKER_TAB_TITLE + "&nbsp;" + DisplayConstants.BETA_BADGE_HTML, "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html");
@@ -66,8 +68,8 @@ public class DockerTab implements DockerTabView.Presenter{
 		if (view == null) {
 			this.view = ginInjector.getDockerTabView();
 			this.dockerRepoListWidget = ginInjector.getDockerRepoListWidget();
+			this.jsClient = ginInjector.getSynapseJavascriptClient();
 			this.breadcrumb = ginInjector.getBreadcrumb();
-			this.synapseClient = ginInjector.getSynapseClientAsync();
 			this.synAlert = ginInjector.getStuAlert();
 			view.setPresenter(this);
 			view.setBreadcrumb(breadcrumb.asWidget());
@@ -200,7 +202,7 @@ public class DockerTab implements DockerTabView.Presenter{
 			}
 		};
 
-		synapseClient.getEntityBundle(entityId, mask, callback);
+		jsClient.getEntityBundle(entityId, mask, callback);
 	}
 
 	public Tab asTab(){

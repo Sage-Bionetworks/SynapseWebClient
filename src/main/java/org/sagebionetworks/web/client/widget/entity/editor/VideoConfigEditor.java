@@ -9,7 +9,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -23,7 +23,7 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 	public static final String UNRECOGNIZED_VIDEO_FORMAT_MESSAGE = "Unrecognized video format";
 	private VideoConfigView view;
 	private Map<String, String> descriptor;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	public static enum VIDEO_TYPE { MP4, OGG, WEBM }
 	
 	private static final String[] MP4_EXTENSIONS = new String[] {".mp4", ".m4a", ".m4p", ".m4b", ".m4r", ".m4v"};
@@ -34,9 +34,9 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 	VIDEO_TYPE currentType;
 	
 	@Inject
-	public VideoConfigEditor(VideoConfigView view, SynapseClientAsync synapseClient) {
+	public VideoConfigEditor(VideoConfigView view, SynapseJavascriptClient jsClient) {
 		this.view = view;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.initView();
 	}		
@@ -100,7 +100,7 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 			}
 			
 		};
-		synapseClient.getEntityBundle(ref.getTargetId(), mask, ebCallback);
+		jsClient.getEntityBundle(ref.getTargetId(), mask, ebCallback);
 	}
 	
 	public static boolean isRecognizedVideoFileName(String fileName) {

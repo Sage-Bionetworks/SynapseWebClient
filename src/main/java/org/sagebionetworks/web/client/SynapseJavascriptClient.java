@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import static org.sagebionetworks.client.SynapseClientImpl.*;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -20,14 +21,16 @@ public class SynapseJavascriptClient {
 	JSONObjectAdapter jsonObjectAdapter;
 	GlobalApplicationState globalAppState;
 	
-	private static final String ENTITY_URI_PATH = "/entity";
-	private static final String ENTITY_BUNDLE_PATH = "/bundle?mask=";
-	private static final String CONTENT_TYPE = "Content-Type";
-	private static final String ACCEPT = "Accept";
-	private static final String SESSION_TOKEN_HEADER = "sessionToken";
-	private static final String USER_AGENT = "User-Agent";
-	private static final String SYNAPSE_ENCODING_CHARSET = "UTF-8";
-	private static final String APPLICATION_JSON_CHARSET_UTF8 = "application/json; charset="+SYNAPSE_ENCODING_CHARSET;
+	public static final String ENTITY_URI_PATH = "/entity";
+	public static final String ENTITY_BUNDLE_PATH = "/bundle?mask=";
+	public static final String CONTENT_TYPE = "Content-Type";
+	public static final String ACCEPT = "Accept";
+	public static final String SESSION_TOKEN_HEADER = "sessionToken";
+	public static final String USER_AGENT = "User-Agent";
+	public static final String SYNAPSE_ENCODING_CHARSET = "UTF-8";
+	public static final String APPLICATION_JSON_CHARSET_UTF8 = "application/json; charset="+SYNAPSE_ENCODING_CHARSET;
+	public static final String REPO_SUFFIX_VERSION = "/version";
+	
 	public String repoServiceUrl; 
 	@Inject
 	public SynapseJavascriptClient(
@@ -90,7 +93,14 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getEntityBundle(String entityId, int partsMask, final AsyncCallback<EntityBundle> callback) {
+		getEntityBundleForVersion(entityId, null, partsMask, callback);
+	}
+	
+	public void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, final AsyncCallback<EntityBundle> callback) {
 		String url = repoServiceUrl + ENTITY_URI_PATH + "/"+ entityId + ENTITY_BUNDLE_PATH + partsMask;
+		if (versionNumber != null) {
+			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
+		}
 		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
 			@Override
 			public void invoke(JSONObjectAdapter json) {

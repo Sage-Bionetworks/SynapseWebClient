@@ -37,6 +37,7 @@ import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget.PreviewFileType;
@@ -68,6 +69,9 @@ public class PreviewWidgetTest {
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+
 	EntityBundle testBundle;
 	FileEntity testEntity;
 	List<FileHandle> testFileHandleList;
@@ -90,7 +94,7 @@ public class PreviewWidgetTest {
 	@Before
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
-		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockSynapseClient, mockAuthController, mockVideoWidget);
+		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockSynapseClient, mockAuthController, mockVideoWidget, mockSynapseJavascriptClient);
 		testEntity = new FileEntity();
 		testFileHandleList = new ArrayList<FileHandle>();
 		mainFileHandle = new S3FileHandle();
@@ -108,8 +112,8 @@ public class PreviewWidgetTest {
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(true);
 		
-		AsyncMockStubber.callSuccessWith(testBundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(testBundle).when(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		// create empty wiki descriptor
 		descriptor = new HashMap<String, String>();
@@ -302,7 +306,7 @@ public class PreviewWidgetTest {
 		previewWidget.configure(linkBundle);
 		previewWidget.asWidget();
 		
-		verify(mockSynapseClient).getEntityBundle(eq(targetEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(targetEntityId), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -319,7 +323,7 @@ public class PreviewWidgetTest {
 		previewWidget.configure(linkBundle);
 		previewWidget.asWidget();
 		
-		verify(mockSynapseClient).getEntityBundleForVersion(eq(targetEntityId), eq(targetVersion), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(targetEntityId), eq(targetVersion), anyInt(), any(AsyncCallback.class));
 	}
 
 	
@@ -329,7 +333,7 @@ public class PreviewWidgetTest {
 		previewWidget.configure(null, descriptor, null, null);
 		
 		//verify that it tries to get the entity bundle (without version)
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -339,7 +343,7 @@ public class PreviewWidgetTest {
 		previewWidget.configure(null, descriptor, null, null);
 		
 		//verify that it tries to get the entity bundle (without version)
-		verify(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -350,7 +354,7 @@ public class PreviewWidgetTest {
 		previewWidget.configure(null, descriptor, null, null);
 		
 		//verify that it tries to get the entity bundle (with version)
-		verify(mockSynapseClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -366,7 +370,7 @@ public class PreviewWidgetTest {
 	@Test
 	public void testWikiConfigureFailure() {
 		String exceptionMessage= "my test error message";
-		AsyncMockStubber.callFailureWith(new Exception(exceptionMessage)).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(exceptionMessage)).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		
 		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
 		previewWidget.configure(null, descriptor, null, null);

@@ -21,10 +21,10 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -54,6 +54,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	GlobalApplicationState globalApplicationState;
 	PublicPrincipalIds publicPrincipalIds;
 	GWTWrapper gwt;
+	SynapseJavascriptClient jsClient;
 	
 	// Entity components
 	private Entity entity;
@@ -69,12 +70,14 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			SynapseClientAsync synapseClientAsync,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.gwt = gwt;
+		this.jsClient = jsClient;
 		
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);
@@ -147,7 +150,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		hasChangesHandler.hasChanges(false);
 		
 		int partsMask = EntityBundle.BENEFACTOR_ACL | EntityBundle.PERMISSIONS;
-		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundle>() {
+		jsClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				try {

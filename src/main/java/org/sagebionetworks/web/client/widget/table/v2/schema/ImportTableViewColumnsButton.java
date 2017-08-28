@@ -14,7 +14,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
@@ -31,16 +31,16 @@ public class ImportTableViewColumnsButton implements IsWidget {
 	public static final String BUTTON_TEXT = "Import columns";
 	public Button button;
 	public PortalGinInjector ginInjector;
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	CallbackP<List<ColumnModel>> callback;
 	EntityFinder finder;
 	@Inject
 	public ImportTableViewColumnsButton(
 			Button button,
 			final EntityFinder finder,
-			SynapseClientAsync synapseClient) {
+			SynapseJavascriptClient jsClient) {
 		this.button = button;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.finder = finder;
 		button.setText(BUTTON_TEXT);
 		button.setSize(ButtonSize.DEFAULT);
@@ -64,7 +64,7 @@ public class ImportTableViewColumnsButton implements IsWidget {
 	public void onTableViewSelected(String entityId) {
 		// get the column schema
 		int mask =  ENTITY | TABLE_DATA;
-		synapseClient.getEntityBundle(entityId, mask, 
+		jsClient.getEntityBundle(entityId, mask, 
 			new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onSuccess(EntityBundle bundle) {

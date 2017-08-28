@@ -40,6 +40,7 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -86,7 +87,9 @@ public class TablesTabTest {
 	SynapseClientAsync mockSynapseClientAsync;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
-	
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+
 	@Mock
 	EntityBundle mockProjectEntityBundle;
 	@Mock
@@ -137,6 +140,8 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClientAsync);
 		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
 		when(mockPortalGinInjector.getProvenanceRenderer()).thenReturn(mockProvenanceWidget);
+		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockSynapseJavascriptClient);
+		
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		AccessRequirement tou = new TermsOfUseAccessRequirement();
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
@@ -156,7 +161,7 @@ public class TablesTabTest {
 		when(mockFileViewEntity.getId()).thenReturn(tableEntityId);
 		when(mockFileViewEntity.getName()).thenReturn(tableName);
 		
-		AsyncMockStubber.callSuccessWith(mockTableEntityBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockTableEntityBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		
 		// setup a complex query.
 		query = new Query();
@@ -212,7 +217,7 @@ public class TablesTabTest {
 	}
 	
 	private void verifyTableConfiguration() {
-		verify(mockSynapseClientAsync).getEntityBundle(eq(tableEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(tableEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.TABLES));
 		verify(mockPortalGinInjector).createActionMenuWidget();
 		verify(mockPortalGinInjector).createEntityActionController();

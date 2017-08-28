@@ -26,7 +26,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DateTimeUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadgeView;
@@ -47,17 +47,17 @@ public class EntityListRowBadgeTest {
 	@Mock
 	UserBadge mockUserBadge;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
 	DateTimeUtils mockDateTimeUtils;
 	@Mock
 	FileDownloadButton mockFileDownloadButton;
 	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
-		widget = new EntityListRowBadge(mockView, mockUserBadge, mockSynapseClient,
+		widget = new EntityListRowBadge(mockView, mockUserBadge, mockSynapseJavascriptClient,
 				mockFileDownloadButton, mockLazyLoadHelper, mockDateTimeUtils);
 	}
 	@Test
@@ -70,8 +70,8 @@ public class EntityListRowBadgeTest {
 	private EntityBundle setupEntity(Entity entity) {
 		EntityBundle bundle = mock(EntityBundle.class);
 		when(bundle.getEntity()).thenReturn(entity);
-		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		return bundle;
 	}
 	
@@ -104,7 +104,7 @@ public class EntityListRowBadgeTest {
 		verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
 		captor.getValue().invoke();
 		
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showLoading();
 		verify(mockView).setIcon(IconType.LIST_ALT); //project icon
 		verify(mockView).setEntityLink(entityName, "#!Synapse:"+entityId);
@@ -139,7 +139,7 @@ public class EntityListRowBadgeTest {
 		
 		widget.getEntityBundle();
 		
-		verify(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showLoading();
 		verify(mockView).setIcon(IconType.FILE_O); //file icon
 		verify(mockView).setEntityLink(entityName, "#!Synapse:"+entityId+"."+version);
@@ -161,7 +161,7 @@ public class EntityListRowBadgeTest {
 		//test failure response from getEntityBundle
 		String errorMessage = "problem occurred while asking for entity bundle";
 		Exception ex = new Exception(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		widget.getEntityBundle();
 		verify(mockView).showErrorIcon(errorMessage);
 		verify(mockView).setEntityLink(entityId, "#!Synapse:"+entityId);
