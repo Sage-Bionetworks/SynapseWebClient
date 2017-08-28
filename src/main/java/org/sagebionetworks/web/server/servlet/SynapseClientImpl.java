@@ -30,6 +30,7 @@ import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Whitelist;
+import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.AsynchJobType;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -2063,7 +2064,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	@Override
 	public HashMap<String, String> getSynapseProperties(){
 		HashMap<String, String> properties = PortalPropertiesHolder.getPropertiesMap();
-		properties.put(WebConstants.REPO_SERVICE_URL_KEY, getRepositoryServiceUrl());
+		properties.put(WebConstants.REPO_SERVICE_URL_KEY, StackConfiguration.getRepositoryServiceEndpoint());
+		properties.put(WebConstants.FILE_SERVICE_URL_KEY, StackConfiguration.getFileServiceEndpoint());
+		properties.put(WebConstants.AUTH_PUBLIC_SERVICE_URL_KEY, StackConfiguration.getAuthenticationServicePublicEndpoint());
 		return properties;
 	}
 

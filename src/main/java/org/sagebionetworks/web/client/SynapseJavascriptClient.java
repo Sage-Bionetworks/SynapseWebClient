@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
-import org.sagebionetworks.client.ClientUtils;
-import org.sagebionetworks.client.exceptions.SynapseException;
+import org.apache.http.HttpStatus;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Team;
@@ -11,7 +10,15 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
+import org.sagebionetworks.web.shared.exceptions.LockedException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -83,12 +90,9 @@ public class SynapseJavascriptClient {
 								}
 							}, 2000);
 						} else {
-							// convert the error into a RestServiceException.
-							try {
-								ClientUtils.throwException(statusCode, response.getStatusText());
-							} catch (SynapseException e) {
-								onError(request, ExceptionUtil.convertSynapseException(e));
-							}
+							// getException() based on status code, 
+							// instead of using org.sagebionetworks.client.ClientUtils.throwException() and ExceptionUtil.convertSynapseException() (neither of which can be referenced here)
+							onError(request, getException(statusCode, response.getStatusText()));
 						}
 					}
 				}
@@ -100,6 +104,28 @@ public class SynapseJavascriptClient {
 			});
 		} catch (final Exception e) {
 			callback.onFailure(e);
+		}
+	}
+	
+	public static RestServiceException getException(int statusCode, String reasonStr) {
+		if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
+			return new UnauthorizedException(reasonStr);
+		} else if (statusCode == HttpStatus.SC_FORBIDDEN) {
+			return new ForbiddenException(reasonStr);
+		} else if (statusCode == HttpStatus.SC_NOT_FOUND) {
+			return new NotFoundException(reasonStr);
+		} else if (statusCode == HttpStatus.SC_BAD_REQUEST) {
+			return new BadRequestException(reasonStr);
+		} else if (statusCode == HttpStatus.SC_LOCKED) {
+			return new LockedException(reasonStr);
+		} else if (statusCode == HttpStatus.SC_PRECONDITION_FAILED) {
+			return new ConflictingUpdateException(reasonStr);
+		} else if (statusCode == HttpStatus.SC_GONE) {
+			return new BadRequestException(reasonStr);
+		} else if (statusCode == SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE){
+			return new TooManyRequestsException(reasonStr);
+		}else {
+			return new UnknownErrorException(reasonStr);
 		}
 	}
 
