@@ -3,6 +3,9 @@ package org.sagebionetworks.web.client;
 import org.apache.http.HttpStatus;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.RestrictableObjectType;
+import org.sagebionetworks.repo.model.RestrictionInformationRequest;
+import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -28,7 +31,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class SynapseJavascriptClient {
-	RequestBuilderWrapper requestBuilderForGet;
+	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
 	JSONObjectAdapter jsonObjectAdapter;
 	GlobalApplicationState globalAppState;
@@ -53,22 +56,35 @@ public class SynapseJavascriptClient {
 			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalAppState,
 			GWTWrapper gwt) {
-		this.requestBuilderForGet = requestBuilder;
+		this.requestBuilder = requestBuilder;
 		this.authController = authController;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.gwt = gwt;
 		repoServiceUrl = globalAppState.getSynapseProperty(WebConstants.REPO_SERVICE_URL_KEY);
 	}
 
-	private void doGet(final String url, final AsyncCallback<JSONObjectAdapter> callback) {
-		requestBuilderForGet.configure(RequestBuilder.GET, url);
-		requestBuilderForGet.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+	private void doGet(String url, AsyncCallback<JSONObjectAdapter> callback) {
+		requestBuilder.configure(RequestBuilder.GET, url);
+		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
-			requestBuilderForGet.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
+			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-
+		sendRequest(url, null, callback);
+	}
+	
+	private void doPost(String url, String requestData, AsyncCallback<JSONObjectAdapter> callback) {
+		requestBuilder.configure(RequestBuilder.POST, url);
+		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		requestBuilder.setHeader(CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
+		if (authController.isLoggedIn()) {
+			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
+		}
+		sendRequest(url, requestData, callback);
+	}
+	
+	private void sendRequest(final String url, String requestData, final AsyncCallback<JSONObjectAdapter> callback) {
 		try {
-			requestBuilderForGet.sendRequest(null, new RequestCallback() {
+			requestBuilder.sendRequest(requestData, new RequestCallback() {
 				@Override
 				public void onResponseReceived(Request request,
 						Response response) {
@@ -178,4 +194,29 @@ public class SynapseJavascriptClient {
 		};
 		doGet(url, wrapCallback(constructCallback, callback));
 	}
+	
+	public void getRestrictionInformation(String subjectId, RestrictableObjectType type, final AsyncCallback<RestrictionInformationResponse> callback)  {
+		String url = repoServiceUrl + "/restrictionInformation";
+		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
+			@Override
+			public void invoke(JSONObjectAdapter json) {
+				try {
+					callback.onSuccess(new RestrictionInformationResponse(json));
+				} catch (JSONObjectAdapterException e) {
+					callback.onFailure(e);
+				}
+			}
+		};
+		RestrictionInformationRequest request = new RestrictionInformationRequest();
+		request.setObjectId(subjectId);
+		request.setRestrictableObjectType(type);
+		try {
+			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+			request.writeToJSONObject(jsonAdapter);
+			doPost(url, jsonAdapter.toJSONString(), wrapCallback(constructCallback, callback));
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
+	}
+	
 }

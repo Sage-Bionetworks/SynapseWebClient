@@ -39,7 +39,6 @@ public interface DataAccessClientAsync {
 			AsyncCallback<List<AccessRequirement>> callback);
 	void getAccessRequirementStatus(String accessRequirementId, AsyncCallback<AccessRequirementStatus> callback);
 	void cancelDataAccessSubmission(String submissionId, AsyncCallback<Void> asyncCallback);
-	void getRestrictionInformation(String subjectId, RestrictableObjectType type, AsyncCallback<RestrictionInformationResponse> callback);
 	void createLockAccessRequirement(String entityId, AsyncCallback<Void> callback);
 	void updateDataAccessSubmissionState(String submissionId, SubmissionState newState, String reason,
 			AsyncCallback<Submission> callback);
