@@ -99,6 +99,10 @@ public class EntityActionControllerViewImpl implements
 		awsLoginDialog.show();
 	}
 	@Override
+	public void clearAwsLoginCredentials() {
+		awsLoginView.clear();
+	}
+	@Override
 	public String getS3DirectAccessKey() {
 		return awsLoginView.getAccessKey();
 	}

@@ -63,6 +63,7 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -148,6 +149,7 @@ public class EntityActionControllerImpl implements EntityActionController, Entit
 		this.cookies = cookies;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.awsSdk = awsSdk;
+		view.setPresenter(this);
 	}
 	
 	private ApproveUserAccessModal getApproveUserAccessModal() {
@@ -1253,16 +1255,18 @@ public class EntityActionControllerImpl implements EntityActionController, Entit
 		String secretAccessKey = view.getS3DirectSecretKey();
 		final String bucketName = currentExternalObjectStoreFileHandle.getBucket();
 		String endpoint = currentExternalObjectStoreFileHandle.getEndpointUrl();
+		view.clearAwsLoginCredentials();
 		// try to delete underlying file
 		awsSdk.getS3(accessKeyId, secretAccessKey, bucketName, endpoint, new CallbackP<JavaScriptObject>() {
 			public void invoke(JavaScriptObject s3) {
 				String key = currentExternalObjectStoreFileHandle.getFileKey();
-				try {
-					awsSdk.deleteObject(key, bucketName, s3);
-					deleteEntity();
-				} catch (Exception e) {
-					view.showErrorMessage(e.getMessage());
-				}
+				Callback successCallback = new Callback() {
+					@Override
+					public void invoke() {
+						deleteEntity();
+					}
+				};
+				awsSdk.deleteObject(key, bucketName, s3, successCallback);
 			};
 		});
 	}

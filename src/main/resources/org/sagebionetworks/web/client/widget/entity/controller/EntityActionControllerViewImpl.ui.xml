@@ -18,8 +18,8 @@
 				<bh:Div ui:field="awsLoginContainer"/> 		
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button ui:field="awsLoginCancelButton" type="PRIMARY"  dataDismiss="MODAL">Cancel</b:Button>
-				<b:Button ui:field="awsLoginOkButton" type="PRIMARY">OK</b:Button>
+				<b:Button ui:field="awsLoginCancelButton" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button ui:field="awsLoginOkButton" dataDismiss="MODAL" type="PRIMARY">OK</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 		
