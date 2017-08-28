@@ -26,7 +26,7 @@ public class SynapseJavascriptClient {
 	JSONObjectAdapter jsonObjectAdapter;
 	GlobalApplicationState globalAppState;
 	GWTWrapper gwt;
-	
+
 	public static final String ENTITY_URI_PATH = "/entity";
 	public static final String ENTITY_BUNDLE_PATH = "/bundle?mask=";
 	public static final String CONTENT_TYPE = "Content-Type";
@@ -37,7 +37,7 @@ public class SynapseJavascriptClient {
 	public static final String APPLICATION_JSON_CHARSET_UTF8 = "application/json; charset="+SYNAPSE_ENCODING_CHARSET;
 	public static final String REPO_SUFFIX_VERSION = "/version";
 	protected static final String TEAM = "/team";
-	
+
 	public String repoServiceUrl; 
 	@Inject
 	public SynapseJavascriptClient(
@@ -52,14 +52,14 @@ public class SynapseJavascriptClient {
 		this.gwt = gwt;
 		repoServiceUrl = globalAppState.getSynapseProperty(WebConstants.REPO_SERVICE_URL_KEY);
 	}
-	
+
 	private void doGet(final String url, final AsyncCallback<JSONObjectAdapter> callback) {
 		requestBuilderForGet.configure(RequestBuilder.GET, url);
 		requestBuilderForGet.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
 			requestBuilderForGet.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		
+
 		try {
 			requestBuilderForGet.sendRequest(null, new RequestCallback() {
 				@Override
@@ -81,7 +81,7 @@ public class SynapseJavascriptClient {
 								public void invoke() {
 									doGet(url, callback);
 								}
-							}, 200);
+							}, 2000);
 						} else {
 							// convert the error into a RestServiceException.
 							try {
@@ -102,7 +102,7 @@ public class SynapseJavascriptClient {
 			callback.onFailure(e);
 		}
 	}
-	
+
 	public AsyncCallback<JSONObjectAdapter> wrapCallback(final CallbackP<JSONObjectAdapter> constructCallback, final AsyncCallback callback) {
 		return  new AsyncCallback<JSONObjectAdapter>() {
 			@Override
@@ -115,11 +115,11 @@ public class SynapseJavascriptClient {
 			}
 		};
 	}
-	
+
 	public void getEntityBundle(String entityId, int partsMask, final AsyncCallback<EntityBundle> callback) {
 		getEntityBundleForVersion(entityId, null, partsMask, callback);
 	}
-	
+
 	public void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, final AsyncCallback<EntityBundle> callback) {
 		String url = repoServiceUrl + ENTITY_URI_PATH + "/" + entityId + ENTITY_BUNDLE_PATH + partsMask;
 		if (versionNumber != null) {
@@ -137,7 +137,7 @@ public class SynapseJavascriptClient {
 		};
 		doGet(url, wrapCallback(constructCallback, callback));
 	}
-	
+
 	public void getTeam(String teamId, final AsyncCallback<Team> callback) {
 		String url = repoServiceUrl + TEAM + "/" + teamId;
 		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
