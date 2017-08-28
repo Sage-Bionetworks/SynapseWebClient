@@ -355,14 +355,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body) throws RestServiceException, ResultNotReadyException;
 
 	/**
-	 * Get entity children
-	 * @param request
-	 * @return
-	 * @throws RestServiceException
-	 */
-	EntityChildrenResponse getEntityChildren(EntityChildrenRequest request) throws RestServiceException;
-	
-	/**
 	 * Create or update an Entity.
 	 * @param entity
 	 * @param annoJson

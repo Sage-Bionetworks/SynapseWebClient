@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client;
 import org.apache.http.HttpStatus;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -219,4 +221,24 @@ public class SynapseJavascriptClient {
 		}
 	}
 	
+	public void getEntityChildren(EntityChildrenRequest request, final AsyncCallback<EntityChildrenResponse> callback) {
+		String url = repoServiceUrl + ENTITY_URI_PATH + "/children";
+		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
+			@Override
+			public void invoke(JSONObjectAdapter json) {
+				try {
+					callback.onSuccess(new EntityChildrenResponse(json));
+				} catch (JSONObjectAdapterException e) {
+					callback.onFailure(e);
+				}
+			}
+		};
+		try {
+			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+			request.writeToJSONObject(jsonAdapter);
+			doPost(url, jsonAdapter.toJSONString(), wrapCallback(constructCallback, callback));
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
+	}
 }

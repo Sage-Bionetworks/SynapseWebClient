@@ -26,7 +26,7 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -47,7 +47,6 @@ public class TableListWidgetTest {
 	private static final String ENTITY_ID = "syn123";
 	private PreflightController mockPreflightController;
 	private TableListWidgetView mockView;
-	private SynapseClientAsync mockSynapseClient;
 	private UploadTableModalWidget mockUploadTableModalWidget;
 	private TableListWidget widget;
 	private EntityBundle parentBundle;
@@ -60,6 +59,8 @@ public class TableListWidgetTest {
 	LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
 	@Mock
 	EntityChildrenResponse mockResults;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	SynapseAlert mockSynAlert;
 	List<EntityHeader> searchResults;
@@ -76,11 +77,10 @@ public class TableListWidgetTest {
 		parentBundle.setEntity(project);
 		parentBundle.setPermissions(permissions);
 		mockView = Mockito.mock(TableListWidgetView.class);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockUploadTableModalWidget = Mockito.mock(UploadTableModalWidget.class);
 		mockPreflightController = Mockito.mock(PreflightController.class);
-		widget = new TableListWidget(mockPreflightController, mockView, mockSynapseClient, mockUploadTableModalWidget, mockCookies, mockCreateTableViewWizard, mockLoadMoreWidgetContainer, mockSynAlert);
-		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		widget = new TableListWidget(mockPreflightController, mockView, mockSynapseJavascriptClient, mockUploadTableModalWidget, mockCookies, mockCreateTableViewWizard, mockLoadMoreWidgetContainer, mockSynAlert);
+		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		searchResults = new ArrayList<EntityHeader>();
 		when(mockResults.getPage()).thenReturn(searchResults);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
@@ -137,7 +137,7 @@ public class TableListWidgetTest {
 		parentBundle.getPermissions().setCanEdit(false);
 		String error = "an error";
 		Throwable th = new Throwable(error);
-		AsyncMockStubber.callFailureWith(th).when(mockSynapseClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(th).when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		widget.configure(parentBundle);
 		verify(mockSynAlert).handleException(th);
 	}

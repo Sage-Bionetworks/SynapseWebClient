@@ -2521,7 +2521,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} 
 	}
 	
-	@Override
 	public EntityChildrenResponse getEntityChildren(EntityChildrenRequest request) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{

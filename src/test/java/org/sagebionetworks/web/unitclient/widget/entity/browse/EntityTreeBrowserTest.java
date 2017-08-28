@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -56,7 +57,6 @@ import com.google.gwt.user.client.ui.IsTreeItem;
 
 public class EntityTreeBrowserTest {
 	EntityTreeBrowserView mockView;
-	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	IconsImageBundle mockIconsImageBundle;
@@ -65,6 +65,8 @@ public class EntityTreeBrowserTest {
 	EntityTreeBrowser entityTreeBrowser;
 	@Mock
 	EntityChildrenResponse mockResults;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	List<EntityHeader> searchResults;
 	
 	EntityTreeItem mockEntityTreeItem;
@@ -76,7 +78,6 @@ public class EntityTreeBrowserTest {
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(EntityTreeBrowserView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockIconsImageBundle = mock(IconsImageBundle.class);
@@ -86,7 +87,7 @@ public class EntityTreeBrowserTest {
 		mockLoadingItem = mock(IsTreeItem.class);
 		adapterFactory = new AdapterFactoryImpl();
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
-				mockSynapseClient, mockAuthenticationController,  mockGlobalApplicationState,
+				mockSynapseJavascriptClient, mockAuthenticationController,  mockGlobalApplicationState,
 				mockIconsImageBundle, adapterFactory);
 		verify(mockView).setPresenter(entityTreeBrowser);
 		reset(mockView);
@@ -106,7 +107,7 @@ public class EntityTreeBrowserTest {
 		Mockito.when(mockInjector.getMoreTreeWidget()).thenReturn(mockMoreTreeItem);
 		AsyncMockStubber
 				.callSuccessWith(mockResults)
-				.when(mockSynapseClient)
+				.when(mockSynapseJavascriptClient)
 				.getEntityChildren(any(EntityChildrenRequest.class),
 						any(AsyncCallback.class));
 	}
@@ -116,7 +117,7 @@ public class EntityTreeBrowserTest {
 		entityTreeBrowser.getChildren("123", null, null);
 		ArgumentCaptor<EntityChildrenRequest> captor = ArgumentCaptor
 				.forClass(EntityChildrenRequest.class);
-		verify(mockSynapseClient).getEntityChildren(captor.capture(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityChildren(captor.capture(), any(AsyncCallback.class));
 		EntityChildrenRequest request = captor.getValue();
 		assertEquals("123", request.getParentId());
 		assertNull(request.getNextPageToken());
@@ -134,16 +135,16 @@ public class EntityTreeBrowserTest {
 
 	@Test
 	public void testGetFolderChildrenRaceCondition() {
-		mockSynapseClient = mock(SynapseClientAsync.class);
+		mockSynapseJavascriptClient = mock(SynapseJavascriptClient.class);
 		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
-				mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState,
+				mockSynapseJavascriptClient, mockAuthenticationController, mockGlobalApplicationState,
 				mockIconsImageBundle, adapterFactory);
 		entityTreeBrowser.getChildren("123", null, null);
 		// capture the servlet call
 		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor
 				.forClass(AsyncCallback.class);
-		verify(mockSynapseClient).getEntityChildren(any(EntityChildrenRequest.class), captor.capture());
+		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), captor.capture());
 		// before invoking asynccallback.success, set the current entity id to
 		// something else (simulating that the user
 		// has selected a different folder while this was still processing)

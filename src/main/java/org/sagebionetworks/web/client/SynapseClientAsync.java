@@ -316,8 +316,6 @@ public interface SynapseClientAsync {
 	void getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body,
 			AsyncCallback<AsynchronousResponseBody> callback);
 
-	void getEntityChildren(EntityChildrenRequest request, AsyncCallback<EntityChildrenResponse> callback);
-	
 	void createEntity(Entity entity,
 			AsyncCallback<Entity> callback);
 
