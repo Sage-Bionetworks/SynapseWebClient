@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.TabListItem;
+import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -27,7 +29,23 @@ public class VideoConfigViewImpl implements VideoConfigView {
 	@UiField
 	Heading videoFormatWarning;
 	EntityFinder entityFinder;
+	@UiField
+	TabListItem synapseTabListItem;
+	@UiField
+	TabListItem youtubeTabListItem;
+	@UiField
+	TabListItem vimeoTabListItem;
+	@UiField
+	TabPane tab1;
+	@UiField
+	TabPane tab2;
+	@UiField
+	TabPane tab3;
 	
+	@UiField
+	TextBox youtubeUrlField;
+	@UiField
+	TextBox vimeoUrlField;
 	Widget widget;
 	
 	@Inject
@@ -114,5 +132,50 @@ public class VideoConfigViewImpl implements VideoConfigView {
 	@Override
 	public void showFinderError(String error) {
 		entityFinder.showError(error);
+	}
+	
+	@Override
+	public String getVimeoVideoUrl() {
+		return vimeoUrlField.getValue();
+	}
+	
+	@Override
+	public String getYouTubeVideoUrl() {
+		return youtubeUrlField.getValue();
+	}
+	@Override
+	public boolean isSynapseEntity() {
+		return synapseTabListItem.isActive();
+	}
+	@Override
+	public boolean isVimeoVideo() {
+		return vimeoTabListItem.isActive();
+	}
+	@Override
+	public boolean isYouTubeVideo() {
+		return youtubeTabListItem.isActive();
+	}
+	@Override
+	public void setVimeoVideoUrl(String value) {
+		vimeoUrlField.setValue(value);
+	}
+	@Override
+	public void setYouTubeVideoUrl(String value) {
+		youtubeUrlField.setValue(value);
+	}
+	@Override
+	public void showSynapseTab() {
+		synapseTabListItem.setActive(true);
+		tab1.setActive(true);
+	}
+	@Override
+	public void showYouTubeTab() {
+		youtubeTabListItem.setActive(true);
+		tab2.setActive(true);
+	}
+	@Override
+	public void showVimeoTab() {
+		vimeoTabListItem.setActive(true);
+		tab3.setActive(true);
 	}
 }

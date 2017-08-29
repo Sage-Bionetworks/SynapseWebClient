@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -13,7 +12,6 @@ import com.google.inject.Inject;
 
 public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
 
-	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
 	
 	@Inject
@@ -61,6 +59,18 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
 		
 		add(new HTML(builder.toString()));
 	}
+	@Override
+	public void configure(String iframeTargetUrl) {
+		clear();
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("<iframe width=\"560\" height=\"315\" frameborder=\"0\" allowfullscreen=\"true\" src=\"");
+		sb.append(SafeHtmlUtils.htmlEscape(iframeTargetUrl));
+		
+		sb.append("\" />");
+		add(new HTML(sb.toString()));
+		
+	}
 
 	public void showError(String error) {
 		clear();
@@ -71,15 +81,4 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
 	public Widget asWidget() {
 		return this;
 	}	
-
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
-
-
-	/*
-	 * Private Methods
-	 */
-
 }

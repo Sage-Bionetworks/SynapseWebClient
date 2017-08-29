@@ -52,10 +52,6 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getBookmarkConfigEditor();
 		} else if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceConfigEditor();
-		} else if (contentTypeKey.equals(YOUTUBE_CONTENT_TYPE)) {
-			presenter = ginInjector.getYouTubeConfigEditor();
-		} else if (contentTypeKey.equals(VIMEO_CONTENT_TYPE)) {
-			presenter = ginInjector.getVimeoConfigEditor();
 		} else if (contentTypeKey.equals(JOIN_TEAM_CONTENT_TYPE)) {
 			presenter = ginInjector.getJoinTeamConfigEditor();
 		} else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
@@ -84,7 +80,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getButtonLinkConfigEditor();
 		} else if (contentTypeKey.equals(USER_TEAM_BADGE_CONTENT_TYPE)) {
 			presenter = ginInjector.getUserTeamConfigEditor();
-		} else if (contentTypeKey.equals(VIDEO_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(VIDEO_CONTENT_TYPE) ||
+				contentTypeKey.equals(YOUTUBE_CONTENT_TYPE) ||
+				contentTypeKey.equals(VIMEO_CONTENT_TYPE)) {
 			presenter = ginInjector.getVideoConfigEditor();
 		} else if (contentTypeKey.equals(SYNAPSE_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseTableQueryResultEditor();
@@ -122,10 +120,6 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getBookmarkRenderer();
 		} else if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceRenderer();
-		} else if (contentTypeKey.equals(YOUTUBE_CONTENT_TYPE)) {
-			presenter = ginInjector.getYouTubeRenderer();
-		} else if (contentTypeKey.equals(VIMEO_CONTENT_TYPE)) {
-			presenter = ginInjector.getVimeoRenderer();
 		} else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceRenderer();
 		} else if (contentTypeKey.equals(IMAGE_CONTENT_TYPE) ||
@@ -159,7 +153,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getTutorialWidgetRenderer();
 		} else if (contentTypeKey.equals(WIKI_SUBPAGES_CONTENT_TYPE) || contentTypeKey.equals(NO_AUTO_WIKI_SUBPAGES)) {
 			presenter = ginInjector.getEmptyWidget();
-		} else if (contentTypeKey.equals(VIDEO_CONTENT_TYPE)) {
+		} else if (contentTypeKey.equals(VIDEO_CONTENT_TYPE) ||
+				contentTypeKey.equals(YOUTUBE_CONTENT_TYPE) ||
+				contentTypeKey.equals(VIMEO_CONTENT_TYPE)) {
 			presenter = ginInjector.getVideoWidget();
 		} else if (contentTypeKey.equals(SYNAPSE_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseTableQueryResultWikiWidget();
