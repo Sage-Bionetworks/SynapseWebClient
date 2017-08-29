@@ -5,21 +5,47 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	
 	<bh:Div>
-		<b:Row addStyleNames="margin-10">
-			<b:Column size="XS_12">
-				<b:InputGroup>
-					<b:TextBox ui:field="entity" autoComplete="false" enabled="false" />
-					<b:InputGroupButton>
-						<b:Button text="Find video file" ui:field="button" icon="SEARCH" width="140px"/>
-					</b:InputGroupButton>
-				</b:InputGroup>
-			</b:Column>
-			<b:Column size="XS_12" >
-				<b:Heading size="H5" ui:field="videoFormatWarning" visible="false">
-					<bh:Text>We recommend using the mp4 video format for</bh:Text>
-					<b:Anchor ui:field="moreInfoLink" target="_blank" addStyleNames="margin-left-5" text="cross-browser compatability" href="http://en.wikipedia.org/wiki/HTML5_video#Browser_support"/>
-				</b:Heading>
-			</b:Column>
-		</b:Row>
+		<!-- Tabs -->
+		<b:NavTabs>
+			<b:TabListItem ui:field="synapseTabListItem" dataTarget="#tab1" text="From Synapse File"/>
+			<b:TabListItem ui:field="youtubeTabListItem" dataTarget="#tab1" text="YouTube"/>
+			<b:TabListItem ui:field="vimeoTabListItem" dataTarget="#tab3" text="Vimeo"/>
+		</b:NavTabs>
+		<b:TabContent>
+			<b:TabPane b:id="tab1" addStyleNames="margin-top-15" ui:field="tab1">
+				<b:Row addStyleNames="margin-10">
+					<b:Column size="XS_12">
+						<b:InputGroup>
+							<b:TextBox ui:field="entity" autoComplete="false" enabled="false" />
+							<b:InputGroupButton>
+								<b:Button text="Find video file" ui:field="button" icon="SEARCH" width="140px"/>
+							</b:InputGroupButton>
+						</b:InputGroup>
+					</b:Column>
+					<b:Column size="XS_12" >
+						<b:Heading size="H5" ui:field="videoFormatWarning" visible="false">
+							<bh:Text>We recommend using the mp4 video format for</bh:Text>
+							<b:Anchor ui:field="moreInfoLink" target="_blank" addStyleNames="margin-left-5" text="cross-browser compatability" href="http://en.wikipedia.org/wiki/HTML5_video#Browser_support"/>
+						</b:Heading>
+					</b:Column>
+				</b:Row>
+			</b:TabPane>
+			<b:TabPane b:id="tab2" addStyleNames="margin-top-15" ui:field="tab2">
+				<b:FieldSet>
+					<b:FormGroup>
+						<b:FormLabel>YouTube Video URL</b:FormLabel>
+						<b:TextBox ui:field="youtubeUrlField" />
+					</b:FormGroup>
+				</b:FieldSet>
+			</b:TabPane>
+			<b:TabPane b:id="tab3" addStyleNames="margin-top-15" ui:field="tab3">
+				<b:FieldSet>
+					<b:FormGroup>
+						<b:FormLabel>Vimeo Video URL</b:FormLabel>
+						<b:TextBox ui:field="vimeoUrlField" />
+					</b:FormGroup>
+				</b:FieldSet>
+			</b:TabPane>
+		</b:TabContent>
 	</bh:Div>
 </ui:UiBinder>

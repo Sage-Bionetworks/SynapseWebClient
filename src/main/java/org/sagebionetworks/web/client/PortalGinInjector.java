@@ -127,8 +127,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEdit
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.VimeoConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
@@ -332,8 +330,6 @@ public interface PortalGinInjector extends Ginjector {
 	////// Editors
 	public BookmarkConfigEditor getBookmarkConfigEditor();
 	public ReferenceConfigEditor getReferenceConfigEditor();
-	public YouTubeConfigEditor getYouTubeConfigEditor();
-	public VimeoConfigEditor getVimeoConfigEditor();
 	public ProvenanceConfigEditor getProvenanceConfigEditor();
 	public ImageConfigEditor getImageConfigEditor();
 	public ImageLinkConfigEditor getImageLinkConfigEditor();
