@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client;
 
-import org.apache.http.HttpStatus;
-import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
+import static org.apache.http.HttpStatus.*;
+import static org.sagebionetworks.web.shared.WebConstants.*;
+import static com.google.gwt.http.client.RequestBuilder.*;
+import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.*;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
@@ -15,7 +17,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
@@ -27,15 +28,19 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
+
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class SynapseJavascriptClient {
+	public static final String WIKI = "/wiki/";
+	public static final String WIKIKEY = "/wikikey";
+	public static final String CHILDREN = "/children";
+	public static final String RESTRICTION_INFORMATION = "/restrictionInformation";
+	public static final int RETRY_REQUEST_DELAY_MS = 2000;
 	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
 	JSONObjectAdapter jsonObjectAdapter;
@@ -66,11 +71,11 @@ public class SynapseJavascriptClient {
 		this.authController = authController;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.gwt = gwt;
-		repoServiceUrl = globalAppState.getSynapseProperty(WebConstants.REPO_SERVICE_URL_KEY);
+		repoServiceUrl = globalAppState.getSynapseProperty(REPO_SERVICE_URL_KEY);
 	}
 
 	private void doGet(String url, AsyncCallback<JSONObjectAdapter> callback) {
-		requestBuilder.configure(RequestBuilder.GET, url);
+		requestBuilder.configure(GET, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
@@ -79,7 +84,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	private void doPost(String url, String requestData, AsyncCallback<JSONObjectAdapter> callback) {
-		requestBuilder.configure(RequestBuilder.POST, url);
+		requestBuilder.configure(POST, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		requestBuilder.setHeader(CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
@@ -88,14 +93,14 @@ public class SynapseJavascriptClient {
 		sendRequest(url, requestData, callback);
 	}
 	
-	private void sendRequest(final String url, String requestData, final AsyncCallback<JSONObjectAdapter> callback) {
+	private void sendRequest(final String url, final String requestData, final AsyncCallback<JSONObjectAdapter> callback) {
 		try {
 			requestBuilder.sendRequest(requestData, new RequestCallback() {
 				@Override
 				public void onResponseReceived(Request request,
 						Response response) {
 					int statusCode = response.getStatusCode();
-					if (statusCode == Response.SC_OK) {
+					if (statusCode == SC_OK) {
 						try {
 							JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
 							callback.onSuccess(jsonObject);
@@ -103,14 +108,14 @@ public class SynapseJavascriptClient {
 							onError(null, e);
 						}
 					} else {
-						if (statusCode == SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE) {
+						if (statusCode == TOO_MANY_REQUESTS_STATUS_CODE) {
 							// wait a couple of seconds and try the request again...
 							gwt.scheduleExecution(new Callback() {
 								@Override
 								public void invoke() {
-									doGet(url, callback);
+									sendRequest(url, requestData, callback);
 								}
-							}, 2000);
+							}, RETRY_REQUEST_DELAY_MS);
 						} else {
 							// getException() based on status code, 
 							// instead of using org.sagebionetworks.client.ClientUtils.throwException() and ExceptionUtil.convertSynapseException() (neither of which can be referenced here)
@@ -130,21 +135,21 @@ public class SynapseJavascriptClient {
 	}
 	
 	public static RestServiceException getException(int statusCode, String reasonStr) {
-		if (statusCode == HttpStatus.SC_UNAUTHORIZED) {
+		if (statusCode == SC_UNAUTHORIZED) {
 			return new UnauthorizedException(reasonStr);
-		} else if (statusCode == HttpStatus.SC_FORBIDDEN) {
+		} else if (statusCode == SC_FORBIDDEN) {
 			return new ForbiddenException(reasonStr);
-		} else if (statusCode == HttpStatus.SC_NOT_FOUND) {
+		} else if (statusCode == SC_NOT_FOUND) {
 			return new NotFoundException(reasonStr);
-		} else if (statusCode == HttpStatus.SC_BAD_REQUEST) {
+		} else if (statusCode == SC_BAD_REQUEST) {
 			return new BadRequestException(reasonStr);
-		} else if (statusCode == HttpStatus.SC_LOCKED) {
+		} else if (statusCode == SC_LOCKED) {
 			return new LockedException(reasonStr);
-		} else if (statusCode == HttpStatus.SC_PRECONDITION_FAILED) {
+		} else if (statusCode == SC_PRECONDITION_FAILED) {
 			return new ConflictingUpdateException(reasonStr);
-		} else if (statusCode == HttpStatus.SC_GONE) {
+		} else if (statusCode == SC_GONE) {
 			return new BadRequestException(reasonStr);
-		} else if (statusCode == SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE){
+		} else if (statusCode == TOO_MANY_REQUESTS_STATUS_CODE){
 			return new TooManyRequestsException(reasonStr);
 		}else {
 			return new UnknownErrorException(reasonStr);
@@ -202,7 +207,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getRestrictionInformation(String subjectId, RestrictableObjectType type, final AsyncCallback<RestrictionInformationResponse> callback)  {
-		String url = repoServiceUrl + "/restrictionInformation";
+		String url = repoServiceUrl + RESTRICTION_INFORMATION;
 		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
 			@Override
 			public void invoke(JSONObjectAdapter json) {
@@ -226,7 +231,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getEntityChildren(EntityChildrenRequest request, final AsyncCallback<EntityChildrenResponse> callback) {
-		String url = repoServiceUrl + ENTITY_URI_PATH + "/children";
+		String url = repoServiceUrl + ENTITY_URI_PATH + CHILDREN;
 		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
 			@Override
 			public void invoke(JSONObjectAdapter json) {
@@ -255,7 +260,7 @@ public class SynapseJavascriptClient {
 			// get the root wiki page id first
 			String url = repoServiceUrl + "/" +
 					key.getOwnerObjectType().toLowerCase() + "/" + 
-					key.getOwnerObjectId() + "/wikikey";
+					key.getOwnerObjectId() + WIKIKEY;
 			CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
 				@Override
 				public void invoke(JSONObjectAdapter json) {
@@ -277,7 +282,7 @@ public class SynapseJavascriptClient {
 	private void getVersionOfV2WikiPageAsV1WithWikiPageId(WikiPageKey key, Long versionNumber, final AsyncCallback<WikiPage> callback) {
 		String url = repoServiceUrl + "/" +
 				key.getOwnerObjectType().toLowerCase() + "/" + 
-				key.getOwnerObjectId() + "/wiki/" +
+				key.getOwnerObjectId() + WIKI +
 				key.getWikiPageId();
 		if (versionNumber != null) {
 			url += WIKI_VERSION_PARAMETER + versionNumber;
