@@ -189,8 +189,6 @@ public interface SynapseClientAsync {
 
 	public void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	public void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
-	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback);
-	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<WikiPage> callback);
 	
 	void getEntitiesGeneratedBy(String activityId, Integer limit,
 			Integer offset, AsyncCallback<PaginatedResults<Reference>> callback);

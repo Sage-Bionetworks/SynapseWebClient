@@ -19,7 +19,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -167,9 +166,6 @@ import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
 import com.google.gwt.core.server.StackTraceDeobfuscator;
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
 import com.google.gwt.thirdparty.guava.common.base.Suppliers;
@@ -195,31 +191,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 
 	private static StackTraceDeobfuscator deobfuscator = null;
 	
-	private Cache<MarkdownCacheRequest, WikiPage> wiki2Markdown = CacheBuilder
-			.newBuilder().maximumSize(35).expireAfterAccess(1, TimeUnit.HOURS)
-			.build(new CacheLoader<MarkdownCacheRequest, WikiPage>() {
-				@Override
-				public WikiPage load(MarkdownCacheRequest key) throws Exception {
-					try {
-						org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-						WikiPage returnPage = null;
-						if (key.getVersion() == null)
-							returnPage = synapseClient.getWikiPage(key
-									.getWikiPageKey());
-						else
-							returnPage = synapseClient
-									.getWikiPageForVersion(
-											key.getWikiPageKey(),
-											key.getVersion());
-
-						return returnPage;
-					} catch (SynapseException e) {
-						throw ExceptionUtil.convertSynapseException(e);
-					}
-				}
-			});
-	
-    private final Supplier<Set<String>> htmlTeamMembersCache = Suppliers.memoizeWithExpiration(teamMembersSupplier(), 1, TimeUnit.HOURS);
+	private final Supplier<Set<String>> htmlTeamMembersCache = Suppliers.memoizeWithExpiration(teamMembersSupplier(), 1, TimeUnit.HOURS);
 
     public Set<String> getHtmlTeamMembers() {
         return htmlTeamMembersCache.get();
@@ -254,10 +226,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
 	private volatile HashSet<String> wikiBasedEntities;
 	
-	public void setMarkdownCache(Cache<MarkdownCacheRequest, WikiPage> wikiToMarkdown) {
-		this.wiki2Markdown = wikiToMarkdown;
-	}
-
 	/*
 	 * SynapseClient Service Methods
 	 */
@@ -1351,8 +1319,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 		return wikiPageId;
 	}
-
-	@Override
+	
 	public WikiPage getV2WikiPageAsV1(
 			org.sagebionetworks.web.shared.WikiPageKey key)
 			throws RestServiceException, IOException {
@@ -1361,55 +1328,10 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				key.getOwnerObjectId(),
 				ObjectType.valueOf(key.getOwnerObjectType()),
 				getWikiKeyId(synapseClient, key));
-		String etag = null;
 		try {
-			V2WikiPage page = synapseClient.getV2WikiPage(properKey);
-			etag = page.getEtag();
+			return synapseClient.getWikiPage(properKey);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		}
-
-		MarkdownCacheRequest request = new MarkdownCacheRequest(properKey,
-				etag, null);
-		return processMarkdownRequest(request);
-	}
-
-	@Override
-	public WikiPage getVersionOfV2WikiPageAsV1(
-			org.sagebionetworks.web.shared.WikiPageKey key, Long version)
-			throws RestServiceException, IOException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
-				key.getOwnerObjectId(),
-				ObjectType.valueOf(key.getOwnerObjectType()),
-				getWikiKeyId(synapseClient, key));
-		String etag = null;
-		try {
-			V2WikiPage page = synapseClient.getVersionOfV2WikiPage(properKey,
-					version);
-			etag = page.getEtag();
-			key.setWikiPageId(page.getId());
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-
-		MarkdownCacheRequest request = new MarkdownCacheRequest(properKey,
-				etag, version);
-		return processMarkdownRequest(request);
-	}
-
-	private WikiPage processMarkdownRequest(MarkdownCacheRequest request)
-			throws RestServiceException {
-		try {
-			return wiki2Markdown.get(request);
-		} catch (ExecutionException e) {
-			if (e.getCause() != null
-					&& e.getCause() instanceof SynapseException)
-				throw ExceptionUtil
-						.convertSynapseException((SynapseException) e
-								.getCause());
-			else
-				throw new RestServiceException(e.getMessage());
 		}
 	}
 

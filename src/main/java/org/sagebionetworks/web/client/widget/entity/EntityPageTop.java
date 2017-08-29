@@ -472,7 +472,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 				@Override
 				public void noWikiFound() {
-					if (isWikiTabShown && projectBundle.getRootWikiId() != null) {
+					if (isWikiTabShown && projectBundle.getRootWikiId() != null && !projectBundle.getRootWikiId().equals(wikiAreaToken)) {
 						// attempted to load a wiki, but it was not found.  Show a message, and redirect to the root.
 						view.showInfo("Wiki not found (id=" + wikiAreaToken + "), loading root wiki page instead.","");
 						wikiTab.asTab().setContentStale(true);

@@ -9,12 +9,14 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -25,6 +27,7 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -48,7 +51,8 @@ public class SynapseJavascriptClient {
 	public static final String SYNAPSE_ENCODING_CHARSET = "UTF-8";
 	public static final String APPLICATION_JSON_CHARSET_UTF8 = "application/json; charset="+SYNAPSE_ENCODING_CHARSET;
 	public static final String REPO_SUFFIX_VERSION = "/version";
-	protected static final String TEAM = "/team";
+	public static final String TEAM = "/team";
+	public static final String WIKI_VERSION_PARAMETER = "?wikiVersion=";
 
 	public String repoServiceUrl; 
 	@Inject
@@ -240,5 +244,55 @@ public class SynapseJavascriptClient {
 		} catch (JSONObjectAdapterException e) {
 			callback.onFailure(e);
 		}
+	}
+	
+	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback) {
+		getVersionOfV2WikiPageAsV1(key, null, callback);
+	}
+	
+	public void getVersionOfV2WikiPageAsV1(final WikiPageKey key, final Long versionNumber, final AsyncCallback<WikiPage> callback) {
+		if (key.getWikiPageId() == null) {
+			// get the root wiki page id first
+			String url = repoServiceUrl + "/" +
+					key.getOwnerObjectType().toLowerCase() + "/" + 
+					key.getOwnerObjectId() + "/wikikey";
+			CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
+				@Override
+				public void invoke(JSONObjectAdapter json) {
+					try {
+						String wikiPageId = new org.sagebionetworks.repo.model.dao.WikiPageKey(json).getWikiPageId();
+						key.setWikiPageId(wikiPageId);
+						getVersionOfV2WikiPageAsV1WithWikiPageId(key, versionNumber, callback);
+					} catch (JSONObjectAdapterException e) {
+						callback.onFailure(e);
+					}
+				}
+			};
+			doGet(url, wrapCallback(constructCallback, callback));
+		} else {
+			getVersionOfV2WikiPageAsV1WithWikiPageId(key, versionNumber, callback);
+		}
+	}
+	
+	private void getVersionOfV2WikiPageAsV1WithWikiPageId(WikiPageKey key, Long versionNumber, final AsyncCallback<WikiPage> callback) {
+		String url = repoServiceUrl + "/" +
+				key.getOwnerObjectType().toLowerCase() + "/" + 
+				key.getOwnerObjectId() + "/wiki/" +
+				key.getWikiPageId();
+		if (versionNumber != null) {
+			url += WIKI_VERSION_PARAMETER + versionNumber;
+		}
+				
+		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
+			@Override
+			public void invoke(JSONObjectAdapter json) {
+				try {
+					callback.onSuccess(new WikiPage(json));
+				} catch (JSONObjectAdapterException e) {
+					callback.onFailure(e);
+				}
+			}
+		};
+		doGet(url, wrapCallback(constructCallback, callback));
 	}
 }

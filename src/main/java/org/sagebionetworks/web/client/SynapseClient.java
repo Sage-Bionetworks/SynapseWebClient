@@ -14,8 +14,6 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityChildrenRequest;
-import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LogEntry;
@@ -244,8 +242,6 @@ public interface SynapseClient extends XsrfProtectedService {
     
 	public WikiPage createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
 	public WikiPage updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
-	public WikiPage getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
-	public WikiPage getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
 	
 	public EntityHeader addFavorite(String entityId) throws RestServiceException;
 	

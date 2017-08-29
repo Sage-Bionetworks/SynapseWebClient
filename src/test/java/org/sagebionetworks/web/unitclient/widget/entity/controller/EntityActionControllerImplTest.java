@@ -77,6 +77,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -183,6 +184,9 @@ public class EntityActionControllerImplTest {
 	PublicPrincipalIds mockPublicPrincipalIds;
 	@Mock
 	AccessControlList mockACL;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	
 	Set<ResourceAccess> resourceAccessSet;
 	
 	public static final String SELECTED_TEAM_ID = "987654";
@@ -234,6 +238,7 @@ public class EntityActionControllerImplTest {
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockSubmitter);
 		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
+		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockSynapseJavascriptClient);
 		// The controller under test.
 		controller = new EntityActionControllerImpl(mockView,
 				mockPreflightController,
@@ -1032,7 +1037,7 @@ public class EntityActionControllerImplTest {
 		WikiPage page = new WikiPage();
 		String markdown = "hello markdown";
 		page.setMarkdown(markdown);
-		AsyncMockStubber.callSuccessWith(page).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class),any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(page).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class),any(AsyncCallback.class));
 		entityBundle.setRootWikiId("111");
 		controller.configure(mockActionMenu, entityBundle, true,null, mockEntityUpdatedHandler);
 		controller.onAction(Action.VIEW_WIKI_SOURCE);
@@ -1041,7 +1046,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testOnViewWikiSourceError(){
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class),any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class),any(AsyncCallback.class));
 		entityBundle.setRootWikiId("111");
 		controller.configure(mockActionMenu, entityBundle, true,null, mockEntityUpdatedHandler);
 		controller.onAction(Action.VIEW_WIKI_SOURCE);
