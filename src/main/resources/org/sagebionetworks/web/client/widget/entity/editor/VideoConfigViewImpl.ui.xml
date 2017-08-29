@@ -8,7 +8,7 @@
 		<!-- Tabs -->
 		<b:NavTabs>
 			<b:TabListItem ui:field="synapseTabListItem" dataTarget="#tab1" text="From Synapse File"/>
-			<b:TabListItem ui:field="youtubeTabListItem" dataTarget="#tab1" text="YouTube"/>
+			<b:TabListItem ui:field="youtubeTabListItem" dataTarget="#tab2" text="YouTube"/>
 			<b:TabListItem ui:field="vimeoTabListItem" dataTarget="#tab3" text="Vimeo"/>
 		</b:NavTabs>
 		<b:TabContent>

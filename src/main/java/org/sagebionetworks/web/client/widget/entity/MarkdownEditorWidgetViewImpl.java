@@ -98,10 +98,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public AnchorListItem synapseFormLink;
 	@UiField
 	public AnchorListItem videoLink;
-	@UiField
-	public AnchorListItem youTubeLink;
-	@UiField
-	public AnchorListItem vimeoLink;
 	
 	@UiField
 	public Button formattingGuideButton;
@@ -216,8 +212,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		teamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_USER_TEAM_BADGE));
 		synapseFormLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_FORM));
 		videoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
-		youTubeLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_YOU_TUBE));
-		vimeoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIMEO));
 		previewLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_PREVIEW));
 		bookmarkLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BOOKMARK));
 		synapseTableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_TABLE));

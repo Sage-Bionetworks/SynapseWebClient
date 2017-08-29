@@ -55,18 +55,18 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 		} else if (youtubeVideoId != null) {
 			view.showYouTubeTab();
 			view.setYouTubeVideoUrl(YOUTUBE_URL_PREFIX + youtubeVideoId);
-		} else if (descriptor.get(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY) != null) {
+		} else {
 			view.showSynapseTab();
-			currentType = VIDEO_TYPE.MP4;
-			view.setEntity(descriptor.get(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY));
-		} else if (descriptor.get(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY) != null){
-			view.showSynapseTab();
-			currentType = VIDEO_TYPE.OGG;
-			view.setEntity(descriptor.get(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY));
-		} else if (descriptor.get(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY) != null){
-			view.showSynapseTab();
-			currentType = VIDEO_TYPE.WEBM;
-			view.setEntity(descriptor.get(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY));
+			if (descriptor.get(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY) != null) {
+				currentType = VIDEO_TYPE.MP4;
+				view.setEntity(descriptor.get(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY));
+			} else if (descriptor.get(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY) != null){
+				currentType = VIDEO_TYPE.OGG;
+				view.setEntity(descriptor.get(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY));
+			} else if (descriptor.get(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY) != null){
+				currentType = VIDEO_TYPE.WEBM;
+				view.setEntity(descriptor.get(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY));
+			}
 		}
 	}
 	

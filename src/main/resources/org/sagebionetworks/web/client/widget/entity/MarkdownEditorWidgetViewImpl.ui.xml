@@ -36,9 +36,7 @@
 				    <b:AnchorListItem ui:field="teamMemberCountLink" text="Team Member Count" />
 					<b:AnchorListItem ui:field="teamMembersLink" text="Team Members List" />
 					<b:AnchorListItem ui:field="userLink" text="User"/>
-				    <b:AnchorListItem ui:field="videoLink" icon="HTML5" iconPosition="RIGHT" text="Video"/>
-				    <b:AnchorListItem ui:field="vimeoLink" icon="VIMEO_SQUARE" iconPosition="RIGHT" text="Vimeo Video"/>
-				    <b:AnchorListItem ui:field="youTubeLink" icon="YOUTUBE" iconPosition="RIGHT" text="YouTube Video"/>
+				    <b:AnchorListItem ui:field="videoLink" icon="VIDEO_CAMERA" iconPosition="RIGHT" text="Video"/>
 				  </b:DropDownMenu>
 				</b:ButtonGroup>
 		        <b:ButtonGroup>

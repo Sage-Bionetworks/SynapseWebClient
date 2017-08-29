@@ -427,12 +427,6 @@ public class MarkdownEditorWidgetTest {
 	}
 	
 	@Test
-	public void testHandleCommandInsertYouTube(){
-		String contentType = WidgetConstants.YOUTUBE_CONTENT_TYPE;
-		presenter.handleCommand(MarkdownEditorAction.INSERT_YOU_TUBE);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
-	}
-	@Test
 	public void testHandleCommandInsertBookmark(){
 		String contentType = WidgetConstants.BOOKMARK_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_BOOKMARK);
