@@ -121,9 +121,6 @@ public interface SynapseClientAsync {
 
 	void getUserProfile(String userId, AsyncCallback<UserProfile> callback);
 	
-	void listUserProfiles(List<String> userIds,
-			AsyncCallback<List<UserProfile>> callback);
-	
 	void getUserGroupHeadersById(ArrayList<String> ids, AsyncCallback<UserGroupHeaderResponsePage> headers);
 	
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);

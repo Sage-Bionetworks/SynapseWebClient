@@ -1436,18 +1436,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
-	@Override
-	public List<UserProfile> listUserProfiles(List<String> userIds) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			List<Long> userIdsLong = new LinkedList<Long>();
-			for (String idString :userIds) {
-				userIdsLong.add(Long.parseLong(idString));
-			}
-			return synapseClient.listUserProfiles(userIdsLong);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
+	public List<UserProfile> listUserProfiles(List<String> userIds, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
+		List<Long> userIdsLong = new LinkedList<Long>();
+		for (String idString :userIds) {
+			userIdsLong.add(Long.parseLong(idString));
 		}
+		return synapseClient.listUserProfiles(userIdsLong);
 	}
 	
 	@Override
@@ -2506,7 +2500,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				if (header.getModifiedBy() != null)
 					lastModifiedByList.add(header.getModifiedBy().toString());
 			}			
-			return new ProjectPagedResults(headers, safeLongToInt(paginatedResults.getTotalNumberOfResults()), listUserProfiles(lastModifiedByList));
+			return new ProjectPagedResults(headers, safeLongToInt(paginatedResults.getTotalNumberOfResults()), listUserProfiles(lastModifiedByList, synapseClient));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -2525,7 +2519,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				if (header.getModifiedBy() != null)
 					lastModifiedByList.add(header.getModifiedBy().toString());
 			}
-			return new ProjectPagedResults(headers, safeLongToInt(paginatedResults.getTotalNumberOfResults()), listUserProfiles(lastModifiedByList));
+			return new ProjectPagedResults(headers, safeLongToInt(paginatedResults.getTotalNumberOfResults()), listUserProfiles(lastModifiedByList, synapseClient));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -2542,7 +2536,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				if (header.getModifiedBy() != null)
 					lastModifiedByList.add(header.getModifiedBy().toString());
 			}
-			return new ProjectPagedResults(headers, safeLongToInt(paginatedResults.getTotalNumberOfResults()), listUserProfiles(lastModifiedByList));
+			return new ProjectPagedResults(headers, safeLongToInt(paginatedResults.getTotalNumberOfResults()), listUserProfiles(lastModifiedByList, synapseClient));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

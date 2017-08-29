@@ -1,17 +1,32 @@
 package org.sagebionetworks.web.client;
 
-import static org.apache.http.HttpStatus.*;
-import static org.sagebionetworks.web.shared.WebConstants.*;
-import static com.google.gwt.http.client.RequestBuilder.*;
-import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.*;
+import static com.google.gwt.http.client.RequestBuilder.GET;
+import static com.google.gwt.http.client.RequestBuilder.POST;
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
+import static org.apache.http.HttpStatus.SC_GONE;
+import static org.apache.http.HttpStatus.SC_LOCKED;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_PRECONDITION_FAILED;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
+import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -29,17 +44,24 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.http.client.Request;
-
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
+/**
+ * Used to call Synapse backend services directly from the client.
+ * Reflection is not supported (you can't call Class.newInstance() in this js code), so each method has a construction callback where they create the return object.
+ * 
+ * @author Jay
+ *
+ */
 public class SynapseJavascriptClient {
 	public static final String WIKI = "/wiki/";
 	public static final String WIKIKEY = "/wikikey";
 	public static final String CHILDREN = "/children";
 	public static final String RESTRICTION_INFORMATION = "/restrictionInformation";
+	public static final String USER_PROFILE_PATH = "/userProfile";
 	public static final int RETRY_REQUEST_DELAY_MS = 2000;
 	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
@@ -58,8 +80,8 @@ public class SynapseJavascriptClient {
 	public static final String REPO_SUFFIX_VERSION = "/version";
 	public static final String TEAM = "/team";
 	public static final String WIKI_VERSION_PARAMETER = "?wikiVersion=";
+	private String repoServiceUrl; 
 
-	public String repoServiceUrl; 
 	@Inject
 	public SynapseJavascriptClient(
 			RequestBuilderWrapper requestBuilder,
@@ -70,10 +92,15 @@ public class SynapseJavascriptClient {
 		this.requestBuilder = requestBuilder;
 		this.authController = authController;
 		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.globalAppState = globalAppState;
 		this.gwt = gwt;
-		repoServiceUrl = globalAppState.getSynapseProperty(REPO_SERVICE_URL_KEY);
 	}
-
+	private String getRepoServiceUrl() {
+		if (repoServiceUrl == null) {
+			repoServiceUrl = globalAppState.getSynapseProperty(REPO_SERVICE_URL_KEY);
+		}
+		return repoServiceUrl;
+	}
 	private void doGet(String url, AsyncCallback<JSONObjectAdapter> callback) {
 		requestBuilder.configure(GET, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
@@ -157,7 +184,7 @@ public class SynapseJavascriptClient {
 	}
 
 	public AsyncCallback<JSONObjectAdapter> wrapCallback(final CallbackP<JSONObjectAdapter> constructCallback, final AsyncCallback callback) {
-		return  new AsyncCallback<JSONObjectAdapter>() {
+		return new AsyncCallback<JSONObjectAdapter>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				callback.onFailure(caught);
@@ -174,7 +201,7 @@ public class SynapseJavascriptClient {
 	}
 
 	public void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, final AsyncCallback<EntityBundle> callback) {
-		String url = repoServiceUrl + ENTITY_URI_PATH + "/" + entityId + ENTITY_BUNDLE_PATH + partsMask;
+		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId + ENTITY_BUNDLE_PATH + partsMask;
 		if (versionNumber != null) {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
@@ -192,7 +219,7 @@ public class SynapseJavascriptClient {
 	}
 
 	public void getTeam(String teamId, final AsyncCallback<Team> callback) {
-		String url = repoServiceUrl + TEAM + "/" + teamId;
+		String url = getRepoServiceUrl() + TEAM + "/" + teamId;
 		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
 			@Override
 			public void invoke(JSONObjectAdapter json) {
@@ -207,7 +234,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getRestrictionInformation(String subjectId, RestrictableObjectType type, final AsyncCallback<RestrictionInformationResponse> callback)  {
-		String url = repoServiceUrl + RESTRICTION_INFORMATION;
+		String url = getRepoServiceUrl() + RESTRICTION_INFORMATION;
 		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
 			@Override
 			public void invoke(JSONObjectAdapter json) {
@@ -231,7 +258,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getEntityChildren(EntityChildrenRequest request, final AsyncCallback<EntityChildrenResponse> callback) {
-		String url = repoServiceUrl + ENTITY_URI_PATH + CHILDREN;
+		String url = getRepoServiceUrl() + ENTITY_URI_PATH + CHILDREN;
 		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
 			@Override
 			public void invoke(JSONObjectAdapter json) {
@@ -258,7 +285,7 @@ public class SynapseJavascriptClient {
 	public void getVersionOfV2WikiPageAsV1(final WikiPageKey key, final Long versionNumber, final AsyncCallback<WikiPage> callback) {
 		if (key.getWikiPageId() == null) {
 			// get the root wiki page id first
-			String url = repoServiceUrl + "/" +
+			String url = getRepoServiceUrl() + "/" +
 					key.getOwnerObjectType().toLowerCase() + "/" + 
 					key.getOwnerObjectId() + WIKIKEY;
 			CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
@@ -280,7 +307,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	private void getVersionOfV2WikiPageAsV1WithWikiPageId(WikiPageKey key, Long versionNumber, final AsyncCallback<WikiPage> callback) {
-		String url = repoServiceUrl + "/" +
+		String url = getRepoServiceUrl() + "/" +
 				key.getOwnerObjectType().toLowerCase() + "/" + 
 				key.getOwnerObjectId() + WIKI +
 				key.getWikiPageId();
@@ -299,5 +326,43 @@ public class SynapseJavascriptClient {
 			}
 		};
 		doGet(url, wrapCallback(constructCallback, callback));
+	}
+	
+	public void listUserProfiles(List<String> userIds, final AsyncCallback<List<UserProfile>> callback) {
+		List<Long> userIdsLong = new ArrayList<>();
+		for (String userId : userIds) {
+			userIdsLong.add(Long.parseLong(userId));
+		}
+		listUserProfilesFromUserIds(userIdsLong, callback);
+	}
+	private void listUserProfilesFromUserIds(List<Long> userIds, final AsyncCallback<List<UserProfile>> callback) {
+		String url = getRepoServiceUrl() + USER_PROFILE_PATH;
+		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
+			@Override
+			public void invoke(JSONObjectAdapter json) {
+				// json really represents a ListWrapper, but we can't reference ListWrapper here because it uses Class.forName() (breaks gwt compile)
+				try {
+					List<UserProfile> list = new ArrayList<>();
+					JSONArrayAdapter jsonArray = json.getJSONArray("list");
+					for (int i = 0; i < jsonArray.length(); i++) {
+						JSONObjectAdapter jsonObject = jsonArray.getJSONObject(i);
+						list.add(new UserProfile(jsonObject));
+					}
+					
+					callback.onSuccess(list);
+				} catch (JSONObjectAdapterException e) {
+					callback.onFailure(e);
+				}
+			}
+		};
+		try {
+			IdList idList = new IdList();
+			idList.setList(userIds);
+			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+			idList.writeToJSONObject(jsonAdapter);
+			doPost(url, jsonAdapter.toJSONString(), wrapCallback(constructCallback, callback));
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
 	}
 }

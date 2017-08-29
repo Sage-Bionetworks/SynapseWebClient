@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandlerImpl;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -26,7 +27,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class UserProfileAsyncHandlerImplTest {
 	UserProfileAsyncHandlerImpl userProfileAsyncHandler;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	GWTWrapper mockGwt;
 	String userId = "123";
@@ -39,9 +40,9 @@ public class UserProfileAsyncHandlerImplTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		userProfileAsyncHandler = new UserProfileAsyncHandlerImpl(mockSynapseClient, mockGwt);
+		userProfileAsyncHandler = new UserProfileAsyncHandlerImpl(mockSynapseJavascriptClient, mockGwt);
 		resultList = new ArrayList<UserProfile>();
-		AsyncMockStubber.callSuccessWith(resultList).when(mockSynapseClient).listUserProfiles(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(resultList).when(mockSynapseJavascriptClient).listUserProfiles(anyList(), any(AsyncCallback.class));
 		when(mockUserProfile.getOwnerId()).thenReturn(userId);
 	}
 	
@@ -54,14 +55,14 @@ public class UserProfileAsyncHandlerImplTest {
 	public void testSuccess() {
 		//verify no rpc if nothing has been requested.
 		userProfileAsyncHandler.executeRequests();
-		verifyZeroInteractions(mockSynapseClient);
+		verifyZeroInteractions(mockSynapseJavascriptClient);
 		
 		//add one, simulate single file response
 		userProfileAsyncHandler.getUserProfile(userId, mockCallback);
 		resultList.add(mockUserProfile);
 		
 		userProfileAsyncHandler.executeRequests();
-		verify(mockSynapseClient).listUserProfiles(anyList(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).listUserProfiles(anyList(), any(AsyncCallback.class));
 		verify(mockCallback).onSuccess(mockUserProfile);
 	}
 	
@@ -69,7 +70,7 @@ public class UserProfileAsyncHandlerImplTest {
 	public void testFailure() {
 		//simulate exception response
 		Exception ex = new Exception("problem loading batch");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).listUserProfiles(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).listUserProfiles(anyList(), any(AsyncCallback.class));
 		userProfileAsyncHandler.getUserProfile(userId, mockCallback);
 		userProfileAsyncHandler.executeRequests();
 		
@@ -84,7 +85,7 @@ public class UserProfileAsyncHandlerImplTest {
 		resultList.add(mockUserProfile);
 		
 		userProfileAsyncHandler.executeRequests();
-		verify(mockSynapseClient).listUserProfiles(anyList(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).listUserProfiles(anyList(), any(AsyncCallback.class));
 		verify(mockCallback).onFailure(any(Throwable.class));
 	}
 

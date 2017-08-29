@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -17,13 +18,13 @@ import com.google.inject.Inject;
 
 public class UserProfileAsyncHandlerImpl implements UserProfileAsyncHandler {
 	private Map<String, List<AsyncCallback<UserProfile>>> reference2Callback = new HashMap<String, List<AsyncCallback<UserProfile>>>();
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	// This singleton checks for new work every <DELAY> milliseconds.
 	public static final int DELAY = 280;
 	
 	@Inject
-	public UserProfileAsyncHandlerImpl(SynapseClientAsync synapseClient, GWTWrapper gwt) {
-		this.synapseClient = synapseClient;
+	public UserProfileAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt) {
+		this.jsClient = jsClient;
 		Callback callback = new Callback() {
 			@Override
 			public void invoke() {
@@ -50,7 +51,7 @@ public class UserProfileAsyncHandlerImpl implements UserProfileAsyncHandler {
 			reference2Callback.clear();
 			List<String> userIds = new ArrayList<String>();
 			userIds.addAll(reference2CallbackCopy.keySet());
-			synapseClient.listUserProfiles(userIds, new AsyncCallback<List<UserProfile>>() {
+			jsClient.listUserProfiles(userIds, new AsyncCallback<List<UserProfile>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					// go through all requested objects, and inform them of the error

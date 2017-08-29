@@ -5,6 +5,10 @@ import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 import static org.apache.http.HttpStatus.*;
 import static org.sagebionetworks.web.shared.WebConstants.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
 import static com.google.gwt.http.client.RequestBuilder.*;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.*;
@@ -25,9 +29,11 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.ListWrapper;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -233,6 +239,42 @@ public class SynapseJavascriptClientTest {
 		//verify url and method
 		String url = REPO_ENDPOINT + "/" + ownerObjectType + "/" + ownerObjectId + WIKI + pageId + WIKI_VERSION_PARAMETER + versionNumber;
 		verify(mockRequestBuilder).configure(GET, url);
+	}
+	
+	@Test
+	public void testPostListUserProfiles() throws RequestException, JSONObjectAdapterException {
+		String userId1 = "32";
+		String userId2 = "8";
+		List<String> userIds = new ArrayList<>();
+		userIds.add(userId1);
+		userIds.add(userId2);
+		
+		client.listUserProfiles(userIds, mockAsyncCallback);
+		
+		//verify url and method
+		String url = REPO_ENDPOINT + USER_PROFILE_PATH;
+		verify(mockRequestBuilder).configure(POST, url);
+		
+		verify(mockRequestBuilder).sendRequest(anyString(), requestCallbackCaptor.capture());
+		RequestCallback requestCallback = requestCallbackCaptor.getValue();
+		
+		//we can use ListWrapper in junit (java) since it is not compiled into js.
+		ListWrapper<UserProfile> results = new ListWrapper<UserProfile>(UserProfile.class);
+		List<UserProfile> profiles = new ArrayList<UserProfile>();
+		UserProfile profile = new UserProfile();
+		profile.setOwnerId(userId1);
+		profiles.add(profile);
+		profile = new UserProfile();
+		profile.setOwnerId(userId2);
+		profiles.add(profile);
+		results.setList(profiles);
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		results.writeToJSONObject(adapter);
+		when(mockResponse.getStatusCode()).thenReturn(SC_OK);
+		when(mockResponse.getText()).thenReturn(adapter.toJSONString());
+		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		
+		verify(mockAsyncCallback).onSuccess(profiles);
 	}
 	
 }
