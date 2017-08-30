@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -58,6 +59,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	VideoWidget videoWidget;
 	EntityBundle bundle;
 	boolean isFullSize = false;
+	SynapseJavascriptClient jsClient;
 	@Inject
 	public PreviewWidget(PreviewWidgetView view, 
 			RequestBuilderWrapper requestBuilder,
@@ -65,7 +67,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			SynapseAlert synapseAlert,
 			SynapseClientAsync synapseClient,
 			AuthenticationController authController,
-			VideoWidget videoWidget) {
+			VideoWidget videoWidget,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.requestBuilder = requestBuilder;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -73,6 +76,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		this.synapseClient = synapseClient;
 		this.authController = authController;
 		this.videoWidget = videoWidget;
+		this.jsClient = jsClient;
 	}
 	
 	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
@@ -155,9 +159,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		};
 		if (EntityPresenter.isValidEntityId(entityId)) {
 			if (version == null) {
-				synapseClient.getEntityBundle(entityId, mask, entityBundleCallback);
+				jsClient.getEntityBundle(entityId, mask, entityBundleCallback);
 			} else {
-				synapseClient.getEntityBundleForVersion(entityId, Long.parseLong(version), mask, entityBundleCallback);	
+				jsClient.getEntityBundleForVersion(entityId, Long.parseLong(version), mask, entityBundleCallback);	
 			}
 		} else {
 			view.addSynapseAlertWidget(synapseAlert.asWidget());

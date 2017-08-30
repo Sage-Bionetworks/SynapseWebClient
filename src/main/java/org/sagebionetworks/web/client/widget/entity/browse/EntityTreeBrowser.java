@@ -19,7 +19,7 @@ import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -35,7 +35,7 @@ import com.google.inject.Inject;
 public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		SynapseWidgetPresenter {
 	private EntityTreeBrowserView view;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	AdapterFactory adapterFactory;
@@ -49,13 +49,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, 
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient synapseClient,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			IconsImageBundle iconsImageBundle, 
 			AdapterFactory adapterFactory) {
 		this.view = view;
-		this.synapseClient = synapseClient;
+		this.jsClient = synapseClient;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.adapterFactory = adapterFactory;
@@ -136,7 +136,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			final EntityTreeItem parent, String nextPageToken) {
 		EntityChildrenRequest request = createGetEntityChildrenRequest(parentId, nextPageToken);
 		// ask for the folder children, then the files
-		synapseClient.getEntityChildren(request,
+		jsClient.getEntityChildren(request,
 				new AsyncCallback<EntityChildrenResponse>() {
 					@Override
 					public void onSuccess(EntityChildrenResponse results) {

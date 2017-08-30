@@ -14,9 +14,6 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityChildrenRequest;
-import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LogEntry;
@@ -117,24 +114,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	public Entity updateEntity(Entity toUpdate) throws RestServiceException;
 	
 	/**
-	 * Get a bundle of information about an entity in a single call
-	 * @param entityId
-	 * @return
-	 * @throws RestServiceException 
-	 * @throws SynapseException 
-	 */
-	public EntityBundle getEntityBundle(String entityId, int partsMask) throws RestServiceException;
-
-	/**
-	 * Get a bundle of information about an entity in a single call
-	 * @param entityId
-	 * @return
-	 * @throws RestServiceException 
-	 * @throws SynapseException 
-	 */
-	public EntityBundle getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask) throws RestServiceException;
-
-	/**
 	 * Log a debug message in the server-side log.
 	 * @param message
 	 */
@@ -183,22 +162,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	 * @throws RestServiceException
 	 */
 	public UserProfile getUserProfile(String userId) throws RestServiceException;
-	
-	/**
-	 * List UserProfiels by ID.
-	 * @param userIds
-	 * @return
-	 * @throws RestServiceException 
-	 */
-	public List<UserProfile> listUserProfiles(List<String> userIds) throws RestServiceException;
-	
-	/**
-	 * Return the specified team object in json string
-	 * @param teamId
-	 * @return
-	 * @throws RestServiceException
-	 */
-	public Team getTeam(String teamId) throws RestServiceException;
 	
 	/**
 	 * Batch get headers for users/groups matching a list of Synapse IDs.
@@ -271,8 +234,6 @@ public interface SynapseClient extends XsrfProtectedService {
     
 	public WikiPage createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
 	public WikiPage updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
-	public WikiPage getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
-	public WikiPage getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
 	
 	public EntityHeader addFavorite(String entityId) throws RestServiceException;
 	
@@ -381,14 +342,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	 */
 	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body) throws RestServiceException, ResultNotReadyException;
 
-	/**
-	 * Get entity children
-	 * @param request
-	 * @return
-	 * @throws RestServiceException
-	 */
-	EntityChildrenResponse getEntityChildren(EntityChildrenRequest request) throws RestServiceException;
-	
 	/**
 	 * Create or update an Entity.
 	 * @param entity

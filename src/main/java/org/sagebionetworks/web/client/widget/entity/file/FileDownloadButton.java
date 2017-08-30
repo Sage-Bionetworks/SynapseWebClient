@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -17,6 +16,7 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -50,7 +50,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	private GlobalApplicationState globalAppState;
 	private SynapseAlert synAlert;
 	private PortalGinInjector ginInjector;
-	DataAccessClientAsync dataAccessClient;
+	SynapseJavascriptClient jsClient;
 	AuthenticationController authController;
 	SynapseJSNIUtils jsniUtils;
 	GWTWrapper gwt;
@@ -68,7 +68,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 			GlobalApplicationState globalAppState,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
-			DataAccessClientAsync dataAccessClient,
+			SynapseJavascriptClient jsClient,
 			AuthenticationController authController,
 			SynapseJSNIUtils jsniUtils,
 			GWTWrapper gwt,
@@ -81,7 +81,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		this.globalAppState = globalAppState;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
-		this.dataAccessClient = dataAccessClient;
+		this.jsClient = jsClient;
 		this.authController = authController;
 		this.jsniUtils = jsniUtils;
 		this.gwt = gwt;
@@ -95,7 +95,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	
 	public void configure(final EntityBundle bundle) {
 		view.clear();
-		dataAccessClient.getRestrictionInformation(bundle.getEntity().getId(), RestrictableObjectType.ENTITY, new AsyncCallback<RestrictionInformationResponse>() {
+		jsClient.getRestrictionInformation(bundle.getEntity().getId(), RestrictableObjectType.ENTITY, new AsyncCallback<RestrictionInformationResponse>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);

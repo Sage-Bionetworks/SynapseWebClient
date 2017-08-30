@@ -502,6 +502,7 @@ public interface PortalGinInjector extends Ginjector {
 	public DockerRepoListWidget getDockerRepoListWidget();
 	public Breadcrumb getBreadcrumb();
 	public SynapseClientAsync getSynapseClientAsync();
+	public SynapseJavascriptClient getSynapseJavascriptClient();
 	public StuAlert getStuAlert();
 	public FilesTabView getFilesTabView();
 	public FileTitleBar getFileTitleBar();

@@ -37,7 +37,6 @@ public interface DataAccessClient extends XsrfProtectedService {
 	List<AccessRequirement> getAccessRequirements(RestrictableObjectDescriptor subject, Long limit, Long offset) throws RestServiceException;
 	AccessRequirementStatus getAccessRequirementStatus(String accessRequirementId) throws RestServiceException;
 	void cancelDataAccessSubmission(String submissionId) throws RestServiceException;
-	RestrictionInformationResponse getRestrictionInformation(String subjectId, RestrictableObjectType type) throws RestServiceException;
 	void createLockAccessRequirement(String entityId) throws RestServiceException;
 	Submission updateDataAccessSubmissionState(String submissionId, SubmissionState newState,
 			String reason) throws RestServiceException;

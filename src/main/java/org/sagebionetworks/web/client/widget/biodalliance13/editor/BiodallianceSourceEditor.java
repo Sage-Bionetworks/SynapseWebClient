@@ -10,7 +10,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidget;
@@ -29,23 +29,23 @@ import com.google.inject.Inject;
 public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Presenter, IsWidget, SelectableListItem {
 	//view, may not be set if only using this class to pass data around
 	BiodallianceSourceEditorView view;
-	private SynapseClientAsync synapseClient;
 	private BiodallianceSource source;
 	EntityFinder entityFinder, indexEntityFinder;
 	Callback selectionChangedCallback;
+	SynapseJavascriptClient jsClient;
 	
 	@Inject
 	public BiodallianceSourceEditor(
-			BiodallianceSourceEditorView view, 
-			SynapseClientAsync synapseClient, 
+			BiodallianceSourceEditorView view,
 			EntityFinder entityFinder, 
 			EntityFinder indexEntityFinder,
-			BiodallianceSource source) {
+			BiodallianceSource source,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
-		this.synapseClient = synapseClient;
 		this.entityFinder = entityFinder;
 		this.indexEntityFinder = indexEntityFinder;
 		this.source = source;
+		this.jsClient = jsClient;
 		
 		view.setPresenter(this);
 		entityFinder.configure(EntityFilter.ALL_BUT_LINK, true, new SelectedHandler<Reference>() {					
@@ -129,9 +129,9 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 			}			
 		};
 		if (ref.getTargetVersionNumber() == null) {
-			synapseClient.getEntityBundle(ref.getTargetId(), mask, callback);
+			jsClient.getEntityBundle(ref.getTargetId(), mask, callback);
 		} else {
-			synapseClient.getEntityBundleForVersion(ref.getTargetId(), ref.getTargetVersionNumber(), mask, callback);
+			jsClient.getEntityBundleForVersion(ref.getTargetId(), ref.getTargetVersionNumber(), mask, callback);
 		}
 	}
 	
@@ -162,9 +162,9 @@ public class BiodallianceSourceEditor implements BiodallianceSourceEditorView.Pr
 			}			
 		};
 		if (ref.getTargetVersionNumber() == null) {
-			synapseClient.getEntityBundle(ref.getTargetId(), mask, callback);
+			jsClient.getEntityBundle(ref.getTargetId(), mask, callback);
 		} else {
-			synapseClient.getEntityBundleForVersion(ref.getTargetId(), ref.getTargetVersionNumber(), mask, callback);
+			jsClient.getEntityBundleForVersion(ref.getTargetId(), ref.getTargetVersionNumber(), mask, callback);
 		}
 	}
 	

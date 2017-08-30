@@ -18,7 +18,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -33,7 +33,6 @@ import com.google.inject.Inject;
 public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter {
 
 	private DockerRepoListWidgetView view;
-	private SynapseClientAsync synapseClient;
 	private AddExternalRepoModal addExternalRepoModal;
 	private PreflightController preflightController;
 	private SynapseAlert synAlert;
@@ -41,23 +40,23 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 	private EntityChildrenRequest query;
 	private CallbackP<EntityBundle> onRepoClickCallback;
 	private LoadMoreWidgetContainer membersContainer;
-
+	private SynapseJavascriptClient jsClient;
 
 	@Inject
 	public DockerRepoListWidget(
 			DockerRepoListWidgetView view,
-			SynapseClientAsync synapseClient,
 			AddExternalRepoModal addExternalRepoModal,
 			PreflightController preflightController,
 			LoadMoreWidgetContainer membersContainer,
-			SynapseAlert synAlert
+			SynapseAlert synAlert,
+			SynapseJavascriptClient jsClient
 			) {
 		this.view = view;
-		this.synapseClient = synapseClient;
 		this.addExternalRepoModal = addExternalRepoModal;
 		this.preflightController = preflightController;
 		this.synAlert = synAlert;
 		this.membersContainer = membersContainer;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.addExternalRepoModal(addExternalRepoModal.asWidget());
 		view.setSynAlert(synAlert.asWidget());
@@ -115,7 +114,7 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 
 	public void loadMore() {
 		synAlert.clear();
-		synapseClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
+		jsClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
 			public void onSuccess(EntityChildrenResponse results) {
 				query.setNextPageToken(results.getNextPageToken());
 				membersContainer.setIsMore(results.getNextPageToken() != null);
@@ -133,7 +132,7 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 		synAlert.clear();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | DOI | BENEFACTOR_ACL;
 		for (EntityHeader header: results) {
-			synapseClient.getEntityBundle(header.getId(), mask, new AsyncCallback<EntityBundle>(){
+			jsClient.getEntityBundle(header.getId(), mask, new AsyncCallback<EntityBundle>(){
 				@Override
 				public void onSuccess(EntityBundle bundle) {
 					view.addRepo(bundle);

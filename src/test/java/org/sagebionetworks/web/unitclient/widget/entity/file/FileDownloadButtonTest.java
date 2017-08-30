@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -87,7 +88,7 @@ public class FileDownloadButtonTest {
 	@Mock
 	EntityUpdatedEvent mockEntityUpdatedEvent;
 	@Mock
-	DataAccessClientAsync mockDataAccessClient;
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	AuthenticationController mockAuthController;
 	@Mock
@@ -120,7 +121,7 @@ public class FileDownloadButtonTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		widget = new FileDownloadButton(mockView, mockSynapseClient, mockLoginModalWidget, mockGlobalAppState, mockSynAlert, mockGinInjector,
-				mockDataAccessClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies, mockAwsSdk, mockPopupUtilsView);
+				mockSynapseJavascriptClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies, mockAwsSdk, mockPopupUtilsView);
 		when(mockGlobalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(SFTP_ENDPOINT);
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);

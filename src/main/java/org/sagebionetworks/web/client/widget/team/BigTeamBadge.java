@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -13,15 +13,15 @@ import com.google.inject.Inject;
 public class BigTeamBadge implements BigTeamBadgeView.Presenter, SynapseWidgetPresenter, HasNotificationUI {
 	
 	private BigTeamBadgeView view;
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	AuthenticationController authController;
 	
 	private String teamName;
 	
 	@Inject
-	public BigTeamBadge(BigTeamBadgeView view, SynapseClientAsync synapseClient, AuthenticationController authController) {
+	public BigTeamBadge(BigTeamBadgeView view, SynapseJavascriptClient jsClient, AuthenticationController authController) {
 		this.view = view;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.authController = authController;
 		view.setPresenter(this);
 	}
@@ -33,7 +33,7 @@ public class BigTeamBadge implements BigTeamBadgeView.Presenter, SynapseWidgetPr
 	public void configure(final String teamId) {
 		if (teamId != null && teamId.trim().length() > 0) {
 			view.showLoading();
-			synapseClient.getTeam(teamId, new AsyncCallback<Team>() {
+			jsClient.getTeam(teamId, new AsyncCallback<Team>() {
 				@Override
 				public void onSuccess(Team team) {
 						configure(team, team.getDescription());

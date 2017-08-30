@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -40,6 +41,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	private DataAccessClientAsync dataAccessClient;
 	private SynapseAlert synAlert;
 	private IsACTMemberAsyncHandler isACTMemberAsyncHandler;
+	private SynapseJavascriptClient jsClient;
 	@Inject
 	public RestrictionWidget(
 			RestrictionWidgetView view,
@@ -48,7 +50,8 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			JiraURLHelper jiraURLHelper,
 			DataAccessClientAsync dataAccessClient,
 			SynapseAlert synAlert,
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -56,6 +59,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.dataAccessClient = dataAccessClient;
 		this.synAlert = synAlert;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
+		this.jsClient = jsClient;
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
 	}
@@ -113,7 +117,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	public void loadRestrictionInformation() {
 		view.clear();
 		synAlert.clear();
-		dataAccessClient.getRestrictionInformation(entity.getId(), RestrictableObjectType.ENTITY, new AsyncCallback<RestrictionInformationResponse>() {
+		jsClient.getRestrictionInformation(entity.getId(), RestrictableObjectType.ENTITY, new AsyncCallback<RestrictionInformationResponse>() {
 			@Override
 			public void onSuccess(RestrictionInformationResponse restrictionInformation) {
 				configureUI(restrictionInformation);

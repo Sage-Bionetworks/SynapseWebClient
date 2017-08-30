@@ -4,8 +4,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
@@ -24,17 +24,18 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 	private JoinTeamConfigEditorView view;
 	private Map<String, String> descriptor;
 	private SynapseSuggestBox teamSuggestBox;
-	private SynapseClientAsync synClient;
+	private SynapseJavascriptClient jsClient;
 	private GroupSuggestionProvider provider;
 	private SynapseJSNIUtils jsniUtils;
 
 	@Inject
 	public JoinTeamConfigEditor(JoinTeamConfigEditorView view,
 			SynapseSuggestBox teamSuggestBox,
-			GroupSuggestionProvider provider, SynapseClientAsync synClient,
+			GroupSuggestionProvider provider, 
+			SynapseJavascriptClient jsClient,
 			SynapseJSNIUtils jsniUtils) {
 		this.provider = provider;
-		this.synClient = synClient;
+		this.jsClient = jsClient;
 		this.teamSuggestBox = teamSuggestBox;
 		this.jsniUtils = jsniUtils;
 		teamSuggestBox.setSuggestionProvider(provider);
@@ -53,7 +54,7 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 			Map<String, String> widgetDescriptor, DialogCallback window) {
 		this.descriptor = widgetDescriptor;
 		if (descriptor.containsKey(WidgetConstants.TEAM_ID_KEY)) {
-			synClient.getTeam(descriptor.get(WidgetConstants.TEAM_ID_KEY), new AsyncCallback<Team>() {
+			jsClient.getTeam(descriptor.get(WidgetConstants.TEAM_ID_KEY), new AsyncCallback<Team>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					jsniUtils.consoleError(caught.getMessage());

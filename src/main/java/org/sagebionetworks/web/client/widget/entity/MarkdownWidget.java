@@ -12,9 +12,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -39,14 +38,14 @@ import com.google.inject.Inject;
  */
 public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private MarkdownIt markdownIt;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private WidgetRegistrar widgetRegistrar;
 	private CookieProvider cookies;
 	AuthenticationController authenticationController;
 	GWTWrapper gwt;
-	private SessionStorage sessionStorage;
+	
 	PortalGinInjector ginInjector;
 	private ResourceLoader resourceLoader;
 	private String md;
@@ -55,7 +54,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	private WikiPageKey wikiKey;
 	private Long wikiVersionInView;
 	@Inject
-	public MarkdownWidget(SynapseClientAsync synapseClient,
+	public MarkdownWidget(SynapseJavascriptClient jsClient,
 			SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar,
 			CookieProvider cookies,
 			ResourceLoader resourceLoader, 
@@ -63,10 +62,9 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			PortalGinInjector ginInjector,
 			MarkdownWidgetView view,
 			SynapseAlert synAlert,
-			SessionStorage sessionStorage,
 			MarkdownIt markdownIt) {
 		super();
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.widgetRegistrar = widgetRegistrar;
 		this.cookies = cookies;
@@ -75,7 +73,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.ginInjector = ginInjector;
 		this.view = view;
 		this.synAlert = synAlert;
-		this.sessionStorage = sessionStorage;
 		this.markdownIt = markdownIt;
 		view.setSynAlertWidget(synAlert.asWidget());
 	}
@@ -214,7 +211,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isIgnoreLoadingFailure) {
 		synAlert.clear();
 		//get the wiki page
-		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
+		jsClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage page) {
 				wikiKey.setWikiPageId(page.getId());

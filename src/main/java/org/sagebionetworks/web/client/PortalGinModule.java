@@ -1430,5 +1430,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TeamMembersWidgetView.class).to(TeamMembersWidgetViewImpl.class);
 		bind(FileViewClientsHelp.class).to(FileViewClientsHelpImpl.class);
 		bind(EmailAddressesWidgetView.class).to(EmailAddressesWidgetViewImpl.class);
+		
+		// Synapse js client
+		bind(SynapseJavascriptClient.class).in(Singleton.class);
 	}
 }
