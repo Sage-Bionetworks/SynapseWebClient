@@ -13,24 +13,26 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GWTTimer;
-import org.sagebionetworks.web.client.widget.search.SuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestOracle;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestionBundle;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle.Response;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
 public class SynapseSuggestOracleTest {
 
 	SynapseSuggestBox mockSuggestBox;
-	SuggestionProvider mockSuggestionProvider;
+	UserGroupSuggestionProvider mockSuggestionProvider;
 	SynapseSuggestOracle presenter;
-	SynapseSuggestion mockSuggestion;
+	UserGroupSuggestion mockSuggestion;
 	SuggestOracle.Callback mockCallback;
 	SuggestOracle.Request mockRequest;
 	GWTTimer mockTimer;
@@ -43,8 +45,8 @@ public class SynapseSuggestOracleTest {
 	@Before
 	public void setup() {
 		mockSuggestBox = mock(SynapseSuggestBox.class);
-		mockSuggestionProvider = mock(SuggestionProvider.class);
-		mockSuggestion = mock(SynapseSuggestion.class);
+		mockSuggestionProvider = mock(UserGroupSuggestionProvider.class);
+		mockSuggestion = mock(UserGroupSuggestion.class);
 		mockCallback = mock(SuggestOracle.Callback.class);
 		mockRequest = mock(SuggestOracle.Request.class);
 		Mockito.when(mockRequest.getQuery()).thenReturn(query);
@@ -52,7 +54,7 @@ public class SynapseSuggestOracleTest {
 		presenter = new SynapseSuggestOracle(mockTimer);
 		presenter.configure(mockSuggestBox, pageSize, mockSuggestionProvider);
 		presenter.requestSuggestions(mockRequest, mockCallback);
-		List<SynapseSuggestion> suggList = new LinkedList<SynapseSuggestion>();
+		List<Suggestion> suggList = new LinkedList<>();
 		for (int i = 0; i < pageSize; i++) {
 			suggList.add(mockSuggestion);
 		}
@@ -68,10 +70,10 @@ public class SynapseSuggestOracleTest {
 	
 	@Test
 	public void testGetSuggestions() {
-		AsyncMockStubber.callSuccessWith(suggBundle).when(mockSuggestionProvider).getSuggestions(anyInt(), anyInt(), anyInt(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(suggBundle).when(mockSuggestionProvider).getSuggestions(any(TypeFilter.class), anyInt(), anyInt(), anyInt(), anyString(), any(AsyncCallback.class));
 		presenter.getSuggestions(offset);
 		verify(mockSuggestBox).showLoading();
-		verify(mockSuggestionProvider).getSuggestions(eq(offset), eq(pageSize),
+		verify(mockSuggestionProvider).getSuggestions(eq(TypeFilter.ALL), eq(offset), eq(pageSize),
 				anyInt(), eq(query), any(AsyncCallback.class));
 		verify(mockSuggestBox).hideLoading();
 		verify(mockSuggestBox).updateFieldStateForSuggestions((int)suggBundle.getTotalNumberOfResults(), offset);
@@ -81,10 +83,10 @@ public class SynapseSuggestOracleTest {
 	@Test
 	public void testGetSuggestionsFailure() {
 		Exception caught = new Exception("an error message");
-		AsyncMockStubber.callFailureWith(caught).when(mockSuggestionProvider).getSuggestions(anyInt(), anyInt(), anyInt(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(caught).when(mockSuggestionProvider).getSuggestions(any(TypeFilter.class),anyInt(), anyInt(), anyInt(), anyString(), any(AsyncCallback.class));
 		presenter.getSuggestions(offset);
 		verify(mockSuggestBox).showLoading();
-		verify(mockSuggestionProvider).getSuggestions(eq(offset), eq(pageSize),
+		verify(mockSuggestionProvider).getSuggestions(eq(TypeFilter.ALL), eq(offset), eq(pageSize),
 				anyInt(), eq(query), any(AsyncCallback.class));
 		verify(mockSuggestBox).hideLoading();
 		verify(mockSuggestBox).handleOracleException(caught);

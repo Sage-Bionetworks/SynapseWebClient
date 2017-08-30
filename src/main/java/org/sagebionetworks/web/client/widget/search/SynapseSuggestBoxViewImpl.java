@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -44,7 +45,7 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 		suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
 			@Override
 			public void onSelection(SelectionEvent<Suggestion> event) {
-				selectSuggestion((SynapseSuggestion)event.getSelectedItem());
+				selectSuggestion((UserGroupSuggestion)event.getSelectedItem());
 			}
 			
 		});
@@ -126,7 +127,7 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 		selectedItemText.setText("");
 	}
 	
-	public void selectSuggestion(SynapseSuggestion suggestion) {
+	public void selectSuggestion(UserGroupSuggestion suggestion) {
 		// Update the SuggestBox's selected suggestion.
 		synAlert.clear();
 		selectedItem.setText(suggestion.getReplacementString());

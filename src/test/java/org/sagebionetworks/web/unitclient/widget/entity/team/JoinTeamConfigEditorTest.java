@@ -17,9 +17,9 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider.GroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditorView;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -34,9 +34,9 @@ public class JoinTeamConfigEditorTest {
 	JoinTeamConfigEditor presenter;
 	JoinTeamConfigEditorView mockView;
 	SynapseSuggestBox mockSuggestBox;
-	GroupSuggestionProvider mockProvider;
+	UserGroupSuggestionProvider mockProvider;
 	DialogCallback mockCallback;
-	GroupSuggestion mockSuggestion;
+	UserGroupSuggestion mockSuggestion;
 	SynapseJSNIUtils mockJSNI;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
@@ -61,9 +61,9 @@ public class JoinTeamConfigEditorTest {
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(JoinTeamConfigEditorView.class);
-		mockSuggestion = mock(GroupSuggestion.class);
+		mockSuggestion = mock(UserGroupSuggestion.class);
 		mockSuggestBox = mock(SynapseSuggestBox.class);
-		mockProvider = mock(GroupSuggestionProvider.class);
+		mockProvider = mock(UserGroupSuggestionProvider.class);
 		mockCallback = mock(DialogCallback.class);
 		mockJSNI = mock(SynapseJSNIUtils.class);
 		descriptor = new HashMap<String, String>();

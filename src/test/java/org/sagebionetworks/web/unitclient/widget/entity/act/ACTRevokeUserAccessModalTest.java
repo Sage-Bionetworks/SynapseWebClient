@@ -15,8 +15,8 @@ import org.sagebionetworks.web.client.widget.entity.act.ACTRevokeUserAccessModal
 import org.sagebionetworks.web.client.widget.entity.act.RevokeUserAccessModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -37,7 +37,7 @@ public class ACTRevokeUserAccessModalTest {
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
-	SynapseSuggestion mockUser;
+	UserGroupSuggestion mockUser;
 	@Mock
 	ACTAccessRequirement mockACTAccessRequirement;
 	String selectedUserId = "34543";

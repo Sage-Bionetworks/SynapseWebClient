@@ -5,34 +5,32 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.IsSerializable;
+import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 
-public class UserGroupSuggestionProvider implements SuggestionProvider {
+public class UserGroupSuggestionProvider {
 	
-	private SynapseClientAsync synapseClient;
-	private SynapseJSNIUtils jsniUtils;
+	private SynapseJavascriptClient jsClient;
 	// for rendering
 	private String width;
 	
 	@Inject
-	public UserGroupSuggestionProvider(SynapseClientAsync synapseClient, SynapseJSNIUtils jsniUtils) {
-		this.synapseClient = synapseClient;
-		this.jsniUtils = jsniUtils;
+	public UserGroupSuggestionProvider(SynapseJavascriptClient jsClient) {
+		this.jsClient = jsClient;
 	}
 	
-	@Override
-	public void getSuggestions(final int offset, final int pageSize, final int width, final String prefix, final AsyncCallback<SynapseSuggestionBundle> callback) {
+	public void getSuggestions(TypeFilter type, final int offset, final int pageSize, final int width, final String prefix, final AsyncCallback<SynapseSuggestionBundle> callback) {
 		this.width = String.valueOf(width);
-		synapseClient.getUserGroupHeadersByPrefix(prefix, pageSize, offset, new AsyncCallback<UserGroupHeaderResponsePage>() {
+		jsClient.getUserGroupHeadersByPrefix(prefix, type, pageSize, offset, new AsyncCallback<UserGroupHeaderResponsePage>() {
 			@Override
 			public void onSuccess(UserGroupHeaderResponsePage result) {
-				List<SynapseSuggestion> suggestions = new LinkedList<SynapseSuggestion>();
+				List<Suggestion> suggestions = new LinkedList<Suggestion>();
 				for (UserGroupHeader header: result.getChildren()) {
 					suggestions.add(new UserGroupSuggestion(header, prefix));
 				}
@@ -49,7 +47,7 @@ public class UserGroupSuggestionProvider implements SuggestionProvider {
 	/*
 	 * Suggestion
 	 */
-	public class UserGroupSuggestion implements IsSerializable, SynapseSuggestion {
+	public class UserGroupSuggestion implements IsSerializable, Suggestion {
 		private UserGroupHeader header;
 		private String prefix;
 		
@@ -96,12 +94,10 @@ public class UserGroupSuggestionProvider implements SuggestionProvider {
 			return sb.toString();
 		}
 
-		@Override
 		public String getId() {
 			return header.getOwnerId();
 		}
 
-		@Override
 		public String isIndividual() {
 			return header.getIsIndividual().toString();
 		}
