@@ -58,6 +58,8 @@ public class VideoConfigViewImpl implements VideoConfigView {
 	
 	@Override
 	public void initView() {
+		youtubeUrlField.setValue("");
+		vimeoUrlField.setValue("");
 	}
 
 	public ClickHandler getClickHandler(final TextBox textBox) {

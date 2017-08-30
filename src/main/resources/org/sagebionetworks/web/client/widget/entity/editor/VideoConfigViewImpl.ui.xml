@@ -15,10 +15,11 @@
 			<b:TabPane b:id="tab1" addStyleNames="margin-top-15" ui:field="tab1">
 				<b:Row addStyleNames="margin-10">
 					<b:Column size="XS_12">
+						<b:FormLabel>Video File</b:FormLabel>
 						<b:InputGroup>
-							<b:TextBox ui:field="entity" autoComplete="false" enabled="false" />
+							<b:TextBox ui:field="entity" autoComplete="false" enabled="false" height="34px"/>
 							<b:InputGroupButton>
-								<b:Button text="Find video file" ui:field="button" icon="SEARCH" width="140px"/>
+								<b:Button ui:field="button" icon="SEARCH" height="34px"/>
 							</b:InputGroupButton>
 						</b:InputGroup>
 					</b:Column>
