@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
@@ -49,6 +50,7 @@ public class SelectTeamModalTest {
 		verify(mockView).setPresenter(widget);
 		verify(mockView).setSuggestWidget(any(Widget.class));
 		verify(mockTeamSuggestBox).setSuggestionProvider(mockProvider);
+		verify(mockTeamSuggestBox).setTypeFilter(TypeFilter.TEAMS_ONLY);
 	}
 	
 	@Test

@@ -14,6 +14,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
@@ -93,6 +94,7 @@ public class JoinTeamConfigEditorTest {
 	@Test
 	public void testConstruction() {
 		verify(mockSuggestBox).setSuggestionProvider(mockProvider);
+		verify(mockSuggestBox).setTypeFilter(TypeFilter.TEAMS_ONLY);
 		verify(mockView).setSuggestWidget(mockSuggestBox);
 	}
 	

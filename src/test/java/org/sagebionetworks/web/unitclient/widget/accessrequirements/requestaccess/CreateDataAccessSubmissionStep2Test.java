@@ -36,6 +36,7 @@ import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -192,6 +193,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockView).setOtherDocumentUploaded(any(IsWidget.class));
 		verify(mockView).setPeopleSuggestWidget(any(IsWidget.class));
 		verify(mockPeopleSuggestBox).setSuggestionProvider(mockProvider);
+		verify(mockPeopleSuggestBox).setTypeFilter(TypeFilter.USERS_ONLY);
 		verify(mockAccessorsList).setCanDelete(true);
 		verify(mockOtherDocuments).setCanDelete(true);
 		verify(mockOtherDocuments).setCanUpload(true);

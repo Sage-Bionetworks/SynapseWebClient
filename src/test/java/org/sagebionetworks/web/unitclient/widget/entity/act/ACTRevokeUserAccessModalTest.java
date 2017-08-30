@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.act.ACTRevokeUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.RevokeUserAccessModalView;
@@ -56,6 +57,7 @@ public class ACTRevokeUserAccessModalTest {
 		verify(mockView).setUserPickerWidget(any(Widget.class));
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockSynAlert).clear();
+		verify(mockPeopleSuggestWidget).setTypeFilter(TypeFilter.USERS_ONLY);
 		verify(mockView).show();
 	}
 	@Test

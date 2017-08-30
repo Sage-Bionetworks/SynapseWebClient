@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -36,6 +37,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		peopleSuggestWidget.setSuggestionProvider(provider);
+		peopleSuggestWidget.setTypeFilter(TypeFilter.USERS_ONLY);
 		view.setSuggestWidget(peopleSuggestBox.asWidget());
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setPresenter(this);
