@@ -128,8 +128,6 @@ public interface SynapseClientAsync {
 	
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);
 	
-	void getUserGroupHeadersByPrefix(String prefix, long limit, long offset, AsyncCallback<UserGroupHeaderResponsePage> callback);
-	
 	void additionalEmailValidation(String userId, String emailAddress, String callbackUrl, AsyncCallback<Void> callback);
 	
 	void addEmail(String emailValidationToken, AsyncCallback<Void> callback);

@@ -1,6 +1,10 @@
 package org.sagebionetworks.web.client;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+
 import org.apache.http.HttpStatus;
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -9,6 +13,8 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -53,7 +59,10 @@ public class SynapseJavascriptClient {
 	public static final String REPO_SUFFIX_VERSION = "/version";
 	public static final String TEAM = "/team";
 	public static final String WIKI_VERSION_PARAMETER = "?wikiVersion=";
-
+	public static final String USER_GROUP_HEADER_PREFIX_PATH = "/userGroupHeaders?prefix=";
+	public static final String OFFSET_PARAMETER = "offset=";
+	public static final String LIMIT_PARAMETER = "limit=";
+	
 	public String repoServiceUrl; 
 	@Inject
 	public SynapseJavascriptClient(
@@ -294,5 +303,18 @@ public class SynapseJavascriptClient {
 			}
 		};
 		doGet(url, wrapCallback(constructCallback, callback));
+	}
+	
+	public void getUserGroupHeadersByPrefix(String prefix, TypeFilter type, long limit, long offset, AsyncCallback<UserGroupHeaderResponsePage> callback) {
+		String encodedPrefix = gwt.encodeQueryString(prefix);
+		StringBuilder builder = new StringBuilder();
+		builder.append(USER_GROUP_HEADER_PREFIX_PATH);
+		builder.append(encodedPrefix);
+		builder.append("&" + LIMIT_PARAMETER + limit);
+		builder.append( "&" + OFFSET_PARAMETER + offset);
+		if(type != null){
+			builder.append("&typeFilter="+type.name());
+		}
+		return getJSONEntity(getRepoEndpoint(), builder.toString(), UserGroupHeaderResponsePage.class);
 	}
 }
