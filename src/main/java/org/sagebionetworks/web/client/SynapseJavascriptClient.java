@@ -59,6 +59,7 @@ import com.google.inject.Inject;
  *
  */
 public class SynapseJavascriptClient {
+	public static final String TYPE_FILTER_PARAMETER = "&typeFilter=";
 	public static final String WIKI = "/wiki/";
 	public static final String WIKIKEY = "/wikikey";
 	public static final String CHILDREN = "/children";
@@ -345,7 +346,7 @@ public class SynapseJavascriptClient {
 		builder.append("&" + LIMIT_PARAMETER + limit);
 		builder.append( "&" + OFFSET_PARAMETER + offset);
 		if(type != null){
-			builder.append("&typeFilter="+type.name());
+			builder.append(TYPE_FILTER_PARAMETER+type.name());
 		}
 		
 		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
