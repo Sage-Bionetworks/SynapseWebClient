@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.Button;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -20,18 +21,18 @@ import com.google.inject.Inject;
 public class ShowEmailsButton implements IsWidget {
 	public static final String EMAILS_BUTTON_TEXT = "Email";
 	Button button;
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	List<String> userIds;
 	PopupUtilsView popupUtils;
 	
 	@Inject
 	public ShowEmailsButton(
 			Button button,
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			PopupUtilsView popupUtils
 		) {
 		this.button = button;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.popupUtils = popupUtils;
 		button.addStyleName("margin-left-10");
 		button.setType(ButtonType.PRIMARY);
@@ -51,7 +52,7 @@ public class ShowEmailsButton implements IsWidget {
 	
 	public void onShowEmails() {
 		//get the profiles, to get the usernames
-		synapseClient.listUserProfiles(userIds, new AsyncCallback<List<UserProfile>>() {
+		jsClient.listUserProfiles(userIds, new AsyncCallback<List<UserProfile>>() {
 			@Override
 			public void onSuccess(List<UserProfile> userProfiles) {
 				StringBuilder sb = new StringBuilder();

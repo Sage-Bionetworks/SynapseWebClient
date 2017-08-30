@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -27,17 +28,20 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 	private SynapseClientAsync synapseClient;
 	WikiMarkdownEditorView view;
 	GlobalApplicationState globalApplicationState;
+	SynapseJavascriptClient jsClient;
 	
 	@Inject
 	public WikiMarkdownEditor(
 			WikiMarkdownEditorView view,
 			MarkdownEditorWidget editor,
 			SynapseClientAsync synapseClient,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.editor = editor;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.setMarkdownEditorWidget(editor.asWidget());
 		editor.setFilesAddedCallback(new CallbackP<List<String>>() {
@@ -84,7 +88,7 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 	
 	public void initWikiPage() {
 		//get the wiki page
-		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
+		jsClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage result) {
 				try {

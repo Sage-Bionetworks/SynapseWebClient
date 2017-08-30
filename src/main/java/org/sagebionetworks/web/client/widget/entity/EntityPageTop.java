@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -57,6 +58,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private EntityBundle projectBundle;
 	private Throwable projectBundleLoadError;
 	private Entity entity;
+	private SynapseJavascriptClient synapseJavascriptClient;
 	
 	private Synapse.EntityArea area;
 	private String initialAreaToken;
@@ -100,7 +102,8 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			EntityActionController controller,
 			ActionMenuWidget actionMenu,
 			CookieProvider cookies,
-			ClientCache storage) {
+			ClientCache storage,
+			SynapseJavascriptClient synapseJavascriptClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
@@ -116,7 +119,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.actionMenu = actionMenu;
 		this.cookies = cookies;
 		this.storage = storage;
-		
+		this.synapseJavascriptClient = synapseJavascriptClient;
 		initTabs();
 		view.setTabs(tabs.asWidget());
 		view.setProjectMetadata(projectMetadata.asWidget());
@@ -230,7 +233,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				showSelectedTabs();
 			}
 		};
-		synapseClient.getEntityBundle(projectHeader.getId(), mask, callback);
+		synapseJavascriptClient.getEntityBundle(projectHeader.getId(), mask, callback);
     }
     
     public void showSelectedTabs() {
@@ -469,7 +472,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				}
 				@Override
 				public void noWikiFound() {
-					if (isWikiTabShown && projectBundle.getRootWikiId() != null) {
+					if (isWikiTabShown && projectBundle.getRootWikiId() != null && !projectBundle.getRootWikiId().equals(wikiAreaToken)) {
 						// attempted to load a wiki, but it was not found.  Show a message, and redirect to the root.
 						view.showInfo("Wiki not found (id=" + wikiAreaToken + "), loading root wiki page instead.","");
 						wikiTab.asTab().setContentStale(true);

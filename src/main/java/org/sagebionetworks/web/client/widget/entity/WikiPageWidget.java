@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -47,6 +48,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 
 	// utility
 	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private WikiPageWidgetView view; 
 
 	// callback
@@ -86,7 +88,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			SessionStorage sessionStorage,
 			AuthenticationController authController,
 			AdapterFactory adapterFactory,
-			DateTimeUtils dateTimeUtils
+			DateTimeUtils dateTimeUtils,
+			SynapseJavascriptClient jsClient
 			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -100,6 +103,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		this.authController = authController;
 		this.adapterFactory = adapterFactory;
 		this.dateTimeUtils = dateTimeUtils;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.setSynapseAlertWidget(stuAlert.asWidget());
 		view.setWikiHistoryWidget(historyWidget);
@@ -178,7 +182,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 	
 	public void getV2WikiPageAsV1() {
-		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
+		jsClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage result) {
 				cacheWikiPage(result);
@@ -359,7 +363,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		setOwnerObjectName(new CallbackP<String>() {
 			@Override
 			public void invoke(final String ownerObjectName) {
-				synapseClient.getVersionOfV2WikiPageAsV1(wikiKey, versionToPreview, new AsyncCallback<WikiPage>() {
+				jsClient.getVersionOfV2WikiPageAsV1(wikiKey, versionToPreview, new AsyncCallback<WikiPage>() {
 
 					@Override
 					public void onFailure(Throwable caught) {

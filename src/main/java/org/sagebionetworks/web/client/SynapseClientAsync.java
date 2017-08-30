@@ -12,7 +12,6 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -82,10 +81,6 @@ public interface SynapseClientAsync {
 	
 	void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<Entity> callback);
 	
-	void getEntityBundle(String entityId, int partsMask, AsyncCallback<EntityBundle> callback);
-	
-	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundle> callback);
-
 	void getEntityBundlePlusForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundlePlus> callback);
 	
 	void getEntityVersions(String entityId, int offset, int limit,
@@ -125,11 +120,6 @@ public interface SynapseClientAsync {
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void getUserProfile(String userId, AsyncCallback<UserProfile> callback);
-	
-	void listUserProfiles(List<String> userIds,
-			AsyncCallback<List<UserProfile>> callback);
-	
-	void getTeam(String teamId, AsyncCallback<Team> callback);
 	
 	void getUserGroupHeadersById(ArrayList<String> ids, AsyncCallback<UserGroupHeaderResponsePage> headers);
 	
@@ -196,8 +186,6 @@ public interface SynapseClientAsync {
 
 	public void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	public void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
-	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback);
-	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<WikiPage> callback);
 	
 	void getEntitiesGeneratedBy(String activityId, Integer limit,
 			Integer offset, AsyncCallback<PaginatedResults<Reference>> callback);
@@ -323,8 +311,6 @@ public interface SynapseClientAsync {
 	void getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body,
 			AsyncCallback<AsynchronousResponseBody> callback);
 
-	void getEntityChildren(EntityChildrenRequest request, AsyncCallback<EntityChildrenResponse> callback);
-	
 	void createEntity(Entity entity,
 			AsyncCallback<Entity> callback);
 

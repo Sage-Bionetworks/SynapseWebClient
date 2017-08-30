@@ -1,11 +1,15 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
@@ -18,7 +22,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -33,7 +37,7 @@ public class VideoConfigEditorTest {
 	VideoConfigView mockView;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	@Mock
-	SynapseClientAsync mockSynapseClient;
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	EntityBundle mockBundle;
 	@Mock
@@ -43,9 +47,9 @@ public class VideoConfigEditorTest {
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(VideoConfigView.class);
-		editor = new VideoConfigEditor(mockView, mockSynapseClient);
+		editor = new VideoConfigEditor(mockView, mockSynapseJavascriptClient);
 		
-		AsyncMockStubber.callSuccessWith(mockBundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		when(mockSelectedEntityReference.getTargetId()).thenReturn(selectedEntityId);
 	}
 	
@@ -94,7 +98,7 @@ public class VideoConfigEditorTest {
 		editor.configure(wikiKey, descriptor, null);
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockView, never()).setVideoFormatWarningVisible(true);
 		verify(mockView).setEntity(selectedEntityId);
 		verify(mockView).hideFinder();
@@ -113,7 +117,7 @@ public class VideoConfigEditorTest {
 		editor.configure(wikiKey, descriptor, null);
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setVideoFormatWarningVisible(true);
 		verify(mockView).setEntity(selectedEntityId);
 		verify(mockView).hideFinder();
@@ -132,7 +136,7 @@ public class VideoConfigEditorTest {
 		editor.configure(wikiKey, descriptor, null);
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setVideoFormatWarningVisible(true);
 		verify(mockView).setEntity(selectedEntityId);
 		verify(mockView).hideFinder();
@@ -149,7 +153,7 @@ public class VideoConfigEditorTest {
 		
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setVideoFormatWarningVisible(true);
 		verify(mockView).showFinderError(VideoConfigEditor.UNRECOGNIZED_VIDEO_FORMAT_MESSAGE);
 		verify(mockView, never()).setEntity(selectedEntityId);
@@ -159,15 +163,13 @@ public class VideoConfigEditorTest {
 	@Test
 	public void testValidateSelectionRPCError() {
 		Exception ex = new Exception("error seeking file name");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showFinderError(ex.getMessage());
 	}
 	
-	
-
 	@Test
 	public void testRecognizedFiletype() {
 		assertTrue(VideoConfigEditor.isRecognizedMP4FileName("video.mp4"));

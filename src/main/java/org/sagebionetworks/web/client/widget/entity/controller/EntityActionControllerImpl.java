@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -94,6 +95,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EntityActionControllerView view;
 	PreflightController preflightController;
 	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	AccessControlListModalWidget accessControlListModalWidget;
@@ -181,6 +183,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			synapseClient = ginInjector.getSynapseClientAsync();
 		}
 		return synapseClient;
+	}
+	
+	private SynapseJavascriptClient getSynapseJavascriptClient() {
+		if (jsClient == null) {
+			jsClient = ginInjector.getSynapseJavascriptClient();
+		}
+		return jsClient;
 	}
 	
 	private GlobalApplicationState getGlobalApplicationState() {
@@ -991,7 +1000,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void onViewWikiSource() {
 		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
-		getSynapseClient().getV2WikiPageAsV1(key, new AsyncCallback<WikiPage>() {
+		getSynapseJavascriptClient().getV2WikiPageAsV1(key, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage page) {
 				view.showInfoDialog("Wiki Source", page.getMarkdown());

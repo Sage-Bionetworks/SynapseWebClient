@@ -10,12 +10,12 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
@@ -41,12 +41,14 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
 	private boolean isEmbeddedInOwnerPage;
 	private CallbackP<WikiPageKey> reloadWikiPageCallback;
-	
+	private SynapseJavascriptClient jsClient;
 	@Inject
 	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient,
-							AuthenticationController authenticationController) {
+							AuthenticationController authenticationController,
+							SynapseJavascriptClient jsClient) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 	}
 
@@ -62,7 +64,7 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
 			int mask = ENTITY | PERMISSIONS;
-			synapseClient.getEntityBundle(wikiKey.getOwnerObjectId(), mask, new AsyncCallback<EntityBundle>() {
+			jsClient.getEntityBundle(wikiKey.getOwnerObjectId(), mask, new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onSuccess(EntityBundle bundle) {
 					ownerObjectName = bundle.getEntity().getName();

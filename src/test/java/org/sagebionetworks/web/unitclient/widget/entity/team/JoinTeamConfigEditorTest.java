@@ -9,11 +9,13 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider.GroupSuggestion;
@@ -35,8 +37,9 @@ public class JoinTeamConfigEditorTest {
 	GroupSuggestionProvider mockProvider;
 	DialogCallback mockCallback;
 	GroupSuggestion mockSuggestion;
-	SynapseClientAsync mockSynClient;
 	SynapseJSNIUtils mockJSNI;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	
 	Map<String, String> descriptor;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
@@ -54,16 +57,14 @@ public class JoinTeamConfigEditorTest {
 	boolean isChallenge = true; // current
 	boolean showProfileFormKey = true; // deprecated but needs support
 	
-
-	
 	@Before
 	public void setup() {
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(JoinTeamConfigEditorView.class);
 		mockSuggestion = mock(GroupSuggestion.class);
 		mockSuggestBox = mock(SynapseSuggestBox.class);
 		mockProvider = mock(GroupSuggestionProvider.class);
 		mockCallback = mock(DialogCallback.class);
-		mockSynClient = mock(SynapseClientAsync.class);
 		mockJSNI = mock(SynapseJSNIUtils.class);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.TEAM_ID_KEY, teamID);
@@ -77,10 +78,10 @@ public class JoinTeamConfigEditorTest {
 		testTeam = new Team();
 		testTeam.setId(teamID);
 		testTeam.setName(teamName);
-		presenter = new JoinTeamConfigEditor(mockView, mockSuggestBox, mockProvider, mockSynClient, mockJSNI);
+		presenter = new JoinTeamConfigEditor(mockView, mockSuggestBox, mockProvider, mockSynapseJavascriptClient, mockJSNI);
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
 		when(mockSuggestion.getId()).thenReturn(suggestionID);
-		AsyncMockStubber.callSuccessWith(testTeam).when(mockSynClient).getTeam(Mockito.anyString(), Mockito.any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testTeam).when(mockSynapseJavascriptClient).getTeam(Mockito.anyString(), Mockito.any(AsyncCallback.class));
 	}
 	
 	@Test

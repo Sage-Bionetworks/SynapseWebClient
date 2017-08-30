@@ -41,6 +41,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
@@ -87,6 +88,8 @@ public class AccessControlListEditorTest {
 	ArgumentCaptor<ArrayList<String>> listCaptor;
 	@Mock
 	PublicPrincipalIds mockPublicPrincipalIds;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws JSONObjectAdapterException {
@@ -123,7 +126,8 @@ public class AccessControlListEditorTest {
 				mockSynapseClient,
 				mockAuthenticationController,
 				mockGlobalApplicationState, 
-				mockGwt
+				mockGwt,
+				mockSynapseJavascriptClient
 		);
 		acle.configure(project, true, mockHasChangeHandler);
 		when(mockACLEView.isNotifyPeople()).thenReturn(true);
@@ -248,7 +252,7 @@ public class AccessControlListEditorTest {
 	public void createAclTest() throws Exception {		
 		// create response ACL
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(entityBundleTransport_inheritedACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_inheritedACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
 		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).createAcl(any(AccessControlList.class), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 		
@@ -284,7 +288,7 @@ public class AccessControlListEditorTest {
 		localACL.getResourceAccess().add(ra);
 		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
 		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 		
@@ -328,7 +332,7 @@ public class AccessControlListEditorTest {
 		when(mockACLEView.isNotifyPeople()).thenReturn(false);
 		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
 		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
 		
 		// update
@@ -349,7 +353,7 @@ public class AccessControlListEditorTest {
 		localACL.getResourceAccess().add(ra);
 		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
 		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
 		
 		// update
@@ -377,7 +381,7 @@ public class AccessControlListEditorTest {
 				resourceAccess.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_VIEW));
 		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
 		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(),  any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 		
@@ -418,7 +422,7 @@ public class AccessControlListEditorTest {
 		localACL.getResourceAccess().remove(toRemove);
 		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
 		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 		
@@ -445,7 +449,7 @@ public class AccessControlListEditorTest {
 		// create response ACL: benefactor's
 		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
 		AsyncMockStubber.callSuccessWith(inheritedACL).when(mockSynapseClient).deleteAcl(eq(ENTITY_ID), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(inheritedACL).when(mockSynapseClient).getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
 		
@@ -472,7 +476,7 @@ public class AccessControlListEditorTest {
 		localACL.getResourceAccess().add(ra);
 		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
 		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
 		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
 		
@@ -495,7 +499,7 @@ public class AccessControlListEditorTest {
 	@Test
 	public void setAdminAccessTest() throws Exception {
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		
 		// update
 		acle.refresh();
@@ -510,7 +514,7 @@ public class AccessControlListEditorTest {
 	@Test
 	public void pushNoChangesTest() throws Exception {		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		
 		// attempt to push changes when none have been made
 		acle.refresh();
@@ -523,7 +527,7 @@ public class AccessControlListEditorTest {
 	@Test
 	public void removeAccessNotFoundTest() throws Exception {		
 		// configure mocks
-		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		
 		// attempt to remove permissions for user not on ACL
 		acle.refresh();

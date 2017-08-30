@@ -297,4 +297,7 @@ public class WebConstants {
 	public static final String CONTENT_TYPE = "Content-Type";
 
 	public static final Long ZERO_OFFSET = 0L;
+	public static final String REPO_SERVICE_URL_KEY = "repoServiceUrl";
+	public static final String FILE_SERVICE_URL_KEY = "fileServiceUrl";
+	public static final String AUTH_PUBLIC_SERVICE_URL_KEY = "authPublicServiceUrl";
 }

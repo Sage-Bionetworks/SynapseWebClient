@@ -21,8 +21,7 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -35,8 +34,6 @@ import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.PublicPrincipalIds;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -51,17 +48,18 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	private EntityHeader entityHeader;
 	private AnnotationTransformer transformer;
 	private UserBadge modifiedByUserBadge;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private CallbackP<String> customEntityClickHandler;
 	private FileDownloadButton fileDownloadButton;
 	private LazyLoadHelper lazyLoadHelper;
 	private DateTimeUtils dateTimeUtils;
+	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
 			AnnotationTransformer transformer,
 			UserBadge modifiedByUserBadge,
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			FileDownloadButton fileDownloadButton,
 			LazyLoadHelper lazyLoadHelper,
 			DateTimeUtils dateTimeUtils) {
@@ -70,7 +68,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		this.transformer = transformer;
 		this.modifiedByUserBadge = modifiedByUserBadge;
 		this.dateTimeUtils = dateTimeUtils;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.fileDownloadButton = fileDownloadButton;
 		this.lazyLoadHelper = lazyLoadHelper;
 		view.setPresenter(this);
@@ -94,7 +92,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	
 	public void getEntityBundle() {
 		int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL | THREAD_COUNT;
-		synapseClient.getEntityBundle(entityHeader.getId(), partsMask, new AsyncCallback<EntityBundle>() {
+		jsClient.getEntityBundle(entityHeader.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorIcon();

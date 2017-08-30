@@ -4,9 +4,11 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import java.util.HashMap;
@@ -21,8 +23,8 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -42,12 +44,12 @@ import com.google.gwt.user.client.ui.Widget;
 public class TableQueryResultWikiWidgetTest {
 	TableQueryResultWikiWidget widget;
 	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
 	TableQueryResultWikiWidgetView mockView;
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
-	@Mock
-	SynapseClientAsync mockSynapseClient;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
@@ -62,14 +64,15 @@ public class TableQueryResultWikiWidgetTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		widget = new TableQueryResultWikiWidget(mockView, 
+		widget = new TableQueryResultWikiWidget(
+				mockView, 
 				mockTableEntityWidget,
 				mockActionMenu,
 				mockEntityActionController,
 				mockSynapseJSNIUtils, 
-				mockSynapseClient, 
+				mockSynapseJavascriptClient, 
 				mockSynAlert);
-		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -94,7 +97,7 @@ public class TableQueryResultWikiWidgetTest {
 		
 		widget.configure(wikiKey, descriptor, null, null);
 		
-		verify(mockSynapseClient).getEntityBundle(eq(tableId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(tableId), anyInt(), any(AsyncCallback.class));
 		verify(mockSynAlert).clear();
 		Query query = widget.getQueryString();
 		assertEquals(sql, query.getSql());
@@ -117,7 +120,7 @@ public class TableQueryResultWikiWidgetTest {
 	
 	@Test
 	public void testConfigureNotFound() {
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		Map<String, String> descriptor = new HashMap<String, String>();
 		String sql = "my query string";
 		descriptor.put(WidgetConstants.TABLE_QUERY_KEY, sql);

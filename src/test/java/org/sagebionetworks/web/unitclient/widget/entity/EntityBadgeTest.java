@@ -44,8 +44,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -74,7 +73,6 @@ public class EntityBadgeTest {
 	private static final String KEY3 = "key3";
 	private static final String KEY1 = "key1";
 	private static final String KEY2 = "key2";
-	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
@@ -101,12 +99,13 @@ public class EntityBadgeTest {
 	ResourceAccess mockResourceAccess;
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	Set<ResourceAccess> resourceAccessSet;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(EntityBadgeView.class);
 		mockClientCache = mock(ClientCache.class);
 		getInfoCallback = mock(AsyncCallback.class);
@@ -119,7 +118,7 @@ public class EntityBadgeTest {
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
-				mockUserBadge, mockSynapseClient,
+				mockUserBadge, mockSynapseJavascriptClient,
 				mockFileDownloadButton, mockLazyLoadHelper,
 				mockDateTimeUtils);
 		
@@ -146,7 +145,7 @@ public class EntityBadgeTest {
 		when(bundle.getBenefactorAcl()).thenReturn(mockBenefactorAcl);
 		when(bundle.getRootWikiId()).thenReturn(rootWikiKeyId);
 		when(bundle.getThreadCount()).thenReturn(entityThreadCount);
-		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		return bundle;
 	}
 	
@@ -183,7 +182,7 @@ public class EntityBadgeTest {
 		verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
 		captor.getValue().invoke();
 		
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showPublicIcon();
 		verify(mockView).showAnnotationsIcon();
 		verify(mockView).setAnnotations(anyString());
@@ -212,7 +211,7 @@ public class EntityBadgeTest {
 		configure();
 		widget.getEntityBundle();
 		
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockUserBadge).configure(modifiedByPrincipalId.toString());
 		verify(mockView).setModifiedByWidgetVisible(true);
 		verify(mockDateTimeUtils).convertDateToSmallString(modifiedOn);
@@ -235,7 +234,7 @@ public class EntityBadgeTest {
 		//test failure response from getEntityBundle
 		String errorMessage = "problem occurred while asking for entity bundle";
 		Exception ex = new Exception(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		widget.getEntityBundle();
 
 		verify(mockView).showErrorIcon();

@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.view.SynapseStandaloneWikiView;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -22,11 +23,12 @@ public class SynapseStandaloneWikiPresenter extends AbstractActivity implements 
 	private SynapseStandaloneWikiView view;
 	private SynapseClientAsync synapseClient;
 	private Map<String, WikiPageKey> pageName2WikiKeyMap;
-	
+	private SynapseJavascriptClient jsClient;
 	@Inject
-	public SynapseStandaloneWikiPresenter(SynapseStandaloneWikiView view, SynapseClientAsync synapseClient){
+	public SynapseStandaloneWikiPresenter(SynapseStandaloneWikiView view, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient){
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 	}
 
@@ -78,7 +80,7 @@ public class SynapseStandaloneWikiPresenter extends AbstractActivity implements 
 	}
 	
 	public void configure(final WikiPageKey wikiKey) {
-		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
+		jsClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage result) {
 				view.configure(result.getMarkdown(), wikiKey);

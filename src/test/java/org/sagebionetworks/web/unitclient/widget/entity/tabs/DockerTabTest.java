@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -81,6 +82,8 @@ public class DockerTabTest {
 	EntityBundle mockDockerRepoEntityBundle;
 	@Mock
 	EntityPath path;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 
 	DockerTab tab;
 
@@ -99,7 +102,8 @@ public class DockerTabTest {
 		when(mockGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
 		when(mockGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClient);
 		when(mockGinInjector.getStuAlert()).thenReturn(mockSynAlert);
-
+		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockSynapseJavascriptClient);
+		
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
@@ -192,7 +196,7 @@ public class DockerTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, mockProjectBundleLoadError);
 		tab.configure(mockDockerRepoEntity, mockEntityUpdatedHandler, areaToken);
 		verify(mockSynAlert, atLeastOnce()).clear();
-		verify(mockSynapseClient).getEntityBundle(eq(dockerRepoEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(dockerRepoEntityId), anyInt(), any(AsyncCallback.class));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -200,7 +204,7 @@ public class DockerTabTest {
 	public void testConfigureWithDockerRepoEntitySuccess() {
 		String areaToken = null;
 		AsyncMockStubber.callSuccessWith(mockDockerRepoEntityBundle)
-				.when(mockSynapseClient)
+				.when(mockSynapseJavascriptClient)
 				.getEntityBundle(eq(dockerRepoEntityId), anyInt(), any(AsyncCallback.class));
 		tab.setShowProjectInfoCallback(mockShowProjectInfoCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, mockProjectBundleLoadError);
@@ -230,7 +234,7 @@ public class DockerTabTest {
 	public void testConfigureWithDockerRepoEntityFailure() {
 		String areaToken = null;
 		AsyncMockStubber.callFailureWith(new Throwable())
-				.when(mockSynapseClient)
+				.when(mockSynapseJavascriptClient)
 				.getEntityBundle(eq(dockerRepoEntityId), anyInt(), any(AsyncCallback.class));
 		tab.setShowProjectInfoCallback(mockShowProjectInfoCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, mockProjectBundleLoadError);

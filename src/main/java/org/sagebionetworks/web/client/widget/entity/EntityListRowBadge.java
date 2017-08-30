@@ -12,8 +12,7 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -32,7 +31,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	public static final String N_A = "N/A";
 	private EntityListRowBadgeView view;
 	private UserBadge createdByUserBadge;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private FileDownloadButton fileDownloadButton;
 	private String entityId;
 	private Long version;
@@ -42,14 +41,14 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	@Inject
 	public EntityListRowBadge(EntityListRowBadgeView view, 
 			UserBadge userBadge,
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			FileDownloadButton fileDownloadButton,
 			LazyLoadHelper lazyLoadHelper,
 			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.createdByUserBadge = userBadge;
 		this.dateTimeUtils = dateTimeUtils;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.fileDownloadButton = fileDownloadButton;
 		this.lazyLoadHelper = lazyLoadHelper;
 		view.setCreatedByWidget(userBadge.asWidget());
@@ -101,9 +100,9 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			};
 		};
 		if (version == null) {
-			synapseClient.getEntityBundle(entityId, partsMask, callback);	
+			jsClient.getEntityBundle(entityId, partsMask, callback);	
 		} else {
-			synapseClient.getEntityBundleForVersion(entityId, version, partsMask, callback);
+			jsClient.getEntityBundleForVersion(entityId, version, partsMask, callback);
 		}
 	}
 	

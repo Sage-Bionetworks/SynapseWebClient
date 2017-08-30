@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -135,6 +136,9 @@ public class FilesTabTest {
 	DiscussionThreadListWidget mockDiscussionThreadListWidget;
 	@Mock
 	DiscussionThreadBundle mockBundle;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+
 	FilesTab tab;
 	String projectEntityId = "syn9";
 	String projectName = "proyecto";
@@ -170,6 +174,7 @@ public class FilesTabTest {
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
 		when(mockPortalGinInjector.getDiscussionThreadListWidget()).thenReturn(mockDiscussionThreadListWidget);
+		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockSynapseJavascriptClient);
 		
 		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
 		
@@ -183,7 +188,7 @@ public class FilesTabTest {
 		when(mockEntityBundlePlus.getEntityBundle()).thenReturn(mockEntityBundle);
 		when(mockEntityBundlePlus.getLatestVersionNumber()).thenReturn(null);
 		
-		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseClientAsync).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockEntityBundlePlus).when(mockSynapseClientAsync).getEntityBundlePlusForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		when(mockPortalGinInjector.createActionMenuWidget()).thenReturn(mockActionMenuWidget);
