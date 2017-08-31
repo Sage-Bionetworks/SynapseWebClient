@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.http.client.Response;
 public class SynapseJavascriptClientTest {
 	SynapseJavascriptClient client;
+	private static SynapseJavascriptFactory synapseJsFactory = new SynapseJavascriptFactory();
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	public static final String REPO_ENDPOINT = "http://repo-endpoint/v1";
 	public static final String USER_SESSION_TOKEN = "abc123";
@@ -81,7 +82,8 @@ public class SynapseJavascriptClientTest {
 				mockAuthController, 
 				jsonObjectAdapter, 
 				mockGlobalAppState, 
-				mockGwt);
+				mockGwt,
+				synapseJsFactory);
 	}
 	
 	@Test
