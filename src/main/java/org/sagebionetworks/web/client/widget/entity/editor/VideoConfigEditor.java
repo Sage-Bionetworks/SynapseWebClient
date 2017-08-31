@@ -20,6 +20,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEditorPresenter {
 	
+	public static final String VIMEO_URL_PREFIX = "https://player.vimeo.com/video/";
+	public static final String YOUTUBE_URL_PREFIX = "http://www.youtube.com/watch?v=";
+	
 	public static final String UNRECOGNIZED_VIDEO_FORMAT_MESSAGE = "Unrecognized video format";
 	private VideoConfigView view;
 	private Map<String, String> descriptor;
@@ -43,16 +46,27 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
-		descriptor = widgetDescriptor;		
-		if (descriptor.get(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY) != null) {
-			currentType = VIDEO_TYPE.MP4;
-			view.setEntity(descriptor.get(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY));
-		} else if (descriptor.get(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY) != null){
-			currentType = VIDEO_TYPE.OGG;
-			view.setEntity(descriptor.get(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY));
-		} else if (descriptor.get(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY) != null){
-			currentType = VIDEO_TYPE.WEBM;
-			view.setEntity(descriptor.get(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY));
+		descriptor = widgetDescriptor;
+		String vimeoVideoId = descriptor.get(WidgetConstants.VIMEO_WIDGET_VIDEO_ID_KEY);
+		String youtubeVideoId  = descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY);
+		if (vimeoVideoId != null) {
+			view.showVimeoTab();
+			view.setVimeoVideoUrl(VIMEO_URL_PREFIX + vimeoVideoId);
+		} else if (youtubeVideoId != null) {
+			view.showYouTubeTab();
+			view.setYouTubeVideoUrl(YOUTUBE_URL_PREFIX + youtubeVideoId);
+		} else {
+			view.showSynapseTab();
+			if (descriptor.get(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY) != null) {
+				currentType = VIDEO_TYPE.MP4;
+				view.setEntity(descriptor.get(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY));
+			} else if (descriptor.get(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY) != null){
+				currentType = VIDEO_TYPE.OGG;
+				view.setEntity(descriptor.get(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY));
+			} else if (descriptor.get(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY) != null){
+				currentType = VIDEO_TYPE.WEBM;
+				view.setEntity(descriptor.get(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY));
+			}
 		}
 	}
 	
@@ -147,14 +161,20 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 	public void updateDescriptorFromView() {
 		//update widget descriptor from the view
 		view.checkParams();
-		String entityId = view.getEntity();
 		descriptor.clear();
-		if (VIDEO_TYPE.MP4.equals(currentType)) {
-			descriptor.put(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY, entityId);
-		} else if (VIDEO_TYPE.OGG.equals(currentType)) {
-			descriptor.put(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY, entityId);
-		} else if (VIDEO_TYPE.WEBM.equals(currentType)) {
-			descriptor.put(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY, entityId);
+		if (view.isSynapseEntity()) {
+			String entityId = view.getEntity();
+			if (VIDEO_TYPE.MP4.equals(currentType)) {
+				descriptor.put(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY, entityId);
+			} else if (VIDEO_TYPE.OGG.equals(currentType)) {
+				descriptor.put(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY, entityId);
+			} else if (VIDEO_TYPE.WEBM.equals(currentType)) {
+				descriptor.put(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY, entityId);
+			}
+		} else if (view.isYouTubeVideo()) {
+			descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, getYouTubeVideoId(view.getYouTubeVideoUrl()));
+		} else if (view.isVimeoVideo()) {
+			descriptor.put(WidgetConstants.VIMEO_WIDGET_VIDEO_ID_KEY, getVimeoVideoId(view.getVimeoVideoUrl()));
 		}
 	}
 	
@@ -174,7 +194,34 @@ public class VideoConfigEditor implements VideoConfigView.Presenter, WidgetEdito
 	public List<String> getDeletedFileHandleIds() {
 		return null;
 	}
-	/*
-	 * Private Methods
-	 */
+	
+	public String getVimeoVideoId(String videoUrl) {
+		String videoId = null;
+		//parse out the video id from the urlS
+		int start = videoUrl.lastIndexOf("/");
+		if (start > -1) {
+			videoId = videoUrl.substring(start + 1);
+		}
+		if (videoId == null || videoId.trim().length() == 0) {
+			throw new IllegalArgumentException("Could not determine the Vimeo video ID from the given URL.");
+		}
+		return videoId;
+	}
+	
+
+	public String getYouTubeVideoId(String videoUrl) {
+		String videoId = null;
+		//parse out the video id from the url
+		int start = videoUrl.indexOf("v=");
+		if (start > -1) {
+			int end = videoUrl.indexOf("&", start);
+			if (end == -1)
+				end = videoUrl.length();
+			videoId = videoUrl.substring(start + "v=".length(), end);
+		}
+		if (videoId == null || videoId.trim().length() == 0) {
+			throw new IllegalArgumentException("Could not determine the YouTube video ID from the given URL.");
+		}
+		return videoId;
+	}
 }

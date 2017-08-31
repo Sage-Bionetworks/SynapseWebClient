@@ -127,8 +127,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEdit
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.VimeoConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
@@ -162,10 +160,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountWidg
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.VimeoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabView;
@@ -332,8 +328,6 @@ public interface PortalGinInjector extends Ginjector {
 	////// Editors
 	public BookmarkConfigEditor getBookmarkConfigEditor();
 	public ReferenceConfigEditor getReferenceConfigEditor();
-	public YouTubeConfigEditor getYouTubeConfigEditor();
-	public VimeoConfigEditor getVimeoConfigEditor();
 	public ProvenanceConfigEditor getProvenanceConfigEditor();
 	public ImageConfigEditor getImageConfigEditor();
 	public ImageLinkConfigEditor getImageLinkConfigEditor();
@@ -360,8 +354,6 @@ public interface PortalGinInjector extends Ginjector {
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
 	public ReferenceWidget getReferenceRenderer();
-	public YouTubeWidget getYouTubeRenderer();
-	public VimeoWidget getVimeoRenderer();
 	public TutorialWizard getTutorialWidgetRenderer();
 	public ProvenanceWidget getProvenanceRenderer();
 	public AdministerEvaluationsList getAdministerEvaluationsList();

@@ -31,7 +31,7 @@ public class WidgetRegistrarImplTest {
 	@Test
 	public void testCreateWidgets() {
 		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, null, null);
-		verify(mockGinInjector).getYouTubeRenderer();
+		verify(mockGinInjector).getVideoWidget();
 		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, null, null);
 		verify(mockGinInjector).getImageRenderer();
 		reset(mockGinInjector);
@@ -47,7 +47,7 @@ public class WidgetRegistrarImplTest {
 	@Test
 	public void testCreateWidgetEditors() {
 		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, null);
-		verify(mockGinInjector).getYouTubeConfigEditor();
+		verify(mockGinInjector).getVideoConfigEditor();
 		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, null);
 		verify(mockGinInjector).getImageConfigEditor();
 		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE, null, null);

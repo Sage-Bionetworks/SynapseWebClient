@@ -12,8 +12,10 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class VideoWidget implements VideoWidgetView.Presenter, WidgetRendererPresenter {
+public class VideoWidget implements WidgetRendererPresenter {
 	
+	public static final String VIMEO_URL_PREFIX = "https://player.vimeo.com/video/";
+	public static final String YOUTUBE_URL_PREFIX = "https://www.youtube.com/embed/";
 	private VideoWidgetView view;
 	private Map<String,String> descriptor;
 	AuthenticationController authenticationController;
@@ -23,19 +25,27 @@ public class VideoWidget implements VideoWidgetView.Presenter, WidgetRendererPre
 			AuthenticationController authenticationController) {
 		this.view = view;
 		this.authenticationController = authenticationController;
-		view.setPresenter(this);
 	}
 	
 	@Override
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.descriptor = widgetDescriptor;
+		
+		String youTubeVideoId = descriptor.get(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY);
+		String vimeoVideoId = descriptor.get(WidgetConstants.VIMEO_WIDGET_VIDEO_ID_KEY);
 		String mp4SynapseId = descriptor.get(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY);
 		String oggSynapseId = descriptor.get(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY);
 		String webmSynapseId = descriptor.get(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY);
 		String width = descriptor.get(WidgetConstants.VIDEO_WIDGET_WIDTH_KEY);
 		String height = descriptor.get(WidgetConstants.HEIGHT_KEY);
-		view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, width, height, authenticationController.getCurrentXsrfToken());
-		//set up view based on descriptor parameters
+		
+		if (youTubeVideoId != null) {
+			view.configure(YOUTUBE_URL_PREFIX + youTubeVideoId);
+		} else if (vimeoVideoId != null) {
+			view.configure(VIMEO_URL_PREFIX + vimeoVideoId);
+		} else {
+			view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, width, height, authenticationController.getCurrentXsrfToken());
+		}
 		descriptor = widgetDescriptor;
 	}
 	
@@ -44,19 +54,10 @@ public class VideoWidget implements VideoWidgetView.Presenter, WidgetRendererPre
 		String oggSynapseId = VideoConfigEditor.isRecognizedOggFileName(filename) ? synapseId : null;
 		String webmSynapseId = VideoConfigEditor.isRecognizedWebMFileName(filename) ? synapseId : null;
 		view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, Integer.toString(width), Integer.toString(height), authenticationController.getCurrentXsrfToken());
-		
 	}
 	
-	@SuppressWarnings("unchecked")
-	public void clearState() {
-	}
-
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
-		/*
-	 * Private Methods
-	 */
 }
