@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UrlCache;
-import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 
@@ -20,7 +19,7 @@ public class UserTeamConfigViewImpl extends SimplePanel implements UserTeamConfi
 	
 	@Inject
 	public UserTeamConfigViewImpl(UrlCache urlCache, SynapseJSNIUtils synapseJSNIUtils,
-			SynapseSuggestBox suggestBox, GroupSuggestionProvider provider) {
+			SynapseSuggestBox suggestBox, UserGroupSuggestionProvider provider) {
 		this.urlCache = urlCache;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.suggestBox = suggestBox;

@@ -1,5 +1,4 @@
 package org.sagebionetworks.web.client;
-
 import static com.google.gwt.http.client.RequestBuilder.GET;
 import static com.google.gwt.http.client.RequestBuilder.POST;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
@@ -24,14 +23,15 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
@@ -57,6 +57,7 @@ import com.google.inject.Inject;
  *
  */
 public class SynapseJavascriptClient {
+	public static final String TYPE_FILTER_PARAMETER = "&typeFilter=";
 	public static final String WIKI = "/wiki/";
 	public static final String WIKIKEY = "/wikikey";
 	public static final String CHILDREN = "/children";
@@ -68,6 +69,7 @@ public class SynapseJavascriptClient {
 	JSONObjectAdapter jsonObjectAdapter;
 	GlobalApplicationState globalAppState;
 	GWTWrapper gwt;
+	SynapseJavascriptFactory jsFactory;
 
 	public static final String ENTITY_URI_PATH = "/entity";
 	public static final String ENTITY_BUNDLE_PATH = "/bundle?mask=";
@@ -80,20 +82,27 @@ public class SynapseJavascriptClient {
 	public static final String REPO_SUFFIX_VERSION = "/version";
 	public static final String TEAM = "/team";
 	public static final String WIKI_VERSION_PARAMETER = "?wikiVersion=";
-	private String repoServiceUrl; 
 
+	public static final String USER_GROUP_HEADER_PREFIX_PATH = "/userGroupHeaders?prefix=";
+	public static final String OFFSET_PARAMETER = "offset=";
+	public static final String LIMIT_PARAMETER = "limit=";
+	
+	public String repoServiceUrl; 
+	
 	@Inject
 	public SynapseJavascriptClient(
 			RequestBuilderWrapper requestBuilder,
 			AuthenticationController authController,
 			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalAppState,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			SynapseJavascriptFactory jsFactory) {
 		this.requestBuilder = requestBuilder;
 		this.authController = authController;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.globalAppState = globalAppState;
 		this.gwt = gwt;
+		this.jsFactory = jsFactory;
 	}
 	private String getRepoServiceUrl() {
 		if (repoServiceUrl == null) {
@@ -101,26 +110,26 @@ public class SynapseJavascriptClient {
 		}
 		return repoServiceUrl;
 	}
-	private void doGet(String url, AsyncCallback<JSONObjectAdapter> callback) {
+	private void doGet(String url, OBJECT_TYPE responseType, AsyncCallback callback) {
 		requestBuilder.configure(GET, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(url, null, callback);
+		sendRequest(url, null, responseType, callback);
 	}
 	
-	private void doPost(String url, String requestData, AsyncCallback<JSONObjectAdapter> callback) {
+	private void doPost(String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
 		requestBuilder.configure(POST, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		requestBuilder.setHeader(CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(url, requestData, callback);
+		sendRequest(url, requestData, responseType, callback);
 	}
 	
-	private void sendRequest(final String url, final String requestData, final AsyncCallback<JSONObjectAdapter> callback) {
+	private void sendRequest(final String url, final String requestData, final OBJECT_TYPE responseType, final AsyncCallback callback) {
 		try {
 			requestBuilder.sendRequest(requestData, new RequestCallback() {
 				@Override
@@ -130,7 +139,7 @@ public class SynapseJavascriptClient {
 					if (statusCode == SC_OK) {
 						try {
 							JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
-							callback.onSuccess(jsonObject);
+							callback.onSuccess(jsFactory.newInstance(responseType, jsonObject));
 						} catch (JSONObjectAdapterException e) {
 							onError(null, e);
 						}
@@ -140,7 +149,7 @@ public class SynapseJavascriptClient {
 							gwt.scheduleExecution(new Callback() {
 								@Override
 								public void invoke() {
-									sendRequest(url, requestData, callback);
+									sendRequest(url, requestData, responseType, callback);
 								}
 							}, RETRY_REQUEST_DELAY_MS);
 						} else {
@@ -183,19 +192,6 @@ public class SynapseJavascriptClient {
 		}
 	}
 
-	public AsyncCallback<JSONObjectAdapter> wrapCallback(final CallbackP<JSONObjectAdapter> constructCallback, final AsyncCallback callback) {
-		return new AsyncCallback<JSONObjectAdapter>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-			@Override
-			public void onSuccess(JSONObjectAdapter json) {
-				constructCallback.invoke(json);
-			}
-		};
-	}
-
 	public void getEntityBundle(String entityId, int partsMask, final AsyncCallback<EntityBundle> callback) {
 		getEntityBundleForVersion(entityId, null, partsMask, callback);
 	}
@@ -205,53 +201,24 @@ public class SynapseJavascriptClient {
 		if (versionNumber != null) {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
-		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
-			@Override
-			public void invoke(JSONObjectAdapter json) {
-				try {
-					callback.onSuccess(new EntityBundle(json));
-				} catch (JSONObjectAdapterException e) {
-					callback.onFailure(e);
-				}
-			}
-		};
-		doGet(url, wrapCallback(constructCallback, callback));
+		
+		doGet(url, OBJECT_TYPE.EntityBundle, callback);
 	}
 
 	public void getTeam(String teamId, final AsyncCallback<Team> callback) {
 		String url = getRepoServiceUrl() + TEAM + "/" + teamId;
-		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
-			@Override
-			public void invoke(JSONObjectAdapter json) {
-				try {
-					callback.onSuccess(new Team(json));
-				} catch (JSONObjectAdapterException e) {
-					callback.onFailure(e);
-				}
-			}
-		};
-		doGet(url, wrapCallback(constructCallback, callback));
+		doGet(url, OBJECT_TYPE.Team, callback);
 	}
 	
 	public void getRestrictionInformation(String subjectId, RestrictableObjectType type, final AsyncCallback<RestrictionInformationResponse> callback)  {
 		String url = getRepoServiceUrl() + RESTRICTION_INFORMATION;
-		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
-			@Override
-			public void invoke(JSONObjectAdapter json) {
-				try {
-					callback.onSuccess(new RestrictionInformationResponse(json));
-				} catch (JSONObjectAdapterException e) {
-					callback.onFailure(e);
-				}
-			}
-		};
 		RestrictionInformationRequest request = new RestrictionInformationRequest();
 		request.setObjectId(subjectId);
 		request.setRestrictableObjectType(type);
 		try {
 			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
 			request.writeToJSONObject(jsonAdapter);
-			doPost(url, jsonAdapter.toJSONString(), wrapCallback(constructCallback, callback));
+			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.RestrictionInformationResponse, callback);
 		} catch (JSONObjectAdapterException e) {
 			callback.onFailure(e);
 		}
@@ -259,20 +226,10 @@ public class SynapseJavascriptClient {
 	
 	public void getEntityChildren(EntityChildrenRequest request, final AsyncCallback<EntityChildrenResponse> callback) {
 		String url = getRepoServiceUrl() + ENTITY_URI_PATH + CHILDREN;
-		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
-			@Override
-			public void invoke(JSONObjectAdapter json) {
-				try {
-					callback.onSuccess(new EntityChildrenResponse(json));
-				} catch (JSONObjectAdapterException e) {
-					callback.onFailure(e);
-				}
-			}
-		};
 		try {
 			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
 			request.writeToJSONObject(jsonAdapter);
-			doPost(url, jsonAdapter.toJSONString(), wrapCallback(constructCallback, callback));
+			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.EntityChildrenResponse, callback);
 		} catch (JSONObjectAdapterException e) {
 			callback.onFailure(e);
 		}
@@ -288,19 +245,21 @@ public class SynapseJavascriptClient {
 			String url = getRepoServiceUrl() + "/" +
 					key.getOwnerObjectType().toLowerCase() + "/" + 
 					key.getOwnerObjectId() + WIKIKEY;
-			CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
+			
+			AsyncCallback<org.sagebionetworks.repo.model.dao.WikiPageKey> wikiPageKeyCallback = new AsyncCallback<org.sagebionetworks.repo.model.dao.WikiPageKey>() {
 				@Override
-				public void invoke(JSONObjectAdapter json) {
-					try {
-						String wikiPageId = new org.sagebionetworks.repo.model.dao.WikiPageKey(json).getWikiPageId();
-						key.setWikiPageId(wikiPageId);
-						getVersionOfV2WikiPageAsV1WithWikiPageId(key, versionNumber, callback);
-					} catch (JSONObjectAdapterException e) {
-						callback.onFailure(e);
-					}
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+				@Override
+				public void onSuccess(org.sagebionetworks.repo.model.dao.WikiPageKey wikiPageKey) {
+					String wikiPageId = wikiPageKey.getWikiPageId();
+					key.setWikiPageId(wikiPageId);
+					getVersionOfV2WikiPageAsV1WithWikiPageId(key, versionNumber, callback);
 				}
 			};
-			doGet(url, wrapCallback(constructCallback, callback));
+			
+			doGet(url, OBJECT_TYPE.WikiPageKey, wikiPageKeyCallback);
 		} else {
 			getVersionOfV2WikiPageAsV1WithWikiPageId(key, versionNumber, callback);
 		}
@@ -314,20 +273,25 @@ public class SynapseJavascriptClient {
 		if (versionNumber != null) {
 			url += WIKI_VERSION_PARAMETER + versionNumber;
 		}
-				
-		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
-			@Override
-			public void invoke(JSONObjectAdapter json) {
-				try {
-					callback.onSuccess(new WikiPage(json));
-				} catch (JSONObjectAdapterException e) {
-					callback.onFailure(e);
-				}
-			}
-		};
-		doGet(url, wrapCallback(constructCallback, callback));
+		doGet(url, OBJECT_TYPE.WikiPage, callback);
 	}
 	
+
+	public void getUserGroupHeadersByPrefix(String prefix, TypeFilter type, long limit, long offset, final AsyncCallback<UserGroupHeaderResponsePage> callback) {
+		String encodedPrefix = gwt.encodeQueryString(prefix);
+		StringBuilder builder = new StringBuilder();
+		builder.append(getRepoServiceUrl());
+		builder.append(USER_GROUP_HEADER_PREFIX_PATH);
+		builder.append(encodedPrefix);
+		builder.append("&" + LIMIT_PARAMETER + limit);
+		builder.append( "&" + OFFSET_PARAMETER + offset);
+		if(type != null){
+			builder.append(TYPE_FILTER_PARAMETER+type.name());
+		}
+		
+		doGet(builder.toString(), OBJECT_TYPE.UserGroupHeaderResponsePage, callback);
+	}
+
 	public void listUserProfiles(List<String> userIds, final AsyncCallback<List<UserProfile>> callback) {
 		List<Long> userIdsLong = new ArrayList<>();
 		for (String userId : userIds) {
@@ -335,34 +299,18 @@ public class SynapseJavascriptClient {
 		}
 		listUserProfilesFromUserIds(userIdsLong, callback);
 	}
+
 	private void listUserProfilesFromUserIds(List<Long> userIds, final AsyncCallback<List<UserProfile>> callback) {
 		String url = getRepoServiceUrl() + USER_PROFILE_PATH;
-		CallbackP<JSONObjectAdapter> constructCallback = new CallbackP<JSONObjectAdapter>() {
-			@Override
-			public void invoke(JSONObjectAdapter json) {
-				// json really represents a ListWrapper, but we can't reference ListWrapper here because it uses Class.forName() (breaks gwt compile)
-				try {
-					List<UserProfile> list = new ArrayList<>();
-					JSONArrayAdapter jsonArray = json.getJSONArray("list");
-					for (int i = 0; i < jsonArray.length(); i++) {
-						JSONObjectAdapter jsonObject = jsonArray.getJSONObject(i);
-						list.add(new UserProfile(jsonObject));
-					}
-					
-					callback.onSuccess(list);
-				} catch (JSONObjectAdapterException e) {
-					callback.onFailure(e);
-				}
-			}
-		};
 		try {
 			IdList idList = new IdList();
 			idList.setList(userIds);
 			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
 			idList.writeToJSONObject(jsonAdapter);
-			doPost(url, jsonAdapter.toJSONString(), wrapCallback(constructCallback, callback));
+			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.ListWrapperUserProfile, callback);
 		} catch (JSONObjectAdapterException e) {
 			callback.onFailure(e);
 		}
 	}
 }
+

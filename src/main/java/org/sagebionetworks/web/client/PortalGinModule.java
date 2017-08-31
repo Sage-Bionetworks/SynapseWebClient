@@ -1441,5 +1441,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// Synapse js client
 		bind(SynapseJavascriptClient.class).in(Singleton.class);
+		bind(SynapseJavascriptFactory.class).in(Singleton.class);
 	}
 }

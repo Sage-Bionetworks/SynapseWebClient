@@ -2,9 +2,11 @@ package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.PeopleSearchView;
@@ -27,26 +29,25 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 	private PeopleSearch place;
 	private PeopleSearchView view;
 	private GlobalApplicationState globalApplicationState;
-	private SynapseClientAsync synapseClient;
 	private SynapseAlert synAlert;
 	private LoadMoreWidgetContainer loadMoreWidgetContainer;
 	PortalGinInjector ginInjector;
 	private int offset;
 	private String searchTerm;
-	
+	private SynapseJavascriptClient jsClient;
 	@Inject
 	public PeopleSearchPresenter(PeopleSearchView view,
-			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			SynapseAlert synAlert,
 			LoadMoreWidgetContainer loadMoreWidgetContainer,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
-		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
 		this.loadMoreWidgetContainer = loadMoreWidgetContainer;
 		this.ginInjector = ginInjector;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		loadMoreWidgetContainer.configure(new Callback() {
 			@Override
@@ -111,6 +112,6 @@ public class PeopleSearchPresenter extends AbstractActivity implements PeopleSea
 			}
 			
 		};
-		synapseClient.getUserGroupHeadersByPrefix(searchTerm, (long) SEARCH_PEOPLE_LIMIT, (long) this.offset, callback);
+		jsClient.getUserGroupHeadersByPrefix(searchTerm, TypeFilter.USERS_ONLY, (long) SEARCH_PEOPLE_LIMIT, (long) this.offset, callback);
 	}
 }

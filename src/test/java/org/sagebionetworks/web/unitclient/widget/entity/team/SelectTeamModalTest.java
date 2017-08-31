@@ -9,10 +9,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider.GroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModalView;
 
@@ -26,9 +27,9 @@ public class SelectTeamModalTest {
 	@Mock
 	SynapseSuggestBox mockTeamSuggestBox;
 	@Mock
-	GroupSuggestionProvider mockProvider;
+	UserGroupSuggestionProvider mockProvider;
 	@Mock
-	GroupSuggestion mockGroupSuggestion;
+	UserGroupSuggestion mockGroupSuggestion;
 	@Mock
 	CallbackP<String> mockTeamIdSelectedCallback;
 	public static final String PARTICIPANT_TEAM_ID = "1234567890";
@@ -49,6 +50,7 @@ public class SelectTeamModalTest {
 		verify(mockView).setPresenter(widget);
 		verify(mockView).setSuggestWidget(any(Widget.class));
 		verify(mockTeamSuggestBox).setSuggestionProvider(mockProvider);
+		verify(mockTeamSuggestBox).setTypeFilter(TypeFilter.TEAMS_ONLY);
 	}
 	
 	@Test

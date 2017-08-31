@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.search;
 
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 
@@ -16,19 +17,21 @@ public class SynapseSuggestOracle extends SuggestOracle {
 	public int offset;
 	public boolean isLoading;
 	public SynapseSuggestBox suggestBox;
-	public SuggestionProvider provider;
+	public UserGroupSuggestionProvider provider;
 	public String searchTerm;
 	public String width;
 	private GWTTimer timer;
-	
+	private TypeFilter type = TypeFilter.ALL;
 	@Inject
 	public SynapseSuggestOracle(GWTTimer timer) {
 		this.timer = timer;
 	}
-	
+	public void setTypeFilter(TypeFilter type) {
+		this.type = type;
+	}
 	public void configure(final SynapseSuggestBox suggestBox,
 			int pageSize,
-			SuggestionProvider provider) {
+			UserGroupSuggestionProvider provider) {
 		this.isLoading = false;
 		this.suggestBox = suggestBox;
 		this.pageSize = pageSize;
@@ -55,7 +58,7 @@ public class SynapseSuggestOracle extends SuggestOracle {
 		if (!isLoading) {
 			suggestBox.showLoading();
 			//seachTerm or request.getQuery?
-			provider.getSuggestions(offset, pageSize, suggestBox.getWidth(), request.getQuery(), new AsyncCallback<SynapseSuggestionBundle>() {
+			provider.getSuggestions(type, offset, pageSize, suggestBox.getWidth(), request.getQuery(), new AsyncCallback<SynapseSuggestionBundle>() {
 				@Override
 				public void onSuccess(SynapseSuggestionBundle suggestionBundle) {
 					suggestBox.hideLoading();

@@ -179,8 +179,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	 */
 	public void updateUserProfile(UserProfile userProfile) throws RestServiceException;
 	
-	public UserGroupHeaderResponsePage getUserGroupHeadersByPrefix(String prefix, long limit, long offset) throws RestServiceException;
-	
 	public void additionalEmailValidation(String userId, String emailAddress, String callbackUrl) throws RestServiceException;
 	
 	public void addEmail(String emailValidationToken) throws RestServiceException;

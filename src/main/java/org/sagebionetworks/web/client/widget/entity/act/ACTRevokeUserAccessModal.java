@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
 import org.sagebionetworks.repo.model.ACTAccessRequirementInterface;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -37,12 +38,13 @@ public class ACTRevokeUserAccessModal implements RevokeUserAccessModalView.Prese
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.synapseClient = synapseClient;
 		peopleSuggestWidget.setSuggestionProvider(provider);
+		peopleSuggestWidget.setTypeFilter(TypeFilter.USERS_ONLY);
 		view.setPresenter(this);
 		view.setUserPickerWidget(peopleSuggestWidget.asWidget());
 		view.setSynAlert(synAlert.asWidget());
-		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
+		peopleSuggestBox.addItemSelectedHandler(new CallbackP<UserGroupSuggestion>() {
 			@Override
-			public void invoke(SynapseSuggestion suggestion) {
+			public void invoke(UserGroupSuggestion suggestion) {
 				onUserSelected(suggestion);
 			}
 		});
@@ -77,7 +79,7 @@ public class ACTRevokeUserAccessModal implements RevokeUserAccessModalView.Prese
 		});
 	}
 	
-	public void onUserSelected(SynapseSuggestion suggestion) {
+	public void onUserSelected(UserGroupSuggestion suggestion) {
 		this.userId = suggestion.getId();
 	}
 	

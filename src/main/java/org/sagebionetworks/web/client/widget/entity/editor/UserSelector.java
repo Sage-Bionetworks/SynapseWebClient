@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
@@ -25,10 +25,11 @@ public class UserSelector implements UserSelectorView.Presenter {
 		this.suggestBox = suggestBox;
 		view.setPresenter(this);
 		suggestBox.setSuggestionProvider(provider);
+		suggestBox.setTypeFilter(TypeFilter.USERS_ONLY);
 		view.setSelectBox(suggestBox.asWidget());
-		suggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
-			public void invoke(SynapseSuggestion suggestion) {
-				onSynapseSuggestSelected((UserGroupSuggestion)suggestion);
+		suggestBox.addItemSelectedHandler(new CallbackP<UserGroupSuggestion>() {
+			public void invoke(UserGroupSuggestion suggestion) {
+				onSynapseSuggestSelected(suggestion);
 			};
 		});
 	}

@@ -18,7 +18,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxView;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestOracle;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
@@ -51,7 +50,7 @@ public class SynapseSuggestBoxTest {
 	
 	@Test
 	public void testSelectedSuggestionCallback() {
-		CallbackP<SynapseSuggestion> mockCallback = mock(CallbackP.class);
+		CallbackP<UserGroupSuggestion> mockCallback = mock(CallbackP.class);
 		suggestBox.addItemSelectedHandler(mockCallback);
 		UserGroupSuggestion suggestion = mock(UserGroupSuggestion.class);
 		suggestBox.setSelectedSuggestion(suggestion);
@@ -60,7 +59,7 @@ public class SynapseSuggestBoxTest {
 	
 	@Test
 	public void testSelectedSuggestionCallbackNullSelection() {
-		CallbackP<SynapseSuggestion> mockCallback = mock(CallbackP.class);
+		CallbackP<UserGroupSuggestion> mockCallback = mock(CallbackP.class);
 		suggestBox.addItemSelectedHandler(mockCallback);
 		suggestBox.setSelectedSuggestion(null);
 		verify(mockCallback, never()).invoke(any(UserGroupSuggestion.class));

@@ -34,6 +34,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -43,6 +44,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import com.google.gwt.http.client.Response;
 public class SynapseJavascriptClientTest {
 	SynapseJavascriptClient client;
+	private static SynapseJavascriptFactory synapseJsFactory = new SynapseJavascriptFactory();
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	public static final String REPO_ENDPOINT = "http://repo-endpoint/v1";
 	public static final String USER_SESSION_TOKEN = "abc123";
@@ -80,7 +82,8 @@ public class SynapseJavascriptClientTest {
 				mockAuthController, 
 				jsonObjectAdapter, 
 				mockGlobalAppState, 
-				mockGwt);
+				mockGwt,
+				synapseJsFactory);
 	}
 	
 	@Test
@@ -238,6 +241,25 @@ public class SynapseJavascriptClientTest {
 		client.getVersionOfV2WikiPageAsV1(key, versionNumber, mockAsyncCallback);
 		//verify url and method
 		String url = REPO_ENDPOINT + "/" + ownerObjectType + "/" + ownerObjectId + WIKI + pageId + WIKI_VERSION_PARAMETER + versionNumber;
+		verify(mockRequestBuilder).configure(GET, url);
+	}
+	
+	@Test
+	public void testGetUserGroupHeadersByPrefix() throws RequestException, JSONObjectAdapterException {
+		String prefix = "hello";
+		when(mockGwt.encodeQueryString(anyString())).thenReturn(prefix);
+		TypeFilter typeFilter = TypeFilter.TEAMS_ONLY;
+		long limit = 10;
+		long offset = 0;
+		
+		client.getUserGroupHeadersByPrefix(prefix, typeFilter, limit, offset, mockAsyncCallback);
+		//verify url and method
+		String url = REPO_ENDPOINT + 
+			USER_GROUP_HEADER_PREFIX_PATH + 
+			prefix + "&" + 
+			LIMIT_PARAMETER + limit +  "&" + 
+			OFFSET_PARAMETER + offset + 
+			TYPE_FILTER_PARAMETER + typeFilter.name();
 		verify(mockRequestBuilder).configure(GET, url);
 	}
 	

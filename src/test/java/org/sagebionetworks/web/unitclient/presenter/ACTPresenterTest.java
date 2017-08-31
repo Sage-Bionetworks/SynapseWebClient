@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.verification.VerificationPagedResults;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
@@ -90,6 +91,7 @@ public class ACTPresenterTest {
 		verify(mockView).setStates(anyList());
 		verify(mockView).setUserPickerWidget(any(Widget.class));
 		verify(mockView).setSelectedUserBadge(any(Widget.class));
+		verify(mockPeopleSuggestBox).setTypeFilter(TypeFilter.USERS_ONLY);
 	}
 	@Test
 	public void testLoadData() {

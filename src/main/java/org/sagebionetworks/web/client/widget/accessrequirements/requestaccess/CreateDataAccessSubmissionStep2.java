@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -25,8 +26,8 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -101,6 +102,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		view.setPeopleSuggestWidget(peopleSuggestBox.asWidget());
 		this.peopleSuggestWidget = peopleSuggestBox;
 		peopleSuggestWidget.setSuggestionProvider(provider);
+		peopleSuggestWidget.setTypeFilter(TypeFilter.USERS_ONLY);
 		peopleSuggestWidget.setPlaceholderText("Enter the user name of other accessors...");
 		accessorsList.setCanDelete(true);
 		ducUploader.configure("Browse...", new CallbackP<FileUpload>() {
@@ -117,8 +119,8 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			}
 		});
 		
-		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
-			public void invoke(SynapseSuggestion suggestion) {
+		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<UserGroupSuggestion>() {
+			public void invoke(UserGroupSuggestion suggestion) {
 				peopleSuggestWidget.clear();
 				AccessorChange change = new AccessorChange();
 				change.setUserId(suggestion.getId());

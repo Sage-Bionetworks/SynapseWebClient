@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,8 +13,8 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorView;
 
@@ -28,7 +30,7 @@ public class UserIdCellEditorImplTest {
 	@Mock
 	UserGroupSuggestionProvider mockUserGroupSuggestionProvider;
 	@Mock
-	SynapseSuggestion mockSynapseSuggestion;
+	UserGroupSuggestion mockSynapseSuggestion;
 	UserIdCellEditorImpl editor;
 
 	public static final String SELECTED_USER_ID = "876";

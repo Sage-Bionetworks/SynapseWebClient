@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -24,7 +25,6 @@ import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequiremen
 import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -82,6 +82,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		this.globalAppState = globalAppState;
 		this.peopleSuggestWidget = peopleSuggestWidget;
 		peopleSuggestWidget.setSuggestionProvider(provider);
+		peopleSuggestWidget.setTypeFilter(TypeFilter.USERS_ONLY);
 		isAccessRequirementVisible = false;
 		showHideAccessRequirementButton.setText(SHOW_AR_TEXT);
 		showHideAccessRequirementButton.setIcon(IconType.TOGGLE_RIGHT);
@@ -103,10 +104,10 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		view.setUserPickerWidget(peopleSuggestWidget.asWidget());
 		view.setSelectedUserBadge(selectedUserBadge.asWidget());
 		view.setPresenter(this);
-		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
+		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<UserGroupSuggestion>() {
 			@Override
-			public void invoke(SynapseSuggestion suggestion) {
-				onUserSelected((UserGroupSuggestion)suggestion);
+			public void invoke(UserGroupSuggestion suggestion) {
+				onUserSelected(suggestion);
 			}
 		});
 		loadMoreContainer.configure(new Callback() {

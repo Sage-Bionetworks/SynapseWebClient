@@ -10,6 +10,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -58,6 +59,7 @@ public class UserSelectorTest {
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
 		verify(mockSuggestBox).setSuggestionProvider(mockUserGroupSuggestionProvider);
+		verify(mockSuggestBox).setTypeFilter(TypeFilter.USERS_ONLY);
 		verify(mockView).setSelectBox(any(Widget.class));
 		verify(mockSuggestBox).addItemSelectedHandler(any(CallbackP.class));
 	}

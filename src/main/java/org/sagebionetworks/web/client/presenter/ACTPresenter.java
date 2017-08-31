@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.verification.VerificationPagedResults;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
@@ -17,7 +18,6 @@ import org.sagebionetworks.web.client.view.ACTView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -64,7 +64,7 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 		this.selectedUserBadge = selectedUserBadge;
 		this.loadMoreContainer = loadMoreContainer;
 		peopleSuggestWidget.setSuggestionProvider(provider);
-		
+		peopleSuggestWidget.setTypeFilter(TypeFilter.USERS_ONLY);
 		view.setPresenter(this);
 		view.setLoadMoreContainer(loadMoreContainer.asWidget());
 		view.setSynAlert(synAlert.asWidget());
@@ -76,10 +76,10 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 		view.setUserPickerWidget(peopleSuggestWidget.asWidget());
 		view.setSelectedUserBadge(selectedUserBadge.asWidget());
 		view.setSelectedStateText("");
-		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
+		peopleSuggestBox.addItemSelectedHandler(new CallbackP<UserGroupSuggestion>() {
 			@Override
-			public void invoke(SynapseSuggestion suggestion) {
-				onUserSelected((UserGroupSuggestion)suggestion);
+			public void invoke(UserGroupSuggestion suggestion) {
+				onUserSelected(suggestion);
 			}
 		});
 		loadMoreContainer.configure(new Callback() {
