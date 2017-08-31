@@ -177,6 +177,7 @@ public class EvaluationSubmitterTest {
 	public void testSubmitToEvaluation() throws RestServiceException, JSONObjectAdapterException{
 		requirements.setTotalNumberOfResults(0);
 		submitter.configure(entity, null);
+		verify(mockView).resetSubmitButton();
 		submitter.onNextClicked(null, null, e1);
 		//should invoke submission directly without terms of use
 		verify(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), eq(HOST_PAGE_URL), any(AsyncCallback.class));
@@ -343,6 +344,7 @@ public class EvaluationSubmitterTest {
 		submitter.getContributorList(new Evaluation(), new Team());
 
 		submitter.onDoneClicked();
+		verify(mockView).setSubmitButtonLoading();
 		verify(mockChallengeClient).createTeamSubmission(any(Submission.class), anyString(), anyString(), eq(HOST_PAGE_URL), any(AsyncCallback.class));
 	}
 	
@@ -477,6 +479,7 @@ public class EvaluationSubmitterTest {
 		// contributorSynAlert.clear();
 		verify(mockSynAlert, times(4)).clear();
 		verify(mockView).resetNextButton();
+		verify(mockView).resetSubmitButton();
 		verify(mockView).setContributorsLoading(false);
 		ArgumentCaptor<Callback> emptyCallbackCaptor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockDockerCommitListWidget).setEmptyListCallback(emptyCallbackCaptor.capture());
@@ -520,6 +523,7 @@ public class EvaluationSubmitterTest {
 
 		ArgumentCaptor<Submission> captor = ArgumentCaptor.forClass(Submission.class);
 		submitter.onDoneClicked();
+		verify(mockView).setSubmitButtonLoading();
 		verify(mockChallengeClient).createTeamSubmission(captor.capture(), anyString(), anyString(), eq(HOST_PAGE_URL), any(AsyncCallback.class));
 		assertNotNull(captor.getValue().getDockerDigest());
 	}
