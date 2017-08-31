@@ -227,6 +227,16 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	public void resetNextButton() {
 		nextButton.state().reset();
 	}
+	
+	@Override
+	public void resetSubmitButton() {
+		okButton.state().reset();
+	}
+	
+	@Override
+	public void setSubmitButtonLoading() {
+		okButton.state().loading();
+	}
 
 	@Override
 	public void showRegisterTeamDialog(String challengeId) {
@@ -270,6 +280,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+		resetNextButton();
+		resetSubmitButton();
 	}
 
 	@Override

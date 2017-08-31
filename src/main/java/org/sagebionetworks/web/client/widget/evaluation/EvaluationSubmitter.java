@@ -115,6 +115,7 @@ public class EvaluationSubmitter implements Presenter {
 		contributorSynAlert.clear();
 		dockerCommitSynAlert.clear();
 		view.resetNextButton();
+		view.resetSubmitButton();
 		view.setContributorsLoading(false);
 		this.submissionEntity = submissionEntity;
 		this.evaluationIds = evaluationIds;
@@ -290,6 +291,7 @@ public class EvaluationSubmitter implements Presenter {
 	@Override
 	public void onDoneClicked() {
 		view.hideModal1();
+		view.setSubmitButtonLoading();
 		if (!isIndividualSubmission) {
 			//team submission
 			if (selectedTeam == null) {
