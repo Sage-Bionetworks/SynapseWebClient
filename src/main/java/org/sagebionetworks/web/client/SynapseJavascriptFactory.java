@@ -16,51 +16,50 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 
 public class SynapseJavascriptFactory {
-    public enum OBJECT_TYPE {
-    	EntityBundle,
-    	Team,
-    	RestrictionInformationResponse,
-    	EntityChildrenResponse,
-    	WikiPageKey,
-    	UserGroupHeaderResponsePage,
-    	WikiPage,
-    	ListWrapperUserProfile
-    }
-    
-    /**
-     * Create a new instance of a concrete class using the object type
-     * @throws JSONObjectAdapterException 
-     */
-    public Object newInstance(OBJECT_TYPE type, JSONObjectAdapter json) throws JSONObjectAdapterException {
-        switch (type) {
-            case EntityBundle :
-                return new EntityBundle(json);
-            case Team :
-                return new Team(json);
-            case RestrictionInformationResponse :
-                return new RestrictionInformationResponse(json);
-            case EntityChildrenResponse :
-                return new EntityChildrenResponse(json);
-            case WikiPageKey :
-                return new WikiPageKey(json);
-            case UserGroupHeaderResponsePage :
-                return new UserGroupHeaderResponsePage(json);
-            case WikiPage :
-            	return new WikiPage(json);
-            case ListWrapperUserProfile :
-            	// json really represents a ListWrapper, but we can't reference ListWrapper here because it uses Class.forName() (breaks gwt compile)
-				List<UserProfile> list = new ArrayList<>();
-				JSONArrayAdapter jsonArray = json.getJSONArray("list");
-				for (int i = 0; i < jsonArray.length(); i++) {
-					JSONObjectAdapter jsonObject = jsonArray.getJSONObject(i);
-					list.add(new UserProfile(jsonObject));
-				}
-				
-				return list;
-            default:
-                throw new IllegalStateException("No match found for : "+ type);
-        }
-    }
+	public enum OBJECT_TYPE {
+		EntityBundle,
+		Team,
+		RestrictionInformationResponse,
+		EntityChildrenResponse,
+		WikiPageKey,
+		UserGroupHeaderResponsePage,
+		WikiPage,
+		ListWrapperUserProfile
+	}
+
+	/**
+	 * Create a new instance of a concrete class using the object type
+	 * @throws JSONObjectAdapterException 
+	 */
+	public Object newInstance(OBJECT_TYPE type, JSONObjectAdapter json) throws JSONObjectAdapterException {
+		switch (type) {
+		case EntityBundle :
+			return new EntityBundle(json);
+		case Team :
+			return new Team(json);
+		case RestrictionInformationResponse :
+			return new RestrictionInformationResponse(json);
+		case EntityChildrenResponse :
+			return new EntityChildrenResponse(json);
+		case WikiPageKey :
+			return new WikiPageKey(json);
+		case UserGroupHeaderResponsePage :
+			return new UserGroupHeaderResponsePage(json);
+		case WikiPage :
+			return new WikiPage(json);
+		case ListWrapperUserProfile :
+			// json really represents a ListWrapper, but we can't reference ListWrapper here because it uses Class.forName() (breaks gwt compile)
+			List<UserProfile> list = new ArrayList<>();
+			JSONArrayAdapter jsonArray = json.getJSONArray("list");
+			for (int i = 0; i < jsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = jsonArray.getJSONObject(i);
+				list.add(new UserProfile(jsonObject));
+			}
+
+			return list;
+		default:
+			throw new IllegalStateException("No match found for : "+ type);
+		}
+	}
 }
 
-    
