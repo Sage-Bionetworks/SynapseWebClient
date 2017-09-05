@@ -10,14 +10,14 @@ import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-public class UserSelector implements UserSelectorView.Presenter {
+public class UserTeamSelector implements UserSelectorView.Presenter {
 	
 	private UserSelectorView view;
-	CallbackP<String> usernameCallback;
+	CallbackP<String> aliasCallback;
 	SynapseSuggestBox suggestBox;
 	
 	@Inject
-	public UserSelector(UserSelectorView view, 
+	public UserTeamSelector(UserSelectorView view, 
 			SynapseSuggestBox suggestBox, 
 			UserGroupSuggestionProvider provider
 			) {
@@ -25,7 +25,7 @@ public class UserSelector implements UserSelectorView.Presenter {
 		this.suggestBox = suggestBox;
 		view.setPresenter(this);
 		suggestBox.setSuggestionProvider(provider);
-		suggestBox.setTypeFilter(TypeFilter.USERS_ONLY);
+		suggestBox.setTypeFilter(TypeFilter.ALL);
 		view.setSelectBox(suggestBox.asWidget());
 		suggestBox.addItemSelectedHandler(new CallbackP<UserGroupSuggestion>() {
 			public void invoke(UserGroupSuggestion suggestion) {
@@ -36,10 +36,10 @@ public class UserSelector implements UserSelectorView.Presenter {
 	
 	/**
 	 * Configure this widget.  Will call back when a username is selected.
-	 * @param usernameCallback
+	 * @param aliasCallback
 	 */
-	public void configure(CallbackP<String> usernameCallback) {
-		this.usernameCallback = usernameCallback;
+	public void configure(CallbackP<String> aliasCallback) {
+		this.aliasCallback = aliasCallback;
 	}
 	
 	public void clear() {
@@ -52,11 +52,11 @@ public class UserSelector implements UserSelectorView.Presenter {
 
 	public void onSynapseSuggestSelected(UserGroupSuggestion suggestion) {
 		if (!Boolean.parseBoolean(suggestion.isIndividual())) {
-			suggestBox.showErrorMessage(DisplayConstants.NO_USER_SELECTED);
+			suggestBox.showErrorMessage(DisplayConstants.NO_USER_OR_TEAM_SELECTED);
 			return;
 		}
 		
-		usernameCallback.invoke(suggestion.getHeader().getUserName());
+		aliasCallback.invoke(suggestion.getHeader().getUserName());
 		view.hide();
 	}
 	

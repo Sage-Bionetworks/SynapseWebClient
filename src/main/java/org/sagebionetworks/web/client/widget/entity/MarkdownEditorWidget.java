@@ -16,7 +16,7 @@ import org.sagebionetworks.web.client.presenter.BaseEditWidgetDescriptorPresente
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.entity.editor.UserSelector;
+import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidget;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
@@ -55,7 +55,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	private WidgetSelectionState widgetSelectionState;
 	
 	private MarkdownWidget formattingGuide;
-	private UserSelector userSelector;
+	private UserTeamSelector userTeamSelector;
 	
 	//Optional wiki page key.  If set, wiki widgets may use.
 	private WikiPageKey wikiKey;
@@ -71,7 +71,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
 			WidgetRegistrar widgetRegistrar,
 			MarkdownWidget formattingGuide,
-			UserSelector userSelector,
+			UserTeamSelector userTeamSelector,
 			MarkdownWidget markdownPreview,
 			SelectTeamModal selectTeamModal
 			) {
@@ -83,7 +83,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.widgetRegistrar = widgetRegistrar;
 		this.formattingGuide = formattingGuide;
-		this.userSelector = userSelector;
+		this.userTeamSelector = userTeamSelector;
 		this.markdownPreview = markdownPreview;
 		this.selectTeamModal = selectTeamModal;
 		widgetSelectionState = new WidgetSelectionState();
@@ -93,13 +93,13 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		view.setAttachmentCommandsVisible(true);
 		view.setSelectTeamModal(selectTeamModal.asWidget());
 		
-		userSelector.configure(new CallbackP<String>() {
+		userTeamSelector.configure(new CallbackP<String>() {
 			@Override
 			public void invoke(String username) {
 				insertMarkdown(username);
 			}
 		});
-		userSelector.addModalShownHandler(new ModalShownHandler() {
+		userTeamSelector.addModalShownHandler(new ModalShownHandler() {
 			@Override
 			public void onShown(ModalShownEvent evt) {
 				MarkdownEditorWidget.this.view.setEditorEnabled(true);
@@ -548,7 +548,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	public void insertUserLink() {
 		// pop up suggest box.  on selection, userSelector has been configured to add the username to the md.
 		insertMarkdown("@");
-		userSelector.show();
+		userTeamSelector.show();
 	}
 
 	public void setMarkdownFocus() {

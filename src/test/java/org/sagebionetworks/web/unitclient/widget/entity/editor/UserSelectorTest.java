@@ -14,7 +14,7 @@ import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.editor.UserSelector;
+import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
 import org.sagebionetworks.web.client.widget.entity.editor.UserSelectorView;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
@@ -24,7 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class UserSelectorTest {
 		
-	UserSelector widget;
+	UserTeamSelector widget;
 	@Mock
 	UserSelectorView mockView;
 	@Mock
@@ -46,7 +46,7 @@ public class UserSelectorTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		widget = new UserSelector(mockView, mockSuggestBox, mockUserGroupSuggestionProvider);
+		widget = new UserTeamSelector(mockView, mockSuggestBox, mockUserGroupSuggestionProvider);
 		widget.configure(mockUsernameCallback);
 		
 		when(mockSuggestion.getId()).thenReturn(SUGGESTION_ID);
