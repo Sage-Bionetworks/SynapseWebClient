@@ -315,6 +315,7 @@ public class SynapseJavascriptClient {
 			callback.onFailure(e);
 		}
 	}
+	
 	public void getUserGroupHeadersByAlias(
 			ArrayList<String> aliases,
 			AsyncCallback<List<UserGroupHeader>> callback) {
@@ -328,9 +329,6 @@ public class SynapseJavascriptClient {
 		} catch (JSONObjectAdapterException e) {
 			callback.onFailure(e);
 		}
-		
-		
-		
 	}
 }
 
