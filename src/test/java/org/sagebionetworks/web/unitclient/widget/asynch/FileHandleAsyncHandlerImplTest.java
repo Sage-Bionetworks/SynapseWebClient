@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.asynch;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -58,7 +58,7 @@ public class FileHandleAsyncHandlerImplTest {
 	
 	@Test
 	public void testConstructor() {
-		verify(mockGwt).scheduleFixedDelay(any(Callback.class), eq(FileHandleAsyncHandlerImpl.DELAY));
+		verify(mockGwt).scheduleFixedDelay(any(Callback.class), anyInt());
 	}
 
 	@Test

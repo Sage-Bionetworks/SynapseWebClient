@@ -11,8 +11,12 @@ import java.util.Map;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.view.DivView;
+import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderFromAliasAsyncHandler;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -26,27 +30,30 @@ import com.google.gwt.user.client.ui.Widget;
  *
  */
 public class UserTeamBadgeTest {
-
+	@Mock
 	PortalGinInjector mockGinInjector;
+	@Mock
 	UserBadge mockUserBadge;
+	@Mock
 	TeamBadge mockTeamBadge;
 	UserTeamBadge badge;
 	String principalId = "id1";
 	Map<String, String> widgetDescriptor;
-	
+	@Mock
+	UserGroupHeaderFromAliasAsyncHandler mockUserGroupHeaderAsyncHandler;
+	@Mock
+	DivView mockDiv;
 	@Before
 	public void before() throws JSONObjectAdapterException{
+		MockitoAnnotations.initMocks(this);
 		GWTMockUtilities.disarm();
-		mockGinInjector = mock(PortalGinInjector.class);
-		mockUserBadge = mock(UserBadge.class);
-		mockTeamBadge = mock(TeamBadge.class);
 		Widget mockView = mock(Widget.class);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		when(mockGinInjector.getTeamBadgeWidget()).thenReturn(mockTeamBadge);
 		when(mockUserBadge.asWidget()).thenReturn(mockView);
 		when(mockTeamBadge.asWidget()).thenReturn(mockView);
 		
-		badge = new UserTeamBadge(mockGinInjector);
+		badge = new UserTeamBadge(mockGinInjector, mockUserGroupHeaderAsyncHandler, mockDiv);
 		widgetDescriptor = new HashMap<String, String>();
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY, "true");
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY, principalId);

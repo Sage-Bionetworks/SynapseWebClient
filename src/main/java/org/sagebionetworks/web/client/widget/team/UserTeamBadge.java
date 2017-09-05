@@ -2,31 +2,69 @@ package org.sagebionetworks.web.client.widget.team;
 
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderFromAliasAsyncHandler;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class UserTeamBadge implements WidgetRendererPresenter {
 	
 	PortalGinInjector ginInjector;
-	Widget theWidget;
+	Map<String, String> widgetDescriptor;
+	UserGroupHeaderFromAliasAsyncHandler usgFromAliasAsyncHandler;
+	DivView div;
 	
 	@Inject
-	public UserTeamBadge(PortalGinInjector ginInjector) {
+	public UserTeamBadge(PortalGinInjector ginInjector, 
+			UserGroupHeaderFromAliasAsyncHandler usgFromAliasAsyncHandler,
+			DivView div) {
 		this.ginInjector = ginInjector;
+		this.usgFromAliasAsyncHandler = usgFromAliasAsyncHandler;
+		this.div = div;
 	}
 	
 	@Override
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
-		Boolean isIndividual = Boolean.valueOf(widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY));
-		String id = widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY);
+		div.clear();
+		this.widgetDescriptor = widgetDescriptor;
+		String alias = widgetDescriptor.get(WidgetConstants.ALIAS_KEY);
+		if (alias != null) {
+			// TODO: get user group header for this alias (using a new service)
+			usgFromAliasAsyncHandler.getUserGroupHeader(alias, new AsyncCallback<UserGroupHeader>() {
+				@Override
+				public void onSuccess(UserGroupHeader ugh) {
+					Boolean isIndividual = ugh.getIsIndividual();
+					String id = ugh.getOwnerId();
+					configure(isIndividual, id);
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					SynapseAlert synAlert = ginInjector.getSynapseAlertWidget();
+					synAlert.handleException(caught);
+					div.add(synAlert);
+				}
+			});
+		} else {
+			Boolean isIndividual = Boolean.valueOf(widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY));
+			String id = widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY);
+			configure(isIndividual, id);
+		}
+	}
+	
+	public void configure(Boolean isIndividual, String id) {
+		Widget theWidget;
 		if (isIndividual) {
 			UserBadge badge = ginInjector.getUserBadgeWidget();
 			badge.setSize(BadgeSize.SMALLER);
@@ -46,6 +84,8 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			theWidget = badge.asWidget();
 		}
 		theWidget.addStyleName("margin-left-2");
+		div.clear();
+		div.add(theWidget);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -54,7 +94,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 
 	@Override
 	public Widget asWidget() {
-		return theWidget;
+		return div.asWidget();
 	}
 
 }

@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
+import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -24,7 +25,8 @@ public class SynapseJavascriptFactory {
 		WikiPageKey,
 		UserGroupHeaderResponsePage,
 		WikiPage,
-		ListWrapperUserProfile
+		ListWrapperUserProfile,
+		UserGroupHeaderResponse
 	}
 
 	/**
@@ -47,6 +49,8 @@ public class SynapseJavascriptFactory {
 			return new UserGroupHeaderResponsePage(json);
 		case WikiPage :
 			return new WikiPage(json);
+		case UserGroupHeaderResponse :
+			return new UserGroupHeaderResponse(json).getList();
 		case ListWrapperUserProfile :
 			// json really represents a ListWrapper, but we can't reference ListWrapper here because it uses Class.forName() (breaks gwt compile)
 			List<UserProfile> list = new ArrayList<>();

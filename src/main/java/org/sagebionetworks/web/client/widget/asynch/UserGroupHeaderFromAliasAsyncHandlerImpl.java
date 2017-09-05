@@ -6,23 +6,22 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
-public class UserGroupHeaderAsyncHandlerImpl implements UserGroupHeaderAsyncHandler {
+public class UserGroupHeaderFromAliasAsyncHandlerImpl implements UserGroupHeaderFromAliasAsyncHandler {
 	private Map<String, List<AsyncCallback<UserGroupHeader>>> reference2Callback = new HashMap<String, List<AsyncCallback<UserGroupHeader>>>();
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	
 	@Inject
-	public UserGroupHeaderAsyncHandlerImpl(SynapseClientAsync synapseClient, GWTWrapper gwt) {
-		this.synapseClient = synapseClient;
+	public UserGroupHeaderFromAliasAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt) {
+		this.jsClient = jsClient;
 		Callback callback = new Callback() {
 			@Override
 			public void invoke() {
@@ -34,11 +33,11 @@ public class UserGroupHeaderAsyncHandlerImpl implements UserGroupHeaderAsyncHand
 	
 	
 	@Override
-	public void getUserGroupHeader(String principalId, AsyncCallback<UserGroupHeader> callback) {
-		List<AsyncCallback<UserGroupHeader>> list = reference2Callback.get(principalId);
+	public void getUserGroupHeader(String alias, AsyncCallback<UserGroupHeader> callback) {
+		List<AsyncCallback<UserGroupHeader>> list = reference2Callback.get(alias);
 		if (list == null) {
 			list = new ArrayList<AsyncCallback<UserGroupHeader>>();
-			reference2Callback.put(principalId, list);
+			reference2Callback.put(alias, list);
 		}
 		list.add(callback);
 	}
@@ -48,9 +47,9 @@ public class UserGroupHeaderAsyncHandlerImpl implements UserGroupHeaderAsyncHand
 			final Map<String, List<AsyncCallback<UserGroupHeader>>> reference2CallbackCopy = new HashMap<String, List<AsyncCallback<UserGroupHeader>>>();
 			reference2CallbackCopy.putAll(reference2Callback);
 			reference2Callback.clear();
-			ArrayList<String> userIds = new ArrayList<String>();
-			userIds.addAll(reference2CallbackCopy.keySet());
-			synapseClient.getUserGroupHeadersById(userIds, new AsyncCallback<UserGroupHeaderResponsePage>() {
+			ArrayList<String> aliasNames = new ArrayList<String>();
+			aliasNames.addAll(reference2CallbackCopy.keySet());
+			jsClient.getUserGroupHeadersByAlias(aliasNames, new AsyncCallback<List<UserGroupHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					// go through all requested objects, and inform them of the error
@@ -59,8 +58,8 @@ public class UserGroupHeaderAsyncHandlerImpl implements UserGroupHeaderAsyncHand
 					}
 				}
 				
-				private void callOnFailure(String userId, Throwable ex) {
-					List<AsyncCallback<UserGroupHeader>> callbacks = reference2CallbackCopy.get(userId);
+				private void callOnFailure(String alias, Throwable ex) {
+					List<AsyncCallback<UserGroupHeader>> callbacks = reference2CallbackCopy.get(alias);
 					if (callbacks != null) {
 						for (AsyncCallback<UserGroupHeader> callback : callbacks) {
 							callback.onFailure(ex);	
@@ -68,10 +67,10 @@ public class UserGroupHeaderAsyncHandlerImpl implements UserGroupHeaderAsyncHand
 					}
 				}
 				
-				public void onSuccess(UserGroupHeaderResponsePage results) {
+				public void onSuccess(List<UserGroupHeader> results) {
 					// go through all results, and inform the proper callback of the success
-					for (UserGroupHeader header : results.getChildren()) {
-						List<AsyncCallback<UserGroupHeader>> callbacks = reference2CallbackCopy.remove(header.getOwnerId());
+					for (UserGroupHeader header : results) {
+						List<AsyncCallback<UserGroupHeader>> callbacks = reference2CallbackCopy.remove(header.getUserName());
 						if (callbacks != null) {
 							for (AsyncCallback<UserGroupHeader> callback : callbacks) {
 								callback.onSuccess(header);
@@ -79,9 +78,9 @@ public class UserGroupHeaderAsyncHandlerImpl implements UserGroupHeaderAsyncHand
 						}
 					}
 					UnknownErrorException notReturnedException = new UnknownErrorException(DisplayConstants.ERROR_LOADING);
-					for (String userId : reference2CallbackCopy.keySet()) {
+					for (String alias : reference2CallbackCopy.keySet()) {
 						// not returned
-						callOnFailure(userId, notReturnedException);
+						callOnFailure(alias, notReturnedException);
 					}
 				};
 			});

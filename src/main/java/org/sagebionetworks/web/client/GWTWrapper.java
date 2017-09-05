@@ -58,4 +58,5 @@ public interface GWTWrapper {
 	String getUniqueElementId();
 	void saveWindowPosition();
 	void restoreWindowPosition();
+	int nextInt(int upperBound);  
 }

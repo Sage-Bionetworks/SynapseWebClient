@@ -176,4 +176,8 @@ public class GWTWrapperImpl implements GWTWrapper {
 			scrollTop = -1;	
 		}
 	}
+	@Override
+	public int nextInt(int upperBound) {
+		return Random.nextInt(upperBound);
+	}
 }
