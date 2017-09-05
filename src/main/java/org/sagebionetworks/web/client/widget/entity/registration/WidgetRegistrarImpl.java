@@ -86,8 +86,6 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getVideoConfigEditor();
 		} else if (contentTypeKey.equals(SYNAPSE_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getSynapseTableQueryResultEditor();
-		} else if (contentTypeKey.equals(PROJECT_BACKGROUND_CONTENT_TYPE)) {
-			presenter = ginInjector.getProjectBackgroundConfigEditor();
 		} else if (contentTypeKey.equals(PREVIEW_CONTENT_TYPE)) {
 			presenter = ginInjector.getPreviewConfigEditor();
 		} else if(contentTypeKey.equals(BIODALLIANCE13_CONTENT_TYPE)) {

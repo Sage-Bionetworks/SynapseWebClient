@@ -374,9 +374,6 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case INSERT_TEAM_MEMBER_COUNT:	
 			selectTeamModal.show();
 			break;
-		case SET_PROJECT_BACKGROUND:
-			insertNewWidget(WidgetConstants.PROJECT_BACKGROUND_CONTENT_TYPE);
-			break;
 		case MARKDOWN_PREVIEW:
 			previewClicked();
 			break;

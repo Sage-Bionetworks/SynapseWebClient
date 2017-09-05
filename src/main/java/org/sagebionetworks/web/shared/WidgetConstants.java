@@ -103,9 +103,6 @@ public class WidgetConstants {
 	
 	public static final String NO_AUTO_WIKI_SUBPAGES = "nowikipages";
 
-	//has editor, but no renderer
-	public static final String PROJECT_BACKGROUND_CONTENT_TYPE = "projectbackground";
-	
 	public static final String WIKI_FILES_PREVIEW_CONTENT_TYPE = "wikifilepreview";
 	
 	/**

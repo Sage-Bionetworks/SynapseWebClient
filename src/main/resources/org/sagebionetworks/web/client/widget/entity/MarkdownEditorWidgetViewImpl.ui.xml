@@ -50,7 +50,6 @@
 					    <b:AnchorListItem ui:field="cytoscapeJsLink" text="Cytoscape JS Graph" />
 					    <b:AnchorListItem ui:field="externalWebsiteLink" text="External Website" />
 					    <b:AnchorListItem ui:field="registerChallengeTeamLink" text="Register Challenge Team Button" />
-					    <b:AnchorListItem ui:field="entityBackgroundLink" text="Set Project Background Image" />
 					    <b:AnchorListItem ui:field="supertableLink" text="Synapse API SuperTable" />
 					    <b:AnchorListItem ui:field="synapseFormLink" text="Synapse Form" />
 					    <b:AnchorListItem ui:field="tutorialWizardLink" text="Tutorial Wizard" />
