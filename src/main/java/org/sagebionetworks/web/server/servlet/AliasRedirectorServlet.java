@@ -88,12 +88,8 @@ public class AliasRedirectorServlet extends HttpServlet {
 			SynapseClient client = createNewClient();
 			perThreadRequest.set(httpRqst);
 			
-			// TODO: use new service call to resolve
-//			List<UserGroupHeader> ughList = client.getUserGroupHeadersByAliases(Collections.singletonList(alias));
-			UserGroupHeader temp = new UserGroupHeader(); 
-			temp.setOwnerId(alias);
-			temp.setIsIndividual(true);
-			List<UserGroupHeader> ughList = Collections.singletonList(temp);
+			// use new service call to resolve
+			List<UserGroupHeader> ughList = client.getUserGroupHeadersByAliases(Collections.singletonList(alias));
 			if (!ughList.isEmpty()) {
 				UserGroupHeader ugh = ughList.get(0);
 				String place = ugh.getIsIndividual() ? "/#!Profile:" : "/#!Team:";
