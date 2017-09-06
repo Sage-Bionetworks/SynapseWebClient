@@ -10,6 +10,7 @@ import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
@@ -26,6 +27,9 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 public class GWTWrapperImpl implements GWTWrapper {
 
 	private final static RegExp PATTERN_WHITE_SPACE = RegExp.compile("^\\s+$");
+	// Used to replace all characters expect letters and numbers.
+	private final static RegExp PRINICPAL_UNIQUENESS_REPLACE_PATTERN = RegExp.compile("[^a-z0-9]", "gi");
+
 	public int scrollTop = -1;
 	@Override
 	public String getHostPageBaseURL() {
@@ -179,5 +183,24 @@ public class GWTWrapperImpl implements GWTWrapper {
 	@Override
 	public int nextInt(int upperBound) {
 		return Random.nextInt(upperBound);
+	}
+	
+
+	/**
+	 * Get the string that will be used for a uniqueness check for alias
+	 * names. Only lower case letters and numbers contribute to the uniqueness
+	 * of a principal name. All other characters (-,., ,_) are ignored.
+	 * 
+	 * @param inputName
+	 * @return
+	 */
+	@Override
+	public String getUniqueAliasName(String inputName) {
+		if (inputName == null){
+			throw new IllegalArgumentException("Name cannot be null");
+		}
+		// Only letters and numbers contribute to the uniqueness.
+		// Replace all non-letters and numbers with empty strings
+		return PRINICPAL_UNIQUENESS_REPLACE_PATTERN.replace(inputName, "");
 	}
 }

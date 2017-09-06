@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
@@ -15,14 +15,17 @@ public class UserTeamSelector implements UserSelectorView.Presenter {
 	private UserSelectorView view;
 	CallbackP<String> aliasCallback;
 	SynapseSuggestBox suggestBox;
+	GWTWrapper gwt;
 	
 	@Inject
 	public UserTeamSelector(UserSelectorView view, 
 			SynapseSuggestBox suggestBox, 
-			UserGroupSuggestionProvider provider
+			UserGroupSuggestionProvider provider,
+			GWTWrapper gwt
 			) {
 		this.view = view;
 		this.suggestBox = suggestBox;
+		this.gwt = gwt;
 		view.setPresenter(this);
 		suggestBox.setSuggestionProvider(provider);
 		suggestBox.setTypeFilter(TypeFilter.ALL);
@@ -51,12 +54,12 @@ public class UserTeamSelector implements UserSelectorView.Presenter {
 	}
 
 	public void onSynapseSuggestSelected(UserGroupSuggestion suggestion) {
-		if (!Boolean.parseBoolean(suggestion.isIndividual())) {
-			suggestBox.showErrorMessage(DisplayConstants.NO_USER_OR_TEAM_SELECTED);
-			return;
+		String userName = suggestion.getHeader().getUserName();
+		if (!suggestion.getHeader().getIsIndividual()) {
+			// team name, convert to team alias
+			userName = gwt.getUniqueAliasName(userName);
 		}
-		
-		aliasCallback.invoke(suggestion.getHeader().getUserName());
+		aliasCallback.invoke(userName);
 		view.hide();
 	}
 	
