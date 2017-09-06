@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.asynch;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
@@ -55,6 +55,7 @@ public class UserGroupHeaderFromAliasAsyncHandlerImplTest {
 
 	@Test
 	public void testSuccess() {
+		when(mockGwt.getUniqueAliasName(anyString())).thenReturn(alias);
 		//verify no rpc if nothing has been requested.
 		asyncHandler.executeRequests();
 		verifyZeroInteractions(mockSynapseJavascriptClient);
@@ -81,6 +82,7 @@ public class UserGroupHeaderFromAliasAsyncHandlerImplTest {
 	
 	@Test
 	public void testNotFound() {
+		when(mockGwt.getUniqueAliasName(anyString())).thenReturn("alias");
 		when(mockResult.getUserName()).thenReturn("another alias");
 		//add one, simulate different response
 		asyncHandler.getUserGroupHeader(alias, mockCallback);
