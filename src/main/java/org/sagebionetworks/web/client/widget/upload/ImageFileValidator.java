@@ -15,6 +15,10 @@ public class ImageFileValidator extends AbstractFileValidator {
 		if (file == null) {
 			return false;
 		}
+		if (!isValidFilename(file.getFileName())) {
+			invalidMessage = WebConstants.INVALID_ENTITY_NAME_MESSAGE;
+			return false;
+		}
 		invalidMessage = WebConstants.INVALID_IMAGE_FILETYPE_MESSAGE;
 		String contentType = file.getContentType();
 		if (!isValidSize(file.getFileSize())) {
