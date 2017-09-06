@@ -18,10 +18,14 @@ import com.google.inject.Inject;
 public class UserGroupHeaderFromAliasAsyncHandlerImpl implements UserGroupHeaderFromAliasAsyncHandler {
 	private Map<String, List<AsyncCallback<UserGroupHeader>>> reference2Callback = new HashMap<String, List<AsyncCallback<UserGroupHeader>>>();
 	SynapseJavascriptClient jsClient;
+	GWTWrapper gwt;
 	
 	@Inject
-	public UserGroupHeaderFromAliasAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt) {
+	public UserGroupHeaderFromAliasAsyncHandlerImpl(
+			SynapseJavascriptClient jsClient, 
+			GWTWrapper gwt) {
 		this.jsClient = jsClient;
+		this.gwt = gwt;
 		Callback callback = new Callback() {
 			@Override
 			public void invoke() {
@@ -34,10 +38,10 @@ public class UserGroupHeaderFromAliasAsyncHandlerImpl implements UserGroupHeader
 	
 	@Override
 	public void getUserGroupHeader(String alias, AsyncCallback<UserGroupHeader> callback) {
-		List<AsyncCallback<UserGroupHeader>> list = reference2Callback.get(alias);
+		List<AsyncCallback<UserGroupHeader>> list = reference2Callback.get(alias.toLowerCase());
 		if (list == null) {
 			list = new ArrayList<AsyncCallback<UserGroupHeader>>();
-			reference2Callback.put(alias, list);
+			reference2Callback.put(alias.toLowerCase(), list);
 		}
 		list.add(callback);
 	}
@@ -70,7 +74,8 @@ public class UserGroupHeaderFromAliasAsyncHandlerImpl implements UserGroupHeader
 				public void onSuccess(List<UserGroupHeader> results) {
 					// go through all results, and inform the proper callback of the success
 					for (UserGroupHeader header : results) {
-						List<AsyncCallback<UserGroupHeader>> callbacks = reference2CallbackCopy.remove(header.getUserName());
+						String alias = gwt.getUniqueAliasName(header.getUserName()).toLowerCase();
+						List<AsyncCallback<UserGroupHeader>> callbacks = reference2CallbackCopy.remove(alias);
 						if (callbacks != null) {
 							for (AsyncCallback<UserGroupHeader> callback : callbacks) {
 								callback.onSuccess(header);

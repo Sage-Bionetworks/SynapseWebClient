@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -40,7 +41,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 		this.widgetDescriptor = widgetDescriptor;
 		String alias = widgetDescriptor.get(WidgetConstants.ALIAS_KEY);
 		if (alias != null) {
-			// TODO: get user group header for this alias (using a new service)
+			// get user group header for this alias (using a new service)
 			usgFromAliasAsyncHandler.getUserGroupHeader(alias, new AsyncCallback<UserGroupHeader>() {
 				@Override
 				public void onSuccess(UserGroupHeader ugh) {
