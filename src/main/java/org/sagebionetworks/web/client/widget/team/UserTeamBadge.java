@@ -81,7 +81,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			//team
 			TeamBadge badge = ginInjector.getTeamBadgeWidget();
 			badge.configure(id);
-			badge.addStyleName("font-size-15");
+			badge.addStyleName("font-size-13");
 			theWidget = badge.asWidget();
 		}
 		theWidget.addStyleName("margin-left-2");
