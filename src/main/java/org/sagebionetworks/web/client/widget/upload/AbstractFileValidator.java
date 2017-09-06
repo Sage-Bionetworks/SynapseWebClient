@@ -8,7 +8,7 @@ public abstract class AbstractFileValidator implements FileValidator {
 
 	Callback invalidCallback;
 	
-	public boolean isValidFilename(String filename) {
+	public static boolean isValidFilename(String filename) {
 		return filename.matches(VALID_ENTITY_NAME_REGEX);
 	}
 	
