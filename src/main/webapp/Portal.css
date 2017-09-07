@@ -1040,6 +1040,7 @@ a.shortBtn {
 	padding: 0.5em 1em;
 	background-color: #fcf8f2;
 	border-left: 3px solid #f0ad4e;
+	font-size: 13px;
 }
 
 .markdown blockquote h4, .markdown blockquote h3, .markdown blockquote h2, .markdown blockquote h1 {
