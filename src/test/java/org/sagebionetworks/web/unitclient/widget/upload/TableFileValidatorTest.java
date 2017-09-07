@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -9,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.TableFileValidator;
+import org.sagebionetworks.web.shared.WebConstants;
 
 public class TableFileValidatorTest {
 
@@ -46,6 +48,14 @@ public class TableFileValidatorTest {
 		when(mockMeta.getContentType()).thenReturn(null);	
 		assertTrue(tableValidator.isValid(mockMeta));
 		
+	}
+	
+	@Test
+	public void testInvalidName() {
+		when(mockMeta.getContentType()).thenReturn("image/jpg");
+		when(mockMeta.getFileName()).thenReturn("test$%*(&#.jpeg");
+		assertFalse(tableValidator.isValid(mockMeta));
+		assertEquals(WebConstants.INVALID_ENTITY_NAME_MESSAGE, tableValidator.getInvalidMessage());	
 	}
 	
 	@Test

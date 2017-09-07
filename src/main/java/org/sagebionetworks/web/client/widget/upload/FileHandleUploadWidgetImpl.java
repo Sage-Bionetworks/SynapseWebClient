@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import static org.sagebionetworks.repo.model.util.ModelConstants.VALID_ENTITY_NAME_REGEX;
+
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -107,7 +109,14 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 		if (fileMetaArr != null) {
 			FileMetadata fileMeta = fileMetaArr[0];
 			boolean isValidUpload = validator == null || validator.isValid(fileMeta);
-			if (isValidUpload) {
+			boolean isValidFilename = AbstractFileValidator.isValidFilename(fileMeta.getFileName());
+			if (!isValidFilename) {
+				view.showError(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+				if (validator != null && validator.getInvalidFileCallback() != null) {
+					validator.getInvalidFileCallback().invoke();
+				}
+			}
+			else if (isValidUpload) {
 				if (startedUploadingCallback != null) {
 					startedUploadingCallback.invoke();
 				}

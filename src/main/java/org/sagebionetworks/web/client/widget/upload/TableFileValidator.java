@@ -1,17 +1,17 @@
 package org.sagebionetworks.web.client.widget.upload;
 
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class TableFileValidator extends AbstractFileValidator {
 
-	private Callback invalidCallback;
-	
+	String invalidMessage;
 	@Override
 	public boolean isValid(FileMetadata file) {
 		String contentType = file.getContentType();
-		if (file == null){
+		invalidMessage = WebConstants.INVALID_TABLE_FILETYPE_MESSAGE;
+		if (!isValidFilename(file.getFileName())) {
+			invalidMessage = WebConstants.INVALID_ENTITY_NAME_MESSAGE;
 			return false;
 		} else if (contentType != null) {
 			 return DisplayUtils.isRecognizedTableContentType(contentType);
@@ -24,7 +24,7 @@ public class TableFileValidator extends AbstractFileValidator {
 	
 	@Override
 	public String getInvalidMessage() {
-		return WebConstants.INVALID_TABLE_FILETYPE_MESSAGE;
+		return invalidMessage;
 	}
 	
 }
