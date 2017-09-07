@@ -121,6 +121,15 @@ public class FileHandleUploadWidgetImplTest {
 		verify(mockView).showError(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 		verify(mockFailedValidationCallback).invoke();
 	}
+	@Test
+	public void testSelectInvalidFileNameNoValidator() {
+		when(jsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"testName#($*#.jpg"});
+		widget.configure("button text", mockCallback);
+		
+		widget.onFileSelected();
+		
+		verify(mockView).showError(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+	}
 	
 	@Test
 	public void testMultiFileSelected() {

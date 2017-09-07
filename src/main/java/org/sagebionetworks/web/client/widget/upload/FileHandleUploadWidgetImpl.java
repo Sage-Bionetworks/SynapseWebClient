@@ -112,9 +112,8 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 			boolean isValidFilename = AbstractFileValidator.isValidFilename(fileMeta.getFileName());
 			if (!isValidFilename) {
 				view.showError(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
-				Callback invalidFileCallback = validator.getInvalidFileCallback();
-				if (invalidFileCallback != null) {
-					invalidFileCallback.invoke();
+				if (validator != null && validator.getInvalidFileCallback() != null) {
+					validator.getInvalidFileCallback().invoke();
 				}
 			}
 			else if (isValidUpload) {
