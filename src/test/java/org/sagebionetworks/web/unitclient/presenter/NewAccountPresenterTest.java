@@ -13,7 +13,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AliasType;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -31,6 +33,7 @@ import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -51,6 +54,7 @@ public class NewAccountPresenterTest {
 	GWTWrapper mockGWT;
 	RegisterAccount place = Mockito.mock(RegisterAccount.class);
 	SynapseClientAsync mockSynapseClient;
+	SynapseAlert mockSynapseAlert;
 	AuthenticationController mockAuthController;
 	PlaceChanger mockPlaceChanger;
 	@Mock
@@ -70,14 +74,15 @@ public class NewAccountPresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, mockGWT, mockPasswordStrengthWidget);			
+		mockSynapseAlert = mock(SynapseAlert.class);
+		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, mockGWT, mockSynapseAlert, mockPasswordStrengthWidget);
 		verify(mockView).setPresenter(newAccountPresenter);
 		
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		
-		AsyncMockStubber.callSuccessWith(testSessionToken).when(mockUserService).createUserStep2(anyString(), anyString(), anyString(), anyString(),anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testSessionToken).when(mockUserService).createUserStep2(anyString(), anyString(), anyString(), anyString(), any(EmailValidationSignedToken.class), any(AsyncCallback.class));
 	}
 	
 	
@@ -89,16 +94,16 @@ public class NewAccountPresenterTest {
 		verify(mockView).setPresenter(newAccountPresenter);
 	}
 	
-	@Test
-	public void testSetPlaceEncodedToken() {
-		String token = "firstname=&amp;lastname=&amp;email=decode-test%40j.com&amp;timestamp=2016-08-11T22%3A21%3A16.111%2B0000&amp;domain=SYNAPSE&amp;mac=gLaTfdsfB0TSy6JMsfdsuA1k%3D";
-		String decodedToken = "firstname=&lastname=&email=decode-test%40j.com&timestamp=2016-08-11T22%3A22%3A59.022%2B0000&domain=SYNAPSE&mac=EckukfdsGjPbzLVVaaaaLs%3D";
-		NewAccount newPlace = Mockito.mock(NewAccount.class);
-		when(newPlace.toToken()).thenReturn(token);
-		when(mockGWT.decodeQueryString(token)).thenReturn(decodedToken);
-		newAccountPresenter.setPlace(newPlace);
-		assertEquals(decodedToken, newAccountPresenter.getEmailValidationToken());
-	}
+//	@Test
+//	public void testSetPlaceEncodedToken() {
+//		String token = "firstname=&amp;lastname=&amp;email=decode-test%40j.com&amp;timestamp=2016-08-11T22%3A21%3A16.111%2B0000&amp;domain=SYNAPSE&amp;mac=gLaTfdsfB0TSy6JMsfdsuA1k%3D";
+//		String decodedToken = "firstname=&lastname=&email=decode-test%40j.com&timestamp=2016-08-11T22%3A22%3A59.022%2B0000&domain=SYNAPSE&mac=EckukfdsGjPbzLVVaaaaLs%3D";
+//		NewAccount newPlace = Mockito.mock(NewAccount.class);
+//		when(newPlace.toToken()).thenReturn(token);
+//		when(mockGWT.decodeQueryString(token)).thenReturn(decodedToken);
+//		newAccountPresenter.setPlace(newPlace);
+//		assertEquals(decodedToken, newAccountPresenter.getEmailValidationToken());
+//	}
 	
 	@Test
 	public void testIsUsernameAvailableTooSmall() {
@@ -137,19 +142,19 @@ public class NewAccountPresenterTest {
 		verify(mockGlobalApplicationState).gotoLastPlace();
 	}
 
-	@Test
-	public void testParseValidationToken() {
-		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, new GWTStub(), mockPasswordStrengthWidget);
-		String token = "firstname=&lastname=&email=unittest%40jayhodgson.com&timestamp=2014-09-03T23%3A45%3A57.788%2B0000&domain=SYNAPSE&mac=DyXg5wUR3aqDABpnvYE%3D";
-		Map<String, String> result = newAccountPresenter.parseEmailValidationToken(token);
-		assertEquals("unittest@jayhodgson.com", result.get("email"));
-		
-		result = newAccountPresenter.parseEmailValidationToken(null);
-		assertTrue(result.isEmpty());
-		
-		result = newAccountPresenter.parseEmailValidationToken("");
-		assertTrue(result.isEmpty());
-	}
+//	@Test
+//	public void testParseValidationToken() {
+//		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, new GWTStub(), mockPasswordStrengthWidget);
+//		String token = "firstname=&lastname=&email=unittest%40jayhodgson.com&timestamp=2014-09-03T23%3A45%3A57.788%2B0000&domain=SYNAPSE&mac=DyXg5wUR3aqDABpnvYE%3D";
+//		Map<String, String> result = newAccountPresenter.parseEmailValidationToken(token);
+//		assertEquals("unittest@jayhodgson.com", result.get("email"));
+//
+//		result = newAccountPresenter.parseEmailValidationToken(null);
+//		assertTrue(result.isEmpty());
+//
+//		result = newAccountPresenter.parseEmailValidationToken("");
+//		assertTrue(result.isEmpty());
+//	}
 	
 	@Test
 	public void testCompleteRegistration() {
@@ -157,12 +162,13 @@ public class NewAccountPresenterTest {
 		String lastName = " Jade     ";
 		String userName = "skywalker290";
 		String password = "  farfaraway";
-		String emailValidationToken = "a&b&c=123";
-		newAccountPresenter.setEmailValidationToken(emailValidationToken);
+		AccountCreationToken accountCreationToken = new AccountCreationToken();
+		accountCreationToken.setEmailValidationSignedToken(new EmailValidationSignedToken());
+		newAccountPresenter.setAccountCreationToken(accountCreationToken);
 		newAccountPresenter.completeRegistration(userName, firstName, lastName, password);
 		verify(mockView).setLoading(true);
 		verify(mockView).setLoading(false);
-		verify(mockUserService).createUserStep2(eq(userName), eq(firstName.trim()), eq(lastName.trim()), eq(password), eq(emailValidationToken), any(AsyncCallback.class));
+		verify(mockUserService).createUserStep2(eq(userName), eq(firstName.trim()), eq(lastName.trim()), eq(password), eq(accountCreationToken.getEmailValidationSignedToken()), any(AsyncCallback.class));
 		
 		//should go to the login place with the new session token
 		ArgumentCaptor<Place> placeCaptor = new ArgumentCaptor<Place>();

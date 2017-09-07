@@ -2034,20 +2034,18 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public SignedTokenInterface hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) throws RestServiceException {
+	public <T extends JSONEntity> T hexDecodeAndDeserialize(String tokenTypeName, String tokenString) throws RestServiceException {
 		if (!isValidEnum(NotificationTokenType.class, tokenTypeName)) {
 			//error interpreting the token type, respond with a bad request
 			throw new BadRequestException("Invalid notification token type: " + tokenTypeName);
 		}
 		NotificationTokenType tokenType = NotificationTokenType.valueOf(tokenTypeName);
-		SignedTokenInterface signedToken = null;
 		try {
-			signedToken = SerializationUtils.hexDecodeAndDeserialize(signedTokenString, tokenType.classType);
+			return (T) SerializationUtils.hexDecodeAndDeserialize(tokenString, tokenType.classType);
 		} catch (Exception e) {
 			//error decoding, respond with a bad request
 			throw new BadRequestException(e.getMessage());
 		}
-		return signedToken;
 	}
 	
 	public static <E extends Enum<E>> boolean isValidEnum(Class<E> enumClass,

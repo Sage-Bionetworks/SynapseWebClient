@@ -2,17 +2,19 @@ package org.sagebionetworks.web.server.servlet;
 
 
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
-import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
+import org.sagebionetworks.repo.model.principal.AccountCreationToken;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 
 public enum NotificationTokenType  {
 	JoinTeam(JoinTeamSignedToken.class),
 	NewUser(NewUserSignedToken.class),
-	Settings(NotificationSettingsSignedToken.class);
+	Settings(NotificationSettingsSignedToken.class),
+	AccountCreation(AccountCreationToken.class);
 	
-	public final Class<? extends SignedTokenInterface> classType;
-	NotificationTokenType(Class<? extends SignedTokenInterface> classType) {
+	public final Class<? extends JSONEntity> classType;
+	NotificationTokenType(Class<? extends JSONEntity> classType) {
 		this.classType = classType;
 	}
 }

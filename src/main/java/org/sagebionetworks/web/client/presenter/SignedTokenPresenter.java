@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -16,6 +17,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -75,18 +77,22 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 		view.clear();
 		view.setLoadingVisible(true);
 		//hex decode the token
-		synapseClient.hexDecodeAndDeserialize(tokenType, signedEncodedToken, new AsyncCallback<SignedTokenInterface>() {
+		synapseClient.hexDecodeAndDeserialize(tokenType, signedEncodedToken, new AsyncCallback<JSONEntity>() {
 			@Override
-			public void onSuccess(SignedTokenInterface result) {
+			public void onSuccess(JSONEntity result) {
 				view.setLoadingVisible(false);
-				signedToken = result;
-				if (result instanceof NotificationSettingsSignedToken) {
-					handleSettingsToken();
-				} else if (result instanceof JoinTeamSignedToken) {
-					isFirstTry = true;
-					handleJoinTeamToken();
+				if (result instanceof SignedTokenInterface) {
+					signedToken = (SignedTokenInterface) result;
+					if (result instanceof NotificationSettingsSignedToken) {
+						handleSettingsToken();
+					} else if (result instanceof JoinTeamSignedToken) {
+						isFirstTry = true;
+						handleJoinTeamToken();
+					} else {
+						handleSignedToken();
+					}
 				} else {
-					handleSignedToken();
+					synapseAlert.handleException(new BadRequestException("token is not a signed token"));
 				}
 			}
 			@Override

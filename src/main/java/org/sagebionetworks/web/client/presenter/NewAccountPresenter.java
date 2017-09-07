@@ -3,7 +3,10 @@ package org.sagebionetworks.web.client.presenter;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AliasType;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -14,6 +17,7 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.NewAccountView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -21,6 +25,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 
 public class NewAccountPresenter extends AbstractActivity implements NewAccountView.Presenter, Presenter<NewAccount> {
 		
@@ -28,14 +33,14 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 	private NewAccount place;
 	private NewAccountView view;
 	private SynapseClientAsync synapseClient;
+	private SynapseAlert synapseAlert;
 	private GlobalApplicationState globalAppState;
 	private UserAccountServiceAsync userAccountService;
 	private AuthenticationController authController;
 	private GWTWrapper gwt;
 	PasswordStrengthWidget passwordStrengthWidget;
-	private String emailValidationToken;
-	private Map<String, String> emailValidationTokenParams;
-	
+	private AccountCreationToken accountCreationToken;
+
 	@Inject
 	public NewAccountPresenter(NewAccountView view, 
 			SynapseClientAsync synapseClient, 
@@ -43,9 +48,11 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 			UserAccountServiceAsync userAccountService,
 			AuthenticationController authController,
 			GWTWrapper gwt,
+			SynapseAlert synapseAlert,
 			PasswordStrengthWidget passwordStrengthWidget){
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.synapseAlert = synapseAlert;
 		this.globalAppState = globalAppState;
 		this.userAccountService = userAccountService;
 		this.authController = authController;
@@ -53,6 +60,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 		this.passwordStrengthWidget = passwordStrengthWidget;
 		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());
 		view.setPresenter(this);
+		view.setSynapseAlert(synapseAlert.asWidget());
 	}
 
 	@Override
@@ -67,36 +75,30 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 		this.place = place;
 		view.clear();
 		this.view.setPresenter(this);
-		emailValidationToken = place.toToken();
-		
-		//SWC-3222: if token is encoded, then decode before parsing.
-		if (emailValidationToken != null && emailValidationToken.contains("&amp;")) {
-			emailValidationToken = gwt.decodeQueryString(emailValidationToken);
-		}
-		emailValidationTokenParams = parseEmailValidationToken(emailValidationToken);
-		String email = emailValidationTokenParams.get(EMAIL_KEY);
-		view.setEmail(email);
-		checkEmailAvailable(email);
-	}
-	
-	public Map<String, String> parseEmailValidationToken(String token) {
-		Map<String, String> tokenMap = new HashMap<String, String>();
-		if (token != null) {
-			String[] keyValues = token.split("&");
-			for (String keyValue : keyValues) {
-				String[] keyAndValue = keyValue.split("=");
-				if (keyAndValue.length == 2) {
-					tokenMap.put(keyAndValue[0].toLowerCase(), gwt.decodeQueryString(keyAndValue[1]));
+		synapseClient.hexDecodeAndDeserialize("AccountCreation", place.toToken(), new AsyncCallback<JSONEntity>() {
+			@Override
+			public void onSuccess(JSONEntity result) {
+				if (result instanceof AccountCreationToken) {
+					accountCreationToken = (AccountCreationToken) result;
+					String email = accountCreationToken.getEmailValidationSignedToken().getEmail();
+					view.setEmail(email);
+					checkEmailAvailable(email);
+				} else {
+					synapseAlert.handleException(new BadRequestException("token is not an AccountCreationToken"));
 				}
 			}
-		}
-		return tokenMap;
+			@Override
+			public void onFailure(Throwable caught) {
+				synapseAlert.handleException(caught);
+			}
+		});
 	}
 	
 	@Override
 	public void completeRegistration(String userName, String fName, String lName, String password) {
 		view.setLoading(true);
-		userAccountService.createUserStep2(userName.trim(), fName.trim(), lName.trim(), password, emailValidationToken, new AsyncCallback<String>() {
+		EmailValidationSignedToken emailValidationSignedToken = accountCreationToken.getEmailValidationSignedToken();
+		userAccountService.createUserStep2(userName.trim(), fName.trim(), lName.trim(), password, emailValidationSignedToken, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String sessionToken) {
 				view.setLoading(false);
@@ -115,10 +117,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 
 	/**
 	 * check that the email is available
-	 * @param username
 	 * @param email
-	 * @param firstName
-	 * @param lastName
 	 */
 	public void checkEmailAvailable(String email) {
 		synapseClient.isAliasAvailable(email, AliasType.USER_EMAIL.toString(), new AsyncCallback<Boolean>() {
@@ -161,16 +160,16 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 	}
 	
 	/**
-	 * Expose for testing purposes only 
-	 * @param emailValidationToken
+	 * Expose for testing purposes only
+	 * @param accountCreationToken
 	 */
-	public void setEmailValidationToken(String emailValidationToken) {
-		this.emailValidationToken = emailValidationToken;
+	public void setAccountCreationToken(AccountCreationToken accountCreationToken) {
+		this.accountCreationToken = accountCreationToken;
 	}
-	
-	public String getEmailValidationToken() {
-		return emailValidationToken;
-	}
+
+//	public String getEmailValidationToken() {
+//		return emailValidationToken;
+//	}
 	
 	@Override
 	public void passwordChanged(String password) {
