@@ -29,6 +29,10 @@ import com.google.inject.Inject;
  */
 public class AliasRedirectorServlet extends HttpServlet {
 
+	public static final String TEAM_PLACE = "/#!Team:";
+
+	public static final String PROFILE_PLACE = "/#!Profile:";
+
 	private static final long serialVersionUID = 1L;
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
@@ -84,7 +88,7 @@ public class AliasRedirectorServlet extends HttpServlet {
 		HttpServletRequest httpRqst = (HttpServletRequest)request;
 		URL requestURL = new URL(httpRqst.getRequestURL().toString());
 		try {
-			String alias = httpRqst.getParameter("alias");
+			String alias = httpRqst.getParameter(WebConstants.ALIAS_PARAM_KEY);
 			SynapseClient client = createNewClient();
 			perThreadRequest.set(httpRqst);
 			
@@ -92,13 +96,14 @@ public class AliasRedirectorServlet extends HttpServlet {
 			List<UserGroupHeader> ughList = client.getUserGroupHeadersByAliases(Collections.singletonList(alias));
 			if (!ughList.isEmpty()) {
 				UserGroupHeader ugh = ughList.get(0);
-				String place = ugh.getIsIndividual() ? "/#!Profile:" : "/#!Team:";
+				String place = ugh.getIsIndividual() ? PROFILE_PLACE : TEAM_PLACE;
 				StringBuilder newPathBuilder = new StringBuilder();
 				newPathBuilder.append(place);
 				newPathBuilder.append(ugh.getOwnerId());
 				String newPath = newPathBuilder.toString();
 				URL redirectURL = new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), newPath);
-				response.sendRedirect(response.encodeRedirectURL(redirectURL.toString()));
+				String encodedRedirectURL = response.encodeRedirectURL(redirectURL.toString());
+				response.sendRedirect(encodedRedirectURL);
 			}
 		} catch (Exception e) {
 			//redirect to error place with an entry
