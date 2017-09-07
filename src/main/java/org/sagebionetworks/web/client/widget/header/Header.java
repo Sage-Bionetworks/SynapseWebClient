@@ -6,8 +6,8 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -37,21 +37,25 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private HeaderView view;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private FavoriteWidget favWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private StuAnnouncementWidget stuAnnouncementWidget;
 	private PendoSdk pendoSdk;
 	
 	@Inject
-	public Header(HeaderView view, AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient,
-			FavoriteWidget favWidget, SynapseJSNIUtils synapseJSNIUtils, StuAnnouncementWidget stuAnnouncementWidget,
+	public Header(HeaderView view, 
+			AuthenticationController authenticationController,
+			GlobalApplicationState globalApplicationState, 
+			SynapseJavascriptClient jsClient,
+			FavoriteWidget favWidget, 
+			SynapseJSNIUtils synapseJSNIUtils, 
+			StuAnnouncementWidget stuAnnouncementWidget,
 			PendoSdk pendoSdk) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.favWidget = favWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.clear();
@@ -165,7 +169,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	public void onFavoriteClick() {
 		if(authenticationController.isLoggedIn()) {
 			view.showFavoritesLoading();
-			synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
+			jsClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 				@Override
 				public void onSuccess(List<EntityHeader> favorites) {
 					view.clearFavorite();

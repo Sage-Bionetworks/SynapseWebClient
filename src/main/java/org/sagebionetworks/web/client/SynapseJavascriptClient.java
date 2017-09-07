@@ -13,11 +13,14 @@ import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsExcept
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
@@ -82,7 +85,7 @@ public class SynapseJavascriptClient {
 	public static final String REPO_SUFFIX_VERSION = "/version";
 	public static final String TEAM = "/team";
 	public static final String WIKI_VERSION_PARAMETER = "?wikiVersion=";
-
+	private static final String FAVORITE_URI_PATH = "/favorite";
 	public static final String USER_GROUP_HEADER_PREFIX_PATH = "/userGroupHeaders?prefix=";
 	public static final String OFFSET_PARAMETER = "offset=";
 	public static final String LIMIT_PARAMETER = "limit=";
@@ -312,5 +315,29 @@ public class SynapseJavascriptClient {
 			callback.onFailure(e);
 		}
 	}
+	
+	public void getFavorites(final AsyncCallback<List<EntityHeader>> callback) {
+		String url = getRepoServiceUrl() +
+				FAVORITE_URI_PATH + "?" + OFFSET_PARAMETER + "0"
+				+ "&" +LIMIT_PARAMETER+"2000";
+		AsyncCallback<List<EntityHeader>> paginatedResultsCallback = new AsyncCallback<List<EntityHeader>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+			public void onSuccess(List<EntityHeader> results) {
+				//sort by name
+				Collections.sort(results, new Comparator<EntityHeader>() {
+			        @Override
+			        public int compare(EntityHeader o1, EntityHeader o2) {
+			        	return o1.getName().compareToIgnoreCase(o2.getName());
+			        }
+				});
+				callback.onSuccess(results);
+			};
+		};
+		doGet(url, OBJECT_TYPE.PaginatedResultsEntityHeader, paginatedResultsCallback);
+	}
+	
 }
 

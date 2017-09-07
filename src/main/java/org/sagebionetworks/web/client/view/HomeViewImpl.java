@@ -86,7 +86,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	UserBadge userBadge;
 	HorizontalPanel myDashboardButtonContents;
 	LoginWidget loginWidget;
-	
+	ClickHandler emptyClickHandler;
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
 			Header headerWidget,
@@ -188,7 +188,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 				DisplayUtils.newWindow(WebConstants.DOCS_URL + "accounts_certified_users_and_profile_validation.html", "", "");
 			}
 		});
-		
 	}
 	@Override
 	public void prepareTwitterContainer(final String elementId, int height) {
@@ -249,6 +248,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		if (userData != null && userData.getProfile() != null) {
 			UserProfile profile = userData.getProfile();
 			userBadge.configure(profile);
+			userBadge.setDoNothingOnClick();
 		}
 	}
 	

@@ -102,7 +102,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	UserBadge userBadge;
 	Span userBadgeText;
 	HorizontalPanel myDashboardButtonContents;
-
 	@Inject
 	public HeaderViewImpl(Binder binder,
 			SageImageBundle sageImageBundle,
@@ -293,6 +292,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 	 	trashLink.setVisible(isInTestWebsite);
 	 	userBadge.clearState();
+	 	userBadge.setDoNothingOnClick();
 	 	if (userData != null && userData.getProfile() != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
 	 		userBadge.configure(userData.getProfile());

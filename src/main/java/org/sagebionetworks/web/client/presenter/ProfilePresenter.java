@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -57,6 +58,7 @@ import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -121,7 +123,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public DateTimeUtils dateTimeUtils;
 	public PromptModalView promptForProjectNameDialog;
 	public PromptModalView promptForTeamNameDialog;
-	
+	public SynapseJavascriptClient jsClient;
 	@Inject
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
@@ -140,7 +142,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
 			DateTimeUtils dateTimeUtils,
 			PromptModalView promptForProjectNameDialog,
-			PromptModalView promptForTeamNameDialog) {
+			PromptModalView promptForTeamNameDialog,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -160,7 +163,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.dateTimeUtils = dateTimeUtils;
 		this.promptForProjectNameDialog = promptForProjectNameDialog;
 		this.promptForTeamNameDialog = promptForTeamNameDialog;
-		
+		this.jsClient = jsClient;
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
 			view.addSortOption(sort);
@@ -784,7 +787,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getFavorites() {
 		projectSynAlert.clear();
-		EntityBrowserUtils.loadFavorites(synapseClient, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+		EntityBrowserUtils.loadFavorites(jsClient, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				if (filterType == ProjectFilterEnum.FAVORITES) {
@@ -1126,7 +1129,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void initUserFavorites(final Callback callback) {
-		synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
+		jsClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> favorites) {
 				globalApplicationState.setFavorites(favorites);

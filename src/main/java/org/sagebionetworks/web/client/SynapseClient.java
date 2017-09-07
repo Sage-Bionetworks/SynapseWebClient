@@ -237,8 +237,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	public void removeFavorite(String entityId) throws RestServiceException;
 	
-	public List<EntityHeader> getFavorites() throws RestServiceException;
-	
 	public String createTeam(String teamName) throws RestServiceException;
 	public void deleteTeam(String teamId) throws RestServiceException;
 	public PaginatedResults<Team> getTeams(String userId, Integer limit, Integer offset) throws RestServiceException;

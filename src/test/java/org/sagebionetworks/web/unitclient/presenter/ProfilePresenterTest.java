@@ -56,6 +56,7 @@ import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
@@ -161,7 +162,8 @@ public class ProfilePresenterTest {
 	PromptModalView mockPromptForTeamNameDialog;
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
-	
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Before
 	public void setup() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -200,7 +202,8 @@ public class ProfilePresenterTest {
 				mockIsACTMemberAsyncHandler,
 				mockDateTimeUtils,
 				mockPromptForProjectNameDialog,
-				mockPromptForTeamNameDialog
+				mockPromptForTeamNameDialog,
+				mockSynapseJavascriptClient
 				);
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -257,7 +260,7 @@ public class ProfilePresenterTest {
 		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getProjectsForTeam(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		
-		AsyncMockStubber.callSuccessWith(myFavorites).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(myFavorites).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		
 		//set up create project test
 		AsyncMockStubber.callSuccessWith("new entity id").when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
@@ -325,7 +328,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setProfileEditButtonVisible(isOwner);
 		verify(mockView).setOrcIDLinkButtonVisible(isOwner);
 		verify(mockView).showTabs(isOwner);
-		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -371,7 +374,7 @@ public class ProfilePresenterTest {
 		verifyProfileShown(false);
 		
 		//not logged in, should not ask for this user favs
-		verify(mockSynapseClient, never()).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).getFavorites(any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -631,7 +634,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setFavoritesFilterSelected();
-		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 		verify(mockView).setProjectSortVisible(false);
 	}
@@ -660,7 +663,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).setFavoritesFilterSelected();
 		verify(mockView).setFavoritesHelpPanelVisible(true);
-		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, never()).add(any(Widget.class));
 		verify(mockView).setProjectSortVisible(false);
 	}
@@ -748,7 +751,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null);
-		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		verify(mockView).setProjectSortVisible(false);
 	}
 	
@@ -1429,7 +1432,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testInitUserFavorites() {
 		List<EntityHeader> favorites = new ArrayList<EntityHeader>();
-		AsyncMockStubber.callSuccessWith(favorites).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(favorites).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		Callback mockCallback = mock(Callback.class);
 		profilePresenter.initUserFavorites(mockCallback);
 		verify(mockGlobalApplicationState).setFavorites(favorites);
@@ -1438,7 +1441,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testInitUserFavoritesFailure() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		Callback mockCallback = mock(Callback.class);
 		profilePresenter.initUserFavorites(mockCallback);
 		verify(mockGlobalApplicationState, never()).setFavorites(anyList());

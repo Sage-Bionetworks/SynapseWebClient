@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -24,7 +25,8 @@ public class SynapseJavascriptFactory {
 		WikiPageKey,
 		UserGroupHeaderResponsePage,
 		WikiPage,
-		ListWrapperUserProfile
+		ListWrapperUserProfile,
+		PaginatedResultsEntityHeader
 	}
 
 	/**
@@ -47,6 +49,15 @@ public class SynapseJavascriptFactory {
 			return new UserGroupHeaderResponsePage(json);
 		case WikiPage :
 			return new WikiPage(json);
+		case PaginatedResultsEntityHeader :
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<EntityHeader> entityHeaderList = new ArrayList<>();
+			JSONArrayAdapter resultsJsonArray = json.getJSONArray("results");
+			for (int i = 0; i < resultsJsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = resultsJsonArray.getJSONObject(i);
+				entityHeaderList.add(new EntityHeader(jsonObject));
+			}
+			return entityHeaderList;
 		case ListWrapperUserProfile :
 			// json really represents a ListWrapper, but we can't reference ListWrapper here because it uses Class.forName() (breaks gwt compile)
 			List<UserProfile> list = new ArrayList<>();
