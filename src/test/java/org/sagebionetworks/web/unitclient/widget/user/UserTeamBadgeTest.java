@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.user;
 
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -13,6 +13,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.view.DivView;
@@ -21,8 +22,10 @@ import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WidgetConstants;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.junit.GWTMockUtilities;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 /**
@@ -42,6 +45,8 @@ public class UserTeamBadgeTest {
 	@Mock
 	UserGroupHeaderFromAliasAsyncHandler mockUserGroupHeaderAsyncHandler;
 	@Mock
+	UserGroupHeader mockUserGroupHeader;
+	@Mock
 	DivView mockDiv;
 	@Before
 	public void before() throws JSONObjectAdapterException{
@@ -57,6 +62,7 @@ public class UserTeamBadgeTest {
 		widgetDescriptor = new HashMap<String, String>();
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY, "true");
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY, principalId);
+		AsyncMockStubber.callSuccessWith(mockUserGroupHeader).when(mockUserGroupHeaderAsyncHandler).getUserGroupHeader(anyString(), any(AsyncCallback.class));
 	}
 
 	@After
@@ -106,5 +112,29 @@ public class UserTeamBadgeTest {
 		verify(mockUserBadge).configure(eq((String)null));
 	}
 
-
+	@Test
+	public void testConfigureFromUsernameAlias() {
+		widgetDescriptor.clear();
+		String alias = "myalias";
+		widgetDescriptor.put(WidgetConstants.ALIAS_KEY, alias);
+		boolean isIndividual = true;
+		String ownerId = "userId";
+		when(mockUserGroupHeader.getIsIndividual()).thenReturn(isIndividual);
+		when(mockUserGroupHeader.getOwnerId()).thenReturn(ownerId);
+		badge.configure(null, widgetDescriptor, null, null);
+		verify(mockUserBadge).configure(ownerId);
+	}
+	
+	@Test
+	public void testConfigureFromTeamAlias() {
+		widgetDescriptor.clear();
+		String alias = "myteamalias";
+		widgetDescriptor.put(WidgetConstants.ALIAS_KEY, alias);
+		boolean isIndividual = false;
+		String ownerId = "teamId";
+		when(mockUserGroupHeader.getIsIndividual()).thenReturn(isIndividual);
+		when(mockUserGroupHeader.getOwnerId()).thenReturn(ownerId);
+		badge.configure(null, widgetDescriptor, null, null);
+		verify(mockTeamBadge).configure(ownerId);
+	}
 }

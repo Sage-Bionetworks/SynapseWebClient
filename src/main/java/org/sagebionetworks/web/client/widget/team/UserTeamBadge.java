@@ -33,6 +33,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 		this.ginInjector = ginInjector;
 		this.usgFromAliasAsyncHandler = usgFromAliasAsyncHandler;
 		this.div = div;
+		div.addStyleName("displayInline");
 	}
 	
 	@Override
