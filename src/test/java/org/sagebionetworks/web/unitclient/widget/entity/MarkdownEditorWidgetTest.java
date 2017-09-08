@@ -42,7 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
-import org.sagebionetworks.web.client.widget.entity.editor.UserSelector;
+import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -76,7 +76,7 @@ public class MarkdownEditorWidgetTest {
 	String fileHandleId1 = "44";
 	String fileHandleId2 = "45";
 	@Mock
-	UserSelector mockUserSelector;
+	UserTeamSelector mockUserSelector;
 	@Mock
 	KeyPressEvent mockKeyEvent;
 	@Mock

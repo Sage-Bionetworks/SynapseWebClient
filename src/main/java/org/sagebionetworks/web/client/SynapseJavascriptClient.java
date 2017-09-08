@@ -15,6 +15,7 @@ import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
@@ -23,6 +24,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
@@ -63,6 +65,7 @@ public class SynapseJavascriptClient {
 	public static final String CHILDREN = "/children";
 	public static final String RESTRICTION_INFORMATION = "/restrictionInformation";
 	public static final String USER_PROFILE_PATH = "/userProfile";
+	public static final String USER_GROUP_HEADER_BY_ALIAS = "/userGroupHeaders/aliases";
 	public static final int RETRY_REQUEST_DELAY_MS = 2000;
 	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
@@ -308,6 +311,21 @@ public class SynapseJavascriptClient {
 			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
 			idList.writeToJSONObject(jsonAdapter);
 			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.ListWrapperUserProfile, callback);
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
+	}
+	
+	public void getUserGroupHeadersByAlias(
+			ArrayList<String> aliases,
+			AsyncCallback<List<UserGroupHeader>> callback) {
+		String url = getRepoServiceUrl() + USER_GROUP_HEADER_BY_ALIAS;
+		try {
+			AliasList list = new AliasList();
+			list.setList(aliases);
+			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+			list.writeToJSONObject(jsonAdapter);
+			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.UserGroupHeaderResponse, callback);
 		} catch (JSONObjectAdapterException e) {
 			callback.onFailure(e);
 		}
