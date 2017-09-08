@@ -328,7 +328,7 @@ public class SynapseJavascriptClient {
 	public void getFavorites(final AsyncCallback<List<EntityHeader>> callback) {
 		String url = getRepoServiceUrl() +
 				FAVORITE_URI_PATH + "?" + OFFSET_PARAMETER + "0"
-				+ "&" +LIMIT_PARAMETER+"2000";
+				+ "&" +LIMIT_PARAMETER+"200";
 		AsyncCallback<List<EntityHeader>> paginatedResultsCallback = new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
