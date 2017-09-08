@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
@@ -25,6 +26,8 @@ public class APITableColumnRendererUserIDTest {
 
 	@Mock
 	GWTWrapper mockGWT;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	APITableColumnRendererUserId renderer;
 	Map<String, List<String>> columnData;
 	APITableColumnConfig config;
@@ -35,7 +38,7 @@ public class APITableColumnRendererUserIDTest {
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
-		renderer = new APITableColumnRendererUserId(mockGWT);
+		renderer = new APITableColumnRendererUserId(mockGWT, mockSynapseJavascriptClient);
 		columnData = new HashMap<String, List<String>>();
 		config = new APITableColumnConfig();
 		HashSet<String> inputColumnNames = new HashSet<String>();

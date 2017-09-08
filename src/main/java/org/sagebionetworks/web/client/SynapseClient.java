@@ -162,15 +162,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	 * @throws RestServiceException
 	 */
 	public UserProfile getUserProfile(String userId) throws RestServiceException;
-	
-	/**
-	 * Batch get headers for users/groups matching a list of Synapse IDs.
-	 * 
-	 * @param ids
-	 * @return
-	 * @throws RestServiceException
-	 */
-	public UserGroupHeaderResponsePage getUserGroupHeadersById(ArrayList<String> ids) throws RestServiceException;
 
 	/**
 	 * Updates the user's profile json object 
