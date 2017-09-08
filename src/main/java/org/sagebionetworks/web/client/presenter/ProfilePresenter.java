@@ -619,7 +619,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void updateMembershipRequestCount() {
 		if (isOwner) {
 			openRequestCount = 0;
-			synapseClient.getOpenMembershipRequestCount(new AsyncCallback<Long>() {
+			jsClient.getOpenMembershipRequestCount(new AsyncCallback<Long>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					teamSynAlert.handleException(caught);
@@ -636,7 +636,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void updateMembershipInvitationCount() {
 		if (isOwner) {
 			inviteCount = 0;
-			synapseClient.getOpenMembershipInvitationCount(new AsyncCallback<Long>() {
+			jsClient.getOpenMembershipInvitationCount(new AsyncCallback<Long>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					teamSynAlert.handleException(caught);

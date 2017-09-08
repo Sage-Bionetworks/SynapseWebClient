@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
@@ -90,6 +89,13 @@ public class SynapseJavascriptClient {
 	public static final String WIKI_VERSION_PARAMETER = "?wikiVersion=";
 	private static final String FAVORITE_URI_PATH = "/favorite";
 	public static final String USER_GROUP_HEADER_PREFIX_PATH = "/userGroupHeaders?prefix=";
+	
+	public static final String MEMBERSHIP_REQUEST = "/membershipRequest";
+	public static final String OPEN_MEMBERSHIP_REQUEST_COUNT = MEMBERSHIP_REQUEST + "/openRequestCount";
+	
+	public static final String MEMBERSHIP_INVITATION = "/membershipInvitation";
+	public static final String OPEN_MEMBERSHIP_INVITATION_COUNT = MEMBERSHIP_INVITATION + "/openInvitationCount";
+	
 	public static final String OFFSET_PARAMETER = "offset=";
 	public static final String LIMIT_PARAMETER = "limit=";
 	
@@ -345,6 +351,15 @@ public class SynapseJavascriptClient {
 	public void getUserBundle(Long principalId, int mask, AsyncCallback<UserBundle> callback) {
 		String url = getRepoServiceUrl() + USER + "/" + principalId + BUNDLE_MASK_PATH + mask;
 		doGet(url, OBJECT_TYPE.UserBundle, callback);
+	}
+	public void getOpenMembershipInvitationCount(AsyncCallback<Long> callback) {
+		String url = getRepoServiceUrl() + OPEN_MEMBERSHIP_INVITATION_COUNT;
+		doGet(url, OBJECT_TYPE.Count, callback);
+	}
+
+	public void getOpenMembershipRequestCount(AsyncCallback<Long> callback) {
+		String url = getRepoServiceUrl() + OPEN_MEMBERSHIP_REQUEST_COUNT;
+		doGet(url, OBJECT_TYPE.Count, callback);
 	}
 }
 

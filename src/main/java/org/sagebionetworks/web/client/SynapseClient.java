@@ -443,10 +443,6 @@ public interface SynapseClient extends XsrfProtectedService {
 
 	void addTeamMember(String userGroupId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
 
-	Long getOpenMembershipInvitationCount() throws RestServiceException;
-
-	Long getOpenMembershipRequestCount() throws RestServiceException;
-
 	String createExternalObjectStoreFileHandle(ExternalObjectStoreFileHandle fileHandle) throws RestServiceException;
 
 	void removeEmail(String email) throws RestServiceException;

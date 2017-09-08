@@ -1143,7 +1143,7 @@ public class ProfilePresenterTest {
 	public void testUpdateTeamInvites() {
 		profilePresenter.setIsOwner(true);
 		Long inviteCount = 3L;
-		AsyncMockStubber.callSuccessWith(inviteCount).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(inviteCount).when(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		profilePresenter.updateMembershipInvitationCount();
 		
 		assertEquals(inviteCount.intValue(), profilePresenter.getInviteCount());
@@ -1154,12 +1154,12 @@ public class ProfilePresenterTest {
 	public void testAddMembershipRequests() {
 		profilePresenter.setIsOwner(true);
 		Long beforeNotificationCount = 12L; 
-		AsyncMockStubber.callSuccessWith(beforeNotificationCount).when(mockSynapseClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(beforeNotificationCount).when(mockSynapseJavascriptClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
 		profilePresenter.updateMembershipRequestCount();
 		verify(mockView).setTeamNotificationCount(Long.toString(beforeNotificationCount));
 		
 		Long inviteCount = 10L;
-		AsyncMockStubber.callSuccessWith(inviteCount).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(inviteCount).when(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		profilePresenter.updateMembershipInvitationCount();
 		
 		verify(mockView).setTeamNotificationCount(eq(Long.toString(beforeNotificationCount + inviteCount)));
@@ -1168,9 +1168,9 @@ public class ProfilePresenterTest {
 	@Test
 	public void testUpdateTeamInvitesZero() {
 		profilePresenter.setIsOwner(true);
-		AsyncMockStubber.callSuccessWith(0L).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(0L).when(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		profilePresenter.updateMembershipInvitationCount();
-		verify(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		assertEquals(0, profilePresenter.getInviteCount());
 		verify(mockView, never()).setTeamNotificationCount(anyString());
 	}
@@ -1178,9 +1178,9 @@ public class ProfilePresenterTest {
 	@Test
 	public void testAddMembershipRequestsZero() {
 		profilePresenter.setIsOwner(true);
-		AsyncMockStubber.callSuccessWith(0L).when(mockSynapseClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(0L).when(mockSynapseJavascriptClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
 		profilePresenter.updateMembershipRequestCount();
-		verify(mockSynapseClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
 		assertEquals(0, profilePresenter.getOpenRequestCount());
 		verify(mockView, never()).setTeamNotificationCount(anyString());
 	}
@@ -1189,7 +1189,7 @@ public class ProfilePresenterTest {
 	public void testRefreshTeamsOwnerTeamsAndInvites() {
 		int totalNotifications = 12; // must be even for tests to pass
 		int inviteCount = totalNotifications/2;
-		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
 		for (int i = 0; i < inviteCount; i++) {
 			invites.add(new OpenUserInvitationBundle());	
@@ -1237,7 +1237,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testRefreshTeamsOwnerOnlyTeams() {
 		int totalNotifications = 12; // must be even for tests to pass
-		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		int inviteCount = 0;
 		List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
 		for (int i = 0; i < inviteCount; i++) {
@@ -1257,7 +1257,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testRefreshTeamsOwnerOnlyInvites() {
 		int totalNotifications = 12; // must be even for tests to pass
-		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		int inviteCount = totalNotifications;
 		List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
 		for (int i = 0; i < inviteCount; i++) {

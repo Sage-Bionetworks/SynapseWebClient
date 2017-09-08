@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.Count;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -28,7 +29,8 @@ public class SynapseJavascriptFactory {
 		WikiPage,
 		ListWrapperUserProfile,
 		PaginatedResultsEntityHeader,
-		UserBundle
+		UserBundle,
+		Count
 	}
 
 	/**
@@ -53,6 +55,8 @@ public class SynapseJavascriptFactory {
 			return new WikiPage(json);
 		case UserBundle :
 			return new UserBundle(json);
+		case Count :
+			return new Count(json).getCount();
 		case PaginatedResultsEntityHeader :
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<EntityHeader> entityHeaderList = new ArrayList<>();
