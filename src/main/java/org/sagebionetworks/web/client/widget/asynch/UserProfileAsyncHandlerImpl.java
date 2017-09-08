@@ -8,7 +8,6 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -19,8 +18,6 @@ import com.google.inject.Inject;
 public class UserProfileAsyncHandlerImpl implements UserProfileAsyncHandler {
 	private Map<String, List<AsyncCallback<UserProfile>>> reference2Callback = new HashMap<String, List<AsyncCallback<UserProfile>>>();
 	SynapseJavascriptClient jsClient;
-	// This singleton checks for new work every <DELAY> milliseconds.
-	public static final int DELAY = 280;
 	
 	@Inject
 	public UserProfileAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt) {
@@ -31,7 +28,7 @@ public class UserProfileAsyncHandlerImpl implements UserProfileAsyncHandler {
 				executeRequests();
 			}
 		};
-		gwt.scheduleFixedDelay(callback, DELAY);
+		gwt.scheduleFixedDelay(callback, 200 + gwt.nextInt(150));
 	}
 	
 	@Override

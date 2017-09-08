@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -9,6 +9,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
+import org.sagebionetworks.web.shared.WebConstants;
 
 
 public class ImageFileValidatorTest {
@@ -59,13 +60,21 @@ public class ImageFileValidatorTest {
 		when(mockMeta.getContentType()).thenReturn("image/svg+xml");
 		when(mockMeta.getFileName()).thenReturn("test.svg");
 		assertTrue(imageValidator.isValid(mockMeta));
-		
+
 		//test non-null max file size
 		imageValidator.setMaxSize(100.0);
 		assertTrue(imageValidator.isValid(mockMeta));
 		//unit test isValidSize
 		assertTrue(imageValidator.isValidSize(10.0));
 		assertFalse(imageValidator.isValidSize(1000.0));
+	}
+	
+	@Test
+	public void testInvalidName() {
+		when(mockMeta.getContentType()).thenReturn("image/jpg");
+		when(mockMeta.getFileName()).thenReturn("test$%*(&#.jpeg");
+		assertFalse(imageValidator.isValid(mockMeta));
+		assertEquals(WebConstants.INVALID_ENTITY_NAME_MESSAGE, imageValidator.getInvalidMessage());	
 	}
 	
 	@Test

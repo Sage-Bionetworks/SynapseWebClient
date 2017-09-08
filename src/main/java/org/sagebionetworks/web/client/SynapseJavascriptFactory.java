@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
+import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -28,9 +29,10 @@ public class SynapseJavascriptFactory {
 		UserGroupHeaderResponsePage,
 		WikiPage,
 		ListWrapperUserProfile,
-		PaginatedResultsEntityHeader,
+		UserGroupHeaderResponse,
 		UserBundle,
-		Count
+		Count,
+		PaginatedResultsEntityHeader
 	}
 
 	/**
@@ -53,6 +55,8 @@ public class SynapseJavascriptFactory {
 			return new UserGroupHeaderResponsePage(json);
 		case WikiPage :
 			return new WikiPage(json);
+		case UserGroupHeaderResponse :
+			return new UserGroupHeaderResponse(json).getList();
 		case UserBundle :
 			return new UserBundle(json);
 		case Count :

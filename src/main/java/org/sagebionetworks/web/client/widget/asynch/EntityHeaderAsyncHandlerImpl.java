@@ -18,8 +18,6 @@ import com.google.inject.Inject;
 public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 	private Map<String, List<AsyncCallback<EntityHeader>>> reference2Callback = new HashMap<String, List<AsyncCallback<EntityHeader>>>();
 	SynapseClientAsync synapseClient;
-	// This singleton checks for new work every <DELAY> milliseconds.
-	public static final int DELAY = 300;
 	
 	@Inject
 	public EntityHeaderAsyncHandlerImpl(SynapseClientAsync synapseClient, GWTWrapper gwt) {
@@ -30,7 +28,7 @@ public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 				executeRequests();
 			}
 		};
-		gwt.scheduleFixedDelay(callback, DELAY);
+		gwt.scheduleFixedDelay(callback, 200 + gwt.nextInt(150));
 	}
 	
 	@Override

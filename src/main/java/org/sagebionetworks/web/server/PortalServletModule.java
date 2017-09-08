@@ -10,6 +10,7 @@ import java.util.logging.Logger;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.server.servlet.AliasRedirectorServlet;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
 import org.sagebionetworks.web.server.servlet.DataAccessClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
@@ -125,6 +126,10 @@ public class PortalServletModule extends ServletModule {
 		// Slack handler
 		bind(SlackServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.SLACK_SERVLET).with(SlackServlet.class);
+
+		// Alias resolution
+		bind(AliasRedirectorServlet.class).in(Singleton.class);
+		serve("/Portal/"+WebConstants.ALIAS_REDIRECTOR_SERVLET).with(AliasRedirectorServlet.class);
 
 
 		// Multipart file upload

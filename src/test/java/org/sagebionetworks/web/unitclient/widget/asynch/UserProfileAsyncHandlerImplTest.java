@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.asynch;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -16,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandlerImpl;
@@ -48,7 +47,7 @@ public class UserProfileAsyncHandlerImplTest {
 	
 	@Test
 	public void testConstructor() {
-		verify(mockGwt).scheduleFixedDelay(any(Callback.class), eq(UserProfileAsyncHandlerImpl.DELAY));
+		verify(mockGwt).scheduleFixedDelay(any(Callback.class), anyInt());
 	}
 
 	@Test

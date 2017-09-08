@@ -22,7 +22,7 @@ public class WebConstants {
 	 */
 	public static final String VALID_ENTITY_NAME_REGEX = ModelConstants.VALID_ENTITY_NAME_REGEX;
 	
-	public static final String INVALID_ENTITY_NAME_MESSAGE = "Entity names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
+	public static final String INVALID_ENTITY_NAME_MESSAGE = "Names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
 	
 	public static final String INVALID_EMAIL_MESSAGE = "Invalid email address";
 
@@ -191,6 +191,8 @@ public class WebConstants {
 	public static final String STAGE_X_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageX_synapse_id";
 	
 	public static final String FILE_HANDLE_ASSOCIATION_SERVLET = "filehandleassociation";
+	public static final String ALIAS_REDIRECTOR_SERVLET = "aliasredirector";
+	public static final String ALIAS_PARAM_KEY = "alias";
 	public static final String SLACK_SERVLET = "slack";
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
 	public static final String FILE_ENTITY_RESOLVER_SERVLET = "fileresolver";

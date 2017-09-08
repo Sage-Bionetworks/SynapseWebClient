@@ -79,7 +79,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 				add(profilePicture);
 			} else {
 				Icon defaultProfilePicture = new Icon(IconType.USERS);
-				defaultProfilePicture.addStyleName("font-size-lg imageButton lightGreyText margin-right-4");
+				defaultProfilePicture.addStyleName("imageButton lightGreyText margin-right-4");
 				add(defaultProfilePicture);
 			}
 			add(anchor);
