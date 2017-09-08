@@ -27,9 +27,6 @@ public interface UserProfileClientAsync {
 
 	void getMyOwnUserBundle(int mask, AsyncCallback<UserBundle> callback);
 
-	void getUserBundle(Long principalId, int mask,
-			AsyncCallback<UserBundle> callback);
-
 	void unbindOAuthProvidersUserId(OAuthProvider provider, String alias,
 			AsyncCallback<Void> callback);
 

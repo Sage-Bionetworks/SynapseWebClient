@@ -24,6 +24,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.core.java.util.Collections.EmptyMap_CustomFieldSerializer;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -48,6 +49,13 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	private String principalId = null, username = null;
 	UserProfileAsyncHandler userProfileAsyncHandler;
 	private AdapterFactory adapterFactory;
+	
+	public static final ClickHandler DO_NOTHING_ON_CLICK = new ClickHandler() {
+		@Override
+		public void onClick(ClickEvent event) {
+			//do nothing, let event go to button only
+		}
+	};
 	
 	@Inject
 	public UserBadge(UserBadgeView view, 
@@ -317,5 +325,9 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			useCachedImage = false;
 			configurePicture();	
 		}
+	}
+	
+	public void setDoNothingOnClick() {
+		customClickHandler = DO_NOTHING_ON_CLICK;
 	}
 }

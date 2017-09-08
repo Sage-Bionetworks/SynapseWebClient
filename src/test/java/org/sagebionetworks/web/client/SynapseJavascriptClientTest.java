@@ -107,7 +107,7 @@ public class SynapseJavascriptClientTest {
 		client.getEntityBundle(entityId, partsMask, mockAsyncCallback);
 		
 		//verify url and method
-		String url = REPO_ENDPOINT + ENTITY_URI_PATH + "/" + entityId + ENTITY_BUNDLE_PATH + partsMask;
+		String url = REPO_ENDPOINT + ENTITY_URI_PATH + "/" + entityId + BUNDLE_MASK_PATH + partsMask;
 		verify(mockRequestBuilder).configure(GET, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder, never()).setHeader(eq(SESSION_TOKEN_HEADER), anyString());
@@ -135,7 +135,7 @@ public class SynapseJavascriptClientTest {
 		client.getEntityBundleForVersion(entityId, versionNumber, partsMask, mockAsyncCallback);
 		
 		//verify url and method
-		String url = REPO_ENDPOINT + ENTITY_URI_PATH + "/" + entityId + ENTITY_BUNDLE_PATH + partsMask + REPO_SUFFIX_VERSION + "/" + versionNumber;
+		String url = REPO_ENDPOINT + ENTITY_URI_PATH + "/" + entityId + BUNDLE_MASK_PATH + partsMask + REPO_SUFFIX_VERSION + "/" + versionNumber;
 		verify(mockRequestBuilder).configure(GET, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
@@ -299,4 +299,45 @@ public class SynapseJavascriptClientTest {
 		verify(mockAsyncCallback).onSuccess(profiles);
 	}
 	
+	@Test
+	public void testGetFavorites() throws RequestException, JSONObjectAdapterException {
+		client.getFavorites(mockAsyncCallback);
+		//verify url and method
+		String url = REPO_ENDPOINT + 
+			FAVORITE_URI_PATH + 
+			"?" +
+			OFFSET_PARAMETER + "0&" +
+			LIMIT_PARAMETER + "200";
+		verify(mockRequestBuilder).configure(GET, url);
+	}
+	
+	@Test
+	public void testGetUserBundle() throws RequestException, JSONObjectAdapterException {
+		Long principalId = 8222L;
+		int mask = 23;
+		client.getUserBundle(principalId, mask, mockAsyncCallback);
+		//verify url and method
+		String url = REPO_ENDPOINT + 
+			USER + "/" + principalId + 
+			BUNDLE_MASK_PATH + mask;
+		verify(mockRequestBuilder).configure(GET, url);
+	}
+	
+	@Test
+	public void testGetOpenMembershipInvitationCount() throws RequestException, JSONObjectAdapterException {
+		client.getOpenMembershipInvitationCount(mockAsyncCallback);
+		//verify url and method
+		String url = REPO_ENDPOINT + 
+			OPEN_MEMBERSHIP_INVITATION_COUNT; 
+		verify(mockRequestBuilder).configure(GET, url);
+	}
+	
+	@Test
+	public void testGetOpenMembershipRequestCount() throws RequestException, JSONObjectAdapterException {
+		client.getOpenMembershipRequestCount(mockAsyncCallback);
+		//verify url and method
+		String url = REPO_ENDPOINT + 
+			OPEN_MEMBERSHIP_REQUEST_COUNT; 
+		verify(mockRequestBuilder).configure(GET, url);
+	}
 }

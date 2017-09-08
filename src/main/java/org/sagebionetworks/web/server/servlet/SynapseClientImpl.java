@@ -1343,27 +1343,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	@Override
-	public List<EntityHeader> getFavorites()
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> favorites = synapseClient
-					.getFavorites(MAX_LIMIT, ZERO_OFFSET);
-			List<EntityHeader> headers = favorites.getResults();
-			//sort by name
-			Collections.sort(headers, new Comparator<EntityHeader>() {
-		        @Override
-		        public int compare(EntityHeader o1, EntityHeader o2) {
-		        	return o1.getName().compareToIgnoreCase(o2.getName());
-		        }
-			});
-			return headers;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
 	public String createTeam(String teamName) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -2862,26 +2841,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 
-	}
-	
-	@Override
-	public Long getOpenMembershipInvitationCount() throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return synapseClient.getOpenMembershipInvitationCount().getCount();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
-	public Long getOpenMembershipRequestCount() throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return synapseClient.getOpenMembershipRequestCount().getCount();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
 	}
 	
 	@Override

@@ -13,17 +13,21 @@ import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsExcept
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -75,7 +79,8 @@ public class SynapseJavascriptClient {
 	SynapseJavascriptFactory jsFactory;
 
 	public static final String ENTITY_URI_PATH = "/entity";
-	public static final String ENTITY_BUNDLE_PATH = "/bundle?mask=";
+	public static final String USER = "/user";
+	public static final String BUNDLE_MASK_PATH = "/bundle?mask=";
 	public static final String CONTENT_TYPE = "Content-Type";
 	public static final String ACCEPT = "Accept";
 	public static final String SESSION_TOKEN_HEADER = "sessionToken";
@@ -85,8 +90,15 @@ public class SynapseJavascriptClient {
 	public static final String REPO_SUFFIX_VERSION = "/version";
 	public static final String TEAM = "/team";
 	public static final String WIKI_VERSION_PARAMETER = "?wikiVersion=";
-
+	public static final String FAVORITE_URI_PATH = "/favorite";
 	public static final String USER_GROUP_HEADER_PREFIX_PATH = "/userGroupHeaders?prefix=";
+	
+	public static final String MEMBERSHIP_REQUEST = "/membershipRequest";
+	public static final String OPEN_MEMBERSHIP_REQUEST_COUNT = MEMBERSHIP_REQUEST + "/openRequestCount";
+	
+	public static final String MEMBERSHIP_INVITATION = "/membershipInvitation";
+	public static final String OPEN_MEMBERSHIP_INVITATION_COUNT = MEMBERSHIP_INVITATION + "/openInvitationCount";
+	
 	public static final String OFFSET_PARAMETER = "offset=";
 	public static final String LIMIT_PARAMETER = "limit=";
 	
@@ -200,7 +212,7 @@ public class SynapseJavascriptClient {
 	}
 
 	public void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, final AsyncCallback<EntityBundle> callback) {
-		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId + ENTITY_BUNDLE_PATH + partsMask;
+		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId + BUNDLE_MASK_PATH + partsMask;
 		if (versionNumber != null) {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
@@ -316,6 +328,43 @@ public class SynapseJavascriptClient {
 		}
 	}
 	
+	public void getFavorites(final AsyncCallback<List<EntityHeader>> callback) {
+		String url = getRepoServiceUrl() +
+				FAVORITE_URI_PATH + "?" + OFFSET_PARAMETER + "0"
+				+ "&" +LIMIT_PARAMETER+"200";
+		AsyncCallback<List<EntityHeader>> paginatedResultsCallback = new AsyncCallback<List<EntityHeader>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+			public void onSuccess(List<EntityHeader> results) {
+				//sort by name
+				Collections.sort(results, new Comparator<EntityHeader>() {
+			        @Override
+			        public int compare(EntityHeader o1, EntityHeader o2) {
+			        	return o1.getName().compareToIgnoreCase(o2.getName());
+			        }
+				});
+				callback.onSuccess(results);
+			};
+		};
+		doGet(url, OBJECT_TYPE.PaginatedResultsEntityHeader, paginatedResultsCallback);
+	}
+	
+	public void getUserBundle(Long principalId, int mask, AsyncCallback<UserBundle> callback) {
+		String url = getRepoServiceUrl() + USER + "/" + principalId + BUNDLE_MASK_PATH + mask;
+		doGet(url, OBJECT_TYPE.UserBundle, callback);
+	}
+	public void getOpenMembershipInvitationCount(AsyncCallback<Long> callback) {
+		String url = getRepoServiceUrl() + OPEN_MEMBERSHIP_INVITATION_COUNT;
+		doGet(url, OBJECT_TYPE.Count, callback);
+	}
+
+	public void getOpenMembershipRequestCount(AsyncCallback<Long> callback) {
+		String url = getRepoServiceUrl() + OPEN_MEMBERSHIP_REQUEST_COUNT;
+		doGet(url, OBJECT_TYPE.Count, callback);
+	}
+
 	public void getUserGroupHeadersByAlias(
 			ArrayList<String> aliases,
 			AsyncCallback<List<UserGroupHeader>> callback) {

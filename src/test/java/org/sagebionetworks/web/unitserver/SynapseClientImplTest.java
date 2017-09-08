@@ -1855,37 +1855,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testGetFavorites() throws JSONObjectAdapterException,
-			SynapseException, RestServiceException {
-		PaginatedResults<EntityHeader> pagedResults = new PaginatedResults<EntityHeader>();
-		List<EntityHeader> unsortedResults = new ArrayList<EntityHeader>();
-		pagedResults.setResults(unsortedResults);
-		when(mockSynapse.getFavorites(anyInt(), anyInt())).thenReturn(
-				pagedResults);
-
-		// test empty favorites
-		List<EntityHeader> actualList = synapseClient.getFavorites();
-		assertTrue(actualList.isEmpty());
-
-		// test a few unsorted favorites
-		EntityHeader favZ = new EntityHeader();
-		favZ.setName("Z");
-		unsortedResults.add(favZ);
-		EntityHeader favA = new EntityHeader();
-		favA.setName("A");
-		unsortedResults.add(favA);
-		EntityHeader favQ = new EntityHeader();
-		favQ.setName("q");
-		unsortedResults.add(favQ);
-
-		actualList = synapseClient.getFavorites();
-		assertEquals(3, actualList.size());
-		assertEquals(favA, actualList.get(0));
-		assertEquals(favQ, actualList.get(1));
-		assertEquals(favZ, actualList.get(2));
-	}
-
-	@Test
 	public void testGetTeamBundlesNotOwner() throws RestServiceException, SynapseException {
 		// the paginated results were set up to return {teamZ, teamA}, but
 		// servlet side we sort by name.

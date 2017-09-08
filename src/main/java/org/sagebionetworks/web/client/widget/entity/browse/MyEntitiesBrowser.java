@@ -199,7 +199,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	@Override
 	public void loadFavorites() {
 		view.getFavoritesTreeBrowser().clear();
-		EntityBrowserUtils.loadFavorites(synapseClient, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+		EntityBrowserUtils.loadFavorites(jsClient, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				view.setFavoriteEntities(result);

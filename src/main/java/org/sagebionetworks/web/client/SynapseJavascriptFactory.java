@@ -3,10 +3,13 @@ package org.sagebionetworks.web.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.Count;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -26,7 +29,10 @@ public class SynapseJavascriptFactory {
 		UserGroupHeaderResponsePage,
 		WikiPage,
 		ListWrapperUserProfile,
-		UserGroupHeaderResponse
+		UserGroupHeaderResponse,
+		UserBundle,
+		Count,
+		PaginatedResultsEntityHeader
 	}
 
 	/**
@@ -51,6 +57,19 @@ public class SynapseJavascriptFactory {
 			return new WikiPage(json);
 		case UserGroupHeaderResponse :
 			return new UserGroupHeaderResponse(json).getList();
+		case UserBundle :
+			return new UserBundle(json);
+		case Count :
+			return new Count(json).getCount();
+		case PaginatedResultsEntityHeader :
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<EntityHeader> entityHeaderList = new ArrayList<>();
+			JSONArrayAdapter resultsJsonArray = json.getJSONArray("results");
+			for (int i = 0; i < resultsJsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = resultsJsonArray.getJSONObject(i);
+				entityHeaderList.add(new EntityHeader(jsonObject));
+			}
+			return entityHeaderList;
 		case ListWrapperUserProfile :
 			// json really represents a ListWrapper, but we can't reference ListWrapper here because it uses Class.forName() (breaks gwt compile)
 			List<UserProfile> list = new ArrayList<>();
