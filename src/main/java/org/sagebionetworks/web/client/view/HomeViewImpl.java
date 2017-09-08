@@ -86,7 +86,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 	UserBadge userBadge;
 	HorizontalPanel myDashboardButtonContents;
 	LoginWidget loginWidget;
-	ClickHandler emptyClickHandler;
 	@Inject
 	public HomeViewImpl(HomeViewImplUiBinder binder, 
 			Header headerWidget,

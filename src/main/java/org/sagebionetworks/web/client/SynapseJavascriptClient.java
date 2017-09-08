@@ -87,7 +87,7 @@ public class SynapseJavascriptClient {
 	public static final String REPO_SUFFIX_VERSION = "/version";
 	public static final String TEAM = "/team";
 	public static final String WIKI_VERSION_PARAMETER = "?wikiVersion=";
-	private static final String FAVORITE_URI_PATH = "/favorite";
+	public static final String FAVORITE_URI_PATH = "/favorite";
 	public static final String USER_GROUP_HEADER_PREFIX_PATH = "/userGroupHeaders?prefix=";
 	
 	public static final String MEMBERSHIP_REQUEST = "/membershipRequest";
