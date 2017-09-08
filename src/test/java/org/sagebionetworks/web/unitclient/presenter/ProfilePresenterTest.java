@@ -218,7 +218,7 @@ public class ProfilePresenterTest {
 		testUser.getSession().setSessionToken("token");
 		testUser.setIsSSO(false);
 		
-		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockCurrentUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(targetUserId).when(mockSynapseClient).getUserIdFromUsername(eq(targetUsername), any(AsyncCallback.class));
@@ -368,7 +368,7 @@ public class ProfilePresenterTest {
 		when(place.toToken()).thenReturn(targetUserId);
 		when(place.getUserId()).thenReturn(targetUserId);
 		profilePresenter.setPlace(place);
-		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verifyProfileShown(false);
@@ -386,7 +386,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		
 		verify(mockSynapseClient).getUserIdFromUsername(eq(targetUsername), any(AsyncCallback.class));
-		verify(mockUserProfileClient).getUserBundle(eq(Long.parseLong(targetUserId)), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserBundle(eq(Long.parseLong(targetUserId)), anyInt(), any(AsyncCallback.class));
 		verify(place).setUserId(targetUserId);
 	}
 	
@@ -417,7 +417,7 @@ public class ProfilePresenterTest {
 	public void testViewMyProfileNoRedirect() throws JSONObjectAdapterException{
 		//view another user profile
 		setPlaceMyProfile("456");
-		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		//should attempt to get my teams, but delayed.
@@ -442,7 +442,7 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("1");
 		when(place.getUserId()).thenReturn("2");
 		profilePresenter.setPlace(place);
-		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -461,7 +461,7 @@ public class ProfilePresenterTest {
 	public void testGetProfileError() {
 		//some other error occurred
 		Exception ex = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		profilePresenter.updateProfileView("1");
 		verify(mockView).hideLoading();
 		verify(mockSynAlert).handleException(ex);

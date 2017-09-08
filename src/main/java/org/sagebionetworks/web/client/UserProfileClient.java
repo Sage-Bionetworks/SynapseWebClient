@@ -31,9 +31,6 @@ public interface UserProfileClient extends XsrfProtectedService {
 
 	UserBundle getMyOwnUserBundle(int mask) throws RestServiceException;
 
-	UserBundle getUserBundle(Long principalId, int mask)
-			throws RestServiceException;
-
 	void unbindOAuthProvidersUserId(OAuthProvider provider, String alias)
 			throws RestServiceException;
 

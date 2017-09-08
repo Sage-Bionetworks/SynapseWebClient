@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
@@ -26,6 +27,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
@@ -75,7 +77,8 @@ public class SynapseJavascriptClient {
 	SynapseJavascriptFactory jsFactory;
 
 	public static final String ENTITY_URI_PATH = "/entity";
-	public static final String ENTITY_BUNDLE_PATH = "/bundle?mask=";
+	public static final String USER = "/user";
+	public static final String BUNDLE_MASK_PATH = "/bundle?mask=";
 	public static final String CONTENT_TYPE = "Content-Type";
 	public static final String ACCEPT = "Accept";
 	public static final String SESSION_TOKEN_HEADER = "sessionToken";
@@ -200,7 +203,7 @@ public class SynapseJavascriptClient {
 	}
 
 	public void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, final AsyncCallback<EntityBundle> callback) {
-		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId + ENTITY_BUNDLE_PATH + partsMask;
+		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId + BUNDLE_MASK_PATH + partsMask;
 		if (versionNumber != null) {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
@@ -339,5 +342,9 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.PaginatedResultsEntityHeader, paginatedResultsCallback);
 	}
 	
+	public void getUserBundle(Long principalId, int mask, AsyncCallback<UserBundle> callback) {
+		String url = getRepoServiceUrl() + USER + "/" + principalId + BUNDLE_MASK_PATH + mask;
+		doGet(url, OBJECT_TYPE.UserBundle, callback);
+	}
 }
 

@@ -107,7 +107,7 @@ public class SynapseJavascriptClientTest {
 		client.getEntityBundle(entityId, partsMask, mockAsyncCallback);
 		
 		//verify url and method
-		String url = REPO_ENDPOINT + ENTITY_URI_PATH + "/" + entityId + ENTITY_BUNDLE_PATH + partsMask;
+		String url = REPO_ENDPOINT + ENTITY_URI_PATH + "/" + entityId + BUNDLE_MASK_PATH + partsMask;
 		verify(mockRequestBuilder).configure(GET, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder, never()).setHeader(eq(SESSION_TOKEN_HEADER), anyString());
@@ -135,7 +135,7 @@ public class SynapseJavascriptClientTest {
 		client.getEntityBundleForVersion(entityId, versionNumber, partsMask, mockAsyncCallback);
 		
 		//verify url and method
-		String url = REPO_ENDPOINT + ENTITY_URI_PATH + "/" + entityId + ENTITY_BUNDLE_PATH + partsMask + REPO_SUFFIX_VERSION + "/" + versionNumber;
+		String url = REPO_ENDPOINT + ENTITY_URI_PATH + "/" + entityId + BUNDLE_MASK_PATH + partsMask + REPO_SUFFIX_VERSION + "/" + versionNumber;
 		verify(mockRequestBuilder).configure(GET, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);

@@ -58,7 +58,6 @@ import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -323,7 +322,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
 		view.setOrcIdVisible(false);
 		view.setUnbindOrcIdVisible(false);
-		userProfileClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
+		jsClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
 			@Override
 			public void onSuccess(UserBundle bundle) {
 				view.hideLoading();

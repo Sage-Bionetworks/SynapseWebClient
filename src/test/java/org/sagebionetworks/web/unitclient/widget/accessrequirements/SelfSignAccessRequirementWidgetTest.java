@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -84,7 +85,7 @@ public class SelfSignAccessRequirementWidgetTest {
 	@Mock
 	PopupUtilsView mockPopupUtils;
 	@Mock
-	UserProfileClientAsync mockUserProfileClient;
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	UserBundle mockUserBundle;
 	@Mock
@@ -115,7 +116,7 @@ public class SelfSignAccessRequirementWidgetTest {
 				mockLazyLoadHelper,
 				mockManageAccessButton,
 				mockPopupUtils,
-				mockUserProfileClient);
+				mockSynapseJavascriptClient);
 		when(mockAccessRequirement.getId()).thenReturn(AR_ID);
 		when(mockAccessRequirement.getVersionNumber()).thenReturn(AR_VERSION);
 		when(mockAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
@@ -123,7 +124,7 @@ public class SelfSignAccessRequirementWidgetTest {
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
 		lazyLoadDataCallback = callbackCaptor.getValue();
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(CURRENT_USER_ID);
-		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
 	}
 
@@ -221,7 +222,7 @@ public class SelfSignAccessRequirementWidgetTest {
 	@Test
 	public void testGetUserBundleFailure() {
 		Exception ex = new Exception("error getting user bundle");
-		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		when(mockAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
 		widget.setRequirement(mockAccessRequirement, mockRefreshCallback);
 		when(mockDataAccessSubmissionStatus.getIsApproved()).thenReturn(false);
