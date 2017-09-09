@@ -120,6 +120,8 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 
 			@Override
 			public void onSuccess(WikiPage result) {
+				// SWC-3526:  make sure wiki page Id is set in key
+				wikiKey.setWikiPageId(result.getId());
 				configure(result);
 			}});
 	}
