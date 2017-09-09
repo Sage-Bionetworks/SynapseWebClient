@@ -49,6 +49,7 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
@@ -70,6 +71,7 @@ public class SynapseJavascriptClient {
 	public static final String RESTRICTION_INFORMATION = "/restrictionInformation";
 	public static final String USER_PROFILE_PATH = "/userProfile";
 	public static final String USER_GROUP_HEADER_BY_ALIAS = "/userGroupHeaders/aliases";
+	public static final String USER_GROUP_HEADER_BATCH_PATH = "/userGroupHeaders/batch?ids=";
 	public static final int RETRY_REQUEST_DELAY_MS = 2000;
 	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
@@ -378,6 +380,23 @@ public class SynapseJavascriptClient {
 		} catch (JSONObjectAdapterException e) {
 			callback.onFailure(e);
 		}
+	}
+	public void getUserGroupHeadersById(
+			List<String> ids,
+			AsyncCallback<UserGroupHeaderResponsePage> callback) {
+		String url = getRepoServiceUrl() + USER_GROUP_HEADER_BATCH_PATH + listToString(ids);
+		doGet(url, OBJECT_TYPE.UserGroupHeaderResponsePage, callback);
+	}
+	
+	private String listToString(List<String> ids) {
+		StringBuilder sb = new StringBuilder();
+		for (String id : ids) {
+			sb.append(id);
+			sb.append(',');
+		}
+		// Remove the trailing comma
+		sb.deleteCharAt(sb.length() - 1);
+		return sb.toString();
 	}
 }
 

@@ -67,7 +67,6 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.Versionable;
@@ -633,18 +632,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
-	@Override
-	public UserGroupHeaderResponsePage getUserGroupHeadersById(ArrayList<String> ids)
-			throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return synapseClient.getUserGroupHeadersByIds(ids);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
+	
 	@Override
 	public String getUserIdFromUsername(String username) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

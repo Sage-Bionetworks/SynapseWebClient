@@ -11,6 +11,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
@@ -18,6 +20,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
@@ -39,15 +42,18 @@ public class WikiHistoryWidgetTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	WikiHistoryWidget presenter;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	
 	@Before
 	public void before() throws Exception{
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(WikiHistoryWidgetView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		
-		presenter = new WikiHistoryWidget(mockGlobalApplicationState, mockView, mockSynapseClient, mockAuthenticationController);
+		presenter = new WikiHistoryWidget(mockGlobalApplicationState, mockView, mockSynapseClient, mockAuthenticationController, mockSynapseJavascriptClient);
 		
 		PaginatedResults<JSONEntity> paginatedHistory = new PaginatedResults<JSONEntity>();
 		paginatedHistory.setTotalNumberOfResults(1);
@@ -63,7 +69,7 @@ public class WikiHistoryWidgetTest {
 		responsePage.setChildren(new ArrayList<UserGroupHeader>());
 		
 		AsyncMockStubber.callSuccessWith(responsePage)
-			.when(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
+			.when(mockSynapseJavascriptClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -127,7 +133,7 @@ public class WikiHistoryWidgetTest {
 	@Test
 	public void testConfigureNextPageFailure2() {
 		AsyncMockStubber.callFailureWith(new Exception())
-			.when(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
+			.when(mockSynapseJavascriptClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
 		presenter.configureNextPage(new Long(0), new Long(10));
 		verify(mockView).showErrorMessage(anyString());
 	}

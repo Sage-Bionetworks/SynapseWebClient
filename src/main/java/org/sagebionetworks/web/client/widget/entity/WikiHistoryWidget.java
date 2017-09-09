@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -32,7 +33,7 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 	private SynapseClientAsync synapseClient;
 	private WikiPageKey wikiKey;
 	private Map<String, String> mapIdToName;
-
+	private SynapseJavascriptClient jsClient;
 	public interface ActionHandler{
 		public void previewClicked(Long versionToPreview, Long currentVersion);
 		public void restoreClicked(Long versionToRestore);
@@ -40,10 +41,12 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 	
 	@Inject
 	public WikiHistoryWidget(GlobalApplicationState globalApplicationState, WikiHistoryWidgetView view, 
-			SynapseClientAsync synapseClient, AuthenticationController authenticationController) {
+			SynapseClientAsync synapseClient, AuthenticationController authenticationController,
+			SynapseJavascriptClient jsClient) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		view.setPresenter(this);
@@ -93,7 +96,7 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 						}
 					}
 					// Call to get user headers from the list of needed ids
-					synapseClient.getUserGroupHeadersById(idsToSearch, new AsyncCallback<UserGroupHeaderResponsePage>() {
+					jsClient.getUserGroupHeadersById(idsToSearch, new AsyncCallback<UserGroupHeaderResponsePage>() {
 	
 						@Override
 						public void onFailure(Throwable caught) {
