@@ -115,7 +115,7 @@ public class AccessControlListEditorTest {
 		when(mockPublicPrincipalIds.getPublicAclPrincipalId()).thenReturn(TEST_PUBLIC_PRINCIPAL_ID);
 		mockGwt = mock(GWTWrapper.class);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
-		AsyncMockStubber.callSuccessWith(userGroupHeaderRP).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<ArrayList<String>>any(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(userGroupHeaderRP).when(mockSynapseJavascriptClient).getUserGroupHeadersById(Matchers.<ArrayList<String>>any(), any(AsyncCallback.class));
 
 		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		
@@ -360,7 +360,7 @@ public class AccessControlListEditorTest {
 		acle.refresh();
 		
 		// SWC-3602: verify that it asked for the public user group headers
-		verify(mockSynapseClient).getUserGroupHeadersById(listCaptor.capture(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserGroupHeadersById(listCaptor.capture(), any(AsyncCallback.class));
 		ArrayList<String> ids = listCaptor.getValue();
 		assertTrue(ids.contains(TEST_PUBLIC_PRINCIPAL_ID.toString()));
 		

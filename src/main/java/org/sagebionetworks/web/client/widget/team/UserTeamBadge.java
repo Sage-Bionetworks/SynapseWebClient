@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -93,12 +92,15 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 		if (isIndividual) {
 			UserBadge badge = ginInjector.getUserBadgeWidget();
 			badge.setSize(BadgeSize.SMALLER);
-			String username = widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY);
-			if (username != null) {
-				badge.configureWithUsername(username);
-			} else{
+			if (id != null) {
 				badge.configure(id);
+			} else {
+				String username = widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY);
+				if (username != null) {
+					badge.configureWithUsername(username);
+				}
 			}
+			
 			theWidget = badge.asWidget();
 			theWidget.addStyleName("movedown-6");
 		} else {

@@ -49,6 +49,7 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
@@ -389,7 +390,6 @@ public class SynapseJavascriptClient {
 	
 	private String listToString(List<String> ids) {
 		StringBuilder sb = new StringBuilder();
-		sb.append(USER_GROUP_HEADER_BATCH_PATH);
 		for (String id : ids) {
 			sb.append(id);
 			sb.append(',');
