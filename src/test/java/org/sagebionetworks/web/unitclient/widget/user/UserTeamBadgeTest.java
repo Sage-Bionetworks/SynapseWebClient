@@ -69,6 +69,7 @@ public class UserTeamBadgeTest {
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY, "true");
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY, principalId);
 		AsyncMockStubber.callSuccessWith(mockUserGroupHeader).when(mockUserGroupHeaderAsyncHandler).getUserGroupHeader(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserGroupHeader).when(mockUserGroupHeaderFromIdAsyncHandler).getUserGroupHeader(anyString(), any(AsyncCallback.class));
 	}
 
 	@After
@@ -92,6 +93,32 @@ public class UserTeamBadgeTest {
 		badge.configure(null, widgetDescriptor, null, null);
 		verify(mockGinInjector).getUserBadgeWidget();
 		verify(mockUserBadge).configureWithUsername(username);
+	}
+	
+	@Test
+	public void testConfigureUserProfileFromId(){
+		boolean isIndividual = true;
+		String ownerId = "userId";
+		when(mockUserGroupHeader.getIsIndividual()).thenReturn(isIndividual);
+		when(mockUserGroupHeader.getOwnerId()).thenReturn(ownerId);
+		
+		badge.configure(ownerId);
+		
+		verify(mockGinInjector).getUserBadgeWidget();
+		verify(mockUserBadge).configure(ownerId);
+	}
+	
+	@Test
+	public void testConfigureTeamFromId(){
+		boolean isIndividual = false;
+		String ownerId = "teamId";
+		when(mockUserGroupHeader.getIsIndividual()).thenReturn(isIndividual);
+		when(mockUserGroupHeader.getOwnerId()).thenReturn(ownerId);
+		
+		badge.configure(ownerId);
+		
+		verify(mockGinInjector).getTeamBadgeWidget();
+		verify(mockTeamBadge).configure(ownerId);
 	}
 	
 	@Test
