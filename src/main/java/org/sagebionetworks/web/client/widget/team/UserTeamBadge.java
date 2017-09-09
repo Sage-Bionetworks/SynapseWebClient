@@ -70,7 +70,6 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 		}
 	}
 	
-
 	public void configure(final String id) {
 		// determine if this is a team id or user
 		usgFromIdAsyncHandler.getUserGroupHeader(id, new AsyncCallback<UserGroupHeader>() {
@@ -94,11 +93,10 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			badge.setSize(BadgeSize.SMALLER);
 			if (id != null) {
 				badge.configure(id);
+			} else if (widgetDescriptor != null && widgetDescriptor.containsKey(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY)) {
+				badge.configureWithUsername(widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY));
 			} else {
-				String username = widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY);
-				if (username != null) {
-					badge.configureWithUsername(username);
-				}
+				badge.configure((String)null);
 			}
 			
 			theWidget = badge.asWidget();
