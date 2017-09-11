@@ -34,8 +34,6 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	public interface NewAccountViewImplUiBinder extends UiBinder<Widget, NewAccountViewImpl> {}
 
 	@UiField
-	SimplePanel synapseAlertContainer;
-	@UiField
 	TextBox emailField;
 	@UiField
 	TextBox firstNameField;
@@ -246,10 +244,5 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	public void setPasswordStrengthWidget(Widget w) {
 		passwordStrengthContainer.clear();
 		passwordStrengthContainer.add(w);
-	}
-
-	@Override
-	public void setSynapseAlert(Widget w) {
-		synapseAlertContainer.setWidget(w);
 	}
 }

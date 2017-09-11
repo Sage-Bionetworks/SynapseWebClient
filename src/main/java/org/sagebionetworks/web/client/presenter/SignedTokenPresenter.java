@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
+import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -92,7 +93,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 						handleSignedToken();
 					}
 				} else {
-					synapseAlert.handleException(new BadRequestException("token is not a signed token"));
+					synapseAlert.showError("token is not a signed token");
 				}
 			}
 			@Override

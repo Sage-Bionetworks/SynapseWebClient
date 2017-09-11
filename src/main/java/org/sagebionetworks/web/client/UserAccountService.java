@@ -26,6 +26,8 @@ public interface UserAccountService extends XsrfProtectedService {
 
 	public void createUserStep1(String email, String portalEndpoint) throws RestServiceException;
 
+	public String createUserStep2(String userName, String fName, String lName, String password, String emailValidationToken) throws RestServiceException;
+
 	public String createUserStep2(String userName, String fName, String lName, String password, EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException;
 	
 	public void terminateSession(String sessionToken) throws RestServiceException;
