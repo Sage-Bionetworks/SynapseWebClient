@@ -7,6 +7,9 @@ import org.sagebionetworks.repo.model.Count;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
@@ -15,6 +18,7 @@ import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -34,7 +38,11 @@ public class SynapseJavascriptFactory {
 		UserBundle,
 		Count,
 		PaginatedResultsEntityHeader,
-		V2WikiPage
+		V2WikiPage,
+		DockerRepository,
+		FileEntity,
+		Project,
+		Folder
 	}
 
 	/**
@@ -65,6 +73,14 @@ public class SynapseJavascriptFactory {
 			return new Count(json).getCount();
 		case V2WikiPage :
 			return new V2WikiPage(json);
+		case FileEntity :
+			return new FileEntity(json);
+		case DockerRepository :
+			return new DockerRepository(json);
+		case Project :
+			return new Project(json);
+		case Folder :
+			return new Folder(json);
 		case PaginatedResultsEntityHeader :
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<EntityHeader> entityHeaderList = new ArrayList<>();

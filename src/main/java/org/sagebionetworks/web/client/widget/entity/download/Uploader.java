@@ -21,6 +21,8 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
@@ -82,7 +84,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private Long storageLocationId;
 	private S3DirectUploader s3DirectUploader;
 	private String bucketName, endpointUrl, keyPrefixUUID;
-	
+	private SynapseJavascriptClient jsClient;
 	@Inject
 	public Uploader(
 			UploaderView view, 			
@@ -93,7 +95,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			MultipartUploader multiPartUploader,
 			GlobalApplicationState globalAppState,
 			ClientLogger logger,
-			S3DirectUploader s3DirectUploader
+			S3DirectUploader s3DirectUploader,
+			SynapseJavascriptClient jsClient
 			) {
 	
 		this.view = view;		
@@ -106,6 +109,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.multiPartUploader = multiPartUploader;
 		this.s3DirectUploader = s3DirectUploader;
 		this.logger = logger;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		clearHandlers();
 	}		
@@ -690,7 +694,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * Private Methods
 	 */
 	private void refreshAfterSuccessfulUpload(String entityId) {
-		synapseClient.getEntity(entityId, new AsyncCallback<Entity>() {
+		jsClient.getEntityByID(entityId, OBJECT_TYPE.FileEntity, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity result) {
 				entity = result;

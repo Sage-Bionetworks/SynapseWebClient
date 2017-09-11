@@ -6,6 +6,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.UploadView;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
@@ -30,18 +32,21 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	CookieProvider cookies;
 	boolean isCertifiedUser,canCertifiedUserAddChild;
 	private String currentFolderEntityId;
+	private SynapseJavascriptClient jsClient;
 	
 	@Inject
 	public FilesBrowser(FilesBrowserView view,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
-			CookieProvider cookies) {
+			CookieProvider cookies,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.cookies = cookies;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 	}	
 	
@@ -165,7 +170,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	
 	@Override
 	public void updateFolderName(final String newFolderName) {
-		synapseClient.getEntity(currentFolderEntityId, new AsyncCallback<Entity>() {
+		jsClient.getEntityByID(currentFolderEntityId, OBJECT_TYPE.Folder, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity result) {
 				Folder folder = (Folder) result;

@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.principal.AliasList;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
@@ -446,6 +447,17 @@ public class SynapseJavascriptClient {
 		// Remove the trailing comma
 		sb.deleteCharAt(sb.length() - 1);
 		return sb.toString();
+	}
+	
+	public void getEntityByID(String entityId, OBJECT_TYPE type, AsyncCallback<Entity> callback) {
+		getEntityByID(entityId, null, type, callback);
+	}
+	public void getEntityByID(String entityId, Long versionNumber, OBJECT_TYPE type, AsyncCallback<Entity> callback) {
+		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId;
+		if (versionNumber != null) {
+			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
+		}
+		doGet(url, type, callback);
 	}
 }
 

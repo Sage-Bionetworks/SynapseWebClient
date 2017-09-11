@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.docker;
 
-import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -9,10 +9,7 @@ import com.google.gwt.user.client.ui.Widget;
 public interface DockerRepoListWidgetView extends IsWidget {
 
 	public interface Presenter {
-
 		void onClickAddExternalRepo();
-
-		void onRepoClicked(EntityBundle bundle);
 	}
 
 	void setAddExternalRepoButtonVisible(boolean visibile);
@@ -27,7 +24,7 @@ public interface DockerRepoListWidgetView extends IsWidget {
 
 	void clear();
 
-	void addRepo(EntityBundle bundle);
+	void addRepo(DockerRepository entity);
 
 	void setMembersContainer(LoadMoreWidgetContainer membersContainer);
 }

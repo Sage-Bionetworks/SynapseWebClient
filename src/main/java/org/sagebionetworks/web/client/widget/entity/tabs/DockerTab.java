@@ -93,16 +93,6 @@ public class DockerTab implements DockerTabView.Presenter{
 				}
 			};
 		});
-
-		dockerRepoListWidget.setRepoClickedCallback(new CallbackP<EntityBundle>() {
-			@Override
-			public void invoke(EntityBundle bundle) {
-				areaToken = null;
-				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, null, null));
-				setTargetBundle(bundle);
-				tab.showTab();
-			}
-		});
 	}
 
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
