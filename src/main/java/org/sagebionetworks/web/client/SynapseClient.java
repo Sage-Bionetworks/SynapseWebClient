@@ -212,7 +212,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	public FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	 // V2 Wiki crud
-    public V2WikiPage getV2WikiPage(WikiPageKey key) throws RestServiceException;
     public V2WikiPage restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate) throws RestServiceException;
     public void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
     public List<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;

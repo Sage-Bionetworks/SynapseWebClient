@@ -32,6 +32,7 @@ import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -66,6 +67,7 @@ import com.google.inject.Inject;
 public class SynapseJavascriptClient {
 	public static final String TYPE_FILTER_PARAMETER = "&typeFilter=";
 	public static final String WIKI = "/wiki/";
+	public static final String WIKI2 = "/wiki2/";
 	public static final String WIKIKEY = "/wikikey";
 	public static final String CHILDREN = "/children";
 	public static final String RESTRICTION_INFORMATION = "/restrictionInformation";
@@ -258,28 +260,75 @@ public class SynapseJavascriptClient {
 	
 	public void getVersionOfV2WikiPageAsV1(final WikiPageKey key, final Long versionNumber, final AsyncCallback<WikiPage> callback) {
 		if (key.getWikiPageId() == null) {
-			// get the root wiki page id first
-			String url = getRepoServiceUrl() + "/" +
-					key.getOwnerObjectType().toLowerCase() + "/" + 
-					key.getOwnerObjectId() + WIKIKEY;
-			
-			AsyncCallback<org.sagebionetworks.repo.model.dao.WikiPageKey> wikiPageKeyCallback = new AsyncCallback<org.sagebionetworks.repo.model.dao.WikiPageKey>() {
+			AsyncCallback<String> wikiPageIdKeyCallback = new AsyncCallback<String>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					callback.onFailure(caught);
 				}
 				@Override
-				public void onSuccess(org.sagebionetworks.repo.model.dao.WikiPageKey wikiPageKey) {
-					String wikiPageId = wikiPageKey.getWikiPageId();
-					key.setWikiPageId(wikiPageId);
+				public void onSuccess(String wikiPageIdKey) {
+					key.setWikiPageId(wikiPageIdKey);
 					getVersionOfV2WikiPageAsV1WithWikiPageId(key, versionNumber, callback);
 				}
 			};
-			
-			doGet(url, OBJECT_TYPE.WikiPageKey, wikiPageKeyCallback);
+			getRootWikiPageKey(key.getOwnerObjectType(), key.getOwnerObjectId(), wikiPageIdKeyCallback);
 		} else {
 			getVersionOfV2WikiPageAsV1WithWikiPageId(key, versionNumber, callback);
 		}
+	}
+	
+	public void getV2WikiPage(final WikiPageKey key, AsyncCallback<V2WikiPage> callback) {
+		getV2WikiPage(key, null, callback);
+	}
+	
+	public void getV2WikiPage(final WikiPageKey key, final Long versionNumber, final AsyncCallback<V2WikiPage> callback) {
+		if (key.getWikiPageId() == null) {
+			AsyncCallback<String> wikiPageIdKeyCallback = new AsyncCallback<String>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					callback.onFailure(caught);
+				}
+				@Override
+				public void onSuccess(String wikiPageIdKey) {
+					key.setWikiPageId(wikiPageIdKey);
+					getV2WikiPageWithPageId(key, versionNumber, callback);
+				}
+			};
+			getRootWikiPageKey(key.getOwnerObjectType(), key.getOwnerObjectId(), wikiPageIdKeyCallback);
+		} else {
+			getV2WikiPageWithPageId(key, versionNumber, callback);
+		}
+	}
+	
+	private void getV2WikiPageWithPageId(WikiPageKey key, Long versionNumber, final AsyncCallback<V2WikiPage> callback) {
+		String url = getRepoServiceUrl() + "/" +
+				key.getOwnerObjectType().toLowerCase() + "/" + 
+				key.getOwnerObjectId() + WIKI2 +
+				key.getWikiPageId();
+		if (versionNumber != null) {
+			url += WIKI_VERSION_PARAMETER + versionNumber;
+		}
+		doGet(url, OBJECT_TYPE.V2WikiPage, callback);
+	}
+	
+	public void getRootWikiPageKey(String ownerObjectType, String ownerObjectId, final AsyncCallback<String> wikiPageIdKeyCallback) {
+		// get the root wiki page id first
+		String url = getRepoServiceUrl() + "/" +
+				ownerObjectType.toLowerCase() + "/" + 
+				ownerObjectId + WIKIKEY;
+		
+		AsyncCallback<org.sagebionetworks.repo.model.dao.WikiPageKey> wikiPageKeyCallback = new AsyncCallback<org.sagebionetworks.repo.model.dao.WikiPageKey>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				wikiPageIdKeyCallback.onFailure(caught);
+			}
+			@Override
+			public void onSuccess(org.sagebionetworks.repo.model.dao.WikiPageKey wikiPageKey) {
+				wikiPageIdKeyCallback.onSuccess(wikiPageKey.getWikiPageId());
+			}
+		};
+		
+		doGet(url, OBJECT_TYPE.WikiPageKey, wikiPageKeyCallback);
 	}
 	
 	private void getVersionOfV2WikiPageAsV1WithWikiPageId(WikiPageKey key, Long versionNumber, final AsyncCallback<WikiPage> callback) {
