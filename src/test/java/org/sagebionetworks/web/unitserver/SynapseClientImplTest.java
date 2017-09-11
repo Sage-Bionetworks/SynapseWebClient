@@ -832,24 +832,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testGetV2WikiPage() throws Exception {
-		Mockito.when(
-				mockSynapse
-						.getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class)))
-				.thenReturn(v2Page);
-		synapseClient.getV2WikiPage(new WikiPageKey("syn123", ObjectType.ENTITY
-				.toString(), "20"));
-		verify(mockSynapse).getV2WikiPage(
-				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-
-		Mockito.when(
-				mockSynapse
-						.getVersionOfV2WikiPage(
-								any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
-								any(Long.class))).thenReturn(v2Page);
-	}
-
-	@Test
 	public void testRestoreV2WikiPage() throws Exception {
 		String wikiId = "syn123";
 		Mockito.when(

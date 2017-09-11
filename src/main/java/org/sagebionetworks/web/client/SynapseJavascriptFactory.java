@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -32,7 +33,8 @@ public class SynapseJavascriptFactory {
 		UserGroupHeaderResponse,
 		UserBundle,
 		Count,
-		PaginatedResultsEntityHeader
+		PaginatedResultsEntityHeader,
+		V2WikiPage
 	}
 
 	/**
@@ -61,6 +63,8 @@ public class SynapseJavascriptFactory {
 			return new UserBundle(json);
 		case Count :
 			return new Count(json).getCount();
+		case V2WikiPage :
+			return new V2WikiPage(json);
 		case PaginatedResultsEntityHeader :
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<EntityHeader> entityHeaderList = new ArrayList<>();

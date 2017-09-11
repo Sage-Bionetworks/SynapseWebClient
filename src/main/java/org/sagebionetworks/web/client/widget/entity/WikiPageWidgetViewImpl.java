@@ -77,9 +77,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	HTMLPanel loadingPanel;
 	
 	@UiField
-	SimplePanel breadcrumbPanel;
-	
-	@UiField
 	SimplePanel markdownPanel;
 	
 	@UiField
@@ -231,11 +228,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	@Override
-	public void setBreadcrumbWidget(IsWidget breadcrumb) {
-		breadcrumbPanel.setWidget(breadcrumb);
-	}
-
-	@Override
 	public void setRestoreButtonVisible(boolean isVisible) {
 		restoreButton.setVisible(isVisible);
 	}
@@ -243,11 +235,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public void setDiffVersionAlertVisible(boolean isVisible) {
 		diffVersionAlert.setVisible(isVisible);
-	}
-
-	@Override
-	public void setBreadcrumbsVisible(boolean isVisible) {
-		breadcrumbPanel.setVisible(isVisible);
 	}
 
 	@Override

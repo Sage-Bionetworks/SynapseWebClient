@@ -1134,28 +1134,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	// V2 Wiki crud
 	
 	@Override
-	public V2WikiPage getV2WikiPage(org.sagebionetworks.web.shared.WikiPageKey key)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			if (key.getWikiPageId() == null) {
-				// asking for the root. find the root id first
-				String rootWikiPage = getRootWikiId(synapseClient,
-						key.getOwnerObjectId(),
-						ObjectType.valueOf(key.getOwnerObjectType()));
-				key.setWikiPageId(rootWikiPage);
-			}
-			WikiPageKey properKey = WikiPageKeyHelper.createWikiPageKey(
-					key.getOwnerObjectId(),
-					ObjectType.valueOf(key.getOwnerObjectType()),
-					key.getWikiPageId());
-			return synapseClient.getV2WikiPage(properKey);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
 	public V2WikiPage restoreV2WikiPage(String ownerId, String ownerType,
 			String wikiId, Long versionToUpdate) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

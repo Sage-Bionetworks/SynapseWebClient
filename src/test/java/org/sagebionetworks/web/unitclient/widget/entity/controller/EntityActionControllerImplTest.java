@@ -287,7 +287,7 @@ public class EntityActionControllerImplTest {
 		when(mockWikiPageToDelete.getId()).thenReturn(wikiPageId);
 		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(parentWikiPageId);
 		when(mockWikiPageToDelete.getTitle()).thenReturn(wikiPageTitle);
-		AsyncMockStubber.callSuccessWith(mockWikiPageToDelete).when(mockSynapseClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockWikiPageToDelete).when(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -742,7 +742,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testOnDeleteWikiPageFailureToGetPage(){
 		String error = "Unable to get wiki page being deleted";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		
 		/*
 		 * The preflight check is confirmed by calling Callback.invoke(), in this case it must not be invoked.
@@ -750,7 +750,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		// the call under test
 		controller.onAction(Action.DELETE_WIKI_PAGE);
-		verify(mockSynapseClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockView, never()).showConfirmDialog(anyString(), anyString(), any(Callback.class));
 		verify(mockView).showErrorMessage(error);
 	}
