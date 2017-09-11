@@ -1157,7 +1157,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public void onDeleteWiki() {
 		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
 		// Get the wiki page title and parent wiki id.  Go to the parent wiki if this delete is successful.
-		getSynapseClient().getV2WikiPage(key, new AsyncCallback<V2WikiPage>() {
+		getSynapseJavascriptClient().getV2WikiPage(key, new AsyncCallback<V2WikiPage>() {
 			@Override
 			public void onSuccess(V2WikiPage page) {
 				// Confirm the delete with the user.

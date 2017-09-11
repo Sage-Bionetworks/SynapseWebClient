@@ -146,15 +146,15 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 	
 	public void checkUseCachedWikiPage(final WikiPage cachedWikiPage) {
-		synapseClient.getV2WikiPage(wikiKey, new AsyncCallback<V2WikiPage>() {
+		jsClient.getV2WikiPage(wikiKey, new AsyncCallback<V2WikiPage>() {
 			@Override
 			public void onSuccess(V2WikiPage v2WikiPage) {
-					if (v2WikiPage.getEtag().equals(cachedWikiPage.getEtag())) {
-						setWikiPage(cachedWikiPage);
-					} else {
-						// cached wiki page is old, ask for the updated version
-						getV2WikiPageAsV1();
-					}
+				if (v2WikiPage.getEtag().equals(cachedWikiPage.getEtag())) {
+					setWikiPage(cachedWikiPage);
+				} else {
+					// cached wiki page is old, ask for the updated version
+					getV2WikiPageAsV1();
+				}
 			}
 			@Override
 			public void onFailure(Throwable caught) {

@@ -285,7 +285,7 @@ public class WikiPageWidgetTest {
 		
 		V2WikiPage currentV2WikiPage = new V2WikiPage();
 		currentV2WikiPage.setEtag(etag);
-		AsyncMockStubber.callSuccessWith(currentV2WikiPage).when(mockSynapseClient).getV2WikiPage(eq(wikiPageKey), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(currentV2WikiPage).when(mockSynapseJavascriptClient).getV2WikiPage(eq(wikiPageKey), any(AsyncCallback.class));
 		
 		presenter.configure(wikiPageKey, false, null, false);
 		verify(mockSynapseJavascriptClient, never()).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
@@ -310,7 +310,7 @@ public class WikiPageWidgetTest {
 		
 		V2WikiPage currentV2WikiPage = new V2WikiPage();
 		currentV2WikiPage.setEtag(newEtag);
-		AsyncMockStubber.callSuccessWith(currentV2WikiPage).when(mockSynapseClient).getV2WikiPage(eq(wikiPageKey), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(currentV2WikiPage).when(mockSynapseJavascriptClient).getV2WikiPage(eq(wikiPageKey), any(AsyncCallback.class));
 		
 		presenter.configure(wikiPageKey, false, null, false);
 		verify(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
