@@ -1,12 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -19,21 +12,16 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.SessionStorage;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -67,7 +55,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	private StuAlert stuAlert;
 	private WikiHistoryWidget historyWidget;
 	private MarkdownWidget markdownWidget;
-	private Breadcrumb breadcrumb;
 	private WikiSubpagesWidget wikiSubpages;
 	private SessionStorage sessionStorage;
 	private AuthenticationController authController;
@@ -83,7 +70,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public WikiPageWidget(WikiPageWidgetView view,
 			SynapseClientAsync synapseClient,
 			StuAlert stuAlert, WikiHistoryWidget historyWidget,
-			MarkdownWidget markdownWidget, Breadcrumb breadcrumb,
+			MarkdownWidget markdownWidget,
 			WikiSubpagesWidget wikiSubpages, PortalGinInjector ginInjector,
 			SessionStorage sessionStorage,
 			AuthenticationController authController,
@@ -97,7 +84,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		this.historyWidget = historyWidget;
 		this.markdownWidget = markdownWidget;
 		this.wikiSubpages = wikiSubpages;
-		this.breadcrumb = breadcrumb;
 		this.stuAlert = stuAlert;
 		this.sessionStorage = sessionStorage;
 		this.authController = authController;
@@ -108,14 +94,12 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		view.setSynapseAlertWidget(stuAlert.asWidget());
 		view.setWikiHistoryWidget(historyWidget);
 		view.setMarkdownWidget(markdownWidget);
-		view.setBreadcrumbWidget(breadcrumb);
 	}
 	
 	public void clear(){
 		view.clear();
 		view.setLoadingVisible(false);
 		markdownWidget.clear();
-		breadcrumb.clear();
 		wikiSubpages.clearState();
 		view.setWikiHeadingText("");
 	}
@@ -161,8 +145,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		reloadWikiPage();
 	}
 	
-	
-	
 	public void checkUseCachedWikiPage(final WikiPage cachedWikiPage) {
 		synapseClient.getV2WikiPage(wikiKey, new AsyncCallback<V2WikiPage>() {
 			@Override
@@ -200,14 +182,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			view.setDiffVersionAlertVisible(false);
 			view.setModifiedCreatedByHistoryPanelVisible(isModifiedCreatedByHistoryVisible);
 			isCurrentVersion = true;
-			final boolean isRootWiki = result.getParentWikiId() == null;
 			updateCurrentPage(result);
-			setOwnerObjectName(new CallbackP<String>() {
-				@Override
-				public void invoke(String param) {
-					configureBreadcrumbs(isRootWiki, param);
-				}
-			});
 			view.scrollWikiHeadingIntoView();
 			view.setLoadingVisible(false);
 		} catch (Exception e) {
@@ -268,6 +243,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		wikiSubpages.configure(wikiKey, null, true, new CallbackP<WikiPageKey>() {
 			@Override
 			public void invoke(WikiPageKey param) {
+				view.setLoadingVisible(true);
+				markdownWidget.clear();
+				view.setWikiHeadingText("");
+				
 				wikiKey = param;
 				reloadWikiPage();
 				if (wikiReloadHandler != null) {
@@ -296,19 +275,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		view.setWikiHistoryWidget(historyWidget);
 	}
 	
-	@Override
-	public void configureBreadcrumbs(boolean isRootWiki, String ownerObjectName) {
-		if (!isRootWiki) {
-			List<LinkData> links = new ArrayList<LinkData>();
-			Place ownerObjectPlace = new Synapse(wikiKey.getOwnerObjectId());
-			links.add(new LinkData(ownerObjectName, ownerObjectPlace));
-			breadcrumb.configure(links, currentPage.getTitle());
-			view.setBreadcrumbsVisible(true);
-		} else {
-			view.setBreadcrumbsVisible(false);
-		}
-	}
-	
 	public void configureWikiTitle(boolean isRootWiki, String title) {
 		if (!isRootWiki) {
 			view.setWikiHeadingText(title);
@@ -316,41 +282,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			view.setWikiHeadingText("");
 		}
 	}	
-	
-	public void setOwnerObjectName(final CallbackP<String> callback) {
-		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
-			//lookup the entity name based on the id
-			Reference ref = new Reference();
-			ref.setTargetId(wikiKey.getOwnerObjectId());
-			List<Reference> allRefs = new ArrayList<Reference>();
-			allRefs.add(ref);
-			ReferenceList list = new ReferenceList();
-			list.setReferences(allRefs);
-			synapseClient.getEntityHeaderBatch(list, new AsyncCallback<PaginatedResults<EntityHeader>>() {
-				@Override
-				public void onSuccess(PaginatedResults<EntityHeader> headers) {
-					if (headers.getResults() != null && !headers.getResults().isEmpty()) {
-						EntityHeader theHeader = headers.getResults().get(0);
-						String ownerObjectName = theHeader.getName();
-						callback.invoke(ownerObjectName);
-					} else {
-						onFailure(new NotFoundException());
-					}
-				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.setMainPanelVisible(false);
-					stuAlert.handleException(caught);
-				}
-			});
-		} else if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.EVALUATION.toString()) 
-				|| wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ACCESS_REQUIREMENT.toString())) {
-			callback.invoke("");
-		} 
-	}
-
-	
+		
 	private void refresh() {
 		view.setMainPanelVisible(true);
 		configure(wikiKey, canEdit, callback, showSubpages);
@@ -360,33 +292,28 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	public void showPreview(final Long versionToPreview, Long currentVersion) {
 		isCurrentVersion = versionToPreview.equals(currentVersion);
 		versionInView = versionToPreview;
-		setOwnerObjectName(new CallbackP<String>() {
+		jsClient.getVersionOfV2WikiPageAsV1(wikiKey, versionToPreview, new AsyncCallback<WikiPage>() {
+
 			@Override
-			public void invoke(final String ownerObjectName) {
-				jsClient.getVersionOfV2WikiPageAsV1(wikiKey, versionToPreview, new AsyncCallback<WikiPage>() {
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NotFoundException) {
+					if (callback != null)
+						callback.noWikiFound();
+				}
+				else {
+					stuAlert.handleException(caught);
+				}
+			}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						if (caught instanceof NotFoundException) {
-							if (callback != null)
-								callback.noWikiFound();
-						}
-						else {
-							stuAlert.handleException(caught);
-						}
-					}
-
-					@Override
-					public void onSuccess(WikiPage result) {
-						try {
-							currentPage = result;
-							wikiKey.setWikiPageId(currentPage.getId());
-							resetWikiMarkdown(currentPage.getMarkdown());
-						} catch (Exception e) {
-							onFailure(e);
-						}
-					}
-				});
+			@Override
+			public void onSuccess(WikiPage result) {
+				try {
+					currentPage = result;
+					wikiKey.setWikiPageId(currentPage.getId());
+					resetWikiMarkdown(currentPage.getMarkdown());
+				} catch (Exception e) {
+					onFailure(e);
+				}
 			}
 		});
 	}
