@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JsoProvider;
@@ -54,6 +55,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;	
 	private SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	private Map<String, ProvGraphNode> idToNode = new HashMap<String, ProvGraphNode>();
 	private AdapterFactory adapterFactory;
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -88,7 +90,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			SynapseJSNIUtils synapseJSNIUtils,
 			JsoProvider jsoProvider, 
 			ClientCache clientCache,
-			DateTimeUtils dateTimeUtils) {
+			DateTimeUtils dateTimeUtils,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
@@ -98,6 +101,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		this.jsoProvider = jsoProvider;
 		this.clientCache = clientCache;
 		this.dateTimeUtils = dateTimeUtils;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 	}
 
@@ -182,7 +186,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			
 	@Override
 	public void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback) {
-		ProvUtils.getInfo(nodeId, synapseClient, adapterFactory, clientCache, dateTimeUtils, idToNode, callback);
+		ProvUtils.getInfo(nodeId, jsClient, synapseClient, adapterFactory, clientCache, dateTimeUtils, idToNode, callback);
 	}
 	
 	@SuppressWarnings("unchecked")

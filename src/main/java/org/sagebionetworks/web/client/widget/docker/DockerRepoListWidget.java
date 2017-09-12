@@ -10,6 +10,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
@@ -18,7 +19,9 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -38,7 +41,6 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 	private SynapseAlert synAlert;
 	private EntityBundle projectBundle;
 	private EntityChildrenRequest query;
-	private CallbackP<EntityBundle> onRepoClickCallback;
 	private LoadMoreWidgetContainer membersContainer;
 	private SynapseJavascriptClient jsClient;
 
@@ -81,10 +83,6 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 				addExternalRepoModal.show();
 			}
 		});
-	}
-
-	public void setRepoClickedCallback(CallbackP<EntityBundle> onRepoClickCallback) {
-		this.onRepoClickCallback = onRepoClickCallback;
 	}
 
 	/**
@@ -130,12 +128,11 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 	
 	private void setResults(List<EntityHeader> results) {
 		synAlert.clear();
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | DOI | BENEFACTOR_ACL;
 		for (EntityHeader header: results) {
-			jsClient.getEntityBundle(header.getId(), mask, new AsyncCallback<EntityBundle>(){
+			jsClient.getEntity(header.getId(), OBJECT_TYPE.DockerRepository, new AsyncCallback<Entity>(){
 				@Override
-				public void onSuccess(EntityBundle bundle) {
-					view.addRepo(bundle);
+				public void onSuccess(Entity dockerRepository) {
+					view.addRepo((DockerRepository)dockerRepository);
 				}
 				@Override
 				public void onFailure(Throwable error) {
@@ -159,12 +156,5 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 		types.add(EntityType.dockerrepo);
 		newQuery.setIncludeTypes(types);
 		return newQuery;
-	}
-
-	@Override
-	public void onRepoClicked(EntityBundle bundle) {
-		if (onRepoClickCallback != null) {
-			onRepoClickCallback.invoke(bundle);
-		}
 	}
 }

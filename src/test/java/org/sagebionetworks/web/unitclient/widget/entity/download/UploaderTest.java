@@ -57,6 +57,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
@@ -101,6 +102,8 @@ public class UploaderTest {
 	String md5 = "e10e3f4491440ce7b48edc97f03307bb";
 	@Mock
 	ExternalObjectStoreUploadDestination mockExternalObjectStoreUploadDestination;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	
 	@Before
 	public void before() throws Exception {
@@ -158,7 +161,8 @@ public class UploaderTest {
 				multipartUploader, 
 				mockGlobalApplicationState, 
 				mockLogger,
-				mockS3DirectUploader);
+				mockS3DirectUploader,
+				mockSynapseJavascriptClient);
 		uploader.addCancelHandler(cancelHandler);
 		parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId);

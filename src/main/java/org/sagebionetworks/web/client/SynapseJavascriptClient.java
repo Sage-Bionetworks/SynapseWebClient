@@ -18,6 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.principal.AliasList;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
@@ -446,6 +447,27 @@ public class SynapseJavascriptClient {
 		// Remove the trailing comma
 		sb.deleteCharAt(sb.length() - 1);
 		return sb.toString();
+	}
+	
+
+	public void getEntity(String entityId, OBJECT_TYPE type, AsyncCallback<Entity> callback) {
+		getEntityByID(entityId, type, null, callback);
+	}
+	
+	public void getEntity(String entityId, AsyncCallback<Entity> callback) {
+		getEntityByID(entityId, OBJECT_TYPE.Entity, null, callback);
+	}
+	
+	public void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<Entity> callback) {
+		getEntityByID(entityId, OBJECT_TYPE.Entity, null, callback);
+	}
+	
+	private void getEntityByID(String entityId, OBJECT_TYPE type, Long versionNumber, AsyncCallback<Entity> callback) {
+		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId;
+		if (versionNumber != null) {
+			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
+		}
+		doGet(url, type , callback);
 	}
 }
 

@@ -225,14 +225,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
 	private volatile HashSet<String> wikiBasedEntities;
 	
-	/*
-	 * SynapseClient Service Methods
-	 */
-	@Override
-	public Entity getEntity(String entityId) throws RestServiceException {
-		return getEntityForVersion(entityId, null);
-	}
-	
 	public Project getProject(String projectId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -240,22 +232,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
-	}
-
-	@Override
-	public Entity getEntityForVersion(String entityId, Long versionNumber)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			if (versionNumber == null) {
-				return synapseClient.getEntityById(entityId);
-			} else {
-				return synapseClient.getEntityByIdForVersion(entityId,
-						versionNumber);
-			}
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} 
 	}
 
 	public EntityBundle getEntityBundle(String entityId, int partsMask)

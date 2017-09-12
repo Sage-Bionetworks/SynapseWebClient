@@ -79,10 +79,6 @@ import com.google.gwt.user.client.rpc.XsrfProtectedService;
 @RemoteServiceRelativePath("synapseclient")	
 public interface SynapseClient extends XsrfProtectedService {
 
-	public Entity getEntity(String entityId) throws RestServiceException;
-	
-	public Entity getEntityForVersion(String entityId, Long versionNumber) throws RestServiceException;
-		
 	public PaginatedResults<VersionInfo> getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
 
 	public void deleteEntityById(String entityId) throws RestServiceException;

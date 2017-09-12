@@ -50,6 +50,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
@@ -75,8 +76,6 @@ public class EvaluationSubmitterTest {
 	@Mock
 	AuthenticationController mockAuthenticationController;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
 	ChallengeClientAsync mockChallengeClient;
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
@@ -92,6 +91,8 @@ public class EvaluationSubmitterTest {
 	DockerCommitListWidget mockDockerCommitListWidget;
 	@Mock
 	DockerCommit mockCommit;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	JSONObjectAdapter jSONObjectAdapter = new JSONObjectAdapterImpl();
 	FileEntity entity;
 	EntityBundle bundle;
@@ -108,7 +109,7 @@ public class EvaluationSubmitterTest {
 	public void setup() throws RestServiceException, JSONObjectAdapterException{	
 		MockitoAnnotations.initMocks(this);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
-		submitter = new EvaluationSubmitter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockChallengeClient, mockGWTWrapper, mockInjector, mockDockerCommitListWidget);
+		submitter = new EvaluationSubmitter(mockView, mockSynapseJavascriptClient, mockGlobalApplicationState, mockAuthenticationController, mockChallengeClient, mockGWTWrapper, mockInjector, mockDockerCommitListWidget);
 		verify(mockView).setChallengesSynAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setTeamSelectSynAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setContributorsSynAlertWidget(mockSynAlert.asWidget());
@@ -147,7 +148,7 @@ public class EvaluationSubmitterTest {
 		bundle = new EntityBundle();
 		bundle.setEntity(entity);
 		
-		AsyncMockStubber.callSuccessWith(entity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entity).when(mockSynapseJavascriptClient).getEntity(anyString(), any(AsyncCallback.class));
 
 		requirements = new PaginatedResults<TermsOfUseAccessRequirement>();
 		requirements.setTotalNumberOfResults(0);
