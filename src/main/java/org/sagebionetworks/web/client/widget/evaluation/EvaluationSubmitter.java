@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -46,7 +47,7 @@ public class EvaluationSubmitter implements Presenter {
 	public static final String NO_COMMITS_SELECTED_MSG = "Please select a commit to submit.";
 	public static final String ZERO_COMMITS_ERROR = "This repo does not have any commit. Please add commits to repo before submit to challenge.";
 	private EvaluationSubmitterView view;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
@@ -71,7 +72,7 @@ public class EvaluationSubmitter implements Presenter {
 	
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			ChallengeClientAsync challengeClient,
@@ -80,7 +81,7 @@ public class EvaluationSubmitter implements Presenter {
 			DockerCommitListWidget dockerCommitList) {
 		this.view = view;
 		this.view.setPresenter(this);
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.challengeClient = challengeClient;
@@ -370,7 +371,7 @@ public class EvaluationSubmitter implements Presenter {
 	
 	public void lookupEtagAndCreateSubmission(final String id, final Long ver) {
 		//look up entity for the current etag
-		synapseClient.getEntity(id, new AsyncCallback<Entity>() {
+		jsClient.getEntity(id, new AsyncCallback<Entity>() {
 			public void onSuccess(Entity result) {
 				Entity entity;
 				entity = result;

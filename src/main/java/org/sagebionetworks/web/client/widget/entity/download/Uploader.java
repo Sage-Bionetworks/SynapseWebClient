@@ -694,7 +694,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * Private Methods
 	 */
 	private void refreshAfterSuccessfulUpload(String entityId) {
-		jsClient.getEntityByID(entityId, OBJECT_TYPE.FileEntity, new AsyncCallback<Entity>() {
+		jsClient.getEntity(entityId, OBJECT_TYPE.FileEntity, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity result) {
 				entity = result;

@@ -20,6 +20,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -37,6 +39,7 @@ import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
@@ -53,6 +56,8 @@ public class FileHistoryWidgetTest {
 
 	public static final Long CURRENT_FILE_VERSION = 8888L;
 	SynapseClientAsync mockSynapseClient;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	FileHistoryWidgetView mockView;
@@ -69,6 +74,7 @@ public class FileHistoryWidgetTest {
 	public static final Long DEFAULT_MOCK_VERSION_COUNT = 2L;
 	@Before
 	public void before() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPaginationWidget = mock(BasicPaginationWidget.class);
@@ -104,7 +110,7 @@ public class FileHistoryWidgetTest {
 		accessRequirement.setTermsOfUse("terms of use");
 		accessRequirements.add(accessRequirement);
 				
-		AsyncMockStubber.callSuccessWith(vb).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(vb).when(mockSynapseJavascriptClient).getEntity(anyString(), any(AsyncCallback.class));
 		
 		PaginatedResults<VersionInfo> mockPagedResults = mock(PaginatedResults.class);
 		when(mockPagedResults.getTotalNumberOfResults()).thenReturn(DEFAULT_MOCK_VERSION_COUNT);

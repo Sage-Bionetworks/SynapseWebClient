@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.widget.Button;
@@ -71,18 +72,20 @@ public class PlotlyConfigEditorTest {
 	public static String Y2_COLUMN_NAME = "y2 column";
 	@Mock
 	Entity mockTableEntity;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	public static String TABLE_NAME = "my table to plot";
 	
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		editor = new PlotlyConfigEditor(mockView, mockFinder, mockSynAlert, mockSynapseClient, mockShowHideAdvancedButton);
+		editor = new PlotlyConfigEditor(mockView, mockFinder, mockSynAlert, mockSynapseClient, mockShowHideAdvancedButton, mockSynapseJavascriptClient);
 		columnModels = new ArrayList<ColumnModel>();
 		AsyncMockStubber.callSuccessWith(columnModels).when(mockSynapseClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
 		when(mockXColumnModel.getName()).thenReturn(X_COLUMN_NAME);
 		when(mockYColumnModel.getName()).thenReturn(Y_COLUMN_NAME);
 		when(mockY2ColumnModel.getName()).thenReturn(Y2_COLUMN_NAME);
-		AsyncMockStubber.callSuccessWith(mockTableEntity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockTableEntity).when(mockSynapseJavascriptClient).getEntity(anyString(), any(AsyncCallback.class));
 		when(mockTableEntity.getName()).thenReturn(TABLE_NAME);
 	}
 	
@@ -290,6 +293,6 @@ public class PlotlyConfigEditorTest {
 		r.setTargetId(newTableId);
 		callback.onSelected(r);
 		verify(mockFinder).hide();
-		verify(mockSynapseClient).getEntity(eq(newTableId), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntity(eq(newTableId), any(AsyncCallback.class));
 	}
 }

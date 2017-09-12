@@ -170,7 +170,7 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 	
 	@Override
 	public void updateFolderName(final String newFolderName) {
-		jsClient.getEntityByID(currentFolderEntityId, OBJECT_TYPE.Folder, new AsyncCallback<Entity>() {
+		jsClient.getEntity(currentFolderEntityId, OBJECT_TYPE.Folder, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity result) {
 				Folder folder = (Folder) result;

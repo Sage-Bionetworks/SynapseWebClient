@@ -76,11 +76,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
 public interface SynapseClientAsync {
-
-	void getEntity(String entityId, AsyncCallback<Entity> callback);
-	
-	void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<Entity> callback);
-	
 	void getEntityBundlePlusForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundlePlus> callback);
 	
 	void getEntityVersions(String entityId, int offset, int limit,

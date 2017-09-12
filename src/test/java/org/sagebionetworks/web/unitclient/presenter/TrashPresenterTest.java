@@ -125,8 +125,6 @@ public class TrashPresenterTest {
 	public void testRestore() {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).restoreFromTrash(
 				anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).getEntity(
-				anyString(), any(AsyncCallback.class));
 		presenter.restoreEntity(trashList.getResults().get(0));
 		verify(mockView).showInfo(anyString(), anyString());
 	}
@@ -136,8 +134,6 @@ public class TrashPresenterTest {
 		Exception caught = new Exception("this is an exception");
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapse).restoreFromTrash(
 				anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapse).getEntity(
-				anyString(), any(AsyncCallback.class));
 		presenter.restoreEntity(trashList.getResults().get(0));
 		verify(mockSynAlert).showError(anyString());
 	}

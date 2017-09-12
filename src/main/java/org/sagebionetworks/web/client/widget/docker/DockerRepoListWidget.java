@@ -129,7 +129,7 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 	private void setResults(List<EntityHeader> results) {
 		synAlert.clear();
 		for (EntityHeader header: results) {
-			jsClient.getEntityByID(header.getId(), OBJECT_TYPE.DockerRepository, new AsyncCallback<Entity>(){
+			jsClient.getEntity(header.getId(), OBJECT_TYPE.DockerRepository, new AsyncCallback<Entity>(){
 				@Override
 				public void onSuccess(Entity dockerRepository) {
 					view.addRepo((DockerRepository)dockerRepository);

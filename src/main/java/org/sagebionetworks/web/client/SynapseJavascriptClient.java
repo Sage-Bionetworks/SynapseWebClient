@@ -449,15 +449,25 @@ public class SynapseJavascriptClient {
 		return sb.toString();
 	}
 	
-	public void getEntityByID(String entityId, OBJECT_TYPE type, AsyncCallback<Entity> callback) {
-		getEntityByID(entityId, null, type, callback);
+
+	public void getEntity(String entityId, OBJECT_TYPE type, AsyncCallback<Entity> callback) {
+		getEntityByID(entityId, type, null, callback);
 	}
-	public void getEntityByID(String entityId, Long versionNumber, OBJECT_TYPE type, AsyncCallback<Entity> callback) {
+	
+	public void getEntity(String entityId, AsyncCallback<Entity> callback) {
+		getEntityByID(entityId, OBJECT_TYPE.Entity, null, callback);
+	}
+	
+	public void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<Entity> callback) {
+		getEntityByID(entityId, OBJECT_TYPE.Entity, null, callback);
+	}
+	
+	private void getEntityByID(String entityId, OBJECT_TYPE type, Long versionNumber, AsyncCallback<Entity> callback) {
 		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId;
 		if (versionNumber != null) {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
-		doGet(url, type, callback);
+		doGet(url, type , callback);
 	}
 }
 

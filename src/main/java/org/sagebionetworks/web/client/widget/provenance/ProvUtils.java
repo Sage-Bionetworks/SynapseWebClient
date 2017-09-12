@@ -21,6 +21,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
@@ -244,7 +245,8 @@ public class ProvUtils {
 	 * @param nodeModelCreator
 	 * @param idToNode mapping from id to ProvGraphNode
 	 */
-	public static void getInfo(String nodeId,			
+	public static void getInfo(String nodeId,
+			SynapseJavascriptClient jsClient,
 			SynapseClientAsync synapseClient,
 			AdapterFactory adapterFactory,
 			ClientCache clientCache,
@@ -257,7 +259,7 @@ public class ProvUtils {
 		ProvGraphNode node = idToNode.get(nodeId);
 		if(node == null) callback.onFailure(null);
 		if(node instanceof EntityGraphNode) {
-			getInfoEntityTreeNode(synapseClient, adapterFactory, clientCache, dateTimeUtils, callback, (EntityGraphNode)node);
+			getInfoEntityTreeNode(jsClient, synapseClient, adapterFactory, clientCache, dateTimeUtils, callback, (EntityGraphNode)node);
 		} else if(node instanceof ActivityGraphNode) { 
 			getInfoActivityTreeNode(synapseClient, adapterFactory, clientCache, dateTimeUtils, callback, (ActivityGraphNode)node);
 		} else if(node instanceof ExternalGraphNode) {
@@ -298,13 +300,15 @@ public class ProvUtils {
 		});
 	}
 
-	private static void getInfoEntityTreeNode(final SynapseClientAsync synapseClient,
+	private static void getInfoEntityTreeNode(
+			SynapseJavascriptClient jsClient,
+			final SynapseClientAsync synapseClient,
 			final AdapterFactory adapterFactory,
 			final ClientCache clientCache,
 			final DateTimeUtils dateTimeUtils,
 			final AsyncCallback<KeyValueDisplay<String>> callback,
 			EntityGraphNode etNode) {
-		synapseClient.getEntityForVersion(etNode.getEntityId(), etNode.getVersionNumber(), new AsyncCallback<Entity>() {
+		jsClient.getEntityForVersion(etNode.getEntityId(), etNode.getVersionNumber(), new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity result) {
 				final Entity entity = result;

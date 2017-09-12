@@ -9,12 +9,16 @@ import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
+import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
@@ -23,6 +27,8 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+
+import com.google.gwt.core.shared.GWT;
 
 public class SynapseJavascriptFactory {
 	public enum OBJECT_TYPE {
@@ -42,7 +48,12 @@ public class SynapseJavascriptFactory {
 		DockerRepository,
 		FileEntity,
 		Project,
-		Folder
+		Folder,
+		EntityView,
+		TableEntity,
+		Link,
+		Preview,
+		Entity // used for services where we don't know what type of entity is returned (but object has concreteType set)
 	}
 
 	/**
@@ -50,6 +61,27 @@ public class SynapseJavascriptFactory {
 	 * @throws JSONObjectAdapterException 
 	 */
 	public Object newInstance(OBJECT_TYPE type, JSONObjectAdapter json) throws JSONObjectAdapterException {
+		if (OBJECT_TYPE.Entity.equals(type) && json.getString("concreteType") != null) {
+			// attempt to construct based on concreteType
+			String concreteType = json.getString("concreteType");
+			if (FileEntity.class.getName().equals(concreteType)) {
+				type = OBJECT_TYPE.FileEntity;
+			} else if (Folder.class.getName().equals(concreteType)) {
+				type = OBJECT_TYPE.Folder;
+			} else if (EntityView.class.getName().equals(concreteType)) {
+				type = OBJECT_TYPE.EntityView;
+			} else if (TableEntity.class.getName().equals(concreteType)) {
+				type = OBJECT_TYPE.TableEntity;
+			} else if (Project.class.getName().equals(concreteType)) {
+				type = OBJECT_TYPE.Project;
+			} else if (Link.class.getName().equals(concreteType)) {
+				type = OBJECT_TYPE.Link;
+			} else if (Preview.class.getName().equals(concreteType)) {
+				type = OBJECT_TYPE.Preview;
+			} else {
+				throw new IllegalStateException("No match found for : "+ concreteType);
+			}
+		} 
 		switch (type) {
 		case EntityBundle :
 			return new EntityBundle(json);
@@ -81,6 +113,14 @@ public class SynapseJavascriptFactory {
 			return new Project(json);
 		case Folder :
 			return new Folder(json);
+		case EntityView :
+			return new EntityView(json);
+		case TableEntity :
+			return new TableEntity(json);
+		case Link :
+			return new Link(json);
+		case Preview :
+			return new Preview(json);
 		case PaginatedResultsEntityHeader :
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<EntityHeader> entityHeaderList = new ArrayList<>();
