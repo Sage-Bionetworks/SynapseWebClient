@@ -16,19 +16,17 @@ import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.dao.WikiPageKey;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.dao.WikiPageKey;
-import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-
-import com.google.gwt.core.shared.GWT;
 
 public class SynapseJavascriptFactory {
 	public enum OBJECT_TYPE {
@@ -61,7 +59,7 @@ public class SynapseJavascriptFactory {
 	 * @throws JSONObjectAdapterException 
 	 */
 	public Object newInstance(OBJECT_TYPE type, JSONObjectAdapter json) throws JSONObjectAdapterException {
-		if (OBJECT_TYPE.Entity.equals(type) && json.getString("concreteType") != null) {
+		if (OBJECT_TYPE.Entity.equals(type) && json.has("concreteType")) {
 			// attempt to construct based on concreteType
 			String concreteType = json.getString("concreteType");
 			if (FileEntity.class.getName().equals(concreteType)) {
@@ -79,7 +77,7 @@ public class SynapseJavascriptFactory {
 			} else if (Preview.class.getName().equals(concreteType)) {
 				type = OBJECT_TYPE.Preview;
 			} else {
-				throw new IllegalStateException("No match found for : "+ concreteType);
+				throw new IllegalArgumentException("No match found for : "+ concreteType);
 			}
 		} 
 		switch (type) {
@@ -141,7 +139,7 @@ public class SynapseJavascriptFactory {
 
 			return list;
 		default:
-			throw new IllegalStateException("No match found for : "+ type);
+			throw new IllegalArgumentException("No match found for : "+ type);
 		}
 	}
 }

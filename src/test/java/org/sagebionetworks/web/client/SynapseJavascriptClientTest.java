@@ -29,15 +29,24 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ListWrapper;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.Preview;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
+import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
+import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
+import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -339,5 +348,67 @@ public class SynapseJavascriptClientTest {
 		String url = REPO_ENDPOINT + 
 			OPEN_MEMBERSHIP_REQUEST_COUNT; 
 		verify(mockRequestBuilder).configure(GET, url);
+	}
+	
+	@Test
+	public void testGetEntity()  throws RequestException, JSONObjectAdapterException {
+		String entityId = "syn921";
+		client.getEntity(entityId, mockAsyncCallback);
+		
+		//verify url and method
+		String url = REPO_ENDPOINT + 
+			ENTITY_URI_PATH + "/" + entityId;
+		verify(mockRequestBuilder).configure(GET, url);
+	}
+	
+	public void testGetForEntity()  throws RequestException, JSONObjectAdapterException {
+		String entityId = "syn921";
+		Long versionNumber = 3L;
+		client.getEntityForVersion(entityId, versionNumber, mockAsyncCallback);
+		
+		//verify url and method
+		String url = REPO_ENDPOINT + 
+			ENTITY_URI_PATH + "/" + entityId +
+			REPO_SUFFIX_VERSION + "/" + versionNumber;
+		verify(mockRequestBuilder).configure(GET, url);
+	}
+
+	@Test
+	public void testGetNewEntityInstance() throws RequestException, JSONObjectAdapterException {
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		new FileEntity().writeToJSONObject(adapter);
+		assertTrue(synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof FileEntity);
+		
+		adapter = jsonObjectAdapter.createNew();
+		new Folder().writeToJSONObject(adapter);
+		assertTrue(synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof Folder);
+		
+		adapter = jsonObjectAdapter.createNew();
+		new EntityView().writeToJSONObject(adapter);
+		assertTrue(synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof EntityView);
+		
+		adapter = jsonObjectAdapter.createNew();
+		new TableEntity().writeToJSONObject(adapter);
+		assertTrue(synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof TableEntity);
+		
+		adapter = jsonObjectAdapter.createNew();
+		new Project().writeToJSONObject(adapter);
+		assertTrue(synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof Project);
+	
+		adapter = jsonObjectAdapter.createNew();
+		new Link().writeToJSONObject(adapter);
+		assertTrue(synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof Link);
+		
+		adapter = jsonObjectAdapter.createNew();
+		new Preview().writeToJSONObject(adapter);
+		assertTrue(synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof Preview);
+	}
+
+	@Test (expected=IllegalArgumentException.class)
+	public void testGetInvalidEntityInstance() throws RequestException, JSONObjectAdapterException {
+		// if using OBJECT_TYPE Entity, then json must represent a recognized subclass of Entity.
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		new Team().writeToJSONObject(adapter);
+		synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter);
 	}
 }
