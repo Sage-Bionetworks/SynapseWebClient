@@ -10,9 +10,8 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 public enum NotificationTokenType  {
 	JoinTeam(JoinTeamSignedToken.class),
 	NewUser(NewUserSignedToken.class),
-	Settings(NotificationSettingsSignedToken.class),
-	AccountCreation(AccountCreationToken.class);
-	
+	Settings(NotificationSettingsSignedToken.class);
+
 	public final Class<? extends JSONEntity> classType;
 	NotificationTokenType(Class<? extends JSONEntity> classType) {
 		this.classType = classType;

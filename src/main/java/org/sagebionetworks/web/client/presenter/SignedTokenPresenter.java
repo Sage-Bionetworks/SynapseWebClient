@@ -78,23 +78,19 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 		view.clear();
 		view.setLoadingVisible(true);
 		//hex decode the token
-		synapseClient.hexDecodeAndDeserialize(tokenType, signedEncodedToken, new AsyncCallback<JSONEntity>() {
+		synapseClient.hexDecodeAndDeserialize(tokenType, signedEncodedToken, new AsyncCallback<SignedTokenInterface>() {
 			@Override
-			public void onSuccess(JSONEntity result) {
+			public void onSuccess(SignedTokenInterface result) {
 				view.setLoadingVisible(false);
-				if (result instanceof SignedTokenInterface) {
-					signedToken = (SignedTokenInterface) result;
-					if (result instanceof NotificationSettingsSignedToken) {
-						handleSettingsToken();
-					} else if (result instanceof JoinTeamSignedToken) {
-						isFirstTry = true;
-						handleJoinTeamToken();
-					} else {
-						handleSignedToken();
-					}
-				} else {
-					synapseAlert.showError("token is not a signed token");
-				}
+                signedToken = (SignedTokenInterface) result;
+                if (result instanceof NotificationSettingsSignedToken) {
+                    handleSettingsToken();
+                } else if (result instanceof JoinTeamSignedToken) {
+                    isFirstTry = true;
+                    handleJoinTeamToken();
+                } else {
+                    handleSignedToken();
+                }
 			}
 			@Override
 			public void onFailure(Throwable caught) {

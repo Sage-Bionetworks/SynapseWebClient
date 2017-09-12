@@ -7,15 +7,19 @@ import java.util.Map;
 
 import static junit.framework.Assert.*;
 
+import org.eclipse.jetty.util.ajax.JSON;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -34,7 +38,6 @@ import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -55,7 +58,6 @@ public class NewAccountPresenterTest {
 	GWTWrapper mockGWT;
 	RegisterAccount place = Mockito.mock(RegisterAccount.class);
 	SynapseClientAsync mockSynapseClient;
-	SynapseAlert mockSynapseAlert;
 	AuthenticationController mockAuthController;
 	PlaceChanger mockPlaceChanger;
 	@Mock
@@ -75,7 +77,6 @@ public class NewAccountPresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		mockSynapseAlert = mock(SynapseAlert.class);
 		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, mockGWT, mockPasswordStrengthWidget);
 		verify(mockView).setPresenter(newAccountPresenter);
 		
@@ -165,8 +166,8 @@ public class NewAccountPresenterTest {
 		String lastName = " Jade     ";
 		String userName = "skywalker290";
 		String password = "  farfaraway";
-		String emailValidationToken = "a&b&c=123";
-		newAccountPresenter.setEmailValidationToken(emailValidationToken);
+		final String emailValidationToken = "email=test@email.com";
+		newAccountPresenter.setPlace(new NewAccount(emailValidationToken));
 		newAccountPresenter.completeRegistration(userName, firstName, lastName, password);
 		verify(mockView).setLoading(true);
 		verify(mockView).setLoading(false);
@@ -184,9 +185,18 @@ public class NewAccountPresenterTest {
 		String lastName = " Jade     ";
 		String userName = "skywalker290";
 		String password = "  farfaraway";
-		AccountCreationToken accountCreationToken = new AccountCreationToken();
+		final AccountCreationToken accountCreationToken = new AccountCreationToken();
 		accountCreationToken.setEmailValidationSignedToken(new EmailValidationSignedToken());
-		newAccountPresenter.setAccountCreationToken(accountCreationToken);
+		NewAccount newPlace = Mockito.mock(NewAccount.class);
+		when(newPlace.toToken()).thenReturn("0123456789ABCDEF");
+		doAnswer(new Answer<Void>() {
+			public Void answer(InvocationOnMock invocation) {
+				AsyncCallback<AccountCreationToken> callback = (AsyncCallback<AccountCreationToken>) invocation.getArguments()[1];
+				callback.onSuccess(accountCreationToken);
+				return null;
+			}
+		}).when(mockSynapseClient).hexDecodeAndDeserializeAccountCreationToken(any(String.class), any(AsyncCallback.class));
+		newAccountPresenter.setPlace(newPlace);
 		newAccountPresenter.completeRegistration(userName, firstName, lastName, password);
 		verify(mockView).setLoading(true);
 		verify(mockView).setLoading(false);

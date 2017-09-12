@@ -76,7 +76,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 		this.view.setPresenter(this);
 
 		if (place.toToken().contains("email")) {
-		    // Handle old style email validation token
+			// Handle old style email validation token
 			emailValidationToken = place.toToken();
 			//SWC-3222: if token is encoded, then decode before parsing.
 			if (emailValidationToken != null && emailValidationToken.contains("&amp;")) {
@@ -88,23 +88,18 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 			checkEmailAvailable(email);
 		} else {
 			// Handle AccountCreationToken
-			synapseClient.hexDecodeAndDeserialize("AccountCreation", place.toToken(), new AsyncCallback<JSONEntity>() {
+			synapseClient.hexDecodeAndDeserializeAccountCreationToken(place.toToken(), new AsyncCallback<AccountCreationToken>() {
 				@Override
-				public void onSuccess(JSONEntity result) {
-					if (result instanceof AccountCreationToken) {
-						accountCreationToken = (AccountCreationToken) result;
-						if (!accountCreationTokenIsValid()) {
-							view.setLoading(false);
-							view.showErrorMessage(DisplayConstants.ACCOUNT_CREATION_FAILURE + " token is not valid");
-							return;
-						}
-						String email = accountCreationToken.getEmailValidationSignedToken().getEmail();
-						view.setEmail(email);
-						checkEmailAvailable(email);
-					} else {
+				public void onSuccess(AccountCreationToken result) {
+					accountCreationToken = result;
+					if (!accountCreationTokenIsValid()) {
 						view.setLoading(false);
 						view.showErrorMessage(DisplayConstants.ACCOUNT_CREATION_FAILURE + " token is not valid");
+						return;
 					}
+					String email = accountCreationToken.getEmailValidationSignedToken().getEmail();
+					view.setEmail(email);
+					checkEmailAvailable(email);
 				}
 
 				@Override
@@ -117,7 +112,7 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 	}
 
 	private boolean accountCreationTokenIsValid() {
-	    return accountCreationToken.getEmailValidationSignedToken() != null;
+		return accountCreationToken.getEmailValidationSignedToken() != null;
 	}
 
 	public Map<String, String> parseEmailValidationToken(String token) {
@@ -208,22 +203,6 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 		}
 	}
 	
-	/**
-	 * Expose for testing purposes only
-	 * @param accountCreationToken
-	 */
-	public void setAccountCreationToken(AccountCreationToken accountCreationToken) {
-		this.accountCreationToken = accountCreationToken;
-	}
-
-	/**
-	 * Expose for testing purposes only
-	 * @param emailValidationToken
-	 */
-	public void setEmailValidationToken(String emailValidationToken) {
-		this.emailValidationToken = emailValidationToken;
-	}
-
 	public String getEmailValidationToken() {
 		return emailValidationToken;
 	}
@@ -234,8 +213,8 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 	}
 	
 	@Override
-    public String mayStop() {
-        view.clear();
-        return null;
-    }
+	public String mayStop() {
+		view.clear();
+		return null;
+	}
 }

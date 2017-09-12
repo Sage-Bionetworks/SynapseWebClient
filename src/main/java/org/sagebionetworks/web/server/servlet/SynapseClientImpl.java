@@ -95,12 +95,7 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
-import org.sagebionetworks.repo.model.principal.AddEmailInfo;
-import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
-import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
-import org.sagebionetworks.repo.model.principal.AliasType;
-import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
-import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
+import org.sagebionetworks.repo.model.principal.*;
 import org.sagebionetworks.repo.model.project.ProjectSettingsType;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.UploadDestinationListSetting;
@@ -169,6 +164,9 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.core.server.StackTraceDeobfuscator;
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
 import com.google.gwt.thirdparty.guava.common.base.Suppliers;
+
+import javax.annotation.Signed;
+
 public class SynapseClientImpl extends SynapseClientBase implements
 		SynapseClient, TokenProvider {
 	
@@ -2034,20 +2032,30 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public <T extends JSONEntity> T hexDecodeAndDeserialize(String tokenTypeName, String tokenString) throws RestServiceException {
+	public SignedTokenInterface hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) throws RestServiceException {
 		if (!isValidEnum(NotificationTokenType.class, tokenTypeName)) {
 			//error interpreting the token type, respond with a bad request
 			throw new BadRequestException("Invalid notification token type: " + tokenTypeName);
 		}
 		NotificationTokenType tokenType = NotificationTokenType.valueOf(tokenTypeName);
 		try {
-			return (T) SerializationUtils.hexDecodeAndDeserialize(tokenString, tokenType.classType);
+			return (SignedTokenInterface) SerializationUtils.hexDecodeAndDeserialize(signedTokenString, tokenType.classType);
 		} catch (Exception e) {
 			//error decoding, respond with a bad request
 			throw new BadRequestException(e.getMessage());
 		}
 	}
-	
+
+	@Override
+	public AccountCreationToken hexDecodeAndDeserializeAccountCreationToken(String tokenString) throws RestServiceException {
+		try {
+			return SerializationUtils.hexDecodeAndDeserialize(tokenString, AccountCreationToken.class);
+		} catch (Exception e) {
+			//error decoding, respond with a bad request
+			throw new BadRequestException(e.getMessage());
+		}
+	}
+
 	public static <E extends Enum<E>> boolean isValidEnum(Class<E> enumClass,
 			String enumName) {
 		if (enumName == null) {
