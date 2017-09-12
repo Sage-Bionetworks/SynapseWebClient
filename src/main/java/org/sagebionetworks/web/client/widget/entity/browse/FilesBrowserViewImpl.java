@@ -201,6 +201,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	@Override
 	public void clear() {
 		topBar.setVisible(false);
+		entityTreeBrowser.clear();
 	}
 
 	@Override

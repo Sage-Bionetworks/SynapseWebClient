@@ -165,7 +165,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		}
 	}
 	
-	
 	public void showProjectLevelUI() {
 		String title = projectEntityId;
 		if (projectBundle != null) {
@@ -179,16 +178,18 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	}
 	
 	public void resetView() {
-		synAlert.clear();
-		view.setEntityMetadataVisible(false);
-		view.setBreadcrumbVisible(false);
-		view.setTableListVisible(false);
-		view.setTitlebarVisible(false);
-		showProjectInfoCallack.invoke(false);
-		view.clearActionMenuContainer();
-		view.clearTableEntityWidget();
-		modifiedCreatedBy.setVisible(false);
-		view.setProvenanceVisible(false);
+		if (view != null) {
+			synAlert.clear();
+			view.setEntityMetadataVisible(false);
+			view.setBreadcrumbVisible(false);
+			view.setTableListVisible(false);
+			view.setTitlebarVisible(false);
+			showProjectInfoCallack.invoke(false);
+			view.clearActionMenuContainer();
+			view.clearTableEntityWidget();
+			modifiedCreatedBy.setVisible(false);
+			view.setProvenanceVisible(false);
+		}
 	}
 	
 	public void showError(Throwable error) {
