@@ -2039,7 +2039,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 		NotificationTokenType tokenType = NotificationTokenType.valueOf(tokenTypeName);
 		try {
-			return (SignedTokenInterface) SerializationUtils.hexDecodeAndDeserialize(signedTokenString, tokenType.classType);
+			return SerializationUtils.hexDecodeAndDeserialize(signedTokenString, tokenType.classType);
 		} catch (Exception e) {
 			//error decoding, respond with a bad request
 			throw new BadRequestException(e.getMessage());
