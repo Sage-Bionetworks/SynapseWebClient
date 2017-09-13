@@ -96,7 +96,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		userTeamSelector.configure(new CallbackP<String>() {
 			@Override
 			public void invoke(String username) {
-				insertMarkdown(username);
+				insertMarkdown(username + " ");
 			}
 		});
 		userTeamSelector.addModalShownHandler(new ModalShownHandler() {
