@@ -39,6 +39,7 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -58,6 +59,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
@@ -263,7 +265,9 @@ public interface SynapseClient extends XsrfProtectedService {
 	public ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException;
 	
 	public SignedTokenInterface hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) throws RestServiceException;
-	
+
+	public AccountCreationToken hexDecodeAndDeserializeAccountCreationToken(String tokenString) throws RestServiceException;
+
 	public List<ColumnModel> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
 	
 	public String createColumnModel(String columnModelJson) throws RestServiceException;

@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
@@ -24,7 +25,10 @@ public interface UserAccountService extends XsrfProtectedService {
 	public void signTermsOfUse(String sessionToken, boolean acceptsTerms) throws RestServiceException;
 
 	public void createUserStep1(String email, String portalEndpoint) throws RestServiceException;
+
 	public String createUserStep2(String userName, String fName, String lName, String password, String emailValidationToken) throws RestServiceException;
+
+	public String createUserStep2(String userName, String fName, String lName, String password, EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException;
 	
 	public void terminateSession(String sessionToken) throws RestServiceException;
 	

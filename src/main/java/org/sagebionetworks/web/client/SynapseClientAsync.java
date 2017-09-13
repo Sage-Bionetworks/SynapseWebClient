@@ -12,8 +12,6 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityChildrenRequest;
-import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LogEntry;
@@ -39,6 +37,7 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -237,7 +236,9 @@ public interface SynapseClientAsync {
 	void handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL, AsyncCallback<ResponseMessage> callback);
 	
 	void hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString, AsyncCallback<SignedTokenInterface> callback);
-	
+
+	void hexDecodeAndDeserializeAccountCreationToken(String tokenString, AsyncCallback<AccountCreationToken> callback);
+
 	void getAPIKey(AsyncCallback<String> callback);
 
 	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<ColumnModel>> asyncCallback);

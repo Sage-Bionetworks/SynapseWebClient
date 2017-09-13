@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
@@ -141,7 +142,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public String createUserStep2(String userName, String fName, String lName, String password, String emailValidationToken) throws RestServiceException {
 		validateService();
@@ -154,6 +155,25 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			accountSetup.setUsername(userName);
 			accountSetup.setPassword(password);
 			accountSetup.setEmailValidationToken(emailValidationToken);
+			Session s = client.createNewAccount(accountSetup);
+			return s.getSessionToken();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public String createUserStep2(String userName, String fName, String lName, String password, EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException {
+		validateService();
+
+		SynapseClient client = createAnonymousSynapseClient();
+		try {
+			AccountSetupInfo accountSetup = new AccountSetupInfo();
+			accountSetup.setFirstName(fName);
+			accountSetup.setLastName(lName);
+			accountSetup.setUsername(userName);
+			accountSetup.setPassword(password);
+			accountSetup.setEmailValidationSignedToken(emailValidationSignedToken);
 			Session s = client.createNewAccount(accountSetup);
 			return s.getSessionToken();
 		} catch (SynapseException e) {
