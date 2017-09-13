@@ -308,13 +308,15 @@ public class EntityPageTopTest {
 		verify(mockWikiTab).clear();
 	}
 	
-	
 	@Test
 	public void testConfigureWithFile(){
 		Synapse.EntityArea area = null;
 		String areaToken = null;
 		Long versionNumber = 5L;
 		pageTop.configure(mockFileEntity, versionNumber, mockProjectHeader, area, areaToken);
+		verify(mockFilesTab).resetView();
+		verify(mockTablesTab).resetView();
+
 		verify(mockTabs).showTab(mockFilesInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
 		verify(mockEntityMetadata).setEntityBundle(mockProjectBundle, null);
 		

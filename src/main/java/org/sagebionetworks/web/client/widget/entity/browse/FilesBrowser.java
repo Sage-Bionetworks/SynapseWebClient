@@ -63,6 +63,10 @@ public class FilesBrowser implements FilesBrowserView.Presenter, SynapseWidgetPr
 		currentFolderEntityId = null;
 	}
 	
+	public void clear() {
+		view.clear();
+	}
+	
 	@Override
 	public void fireEntityUpdatedEvent() {
 		if (entityUpdatedHandler != null)

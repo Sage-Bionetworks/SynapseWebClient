@@ -314,7 +314,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     	tabs.setNavTabsVisible(false);
     	wikiTab.asTab().setTabListItemVisible(false);
 		filesTab.asTab().setTabListItemVisible(false);
+		filesTab.resetView();
 		tablesTab.asTab().setTabListItemVisible(false);
+		tablesTab.resetView();
 		adminTab.asTab().setTabListItemVisible(false);
 		discussionTab.asTab().setTabListItemVisible(false);
 		dockerTab.asTab().setTabListItemVisible(false);
