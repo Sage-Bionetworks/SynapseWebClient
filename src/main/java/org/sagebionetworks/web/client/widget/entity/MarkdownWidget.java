@@ -91,7 +91,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.md = md;
 		this.wikiKey = wikiKey;
 		this.wikiVersionInView = wikiVersionInView;
-		final String uniqueSuffix = new Date().getTime() + "" + gwt.nextRandomInt();
+		final String uniqueSuffix = "-" + new Date().getTime() + "" + gwt.nextRandomInt();
 		view.callbackWhenAttached(new Callback() {
 			@Override
 			public void invoke() {
@@ -113,6 +113,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			loadMath(uniqueSuffix);
 			loadWidgets(wikiKey, wikiVersionInView, uniqueSuffix);	
 			loadTableSorters();
+			
 		} else {
 			view.setEmptyVisible(true);
 		}
