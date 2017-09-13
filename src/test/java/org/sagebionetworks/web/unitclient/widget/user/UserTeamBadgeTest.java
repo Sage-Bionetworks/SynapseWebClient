@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderAsyncHandler;
@@ -51,6 +52,8 @@ public class UserTeamBadgeTest {
 	UserGroupHeader mockUserGroupHeader;
 	@Mock
 	DivView mockDiv;
+	@Mock
+	GWTWrapper mockGWT;
 	@Before
 	public void before() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
@@ -64,7 +67,8 @@ public class UserTeamBadgeTest {
 		badge = new UserTeamBadge(mockGinInjector, 
 				mockUserGroupHeaderFromIdAsyncHandler, 
 				mockUserGroupHeaderAsyncHandler, 
-				mockDiv);
+				mockDiv,
+				mockGWT);
 		widgetDescriptor = new HashMap<String, String>();
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY, "true");
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY, principalId);
@@ -148,26 +152,33 @@ public class UserTeamBadgeTest {
 	@Test
 	public void testConfigureFromUsernameAlias() {
 		widgetDescriptor.clear();
-		String alias = "myalias";
+		String alias = "my-alias";
+		String uniqueAlias = "myalias";
+		when(mockGWT.getUniqueAliasName(alias)).thenReturn(uniqueAlias);
 		widgetDescriptor.put(WidgetConstants.ALIAS_KEY, alias);
 		boolean isIndividual = true;
 		String ownerId = "userId";
 		when(mockUserGroupHeader.getIsIndividual()).thenReturn(isIndividual);
 		when(mockUserGroupHeader.getOwnerId()).thenReturn(ownerId);
 		badge.configure(null, widgetDescriptor, null, null);
+		verify(mockUserGroupHeaderAsyncHandler).getUserGroupHeader(eq(uniqueAlias), any(AsyncCallback.class));
 		verify(mockUserBadge).configure(ownerId);
 	}
 	
 	@Test
 	public void testConfigureFromTeamAlias() {
 		widgetDescriptor.clear();
-		String alias = "myteamalias";
+		String alias = "my-team-alias";
+		String uniqueAlias = "myteamalias";
+		when(mockGWT.getUniqueAliasName(alias)).thenReturn(uniqueAlias);
 		widgetDescriptor.put(WidgetConstants.ALIAS_KEY, alias);
 		boolean isIndividual = false;
 		String ownerId = "teamId";
 		when(mockUserGroupHeader.getIsIndividual()).thenReturn(isIndividual);
 		when(mockUserGroupHeader.getOwnerId()).thenReturn(ownerId);
 		badge.configure(null, widgetDescriptor, null, null);
+		verify(mockUserGroupHeaderAsyncHandler).getUserGroupHeader(eq(uniqueAlias), any(AsyncCallback.class));
 		verify(mockTeamBadge).configure(ownerId);
+		
 	}
 }
