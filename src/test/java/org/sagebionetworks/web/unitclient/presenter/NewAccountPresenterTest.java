@@ -189,22 +189,36 @@ public class NewAccountPresenterTest {
 		accountCreationToken.setEmailValidationSignedToken(new EmailValidationSignedToken());
 		NewAccount newPlace = Mockito.mock(NewAccount.class);
 		when(newPlace.toToken()).thenReturn("0123456789ABCDEF");
-		doAnswer(new Answer<Void>() {
-			public Void answer(InvocationOnMock invocation) {
-				AsyncCallback<AccountCreationToken> callback = (AsyncCallback<AccountCreationToken>) invocation.getArguments()[1];
-				callback.onSuccess(accountCreationToken);
-				return null;
-			}
-		}).when(mockSynapseClient).hexDecodeAndDeserializeAccountCreationToken(any(String.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(accountCreationToken).when(mockSynapseClient).hexDecodeAndDeserializeAccountCreationToken(anyString(), any(AsyncCallback.class));
 		newAccountPresenter.setPlace(newPlace);
 		newAccountPresenter.completeRegistration(userName, firstName, lastName, password);
 		verify(mockView).setLoading(true);
 		verify(mockView).setLoading(false);
 		verify(mockUserService).createUserStep2(eq(userName), eq(firstName.trim()), eq(lastName.trim()), eq(password), eq(accountCreationToken.getEmailValidationSignedToken()), any(AsyncCallback.class));
-		
+
 		//should go to the login place with the new session token
 		ArgumentCaptor<Place> placeCaptor = new ArgumentCaptor<Place>();
 		verify(mockPlaceChanger).goTo(placeCaptor.capture());
 		assertEquals(testSessionToken, ((LoginPlace)placeCaptor.getValue()).toToken());
+	}
+
+	@Test
+	public void testCompleteRegistrationAccountCreationTokenFailure() {
+		String firstName = "   Mara  ";
+		String lastName = " Jade     ";
+		String userName = "skywalker290";
+		String password = "  farfaraway";
+		final AccountCreationToken accountCreationToken = new AccountCreationToken();
+		accountCreationToken.setEmailValidationSignedToken(new EmailValidationSignedToken());
+		NewAccount newPlace = Mockito.mock(NewAccount.class);
+		when(newPlace.toToken()).thenReturn("0123456789ABCDEF");
+		AsyncMockStubber.callSuccessWith(accountCreationToken).when(mockSynapseClient).hexDecodeAndDeserializeAccountCreationToken(anyString(), any(AsyncCallback.class));
+		newAccountPresenter.setPlace(newPlace);
+		String failureMessage = "test message";
+		AsyncMockStubber.callFailureWith(new Throwable(failureMessage)).when(mockUserService).createUserStep2(
+				eq(userName.trim()), eq(firstName.trim()), eq(lastName.trim()), eq(password), any(EmailValidationSignedToken.class), any(AsyncCallback.class));
+		newAccountPresenter.completeRegistration(userName, firstName, lastName, password);
+		verify(mockView).setLoading(false);
+		verify(mockView).showErrorMessage(DisplayConstants.ACCOUNT_CREATION_FAILURE + failureMessage);
 	}
 }

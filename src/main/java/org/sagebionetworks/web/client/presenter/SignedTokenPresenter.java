@@ -82,7 +82,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 			@Override
 			public void onSuccess(SignedTokenInterface result) {
 				view.setLoadingVisible(false);
-				signedToken = (SignedTokenInterface) result;
+				signedToken = result;
 				if (result instanceof NotificationSettingsSignedToken) {
 					handleSettingsToken();
 				} else if (result instanceof JoinTeamSignedToken) {
