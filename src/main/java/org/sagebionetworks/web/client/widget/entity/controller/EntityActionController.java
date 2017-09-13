@@ -42,7 +42,5 @@ public interface EntityActionController extends IsWidget {
 
 	void onFileHistoryToggled(boolean shown);
 
-	void onProjectDisplay();
-
 	void setIsShowingVersion(boolean isShowingVersion);
 }

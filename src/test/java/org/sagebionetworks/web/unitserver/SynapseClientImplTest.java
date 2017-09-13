@@ -102,9 +102,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
-import org.sagebionetworks.repo.model.discussion.Forum;
-import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -2416,32 +2413,5 @@ public class SynapseClientImplTest {
 		
 		//and verify that no evaluations are returned for a different entity id
 		assertFalse(synapseClient.isChallenge("syn987"));
-	}
-	
-	@Test
-	public void testIsQueryResult() throws RestServiceException, SynapseException {
-		// empty results are returned by default.
-		// entity query is run for Files tab, Tables tab, and Docker tab.
-		assertFalse(synapseClient.isFileOrFolder("syn987"));
-		assertFalse(synapseClient.isTable("syn987"));
-		assertFalse(synapseClient.isDocker("syn987"));
-		
-		entityChildrenPage.add(mockEntityHeader);
-		assertTrue(synapseClient.isFileOrFolder("syn987"));
-		assertTrue(synapseClient.isTable("syn987"));
-		assertTrue(synapseClient.isDocker("syn987"));
-	}
-	
-	@Test
-	public void testIsForum() throws RestServiceException, SynapseException {
-		Forum mockForum = mock(Forum.class);
-		when(mockSynapse.getForumByProjectId(anyString())).thenReturn(mockForum);
-		ThreadCount mockThreadCount = mock(ThreadCount.class);
-		when(mockThreadCount.getCount()).thenReturn(0L);
-		when(mockSynapse.getThreadCountForForum(anyString(), any(DiscussionFilter.class))).thenReturn(mockThreadCount);
-		assertFalse(synapseClient.isForum("65"));
-		
-		when(mockThreadCount.getCount()).thenReturn(1L);
-		assertTrue(synapseClient.isForum("65"));
 	}
 }

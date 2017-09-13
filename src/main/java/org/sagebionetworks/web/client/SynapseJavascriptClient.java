@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
@@ -32,6 +33,8 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.entity.Direction;
+import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -468,6 +471,48 @@ public class SynapseJavascriptClient {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
 		doGet(url, type , callback);
+	}
+	
+	public void isDocker(String projectId, AsyncCallback<Boolean> callback) {
+		EntityChildrenRequest request = getEntityChildrenRequest(projectId, EntityType.dockerrepo);
+		getEntityChildren(request, getEntityChildrenExistCallback(callback));
+	}
+	
+	public void isFileOrFolder(String projectId, AsyncCallback<Boolean> callback) {
+		EntityChildrenRequest request = getEntityChildrenRequest(projectId, EntityType.file, EntityType.folder);
+		getEntityChildren(request, getEntityChildrenExistCallback(callback));
+	}
+	
+	public void isTable(String projectId, AsyncCallback<Boolean> callback) {
+		EntityChildrenRequest request = getEntityChildrenRequest(projectId, EntityType.table, EntityType.entityview);
+		getEntityChildren(request, getEntityChildrenExistCallback(callback));
+	}
+			
+	private AsyncCallback<EntityChildrenResponse> getEntityChildrenExistCallback(final AsyncCallback<Boolean> callback) {
+		return new AsyncCallback<EntityChildrenResponse>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+			@Override
+			public void onSuccess(EntityChildrenResponse result) {
+				callback.onSuccess(!result.getPage().isEmpty());
+			}
+		};
+	}
+	
+	private EntityChildrenRequest getEntityChildrenRequest(String parentId, EntityType... types) {
+		EntityChildrenRequest request = new EntityChildrenRequest();
+		request.setNextPageToken(null);
+		request.setParentId(parentId);
+		request.setSortBy(SortBy.NAME);
+		request.setSortDirection(Direction.ASC);
+		List<EntityType> includeTypes = new ArrayList<EntityType>();
+		for (int i = 0; i < types.length; i++) {
+			includeTypes.add(types[i]);
+		}
+		request.setIncludeTypes(includeTypes);
+		return request;
 	}
 }
 
