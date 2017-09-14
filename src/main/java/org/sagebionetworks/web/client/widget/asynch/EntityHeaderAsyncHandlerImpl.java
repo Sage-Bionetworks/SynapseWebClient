@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -76,7 +77,7 @@ public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 							}
 						}
 					}
-					UnknownErrorException notReturnedException = new UnknownErrorException(DisplayConstants.ERROR_LOADING);
+					NotFoundException notReturnedException = new NotFoundException(DisplayConstants.ERROR_LOADING);
 					for (String entityId : reference2CallbackCopy.keySet()) {
 						// not returned
 						callOnFailure(entityId, notReturnedException);

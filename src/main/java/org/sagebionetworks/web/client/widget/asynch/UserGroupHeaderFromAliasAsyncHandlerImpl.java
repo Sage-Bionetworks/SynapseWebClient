@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -38,10 +39,11 @@ public class UserGroupHeaderFromAliasAsyncHandlerImpl implements UserGroupHeader
 	
 	@Override
 	public void getUserGroupHeader(String alias, AsyncCallback<UserGroupHeader> callback) {
-		List<AsyncCallback<UserGroupHeader>> list = reference2Callback.get(alias.toLowerCase());
+		String key = gwt.getUniqueAliasName(alias).toLowerCase();
+		List<AsyncCallback<UserGroupHeader>> list = reference2Callback.get(key);
 		if (list == null) {
 			list = new ArrayList<AsyncCallback<UserGroupHeader>>();
-			reference2Callback.put(alias.toLowerCase(), list);
+			reference2Callback.put(key, list);
 		}
 		list.add(callback);
 	}
@@ -82,7 +84,7 @@ public class UserGroupHeaderFromAliasAsyncHandlerImpl implements UserGroupHeader
 							}
 						}
 					}
-					UnknownErrorException notReturnedException = new UnknownErrorException(DisplayConstants.ERROR_LOADING);
+					NotFoundException notReturnedException = new NotFoundException(DisplayConstants.ERROR_LOADING);
 					for (String alias : reference2CallbackCopy.keySet()) {
 						// not returned
 						callOnFailure(alias, notReturnedException);
