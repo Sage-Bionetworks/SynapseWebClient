@@ -26,7 +26,7 @@ public interface UploaderView extends IsWidget, SynapseView, HasAttachHandlers {
 	void setShowCancelButton(boolean showCancel);
 	void showUploaderUI();
 	void triggerUpload();
-	
+	void setExternalUrl(String url);
 	void showErrorMessage(String title, String details);
 	
 	void showUploadingToSynapseStorage();

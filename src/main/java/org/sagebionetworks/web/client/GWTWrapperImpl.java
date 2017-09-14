@@ -47,6 +47,10 @@ public class GWTWrapperImpl implements GWTWrapper {
 	}
 	
 	@Override
+	public String encode(String decodedURL) {
+		return URL.encode(decodedURL);
+	}
+	@Override
 	public String encodeQueryString(String queryString){
 		if (queryString == null)
 			return "";
