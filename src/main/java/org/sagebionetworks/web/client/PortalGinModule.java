@@ -186,8 +186,6 @@ import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadMo
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalViewImpl;
-import org.sagebionetworks.web.client.widget.display.ProjectDisplayView;
-import org.sagebionetworks.web.client.widget.display.ProjectDisplayViewImpl;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidgetView;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidgetView;
@@ -1365,7 +1363,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);
 		bind(SelectTeamModalView.class).to(SelectTeamModalViewImpl.class);
 		bind(ApproveUserAccessModalView.class).to(ApproveUserAccessModalViewImpl.class);
-		bind(ProjectDisplayView.class).to(ProjectDisplayViewImpl.class);
 		bind(UserBadgeListView.class).to(UserBadgeListViewImpl.class);
 		bind(EntityListRowBadgeView.class).to(EntityListRowBadgeViewImpl.class);
 		

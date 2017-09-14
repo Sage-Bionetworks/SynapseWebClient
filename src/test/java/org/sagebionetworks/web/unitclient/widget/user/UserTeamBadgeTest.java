@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.user;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -148,26 +150,29 @@ public class UserTeamBadgeTest {
 	@Test
 	public void testConfigureFromUsernameAlias() {
 		widgetDescriptor.clear();
-		String alias = "myalias";
+		String alias = "my-alias";
 		widgetDescriptor.put(WidgetConstants.ALIAS_KEY, alias);
 		boolean isIndividual = true;
 		String ownerId = "userId";
 		when(mockUserGroupHeader.getIsIndividual()).thenReturn(isIndividual);
 		when(mockUserGroupHeader.getOwnerId()).thenReturn(ownerId);
 		badge.configure(null, widgetDescriptor, null, null);
+		verify(mockUserGroupHeaderAsyncHandler).getUserGroupHeader(eq(alias), any(AsyncCallback.class));
 		verify(mockUserBadge).configure(ownerId);
 	}
 	
 	@Test
 	public void testConfigureFromTeamAlias() {
 		widgetDescriptor.clear();
-		String alias = "myteamalias";
+		String alias = "my-team-alias";
 		widgetDescriptor.put(WidgetConstants.ALIAS_KEY, alias);
 		boolean isIndividual = false;
 		String ownerId = "teamId";
 		when(mockUserGroupHeader.getIsIndividual()).thenReturn(isIndividual);
 		when(mockUserGroupHeader.getOwnerId()).thenReturn(ownerId);
 		badge.configure(null, widgetDescriptor, null, null);
+		verify(mockUserGroupHeaderAsyncHandler).getUserGroupHeader(eq(alias), any(AsyncCallback.class));
 		verify(mockTeamBadge).configure(ownerId);
+		
 	}
 }

@@ -139,7 +139,7 @@ public class MarkdownEditorWidgetTest {
 		String username = "jay";
 		callbackCaptor.getValue().invoke(username);
 		
-		verify(mockView).setMarkdown(username);
+		verify(mockView).setMarkdown(username + " ");
 		verify(mockView).setFocus(true);
 	}
 	

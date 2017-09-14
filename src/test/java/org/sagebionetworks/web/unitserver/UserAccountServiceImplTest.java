@@ -16,7 +16,9 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -76,15 +78,15 @@ public class UserAccountServiceImplTest {
 		String fName = "ralph";
 		String lName = "wiggum";
 		String pw = "password";
-		String emailValidationToken = "firstname=&lastname=&email=choochoo%40aol.com&timestamp=2014-09-02T23%3A45%3A57.788%2B0000&domain=SYNAPSE&mac=1hBX";
+		EmailValidationSignedToken emailValidationSignedToken = new EmailValidationSignedToken();
 		AccountSetupInfo testASI = new AccountSetupInfo();
 		testASI.setUsername(username);
 		testASI.setFirstName(fName);
 		testASI.setLastName(lName);
 		testASI.setPassword(pw);
-		testASI.setEmailValidationToken(emailValidationToken);
+		testASI.setEmailValidationSignedToken(emailValidationSignedToken);
 
-		String returnSessionToken = userAccountService.createUserStep2(username, fName, lName, pw, emailValidationToken);
+		String returnSessionToken = userAccountService.createUserStep2(username, fName, lName, pw, emailValidationSignedToken);
 		assertEquals(testSessionToken, returnSessionToken);
 		ArgumentCaptor<AccountSetupInfo> arg = ArgumentCaptor.forClass(AccountSetupInfo.class);
 		verify(mockSynapse).createNewAccount(arg.capture());

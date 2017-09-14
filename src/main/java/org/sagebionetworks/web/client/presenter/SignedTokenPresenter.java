@@ -7,6 +7,8 @@ import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
+import org.sagebionetworks.repo.model.principal.AccountCreationToken;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -16,6 +18,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -36,13 +39,13 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 	AuthenticationController authController;
 	boolean isFirstTry;
 	@Inject
-	public SignedTokenPresenter(SignedTokenView view, 
-			SynapseClientAsync synapseClient, 
-			GWTWrapper gwt, 
-			SynapseAlert synapseAlert,
-			GlobalApplicationState globalApplicationState, 
-			UserBadge unsubscribingUserBadge,
-			AuthenticationController authController){
+	public SignedTokenPresenter(SignedTokenView view,
+								SynapseClientAsync synapseClient,
+								GWTWrapper gwt,
+								SynapseAlert synapseAlert,
+								GlobalApplicationState globalApplicationState,
+								UserBadge unsubscribingUserBadge,
+								AuthenticationController authController){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.synapseAlert = synapseAlert;
@@ -65,10 +68,10 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 	public void setPlace(SignedToken place) {
 		this.place = place;
 		this.view.setPresenter(this);
-		
+
 		configure(place.getTokenType(), place.getSignedEncodedToken());
 	}
-	
+
 	public void configure(String tokenType, String signedEncodedToken) {
 		signedToken = null;
 		synapseAlert.clear();
@@ -96,13 +99,13 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 			}
 		});
 	}
-	
+
 	public void handleSettingsToken() {
 		NotificationSettingsSignedToken token = (NotificationSettingsSignedToken) signedToken;
 		unsubscribingUserBadge.configure(token.getUserId());
 		view.showConfirmUnsubscribe();
 	}
-	
+
 	public void handleJoinTeamToken() {
 		final JoinTeamSignedToken token = (JoinTeamSignedToken) signedToken;
 		String teamId = token.getTeamId();
@@ -119,7 +122,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 					handleSignedToken();
 				}
 			}
-			
+
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof UnauthorizedException && isFirstTry) {
@@ -129,12 +132,12 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 					handleJoinTeamToken();
 				} else {
 					view.setLoadingVisible(false);
-					synapseAlert.handleException(caught);	
+					synapseAlert.handleException(caught);
 				}
 			}
 		});
 	}
-	
+
 	public void handleSignedToken() {
 		view.clear();
 		view.setLoadingVisible(true);
@@ -151,18 +154,18 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 			}
 		});
 	}
-	
+
 	@Override
 	public void unsubscribeConfirmed() {
 		handleSignedToken();
 	}
-	
+
 	@Override
-    public String mayStop() {
-        view.clear();
-        return null;
-    }
-	
+	public String mayStop() {
+		view.clear();
+		return null;
+	}
+
 	@Override
 	public void okClicked() {
 		globalApplicationState.gotoLastPlace();

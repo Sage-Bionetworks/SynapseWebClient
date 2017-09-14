@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -61,6 +62,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	SingleDiscussionThreadWidgetView view;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
+	SynapseJavascriptClient jsClient;
 	PortalGinInjector ginInjector;
 	DateTimeUtils dateTimeUtils;
 	UserBadge authorWidget;
@@ -108,7 +110,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			SubscribeButtonWidget subscribeButtonWidget,
 			NewReplyWidget newReplyWidget,
 			NewReplyWidget secondNewReplyWidget,
-			SubscribersWidget threadSubscribersWidget
+			SubscribersWidget threadSubscribersWidget,
+			SynapseJavascriptClient jsClient
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -126,6 +129,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.newReplyWidget = newReplyWidget;
 		this.secondNewReplyWidget = secondNewReplyWidget;
 		this.threadSubscribersWidget = threadSubscribersWidget;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setAuthor(authorWidget.asWidget());
@@ -262,7 +266,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 	public void reconfigureThread() {
 		synAlert.clear();
-		discussionForumClientAsync.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
+		jsClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -281,7 +285,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		markdownWidget.clear();
 		view.setLoadingMessageVisible(true);
 		subscribeButtonWidget.configure(SubscriptionObjectType.THREAD, threadId);
-		discussionForumClientAsync.getThreadUrl(messageKey, new AsyncCallback<String>(){
+		jsClient.getThreadUrl(messageKey, new AsyncCallback<String>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -393,7 +397,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		repliesContainer.setIsMore(false);
 		view.setShowAllRepliesButtonVisible(true);
 		setReplyId(replyId);
-		discussionForumClientAsync.getReply(replyId, new AsyncCallback<DiscussionReplyBundle>() {
+		jsClient.getReply(replyId, new AsyncCallback<DiscussionReplyBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);

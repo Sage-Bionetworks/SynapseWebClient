@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -128,7 +129,8 @@ public class SingleDiscussionThreadWidgetTest {
 	ArgumentCaptor<Topic> topicCaptor;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
-	
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	Set<String> moderatorIds;
 	SingleDiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -148,7 +150,7 @@ public class SingleDiscussionThreadWidgetTest {
 				mockDateTimeUtils, mockRequestBuilder, mockAuthController,
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
 				mockRepliesContainer, mockSubscribeButtonWidget, mockNewReplyWidget,
-				mockNewReplyWidget, mockSubscribersWidget);
+				mockNewReplyWidget, mockSubscribersWidget, mockSynapseJavascriptClient);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
 		moderatorIds = new HashSet<String>();
@@ -218,10 +220,10 @@ public class SingleDiscussionThreadWidgetTest {
 		assertNotNull(captured);
 		assertEquals(2, captured.size());
 		captured.get(0).invoke();
-		verify(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
-		reset(mockDiscussionForumClientAsync);
+		verify(mockSynapseJavascriptClient).getThread(anyString(), any(AsyncCallback.class));
+		reset(mockDiscussionForumClientAsync, mockSynapseJavascriptClient);
 		captured.get(1).invoke();
-		verify(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getThread(anyString(), any(AsyncCallback.class));
 		verify(mockSubscribersWidget).configure(topicCaptor.capture());
 		assertEquals(threadId, topicCaptor.getValue().getObjectId());
 		assertEquals(SubscriptionObjectType.THREAD, topicCaptor.getValue().getObjectType());
@@ -512,7 +514,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean isPinned = false;
 		String replyId = "123";
 		AsyncMockStubber.callSuccessWith(mockDiscussionReplyBundle)
-				.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
+				.when(mockSynapseJavascriptClient).getReply(anyString(), any(AsyncCallback.class));
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
@@ -521,7 +523,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockRepliesContainer, atLeastOnce()).clear();
 		verify(mockView).setShowAllRepliesButtonVisible(true);
-		verify(mockDiscussionForumClientAsync).getReply(eq(replyId), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getReply(eq(replyId), any(AsyncCallback.class));
 		verify(mockView).setDeleteIconVisible(false);
 		verify(mockRepliesContainer).add(any(Widget.class));
 		verify(mockReplyIdCallback).invoke(replyId);
@@ -536,7 +538,7 @@ public class SingleDiscussionThreadWidgetTest {
 		String replyId = "123";
 		Exception ex = new Exception("error");
 		AsyncMockStubber.callFailureWith(ex)
-			.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
+			.when(mockSynapseJavascriptClient).getReply(anyString(), any(AsyncCallback.class));
 
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
@@ -680,7 +682,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle bundle = DiscussionTestUtils.createThreadBundle(threadId, "title", Arrays.asList("1"),
 				1L, 1L, new Date(), "messageKey", isDeleted, CREATED_BY, isEdited, isPinned);
 		AsyncMockStubber.callFailureWith(new Exception())
-				.when(mockDiscussionForumClientAsync).getThreadUrl(anyString(), any(AsyncCallback.class));
+				.when(mockSynapseJavascriptClient).getThreadUrl(anyString(), any(AsyncCallback.class));
 		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockRequestBuilder, never()).configure(eq(RequestBuilder.GET), anyString());
@@ -704,7 +706,7 @@ public class SingleDiscussionThreadWidgetTest {
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
 		String url = "url";
 		AsyncMockStubber.callSuccessWith(url)
-				.when(mockDiscussionForumClientAsync).getThreadUrl(anyString(), any(AsyncCallback.class));
+				.when(mockSynapseJavascriptClient).getThreadUrl(anyString(), any(AsyncCallback.class));
 		RequestBuilderMockStubber.callOnError(null, new Exception())
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
@@ -732,7 +734,7 @@ public class SingleDiscussionThreadWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		String url = "url";
 		AsyncMockStubber.callSuccessWith(url)
-				.when(mockDiscussionForumClientAsync).getThreadUrl(anyString(), any(AsyncCallback.class));
+				.when(mockSynapseJavascriptClient).getThreadUrl(anyString(), any(AsyncCallback.class));
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
@@ -877,10 +879,10 @@ public class SingleDiscussionThreadWidgetTest {
 		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
 		reset(mockView);
 		AsyncMockStubber.callSuccessWith(bundle)
-		.when(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
+		.when(mockSynapseJavascriptClient).getThread(anyString(), any(AsyncCallback.class));
 		discussionThreadWidget.reconfigureThread();
 		verify(mockSynAlert, atLeastOnce()).clear();
-		verify(mockDiscussionForumClientAsync).getThread(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getThread(anyString(), any(AsyncCallback.class));
 	}
 	
 

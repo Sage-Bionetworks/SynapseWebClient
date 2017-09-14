@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -18,8 +19,16 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
+import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
+import org.sagebionetworks.repo.model.discussion.Forum;
+import org.sagebionetworks.repo.model.discussion.MessageURL;
+import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
+import org.sagebionetworks.repo.model.subscription.SubscriberCount;
+import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -51,7 +60,16 @@ public class SynapseJavascriptFactory {
 		TableEntity,
 		Link,
 		Preview,
-		Entity // used for services where we don't know what type of entity is returned (but object has concreteType set)
+		Entity, // used for services where we don't know what type of entity is returned (but object has concreteType set)
+		Forum,
+		DiscussionThreadBundle,
+		DiscussionReplyBundle,
+		MessageURL,
+		ThreadCount,
+		EntityThreadCounts,
+		PaginatedIds,
+		SubscriberPagedResults,
+		SubscriberCount
 	}
 
 	/**
@@ -119,6 +137,24 @@ public class SynapseJavascriptFactory {
 			return new Link(json);
 		case Preview :
 			return new Preview(json);
+		case Forum :
+			return new Forum(json);
+		case DiscussionThreadBundle : 
+			return new DiscussionThreadBundle(json);
+		case DiscussionReplyBundle :
+			return new DiscussionReplyBundle(json);
+		case MessageURL :
+			return new MessageURL(json).getMessageUrl();
+		case ThreadCount :
+			return new ThreadCount(json).getCount();
+		case EntityThreadCounts : 
+			return new EntityThreadCounts(json);
+		case PaginatedIds : 
+			return new PaginatedIds(json);
+		case SubscriberPagedResults :
+			return new SubscriberPagedResults(json);
+		case SubscriberCount :
+			return new SubscriberCount(json).getCount();
 		case PaginatedResultsEntityHeader :
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<EntityHeader> entityHeaderList = new ArrayList<>();
