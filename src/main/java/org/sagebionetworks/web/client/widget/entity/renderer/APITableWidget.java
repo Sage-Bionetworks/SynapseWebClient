@@ -63,7 +63,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_CREATED_BY_PRINCIPAL_ID);
 		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_MODIFIED_BY_PRINCIPAL_ID);
 		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_USER_ID);
-
+		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_SUBMITTER_ID);
+		
 		dateColumnNames.add(WebConstants.DEFAULT_COL_NAME_CREATED_ON);
 		dateColumnNames.add(WebConstants.DEFAULT_COL_NAME_MODIFIED_ON);
 		
