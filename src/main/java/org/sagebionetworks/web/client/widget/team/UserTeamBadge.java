@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.team;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DivView;
@@ -16,7 +15,6 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -48,6 +46,10 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		div.clear();
 		this.widgetDescriptor = widgetDescriptor;
+		final boolean isToc = widgetDescriptor.containsKey(WidgetConstants.IS_TOC_KEY) ? 
+				Boolean.parseBoolean(widgetDescriptor.get(WidgetConstants.IS_TOC_KEY)) :
+				false;
+		
 		String alias = widgetDescriptor.get(WidgetConstants.ALIAS_KEY);
 		if (alias != null) {
 			// get user group header for this alias (using a new service)
@@ -56,7 +58,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 				public void onSuccess(UserGroupHeader ugh) {
 					Boolean isIndividual = ugh.getIsIndividual();
 					String id = ugh.getOwnerId();
-					configure(isIndividual, id);
+					configure(isIndividual, id, isToc);
 				}
 				
 				@Override
@@ -69,7 +71,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 		} else {
 			Boolean isIndividual = Boolean.valueOf(widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY));
 			String id = widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY);
-			configure(isIndividual, id);
+			configure(isIndividual, id, isToc);
 		}
 	}
 	
@@ -84,17 +86,13 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			}
 			@Override
 			public void onSuccess(UserGroupHeader ugh) {
-				configure(ugh.getIsIndividual(), id);
+				configure(ugh.getIsIndividual(), id, false);
 			}
 		});
 	}
 	
-	public void configure(Boolean isIndividual, String id) {
+	public void configure(Boolean isIndividual, String id, boolean isIgnoreClick) {
 		Widget theWidget;
-		boolean isToc = false;
-		if (widgetDescriptor.containsKey(WidgetConstants.IS_TOC_KEY)) {
-			isToc = Boolean.parseBoolean(widgetDescriptor.get(WidgetConstants.IS_TOC_KEY));
-		}
 		if (isIndividual) {
 			UserBadge badge = ginInjector.getUserBadgeWidget();
 			badge.setSize(BadgeSize.SMALLER);
@@ -105,7 +103,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			} else {
 				badge.configure((String)null);
 			}
-			if (isToc) {
+			if (isIgnoreClick) {
 				badge.setDoNothingOnClick();	
 			}
 			
@@ -114,7 +112,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 		} else {
 			//team
 			ClickHandler customClickHandler = null;
-			if (isToc) {
+			if (isIgnoreClick) {
 				customClickHandler = UserBadge.DO_NOTHING_ON_CLICK;
 			}
 			TeamBadge badge = ginInjector.getTeamBadgeWidget();
