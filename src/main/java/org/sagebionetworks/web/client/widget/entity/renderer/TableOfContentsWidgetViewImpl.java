@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.google.gwt.core.client.JsArray;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.regexp.shared.MatchResult;
@@ -25,9 +24,14 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 	private Presenter presenter;
 	private boolean hasLoaded;
 	private Map<String, String> tagName2Style;
+	// Matches a widget element id.  Group 1 contains the suffix (that all widgets will use for this particular markdown renderer).
 	private RegExp widgetIdRegEx = RegExp.compile("^widget[-]{1}\\d+([-]{1}.*)$", "i");
+	// Matches a widget element id.  Group 1 contains prefix, Group 2 contains suffix.  Used to replace widget index (with the next available index, so that the markdown renderer will find it). 
 	private RegExp widgetExistsRegEx = RegExp.compile("(widget[-]{1})\\d+([-]{1})", "i");
+	// Matches widget parameters.  Group 1 contains full param definition minus the end quote.  Group 2 contains end quote.
+	// Used to insert new isTOC parameter into widget definition (badge will ignore clicks).
 	private RegExp widgetParamsRegEx = RegExp.compile("(widgetparams[=]{1}[\"]{1}[^\"]*)([\"]{1})", "i");
+	// Matches any html inside of the widget span.  Used to remove any other html (for example, mentioning adds a child user/team anchor, used in notification emails).
 	private RegExp widgetInnerHtmlRegEx = RegExp.compile("(<span widgetparams[^>]*>).*(<\\/span>)", "i");
 	
 	@Inject
