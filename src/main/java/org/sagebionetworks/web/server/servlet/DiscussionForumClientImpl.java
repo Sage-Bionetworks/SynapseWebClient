@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.util.List;
-
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
@@ -12,13 +9,10 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
-import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
-import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
-import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.DiscussionForumClient;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -39,7 +33,6 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		return  new PaginatedResults<T>(in.getResults(), in.getTotalNumberOfResults());
 	}
 
-	@Override
 	public Forum getForumByProjectId(String projectId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -60,7 +53,6 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	@Override
 	public DiscussionThreadBundle getThread(String threadId)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -128,7 +120,6 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	@Override
 	public DiscussionReplyBundle getReply(String replyId)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -189,7 +180,6 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	@Override
 	public String getThreadUrl(String messageKey) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -199,7 +189,6 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	@Override
 	public String getReplyUrl(String messageKey) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
@@ -218,27 +207,6 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
-	}
-	
-	@Override
-	public Long getThreadCountForForum(String forumId, DiscussionFilter filter) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getThreadCountForForum(forumId, filter).getCount();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
-	public Long getReplyCountForThread(String threadId, DiscussionFilter filter) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getReplyCountForThread(threadId, filter).getCount();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-
 	}
 	
 	@Override
@@ -275,51 +243,10 @@ public class DiscussionForumClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public EntityThreadCounts getEntityThreadCount(List<String> idList) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getEntityThreadCount(idList);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
 	public void restoreThread(String threadId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			synapseClient.restoreDeletedThread(threadId);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public PaginatedIds getModerators(String forumId, Long limit, Long offset) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			
-			return synapseClient.getModeratorsForForum(forumId, limit, offset);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
-	public SubscriberPagedResults getSubscribers(Topic topic, String nextPageToken) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getSubscribers(topic, nextPageToken);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
-	public Long getSubscribersCount(Topic topic) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getSubscriberCount(topic).getCount();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

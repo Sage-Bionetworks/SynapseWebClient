@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -44,7 +45,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	GlobalApplicationState globalApplicationState;
 	SingleDiscussionThreadWidget singleThreadWidget;
 	DiscussionThreadListWidget deletedThreadListWidget;
-
+	SynapseJavascriptClient jsClient;
 	String forumId, threadId;
 	String entityId;
 	Boolean isCurrentUserModerator;
@@ -77,7 +78,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			SingleDiscussionThreadWidget singleThreadWidget,
 			SubscribeButtonWidget subscribeToForumButton,
 			SingleDiscussionThreadWidget defaultThreadWidget,
-			SubscribersWidget forumSubscribersWidget
+			SubscribersWidget forumSubscribersWidget,
+			SynapseJavascriptClient jsClient
 			) {
 		this.view = view;
 		this.stuAlert = stuAlert;
@@ -91,6 +93,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.defaultThreadWidget = defaultThreadWidget;
 		this.deletedThreadListWidget = deletedThreadListWidget;
 		this.forumSubscribersWidget = forumSubscribersWidget;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.setThreadList(threadListWidget.asWidget());
 		view.setNewThreadModal(newThreadModal.asWidget());
@@ -151,7 +154,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	public void initDefaultThread(String defaultThreadId) {
 		if (defaultThreadBundle == null) {
 			//get default thread bundle
-			discussionForumClient.getThread(defaultThreadId, new AsyncCallback<DiscussionThreadBundle>() {
+			jsClient.getThread(defaultThreadId, new AsyncCallback<DiscussionThreadBundle>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					stuAlert.handleException(caught);
@@ -259,7 +262,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 	public void loadForum(String entityId, final Callback callback) {
 		stuAlert.clear();
-		discussionForumClient.getForumByProjectId(entityId, new AsyncCallback<Forum>(){
+		jsClient.getForumByProjectId(entityId, new AsyncCallback<Forum>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				stuAlert.handleException(caught);
@@ -275,7 +278,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 	public void loadModerators(final String forumId, final Long offset, final Callback callback) {
 		stuAlert.clear();
-		discussionForumClient.getModerators(forumId, MODERATOR_LIMIT, offset, new AsyncCallback<PaginatedIds>(){
+		jsClient.getModerators(forumId, MODERATOR_LIMIT, offset, new AsyncCallback<PaginatedIds>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -316,7 +319,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		stuAlert.clear();
 		subscribeToForumButton.clear();
 		updatePlaceToSingleThread(threadId);
-		discussionForumClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
+		jsClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>(){
 
 			@Override
 			public void onFailure(Throwable caught) {

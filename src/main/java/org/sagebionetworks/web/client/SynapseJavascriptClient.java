@@ -23,8 +23,10 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
+import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -33,9 +35,19 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
+import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
+import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
+import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
+import org.sagebionetworks.repo.model.discussion.Forum;
+import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
+import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
+import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
+import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -78,6 +90,27 @@ public class SynapseJavascriptClient {
 	public static final String USER_PROFILE_PATH = "/userProfile";
 	public static final String USER_GROUP_HEADER_BY_ALIAS = "/userGroupHeaders/aliases";
 	public static final String USER_GROUP_HEADER_BATCH_PATH = "/userGroupHeaders/batch?ids=";
+	private static final String ENTITY = "/entity";
+	private static final String PROJECT = "/project";
+	private static final String FORUM = "/forum";
+	private static final String THREAD = "/thread";
+	private static final String THREADS = "/threads";
+	private static final String THREAD_COUNT = "/threadcount";
+	private static final String THREAD_TITLE = "/title";
+	private static final String DISCUSSION_MESSAGE = "/message";
+	private static final String REPLY = "/reply";
+	private static final String REPLIES = "/replies";
+	private static final String REPLY_COUNT = "/replycount";
+	private static final String URL = "/messageUrl";
+	private static final String PIN = "/pin";
+	private static final String UNPIN = "/unpin";
+	private static final String RESTORE = "/restore";
+	private static final String MODERATORS = "/moderators";
+	private static final String SUBSCRIPTION = "/subscription";
+	
+	private static final String THREAD_COUNTS = "/threadcounts";
+	private static final String ENTITY_THREAD_COUNTS = ENTITY + THREAD_COUNTS;
+	
 	public static final int RETRY_REQUEST_DELAY_MS = 2000;
 	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
@@ -109,6 +142,7 @@ public class SynapseJavascriptClient {
 	
 	public static final String OFFSET_PARAMETER = "offset=";
 	public static final String LIMIT_PARAMETER = "limit=";
+	private static final String NEXT_PAGE_TOKEN_PARAM = "nextPageToken=";
 	
 	public String repoServiceUrl; 
 	
@@ -513,6 +547,82 @@ public class SynapseJavascriptClient {
 		}
 		request.setIncludeTypes(includeTypes);
 		return request;
+	}
+	
+	public void getForumByProjectId(String projectId, AsyncCallback<Forum> callback) {
+		String url = getRepoServiceUrl() + PROJECT+"/"+projectId+FORUM;
+		doGet(url, OBJECT_TYPE.Forum, callback);
+	}
+	
+	public void getThread(String threadId, AsyncCallback<DiscussionThreadBundle> callback) {
+		String url = getRepoServiceUrl() + THREAD+"/"+threadId;
+		doGet(url, OBJECT_TYPE.DiscussionThreadBundle, callback);
+	}
+	
+	public void getReply(String replyId, AsyncCallback<DiscussionReplyBundle> callback) {
+		String url = getRepoServiceUrl() + REPLY+"/"+replyId;
+		doGet(url, OBJECT_TYPE.DiscussionReplyBundle, callback);
+	}
+	public void getThreadUrl(String messageKey, AsyncCallback<String> callback) {
+		String url = getRepoServiceUrl() + THREAD+URL+"?messageKey="+messageKey;
+		doGet(url, OBJECT_TYPE.MessageURL, callback);
+	}
+	public void getReplyUrl(String messageKey, AsyncCallback<String> callback) {
+		String url = getRepoServiceUrl() + REPLY+URL+"?messageKey="+messageKey;
+		doGet(url, OBJECT_TYPE.MessageURL, callback);
+	}
+	
+	public void getThreadCountForForum(String forumId, DiscussionFilter filter, AsyncCallback<Long> callback) {
+		String url = getRepoServiceUrl() + FORUM+"/"+forumId+THREAD_COUNT + "?filter="+filter;
+		doGet(url, OBJECT_TYPE.ThreadCount, callback);
+	}
+
+	public void getReplyCountForThread(String threadId, DiscussionFilter filter, AsyncCallback<Long> callback) {
+		String url = getRepoServiceUrl() + THREAD+"/"+threadId+REPLY_COUNT + "?filter="+filter;
+		doGet(url, OBJECT_TYPE.ThreadCount, callback);
+	}
+	
+	public void getEntityThreadCount(List<String> entityIds, AsyncCallback<EntityThreadCounts> callback) {
+		String url = getRepoServiceUrl() + ENTITY_THREAD_COUNTS;
+		EntityIdList idList = new EntityIdList();
+		idList.setIdList(entityIds);
+		try {
+			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+			idList.writeToJSONObject(jsonAdapter);
+			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.EntityThreadCounts, callback);
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
+	}
+	
+	public void getModerators(String forumId, Long limit, Long offset, AsyncCallback<PaginatedIds> callback) {
+		String url = getRepoServiceUrl() + FORUM+"/"+forumId+MODERATORS+"?"+LIMIT_PARAMETER+limit+"&"+OFFSET_PARAMETER+offset;
+		doGet(url, OBJECT_TYPE.PaginatedIds, callback);
+	}
+
+	public void getSubscribers(Topic topic, String nextPageToken, AsyncCallback<SubscriberPagedResults> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION+"/subscribers";
+		if (nextPageToken != null) {
+			url += "?" + NEXT_PAGE_TOKEN_PARAM + nextPageToken;
+		}
+		try {
+			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+			topic.writeToJSONObject(jsonAdapter);
+			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.SubscriberPagedResults, callback);
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
+	}
+
+	public void getSubscribersCount(Topic topic, AsyncCallback<Long> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION+"/subscribers/count";
+		try {
+			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+			topic.writeToJSONObject(jsonAdapter);
+			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.SubscriberCount, callback);
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
 	}
 }
 

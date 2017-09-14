@@ -4,8 +4,8 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
-import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -20,24 +20,24 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 
 	SubscribersWidgetView view;
 	SynapseAlert synAlert;
-	DiscussionForumClientAsync discussionForumClientAsync;
 	Topic topic;
 	LoadMoreWidgetContainer loadMoreWidgetContainer;
 	String nextPageToken;
 	PortalGinInjector ginInjector;
+	SynapseJavascriptClient jsClient;
 	@Inject
 	public SubscribersWidget(
 			SubscribersWidgetView view,
 			PortalGinInjector ginInjector,
 			SynapseAlert synAlert,
 			LoadMoreWidgetContainer loadMoreWidgetContainer,
-			DiscussionForumClientAsync discussionForumClientAsync
+			SynapseJavascriptClient jsClient
 			) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.synAlert = synAlert;
 		this.loadMoreWidgetContainer = loadMoreWidgetContainer;
-		this.discussionForumClientAsync = discussionForumClientAsync;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.setSynapseAlert(synAlert.asWidget());
 		view.setUserListContainer(loadMoreWidgetContainer.asWidget());
@@ -48,7 +48,7 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 		synAlert.clear();
 		// get the count
 		view.setSubscribersLinkVisible(false);
-		discussionForumClientAsync.getSubscribersCount(topic, new AsyncCallback<Long>(){
+		jsClient.getSubscribersCount(topic, new AsyncCallback<Long>(){
 			private void countIsUnavailable() {
 				view.clearSubscriberCount();
 				view.setSubscribersLinkVisible(true);
@@ -89,7 +89,7 @@ public class SubscribersWidget implements SubscribersWidgetView.Presenter, IsWid
 	
 	public void loadMoreSubscribers() {
 		synAlert.clear();
-		discussionForumClientAsync.getSubscribers(topic, nextPageToken, new AsyncCallback<SubscriberPagedResults>(){
+		jsClient.getSubscribers(topic, nextPageToken, new AsyncCallback<SubscriberPagedResults>(){
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);

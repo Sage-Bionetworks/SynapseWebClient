@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.discussion.SubscribersWidget;
 import org.sagebionetworks.web.client.widget.discussion.SubscribersWidgetView;
@@ -39,8 +40,6 @@ public class SubscribersWidgetTest {
 	SynapseAlert mockSynAlert;
 	@Mock
 	LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
-	@Mock
-	DiscussionForumClientAsync mockDiscussionForumClientAsync;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Mock
@@ -49,6 +48,8 @@ public class SubscribersWidgetTest {
 	Topic mockTopic;
 	@Mock
 	UserBadge mockUserBadge;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	
 	SubscribersWidget widget;
 	public static final Long TEST_SUBSCRIBER_COUNT = 44L;
@@ -60,9 +61,9 @@ public class SubscribersWidgetTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new SubscribersWidget(mockView, mockGinInjector, mockSynAlert, mockLoadMoreWidgetContainer, mockDiscussionForumClientAsync);
-		AsyncMockStubber.callSuccessWith(mockSubscriberPagedResults).when(mockDiscussionForumClientAsync).getSubscribers(any(Topic.class), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(TEST_SUBSCRIBER_COUNT).when(mockDiscussionForumClientAsync).getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
+		widget = new SubscribersWidget(mockView, mockGinInjector, mockSynAlert, mockLoadMoreWidgetContainer, mockSynapseJavascriptClient);
+		AsyncMockStubber.callSuccessWith(mockSubscriberPagedResults).when(mockSynapseJavascriptClient).getSubscribers(any(Topic.class), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(TEST_SUBSCRIBER_COUNT).when(mockSynapseJavascriptClient).getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
 		when(mockTopic.getObjectType()).thenReturn(SubscriptionObjectType.FORUM);
 		when(mockTopic.getObjectId()).thenReturn(TEST_OBJECT_ID);
 		subscribers = new ArrayList<String>();
@@ -89,7 +90,7 @@ public class SubscribersWidgetTest {
 	
 	@Test
 	public void testConfigureNullCount() {
-		AsyncMockStubber.callSuccessWith(null).when(mockDiscussionForumClientAsync).getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
 		widget.configure(mockTopic);
 		
 		InOrder inOrder = inOrder(mockView);
@@ -104,7 +105,7 @@ public class SubscribersWidgetTest {
 	@Test
 	public void testConfigureFailure() {
 		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockDiscussionForumClientAsync).getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getSubscribersCount(any(Topic.class), any(AsyncCallback.class));
 		
 		widget.configure(mockTopic);
 		
@@ -146,7 +147,7 @@ public class SubscribersWidgetTest {
 	@Test
 	public void testLoadMoreSubscribersFailure() {
 		Exception ex = new Exception();
-		AsyncMockStubber.callFailureWith(ex).when(mockDiscussionForumClientAsync).getSubscribers(any(Topic.class), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getSubscribers(any(Topic.class), anyString(), any(AsyncCallback.class));
 		
 		widget.loadMoreSubscribers();
 		verify(mockSynAlert).handleException(ex);
