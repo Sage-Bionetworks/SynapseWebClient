@@ -242,6 +242,7 @@ public class WebConstants {
 	public static final String DEFAULT_COL_NAME_MODIFIED_ON = "modifiedon";
 	public static final String DEFAULT_COL_NAME_CREATED_ON = "createdon";
 	public static final String DEFAULT_COL_NAME_USER_ID = "userid";
+	public static final String DEFAULT_COL_NAME_SUBMITTER_ID = "submitterid";
 	public static final String DEFAULT_COL_NAME_MODIFIED_BY_PRINCIPAL_ID = "modifiedbyprincipalid";
 	public static final String DEFAULT_COL_NAME_CREATED_BY_PRINCIPAL_ID = "createdbyprincipalid";
 	public static final String DEFAULT_COL_NAME_ID = "id";
