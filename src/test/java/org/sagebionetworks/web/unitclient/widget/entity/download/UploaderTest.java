@@ -94,7 +94,8 @@ public class UploaderTest {
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
 	
 	Uploader uploader;
-	GWTWrapper gwt;
+	@Mock
+	GWTWrapper mockGwt;
 	FileEntity testEntity;
 	CancelHandler cancelHandler;
 	String parentEntityId;
@@ -114,7 +115,6 @@ public class UploaderTest {
 		synapseClient=mock(SynapseClientAsync.class);
 		jiraURLHelper=mock(JiraURLHelper.class);
 		synapseJsniUtils=mock(SynapseJSNIUtils.class);
-		gwt = mock(GWTWrapper.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockLogger = mock(ClientLogger.class);
 		AsyncMockStubber.callSuccessWith("syn123").when(synapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
@@ -141,7 +141,7 @@ public class UploaderTest {
 		
 		AsyncMockStubber.callSuccessWith("entityID").when(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
 		
-		when(gwt.createXMLHttpRequest()).thenReturn(null);
+		when(mockGwt.createXMLHttpRequest()).thenReturn(null);
 		cancelHandler = mock(CancelHandler.class);
 		
 		String[] fileNames = {"newFile.txt"};
@@ -156,7 +156,7 @@ public class UploaderTest {
 				view,
 				synapseClient,
 				synapseJsniUtils,
-				gwt, 
+				mockGwt, 
 				authenticationController, 
 				multipartUploader, 
 				mockGlobalApplicationState, 
@@ -206,6 +206,16 @@ public class UploaderTest {
 		AsyncMockStubber.callFailureWith(new Exception("failed to update path")).when(synapseClient).createExternalFile(anyString(), anyString(),anyString(), anyString(), eq((Long)null), eq((String)null), anyLong(), any(AsyncCallback.class));
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		verify(view).showErrorMessage(anyString());
+	}
+	
+	@Test
+	public void testSetNewExternalPathEncoding() throws Exception {
+		String url = "http://fakepath.url/a b/c d/blah.xml";
+		String encodedUrl = "http://fakepath.url/a%20b/c%20d/blah.xml";
+		when(mockGwt.encode(anyString())).thenReturn(encodedUrl);
+		uploader.setExternalFilePath(url, "", storageLocationId);
+		verify(synapseClient).createExternalFile(anyString(), eq(encodedUrl), anyString(), anyString(), eq((Long)null), eq((String)null), eq(storageLocationId), any(AsyncCallback.class));
+		verify(view).showInfo(anyString(), anyString());
 	}
 	
 	@Test
@@ -434,7 +444,7 @@ public class UploaderTest {
 		String sftpProxy = "http://mytestproxy.com/sftp";
 		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy);
 		String url = "sftp://ok.net";
-		when(gwt.encodeQueryString(anyString())).thenReturn(url);
+		when(mockGwt.encodeQueryString(anyString())).thenReturn(url);
 
 		ExternalUploadDestination d = new ExternalUploadDestination();
 		d.setUploadType(UploadType.SFTP);
@@ -565,9 +575,9 @@ public class UploaderTest {
 		String sftpLink = "sftp://this/and/that.txt?foo=bar";
 		String encodedUrl = URLEncoder.encode(sftpLink, "UTF-8");
 		String encodedFilename = URLEncoder.encode(filename, "UTF-8");
-		when(gwt.encodeQueryString(sftpLink)).thenReturn(encodedUrl);
-		when(gwt.encodeQueryString(filename)).thenReturn(encodedFilename);
-		String sftpProxyLink = Uploader.getSftpProxyLink(filename, sftpLink, mockGlobalApplicationState, gwt);
+		when(mockGwt.encodeQueryString(sftpLink)).thenReturn(encodedUrl);
+		when(mockGwt.encodeQueryString(filename)).thenReturn(encodedFilename);
+		String sftpProxyLink = Uploader.getSftpProxyLink(filename, sftpLink, mockGlobalApplicationState, mockGwt);
 		//verify that the sftp link was encoded
 		assertTrue(sftpProxyLink.contains(encodedUrl));
 		assertTrue(sftpProxyLink.contains(encodedFilename));

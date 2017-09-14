@@ -45,6 +45,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -534,6 +535,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public void setExternalFilePath(String path, String name, Long storageLocationId) {
+		if (path.trim().contains(" ")) {
+			//encode for user
+			path = gwt.encode(path);
+			view.setExternalUrl(path);
+		}
+
 		boolean isUpdating = entityId != null || entity != null;
 		if (isUpdating) {
 			//existing entity
