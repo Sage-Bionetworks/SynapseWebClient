@@ -69,6 +69,7 @@ public class UserGroupHeaderFromAliasAsyncHandlerImplTest {
 	@Test
 	public void testFailure() {
 		//simulate exception response
+		when(mockGwt.getUniqueAliasName(anyString())).thenReturn("alias");
 		Exception ex = new Exception("problem loading batch");
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getUserGroupHeadersByAlias(any(ArrayList.class), any(AsyncCallback.class));
 		asyncHandler.getUserGroupHeader(alias, mockCallback);
@@ -79,12 +80,12 @@ public class UserGroupHeaderFromAliasAsyncHandlerImplTest {
 	
 	@Test
 	public void testNotFound() {
-		when(mockGwt.getUniqueAliasName(anyString())).thenReturn("alias");
-		when(mockResult.getUserName()).thenReturn("another alias");
+		when(mockGwt.getUniqueAliasName(anyString())).thenReturn(alias);
 		//add one, simulate different response
 		asyncHandler.getUserGroupHeader(alias, mockCallback);
 		resultList.add(mockResult);
-		
+		when(mockResult.getUserName()).thenReturn("another alias");
+		when(mockGwt.getUniqueAliasName(anyString())).thenReturn("anotheralias");
 		asyncHandler.executeRequests();
 		verify(mockSynapseJavascriptClient).getUserGroupHeadersByAlias(any(ArrayList.class), any(AsyncCallback.class));
 		verify(mockCallback).onFailure(any(Throwable.class));

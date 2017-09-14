@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -78,7 +79,7 @@ public class UserGroupHeaderAsyncHandlerImpl implements UserGroupHeaderAsyncHand
 							}
 						}
 					}
-					UnknownErrorException notReturnedException = new UnknownErrorException(DisplayConstants.ERROR_LOADING);
+					NotFoundException notReturnedException = new NotFoundException(DisplayConstants.ERROR_LOADING);
 					for (String userId : reference2CallbackCopy.keySet()) {
 						// not returned
 						callOnFailure(userId, notReturnedException);
