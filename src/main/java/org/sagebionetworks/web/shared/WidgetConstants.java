@@ -99,6 +99,7 @@ public class WidgetConstants {
 	public static final String WIDGET_END_MARKDOWN =  "}";
 	
 	public static final String TOC_CONTENT_TYPE = "toc";
+	public static final String IS_TOC_KEY = "isTOC";
 	public static final String WIKI_SUBPAGES_CONTENT_TYPE = "wikipages";
 	
 	public static final String NO_AUTO_WIKI_SUBPAGES = "nowikipages";

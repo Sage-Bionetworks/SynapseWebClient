@@ -2,31 +2,21 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import org.sagebionetworks.markdown.constants.MarkdownRegExConstants;
+import static org.sagebionetworks.markdown.constants.WidgetConstants.*;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
-import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.client.JsArray;
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.dom.client.HeadingElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
-import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Element;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.RootPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -36,7 +26,10 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 	private boolean hasLoaded;
 	private Map<String, String> tagName2Style;
 	private RegExp widgetIdRegEx = RegExp.compile("^widget[-]{1}\\d+([-]{1}.*)$", "i");
-	private RegExp widgetExistsRegEx = RegExp.compile("widget[-]{1}\\d+[-]{1}", "i");
+	private RegExp widgetExistsRegEx = RegExp.compile("(widget[-]{1})\\d+([-]{1})", "i");
+	private RegExp widgetParamsRegEx = RegExp.compile("(widgetparams[=]{1}[\"]{1}[^\"]*)([\"]{1})", "i");
+	private RegExp widgetInnerHtmlRegEx = RegExp.compile("(<span widgetparams[^>]*>).*(<\\/span>)", "i");
+	
 	@Inject
 	public TableOfContentsWidgetViewImpl() {
 		//build up the tag name to css class name here
@@ -62,7 +55,7 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 		Element el = null;
 		do {
 			i++;
-			String currentWidgetDiv = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + i + widgetSuffix;
+			String currentWidgetDiv = DIV_ID_WIDGET_PREFIX + i + widgetSuffix;
 			el = DOM.getElementById(currentWidgetDiv);
 		} while (el != null);
 		return i;
@@ -84,11 +77,8 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 			}
 			// determine element id of this toc element.  find last widget index.
 			int newWidgetIndex = getNewWidgetIndex();
-			String widgetIdSuffix = getWidgetSuffix();
-			String regEx = org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + "(\\d+)" + widgetIdSuffix;
 			// Go through widgets found in heading, and replace widget index with n+1.
-			// MarkdownWidget will go around and look for additional widgets after load
-
+			// MarkdownWidget will find these new widgets to process.
 			for (int j = 0; j < headingElements.length(); j++) {
 				Element heading = headingElements.get(j);
 				String tagName = heading.getTagName();
@@ -99,7 +89,12 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 					String headingHtml = heading.getInnerHTML();
 					// this currently only allows a single wiki widget per heading
 					if (widgetExistsRegEx.test(headingHtml)) {
-						headingHtml = headingHtml.replaceFirst(regEx, org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX + newWidgetIndex + widgetIdSuffix);
+						// remove any inner html
+						headingHtml = widgetInnerHtmlRegEx.replace(headingHtml, "$1$2");
+						// replace the wiki widget index in the id
+						headingHtml = widgetExistsRegEx.replace(headingHtml, "$1" + newWidgetIndex + "$2");
+						// also add the isTOC parameter to the widget definition.  Replace with the first group + new param + second group.
+						headingHtml = widgetParamsRegEx.replace(headingHtml, "$1&"+WidgetConstants.IS_TOC_KEY+"=true$2");
 						newWidgetIndex++;
 					}
 					

@@ -17,6 +17,7 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -90,6 +91,10 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 	
 	public void configure(Boolean isIndividual, String id) {
 		Widget theWidget;
+		boolean isToc = false;
+		if (widgetDescriptor.containsKey(WidgetConstants.IS_TOC_KEY)) {
+			isToc = Boolean.parseBoolean(widgetDescriptor.get(WidgetConstants.IS_TOC_KEY));
+		}
 		if (isIndividual) {
 			UserBadge badge = ginInjector.getUserBadgeWidget();
 			badge.setSize(BadgeSize.SMALLER);
@@ -100,13 +105,20 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			} else {
 				badge.configure((String)null);
 			}
+			if (isToc) {
+				badge.setDoNothingOnClick();	
+			}
 			
 			theWidget = badge.asWidget();
 			theWidget.addStyleName("movedown-6");
 		} else {
 			//team
+			ClickHandler customClickHandler = null;
+			if (isToc) {
+				customClickHandler = UserBadge.DO_NOTHING_ON_CLICK;
+			}
 			TeamBadge badge = ginInjector.getTeamBadgeWidget();
-			badge.configure(id);
+			badge.configure(id, customClickHandler);
 			badge.addStyleName("font-size-13");
 			theWidget = badge.asWidget();
 		}
