@@ -89,6 +89,16 @@ public class UserTeamBadgeTest {
 	}
 	
 	@Test
+	public void testConfigureIgnoreClick(){
+		widgetDescriptor.put(WidgetConstants.IS_TOC_KEY, "true");
+		badge.configure(null, widgetDescriptor, null, null);
+		verify(mockGinInjector).getUserBadgeWidget();
+		verify(mockUserBadge).configure(eq(principalId));
+		verify(mockUserBadge).setDoNothingOnClick();
+	}
+
+	
+	@Test
 	public void testConfigureWithUsername(){
 		String username = "Potter";
 		widgetDescriptor.remove(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY);
@@ -131,6 +141,16 @@ public class UserTeamBadgeTest {
 		verify(mockGinInjector).getTeamBadgeWidget();
 		verify(mockTeamBadge).configure(principalId, (ClickHandler)null);
 	}
+	
+	@Test
+	public void testConfigureTeamIgnoreClick(){
+		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY, "false");
+		widgetDescriptor.put(WidgetConstants.IS_TOC_KEY, "true");
+		badge.configure(null, widgetDescriptor, null, null);
+		verify(mockGinInjector).getTeamBadgeWidget();
+		verify(mockTeamBadge).configure(principalId, UserBadge.DO_NOTHING_ON_CLICK);
+	}
+
 	
 	@Test
 	public void testConfigureNullIsIndividual(){
