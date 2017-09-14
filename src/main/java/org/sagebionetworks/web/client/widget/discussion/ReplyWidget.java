@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TopicUtils;
@@ -37,6 +38,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	RequestBuilderWrapper requestBuilder;
 	SynapseAlert synAlert;
 	DiscussionForumClientAsync discussionForumClientAsync;
+	SynapseJavascriptClient jsClient;
 	AuthenticationController authController;
 	EditReplyModal editReplyModal;
 	MarkdownWidget markdownWidget;
@@ -63,7 +65,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			EditReplyModal editReplyModal,
 			MarkdownWidget markdownWidget,
 			GWTWrapper gwt,
-			CopyTextModal copyTextModal
+			CopyTextModal copyTextModal,
+			SynapseJavascriptClient jsClient
 			) {
 		this.view = view;
 		this.authorWidget = authorWidget;
@@ -76,6 +79,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.markdownWidget = markdownWidget;
 		this.gwt = gwt;
 		this.copyTextModal = copyTextModal;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.setAuthor(authorWidget.asWidget());
 		view.setAlert(synAlert.asWidget());
@@ -115,7 +119,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	public void configureMessage() {
 		synAlert.clear();
 		view.setLoadingMessageVisible(true);
-		discussionForumClientAsync.getReplyUrl(messageKey, new AsyncCallback<String>(){
+		jsClient.getReplyUrl(messageKey, new AsyncCallback<String>(){
 
 			@Override
 			public void onFailure(Throwable caught) {
@@ -208,7 +212,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	public void reconfigure() {
 		synAlert.clear();
-		discussionForumClientAsync.getReply(replyId, new AsyncCallback<DiscussionReplyBundle>(){
+		jsClient.getReply(replyId, new AsyncCallback<DiscussionReplyBundle>(){
 
 			@Override
 			public void onFailure(Throwable caught) {

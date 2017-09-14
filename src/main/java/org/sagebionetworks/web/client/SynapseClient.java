@@ -26,7 +26,6 @@ import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
@@ -66,7 +65,6 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
@@ -417,17 +415,7 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	boolean isWiki(String projectId) throws RestServiceException;
 
-	boolean isFileOrFolder(String projectId) throws RestServiceException;
-
-	boolean isTable(String projectId) throws RestServiceException;
-
-	boolean isForum(String projectId) throws RestServiceException;
-
-	boolean isDocker(String projectId) throws RestServiceException;
-
 	boolean isChallenge(String projectId) throws RestServiceException;
-
-	ProjectDisplayBundle getProjectDisplay(String projectId) throws RestServiceException;
 
 	void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException;
 

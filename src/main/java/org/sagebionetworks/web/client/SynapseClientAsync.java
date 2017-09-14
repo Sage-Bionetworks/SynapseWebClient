@@ -24,7 +24,6 @@ import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
@@ -64,7 +63,6 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
@@ -384,17 +382,7 @@ public interface SynapseClientAsync {
 	
 	void isWiki(String id, AsyncCallback<Boolean> callback);
 
-	void isFileOrFolder(String id, AsyncCallback<Boolean> callback);
-
-	void isTable(String id, AsyncCallback<Boolean> callback);
-
-	void isForum(String id, AsyncCallback<Boolean> callback);
-
-	void isDocker(String id, AsyncCallback<Boolean> callback);
-
 	void isChallenge(String id, AsyncCallback<Boolean> callback);
-
-	void getProjectDisplay(String projectId, AsyncCallback<ProjectDisplayBundle> callback);
 
 	void addTeamMember(String userGroupId, String teamId, String message, String hostPageBaseURL,
 			AsyncCallback<Void> callback);
