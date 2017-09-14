@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -29,19 +30,16 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 	// resolve from alias
 	UserGroupHeaderFromAliasAsyncHandler usgFromAliasAsyncHandler;
 	DivView div;
-	GWTWrapper gwt;
 	
 	@Inject
 	public UserTeamBadge(PortalGinInjector ginInjector,
 			UserGroupHeaderAsyncHandler usgFromIdAsyncHandler,
 			UserGroupHeaderFromAliasAsyncHandler usgFromAliasAsyncHandler,
-			DivView div,
-			GWTWrapper gwt) {
+			DivView div) {
 		this.ginInjector = ginInjector;
 		this.usgFromIdAsyncHandler = usgFromIdAsyncHandler;
 		this.usgFromAliasAsyncHandler = usgFromAliasAsyncHandler;
 		this.div = div;
-		this.gwt = gwt;
 		div.addStyleName("displayInline");
 	}
 	
@@ -52,7 +50,6 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 		String alias = widgetDescriptor.get(WidgetConstants.ALIAS_KEY);
 		if (alias != null) {
 			// get user group header for this alias (using a new service)
-			alias = gwt.getUniqueAliasName(alias);
 			usgFromAliasAsyncHandler.getUserGroupHeader(alias, new AsyncCallback<UserGroupHeader>() {
 				@Override
 				public void onSuccess(UserGroupHeader ugh) {
