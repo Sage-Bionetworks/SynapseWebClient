@@ -63,7 +63,7 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 	}
 	
 	public void setClickHandler(ClickHandler handler) {
-		entityBadge.setClickHandler(handler);
+		entityBadge.addClickHandler(handler);
 	}
 	
 	public void setState(boolean open, boolean fireEvents) {

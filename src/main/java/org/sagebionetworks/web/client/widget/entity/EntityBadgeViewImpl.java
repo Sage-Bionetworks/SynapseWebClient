@@ -30,8 +30,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
-
-	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	SageImageBundle sageImageBundle;
 	Widget modifiedByWidget;
@@ -49,8 +47,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	SimplePanel modifiedByField;
 	@UiField
 	Label modifiedOnField;
-	
-	ClickHandler nonDefaultClickHandler;
 	
 	@UiField
 	Tooltip annotationsField;
@@ -79,6 +75,8 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	Tooltip discussion;
 	Callback onAttachCallback;
+	Anchor entityAnchor;
+	
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
 			final SynapseJSNIUtils synapseJSNIUtils,
@@ -120,26 +118,20 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		if(entityHeader == null)  throw new IllegalArgumentException("Entity is required");
 		
 		if(entityHeader != null) {
-			final Anchor anchor = new Anchor();
-			anchor.setText(entityHeader.getName());
-			anchor.addStyleName("link");
-			
-			anchor.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					entityClicked(entityHeader, event);
-				}
-			});
+			entityAnchor = new Anchor();
+			entityAnchor.setText(entityHeader.getName());
+			entityAnchor.addStyleName("link");
+			entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
 			
 			ClickHandler clickHandler = new ClickHandler() {
 				@Override
 				public void onClick(ClickEvent event) {
-					anchor.fireEvent(event);
+					entityAnchor.fireEvent(event);
 				}
 			};
 			iconContainer.setWidget(icon);
 			iconContainer.addClickHandler(clickHandler);
-			entityContainer.add(anchor);
+			entityContainer.add(entityAnchor);
 			idField.setText(entityHeader.getId());
 		} 		
 	}
@@ -169,11 +161,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}
 
 	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;		
-	}
-	
-	@Override
 	public void clear() {
 		iconContainer.clear();
 		entityContainer.clear();
@@ -190,8 +177,14 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}
 	
 	@Override
-	public void setClickHandler(ClickHandler handler) {
-		nonDefaultClickHandler = handler;
+	public void addClickHandler(final ClickHandler handler) {
+		entityAnchor.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				event.preventDefault();
+				handler.onClick(event);
+			}
+		});
 	}
 	
 	@Override
@@ -203,13 +196,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@Override
 	public void setModifiedOn(String modifiedOnString) {
 		modifiedOnField.setText(modifiedOnString);
-	}
-	private void entityClicked(EntityHeader entityHeader, ClickEvent event) {
-		if (nonDefaultClickHandler == null) {
-			presenter.entityClicked(entityHeader);
-		} else {
-			nonDefaultClickHandler.onClick(event);
-		}
 	}
 	
 	@Override
