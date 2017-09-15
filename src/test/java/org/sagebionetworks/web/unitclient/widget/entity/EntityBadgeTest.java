@@ -24,6 +24,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -101,6 +102,9 @@ public class EntityBadgeTest {
 	DateTimeUtils mockDateTimeUtils;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Captor
+	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
+	
 	Set<ResourceAccess> resourceAccessSet;
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -242,23 +246,16 @@ public class EntityBadgeTest {
 	}
 
 	@Test
-	public void testEntityClicked() throws Exception {
-		//check the passthrough
-		EntityHeader header = new EntityHeader();
-		header.setId("syn93847");
-		widget.entityClicked(header);
-		verify(mockPlaceChanger).goTo(isA(Synapse.class));
-	}
-	
-	@Test
 	public void testEntityClickedCustomHandler() throws Exception {
+		configure();
 		CallbackP<String> mockEntityClicked = mock(CallbackP.class);
 		widget.setEntityClickedHandler(mockEntityClicked);
-		String id = "syn77";
-		EntityHeader header = new EntityHeader();
-		header.setId(id);
-		widget.entityClicked(header);
-		verify(mockEntityClicked).invoke(id);
+		verify(mockView).addClickHandler(clickHandlerCaptor.capture());
+		// test click handler calls us back
+		ClickHandler clickHandler = clickHandlerCaptor.getValue();
+		verify(mockEntityClicked, never()).invoke(anyString());
+		clickHandler.onClick(null);
+		verify(mockEntityClicked).invoke(anyString());
 	}
 	
 	@Test
@@ -285,14 +282,6 @@ public class EntityBadgeTest {
 		assertTrue(header == widget.getHeader());
 	}
 	
-	@Test
-	public void testSetClickHandler() {
-		ClickHandler mockClickHandler = mock(ClickHandler.class);
-		widget.setClickHandler(mockClickHandler);
-		verify(mockView).setClickHandler(mockClickHandler);
-		verify(mockUserBadge).setCustomClickHandler(mockClickHandler);
-	}
-
 	@Test
 	public void testAnnotationsEmpty() throws Exception {
 		annotationList.clear();
