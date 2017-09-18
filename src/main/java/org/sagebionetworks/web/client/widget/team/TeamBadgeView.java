@@ -14,7 +14,7 @@ public interface TeamBadgeView extends IsWidget, SynapseView {
 	 */
 	public void setPresenter(Presenter presenter);
 	
-	public void setTeam(Team team, Integer maxNameLength, String xsrfToken, ClickHandler customClickHandler);
+	public void setTeam(Team team, Integer maxNameLength, ClickHandler customClickHandler);
 
 	public void showLoadError(String principalId);
 	

@@ -42,7 +42,7 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 
 	@Override
 	public void configure(WikiPageKey wikiKey, final String fileName,
-			final String scale, String alignment, final String synapseId, final Long version, final boolean isLoggedIn, Long wikiVersion, String xsrfToken) {
+			final String scale, String alignment, final String synapseId, final Long version, final boolean isLoggedIn, Long wikiVersion) {
 		this.clear();
 		hasTriedCache = false;
 		// Add a html panel that contains the image src from the attachments server (to pull asynchronously)
@@ -50,11 +50,11 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 		final String url;
 		// If the wiki page is showing a different/old version, we need to get the URL to that version's attachments
 		if(wikiVersion != null) {
-			url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, version, false, xsrfToken) :
-				DisplayUtils.createVersionOfWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false, wikiVersion, xsrfToken);
+			url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, version, false) :
+				DisplayUtils.createVersionOfWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false, wikiVersion);
 		} else {
-			url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, version, false, xsrfToken) :
-				DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false, xsrfToken);
+			url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, version, false) :
+				DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false);
 		}
 		
 		image = new Image();

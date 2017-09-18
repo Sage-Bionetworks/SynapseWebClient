@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import java.util.Date;
-
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
@@ -14,15 +12,12 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Callback;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
@@ -97,21 +92,20 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	
 	@Override
 	public String getBaseFileHandleUrl() {
-		return GWT.getModuleBaseURL()+"filehandle";
+		return GWTWrapperImpl.getRealGWTModuleBaseURL()+"filehandle";
 	}
 	
 	@Override
 	public String getBaseProfileAttachmentUrl() {
-		return GWT.getModuleBaseURL() + "profileAttachment";
+		return GWTWrapperImpl.getRealGWTModuleBaseURL() + "profileAttachment";
 	}
 	
 	@Override
-	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId, String xsrfToken) {
-		return GWT.getModuleBaseURL() + WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET + "?" + 
+	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId) {
+		return GWTWrapperImpl.getRealGWTModuleBaseURL() + WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET + "?" + 
 				WebConstants.ASSOCIATED_OBJECT_ID_PARAM_KEY + "=" + objectId + "&" +
 				WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY + "=" + objectType.toString() + "&" + 
-				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId + "&" +
-				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
+				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId;
 	}
 
 	@Override

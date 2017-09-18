@@ -235,6 +235,7 @@ import org.sagebionetworks.web.client.widget.verification.VerificationSubmission
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
+import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 
 /**
  * The root portal dependency injection root.
@@ -528,6 +529,15 @@ public interface PortalGinInjector extends Ginjector {
 	public ACTRevokeUserAccessModal getACTRevokeUserAccessModal();
 	public ChallengeClientAsync getChallengeClientAsync();
 	public UserProfileClientAsync getUserProfileClientAsync();
+	public DataAccessClientAsync getDataAccessClientAsync();
+	public MultipartFileUploadClientAsync getMultipartFileUploadClientAsync();
+	public DiscussionForumClientAsync getDiscussionForumClientAsync();
+	public DockerClientAsync getDockerClientAsync();
+	public JiraClientAsync getJiraClientAsync();
+	public LinkedInServiceAsync getLinkedInServiceAsync();
+	public StackConfigServiceAsync getStackConfigServiceAsync();
+	public SubscriptionClientAsync getSubscriptionClientAsync();
+	public UserAccountServiceAsync getUserAccountServiceAsync();
 	public EntityIdCellRendererImpl getEntityIdCellRenderer();
 	public UserIdCellRendererImpl getUserIdCellRenderer();
 	

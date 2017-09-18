@@ -17,6 +17,8 @@ import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 
@@ -31,7 +33,6 @@ public class Portal implements EntryPoint {
 	private final PortalGinInjector ginjector = GWT.create(PortalGinInjector.class);
 	
 	private SimplePanel appWidget = new SimplePanel();
-
 	public final static native void _consoleError(String message) /*-{
 		console.error(message);
 	}-*/;
@@ -85,6 +86,7 @@ public class Portal implements EntryPoint {
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
+						fixGWTRpcServiceEntryPoints();
 						globalApplicationState.initSynapseProperties(new Callback() {
 							
 							@Override
@@ -112,6 +114,29 @@ public class Portal implements EntryPoint {
 				}
 			});
 			
+		}
+	}
+	
+	public void fixGWTRpcServiceEntryPoints() {
+		fixServiceEntryPoint((ServiceDefTarget)ginjector.getChallengeClientAsync());
+		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDataAccessClientAsync());
+		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDiscussionForumClientAsync());
+		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDockerClientAsync());
+		fixServiceEntryPoint((ServiceDefTarget)ginjector.getJiraClientAsync());
+		fixServiceEntryPoint((ServiceDefTarget)ginjector.getLinkedInServiceAsync());
+		fixServiceEntryPoint((ServiceDefTarget)ginjector.getStackConfigServiceAsync());
+		fixServiceEntryPoint((ServiceDefTarget)ginjector.getSubscriptionClientAsync());
+		fixServiceEntryPoint((ServiceDefTarget)ginjector.getSynapseClientAsync());
+		fixServiceEntryPoint((ServiceDefTarget)ginjector.getUserAccountServiceAsync());
+		fixServiceEntryPoint((ServiceDefTarget)ginjector.getUserProfileClientAsync());
+		fixServiceEntryPoint((ServiceDefTarget)ginjector.getMultipartFileUploadClientAsync());
+	}
+	
+	public void fixServiceEntryPoint(ServiceDefTarget serviceDefTarget) {
+		String oldUrl = serviceDefTarget.getServiceEntryPoint();
+		if (oldUrl.startsWith(GWT.getModuleBaseURL())) {
+			String serviceEntryPoint = GWTWrapperImpl.getRealGWTModuleBaseURL() + oldUrl.substring(GWT.getModuleBaseURL().length());
+			serviceDefTarget.setServiceEntryPoint(serviceEntryPoint);
 		}
 	}
 	

@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("discussionforumclient")	
-public interface DiscussionForumClient extends XsrfProtectedService {
+public interface DiscussionForumClient {
 
 	DiscussionThreadBundle createThread(CreateDiscussionThread toCreate)
 			throws RestServiceException;

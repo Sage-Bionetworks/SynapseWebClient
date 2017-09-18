@@ -13,7 +13,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("multipartFileUploadClient")	
-public interface MultipartFileUploadClient extends XsrfProtectedService {
+public interface MultipartFileUploadClient {
 
 	MultipartUploadStatus startMultipartUpload(MultipartUploadRequest request, Boolean forceRestart) throws RestServiceException;
 	BatchPresignedUploadUrlResponse getMultipartPresignedUrlBatch(BatchPresignedUploadUrlRequest request) throws RestServiceException;

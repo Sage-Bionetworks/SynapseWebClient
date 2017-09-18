@@ -26,7 +26,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("dataaccessclient")
-public interface DataAccessClient extends XsrfProtectedService {
+public interface DataAccessClient {
 	ResearchProject getResearchProject(Long id) throws RestServiceException;
 	ResearchProject updateResearchProject(ResearchProject researchProject)  throws RestServiceException;
 	RequestInterface getDataAccessRequest(Long id) throws RestServiceException;

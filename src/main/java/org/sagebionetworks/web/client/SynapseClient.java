@@ -77,7 +77,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("synapseclient")	
-public interface SynapseClient extends XsrfProtectedService {
+public interface SynapseClient {
 
 	public PaginatedResults<VersionInfo> getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
 

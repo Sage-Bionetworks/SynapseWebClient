@@ -21,7 +21,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("challengeclient")	
-public interface ChallengeClient extends XsrfProtectedService {
+public interface ChallengeClient {
 
 	/**
 	 * Get evaluations given a list of ids.

@@ -11,7 +11,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("subscriptionclient")	
-public interface SubscriptionClient extends XsrfProtectedService {
+public interface SubscriptionClient {
 	
 	SubscriptionPagedResults getAllSubscriptions(SubscriptionObjectType objectType, Long limit, Long offset) throws RestServiceException;
 	

@@ -51,7 +51,6 @@ public class FileCellRendererImplTest {
 	TableType tableType;
 	@Mock
 	AuthenticationController mockAuthController;
-	String xsrfToken = "98208";
 	@Mock
 	FileResult mockFileResult;
 	@Before
@@ -74,13 +73,12 @@ public class FileCellRendererImplTest {
 		
 		when(mockFileResult.getFileHandle()).thenReturn(fileHandle);
 		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
-		when(mockAuthController.getCurrentXsrfToken()).thenReturn(xsrfToken);
 	}
 	
 	@Test
 	public void testCreateAnchorHref(){
 		renderer.setValue(fileHandleId);
-		String expectedHref = "/Portal/filehandleassociation?associatedObjectId=syn123&associatedObjectType=TableEntity&fileHandleId="+fileHandleId+"&xsrfToken=98208";
+		String expectedHref = "/Portal/filehandleassociation?associatedObjectId=syn123&associatedObjectType=TableEntity&fileHandleId="+fileHandleId;
 		assertEquals(expectedHref, renderer.createAnchorHref());
 	}
 	
@@ -90,7 +88,7 @@ public class FileCellRendererImplTest {
 		address = new CellAddress(tableId, column, rowId, rowVersion, tableType);
 		renderer.setCellAddresss(address);
 		renderer.setValue(fileHandleId);
-		String expectedHref = "/Portal/filehandleassociation?associatedObjectId="+rowId+"&associatedObjectType=FileEntity&fileHandleId="+fileHandleId+"&xsrfToken=98208";
+		String expectedHref = "/Portal/filehandleassociation?associatedObjectId="+rowId+"&associatedObjectType=FileEntity&fileHandleId="+fileHandleId;
 		assertEquals(expectedHref, renderer.createAnchorHref());
 	}
 	

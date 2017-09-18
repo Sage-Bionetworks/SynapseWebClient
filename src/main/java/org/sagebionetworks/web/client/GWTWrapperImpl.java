@@ -38,7 +38,7 @@ public class GWTWrapperImpl implements GWTWrapper {
 
 	@Override
 	public String getModuleBaseURL() {
-		return GWT.getModuleBaseURL();
+		return GWTWrapperImpl.getRealGWTModuleBaseURL();
 	}
 	
 	@Override
@@ -207,4 +207,13 @@ public class GWTWrapperImpl implements GWTWrapper {
 		// Replace all non-letters and numbers with empty strings
 		return PRINICPAL_UNIQUENESS_REPLACE_PATTERN.replace(inputName, "");
 	}
+	
+	public static native String getHostpageUrl()/*-{
+	   return $wnd.location.protocol + "//" + $wnd.location.host + "/";
+	}-*/;
+
+	public static String getRealGWTModuleBaseURL() {
+		return getHostpageUrl() + GWT.getModuleName() + "/";
+	}
+	
 }

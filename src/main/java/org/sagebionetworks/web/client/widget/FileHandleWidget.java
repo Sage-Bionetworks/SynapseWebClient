@@ -65,8 +65,7 @@ public class FileHandleWidget implements IsWidget {
 	}
 	
 	public String createAnchorHref(FileHandleAssociation fha){
-		String xsrfToken = authController.getCurrentXsrfToken();
-		return jsniUtils.getFileHandleAssociationUrl(fha.getAssociateObjectId(), fha.getAssociateObjectType(), fha.getFileHandleId(), xsrfToken);
+		return jsniUtils.getFileHandleAssociationUrl(fha.getAssociateObjectId(), fha.getAssociateObjectType(), fha.getFileHandleId());
 	}
 	
 	public void configure(String fileName, String rawFileHandleId) {
@@ -76,8 +75,7 @@ public class FileHandleWidget implements IsWidget {
 	}
 	
 	public String createAnchorHref(String rawFileHandleId) {
-		String xsrfToken = authController.getCurrentXsrfToken();
-		return	jsniUtils.getBaseFileHandleUrl() + "?rawFileHandleId=" + rawFileHandleId + "&" + WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
+		return	jsniUtils.getBaseFileHandleUrl() + "?rawFileHandleId=" + rawFileHandleId;
 	}
 	
 	public String getFileHandleId() {

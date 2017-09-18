@@ -25,8 +25,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.rpc.XsrfToken;
-import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 import com.google.inject.Inject;
 
 /**
@@ -38,7 +36,6 @@ import com.google.inject.Inject;
  *
  */
 public class AuthenticationControllerImpl implements AuthenticationController {
-	public static final String XSRF_TOKEN_KEY = "org.sagebionetworks.XSRFToken";
 	public static final String USER_SESSION_DATA_CACHE_KEY = "org.sagebionetworks.UserSessionData";
 	public static final String USER_AUTHENTICATION_RECEIPT = "_authentication_receipt";
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
@@ -51,7 +48,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private SynapseClientAsync synapseClient;
 	private ChallengeClientAsync challengeClient;
 	private SubscriptionClientAsync subscriptionClient;
-	private XsrfTokenServiceAsync xsrfTokenService;
 	private GWTWrapper gwt;
 	
 	@Inject
@@ -61,7 +57,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			SessionStorage sessionStorage, 
 			ClientCache localStorage, 
 			AdapterFactory adapterFactory,
-			XsrfTokenServiceAsync xsrfTokenService,
 			SynapseClientAsync synapseClient,
 			GWTWrapper gwt,
 			ChallengeClientAsync challengeClient,
@@ -72,11 +67,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		this.localStorage = localStorage;
 		this.adapterFactory = adapterFactory;
 		this.synapseClient = synapseClient;
-		this.xsrfTokenService = xsrfTokenService;
 		this.challengeClient = challengeClient;
 		this.subscriptionClient = subscriptionClient;
 		this.gwt = gwt;
-		gwt.asServiceDefTarget(xsrfTokenService).setServiceEntryPoint(gwt.getModuleBaseURL() + "xsrf");
 	}
 
 	@Override
@@ -158,28 +151,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 				currentUser = userSessionData;
 				localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
-				updateXsrfToken(userSessionData, callback);
+				callback.onSuccess(currentUser);
 			}
 			@Override
 			public void onFailure(Throwable caught) {
 				logoutUser();
 				callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE + " " + caught.getMessage()));
-			}
-		});
-	}
-
-	private void updateXsrfToken(final UserSessionData userSessionData, final AsyncCallback<UserSessionData> callback) {
-		xsrfTokenService.getNewXsrfToken(new AsyncCallback<XsrfToken>() {
-			public void onSuccess(XsrfToken token) {
-				gwt.asHasRpcToken(synapseClient).setRpcToken(token);
-				gwt.asHasRpcToken(challengeClient).setRpcToken(token);
-				gwt.asHasRpcToken(subscriptionClient).setRpcToken(token);
-				localStorage.put(XSRF_TOKEN_KEY, token.getToken(), DateTimeUtilsImpl.getDayFromNow().getTime());
-				callback.onSuccess(userSessionData);
-			}
-
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
 			}
 		});
 	}
@@ -266,10 +243,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public void signTermsOfUse(boolean accepted, AsyncCallback<Void> callback) {
 		userAccountService.signTermsOfUse(getCurrentUserSessionToken(), accepted, callback);
-	}
-	@Override
-	public String getCurrentXsrfToken() {
-		return localStorage.get(XSRF_TOKEN_KEY);
 	}
 	
 	@Override

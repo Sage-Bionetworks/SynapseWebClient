@@ -50,7 +50,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	}
 	
 	@Override
-	public void setTeam(final Team team, Integer maxNameLength, String xsrfToken, ClickHandler customClickHandler) {
+	public void setTeam(final Team team, Integer maxNameLength, ClickHandler customClickHandler) {
 		clear();
 		notificationsPanel.clear();
 		if(team == null)  throw new IllegalArgumentException("Team is required");
@@ -72,7 +72,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			};
 			if (team.getIcon() != null && team.getIcon().length() > 0) {
 				Image profilePicture = new Image();
-				profilePicture.setUrl(DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId(), xsrfToken));
+				profilePicture.setUrl(DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId()));
 				profilePicture.setHeight("24px");
 				profilePicture.addStyleName("imageButton userProfileImage displayInline margin-right-4");
 				profilePicture.addClickHandler(clickHandler);

@@ -34,7 +34,6 @@ import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
-import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -46,7 +45,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Home;
@@ -79,7 +77,6 @@ import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -745,8 +742,8 @@ public class DisplayUtils {
 	 * @return
 	 */
 	public static String createVersionOfWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, 
-			boolean preview, Long wikiVersion, String xsrfToken) {
-		String attachmentUrl = createWikiAttachmentUrl(baseFileHandleUrl, wikiKey, fileName, preview, xsrfToken);
+			boolean preview, Long wikiVersion) {
+		String attachmentUrl = createWikiAttachmentUrl(baseFileHandleUrl, wikiKey, fileName, preview);
 		return attachmentUrl + "&" + WebConstants.WIKI_VERSION_PARAM_KEY + "=" + wikiVersion.toString();
 	}
 	
@@ -758,7 +755,7 @@ public class DisplayUtils {
 		 * @param fileName
 		 * @return
 		 */
-	public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview, String xsrfToken){
+	public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
 		//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
 //		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
 //		return repoServicesUrl 
@@ -772,14 +769,13 @@ public class DisplayUtils {
 		return baseFileHandleUrl + "?" +
 				WebConstants.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
 				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
-				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken + "&" +
 				WebConstants.WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
 					WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
 					wikiIdParam;
 	}
 		
-	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, String xsrfToken){
-		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false, xsrfToken);
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
+		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false);
 	}
 	
 	public static String getParamForNoCaching() {
@@ -792,13 +788,12 @@ public class DisplayUtils {
 	 * @param entityid
 	 * @return
 	 */
-	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy, String xsrfToken){
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy){
 		String versionParam = versionNumber == null ? "" : "&" + WebConstants.ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
 		return baseFileHandleUrl + "?" +
 				WebConstants.ENTITY_PARAM_KEY + "=" + entityId + "&" +
 				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
-				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) + "&" + 
-				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken +
+				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) + 
 				versionParam;
 	}
 	
@@ -808,10 +803,9 @@ public class DisplayUtils {
 	 * @param teamId
 	 * @return
 	 */
-	public static String createTeamIconUrl(String baseFileHandleUrl, String teamId, String xsrfToken){
+	public static String createTeamIconUrl(String baseFileHandleUrl, String teamId){
 		return baseFileHandleUrl + "?" +
-				WebConstants.TEAM_PARAM_KEY + "=" + teamId + "&" +
-				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
+				WebConstants.TEAM_PARAM_KEY + "=" + teamId;
 	}
 	
 	/**
@@ -820,10 +814,9 @@ public class DisplayUtils {
 	 * @param rawFileHandleId
 	 * @return
 	 */
-	public static String createRawFileHandleUrl(String baseFileHandleUrl, String rawFileHandleId, String xsrfToken){
+	public static String createRawFileHandleUrl(String baseFileHandleUrl, String rawFileHandleId){
 		return baseFileHandleUrl + "?" +
-				WebConstants.RAW_FILE_HANDLE_PARAM + "=" + rawFileHandleId + "&" +
-				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
+				WebConstants.RAW_FILE_HANDLE_PARAM + "=" + rawFileHandleId;
 	}
 
 	public static String createEntityVersionString(Reference ref) {

@@ -70,7 +70,6 @@ public class TeamPresenterTest {
 	String newDesc = "newDesc";
 	boolean newPublicJoin = false;
 	String newIcon = "newIcon";
-	String xsrfToken = "98208";
 	@Mock
 	GoogleMap mockGoogleMap;
 	@Mock
@@ -120,8 +119,6 @@ public class TeamPresenterTest {
 		when(mockTeam.getCanPublicJoin()).thenReturn(canPublicJoin);
 		when(mockTeam.getId()).thenReturn(teamId);
 		when(mockTeam.getIcon()).thenReturn(teamIcon);
-		
-		when(mockAuthenticationController.getCurrentXsrfToken()).thenReturn(xsrfToken);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 	}
 	
@@ -167,7 +164,7 @@ public class TeamPresenterTest {
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
 		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
-		verify(mockView).setMediaObjectPanel(mockTeam, xsrfToken);
+		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
 		verify(mockOpenMembershipRequestsWidget).setVisible(true);
@@ -204,7 +201,7 @@ public class TeamPresenterTest {
 		//once
 		verify(mockView).setPublicJoinVisible(false);
 		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
-		verify(mockView).setMediaObjectPanel(mockTeam, xsrfToken);
+		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockJoinWidget).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
@@ -227,7 +224,7 @@ public class TeamPresenterTest {
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
 		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
-		verify(mockView).setMediaObjectPanel(mockTeam, xsrfToken);
+		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
 		

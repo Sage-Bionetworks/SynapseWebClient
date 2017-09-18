@@ -37,8 +37,7 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY),
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY),
 				descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY),
-				synapseId, version, authenticationController.isLoggedIn(), wikiVersionInView,
-				authenticationController.getCurrentXsrfToken());
+				synapseId, version, authenticationController.isLoggedIn(), wikiVersionInView);
 		
 		String responsiveValue = descriptor.get(WidgetConstants.IMAGE_WIDGET_RESPONSIVE_KEY);
 		if (responsiveValue != null && !Boolean.parseBoolean(responsiveValue)) {

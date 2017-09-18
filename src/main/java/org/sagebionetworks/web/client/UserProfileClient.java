@@ -13,7 +13,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("userprofileclient")	
-public interface UserProfileClient extends XsrfProtectedService {
+public interface UserProfileClient {
 
 	VerificationSubmission createVerificationSubmission(
 			VerificationSubmission verificationSubmission, String hostPageBaseURL)

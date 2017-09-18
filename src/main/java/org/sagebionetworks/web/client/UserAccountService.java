@@ -7,12 +7,10 @@ import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("users")
-public interface UserAccountService extends XsrfProtectedService {	
+public interface UserAccountService {	
 
 	public void sendPasswordResetEmail(String emailAddress) throws RestServiceException;
 	

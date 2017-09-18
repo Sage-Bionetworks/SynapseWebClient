@@ -227,10 +227,10 @@ public class TeamViewImpl extends Composite implements TeamView {
 	}
 	
 	@Override
-	public void setMediaObjectPanel(Team team, String xsrfToken) {
+	public void setMediaObjectPanel(Team team) {
 		String pictureUrl = null;
 		if (team.getIcon() != null) {
-			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId(), xsrfToken) + "&imageId=" + team.getIcon();
+			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId()) + "&imageId=" + team.getIcon();
 		}
 		FlowPanel mediaObjectPanel = DisplayUtils.getMediaObject(team.getName(), team.getDescription(), null,  pictureUrl, false, 2);
 		mediaObjectContainer.setWidget(mediaObjectPanel.asWidget());

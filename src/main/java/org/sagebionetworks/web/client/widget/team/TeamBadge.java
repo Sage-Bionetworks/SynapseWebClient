@@ -59,7 +59,7 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	}
 	
 	public void configure(Team team) {
-		view.setTeam(team, maxNameLength, authController.getCurrentXsrfToken(), customClickHandler);
+		view.setTeam(team, maxNameLength, customClickHandler);
 	}
 	
 	/**
