@@ -236,8 +236,8 @@ public class TableEntityWidgetTest {
 		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
 		
 		verify(mockActionMenu).setBasicDivderVisible(true);
-		// TODO: SWC-3729: verify shown for file view, after UX issues have been worked out with users.
-		verify(mockQueryInputWidget).setDownloadFilesVisible(false);
+		// verify download help is shown for file views
+		verify(mockQueryInputWidget).setDownloadFilesVisible(true);
 	}
 	@Test
 	public void testConfigureViewNoEdit(){
