@@ -64,6 +64,7 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -90,6 +91,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
+import org.sagebionetworks.web.client.widget.aws.AwsSdk;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -117,6 +119,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -186,6 +189,14 @@ public class EntityActionControllerImplTest {
 	AccessControlList mockACL;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	AwsSdk mockAwsSdk;
+	@Mock
+	ExternalObjectStoreFileHandle mockExternalObjectStoreFileHandle;
+	@Captor
+	ArgumentCaptor<CallbackP<JavaScriptObject>> callbackPJsObjectCaptor;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
 	
 	Set<ResourceAccess> resourceAccessSet;
 	
@@ -245,7 +256,8 @@ public class EntityActionControllerImplTest {
 				mockPortalGinInjector,
 				mockAuthenticationController, 
 				mockCookies,
-				mockIsACTMemberAsyncHandler);
+				mockIsACTMemberAsyncHandler,
+				mockAwsSdk);
 		
 		parentId = "syn456";
 		entityId = "syn123";
@@ -821,6 +833,61 @@ public class EntityActionControllerImplTest {
 		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(DELETED, THE + EntityTypeUtils.getDisplayName(EntityType.table) + WAS_SUCCESSFULLY_DELETED);
 		verify(mockPlaceChanger).goTo(new Synapse(parentId, null, EntityArea.TABLES, null) );
+	}
+	
+	@Test
+	public void testOnDeleteExternalObjectStoreFileHandle(){
+		String dataFileHandleId = "111";
+		FileEntity file = new FileEntity();
+		file.setId(entityId);
+		file.setParentId(parentId);
+		file.setDataFileHandleId(dataFileHandleId);
+		entityBundle.setEntity(file);
+		entityBundle.setFileHandles(Collections.singletonList((FileHandle)mockExternalObjectStoreFileHandle));
+		when(mockExternalObjectStoreFileHandle.getId()).thenReturn(dataFileHandleId);
+		// confirm the delete
+		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		// confirm pre-flight
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		
+		// the call under test
+		controller.onAction(Action.DELETE_ENTITY);
+		
+		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		// delete does not occur yet
+		verify(mockSynapseClient, never()).deleteEntityById(anyString(), any(AsyncCallback.class));
+		// get credentials
+		verify(mockView).showAwsLoginDialog();
+		
+		String accessKey = "key";
+		String secretKey = "secretKey";
+		String endpoint = "object store endpoint";
+		String bucket = "a bucket";
+		String fileKey = "file.txt";
+		when(mockView.getS3DirectAccessKey()).thenReturn(accessKey);
+		when(mockView.getS3DirectSecretKey()).thenReturn(secretKey);
+		when(mockExternalObjectStoreFileHandle.getEndpointUrl()).thenReturn(endpoint);
+		when(mockExternalObjectStoreFileHandle.getBucket()).thenReturn(bucket);
+		when(mockExternalObjectStoreFileHandle.getFileKey()).thenReturn(fileKey);
+		
+		// view calls back with credentials filled in
+		controller.onAwsLogin();
+		
+		verify(mockAwsSdk).getS3(eq(accessKey), eq(secretKey), eq(bucket), eq(endpoint), callbackPJsObjectCaptor.capture());
+		CallbackP<JavaScriptObject> s3Callback = callbackPJsObjectCaptor.getValue();
+		
+		//simulate success in getting s3 js object
+		s3Callback.invoke(null);
+		verify(mockAwsSdk).deleteObject(eq(fileKey), eq(bucket), eq((JavaScriptObject)null), callbackCaptor.capture());
+		
+		//simulate successful delete
+		callbackCaptor.getValue().invoke();
+		
+		verify(mockView).showInfo(DELETED, THE + EntityTypeUtils.getDisplayName(EntityType.file) + WAS_SUCCESSFULLY_DELETED);
+		verify(mockPlaceChanger).goTo(new Synapse(parentId));
 	}
 	
 	@Test

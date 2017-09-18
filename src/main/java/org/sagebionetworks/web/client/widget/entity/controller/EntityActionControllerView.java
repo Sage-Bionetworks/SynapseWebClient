@@ -41,4 +41,13 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	void showPromptDialog(String prompt, PromptCallback callback);
 
 	void addWidget(IsWidget asWidget);
+	void setPresenter(Presenter p);
+	void showAwsLoginDialog();
+	String getS3DirectAccessKey();
+	String getS3DirectSecretKey();
+	void clearAwsLoginCredentials();
+	public interface Presenter {
+		void onAwsLogin();
+	}
+
 }

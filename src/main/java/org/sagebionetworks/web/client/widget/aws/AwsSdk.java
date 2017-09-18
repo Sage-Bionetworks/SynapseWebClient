@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.aws;
 import static org.sagebionetworks.web.client.ClientProperties.AWS_SDK_JS;
 
 import org.sagebionetworks.web.client.resources.ResourceLoader;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.upload.S3DirectUploadHandler;
 
@@ -97,6 +98,37 @@ public class AwsSdk {
 	        ResponseContentDisposition: 'attachment; filename="' + fileName + '"' 
 	    };
 		return s3.getSignedUrl('getObject', params);
+	}-*/;
+	
+	public String deleteObject(
+			String key,
+			String bucketName,
+			JavaScriptObject s3,
+			Callback successCallback
+			) {
+		return _deleteObject(key, bucketName, s3, successCallback);
+	}
+
+	private static native String _deleteObject(
+			String key,
+			String bucketName,
+			JavaScriptObject s3,
+			Callback successCallback) 
+	/*-{
+		var params = {
+			Bucket: bucketName,
+			Key: key
+	    };
+		return s3.deleteObject(params, function(err, data) {
+//				if (err) {
+//					// Errors are not being sent to this listener (seem to only be logged to the console by the underlying aws sdk), so removing callback for now.
+//					errorCallback.@org.sagebionetworks.web.client.utils.CallbackP::invoke(Ljava/lang/Object;)(err);
+//				} else {
+					//success
+					successCallback.@org.sagebionetworks.web.client.utils.Callback::invoke()();
+//				}
+			}
+		);
 	}-*/;
 
 
