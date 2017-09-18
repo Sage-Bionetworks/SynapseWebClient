@@ -176,18 +176,21 @@ public class FilesTab {
 	}
 	
 	public void resetView() {
-		synAlert.clear();
-		view.setFileTitlebarVisible(false);
-		view.setFolderTitlebarVisible(false);
-		view.setPreviewVisible(false);
-		view.setMetadataVisible(false);
-		view.setWikiPageWidgetVisible(false);
-		view.setFileBrowserVisible(false);
-		view.clearActionMenuContainer();
-		breadcrumb.clear();
-		view.setProvenanceVisible(false);
-		modifiedCreatedBy.setVisible(false);
-		view.setDiscussionThreadListWidgetVisible(false);
+		if (view != null) {
+			synAlert.clear();
+			view.setFileTitlebarVisible(false);
+			view.setFolderTitlebarVisible(false);
+			view.setPreviewVisible(false);
+			view.setMetadataVisible(false);
+			view.setWikiPageWidgetVisible(false);
+			view.setFileBrowserVisible(false);
+			view.clearActionMenuContainer();
+			breadcrumb.clear();
+			view.setProvenanceVisible(false);
+			modifiedCreatedBy.setVisible(false);
+			view.setDiscussionThreadListWidgetVisible(false);
+			filesBrowser.clear();
+		}
 	}
 	
 	public void setProject(String projectEntityId, EntityBundle projectBundle, Throwable projectBundleLoadError) {

@@ -36,6 +36,7 @@ import org.sagebionetworks.repo.model.dataaccess.RequestInterface;
 import org.sagebionetworks.repo.model.dataaccess.ResearchProject;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -48,8 +49,8 @@ import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.Cr
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionWizardStep2View;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -100,9 +101,9 @@ public class CreateDataAccessSubmissionStep2Test {
 	@Captor
 	ArgumentCaptor<CallbackP<FileUpload>> callbackPCaptor;
 	@Mock
-	SynapseSuggestion mockSynapseSuggestion;
+	UserGroupSuggestion mockSynapseSuggestion;
 	@Captor
-	ArgumentCaptor<CallbackP<SynapseSuggestion>> callbackPUserSuggestionCaptor;
+	ArgumentCaptor<CallbackP<UserGroupSuggestion>> callbackPUserSuggestionCaptor;
 	@Mock
 	FileHandleWidget mockFileHandleWidget;
 	@Mock
@@ -192,6 +193,7 @@ public class CreateDataAccessSubmissionStep2Test {
 		verify(mockView).setOtherDocumentUploaded(any(IsWidget.class));
 		verify(mockView).setPeopleSuggestWidget(any(IsWidget.class));
 		verify(mockPeopleSuggestBox).setSuggestionProvider(mockProvider);
+		verify(mockPeopleSuggestBox).setTypeFilter(TypeFilter.USERS_ONLY);
 		verify(mockAccessorsList).setCanDelete(true);
 		verify(mockOtherDocuments).setCanDelete(true);
 		verify(mockOtherDocuments).setCanUpload(true);
@@ -226,7 +228,7 @@ public class CreateDataAccessSubmissionStep2Test {
 	public void testUserSynapseSuggestion() {
 		widget.configure(mockResearchProject, mockACTAccessRequirement, mockSubject);
 		verify(mockPeopleSuggestBox).addItemSelectedHandler(callbackPUserSuggestionCaptor.capture());
-		CallbackP<SynapseSuggestion> callback = callbackPUserSuggestionCaptor.getValue();
+		CallbackP<UserGroupSuggestion> callback = callbackPUserSuggestionCaptor.getValue();
 		callback.invoke(mockSynapseSuggestion);
 		verify(mockAccessorsList).addAccessorChange(accessorChangeCaptor.capture());
 		AccessorChange change = accessorChangeCaptor.getValue();

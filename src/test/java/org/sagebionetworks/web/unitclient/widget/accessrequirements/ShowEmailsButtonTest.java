@@ -16,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
@@ -30,7 +31,7 @@ public class ShowEmailsButtonTest {
 	@Mock
 	PopupUtilsView mockPopupUtils;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	List<UserProfile> userProfiles;
 	@Mock
 	UserProfile mockUserProfile;
@@ -42,10 +43,10 @@ public class ShowEmailsButtonTest {
 		
 		widget = new ShowEmailsButton(
 				mockButton,
-				mockSynapseClient,
+				mockSynapseJavascriptClient,
 				mockPopupUtils);
 		userProfiles = Collections.singletonList(mockUserProfile);
-		AsyncMockStubber.callSuccessWith(userProfiles).when(mockSynapseClient).listUserProfiles(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(userProfiles).when(mockSynapseJavascriptClient).listUserProfiles(anyList(), any(AsyncCallback.class));
 		when(mockUserProfile.getUserName()).thenReturn(USER_NAME);
 	}
 	
@@ -55,14 +56,14 @@ public class ShowEmailsButtonTest {
 		widget.configure(userIds);
 		widget.onShowEmails();
 		
-		verify(mockSynapseClient).listUserProfiles(eq(userIds), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).listUserProfiles(eq(userIds), any(AsyncCallback.class));
 		verify(mockPopupUtils).showInfoDialog(anyString(), eq(USER_NAME + "@synapse.org"), any(Callback.class));
 	}
 	
 	@Test
 	public void testShowEmailsFailure() {
 		String errorMessage = "something is wrong";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).listUserProfiles(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).listUserProfiles(anyList(), any(AsyncCallback.class));
 		
 		widget.configure(Collections.singletonList(USER_ID));
 		widget.onShowEmails();

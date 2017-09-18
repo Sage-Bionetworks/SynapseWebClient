@@ -21,11 +21,9 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -35,33 +33,32 @@ import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.PublicPrincipalIds;
-import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPresenter {
+public class EntityBadge implements SynapseWidgetPresenter {
 	
 	private EntityBadgeView view;
 	private GlobalApplicationState globalAppState;
 	private EntityHeader entityHeader;
 	private AnnotationTransformer transformer;
 	private UserBadge modifiedByUserBadge;
-	private SynapseClientAsync synapseClient;
-	private CallbackP<String> customEntityClickHandler;
+	private SynapseJavascriptClient jsClient;
 	private FileDownloadButton fileDownloadButton;
 	private LazyLoadHelper lazyLoadHelper;
 	private DateTimeUtils dateTimeUtils;
+	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
 			AnnotationTransformer transformer,
 			UserBadge modifiedByUserBadge,
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			FileDownloadButton fileDownloadButton,
 			LazyLoadHelper lazyLoadHelper,
 			DateTimeUtils dateTimeUtils) {
@@ -70,10 +67,9 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		this.transformer = transformer;
 		this.modifiedByUserBadge = modifiedByUserBadge;
 		this.dateTimeUtils = dateTimeUtils;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.fileDownloadButton = fileDownloadButton;
 		this.lazyLoadHelper = lazyLoadHelper;
-		view.setPresenter(this);
 		view.setModifiedByWidget(modifiedByUserBadge.asWidget());
 		Callback loadDataCallback = new Callback() {
 			@Override
@@ -94,7 +90,7 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 	
 	public void getEntityBundle() {
 		int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL | THREAD_COUNT;
-		synapseClient.getEntityBundle(entityHeader.getId(), partsMask, new AsyncCallback<EntityBundle>() {
+		jsClient.getEntityBundle(entityHeader.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorIcon();
@@ -214,21 +210,6 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		return sb.toString();
 	}
 	
-	
-	public void setEntityClickedHandler(CallbackP<String> callback) {
-		customEntityClickHandler = callback;
-	}
-	
-	@Override
-	public void entityClicked(EntityHeader entityHeader) {
-		showLoadingIcon();
-		if (customEntityClickHandler == null) {
-			globalAppState.getPlaceChanger().goTo(new Synapse(entityHeader.getId()));	
-		} else {
-			customEntityClickHandler.invoke(entityHeader.getId());
-		}
-	}
-	
 	public void hideLoadingIcon() {
 		view.hideLoadingIcon();
 	}
@@ -241,9 +222,18 @@ public class EntityBadge implements EntityBadgeView.Presenter, SynapseWidgetPres
 		return entityHeader;
 	}
 	
-	public void setClickHandler(ClickHandler handler) {
+	public void addClickHandler(ClickHandler handler) {
 		modifiedByUserBadge.setCustomClickHandler(handler);
-		view.setClickHandler(handler);
+		view.addClickHandler(handler);
+	}
+	
+	public void setEntityClickedHandler(final CallbackP<String> callback) {
+		view.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				callback.invoke(entityHeader.getId());
+			}
+		});
 	}
 	
 	public String getEntityId() {

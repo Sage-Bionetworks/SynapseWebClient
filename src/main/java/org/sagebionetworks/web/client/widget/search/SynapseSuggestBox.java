@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.client.widget.search;
 
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.event.dom.client.HasKeyDownHandlers;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -22,24 +24,29 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 	public static final int PAGE_SIZE = 10;
 	private SynapseSuggestBoxView view;
 	private SynapseSuggestOracle oracle;
-	private SynapseSuggestion selectedSuggestion;
+	private UserGroupSuggestion selectedSuggestion;
 	private int offset;		// suggestion offset for paging
-	private CallbackP<SynapseSuggestion> callback;
+	private CallbackP<UserGroupSuggestion> callback;
 	
 	@Inject
 	public SynapseSuggestBox(SynapseSuggestBoxView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			SageImageBundle sageImageBundle, SynapseSuggestOracle oracle) {
+			SageImageBundle sageImageBundle, 
+			SynapseSuggestOracle oracle) {
 		this.oracle = oracle;
 		this.view = view;
 		this.view.configure(oracle);
 		view.setPresenter(this);
 	}
 	
-	public void setSuggestionProvider(SuggestionProvider provider) {
+	public void setSuggestionProvider(UserGroupSuggestionProvider provider) {
 		oracle.configure(this, PAGE_SIZE, provider);
+	}
+	
+	public void setTypeFilter(TypeFilter type) {
+		oracle.setTypeFilter(type);
 	}
 	
 	@Override
@@ -76,12 +83,12 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 	}
 
 	@Override
-	public SynapseSuggestion getSelectedSuggestion() {
+	public UserGroupSuggestion getSelectedSuggestion() {
 		return selectedSuggestion;
 	}
 
 	@Override
-	public void setSelectedSuggestion(SynapseSuggestion selectedSuggestion) {
+	public void setSelectedSuggestion(UserGroupSuggestion selectedSuggestion) {
 		this.selectedSuggestion = selectedSuggestion;
 		if (selectedSuggestion != null) {
 			view.setSelectedText("Currently selected: " + selectedSuggestion.getName());
@@ -104,7 +111,7 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 	}
 	
 	@Override
-	public void addItemSelectedHandler(CallbackP<SynapseSuggestion> callback) {
+	public void addItemSelectedHandler(CallbackP<UserGroupSuggestion> callback) {
 		this.callback = callback;
 	}
 

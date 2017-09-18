@@ -7,13 +7,20 @@ import java.util.Map;
 
 import static junit.framework.Assert.*;
 
+import org.eclipse.jetty.util.ajax.JSON;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
+import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AliasType;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
+import org.sagebionetworks.schema.adapter.JSONEntity;
+import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -70,14 +77,15 @@ public class NewAccountPresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, mockGWT, mockPasswordStrengthWidget);			
+		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, mockGWT, mockPasswordStrengthWidget);
 		verify(mockView).setPresenter(newAccountPresenter);
 		
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		
-		AsyncMockStubber.callSuccessWith(testSessionToken).when(mockUserService).createUserStep2(anyString(), anyString(), anyString(), anyString(),anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testSessionToken).when(mockUserService).createUserStep2(anyString(), anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testSessionToken).when(mockUserService).createUserStep2(anyString(), anyString(), anyString(), anyString(), any(EmailValidationSignedToken.class), any(AsyncCallback.class));
 	}
 	
 	
@@ -85,6 +93,7 @@ public class NewAccountPresenterTest {
 	public void testSetPlace() {
 		reset(mockView);
 		NewAccount newPlace = Mockito.mock(NewAccount.class);
+		when(newPlace.toToken()).thenReturn("");
 		newAccountPresenter.setPlace(newPlace);
 		verify(mockView).setPresenter(newAccountPresenter);
 	}
@@ -99,7 +108,7 @@ public class NewAccountPresenterTest {
 		newAccountPresenter.setPlace(newPlace);
 		assertEquals(decodedToken, newAccountPresenter.getEmailValidationToken());
 	}
-	
+
 	@Test
 	public void testIsUsernameAvailableTooSmall() {
 		//should not check if too short
@@ -143,30 +152,73 @@ public class NewAccountPresenterTest {
 		String token = "firstname=&lastname=&email=unittest%40jayhodgson.com&timestamp=2014-09-03T23%3A45%3A57.788%2B0000&domain=SYNAPSE&mac=DyXg5wUR3aqDABpnvYE%3D";
 		Map<String, String> result = newAccountPresenter.parseEmailValidationToken(token);
 		assertEquals("unittest@jayhodgson.com", result.get("email"));
-		
+
 		result = newAccountPresenter.parseEmailValidationToken(null);
 		assertTrue(result.isEmpty());
-		
+
 		result = newAccountPresenter.parseEmailValidationToken("");
 		assertTrue(result.isEmpty());
 	}
-	
-	@Test
-	public void testCompleteRegistration() {
+
+    @Test
+	public void testCompleteRegistrationOldToken() {
 		String firstName = "   Mara  ";
 		String lastName = " Jade     ";
 		String userName = "skywalker290";
 		String password = "  farfaraway";
-		String emailValidationToken = "a&b&c=123";
-		newAccountPresenter.setEmailValidationToken(emailValidationToken);
+		final String emailValidationToken = "email=test@email.com";
+		newAccountPresenter.setPlace(new NewAccount(emailValidationToken));
 		newAccountPresenter.completeRegistration(userName, firstName, lastName, password);
 		verify(mockView).setLoading(true);
 		verify(mockView).setLoading(false);
 		verify(mockUserService).createUserStep2(eq(userName), eq(firstName.trim()), eq(lastName.trim()), eq(password), eq(emailValidationToken), any(AsyncCallback.class));
-		
+
 		//should go to the login place with the new session token
 		ArgumentCaptor<Place> placeCaptor = new ArgumentCaptor<Place>();
 		verify(mockPlaceChanger).goTo(placeCaptor.capture());
 		assertEquals(testSessionToken, ((LoginPlace)placeCaptor.getValue()).toToken());
+	}
+
+	@Test
+	public void testCompleteRegistrationAccountCreationToken() {
+		String firstName = "   Mara  ";
+		String lastName = " Jade     ";
+		String userName = "skywalker290";
+		String password = "  farfaraway";
+		final AccountCreationToken accountCreationToken = new AccountCreationToken();
+		accountCreationToken.setEmailValidationSignedToken(new EmailValidationSignedToken());
+		NewAccount newPlace = Mockito.mock(NewAccount.class);
+		when(newPlace.toToken()).thenReturn("0123456789ABCDEF");
+		AsyncMockStubber.callSuccessWith(accountCreationToken).when(mockSynapseClient).hexDecodeAndDeserializeAccountCreationToken(anyString(), any(AsyncCallback.class));
+		newAccountPresenter.setPlace(newPlace);
+		newAccountPresenter.completeRegistration(userName, firstName, lastName, password);
+		verify(mockView).setLoading(true);
+		verify(mockView).setLoading(false);
+		verify(mockUserService).createUserStep2(eq(userName), eq(firstName.trim()), eq(lastName.trim()), eq(password), eq(accountCreationToken.getEmailValidationSignedToken()), any(AsyncCallback.class));
+
+		//should go to the login place with the new session token
+		ArgumentCaptor<Place> placeCaptor = new ArgumentCaptor<Place>();
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		assertEquals(testSessionToken, ((LoginPlace)placeCaptor.getValue()).toToken());
+	}
+
+	@Test
+	public void testCompleteRegistrationAccountCreationTokenFailure() {
+		String firstName = "   Mara  ";
+		String lastName = " Jade     ";
+		String userName = "skywalker290";
+		String password = "  farfaraway";
+		final AccountCreationToken accountCreationToken = new AccountCreationToken();
+		accountCreationToken.setEmailValidationSignedToken(new EmailValidationSignedToken());
+		NewAccount newPlace = Mockito.mock(NewAccount.class);
+		when(newPlace.toToken()).thenReturn("0123456789ABCDEF");
+		AsyncMockStubber.callSuccessWith(accountCreationToken).when(mockSynapseClient).hexDecodeAndDeserializeAccountCreationToken(anyString(), any(AsyncCallback.class));
+		newAccountPresenter.setPlace(newPlace);
+		String failureMessage = "test message";
+		AsyncMockStubber.callFailureWith(new Throwable(failureMessage)).when(mockUserService).createUserStep2(
+				eq(userName.trim()), eq(firstName.trim()), eq(lastName.trim()), eq(password), any(EmailValidationSignedToken.class), any(AsyncCallback.class));
+		newAccountPresenter.completeRegistration(userName, firstName, lastName, password);
+		verify(mockView).setLoading(false);
+		verify(mockView).showErrorMessage(DisplayConstants.ACCOUNT_CREATION_FAILURE + failureMessage);
 	}
 }

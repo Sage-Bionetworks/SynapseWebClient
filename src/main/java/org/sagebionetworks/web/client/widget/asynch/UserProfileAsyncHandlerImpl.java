@@ -8,8 +8,9 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -17,20 +18,18 @@ import com.google.inject.Inject;
 
 public class UserProfileAsyncHandlerImpl implements UserProfileAsyncHandler {
 	private Map<String, List<AsyncCallback<UserProfile>>> reference2Callback = new HashMap<String, List<AsyncCallback<UserProfile>>>();
-	SynapseClientAsync synapseClient;
-	// This singleton checks for new work every <DELAY> milliseconds.
-	public static final int DELAY = 280;
+	SynapseJavascriptClient jsClient;
 	
 	@Inject
-	public UserProfileAsyncHandlerImpl(SynapseClientAsync synapseClient, GWTWrapper gwt) {
-		this.synapseClient = synapseClient;
+	public UserProfileAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt) {
+		this.jsClient = jsClient;
 		Callback callback = new Callback() {
 			@Override
 			public void invoke() {
 				executeRequests();
 			}
 		};
-		gwt.scheduleFixedDelay(callback, DELAY);
+		gwt.scheduleFixedDelay(callback, 200 + gwt.nextInt(150));
 	}
 	
 	@Override
@@ -50,7 +49,7 @@ public class UserProfileAsyncHandlerImpl implements UserProfileAsyncHandler {
 			reference2Callback.clear();
 			List<String> userIds = new ArrayList<String>();
 			userIds.addAll(reference2CallbackCopy.keySet());
-			synapseClient.listUserProfiles(userIds, new AsyncCallback<List<UserProfile>>() {
+			jsClient.listUserProfiles(userIds, new AsyncCallback<List<UserProfile>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					// go through all requested objects, and inform them of the error
@@ -78,7 +77,7 @@ public class UserProfileAsyncHandlerImpl implements UserProfileAsyncHandler {
 							}
 						}
 					}
-					UnknownErrorException notReturnedException = new UnknownErrorException(DisplayConstants.ERROR_LOADING);
+					NotFoundException notReturnedException = new NotFoundException(DisplayConstants.ERROR_LOADING);
 					for (String userId : reference2CallbackCopy.keySet()) {
 						// not returned
 						callOnFailure(userId, notReturnedException);

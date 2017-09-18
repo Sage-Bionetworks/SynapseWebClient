@@ -99,13 +99,11 @@ public class WidgetConstants {
 	public static final String WIDGET_END_MARKDOWN =  "}";
 	
 	public static final String TOC_CONTENT_TYPE = "toc";
+	public static final String IS_TOC_KEY = "isTOC";
 	public static final String WIKI_SUBPAGES_CONTENT_TYPE = "wikipages";
 	
 	public static final String NO_AUTO_WIKI_SUBPAGES = "nowikipages";
 
-	//has editor, but no renderer
-	public static final String PROJECT_BACKGROUND_CONTENT_TYPE = "projectbackground";
-	
 	public static final String WIKI_FILES_PREVIEW_CONTENT_TYPE = "wikifilepreview";
 	
 	/**
@@ -174,6 +172,7 @@ public class WidgetConstants {
 	public static final String USER_TEAM_BADGE_WIDGET_USERNAME_KEY = "username";
 	public static final String USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY = "isUser";
 	
+	public static final String ALIAS_KEY = "alias";
 	public static final String BIODALLIANCE13_CONTENT_TYPE = "biodalliance13";
 	public static final String BIODALLIANCE_FRIENDLY_NAME = "Genome Browser";
 	public static final String BIODALLIANCE_SPECIES_KEY = "species";

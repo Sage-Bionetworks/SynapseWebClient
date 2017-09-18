@@ -28,7 +28,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -66,13 +66,23 @@ public class RestrictionWidgetTest {
 	Entity mockEntity;
 	@Mock
 	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Captor
 	ArgumentCaptor<CallbackP<Boolean>> callbackPCaptor;
 	public static final String ENTITY_ID = "762";
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new RestrictionWidget(mockView, mockAuthenticationController, mockGlobalApplicationState, mockJiraURLHelper, mockDataAccessClient, mockSynAlert, mockIsACTMemberAsyncHandler);
+		widget = new RestrictionWidget(
+				mockView, 
+				mockAuthenticationController, 
+				mockGlobalApplicationState, 
+				mockJiraURLHelper, 
+				mockDataAccessClient, 
+				mockSynAlert, 
+				mockIsACTMemberAsyncHandler,
+				mockSynapseJavascriptClient);
 		
 		UserSessionData usd = new UserSessionData();
 		List<String> emailAddresses = new ArrayList<String>();
@@ -84,7 +94,7 @@ public class RestrictionWidgetTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		AsyncMockStubber.callSuccessWith(mockRestrictionInformation).when(mockDataAccessClient).getRestrictionInformation(anyString(), any(RestrictableObjectType.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockRestrictionInformation).when(mockSynapseJavascriptClient).getRestrictionInformation(anyString(), any(RestrictableObjectType.class), any(AsyncCallback.class));
 		when(mockEntity.getId()).thenReturn(ENTITY_ID);
 	}
 	

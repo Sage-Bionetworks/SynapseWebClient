@@ -643,4 +643,8 @@ public class UploaderViewImpl extends FlowPanel implements
 		externalNameFormGroup.setVisible(visible);
 	}
 
+	@Override
+	public void setExternalUrl(String url) {
+		pathField.setValue(url);
+	}
 }

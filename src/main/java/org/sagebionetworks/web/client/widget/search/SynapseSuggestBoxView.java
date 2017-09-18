@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.widget.search;
 
-import java.util.Date;
-
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.event.dom.client.HasKeyDownHandlers;
-import com.google.gwt.user.client.TakesValue;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -42,13 +40,13 @@ public interface SynapseSuggestBoxView extends IsWidget, SynapseView, Focusable,
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		SynapseSuggestion getSelectedSuggestion();
-		void setSelectedSuggestion(SynapseSuggestion selectedSuggestion);
+		UserGroupSuggestion getSelectedSuggestion();
+		void setSelectedSuggestion(UserGroupSuggestion selectedSuggestion);
 		
 		void getPrevSuggestions();
 		void getNextSuggestions();
 		
-		void addItemSelectedHandler(CallbackP<SynapseSuggestion> callback);
+		void addItemSelectedHandler(CallbackP<UserGroupSuggestion> callback);
 		void showLoading();
 		void hideLoading();
 		void showErrorMessage(String message);

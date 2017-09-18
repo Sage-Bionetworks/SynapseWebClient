@@ -6,7 +6,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -16,8 +16,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
-
-	private SynapseClientAsync synapseClient;
+	
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	private PublicPrivateBadgeView view;
@@ -25,11 +24,17 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	private UserAccountServiceAsync userAccountService;
 	private Entity entity;
 	private AccessControlList acl;
+	private SynapseJavascriptClient jsClient;
 	
 	@Inject
-	public PublicPrivateBadge(PublicPrivateBadgeView view, SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController, UserAccountServiceAsync userAccountService) {
+	public PublicPrivateBadge(
+			PublicPrivateBadgeView view, 
+			SynapseJavascriptClient jsClient, 
+			GlobalApplicationState globalApplicationState, 
+			AuthenticationController authenticationController, 
+			UserAccountServiceAsync userAccountService) {
 		this.view = view;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.userAccountService = userAccountService;
@@ -110,7 +115,7 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	
 	public void getAcl(final AsyncCallback<AccessControlList> callback) {
 		int partsMask = EntityBundle.BENEFACTOR_ACL;
-		synapseClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundle>() {
+		jsClient.getEntityBundle(entity.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				// retrieve ACL and user entity permissions from bundle

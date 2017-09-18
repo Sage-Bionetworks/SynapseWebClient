@@ -12,7 +12,7 @@ import org.sagebionetworks.repo.model.dataaccess.BasicAccessRequirementStatus;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
@@ -43,8 +43,8 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 	LazyLoadHelper lazyLoadHelper;
 	PopupUtilsView popupUtils;
 	ReviewAccessorsButton manageAccessButton;
-	UserProfileClientAsync userProfileClient;
 	Callback refreshCallback;
+	SynapseJavascriptClient jsClient;
 	
 	@Inject
 	public SelfSignAccessRequirementWidget(SelfSignAccessRequirementWidgetView view,
@@ -59,7 +59,7 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 			LazyLoadHelper lazyLoadHelper,
 			ReviewAccessorsButton manageAccessButton,
 			PopupUtilsView popupUtils,
-			UserProfileClientAsync userProfileClient) {
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.dataAccessClient = dataAccessClient;
@@ -72,7 +72,7 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.manageAccessButton = manageAccessButton;
 		this.popupUtils = popupUtils;
-		this.userProfileClient = userProfileClient;
+		this.jsClient = jsClient;
 		wikiPageWidget.setModifiedCreatedByHistoryVisible(false);
 		view.setPresenter(this);
 		view.setWikiTermsWidget(wikiPageWidget.asWidget());
@@ -126,7 +126,7 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 				// get user certification and validation state
 				int mask = IS_CERTIFIED | IS_VERIFIED;
 				synAlert.clear();
-				userProfileClient.getUserBundle(Long.parseLong(authController.getCurrentUserPrincipalId()), mask, new AsyncCallback<UserBundle>() {
+				jsClient.getUserBundle(Long.parseLong(authController.getCurrentUserPrincipalId()), mask, new AsyncCallback<UserBundle>() {
 					@Override
 					public void onFailure(Throwable caught) {
 						synAlert.handleException(caught);

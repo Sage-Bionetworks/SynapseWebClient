@@ -56,6 +56,7 @@ import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
@@ -161,7 +162,8 @@ public class ProfilePresenterTest {
 	PromptModalView mockPromptForTeamNameDialog;
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
-	
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Before
 	public void setup() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -200,7 +202,8 @@ public class ProfilePresenterTest {
 				mockIsACTMemberAsyncHandler,
 				mockDateTimeUtils,
 				mockPromptForProjectNameDialog,
-				mockPromptForTeamNameDialog
+				mockPromptForTeamNameDialog,
+				mockSynapseJavascriptClient
 				);
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -215,7 +218,7 @@ public class ProfilePresenterTest {
 		testUser.getSession().setSessionToken("token");
 		testUser.setIsSSO(false);
 		
-		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockCurrentUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(targetUserId).when(mockSynapseClient).getUserIdFromUsername(eq(targetUsername), any(AsyncCallback.class));
@@ -257,7 +260,7 @@ public class ProfilePresenterTest {
 		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getProjectsForTeam(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		
-		AsyncMockStubber.callSuccessWith(myFavorites).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(myFavorites).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		
 		//set up create project test
 		AsyncMockStubber.callSuccessWith("new entity id").when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
@@ -325,7 +328,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setProfileEditButtonVisible(isOwner);
 		verify(mockView).setOrcIDLinkButtonVisible(isOwner);
 		verify(mockView).showTabs(isOwner);
-		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -365,13 +368,13 @@ public class ProfilePresenterTest {
 		when(place.toToken()).thenReturn(targetUserId);
 		when(place.getUserId()).thenReturn(targetUserId);
 		profilePresenter.setPlace(place);
-		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verifyProfileShown(false);
 		
 		//not logged in, should not ask for this user favs
-		verify(mockSynapseClient, never()).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).getFavorites(any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -383,7 +386,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		
 		verify(mockSynapseClient).getUserIdFromUsername(eq(targetUsername), any(AsyncCallback.class));
-		verify(mockUserProfileClient).getUserBundle(eq(Long.parseLong(targetUserId)), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserBundle(eq(Long.parseLong(targetUserId)), anyInt(), any(AsyncCallback.class));
 		verify(place).setUserId(targetUserId);
 	}
 	
@@ -414,7 +417,7 @@ public class ProfilePresenterTest {
 	public void testViewMyProfileNoRedirect() throws JSONObjectAdapterException{
 		//view another user profile
 		setPlaceMyProfile("456");
-		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
 		//should attempt to get my teams, but delayed.
@@ -439,7 +442,7 @@ public class ProfilePresenterTest {
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("1");
 		when(place.getUserId()).thenReturn("2");
 		profilePresenter.setPlace(place);
-		verify(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -458,7 +461,7 @@ public class ProfilePresenterTest {
 	public void testGetProfileError() {
 		//some other error occurred
 		Exception ex = new Exception("unhandled");
-		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		profilePresenter.updateProfileView("1");
 		verify(mockView).hideLoading();
 		verify(mockSynAlert).handleException(ex);
@@ -631,7 +634,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).showProjectFiltersUI();
 		verify(mockView).setFavoritesFilterSelected();
-		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 		verify(mockView).setProjectSortVisible(false);
 	}
@@ -660,7 +663,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setProjectContainer(any(Widget.class));
 		verify(mockView).setFavoritesFilterSelected();
 		verify(mockView).setFavoritesHelpPanelVisible(true);
-		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, never()).add(any(Widget.class));
 		verify(mockView).setProjectSortVisible(false);
 	}
@@ -748,7 +751,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("007");
 		profilePresenter.applyFilterClicked(ProjectFilterEnum.FAVORITES, null);
-		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		verify(mockView).setProjectSortVisible(false);
 	}
 	
@@ -1140,7 +1143,7 @@ public class ProfilePresenterTest {
 	public void testUpdateTeamInvites() {
 		profilePresenter.setIsOwner(true);
 		Long inviteCount = 3L;
-		AsyncMockStubber.callSuccessWith(inviteCount).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(inviteCount).when(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		profilePresenter.updateMembershipInvitationCount();
 		
 		assertEquals(inviteCount.intValue(), profilePresenter.getInviteCount());
@@ -1151,12 +1154,12 @@ public class ProfilePresenterTest {
 	public void testAddMembershipRequests() {
 		profilePresenter.setIsOwner(true);
 		Long beforeNotificationCount = 12L; 
-		AsyncMockStubber.callSuccessWith(beforeNotificationCount).when(mockSynapseClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(beforeNotificationCount).when(mockSynapseJavascriptClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
 		profilePresenter.updateMembershipRequestCount();
 		verify(mockView).setTeamNotificationCount(Long.toString(beforeNotificationCount));
 		
 		Long inviteCount = 10L;
-		AsyncMockStubber.callSuccessWith(inviteCount).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(inviteCount).when(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		profilePresenter.updateMembershipInvitationCount();
 		
 		verify(mockView).setTeamNotificationCount(eq(Long.toString(beforeNotificationCount + inviteCount)));
@@ -1165,9 +1168,9 @@ public class ProfilePresenterTest {
 	@Test
 	public void testUpdateTeamInvitesZero() {
 		profilePresenter.setIsOwner(true);
-		AsyncMockStubber.callSuccessWith(0L).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(0L).when(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		profilePresenter.updateMembershipInvitationCount();
-		verify(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		assertEquals(0, profilePresenter.getInviteCount());
 		verify(mockView, never()).setTeamNotificationCount(anyString());
 	}
@@ -1175,9 +1178,9 @@ public class ProfilePresenterTest {
 	@Test
 	public void testAddMembershipRequestsZero() {
 		profilePresenter.setIsOwner(true);
-		AsyncMockStubber.callSuccessWith(0L).when(mockSynapseClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(0L).when(mockSynapseJavascriptClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
 		profilePresenter.updateMembershipRequestCount();
-		verify(mockSynapseClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getOpenMembershipRequestCount(any(AsyncCallback.class));
 		assertEquals(0, profilePresenter.getOpenRequestCount());
 		verify(mockView, never()).setTeamNotificationCount(anyString());
 	}
@@ -1186,7 +1189,7 @@ public class ProfilePresenterTest {
 	public void testRefreshTeamsOwnerTeamsAndInvites() {
 		int totalNotifications = 12; // must be even for tests to pass
 		int inviteCount = totalNotifications/2;
-		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
 		for (int i = 0; i < inviteCount; i++) {
 			invites.add(new OpenUserInvitationBundle());	
@@ -1234,7 +1237,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testRefreshTeamsOwnerOnlyTeams() {
 		int totalNotifications = 12; // must be even for tests to pass
-		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		int inviteCount = 0;
 		List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
 		for (int i = 0; i < inviteCount; i++) {
@@ -1254,7 +1257,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testRefreshTeamsOwnerOnlyInvites() {
 		int totalNotifications = 12; // must be even for tests to pass
-		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith((long)totalNotifications).when(mockSynapseJavascriptClient).getOpenMembershipInvitationCount(any(AsyncCallback.class));
 		int inviteCount = totalNotifications;
 		List<OpenUserInvitationBundle> invites = new ArrayList<OpenUserInvitationBundle>();
 		for (int i = 0; i < inviteCount; i++) {
@@ -1429,7 +1432,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testInitUserFavorites() {
 		List<EntityHeader> favorites = new ArrayList<EntityHeader>();
-		AsyncMockStubber.callSuccessWith(favorites).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(favorites).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		Callback mockCallback = mock(Callback.class);
 		profilePresenter.initUserFavorites(mockCallback);
 		verify(mockGlobalApplicationState).setFavorites(favorites);
@@ -1438,7 +1441,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testInitUserFavoritesFailure() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		Callback mockCallback = mock(Callback.class);
 		profilePresenter.initUserFavorites(mockCallback);
 		verify(mockGlobalApplicationState, never()).setFavorites(anyList());

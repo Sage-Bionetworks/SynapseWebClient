@@ -11,12 +11,17 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -98,10 +103,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public AnchorListItem synapseFormLink;
 	@UiField
 	public AnchorListItem videoLink;
-	@UiField
-	public AnchorListItem youTubeLink;
-	@UiField
-	public AnchorListItem vimeoLink;
 	
 	@UiField
 	public Button formattingGuideButton;
@@ -129,8 +130,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public AnchorListItem wikifilesPreviewLink;
 	@UiField
 	public AnchorListItem tutorialWizardLink;
-	@UiField
-	public AnchorListItem entityBackgroundLink;
 	@UiField
 	public AnchorListItem teamMembersLink;
 	@UiField
@@ -190,7 +189,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	
 	//this UI widget
 	Widget widget;
-	
+	HandlerRegistration formattingGuideKeyHandlerRegistration;
+	KeyDownHandler formattingGuideKeyDownHandler;
 	@Inject
 	public MarkdownEditorWidgetViewImpl(Binder binder) {
 		super();
@@ -216,8 +216,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		teamLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_USER_TEAM_BADGE));
 		synapseFormLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_FORM));
 		videoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
-		youTubeLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_YOU_TUBE));
-		vimeoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIMEO));
 		previewLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_PREVIEW));
 		bookmarkLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BOOKMARK));
 		synapseTableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_TABLE));
@@ -246,7 +244,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		imageLinkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_IMAGE_LINK));
 		videoButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		linkButton.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_LINK));
-		entityBackgroundLink.addClickHandler(getClickHandler(MarkdownEditorAction.SET_PROJECT_BACKGROUND));
 		cytoscapeJsLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_CYTOSCAPE_JS));
 		teamMembersLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TEAM_MEMBERS));
 		teamMemberCountLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_TEAM_MEMBER_COUNT));
@@ -257,18 +254,30 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		heading4Link.addStyleName("font-size-18");
 		heading5Link.addStyleName("font-size-14");
 		heading6Link.addStyleName("font-size-12");
+		final ClickHandler hideFormattingGuide = new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				formattingGuideKeyHandlerRegistration.removeHandler();
+				formattingGuideModal.hide();
+			}
+		};
+		formattingGuideKeyDownHandler = new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if (event.getNativeKeyCode() == KeyCodes.KEY_ESCAPE) {
+					hideFormattingGuide.onClick(null);
+				}
+			}
+		};
+		formattingGuideModal.addCloseHandler(hideFormattingGuide);
 		formattingGuideButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				formattingGuideModal.show();
+				formattingGuideKeyHandlerRegistration = RootPanel.get().addDomHandler(formattingGuideKeyDownHandler, KeyDownEvent.getType());
 			}
 		});
-		formattingGuideOkButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				formattingGuideModal.hide();
-			}
-		});
+		formattingGuideOkButton.addClickHandler(hideFormattingGuide);
 		
 		markdownTextArea.addKeyPressHandler(new KeyPressHandler() {
 			@Override

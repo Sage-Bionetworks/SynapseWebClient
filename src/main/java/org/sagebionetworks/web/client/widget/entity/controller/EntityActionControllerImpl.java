@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -41,7 +42,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
-import org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -63,7 +63,6 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -98,6 +97,7 @@ public class EntityActionControllerImpl implements EntityActionController, Entit
 	EntityActionControllerView view;
 	PreflightController preflightController;
 	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	AccessControlListModalWidget accessControlListModalWidget;
@@ -125,7 +125,6 @@ public class EntityActionControllerImpl implements EntityActionController, Entit
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
 	ApproveUserAccessModal approveUserAccessModal;
-	ProjectDisplayDialog projectDisplay;
 	UserProfileClientAsync userProfileClient;
 	PortalGinInjector ginInjector;
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
@@ -158,12 +157,6 @@ public class EntityActionControllerImpl implements EntityActionController, Entit
 		}
 		return approveUserAccessModal;
 	}
-	private ProjectDisplayDialog getProjectDisplayModal() {
-		if (projectDisplay == null) {
-			projectDisplay = ginInjector.getProjectDisplayDialog();
-		}
-		return projectDisplay;
-	}
 	private SelectTeamModal getSelectTeamModal() {
 		if (selectTeamModal == null) {
 			selectTeamModal = ginInjector.getSelectTeamModal();
@@ -190,6 +183,13 @@ public class EntityActionControllerImpl implements EntityActionController, Entit
 			synapseClient = ginInjector.getSynapseClientAsync();
 		}
 		return synapseClient;
+	}
+	
+	private SynapseJavascriptClient getSynapseJavascriptClient() {
+		if (jsClient == null) {
+			jsClient = ginInjector.getSynapseJavascriptClient();
+		}
+		return jsClient;
 	}
 	
 	private GlobalApplicationState getGlobalApplicationState() {
@@ -319,17 +319,8 @@ public class EntityActionControllerImpl implements EntityActionController, Entit
 			configureAddEvaluationAction();
 			configureCreateChallenge();
 			configureApproveUserAccess();
-			configureProjectDisplay();
 			configureManageAccessRequirements();
 		}
-	}
-	
-	private void configureProjectDisplay() {
-		// SWC-3137: hide until project display settings state persists.  Probably change so that it's available to project administrators only when we re-enable.
-		actionMenu.setActionVisible(Action.PROJECT_DISPLAY, false);
-//		actionMenu.setActionVisible(Action.PROJECT_DISPLAY, permissions.getCanEdit() && entity instanceof Project);
-//		actionMenu.setActionEnabled(Action.PROJECT_DISPLAY, permissions.getCanEdit() && entity instanceof Project);	
-//		actionMenu.setActionListener(Action.PROJECT_DISPLAY, this);
 	}
 	
 	private void configureApproveUserAccess() {
@@ -797,22 +788,12 @@ public class EntityActionControllerImpl implements EntityActionController, Entit
 		case APPROVE_USER_ACCESS:
 			onApproveUserAccess();
 			break;
-		case PROJECT_DISPLAY:
-			onProjectDisplay();
-			break;
 		case MANAGE_ACCESS_REQUIREMENTS:
 			onManageAccessRequirements();
 			break;
 		default:
 			break;
 		}
-	}
-
-	@Override
-	public void onProjectDisplay() {
-		//guaranteed entity in bundle is project; otherwise option would not be shown in dropdown menu
-		getProjectDisplayModal().configure(entity.getId(), authenticationController.getCurrentUserPrincipalId());
-		getProjectDisplayModal().show();
 	}
 
 	private void onApproveUserAccess() {
@@ -1001,7 +982,7 @@ public class EntityActionControllerImpl implements EntityActionController, Entit
 	
 	private void onViewWikiSource() {
 		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
-		getSynapseClient().getV2WikiPageAsV1(key, new AsyncCallback<WikiPage>() {
+		getSynapseJavascriptClient().getV2WikiPageAsV1(key, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage page) {
 				view.showInfoDialog("Wiki Source", page.getMarkdown());
@@ -1158,7 +1139,7 @@ public class EntityActionControllerImpl implements EntityActionController, Entit
 	public void onDeleteWiki() {
 		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
 		// Get the wiki page title and parent wiki id.  Go to the parent wiki if this delete is successful.
-		getSynapseClient().getV2WikiPage(key, new AsyncCallback<V2WikiPage>() {
+		getSynapseJavascriptClient().getV2WikiPage(key, new AsyncCallback<V2WikiPage>() {
 			@Override
 			public void onSuccess(V2WikiPage page) {
 				// Confirm the delete with the user.

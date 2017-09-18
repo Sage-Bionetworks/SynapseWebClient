@@ -9,7 +9,9 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.header.Header.*;
+import static org.sagebionetworks.web.client.widget.header.Header.ANONYMOUS;
+import static org.sagebionetworks.web.client.widget.header.Header.N_A;
+import static org.sagebionetworks.web.client.widget.header.Header.SYNAPSE_ORG;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,8 +29,8 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -52,7 +54,6 @@ public class HeaderTest {
 	HeaderView mockView;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
-	SynapseClientAsync mockSynapseClient;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	PlaceChanger mockPlaceChanger;
 	FavoriteWidget mockFavWidget;
@@ -68,6 +69,8 @@ public class HeaderTest {
 	UserSessionData mockUserSessionData;
 	@Mock
 	UserProfile mockUserProfile;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	
 	@Before
 	public void setup(){
@@ -76,15 +79,14 @@ public class HeaderTest {
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockFavWidget = mock(FavoriteWidget.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget, mockPendoSdk);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget, mockPendoSdk);
 		entityHeaders = new ArrayList<EntityHeader>();
-		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
 		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
 	}
@@ -190,7 +192,7 @@ public class HeaderTest {
 		header.onFavoriteClick();
 		verify(mockView).showFavoritesLoading();
 		verify(mockView).clearFavorite();
-		verify(mockSynapseClient, times(1)).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, times(1)).getFavorites(any(AsyncCallback.class));
 		//initially empty
 		verify(mockView).setEmptyFavorite();
 		
@@ -203,7 +205,7 @@ public class HeaderTest {
 		header.onFavoriteClick();
 		verify(mockView, times(2)).showFavoritesLoading();
 		verify(mockView, times(2)).clearFavorite();
-		verify(mockSynapseClient, times(2)).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, times(2)).getFavorites(any(AsyncCallback.class));
 		verify(mockView).addFavorite(entityHeaders);
 	}
 	
@@ -215,7 +217,7 @@ public class HeaderTest {
 		header.onFavoriteClick();
 		verify(mockView, never()).showFavoritesLoading();
 		verify(mockView, never()).clearFavorite();
-		verify(mockSynapseClient, never()).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).getFavorites(any(AsyncCallback.class));
 	}
 	
 	@Test

@@ -12,9 +12,6 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityChildrenRequest;
-import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LogEntry;
@@ -27,7 +24,6 @@ import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
@@ -40,6 +36,7 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -66,7 +63,6 @@ import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
@@ -77,15 +73,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
 public interface SynapseClientAsync {
-
-	void getEntity(String entityId, AsyncCallback<Entity> callback);
-	
-	void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<Entity> callback);
-	
-	void getEntityBundle(String entityId, int partsMask, AsyncCallback<EntityBundle> callback);
-	
-	void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundle> callback);
-
 	void getEntityBundlePlusForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundlePlus> callback);
 	
 	void getEntityVersions(String entityId, int offset, int limit,
@@ -126,16 +113,7 @@ public interface SynapseClientAsync {
 
 	void getUserProfile(String userId, AsyncCallback<UserProfile> callback);
 	
-	void listUserProfiles(List<String> userIds,
-			AsyncCallback<List<UserProfile>> callback);
-	
-	void getTeam(String teamId, AsyncCallback<Team> callback);
-	
-	void getUserGroupHeadersById(ArrayList<String> ids, AsyncCallback<UserGroupHeaderResponsePage> headers);
-	
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);
-	
-	void getUserGroupHeadersByPrefix(String prefix, long limit, long offset, AsyncCallback<UserGroupHeaderResponsePage> callback);
 	
 	void additionalEmailValidation(String userId, String emailAddress, String callbackUrl, AsyncCallback<Void> callback);
 	
@@ -181,8 +159,7 @@ public interface SynapseClientAsync {
 	public void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
 	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	
-	void getV2WikiPage(WikiPageKey key, AsyncCallback<V2WikiPage> callback);
-    void restoreV2WikiPage(String ownerId, String ownerType, String wikiId,
+	void restoreV2WikiPage(String ownerId, String ownerType, String wikiId,
 			Long versionToUpdate, AsyncCallback<V2WikiPage> callback);
     public void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
     void getV2WikiHeaderTree(String ownerId, String ownerType,
@@ -196,8 +173,6 @@ public interface SynapseClientAsync {
 
 	public void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	public void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
-	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback);
-	public void getVersionOfV2WikiPageAsV1(WikiPageKey key, Long version, AsyncCallback<WikiPage> callback);
 	
 	void getEntitiesGeneratedBy(String activityId, Integer limit,
 			Integer offset, AsyncCallback<PaginatedResults<Reference>> callback);
@@ -205,8 +180,6 @@ public interface SynapseClientAsync {
 	void addFavorite(String entityId, AsyncCallback<EntityHeader> callback);
 
 	void removeFavorite(String entityId, AsyncCallback<Void> callback);
-
-	void getFavorites(AsyncCallback<List<EntityHeader>> callback);
 	
 	/**
 	 * TEAMS
@@ -261,7 +234,9 @@ public interface SynapseClientAsync {
 	void handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL, AsyncCallback<ResponseMessage> callback);
 	
 	void hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString, AsyncCallback<SignedTokenInterface> callback);
-	
+
+	void hexDecodeAndDeserializeAccountCreationToken(String tokenString, AsyncCallback<AccountCreationToken> callback);
+
 	void getAPIKey(AsyncCallback<String> callback);
 
 	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<ColumnModel>> asyncCallback);
@@ -323,8 +298,6 @@ public interface SynapseClientAsync {
 	void getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body,
 			AsyncCallback<AsynchronousResponseBody> callback);
 
-	void getEntityChildren(EntityChildrenRequest request, AsyncCallback<EntityChildrenResponse> callback);
-	
 	void createEntity(Entity entity,
 			AsyncCallback<Entity> callback);
 
@@ -409,24 +382,10 @@ public interface SynapseClientAsync {
 	
 	void isWiki(String id, AsyncCallback<Boolean> callback);
 
-	void isFileOrFolder(String id, AsyncCallback<Boolean> callback);
-
-	void isTable(String id, AsyncCallback<Boolean> callback);
-
-	void isForum(String id, AsyncCallback<Boolean> callback);
-
-	void isDocker(String id, AsyncCallback<Boolean> callback);
-
 	void isChallenge(String id, AsyncCallback<Boolean> callback);
-
-	void getProjectDisplay(String projectId, AsyncCallback<ProjectDisplayBundle> callback);
 
 	void addTeamMember(String userGroupId, String teamId, String message, String hostPageBaseURL,
 			AsyncCallback<Void> callback);
-
-	void getOpenMembershipInvitationCount(AsyncCallback<Long> callback);
-
-	void getOpenMembershipRequestCount(AsyncCallback<Long> callback);
 
 	/**
 	 * If successful, will return the new file handle ID

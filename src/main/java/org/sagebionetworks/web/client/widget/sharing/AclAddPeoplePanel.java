@@ -9,8 +9,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -57,7 +57,7 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 		return notifyPeopleCheckBox;
 	}
 	
-	public void configure(PermissionLevel[] permLevels, final CallbackP<SynapseSuggestion> addPersonCallback,
+	public void configure(PermissionLevel[] permLevels, final CallbackP<UserGroupSuggestion> addPersonCallback,
 						final CallbackP<Void> makePublicCallback, Boolean isPubliclyVisible) {
 		clear();
 		

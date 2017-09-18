@@ -21,6 +21,8 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
@@ -43,6 +45,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.HandlerManager;
+import com.google.gwt.http.client.URL;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -82,7 +85,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private Long storageLocationId;
 	private S3DirectUploader s3DirectUploader;
 	private String bucketName, endpointUrl, keyPrefixUUID;
-	
+	private SynapseJavascriptClient jsClient;
 	@Inject
 	public Uploader(
 			UploaderView view, 			
@@ -93,7 +96,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			MultipartUploader multiPartUploader,
 			GlobalApplicationState globalAppState,
 			ClientLogger logger,
-			S3DirectUploader s3DirectUploader
+			S3DirectUploader s3DirectUploader,
+			SynapseJavascriptClient jsClient
 			) {
 	
 		this.view = view;		
@@ -106,6 +110,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.multiPartUploader = multiPartUploader;
 		this.s3DirectUploader = s3DirectUploader;
 		this.logger = logger;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		clearHandlers();
 	}		
@@ -530,6 +535,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	@Override
 	public void setExternalFilePath(String path, String name, Long storageLocationId) {
+		if (path.trim().contains(" ")) {
+			//encode for user
+			path = gwt.encode(path);
+			view.setExternalUrl(path);
+		}
+
 		boolean isUpdating = entityId != null || entity != null;
 		if (isUpdating) {
 			//existing entity
@@ -690,7 +701,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * Private Methods
 	 */
 	private void refreshAfterSuccessfulUpload(String entityId) {
-		synapseClient.getEntity(entityId, new AsyncCallback<Entity>() {
+		jsClient.getEntity(entityId, OBJECT_TYPE.FileEntity, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity result) {
 				entity = result;

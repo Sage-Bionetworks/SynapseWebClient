@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
@@ -69,6 +70,8 @@ public class ReplyWidgetTest {
 	CopyTextModal mockCopyTextModal;
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	Set<String> moderatorIds;
 	ReplyWidget replyWidget;
 	
@@ -81,7 +84,8 @@ public class ReplyWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		replyWidget = new ReplyWidget(mockView, mockAuthorWidget, mockDateTimeUtils,
 				mockSynAlert, mockRequestBuilder, mockDiscussionForumClientAsync,
-				mockAuthController, mockEditReplyModal, mockMarkdownWidget, mockGwt, mockCopyTextModal);
+				mockAuthController, mockEditReplyModal, mockMarkdownWidget, mockGwt, mockCopyTextModal,
+				mockSynapseJavascriptClient);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
 		moderatorIds = new HashSet<String>();
 	}
@@ -208,7 +212,7 @@ public class ReplyWidgetTest {
 		DiscussionReplyBundle bundle = createReplyBundle("123", "1", "messageKey",
 				new Date(), isDeleted, CREATED_BY, isEdited);
 		AsyncMockStubber.callFailureWith(new Exception())
-				.when(mockDiscussionForumClientAsync).getReplyUrl(anyString(), any(AsyncCallback.class));
+				.when(mockSynapseJavascriptClient).getReplyUrl(anyString(), any(AsyncCallback.class));
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
 		verify(mockSynAlert).clear();
 		verify(mockRequestBuilder, never()).configure(eq(RequestBuilder.GET), anyString());
@@ -231,7 +235,7 @@ public class ReplyWidgetTest {
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK+1);
 		String url = "url";
 		AsyncMockStubber.callSuccessWith(url)
-				.when(mockDiscussionForumClientAsync).getReplyUrl(anyString(), any(AsyncCallback.class));
+				.when(mockSynapseJavascriptClient).getReplyUrl(anyString(), any(AsyncCallback.class));
 		RequestBuilderMockStubber.callOnError(null, new Exception())
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
@@ -259,7 +263,7 @@ public class ReplyWidgetTest {
 		when(mockResponse.getText()).thenReturn(message);
 		String url = "url";
 		AsyncMockStubber.callSuccessWith(url)
-				.when(mockDiscussionForumClientAsync).getReplyUrl(anyString(), any(AsyncCallback.class));
+				.when(mockSynapseJavascriptClient).getReplyUrl(anyString(), any(AsyncCallback.class));
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
@@ -327,7 +331,7 @@ public class ReplyWidgetTest {
 		replyWidget.deleteReply();
 		verify(mockSynAlert, atLeast(1)).clear();
 		verify(mockDiscussionForumClientAsync).markReplyAsDeleted(eq("123"), any(AsyncCallback.class));
-		verify(mockDiscussionForumClientAsync, never()).getReply(anyString(), any(AsyncCallback.class));;
+		verify(mockSynapseJavascriptClient, never()).getReply(anyString(), any(AsyncCallback.class));;
 		verify(mockSynAlert).handleException(any(Throwable.class));
 	}
 
@@ -347,7 +351,7 @@ public class ReplyWidgetTest {
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
 		AsyncMockStubber.callSuccessWith(bundle)
-				.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
+				.when(mockSynapseJavascriptClient).getReply(anyString(), any(AsyncCallback.class));
 		replyWidget.reconfigure();
 		verify(mockSynAlert, atLeast(1)).clear();
 		verify(mockView, times(2)).clear();
@@ -373,7 +377,7 @@ public class ReplyWidgetTest {
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		replyWidget.configure(bundle, canModerate, moderatorIds, mockDeleteCallback, isThreadDeleted);
 		AsyncMockStubber.callFailureWith(new Exception())
-				.when(mockDiscussionForumClientAsync).getReply(anyString(), any(AsyncCallback.class));
+				.when(mockSynapseJavascriptClient).getReply(anyString(), any(AsyncCallback.class));
 		replyWidget.reconfigure();
 		verify(mockSynAlert, atLeast(1)).clear();
 		verify(mockView).clear();

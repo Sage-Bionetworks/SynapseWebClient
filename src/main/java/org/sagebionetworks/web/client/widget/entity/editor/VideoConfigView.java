@@ -18,6 +18,17 @@ public interface VideoConfigView extends IsWidget, WidgetEditorView {
 	void hideFinder();
 	void setVideoFormatWarningVisible(boolean visible);
 	void showFinderError(String error);
+	
+	void showSynapseTab();
+	void showYouTubeTab();
+	void showVimeoTab();
+	void setVimeoVideoUrl(String url);
+	void setYouTubeVideoUrl(String url);
+	boolean isSynapseEntity();
+	boolean isYouTubeVideo();
+	boolean isVimeoVideo();
+	String getYouTubeVideoUrl();
+	String getVimeoVideoUrl();
 	/**
 	 * Presenter interface
 	 */

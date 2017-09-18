@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -15,8 +16,8 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestionBundle;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -26,8 +27,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class UserGroupSuggestionProviderTest {
 
 	UserGroupSuggestionProvider presenter;
-	SynapseClientAsync mockSynapseClient;
-	SynapseJSNIUtils mockJSNI;
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	AsyncCallback<SynapseSuggestionBundle> mockCallback;
 	
 	int offset = 0;
@@ -39,18 +39,17 @@ public class UserGroupSuggestionProviderTest {
 	@Before
 	public void setup() {
 		mockCallback = mock(AsyncCallback.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockJSNI = mock(SynapseJSNIUtils.class);
-		presenter = new UserGroupSuggestionProvider(mockSynapseClient, mockJSNI);
+		mockSynapseJavascriptClient = mock(SynapseJavascriptClient.class);
+		presenter = new UserGroupSuggestionProvider(mockSynapseJavascriptClient);
 	}
 	
 	@Test
 	public void testGetSuggestions() {	
 		ArgumentCaptor<SynapseSuggestionBundle> captor = ArgumentCaptor.forClass(SynapseSuggestionBundle.class);
 		UserGroupHeaderResponsePage testPage = getResponsePage();
-		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseClient).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));		
-		presenter.getSuggestions(offset, pageSize, width, prefix, mockCallback);
-		verify(mockSynapseClient).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(anyString(), any(TypeFilter.class), anyLong(), anyLong(), any(AsyncCallback.class));		
+		presenter.getSuggestions(TypeFilter.TEAMS_ONLY, offset, pageSize, width, prefix, mockCallback);
+		verify(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(anyString(), eq(TypeFilter.TEAMS_ONLY), anyLong(), anyLong(), any(AsyncCallback.class));
 		verify(mockCallback).onSuccess(captor.capture());
 		SynapseSuggestionBundle testBundle = captor.getValue();
 		assertEquals(testBundle.getTotalNumberOfResults(), 6);
@@ -60,9 +59,9 @@ public class UserGroupSuggestionProviderTest {
 	@Test
 	public void testGetSuggestionsFailure() {
 		Exception caught = new Exception("this is an exception");
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));		
-		presenter.getSuggestions(offset, pageSize, width, prefix, mockCallback);
-		verify(mockSynapseClient).getUserGroupHeadersByPrefix(anyString(), anyLong(), anyLong(), any(AsyncCallback.class));	
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(anyString(), any(TypeFilter.class), anyLong(), anyLong(), any(AsyncCallback.class));		
+		presenter.getSuggestions(TypeFilter.ALL, offset, pageSize, width, prefix, mockCallback);
+		verify(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(anyString(), any(TypeFilter.class), anyLong(), anyLong(), any(AsyncCallback.class));	
 		verify(mockCallback).onFailure(caught);
 	}
 	

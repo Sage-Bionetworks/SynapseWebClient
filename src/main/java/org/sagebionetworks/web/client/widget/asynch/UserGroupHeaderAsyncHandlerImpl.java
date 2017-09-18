@@ -9,8 +9,9 @@ import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -18,20 +19,18 @@ import com.google.inject.Inject;
 
 public class UserGroupHeaderAsyncHandlerImpl implements UserGroupHeaderAsyncHandler {
 	private Map<String, List<AsyncCallback<UserGroupHeader>>> reference2Callback = new HashMap<String, List<AsyncCallback<UserGroupHeader>>>();
-	SynapseClientAsync synapseClient;
-	// This singleton checks for new work every <DELAY> milliseconds.
-	public static final int DELAY = 340;
+	SynapseJavascriptClient jsClient;
 	
 	@Inject
-	public UserGroupHeaderAsyncHandlerImpl(SynapseClientAsync synapseClient, GWTWrapper gwt) {
-		this.synapseClient = synapseClient;
+	public UserGroupHeaderAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt) {
+		this.jsClient = jsClient;
 		Callback callback = new Callback() {
 			@Override
 			public void invoke() {
 				executeRequests();
 			}
 		};
-		gwt.scheduleFixedDelay(callback, DELAY);
+		gwt.scheduleFixedDelay(callback, 200 + gwt.nextInt(150));
 	}
 	
 	
@@ -52,7 +51,7 @@ public class UserGroupHeaderAsyncHandlerImpl implements UserGroupHeaderAsyncHand
 			reference2Callback.clear();
 			ArrayList<String> userIds = new ArrayList<String>();
 			userIds.addAll(reference2CallbackCopy.keySet());
-			synapseClient.getUserGroupHeadersById(userIds, new AsyncCallback<UserGroupHeaderResponsePage>() {
+			jsClient.getUserGroupHeadersById(userIds, new AsyncCallback<UserGroupHeaderResponsePage>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					// go through all requested objects, and inform them of the error
@@ -80,7 +79,7 @@ public class UserGroupHeaderAsyncHandlerImpl implements UserGroupHeaderAsyncHand
 							}
 						}
 					}
-					UnknownErrorException notReturnedException = new UnknownErrorException(DisplayConstants.ERROR_LOADING);
+					NotFoundException notReturnedException = new NotFoundException(DisplayConstants.ERROR_LOADING);
 					for (String userId : reference2CallbackCopy.keySet()) {
 						// not returned
 						callOnFailure(userId, notReturnedException);

@@ -57,13 +57,8 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	}
 
 	@Override
-	public void addRepo(final EntityBundle bundle) {
-		dockerList.add(new DockerRepoListGroupItem(HeadingSize.H4, (DockerRepository) bundle.getEntity(), new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRepoClicked(bundle);
-			}
-		}));
+	public void addRepo(DockerRepository entity) {
+		dockerList.add(new DockerRepoListGroupItem(HeadingSize.H4, entity));
 	}
 
 	@Override

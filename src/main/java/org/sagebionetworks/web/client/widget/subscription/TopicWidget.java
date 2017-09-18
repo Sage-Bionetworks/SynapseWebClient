@@ -5,6 +5,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -20,14 +21,17 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 	private TopicWidgetView view;
 	DiscussionForumClientAsync forumClient;
 	SynapseAlert synAlert;
+	SynapseJavascriptClient jsClient;
 	
 	@Inject
 	public TopicWidget(TopicWidgetView view, 
 			DiscussionForumClientAsync forumClient,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.forumClient = forumClient;
 		this.synAlert = synAlert;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 	}
 	
@@ -57,7 +61,7 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 	
 	public void configureThread(String threadId) {
 		//get the thread Project and thread title
-		forumClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>() {
+		jsClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>() {
 			@Override
 			public void onSuccess(DiscussionThreadBundle threadBundle) {
 				view.setTopicText(threadBundle.getTitle());

@@ -29,8 +29,8 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -91,9 +91,9 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		this.view.setPresenter(this);
 		this.view.setUserPickerWidget(peopleSuggestWidget.asWidget());
 		view.setLoadingEmailWidget(this.progressWidget.asWidget());
-		peopleSuggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
+		peopleSuggestBox.addItemSelectedHandler(new CallbackP<UserGroupSuggestion>() {
 			@Override
-			public void invoke(SynapseSuggestion suggestion) {
+			public void invoke(UserGroupSuggestion suggestion) {
 				onUserSelected(suggestion);
 			}
 		});
@@ -289,7 +289,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		});
 	}
 	
-	public void onUserSelected(SynapseSuggestion suggestion) {
+	public void onUserSelected(UserGroupSuggestion suggestion) {
 		this.userId = suggestion.getId();
 	}
 	

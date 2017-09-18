@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -47,7 +47,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private EntityView view;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
-	private SynapseClientAsync synapseClient;
 	private StuAlert synAlert;
 	private String entityId;
 	private Long versionNumber;
@@ -58,16 +57,17 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private EntityPageTop entityPageTop;
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
 	private GWTWrapper gwt;
-	
+	private SynapseJavascriptClient jsClient;
 	@Inject
 	public EntityPresenter(EntityView view,
 			GlobalApplicationState globalAppState,
 			AuthenticationController authenticationController,
-			SynapseClientAsync synapseClient, CookieProvider cookies,
+			SynapseJavascriptClient jsClient, CookieProvider cookies,
 			StuAlert synAlert,
 			EntityPageTop entityPageTop, Header headerWidget,
 			OpenTeamInvitationsWidget openTeamInvitesWidget,
-			GWTWrapper gwt) {
+			GWTWrapper gwt
+			) {
 		this.headerWidget = headerWidget;
 		this.entityPageTop = entityPageTop;
 		this.openTeamInvitesWidget = openTeamInvitesWidget;
@@ -75,7 +75,7 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		this.synAlert = synAlert;
 		this.globalApplicationState = globalAppState;
 		this.authenticationController = authenticationController;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.cookies = cookies;
 		this.gwt = gwt;
 		clear();
@@ -197,9 +197,9 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		
 		if(isValidEntityId(entityId)) {
 			if (versionNumber == null) {
-				synapseClient.getEntityBundle(entityId, mask, callback);
+				jsClient.getEntityBundle(entityId, mask, callback);
 			} else {
-				synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
+				jsClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
 			}
 		} else {
 			//invalid entity detected, indicate that the page was not found

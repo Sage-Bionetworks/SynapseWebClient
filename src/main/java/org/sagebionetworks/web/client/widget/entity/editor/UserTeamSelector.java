@@ -1,44 +1,48 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
-import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-public class UserSelector implements UserSelectorView.Presenter {
+public class UserTeamSelector implements UserSelectorView.Presenter {
 	
 	private UserSelectorView view;
-	CallbackP<String> usernameCallback;
+	CallbackP<String> aliasCallback;
 	SynapseSuggestBox suggestBox;
+	GWTWrapper gwt;
 	
 	@Inject
-	public UserSelector(UserSelectorView view, 
+	public UserTeamSelector(UserSelectorView view, 
 			SynapseSuggestBox suggestBox, 
-			UserGroupSuggestionProvider provider
+			UserGroupSuggestionProvider provider,
+			GWTWrapper gwt
 			) {
 		this.view = view;
 		this.suggestBox = suggestBox;
+		this.gwt = gwt;
 		view.setPresenter(this);
 		suggestBox.setSuggestionProvider(provider);
+		suggestBox.setTypeFilter(TypeFilter.ALL);
 		view.setSelectBox(suggestBox.asWidget());
-		suggestBox.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
-			public void invoke(SynapseSuggestion suggestion) {
-				onSynapseSuggestSelected((UserGroupSuggestion)suggestion);
+		suggestBox.addItemSelectedHandler(new CallbackP<UserGroupSuggestion>() {
+			public void invoke(UserGroupSuggestion suggestion) {
+				onSynapseSuggestSelected(suggestion);
 			};
 		});
 	}
 	
 	/**
 	 * Configure this widget.  Will call back when a username is selected.
-	 * @param usernameCallback
+	 * @param aliasCallback
 	 */
-	public void configure(CallbackP<String> usernameCallback) {
-		this.usernameCallback = usernameCallback;
+	public void configure(CallbackP<String> aliasCallback) {
+		this.aliasCallback = aliasCallback;
 	}
 	
 	public void clear() {
@@ -50,12 +54,12 @@ public class UserSelector implements UserSelectorView.Presenter {
 	}
 
 	public void onSynapseSuggestSelected(UserGroupSuggestion suggestion) {
-		if (!Boolean.parseBoolean(suggestion.isIndividual())) {
-			suggestBox.showErrorMessage(DisplayConstants.NO_USER_SELECTED);
-			return;
+		String userName = suggestion.getHeader().getUserName();
+		if (!suggestion.getHeader().getIsIndividual()) {
+			// team name, convert to team alias
+			userName = gwt.getUniqueAliasName(userName);
 		}
-		
-		usernameCallback.invoke(suggestion.getHeader().getUserName());
+		aliasCallback.invoke(userName);
 		view.hide();
 	}
 	

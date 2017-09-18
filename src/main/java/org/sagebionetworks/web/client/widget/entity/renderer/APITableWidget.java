@@ -30,7 +30,7 @@ import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -63,7 +63,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_CREATED_BY_PRINCIPAL_ID);
 		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_MODIFIED_BY_PRINCIPAL_ID);
 		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_USER_ID);
-
+		userColumnNames.add(WebConstants.DEFAULT_COL_NAME_SUBMITTER_ID);
+		
 		dateColumnNames.add(WebConstants.DEFAULT_COL_NAME_CREATED_ON);
 		dateColumnNames.add(WebConstants.DEFAULT_COL_NAME_MODIFIED_ON);
 		
@@ -426,10 +427,10 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		divs = view.findUserBadgeDivs();
 		for (ElementWrapper div : divs) {
 			div.removeAllChildren();
-			String userId = div.getAttribute("value");
-			UserBadge userBadge = ginInjector.getUserBadgeWidget();
-			userBadge.configure(userId);
-			view.addWidget(userBadge.asWidget(), div.getAttribute("id"));
+			String id = div.getAttribute("value");
+			UserTeamBadge badge = ginInjector.getUserTeamBadgeWidget();
+			badge.configure(id);
+			view.addWidget(badge.asWidget(), div.getAttribute("id"));
 		}
 	}
 	

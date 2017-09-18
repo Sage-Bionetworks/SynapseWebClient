@@ -4,9 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -18,7 +16,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -27,13 +25,15 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import junit.framework.Assert;
+
 public class VideoConfigEditorTest {
 		
 	VideoConfigEditor editor;
 	VideoConfigView mockView;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	@Mock
-	SynapseClientAsync mockSynapseClient;
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	EntityBundle mockBundle;
 	@Mock
@@ -43,9 +43,9 @@ public class VideoConfigEditorTest {
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(VideoConfigView.class);
-		editor = new VideoConfigEditor(mockView, mockSynapseClient);
+		editor = new VideoConfigEditor(mockView, mockSynapseJavascriptClient);
 		
-		AsyncMockStubber.callSuccessWith(mockBundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		when(mockSelectedEntityReference.getTargetId()).thenReturn(selectedEntityId);
 	}
 	
@@ -77,6 +77,7 @@ public class VideoConfigEditorTest {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY, mp4VideoId);
 		editor.configure(wikiKey, descriptor, null);
+		when(mockView.isSynapseEntity()).thenReturn(true);
 		editor.updateDescriptorFromView();
 		verify(mockView).checkParams();
 		verify(mockView).getEntity();
@@ -94,12 +95,13 @@ public class VideoConfigEditorTest {
 		editor.configure(wikiKey, descriptor, null);
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockView, never()).setVideoFormatWarningVisible(true);
 		verify(mockView).setEntity(selectedEntityId);
 		verify(mockView).hideFinder();
 		
 		when(mockView.getEntity()).thenReturn(selectedEntityId);
+		when(mockView.isSynapseEntity()).thenReturn(true);
 		editor.updateDescriptorFromView();
 		assertEquals(selectedEntityId, descriptor.get(WidgetConstants.VIDEO_WIDGET_MP4_SYNAPSE_ID_KEY));
 	}
@@ -113,12 +115,13 @@ public class VideoConfigEditorTest {
 		editor.configure(wikiKey, descriptor, null);
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setVideoFormatWarningVisible(true);
 		verify(mockView).setEntity(selectedEntityId);
 		verify(mockView).hideFinder();
 		
 		when(mockView.getEntity()).thenReturn(selectedEntityId);
+		when(mockView.isSynapseEntity()).thenReturn(true);
 		editor.updateDescriptorFromView();
 		assertEquals(selectedEntityId, descriptor.get(WidgetConstants.VIDEO_WIDGET_OGG_SYNAPSE_ID_KEY));
 	}
@@ -132,12 +135,13 @@ public class VideoConfigEditorTest {
 		editor.configure(wikiKey, descriptor, null);
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setVideoFormatWarningVisible(true);
 		verify(mockView).setEntity(selectedEntityId);
 		verify(mockView).hideFinder();
 		
 		when(mockView.getEntity()).thenReturn(selectedEntityId);
+		when(mockView.isSynapseEntity()).thenReturn(true);
 		editor.updateDescriptorFromView();
 		assertEquals(selectedEntityId, descriptor.get(WidgetConstants.VIDEO_WIDGET_WEBM_SYNAPSE_ID_KEY));
 	}
@@ -149,7 +153,7 @@ public class VideoConfigEditorTest {
 		
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockView).setVideoFormatWarningVisible(true);
 		verify(mockView).showFinderError(VideoConfigEditor.UNRECOGNIZED_VIDEO_FORMAT_MESSAGE);
 		verify(mockView, never()).setEntity(selectedEntityId);
@@ -159,15 +163,13 @@ public class VideoConfigEditorTest {
 	@Test
 	public void testValidateSelectionRPCError() {
 		Exception ex = new Exception("error seeking file name");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		editor.validateSelection(mockSelectedEntityReference);
 		
-		verify(mockSynapseClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(selectedEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showFinderError(ex.getMessage());
 	}
 	
-	
-
 	@Test
 	public void testRecognizedFiletype() {
 		assertTrue(VideoConfigEditor.isRecognizedMP4FileName("video.mp4"));
@@ -196,5 +198,97 @@ public class VideoConfigEditorTest {
 		assertTrue(VideoConfigEditor.isRecognizedVideoFileName("video.1.ogg"));
 		assertTrue(VideoConfigEditor.isRecognizedVideoFileName("video.OGV"));
 		assertTrue(VideoConfigEditor.isRecognizedVideoFileName("video.1.webm"));
+	}
+	
+	@Test
+	public void testConfigureVimeo() {
+		when(mockView.isVimeoVideo()).thenReturn(true);
+		when(mockView.getVimeoVideoUrl()).thenReturn("https://player.vimeo.com/video/9730308");
+		Map<String, String> descriptor = new HashMap<String, String>();
+		String videoId = "my test video id";
+		descriptor.put(WidgetConstants.VIMEO_WIDGET_VIDEO_ID_KEY, videoId);
+		editor.configure(wikiKey, descriptor, null);
+		verify(mockView).showVimeoTab();
+		verify(mockView).setVimeoVideoUrl(VideoConfigEditor.VIMEO_URL_PREFIX + videoId);
+		
+		editor.updateDescriptorFromView();
+		verify(mockView).checkParams();
+		verify(mockView).getVimeoVideoUrl();
+	}
+	
+	@Test
+	public void testVimeoIdFromUrl(){
+		String testVideoUrl = "https://player.vimeo.com/video/9730308";
+		String expectedId = "9730308";
+		String actualId = editor.getVimeoVideoId(testVideoUrl);
+		Assert.assertEquals(actualId, expectedId);
+		
+		testVideoUrl = "https://player.vimeo.com/video/123123";
+		expectedId = "123123";
+		actualId = editor.getVimeoVideoId(testVideoUrl);
+		Assert.assertEquals(actualId, expectedId);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidVimeoIdFromUrl1(){
+		String testVideoUrl = "https://player.vimeo.com/video/";
+		editor.getVimeoVideoId(testVideoUrl);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidVimeoIdFromUrl2(){
+		String testVideoUrl = "http://www.cnn.com/";
+		editor.getVimeoVideoId(testVideoUrl);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidVimeoIdFromUrl3(){
+		String testVideoUrl = "";
+		editor.getVimeoVideoId(testVideoUrl);
+	}
+
+	@Test
+	public void testConfigureYouTube() {
+		when(mockView.getYouTubeVideoUrl()).thenReturn("http://www.youtube.com/watch?v=G0k3kHtyoqc");
+		Map<String, String> descriptor = new HashMap<String, String>();
+		String videoId = "my test video id";
+		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, videoId);
+		editor.configure(wikiKey, descriptor, null);
+		verify(mockView).setYouTubeVideoUrl(VideoConfigEditor.YOUTUBE_URL_PREFIX + videoId);
+		when(mockView.isYouTubeVideo()).thenReturn(true);
+		editor.updateDescriptorFromView();
+		verify(mockView).checkParams();
+		verify(mockView).getYouTubeVideoUrl();
+	}
+	
+	@Test
+	public void testYouTubeVideoIdFromUrl(){
+		String testVideoUrl=  "http://www.youtube.com/watch?v=b1SJ7yaa7cI";
+		String expectedId = "b1SJ7yaa7cI";
+		String actualId = editor.getYouTubeVideoId(testVideoUrl);
+		Assert.assertEquals(actualId, expectedId);
+		
+		testVideoUrl = "http://www.youtube.com/watch?v=aTestVideoId&feature=g-upl";
+		expectedId = "aTestVideoId";
+		actualId = editor.getYouTubeVideoId(testVideoUrl);
+		Assert.assertEquals(actualId, expectedId);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidYouTubeVideoIdFromUrl1(){
+		String testVideoUrl = "http://www.youtube.com/watch?v=";
+		editor.getYouTubeVideoId(testVideoUrl);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidYouTubeVideoIdFromUrl2(){
+		String testVideoUrl = "http://www.cnn.com/";
+		editor.getYouTubeVideoId(testVideoUrl);
+	}
+	
+	@Test (expected=IllegalArgumentException.class)
+	public void testInvalidYouTubeVideoIdFromUrl3(){
+		String testVideoUrl = "";
+		editor.getYouTubeVideoId(testVideoUrl);
 	}
 }

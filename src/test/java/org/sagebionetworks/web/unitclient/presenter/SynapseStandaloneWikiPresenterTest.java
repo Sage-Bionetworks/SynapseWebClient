@@ -7,9 +7,12 @@ import java.util.HashMap;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.presenter.SynapseStandaloneWikiPresenter;
 import org.sagebionetworks.web.client.view.SynapseStandaloneWikiView;
@@ -31,12 +34,15 @@ public class SynapseStandaloneWikiPresenterTest {
 	WikiPage targetWikiPage;
 	String wikiPageMarkdown = "#H1\n##H2";
 	WikiPageKey certificationWikiKey;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	
 	@Before
 	public void setup(){
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(SynapseStandaloneWikiView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		presenter = new SynapseStandaloneWikiPresenter(mockView, mockSynapseClient);
+		presenter = new SynapseStandaloneWikiPresenter(mockView, mockSynapseClient, mockSynapseJavascriptClient);
 		verify(mockView).setPresenter(presenter);
 		
 		testPlace = new StandaloneWiki(token);
@@ -49,7 +55,7 @@ public class SynapseStandaloneWikiPresenterTest {
 		pageName2WikiKeyMap.put(WebConstants.CERTIFICATION, certificationWikiKey);
 		targetWikiPage = mock(WikiPage.class);
 		when(targetWikiPage.getMarkdown()).thenReturn(wikiPageMarkdown);
-		AsyncMockStubber.callSuccessWith(targetWikiPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(targetWikiPage).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(pageName2WikiKeyMap).when(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 	}	
 	
@@ -61,7 +67,7 @@ public class SynapseStandaloneWikiPresenterTest {
 		presenter.setPlace(testPlace);
 		verify(mockView).showLoading();
 		verify(mockView, never()).showErrorMessage(anyString());
-		verify(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		verify(mockView).configure(eq(wikiPageMarkdown), any(WikiPageKey.class));
 	}
@@ -77,7 +83,7 @@ public class SynapseStandaloneWikiPresenterTest {
 		presenter.setPlace(testPlace);
 		verify(mockView).showLoading();
 		verify(mockView, never()).showErrorMessage(anyString());
-		verify(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockSynapseClient, never()).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		verify(mockView).configure(eq(wikiPageMarkdown), any(WikiPageKey.class));
 	}
@@ -110,7 +116,7 @@ public class SynapseStandaloneWikiPresenterTest {
 	@Test
 	public void testSetPlaceFailedToGetWikiPage() {
 		String error = "failed to get wiki";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
 		verify(mockView).showErrorMessage(anyString());
 	}

@@ -14,9 +14,6 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityChildrenRequest;
-import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LogEntry;
@@ -29,7 +26,6 @@ import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
@@ -42,6 +38,7 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -61,13 +58,13 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.ProjectDisplayBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
@@ -82,10 +79,6 @@ import com.google.gwt.user.client.rpc.XsrfProtectedService;
 @RemoteServiceRelativePath("synapseclient")	
 public interface SynapseClient extends XsrfProtectedService {
 
-	public Entity getEntity(String entityId) throws RestServiceException;
-	
-	public Entity getEntityForVersion(String entityId, Long versionNumber) throws RestServiceException;
-		
 	public PaginatedResults<VersionInfo> getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
 
 	public void deleteEntityById(String entityId) throws RestServiceException;
@@ -116,24 +109,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	 */
 	public Entity updateEntity(Entity toUpdate) throws RestServiceException;
 	
-	/**
-	 * Get a bundle of information about an entity in a single call
-	 * @param entityId
-	 * @return
-	 * @throws RestServiceException 
-	 * @throws SynapseException 
-	 */
-	public EntityBundle getEntityBundle(String entityId, int partsMask) throws RestServiceException;
-
-	/**
-	 * Get a bundle of information about an entity in a single call
-	 * @param entityId
-	 * @return
-	 * @throws RestServiceException 
-	 * @throws SynapseException 
-	 */
-	public EntityBundle getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask) throws RestServiceException;
-
 	/**
 	 * Log a debug message in the server-side log.
 	 * @param message
@@ -183,31 +158,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	 * @throws RestServiceException
 	 */
 	public UserProfile getUserProfile(String userId) throws RestServiceException;
-	
-	/**
-	 * List UserProfiels by ID.
-	 * @param userIds
-	 * @return
-	 * @throws RestServiceException 
-	 */
-	public List<UserProfile> listUserProfiles(List<String> userIds) throws RestServiceException;
-	
-	/**
-	 * Return the specified team object in json string
-	 * @param teamId
-	 * @return
-	 * @throws RestServiceException
-	 */
-	public Team getTeam(String teamId) throws RestServiceException;
-	
-	/**
-	 * Batch get headers for users/groups matching a list of Synapse IDs.
-	 * 
-	 * @param ids
-	 * @return
-	 * @throws RestServiceException
-	 */
-	public UserGroupHeaderResponsePage getUserGroupHeadersById(ArrayList<String> ids) throws RestServiceException;
 
 	/**
 	 * Updates the user's profile json object 
@@ -215,8 +165,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	 * @throws RestServiceException
 	 */
 	public void updateUserProfile(UserProfile userProfile) throws RestServiceException;
-	
-	public UserGroupHeaderResponsePage getUserGroupHeadersByPrefix(String prefix, long limit, long offset) throws RestServiceException;
 	
 	public void additionalEmailValidation(String userId, String emailAddress, String callbackUrl) throws RestServiceException;
 	
@@ -260,7 +208,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	public FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	 // V2 Wiki crud
-    public V2WikiPage getV2WikiPage(WikiPageKey key) throws RestServiceException;
     public V2WikiPage restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate) throws RestServiceException;
     public void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
     public List<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
@@ -271,14 +218,10 @@ public interface SynapseClient extends XsrfProtectedService {
     
 	public WikiPage createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
 	public WikiPage updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
-	public WikiPage getV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key) throws RestServiceException, IOException;
-	public WikiPage getVersionOfV2WikiPageAsV1(org.sagebionetworks.web.shared.WikiPageKey key, Long version) throws RestServiceException, IOException;
 	
 	public EntityHeader addFavorite(String entityId) throws RestServiceException;
 	
 	public void removeFavorite(String entityId) throws RestServiceException;
-	
-	public List<EntityHeader> getFavorites() throws RestServiceException;
 	
 	public String createTeam(String teamName) throws RestServiceException;
 	public void deleteTeam(String teamId) throws RestServiceException;
@@ -320,7 +263,9 @@ public interface SynapseClient extends XsrfProtectedService {
 	public ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException;
 	
 	public SignedTokenInterface hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) throws RestServiceException;
-	
+
+	public AccountCreationToken hexDecodeAndDeserializeAccountCreationToken(String tokenString) throws RestServiceException;
+
 	public List<ColumnModel> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
 	
 	public String createColumnModel(String columnModelJson) throws RestServiceException;
@@ -381,14 +326,6 @@ public interface SynapseClient extends XsrfProtectedService {
 	 */
 	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body) throws RestServiceException, ResultNotReadyException;
 
-	/**
-	 * Get entity children
-	 * @param request
-	 * @return
-	 * @throws RestServiceException
-	 */
-	EntityChildrenResponse getEntityChildren(EntityChildrenRequest request) throws RestServiceException;
-	
 	/**
 	 * Create or update an Entity.
 	 * @param entity
@@ -478,25 +415,11 @@ public interface SynapseClient extends XsrfProtectedService {
 	
 	boolean isWiki(String projectId) throws RestServiceException;
 
-	boolean isFileOrFolder(String projectId) throws RestServiceException;
-
-	boolean isTable(String projectId) throws RestServiceException;
-
-	boolean isForum(String projectId) throws RestServiceException;
-
-	boolean isDocker(String projectId) throws RestServiceException;
-
 	boolean isChallenge(String projectId) throws RestServiceException;
-
-	ProjectDisplayBundle getProjectDisplay(String projectId) throws RestServiceException;
 
 	void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException;
 
 	void addTeamMember(String userGroupId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
-
-	Long getOpenMembershipInvitationCount() throws RestServiceException;
-
-	Long getOpenMembershipRequestCount() throws RestServiceException;
 
 	String createExternalObjectStoreFileHandle(ExternalObjectStoreFileHandle fileHandle) throws RestServiceException;
 

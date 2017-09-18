@@ -42,7 +42,7 @@ import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidgetView;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
-import org.sagebionetworks.web.client.widget.entity.editor.UserSelector;
+import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -76,7 +76,7 @@ public class MarkdownEditorWidgetTest {
 	String fileHandleId1 = "44";
 	String fileHandleId2 = "45";
 	@Mock
-	UserSelector mockUserSelector;
+	UserTeamSelector mockUserSelector;
 	@Mock
 	KeyPressEvent mockKeyEvent;
 	@Mock
@@ -139,7 +139,7 @@ public class MarkdownEditorWidgetTest {
 		String username = "jay";
 		callbackCaptor.getValue().invoke(username);
 		
-		verify(mockView).setMarkdown(username);
+		verify(mockView).setMarkdown(username + " ");
 		verify(mockView).setFocus(true);
 	}
 	
@@ -426,12 +426,6 @@ public class MarkdownEditorWidgetTest {
 		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
 	}
 	
-	@Test
-	public void testHandleCommandInsertYouTube(){
-		String contentType = WidgetConstants.YOUTUBE_CONTENT_TYPE;
-		presenter.handleCommand(MarkdownEditorAction.INSERT_YOU_TUBE);
-		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
-	}
 	@Test
 	public void testHandleCommandInsertBookmark(){
 		String contentType = WidgetConstants.BOOKMARK_CONTENT_TYPE;

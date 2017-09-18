@@ -28,6 +28,7 @@ import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupRequest;
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroupResponse;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -131,6 +132,7 @@ public class ACTAccessApprovalsPresenterTest {
 	@Test
 	public void testConstruction() {
 		verify(mockPeopleSuggestWidget).setSuggestionProvider(mockProvider);
+		verify(mockPeopleSuggestWidget).setTypeFilter(TypeFilter.USERS_ONLY);
 		verify(mockShowHideAccessRequirementButton).addClickHandler(clickHandlerCaptor.capture());
 		verify(mockView).setAccessRequirementUIVisible(false);
 		verify(mockShowHideAccessRequirementButton).setText(SHOW_AR_TEXT);

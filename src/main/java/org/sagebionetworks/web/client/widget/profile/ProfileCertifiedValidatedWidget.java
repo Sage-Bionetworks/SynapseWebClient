@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTI
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_VERIFIED;
 
 import org.sagebionetworks.repo.model.UserBundle;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -15,14 +16,14 @@ import com.google.inject.Inject;
 
 public class ProfileCertifiedValidatedWidget implements IsWidget {
 	LazyLoadHelper lazyLoadHelper;
-	UserProfileClientAsync userProfileClient;
+	SynapseJavascriptClient jsClient;
 	Callback inViewportCallback;
 	ProfileCertifiedValidatedView view;
 	Long userId;
 	
 	@Inject
-	public ProfileCertifiedValidatedWidget(ProfileCertifiedValidatedView view, UserProfileClientAsync userProfileClient, LazyLoadHelper lazyLoadHelper) {
-		this.userProfileClient = userProfileClient;
+	public ProfileCertifiedValidatedWidget(ProfileCertifiedValidatedView view, SynapseJavascriptClient jsClient, LazyLoadHelper lazyLoadHelper) {
+		this.jsClient = jsClient;
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.view = view;
 		inViewportCallback = new Callback() {
@@ -41,7 +42,7 @@ public class ProfileCertifiedValidatedWidget implements IsWidget {
 	
 	public void loadData() {
 		int mask = IS_CERTIFIED | IS_VERIFIED;
-		userProfileClient.getUserBundle(userId, mask, new AsyncCallback<UserBundle>() {
+		jsClient.getUserBundle(userId, mask, new AsyncCallback<UserBundle>() {
 			@Override
 			public void onSuccess(UserBundle bundle) {
 				view.setCertifiedVisible(bundle.getIsCertified());

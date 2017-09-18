@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client;
 
 import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder.Method;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
-import com.google.gwt.http.client.RequestBuilder.Method;
 
 /**
  * wrapper for RequestBuilder so that it can be mocked

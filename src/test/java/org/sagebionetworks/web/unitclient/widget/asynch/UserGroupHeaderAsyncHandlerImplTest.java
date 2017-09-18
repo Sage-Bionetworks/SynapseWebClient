@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.asynch;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderAsyncHandlerImpl;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -26,7 +27,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class UserGroupHeaderAsyncHandlerImplTest {
 	UserGroupHeaderAsyncHandlerImpl asyncHandler;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	GWTWrapper mockGwt;
 	@Mock
@@ -41,30 +42,30 @@ public class UserGroupHeaderAsyncHandlerImplTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		asyncHandler = new UserGroupHeaderAsyncHandlerImpl(mockSynapseClient, mockGwt);
+		asyncHandler = new UserGroupHeaderAsyncHandlerImpl(mockSynapseJavascriptClient, mockGwt);
 		resultList = new ArrayList<UserGroupHeader>();
-		AsyncMockStubber.callSuccessWith(mockUserGroupHeaderResponsePage).when(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserGroupHeaderResponsePage).when(mockSynapseJavascriptClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
 		when(mockUserGroupHeaderResponsePage.getChildren()).thenReturn(resultList);
 		when(mockResult.getOwnerId()).thenReturn(userId);
 	}
 	
 	@Test
 	public void testConstructor() {
-		verify(mockGwt).scheduleFixedDelay(any(Callback.class), eq(UserGroupHeaderAsyncHandlerImpl.DELAY));
+		verify(mockGwt).scheduleFixedDelay(any(Callback.class), anyInt());
 	}
 
 	@Test
 	public void testSuccess() {
 		//verify no rpc if nothing has been requested.
 		asyncHandler.executeRequests();
-		verifyZeroInteractions(mockSynapseClient);
+		verifyZeroInteractions(mockSynapseJavascriptClient);
 		
 		//add one, simulate single result
 		asyncHandler.getUserGroupHeader(userId, mockCallback);
 		resultList.add(mockResult);
 		
 		asyncHandler.executeRequests();
-		verify(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
 		verify(mockCallback).onSuccess(mockResult);
 	}
 	
@@ -72,7 +73,7 @@ public class UserGroupHeaderAsyncHandlerImplTest {
 	public void testFailure() {
 		//simulate exception response
 		Exception ex = new Exception("problem loading batch");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
 		asyncHandler.getUserGroupHeader(userId, mockCallback);
 		asyncHandler.executeRequests();
 		
@@ -87,7 +88,7 @@ public class UserGroupHeaderAsyncHandlerImplTest {
 		resultList.add(mockResult);
 		
 		asyncHandler.executeRequests();
-		verify(mockSynapseClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
 		verify(mockCallback).onFailure(any(Throwable.class));
 	}
 

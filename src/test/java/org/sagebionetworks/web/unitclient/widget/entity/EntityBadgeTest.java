@@ -24,6 +24,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -44,8 +45,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -74,7 +74,6 @@ public class EntityBadgeTest {
 	private static final String KEY3 = "key3";
 	private static final String KEY1 = "key1";
 	private static final String KEY2 = "key2";
-	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
@@ -101,12 +100,16 @@ public class EntityBadgeTest {
 	ResourceAccess mockResourceAccess;
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Captor
+	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
+	
 	Set<ResourceAccess> resourceAccessSet;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(EntityBadgeView.class);
 		mockClientCache = mock(ClientCache.class);
 		getInfoCallback = mock(AsyncCallback.class);
@@ -119,7 +122,7 @@ public class EntityBadgeTest {
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
-				mockUserBadge, mockSynapseClient,
+				mockUserBadge, mockSynapseJavascriptClient,
 				mockFileDownloadButton, mockLazyLoadHelper,
 				mockDateTimeUtils);
 		
@@ -146,7 +149,7 @@ public class EntityBadgeTest {
 		when(bundle.getBenefactorAcl()).thenReturn(mockBenefactorAcl);
 		when(bundle.getRootWikiId()).thenReturn(rootWikiKeyId);
 		when(bundle.getThreadCount()).thenReturn(entityThreadCount);
-		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		return bundle;
 	}
 	
@@ -183,7 +186,7 @@ public class EntityBadgeTest {
 		verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
 		captor.getValue().invoke();
 		
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showPublicIcon();
 		verify(mockView).showAnnotationsIcon();
 		verify(mockView).setAnnotations(anyString());
@@ -212,7 +215,7 @@ public class EntityBadgeTest {
 		configure();
 		widget.getEntityBundle();
 		
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockUserBadge).configure(modifiedByPrincipalId.toString());
 		verify(mockView).setModifiedByWidgetVisible(true);
 		verify(mockDateTimeUtils).convertDateToSmallString(modifiedOn);
@@ -235,7 +238,7 @@ public class EntityBadgeTest {
 		//test failure response from getEntityBundle
 		String errorMessage = "problem occurred while asking for entity bundle";
 		Exception ex = new Exception(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		widget.getEntityBundle();
 
 		verify(mockView).showErrorIcon();
@@ -243,23 +246,16 @@ public class EntityBadgeTest {
 	}
 
 	@Test
-	public void testEntityClicked() throws Exception {
-		//check the passthrough
-		EntityHeader header = new EntityHeader();
-		header.setId("syn93847");
-		widget.entityClicked(header);
-		verify(mockPlaceChanger).goTo(isA(Synapse.class));
-	}
-	
-	@Test
 	public void testEntityClickedCustomHandler() throws Exception {
+		configure();
 		CallbackP<String> mockEntityClicked = mock(CallbackP.class);
 		widget.setEntityClickedHandler(mockEntityClicked);
-		String id = "syn77";
-		EntityHeader header = new EntityHeader();
-		header.setId(id);
-		widget.entityClicked(header);
-		verify(mockEntityClicked).invoke(id);
+		verify(mockView).addClickHandler(clickHandlerCaptor.capture());
+		// test click handler calls us back
+		ClickHandler clickHandler = clickHandlerCaptor.getValue();
+		verify(mockEntityClicked, never()).invoke(anyString());
+		clickHandler.onClick(null);
+		verify(mockEntityClicked).invoke(anyString());
 	}
 	
 	@Test
@@ -286,14 +282,6 @@ public class EntityBadgeTest {
 		assertTrue(header == widget.getHeader());
 	}
 	
-	@Test
-	public void testSetClickHandler() {
-		ClickHandler mockClickHandler = mock(ClickHandler.class);
-		widget.setClickHandler(mockClickHandler);
-		verify(mockView).setClickHandler(mockClickHandler);
-		verify(mockUserBadge).setCustomClickHandler(mockClickHandler);
-	}
-
 	@Test
 	public void testAnnotationsEmpty() throws Exception {
 		annotationList.clear();

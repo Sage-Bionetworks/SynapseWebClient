@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.widget.Button;
@@ -59,17 +60,20 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 	public static final String SHOW = "Show Advanced";
 	public static final String HIDE = "Hide Advanced";
 	Button showHideAdvancedButton;
+	SynapseJavascriptClient jsClient;
 	
 	@Inject
 	public PlotlyConfigEditor(final PlotlyConfigView view, 
 			EntityFinder finder,
 			SynapseAlert synAlert,
 			SynapseClientAsync synapseClient,
-			Button showHideAdvancedButton) {
+			Button showHideAdvancedButton,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.finder = finder;
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.showHideAdvancedButton = showHideAdvancedButton;
 		view.setSynAlert(synAlert);
 		view.setPresenter(this);
@@ -271,7 +275,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		synAlert.clear();
 		this.tableSynapseId = synId;
 		view.setTableName("");
-		synapseClient.getEntity(tableSynapseId, new AsyncCallback<Entity>() {
+		jsClient.getEntity(tableSynapseId, new AsyncCallback<Entity>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setTableName(caught.getMessage());

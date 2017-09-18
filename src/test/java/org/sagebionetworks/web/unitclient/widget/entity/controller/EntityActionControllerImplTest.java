@@ -78,6 +78,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -187,6 +188,8 @@ public class EntityActionControllerImplTest {
 	@Mock
 	AccessControlList mockACL;
 	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
 	AwsSdk mockAwsSdk;
 	@Mock
 	ExternalObjectStoreFileHandle mockExternalObjectStoreFileHandle;
@@ -246,6 +249,7 @@ public class EntityActionControllerImplTest {
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockSubmitter);
 		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
+		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockSynapseJavascriptClient);
 		// The controller under test.
 		controller = new EntityActionControllerImpl(mockView,
 				mockPreflightController,
@@ -295,7 +299,7 @@ public class EntityActionControllerImplTest {
 		when(mockWikiPageToDelete.getId()).thenReturn(wikiPageId);
 		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(parentWikiPageId);
 		when(mockWikiPageToDelete.getTitle()).thenReturn(wikiPageTitle);
-		AsyncMockStubber.callSuccessWith(mockWikiPageToDelete).when(mockSynapseClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockWikiPageToDelete).when(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -750,7 +754,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testOnDeleteWikiPageFailureToGetPage(){
 		String error = "Unable to get wiki page being deleted";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		
 		/*
 		 * The preflight check is confirmed by calling Callback.invoke(), in this case it must not be invoked.
@@ -758,7 +762,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		// the call under test
 		controller.onAction(Action.DELETE_WIKI_PAGE);
-		verify(mockSynapseClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockView, never()).showConfirmDialog(anyString(), anyString(), any(Callback.class));
 		verify(mockView).showErrorMessage(error);
 	}
@@ -1100,7 +1104,7 @@ public class EntityActionControllerImplTest {
 		WikiPage page = new WikiPage();
 		String markdown = "hello markdown";
 		page.setMarkdown(markdown);
-		AsyncMockStubber.callSuccessWith(page).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class),any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(page).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class),any(AsyncCallback.class));
 		entityBundle.setRootWikiId("111");
 		controller.configure(mockActionMenu, entityBundle, true,null, mockEntityUpdatedHandler);
 		controller.onAction(Action.VIEW_WIKI_SOURCE);
@@ -1109,7 +1113,7 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testOnViewWikiSourceError(){
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class),any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class),any(AsyncCallback.class));
 		entityBundle.setRootWikiId("111");
 		controller.configure(mockActionMenu, entityBundle, true,null, mockEntityUpdatedHandler);
 		controller.onAction(Action.VIEW_WIKI_SOURCE);

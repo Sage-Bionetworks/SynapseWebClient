@@ -26,8 +26,10 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
+import org.sagebionetworks.web.client.widget.upload.FileValidator;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
 
@@ -105,6 +107,28 @@ public class FileHandleUploadWidgetImplTest {
 		verify(mockView).updateProgress(100, "100%");
 		verify(mockView).setInputEnabled(true);
 		verify(mockView).showProgress(false);
+	}
+	@Test
+	public void testSelectInvalidFileName() {
+		FileValidator mockFileValidator = mock(FileValidator.class);
+		when(mockFileValidator.getInvalidFileCallback()).thenReturn(mockFailedValidationCallback);
+		when(jsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"testName#($*#.jpg"});
+		widget.configure("button text", mockCallback);
+		widget.setValidation(mockFileValidator);
+		
+		widget.onFileSelected();
+		
+		verify(mockView).showError(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+		verify(mockFailedValidationCallback).invoke();
+	}
+	@Test
+	public void testSelectInvalidFileNameNoValidator() {
+		when(jsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"testName#($*#.jpg"});
+		widget.configure("button text", mockCallback);
+		
+		widget.onFileSelected();
+		
+		verify(mockView).showError(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 	}
 	
 	@Test

@@ -65,7 +65,6 @@ import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItem
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListWidget;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
-import org.sagebionetworks.web.client.widget.display.ProjectDisplayDialog;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
@@ -118,7 +117,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.LeaderboardConfigEdit
 import org.sagebionetworks.web.client.widget.entity.editor.LinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.PlotlyConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.PreviewConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.ProjectBackgroundConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigEditor;
@@ -127,8 +125,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEdit
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.VimeoConfigEditor;
-import org.sagebionetworks.web.client.widget.entity.editor.YouTubeConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
@@ -162,10 +158,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberCountWidg
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMemberRowWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.TeamMembersWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.VimeoWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiFilesPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.YouTubeWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTabView;
@@ -332,8 +326,6 @@ public interface PortalGinInjector extends Ginjector {
 	////// Editors
 	public BookmarkConfigEditor getBookmarkConfigEditor();
 	public ReferenceConfigEditor getReferenceConfigEditor();
-	public YouTubeConfigEditor getYouTubeConfigEditor();
-	public VimeoConfigEditor getVimeoConfigEditor();
 	public ProvenanceConfigEditor getProvenanceConfigEditor();
 	public ImageConfigEditor getImageConfigEditor();
 	public ImageLinkConfigEditor getImageLinkConfigEditor();
@@ -350,7 +342,6 @@ public interface PortalGinInjector extends Ginjector {
 	public UserTeamConfigEditor getUserTeamConfigEditor();
 	public VideoConfigEditor getVideoConfigEditor();
 	public TableQueryResultWikiEditor getSynapseTableQueryResultEditor();
-	public ProjectBackgroundConfigEditor getProjectBackgroundConfigEditor();
 	public PreviewConfigEditor getPreviewConfigEditor();
 	public BiodallianceEditor getBiodallianceEditor();
 	public BiodallianceSourceEditor getBiodallianceSourceEditor();
@@ -360,8 +351,6 @@ public interface PortalGinInjector extends Ginjector {
 	////// Renderers
 	public BookmarkWidget getBookmarkRenderer();
 	public ReferenceWidget getReferenceRenderer();
-	public YouTubeWidget getYouTubeRenderer();
-	public VimeoWidget getVimeoRenderer();
 	public TutorialWizard getTutorialWidgetRenderer();
 	public ProvenanceWidget getProvenanceRenderer();
 	public AdministerEvaluationsList getAdministerEvaluationsList();
@@ -510,6 +499,7 @@ public interface PortalGinInjector extends Ginjector {
 	public DockerRepoListWidget getDockerRepoListWidget();
 	public Breadcrumb getBreadcrumb();
 	public SynapseClientAsync getSynapseClientAsync();
+	public SynapseJavascriptClient getSynapseJavascriptClient();
 	public StuAlert getStuAlert();
 	public FilesTabView getFilesTabView();
 	public FileTitleBar getFileTitleBar();
@@ -536,7 +526,6 @@ public interface PortalGinInjector extends Ginjector {
 	public SelectTeamModal getSelectTeamModal();
 	public ApproveUserAccessModal getApproveUserAccessModal();
 	public ACTRevokeUserAccessModal getACTRevokeUserAccessModal();
-	public ProjectDisplayDialog getProjectDisplayDialog();
 	public ChallengeClientAsync getChallengeClientAsync();
 	public UserProfileClientAsync getUserProfileClientAsync();
 	public EntityIdCellRendererImpl getEntityIdCellRenderer();

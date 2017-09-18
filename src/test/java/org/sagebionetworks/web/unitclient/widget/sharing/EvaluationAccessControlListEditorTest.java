@@ -33,7 +33,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -54,7 +54,6 @@ public class EvaluationAccessControlListEditorTest {
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
 	
 	// Mock components
-	private SynapseClientAsync mockSynapseClient;
 	private ChallengeClientAsync mockChallengeClient;
 	private AuthenticationController mockAuthenticationController;
 	private AccessControlListEditorView mockACLEView;
@@ -79,6 +78,8 @@ public class EvaluationAccessControlListEditorTest {
 	EvaluationAccessControlListEditor.HasChangesHandler mockHasChangesHandler;
 	@Mock
 	PublicPrincipalIds mockPublicPrincipalIds;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws JSONObjectAdapterException {
@@ -92,7 +93,6 @@ public class EvaluationAccessControlListEditorTest {
 		uep = createUEP();
 		userGroupHeaderRP = AccessControlListEditorTest.createUGHRP();
 		// set up mocks
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
 		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
 		mockACLEView = mock(AccessControlListEditorView.class);
@@ -107,13 +107,13 @@ public class EvaluationAccessControlListEditorTest {
 		AsyncMockStubber.callSuccessWith(uep.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockChallengeClient).getUserEvaluationPermissions(anyString(), any(AsyncCallback.class));
 		
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
-		AsyncMockStubber.callSuccessWith(userGroupHeaderRP).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<ArrayList<String>>any(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(userGroupHeaderRP).when(mockSynapseJavascriptClient).getUserGroupHeadersById(Matchers.<ArrayList<String>>any(), any(AsyncCallback.class));
 
 		mockPushToSynapseCallback = mock(Callback.class);
 		
 		// instantiate the ACLEditor
 		acle = new EvaluationAccessControlListEditor(mockACLEView,
-				mockSynapseClient,
+				mockSynapseJavascriptClient,
 				mockAuthenticationController,
 				mockGlobalApplicationState,
 				new JSONObjectAdapterImpl(),

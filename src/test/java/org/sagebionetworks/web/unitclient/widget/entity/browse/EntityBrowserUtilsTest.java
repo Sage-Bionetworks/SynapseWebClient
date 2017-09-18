@@ -3,7 +3,6 @@ package org.sagebionetworks.web.unitclient.widget.entity.browse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
@@ -13,26 +12,29 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
-import org.sagebionetworks.web.client.widget.entity.renderer.EntityListUtil;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityBrowserUtilsTest {
 
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	
 	@Before
 	public void before() {
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
+		MockitoAnnotations.initMocks(this);
 	}
 	
 	@Test
@@ -46,9 +48,9 @@ public class EntityBrowserUtilsTest {
 		results.add(h1);
 		results.add(h2);
 		
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(results).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		AsyncCallback<List<EntityHeader>> callback = mock(AsyncCallback.class);
-		EntityBrowserUtils.loadFavorites(mockSynapseClient, mockGlobalApplicationState, callback);
+		EntityBrowserUtils.loadFavorites(mockSynapseJavascriptClient, mockGlobalApplicationState, callback);
 		ArgumentCaptor<List> argument = ArgumentCaptor.forClass(List.class);
 		verify(callback).onSuccess(argument.capture());
 		List<EntityHeader> returned = argument.getValue();

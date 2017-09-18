@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
+import com.google.gwt.user.client.ui.SimplePanel;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -31,7 +32,7 @@ import com.google.inject.Inject;
 public class NewAccountViewImpl extends Composite implements NewAccountView {
 
 	public interface NewAccountViewImplUiBinder extends UiBinder<Widget, NewAccountViewImpl> {}
-	
+
 	@UiField
 	TextBox emailField;
 	@UiField

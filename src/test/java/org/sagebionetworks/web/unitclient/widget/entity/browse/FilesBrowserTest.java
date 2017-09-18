@@ -11,7 +11,9 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
@@ -22,6 +24,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -39,16 +42,18 @@ public class FilesBrowserTest {
 	FilesBrowser filesBrowser;
 	CookieProvider mockCookies;
 	String configuredEntityId = "syn123";
-	
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Before
 	public void before() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(FilesBrowserView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockCookies = mock(CookieProvider.class);
 		filesBrowser = new FilesBrowser(mockView, mockSynapseClient,
-				mockGlobalApplicationState, mockAuthenticationController, mockCookies);
+				mockGlobalApplicationState, mockAuthenticationController, mockCookies, mockSynapseJavascriptClient);
 		verify(mockView).setPresenter(filesBrowser);
 		boolean isCertified = true;
 		boolean canCertifiedUserAddChild = true;

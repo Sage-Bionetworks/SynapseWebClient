@@ -11,12 +11,11 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.HelpWidget;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -176,9 +175,9 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				add(helpWidget.asWidget());
 			} else {
 				// Configure AddPeopleToAclPanel.
-				CallbackP<SynapseSuggestion> addPersonCallback = new CallbackP<SynapseSuggestion>() {
+				CallbackP<UserGroupSuggestion> addPersonCallback = new CallbackP<UserGroupSuggestion>() {
 					@Override
-					public void invoke(SynapseSuggestion param) {
+					public void invoke(UserGroupSuggestion param) {
 						addPersonToAcl(param);
 					}
 				};
@@ -267,9 +266,9 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		showErrorMessage(message);
 	}
 	
-	private void addPersonToAcl(SynapseSuggestion suggestion) {
+	private void addPersonToAcl(UserGroupSuggestion suggestion) {
 		if(suggestion != null) {
-			SynapseSuggestion selectedUser = suggestion;
+			UserGroupSuggestion selectedUser = suggestion;
 			String principalIdStr = selectedUser.getId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			

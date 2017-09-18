@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -22,8 +23,6 @@ public class FileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
 	private Map<String, List<AsyncCallback<FileResult>>> reference2Callback = new HashMap<String, List<AsyncCallback<FileResult>>>();
 	private List<FileHandleAssociation> fileHandleAssociations = new ArrayList<FileHandleAssociation>();
 	SynapseClientAsync synapseClient;
-	// This singleton checks for new work every <DELAY> milliseconds.
-	public static final int DELAY = 325;
 	public static final int LIMIT = 95;
 	
 	@Inject
@@ -35,7 +34,7 @@ public class FileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
 				executeRequests();
 			}
 		};
-		gwt.scheduleFixedDelay(callback, DELAY);
+		gwt.scheduleFixedDelay(callback, 200 + gwt.nextInt(150));
 	}
 	
 	@Override
@@ -94,7 +93,7 @@ public class FileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
 							}
 						}
 					}
-					UnknownErrorException notReturnedException = new UnknownErrorException(DisplayConstants.ERROR_LOADING);
+					NotFoundException notReturnedException = new NotFoundException(DisplayConstants.ERROR_LOADING);
 					for (String fileHandleId : reference2CallbackCopy.keySet()) {
 						// not returned
 						callOnFailure(fileHandleId, notReturnedException);

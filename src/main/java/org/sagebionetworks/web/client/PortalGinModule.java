@@ -150,6 +150,8 @@ import org.sagebionetworks.web.client.widget.asynch.TimerProvider;
 import org.sagebionetworks.web.client.widget.asynch.TimerProviderImpl;
 import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderAsyncHandlerImpl;
+import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderFromAliasAsyncHandler;
+import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderFromAliasAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.biodalliance13.BiodallianceWidgetView;
@@ -184,8 +186,6 @@ import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadMo
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalViewImpl;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalViewImpl;
-import org.sagebionetworks.web.client.widget.display.ProjectDisplayView;
-import org.sagebionetworks.web.client.widget.display.ProjectDisplayViewImpl;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidgetView;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidgetView;
@@ -342,8 +342,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigViewImpl;
-import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigView;
-import org.sagebionetworks.web.client.widget.entity.editor.IFrameConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageParamsPanelView;
@@ -400,8 +398,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.IFrameWidgetView;
-import org.sagebionetworks.web.client.widget.entity.renderer.IFrameWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetView;
@@ -921,9 +917,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// QuestionContainerWidget
 		bind(QuestionContainerWidgetView.class).to(QuestionContainerWidgetViewImpl.class);
 		
-		// IFrameWidget
-		bind(IFrameWidgetView.class).to(IFrameWidgetViewImpl.class);
-		
 		// DoiWidget
 		bind(DoiWidgetView.class).to(DoiWidgetViewImpl.class);
 		
@@ -1052,7 +1045,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(BookmarkConfigView.class).to(BookmarkConfigViewImpl.class);
 		bind(BaseEditWidgetDescriptorView.class).to(BaseEditWidgetDescriptorViewImpl.class);
 		bind(ReferenceConfigView.class).to(ReferenceConfigViewImpl.class);
-		bind(IFrameConfigView.class).to(IFrameConfigViewImpl.class);
 		bind(ImageConfigViewImpl.class).in(Singleton.class);
 		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);
 		bind(AttachmentConfigViewImpl.class).in(Singleton.class);
@@ -1371,7 +1363,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);
 		bind(SelectTeamModalView.class).to(SelectTeamModalViewImpl.class);
 		bind(ApproveUserAccessModalView.class).to(ApproveUserAccessModalViewImpl.class);
-		bind(ProjectDisplayView.class).to(ProjectDisplayViewImpl.class);
 		bind(UserBadgeListView.class).to(UserBadgeListViewImpl.class);
 		bind(EntityListRowBadgeView.class).to(EntityListRowBadgeViewImpl.class);
 		
@@ -1390,6 +1381,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(UserGroupHeaderAsyncHandlerImpl.class).in(Singleton.class);
 		bind(UserGroupHeaderAsyncHandler.class).to(UserGroupHeaderAsyncHandlerImpl.class);
+		
+		bind(UserGroupHeaderFromAliasAsyncHandlerImpl.class).in(Singleton.class);
+		bind(UserGroupHeaderFromAliasAsyncHandler.class).to(UserGroupHeaderFromAliasAsyncHandlerImpl.class);
 		
 		bind(DivView.class).to(DivViewImpl.class);
 		bind(FacetColumnResultValuesView.class).to(FacetColumnResultValuesViewImpl.class);
@@ -1438,5 +1432,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TeamMembersWidgetView.class).to(TeamMembersWidgetViewImpl.class);
 		bind(FileViewClientsHelp.class).to(FileViewClientsHelpImpl.class);
 		bind(EmailAddressesWidgetView.class).to(EmailAddressesWidgetViewImpl.class);
+		
+		// Synapse js client
+		bind(SynapseJavascriptClient.class).in(Singleton.class);
+		bind(SynapseJavascriptFactory.class).in(Singleton.class);
 	}
 }

@@ -20,11 +20,10 @@ import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -48,7 +47,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	
 	// Editor components
 	private AccessControlListEditorView view;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private ChallengeClientAsync challengeClient;
 	private AuthenticationController authenticationController;
 	private JSONObjectAdapter jsonObjectAdapter;
@@ -66,14 +65,14 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	
 	@Inject
 	public EvaluationAccessControlListEditor(AccessControlListEditorView view,
-			SynapseClientAsync synapseClientAsync,
+			SynapseJavascriptClient jsClient,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			JSONObjectAdapter jsonObjectAdapter,
 			ChallengeClientAsync challengeClient
 			) {
 		this.view = view;
-		this.synapseClient = synapseClientAsync;
+		this.jsClient = jsClient;
 		this.challengeClient = challengeClient;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -252,7 +251,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		ArrayList<String> ids = new ArrayList<String>();
 		for (ResourceAccess ra : acl.getResourceAccess())
 			ids.add(ra.getPrincipalId().toString());
-		synapseClient.getUserGroupHeadersById(ids, new AsyncCallback<UserGroupHeaderResponsePage>(){
+		jsClient.getUserGroupHeadersById(ids, new AsyncCallback<UserGroupHeaderResponsePage>(){
 			@Override
 			public void onSuccess(UserGroupHeaderResponsePage response) {
 				for (UserGroupHeader ugh : response.getChildren())

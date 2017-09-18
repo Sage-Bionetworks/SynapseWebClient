@@ -18,7 +18,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -64,12 +64,12 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	String projectEntityId;
 	String areaToken;
 	StuAlert synAlert;
-	SynapseClientAsync synapseClient;
 	PortalGinInjector ginInjector;
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	CallbackP<Boolean> showProjectInfoCallack;
 	TableEntityWidget v2TableWidget;
 	Map<String,String> configMap;
+	SynapseJavascriptClient jsClient;
 	
 	public static final String TABLES_HELP = "Build structured queryable data that can be described by a schema using the Tables.";
 	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "tables.html";
@@ -92,7 +92,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			this.metadata = ginInjector.getEntityMetadata();
 			this.queryTokenProvider = ginInjector.getQueryTokenProvider();
 			this.synAlert = ginInjector.getStuAlert();
-			this.synapseClient = ginInjector.getSynapseClientAsync();
+			this.jsClient = ginInjector.getSynapseJavascriptClient();
 			this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
 			
 			view.setBreadcrumb(breadcrumb.asWidget());
@@ -165,7 +165,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		}
 	}
 	
-	
 	public void showProjectLevelUI() {
 		String title = projectEntityId;
 		if (projectBundle != null) {
@@ -179,16 +178,18 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	}
 	
 	public void resetView() {
-		synAlert.clear();
-		view.setEntityMetadataVisible(false);
-		view.setBreadcrumbVisible(false);
-		view.setTableListVisible(false);
-		view.setTitlebarVisible(false);
-		showProjectInfoCallack.invoke(false);
-		view.clearActionMenuContainer();
-		view.clearTableEntityWidget();
-		modifiedCreatedBy.setVisible(false);
-		view.setProvenanceVisible(false);
+		if (view != null) {
+			synAlert.clear();
+			view.setEntityMetadataVisible(false);
+			view.setBreadcrumbVisible(false);
+			view.setTableListVisible(false);
+			view.setTitlebarVisible(false);
+			showProjectInfoCallack.invoke(false);
+			view.clearActionMenuContainer();
+			view.clearTableEntityWidget();
+			modifiedCreatedBy.setVisible(false);
+			view.setProvenanceVisible(false);
+		}
 	}
 	
 	public void showError(Throwable error) {
@@ -268,7 +269,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			}			
 		};
 		
-		synapseClient.getEntityBundle(entityId, mask, callback);
+		jsClient.getEntityBundle(entityId, mask, callback);
 	}
 	
 	public Tab asTab(){

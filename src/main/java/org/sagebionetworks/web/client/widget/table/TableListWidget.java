@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -39,7 +40,7 @@ import com.google.inject.Inject;
 public class TableListWidget implements TableListWidgetView.Presenter, TableCreatedHandler, IsWidget {
 	private PreflightController preflightController;
 	private TableListWidgetView view;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private UploadTableModalWidget uploadTableModalWidget;
 	private CreateTableViewWizard createTableViewWizard;
 	private boolean canEdit;
@@ -54,7 +55,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	@Inject
 	public TableListWidget(PreflightController preflightController,
 			TableListWidgetView view,
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			UploadTableModalWidget uploadTableModalWidget,
 			CookieProvider cookies,
 			CreateTableViewWizard createTableViewWizard,
@@ -62,7 +63,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 			SynapseAlert synAlert) {
 		this.preflightController = preflightController;
 		this.view = view;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.uploadTableModalWidget = uploadTableModalWidget;
 		this.createTableViewWizard = createTableViewWizard;
 		this.loadMoreWidget = loadMoreWidget;
@@ -142,7 +143,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	 */
 	private void loadMore(){
 		synAlert.clear();
-		synapseClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
+		jsClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
 			public void onSuccess(EntityChildrenResponse result) {
 				query.setNextPageToken(result.getNextPageToken());
 				loadMoreWidget.setIsMore(result.getNextPageToken() != null);

@@ -16,6 +16,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidget;
@@ -38,6 +39,8 @@ public class TopicWidgetTest {
 	DiscussionThreadBundle mockDiscussionThreadBundle;
 	@Mock
 	Project mockProject;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	
 	private static final String TEST_OBJECT_ID = "42";
 	private static final String THREAD_TITLE = "It was the best of times...";
@@ -47,7 +50,7 @@ public class TopicWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new TopicWidget(mockView, mockForumClient, mockSynAlert);
+		widget = new TopicWidget(mockView, mockForumClient, mockSynAlert, mockSynapseJavascriptClient);
 		
 		when(mockDiscussionThreadBundle.getTitle()).thenReturn(THREAD_TITLE);
 		when(mockDiscussionThreadBundle.getProjectId()).thenReturn(THREAD_PROJECT_ID);
@@ -79,11 +82,11 @@ public class TopicWidgetTest {
 	}
 	@Test
 	public void testConfigureDiscussionThread() {
-		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle).when(mockForumClient)
+		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle).when(mockSynapseJavascriptClient)
 			.getThread(anyString(), any(AsyncCallback.class));
 		
 		widget.configure(SubscriptionObjectType.THREAD, TEST_OBJECT_ID);
-		verify(mockForumClient)
+		verify(mockSynapseJavascriptClient)
 			.getThread(anyString(), any(AsyncCallback.class));
 		verify(mockView).setTopicText(THREAD_TITLE);
 		verify(mockView).setIcon(IconType.COMMENTS);
@@ -95,11 +98,11 @@ public class TopicWidgetTest {
 	public void testConfigureDiscussionThreadFailure() {
 		String errorMessage = "error";
 		Exception ex = new Exception(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockForumClient)
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient)
 			.getThread(anyString(), any(AsyncCallback.class));
 		
 		widget.configure(SubscriptionObjectType.THREAD, TEST_OBJECT_ID);
-		verify(mockForumClient)
+		verify(mockSynapseJavascriptClient)
 			.getThread(anyString(), any(AsyncCallback.class));
 		verify(mockSynAlert).showError(errorMessage);
 	}

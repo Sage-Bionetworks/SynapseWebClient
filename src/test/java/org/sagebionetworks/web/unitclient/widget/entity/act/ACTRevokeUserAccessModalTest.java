@@ -10,13 +10,14 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.entity.act.ACTRevokeUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.RevokeUserAccessModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -37,7 +38,7 @@ public class ACTRevokeUserAccessModalTest {
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
-	SynapseSuggestion mockUser;
+	UserGroupSuggestion mockUser;
 	@Mock
 	ACTAccessRequirement mockACTAccessRequirement;
 	String selectedUserId = "34543";
@@ -56,6 +57,7 @@ public class ACTRevokeUserAccessModalTest {
 		verify(mockView).setUserPickerWidget(any(Widget.class));
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockSynAlert).clear();
+		verify(mockPeopleSuggestWidget).setTypeFilter(TypeFilter.USERS_ONLY);
 		verify(mockView).show();
 	}
 	@Test

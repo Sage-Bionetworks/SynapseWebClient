@@ -1,8 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import java.util.List;
-
-import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
@@ -11,14 +8,9 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
-import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
-import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
 import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
-import org.sagebionetworks.repo.model.subscription.SubscriberCount;
-import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
-import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.discussion.UpdateThread;
 
@@ -28,12 +20,8 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("discussionforumclient")
 public interface DiscussionForumClientAsync{
 
-	void getForumByProjectId(String projectId, AsyncCallback<Forum> callback);
-
 	void createThread(CreateDiscussionThread toCreate,
 			AsyncCallback<DiscussionThreadBundle> callback);
-
-	void getThread(String threadId, AsyncCallback<DiscussionThreadBundle> callback);
 
 	void getThreadsForForum(String forumId, Long limit, Long offset,
 			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter,
@@ -53,8 +41,6 @@ public interface DiscussionForumClientAsync{
 	void createReply(CreateDiscussionReply toCreate,
 			AsyncCallback<DiscussionReplyBundle> callback);
 
-	void getReply(String replyId, AsyncCallback<DiscussionReplyBundle> callback);
-
 	void getRepliesForThread(String threadId, Long limit, Long offset,
 			DiscussionReplyOrder order, Boolean ascending, DiscussionFilter filter,
 			AsyncCallback<PaginatedResults<DiscussionReplyBundle>> callback);
@@ -64,16 +50,8 @@ public interface DiscussionForumClientAsync{
 
 	void markReplyAsDeleted(String replyId, AsyncCallback<Void> callback);
 
-	void getThreadUrl(String messageKey, AsyncCallback<String> callback);
-
-	void getReplyUrl(String messageKey, AsyncCallback<String> callback);
-	
 	void getForumProject(String forumId, AsyncCallback<Project> callback);
 	
-	void getThreadCountForForum(String forumId, DiscussionFilter filter, AsyncCallback<Long> callback);
-
-	void getReplyCountForThread(String threadId, DiscussionFilter filter, AsyncCallback<Long> asyncCallback);
-
 	void pinThread(String threadId, AsyncCallback<Void> callback);
 
 	void unpinThread(String threadId, AsyncCallback<Void> callback);
@@ -82,13 +60,5 @@ public interface DiscussionForumClientAsync{
 			DiscussionThreadOrder order, Boolean ascending, DiscussionFilter filter,
 			AsyncCallback<PaginatedResults<DiscussionThreadBundle>> callback);
 
-	void getEntityThreadCount(List<String> idList, AsyncCallback<EntityThreadCounts> callback);
-
 	void restoreThread(String threadId, AsyncCallback<Void> callback);
-
-	void getModerators(String forumId, Long limit, Long offset, AsyncCallback<PaginatedIds> callback);
-
-	void getSubscribers(Topic topic, String nextPageToken, AsyncCallback<SubscriberPagedResults> callback);
-
-	void getSubscribersCount(Topic topic, AsyncCallback<Long> asyncCallback);
 }

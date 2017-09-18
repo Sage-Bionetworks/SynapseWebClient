@@ -10,13 +10,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface EntityBadgeView extends IsWidget, SynapseView, SupportsLazyLoadInterface {
-
-	/**
-	 * Set the presenter.
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
-	
 	void setEntity(EntityHeader header);
 
 	void showLoadError(String entityId);
@@ -25,7 +18,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView, SupportsLazyLoad
 	
 	void hideLoadingIcon();
 	
-	void setClickHandler(ClickHandler handler);
+	void addClickHandler(ClickHandler handler);
 	
 	void setModifiedOn(String modifiedOnString);
 	
@@ -44,12 +37,6 @@ public interface EntityBadgeView extends IsWidget, SynapseView, SupportsLazyLoad
 	void setError(String error);
 	void showErrorIcon();
 	
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void entityClicked(EntityHeader entityHeader);
-	}
 	String getFriendlySize(Long contentSize, boolean b);
 
 	void setDiscussionThreadIconVisible(boolean visible);

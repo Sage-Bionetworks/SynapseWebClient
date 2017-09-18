@@ -49,6 +49,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitialized
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.CancelControlWidget;
+import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -84,7 +85,7 @@ public class APITableWidgetTest {
 	@Mock
 	CancelControlWidget mockCancelControlWidget;
 	@Mock
-	UserBadge mockUserBadge;
+	UserTeamBadge mockUserTeamBadge;
 	@Mock
 	ElementWrapper cancelControlDiv;
 	@Mock
@@ -105,7 +106,7 @@ public class APITableWidgetTest {
 		noneColumnRenderer = new APITableColumnRendererNone();
 		synapseIDColumnRenderer = new APITableColumnRendererSynapseID();
 		when(mockGinInjector.getCancelControlWidget()).thenReturn(mockCancelControlWidget);
-		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
+		when(mockGinInjector.getUserTeamBadgeWidget()).thenReturn(mockUserTeamBadge);
 		
 		testReturnJSONObject = new JSONObjectAdapterImpl();
 		testReturnJSONObject.put("totalNumberOfResults", 100);
@@ -588,13 +589,13 @@ public class APITableWidgetTest {
 		
 		widget.injectWidgets();
 		verify(mockGinInjector, times(cancelRequestDivs.size())).getCancelControlWidget();
-		verify(mockGinInjector, times(userBadgeDivs.size())).getUserBadgeWidget();
+		verify(mockGinInjector, times(userBadgeDivs.size())).getUserTeamBadgeWidget();
 		
 		verify(cancelControlDiv).removeAllChildren();
 		verify(userBadgeDiv1).removeAllChildren();
 		verify(userBadgeDiv2).removeAllChildren();
 		
 		verify(mockCancelControlWidget, times(cancelRequestDivs.size())).configure(anyString());
-		verify(mockUserBadge, times(userBadgeDivs.size())).configure(anyString());
+		verify(mockUserTeamBadge, times(userBadgeDivs.size())).configure(anyString());
 	}
 }

@@ -10,6 +10,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
@@ -18,7 +19,9 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -33,31 +36,29 @@ import com.google.inject.Inject;
 public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter {
 
 	private DockerRepoListWidgetView view;
-	private SynapseClientAsync synapseClient;
 	private AddExternalRepoModal addExternalRepoModal;
 	private PreflightController preflightController;
 	private SynapseAlert synAlert;
 	private EntityBundle projectBundle;
 	private EntityChildrenRequest query;
-	private CallbackP<EntityBundle> onRepoClickCallback;
 	private LoadMoreWidgetContainer membersContainer;
-
+	private SynapseJavascriptClient jsClient;
 
 	@Inject
 	public DockerRepoListWidget(
 			DockerRepoListWidgetView view,
-			SynapseClientAsync synapseClient,
 			AddExternalRepoModal addExternalRepoModal,
 			PreflightController preflightController,
 			LoadMoreWidgetContainer membersContainer,
-			SynapseAlert synAlert
+			SynapseAlert synAlert,
+			SynapseJavascriptClient jsClient
 			) {
 		this.view = view;
-		this.synapseClient = synapseClient;
 		this.addExternalRepoModal = addExternalRepoModal;
 		this.preflightController = preflightController;
 		this.synAlert = synAlert;
 		this.membersContainer = membersContainer;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.addExternalRepoModal(addExternalRepoModal.asWidget());
 		view.setSynAlert(synAlert.asWidget());
@@ -82,10 +83,6 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 				addExternalRepoModal.show();
 			}
 		});
-	}
-
-	public void setRepoClickedCallback(CallbackP<EntityBundle> onRepoClickCallback) {
-		this.onRepoClickCallback = onRepoClickCallback;
 	}
 
 	/**
@@ -115,7 +112,7 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 
 	public void loadMore() {
 		synAlert.clear();
-		synapseClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
+		jsClient.getEntityChildren(query, new AsyncCallback<EntityChildrenResponse>() {
 			public void onSuccess(EntityChildrenResponse results) {
 				query.setNextPageToken(results.getNextPageToken());
 				membersContainer.setIsMore(results.getNextPageToken() != null);
@@ -131,12 +128,11 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 	
 	private void setResults(List<EntityHeader> results) {
 		synAlert.clear();
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | DOI | BENEFACTOR_ACL;
 		for (EntityHeader header: results) {
-			synapseClient.getEntityBundle(header.getId(), mask, new AsyncCallback<EntityBundle>(){
+			jsClient.getEntity(header.getId(), OBJECT_TYPE.DockerRepository, new AsyncCallback<Entity>(){
 				@Override
-				public void onSuccess(EntityBundle bundle) {
-					view.addRepo(bundle);
+				public void onSuccess(Entity dockerRepository) {
+					view.addRepo((DockerRepository)dockerRepository);
 				}
 				@Override
 				public void onFailure(Throwable error) {
@@ -160,12 +156,5 @@ public class DockerRepoListWidget implements DockerRepoListWidgetView.Presenter 
 		types.add(EntityType.dockerrepo);
 		newQuery.setIncludeTypes(types);
 		return newQuery;
-	}
-
-	@Override
-	public void onRepoClicked(EntityBundle bundle) {
-		if (onRepoClickCallback != null) {
-			onRepoClickCallback.invoke(bundle);
-		}
 	}
 }

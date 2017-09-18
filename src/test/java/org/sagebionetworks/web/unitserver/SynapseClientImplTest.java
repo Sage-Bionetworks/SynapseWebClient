@@ -44,7 +44,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Before;
@@ -103,9 +102,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
-import org.sagebionetworks.repo.model.discussion.Forum;
-import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -158,7 +154,6 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
-import org.sagebionetworks.web.server.servlet.MarkdownCacheRequest;
 import org.sagebionetworks.web.server.servlet.NotificationTokenType;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
@@ -183,7 +178,6 @@ import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.google.appengine.repackaged.com.google.common.base.Objects;
-import com.google.common.cache.Cache;
 
 /**
  * Test for the SynapseClientImpl
@@ -835,24 +829,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testGetV2WikiPage() throws Exception {
-		Mockito.when(
-				mockSynapse
-						.getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class)))
-				.thenReturn(v2Page);
-		synapseClient.getV2WikiPage(new WikiPageKey("syn123", ObjectType.ENTITY
-				.toString(), "20"));
-		verify(mockSynapse).getV2WikiPage(
-				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-
-		Mockito.when(
-				mockSynapse
-						.getVersionOfV2WikiPage(
-								any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
-								any(Long.class))).thenReturn(v2Page);
-	}
-
-	@Test
 	public void testRestoreV2WikiPage() throws Exception {
 		String wikiId = "syn123";
 		Mockito.when(
@@ -972,35 +948,6 @@ public class SynapseClientImplTest {
 				ObjectType.ENTITY.toString(), "20"));
 		verify(mockSynapse).getWikiPage(
 				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-		// asking for the same page twice should result in a cache hit, and it
-		// should not ask for it from the synapse client
-		synapseClient.getV2WikiPageAsV1(new WikiPageKey("syn123",
-				ObjectType.ENTITY.toString(), "20"));
-		verify(mockSynapse, Mockito.times(1)).getWikiPage(
-				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class));
-
-		Mockito.when(
-				mockSynapse
-						.getWikiPageForVersion(
-								any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
-								any(Long.class))).thenReturn(page);
-		Mockito.when(
-				mockSynapse
-						.getVersionOfV2WikiPage(
-								any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
-								anyLong())).thenReturn(v2Page);
-		synapseClient.getVersionOfV2WikiPageAsV1(new WikiPageKey("syn123",
-				ObjectType.ENTITY.toString(), "20"), new Long(0));
-		verify(mockSynapse).getWikiPageForVersion(
-				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
-				any(Long.class));
-		// asking for the same page twice should result in a cache hit, and it
-		// should not ask for it from the synapse client
-		synapseClient.getVersionOfV2WikiPageAsV1(new WikiPageKey("syn123",
-				ObjectType.ENTITY.toString(), "20"), new Long(0));
-		verify(mockSynapse, Mockito.times(1)).getWikiPageForVersion(
-				any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
-				any(Long.class));
 	}
 	
 	
@@ -1633,43 +1580,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testMarkdownCache() throws Exception {
-		Cache<MarkdownCacheRequest, WikiPage> mockCache = Mockito
-				.mock(Cache.class);
-		synapseClient.setMarkdownCache(mockCache);
-		WikiPage page = new WikiPage();
-		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(page);
-		Mockito.when(
-				mockSynapse
-						.getV2WikiPage(any(org.sagebionetworks.repo.model.dao.WikiPageKey.class)))
-				.thenReturn(v2Page);
-		WikiPage actualResult = synapseClient
-				.getV2WikiPageAsV1(new WikiPageKey(entity.getId(),
-						ObjectType.ENTITY.toString(), "12"));
-		assertEquals(page, actualResult);
-		verify(mockCache).get(any(MarkdownCacheRequest.class));
-	}
-
-	@Test
-	public void testMarkdownCacheWithVersion() throws Exception {
-		Cache<MarkdownCacheRequest, WikiPage> mockCache = Mockito
-				.mock(Cache.class);
-		synapseClient.setMarkdownCache(mockCache);
-		WikiPage page = new WikiPage();
-		when(mockCache.get(any(MarkdownCacheRequest.class))).thenReturn(page);
-		Mockito.when(
-				mockSynapse
-						.getVersionOfV2WikiPage(
-								any(org.sagebionetworks.repo.model.dao.WikiPageKey.class),
-								anyLong())).thenReturn(v2Page);
-		WikiPage actualResult = synapseClient.getVersionOfV2WikiPageAsV1(
-				new WikiPageKey(entity.getId(), ObjectType.ENTITY.toString(),
-						"12"), 5L);
-		assertEquals(page, actualResult);
-		verify(mockCache).get(any(MarkdownCacheRequest.class));
-	}
-
-	@Test
 	public void testFilterAccessRequirements() throws Exception {
 		List<AccessRequirement> unfilteredAccessRequirements = new ArrayList<AccessRequirement>();
 		List<AccessRequirement> filteredAccessRequirements;
@@ -1921,37 +1831,6 @@ public class SynapseClientImplTest {
 		String actualId = synapseClient.getRootWikiId("1",
 				ObjectType.ENTITY.toString());
 		assertEquals(expectedId, actualId);
-	}
-
-	@Test
-	public void testGetFavorites() throws JSONObjectAdapterException,
-			SynapseException, RestServiceException {
-		PaginatedResults<EntityHeader> pagedResults = new PaginatedResults<EntityHeader>();
-		List<EntityHeader> unsortedResults = new ArrayList<EntityHeader>();
-		pagedResults.setResults(unsortedResults);
-		when(mockSynapse.getFavorites(anyInt(), anyInt())).thenReturn(
-				pagedResults);
-
-		// test empty favorites
-		List<EntityHeader> actualList = synapseClient.getFavorites();
-		assertTrue(actualList.isEmpty());
-
-		// test a few unsorted favorites
-		EntityHeader favZ = new EntityHeader();
-		favZ.setName("Z");
-		unsortedResults.add(favZ);
-		EntityHeader favA = new EntityHeader();
-		favA.setName("A");
-		unsortedResults.add(favA);
-		EntityHeader favQ = new EntityHeader();
-		favQ.setName("q");
-		unsortedResults.add(favQ);
-
-		actualList = synapseClient.getFavorites();
-		assertEquals(3, actualList.size());
-		assertEquals(favA, actualList.get(0));
-		assertEquals(favQ, actualList.get(1));
-		assertEquals(favZ, actualList.get(2));
 	}
 
 	@Test
@@ -2534,32 +2413,5 @@ public class SynapseClientImplTest {
 		
 		//and verify that no evaluations are returned for a different entity id
 		assertFalse(synapseClient.isChallenge("syn987"));
-	}
-	
-	@Test
-	public void testIsQueryResult() throws RestServiceException, SynapseException {
-		// empty results are returned by default.
-		// entity query is run for Files tab, Tables tab, and Docker tab.
-		assertFalse(synapseClient.isFileOrFolder("syn987"));
-		assertFalse(synapseClient.isTable("syn987"));
-		assertFalse(synapseClient.isDocker("syn987"));
-		
-		entityChildrenPage.add(mockEntityHeader);
-		assertTrue(synapseClient.isFileOrFolder("syn987"));
-		assertTrue(synapseClient.isTable("syn987"));
-		assertTrue(synapseClient.isDocker("syn987"));
-	}
-	
-	@Test
-	public void testIsForum() throws RestServiceException, SynapseException {
-		Forum mockForum = mock(Forum.class);
-		when(mockSynapse.getForumByProjectId(anyString())).thenReturn(mockForum);
-		ThreadCount mockThreadCount = mock(ThreadCount.class);
-		when(mockThreadCount.getCount()).thenReturn(0L);
-		when(mockSynapse.getThreadCountForForum(anyString(), any(DiscussionFilter.class))).thenReturn(mockThreadCount);
-		assertFalse(synapseClient.isForum("65"));
-		
-		when(mockThreadCount.getCount()).thenReturn(1L);
-		assertTrue(synapseClient.isForum("65"));
 	}
 }

@@ -19,6 +19,7 @@ public interface GWTWrapper {
 
 	void assignThisWindowWith(String url);
 
+	String encode(String decodedURL);
 	String encodeQueryString(String queryString);
 	String decodeQueryString(String queryString);
 
@@ -58,4 +59,7 @@ public interface GWTWrapper {
 	String getUniqueElementId();
 	void saveWindowPosition();
 	void restoreWindowPosition();
+	int nextInt(int upperBound);
+
+	String getUniqueAliasName(String inputName);  
 }
