@@ -48,21 +48,22 @@
 		</script>
 		
 		<script>
+			var cdnEndpoint = "http://localhost.synapse.org:8888/";
 			head.load("//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js");
 			head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js");
-			head.load("js/spark-md5.min.js");
-			head.load("js/swfobject/swfobject.js");
-			head.load("js/jquery.tablesorter.min.js");
-			head.load("js/jquery.tablesorter.scinot.js");
-			head.load("js/highlight.pack.js");
-			head.load("js/jsPlumb/jquery.jsPlumb-1.6.2-min.js");
-			head.load("js/init-nchart.js");
-			head.load("js/moment_min.js");
+			head.load(cdnEndpoint + "js/spark-md5.min.js");
+			head.load(cdnEndpoint + "js/swfobject/swfobject.js");
+			head.load(cdnEndpoint + "js/jquery.tablesorter.min.js");
+			head.load(cdnEndpoint + "js/jquery.tablesorter.scinot.js");
+			head.load(cdnEndpoint + "js/highlight.pack.js");
+			head.load(cdnEndpoint + "js/jsPlumb/jquery.jsPlumb-1.6.2-min.js");
+			head.load(cdnEndpoint + "js/init-nchart.js");
+			head.load(cdnEndpoint + "js/moment_min.js");
 			head.load("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js");
-			head.load("js/markdown-it-plugins-10.min.js");
-			head.load("js/polyfill.js");
-			head.load("js/xss.min.js");
-			head.load("js/pica.min.js");
+			head.load(cdnEndpoint + "js/markdown-it-plugins-10.min.js");
+			head.load(cdnEndpoint + "js/polyfill.js");
+			head.load(cdnEndpoint + "js/xss.min.js");
+			head.load(cdnEndpoint + "js/pica.min.js");
 			head.load("//www.google-analytics.com/analytics.js");
 			head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css");
 			head.load("//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/default.min.css");
@@ -76,7 +77,7 @@
 		<!-- be added before this line.                -->
 		<!--                                           -->
 		<script type="text/javascript" language="javascript" src="js/compiled-closure-lib.js"></script>
-		<script type="text/javascript" language="javascript" src="http://localhost.synapse.org/Portal/Portal.nocache.js" async></script>
+		<script type="text/javascript" language="javascript" src="http://localhost.synapse.org:8888/Portal/Portal.nocache.js" async></script>
 	</head>
 	<body style="overflow-y: auto">
 		<div>

@@ -15,11 +15,12 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.discussion.UpdateThread;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("discussionforumclient")	
-public interface DiscussionForumClient {
+public interface DiscussionForumClient extends RemoteService {
 
 	DiscussionThreadBundle createThread(CreateDiscussionThread toCreate)
 			throws RestServiceException;
