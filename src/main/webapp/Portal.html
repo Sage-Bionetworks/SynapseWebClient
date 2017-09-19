@@ -51,9 +51,9 @@
 			var stagingRegEx = /^staging.*$/;
 			var prodRegEx = /^www.*$/;
 			if (stagingRegEx.test(location.hostname)) {
-				cdnEndpoint = "http://cdn.staging.synapse.org/";
+				cdnEndpoint = "//cdn.staging.synapse.org/";
 			} else if (prodRegEx.test(location.hostname)) {
-				cdnEndpoint = "http://cdn.www.synapse.org/";
+				cdnEndpoint = "//cdn.www.synapse.org/";
 			}
 			
 			var link = document.createElement( "link" );
