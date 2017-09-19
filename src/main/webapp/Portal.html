@@ -37,9 +37,7 @@
 		<link rel="icon" type="image/png"  href="favicon.png?v=3" />
 		<link href="/opensearch.xml" rel="search" title="Synapse" type="application/opensearchdescription+xml" />
 		<link rel="manifest" href="manifest.json" />
-		<link rel="stylesheet" type="text/css" href="Portal.css" />
 		
-		<script src="js/head.load.min.js"></script>
 		<!-- Google Analytics -->
 		<script type="text/javascript">
 			window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
@@ -48,36 +46,56 @@
 		</script>
 		
 		<script>
-			var cdnEndpoint = "http://localhost.synapse.org:8888/";
-			head.load("//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js");
-			head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js");
-			head.load(cdnEndpoint + "js/spark-md5.min.js");
-			head.load(cdnEndpoint + "js/swfobject/swfobject.js");
-			head.load(cdnEndpoint + "js/jquery.tablesorter.min.js");
-			head.load(cdnEndpoint + "js/jquery.tablesorter.scinot.js");
-			head.load(cdnEndpoint + "js/highlight.pack.js");
-			head.load(cdnEndpoint + "js/jsPlumb/jquery.jsPlumb-1.6.2-min.js");
-			head.load(cdnEndpoint + "js/init-nchart.js");
-			head.load(cdnEndpoint + "js/moment_min.js");
-			head.load("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js");
-			head.load(cdnEndpoint + "js/markdown-it-plugins-10.min.js");
-			head.load(cdnEndpoint + "js/polyfill.js");
-			head.load(cdnEndpoint + "js/xss.min.js");
-			head.load(cdnEndpoint + "js/pica.min.js");
-			head.load("//www.google-analytics.com/analytics.js");
-			head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css");
-			head.load("//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/default.min.css");
-			head.load("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css");
+			// determine cdn endpoind (staging, prod, or dev)
+			var cdnEndpoint = "";
+			var stagingRegEx = /^staging.*$/;
+			var prodRegEx = /^www.*$/;
+			if (stagingRegEx.test(location.hostname)) {
+			    cdnEndpoint = "http://staging.localhost.synapse.org:8888/";
+			} else if (prodRegEx.test(location.hostname)) {
+				cdnEndpoint = "http://prod.localhost.synapse.org:8888/";
+			}
+			
+			var link = document.createElement( "link" );
+			link.href = cdnEndpoint + "Portal.css";
+			link.type = "text/css";
+			link.rel = "stylesheet";
+			document.head.appendChild(link);
+
+			var script = document.createElement('script');
+			script.onload = function () {
+				head.load("//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js");
+				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js");
+				head.load(cdnEndpoint + "js/spark-md5.min.js");
+				head.load(cdnEndpoint + "js/swfobject/swfobject.js");
+				head.load(cdnEndpoint + "js/jquery.tablesorter.min.js");
+				head.load(cdnEndpoint + "js/jquery.tablesorter.scinot.js");
+				head.load(cdnEndpoint + "js/highlight.pack.js");
+				head.load(cdnEndpoint + "js/jsPlumb/jquery.jsPlumb-1.6.2-min.js");
+				head.load(cdnEndpoint + "js/init-nchart.js");
+				head.load(cdnEndpoint + "js/moment_min.js");
+				head.load("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js");
+				head.load(cdnEndpoint + "js/markdown-it-plugins-10.min.js");
+				head.load(cdnEndpoint + "js/polyfill.js");
+				head.load(cdnEndpoint + "js/xss.min.js");
+				head.load(cdnEndpoint + "js/pica.min.js");
+				head.load("//www.google-analytics.com/analytics.js");
+				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css");
+				head.load("//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/default.min.css");
+				head.load("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css");
+			};
+			script.src = cdnEndpoint + "js/head.load.min.js";
+			document.head.appendChild(script);
+			
+			script = document.createElement('script');
+			script.src = cdnEndpoint + "js/compiled-closure-lib.js";
+			document.head.appendChild(script);
+			 
+			script = document.createElement('script');
+			script.src = cdnEndpoint + "Portal/Portal.nocache.js";
+			document.head.appendChild(script);
+			
 	   	</script>
-	   	<!-- xss.min.js from https://github.com/leizongmin/js-xss -->
-		
-		<!--                                           -->
-		<!-- This script loads your compiled module.   -->
-		<!-- If you add any GWT meta tags, they must   -->
-		<!-- be added before this line.                -->
-		<!--                                           -->
-		<script type="text/javascript" language="javascript" src="js/compiled-closure-lib.js"></script>
-		<script type="text/javascript" language="javascript" src="http://localhost.synapse.org:8888/Portal/Portal.nocache.js" async></script>
 	</head>
 	<body style="overflow-y: auto">
 		<div>
