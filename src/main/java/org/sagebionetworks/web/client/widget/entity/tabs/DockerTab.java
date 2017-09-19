@@ -58,7 +58,7 @@ public class DockerTab implements DockerTabView.Presenter{
 			PortalGinInjector ginInjector) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure(DOCKER_TAB_TITLE + "&nbsp;" + DisplayConstants.BETA_BADGE_HTML, "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html");
+		tab.configure(DOCKER_TAB_TITLE, "A [Docker](https://www.docker.com/what-docker) container is a convenient way to bundle up code and dependencies into a lightweight virtual machine to support reusable and reproducible analysis.", WebConstants.DOCS_URL + "docker.html");
 
 		// Necessary for "beta" badge.  Remove when bringing out of beta.
 		tab.addTabListItemStyle("min-width-150");
