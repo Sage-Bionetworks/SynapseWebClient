@@ -46,14 +46,14 @@
 		</script>
 		
 		<script>
-			// determine cdn endpoind (staging, prod, or dev)
+			// determine cdn endpoint (staging, prod, or dev)
 			var cdnEndpoint = "";
 			var stagingRegEx = /^staging.*$/;
 			var prodRegEx = /^www.*$/;
 			if (stagingRegEx.test(location.hostname)) {
-			    cdnEndpoint = "http://staging.localhost.synapse.org:8888/";
+				cdnEndpoint = "http://cdn.staging.synapse.org/";
 			} else if (prodRegEx.test(location.hostname)) {
-				cdnEndpoint = "http://prod.localhost.synapse.org:8888/";
+				cdnEndpoint = "http://cdn.www.synapse.org/";
 			}
 			
 			var link = document.createElement( "link" );
