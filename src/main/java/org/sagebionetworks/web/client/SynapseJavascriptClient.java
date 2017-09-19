@@ -254,11 +254,11 @@ public class SynapseJavascriptClient {
 	}
 
 	public void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, final AsyncCallback<EntityBundle> callback) {
-		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId + BUNDLE_MASK_PATH + partsMask;
+		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId;
 		if (versionNumber != null) {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
-		
+		url += BUNDLE_MASK_PATH + partsMask;
 		doGet(url, OBJECT_TYPE.EntityBundle, callback);
 	}
 
