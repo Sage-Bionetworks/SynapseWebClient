@@ -116,6 +116,7 @@ public class LoginWidgetViewImpl extends Composite implements
 		form.addSubmitHandler(new FormPanel.SubmitHandler() {
 			@Override
 			public void onSubmit(SubmitEvent event) {
+				event.cancel();
 				loginUser();
 			}
 		});

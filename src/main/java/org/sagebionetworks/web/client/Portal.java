@@ -49,6 +49,7 @@ public class Portal implements EntryPoint {
 			Window.Location.replace(fullUrl);
 			Window.Location.reload();
 		} else {
+			fixGWTRpcServiceEntryPoints();
 			// This is a split point where the browser can download the first large code file.
 			GWT.runAsync(new RunAsyncCallback() {
 				@Override
@@ -86,7 +87,6 @@ public class Portal implements EntryPoint {
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
-						fixGWTRpcServiceEntryPoints();
 						globalApplicationState.initSynapseProperties(new Callback() {
 							
 							@Override
@@ -137,6 +137,7 @@ public class Portal implements EntryPoint {
 		if (oldUrl.startsWith(GWT.getModuleBaseURL())) {
 			String serviceEntryPoint = GWTWrapperImpl.getRealGWTModuleBaseURL() + oldUrl.substring(GWT.getModuleBaseURL().length());
 			serviceDefTarget.setServiceEntryPoint(serviceEntryPoint);
+			
 		}
 	}
 	
