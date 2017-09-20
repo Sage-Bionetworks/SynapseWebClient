@@ -66,6 +66,11 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 		this.threadId = threadId;
 		this.newReplyCallback = newReplyCallback;
 		this.key = threadId + "_" + authController.getCurrentUserPrincipalId() + "_reply";
+		reset();
+	}
+	
+	public void reset() {
+		onCancel();
 	}
 
 	@Override
@@ -137,7 +142,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			}
 		});
 	}
-
+	
 	@Override
 	public void onCancel() {
 		view.resetButton();
