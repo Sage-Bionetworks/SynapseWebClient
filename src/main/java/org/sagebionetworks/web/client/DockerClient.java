@@ -10,7 +10,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("dockerclient")
-public interface DockerClient extends XsrfProtectedService {
+public interface DockerClient extends RemoteService {
 
 	PaginatedResults<DockerCommit> getDockerCommits(String entityId, Long limit,
 			Long offset, DockerCommitSortBy sortBy, Boolean ascending) throws RestServiceException;

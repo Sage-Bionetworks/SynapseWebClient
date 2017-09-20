@@ -63,7 +63,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 				uploader.setUploadedFileText(fileUpload.getFileMeta().getFileName());
 				view.hideLoading();
 				uploadedFileHandleId = fileUpload.getFileHandleId();
-				view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, uploadedFileHandleId, authController.getCurrentXsrfToken()));
+				view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, uploadedFileHandleId));
 			}
 		});
 		ImageFileValidator imageValidator = new ImageFileValidator();
@@ -132,7 +132,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		view.clear();
 		view.configure(team);
 		if (team.getIcon() != null)
-			view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, team.getIcon(), authController.getCurrentXsrfToken()));
+			view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, team.getIcon()));
 		else
 			view.setDefaultIconVisible();
 		

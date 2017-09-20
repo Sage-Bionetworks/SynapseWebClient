@@ -2,13 +2,18 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Properties;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.google.gwt.user.server.rpc.SerializationPolicy;
 import com.google.inject.Inject;
 
 @SuppressWarnings("serial")
@@ -134,5 +139,28 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 			synapseClient.setUserIpAddress(this.getThreadLocalRequest().getRemoteAddr());
 		}
 		return synapseClient;
+	}
+
+	@Override
+	protected SerializationPolicy doGetSerializationPolicy (
+			HttpServletRequest request, 
+			String moduleBaseURL,
+			String strongName) {
+
+		// true client side relative location is the app name
+		String newModuleBaseURL = moduleBaseURL;
+		try {
+			URL url = new URL(moduleBaseURL);
+			StringBuilder builder = new StringBuilder();
+			builder.append(url.getProtocol());
+			builder.append("://");
+			builder.append(url.getHost());
+			builder.append("/Portal/");
+			newModuleBaseURL = builder.toString();
+		} catch (MalformedURLException ex) {
+			// we have no affect
+		}
+
+		return super.doGetSerializationPolicy(request, newModuleBaseURL, strongName);
 	}
 }

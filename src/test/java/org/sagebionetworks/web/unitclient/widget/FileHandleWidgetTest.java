@@ -43,12 +43,10 @@ public class FileHandleWidgetTest {
 	FileHandleAssociation mockFHA;
 	FileHandleWidget widget;
 	public static final String FILE_HANDLE_ID = "876567";
-	public static final String XSRF_TOKEN = "98208";
 	public static final String FILE_NAME = "test.png";
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		when(mockAuthController.getCurrentXsrfToken()).thenReturn(XSRF_TOKEN);
 		when(mockFileResult.getFileHandle()).thenReturn(mockFileHandle);
 		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		widget = new FileHandleWidget(mockView, mockAuthController, mockFileHandleAsyncHandler, mockJsniUtils);

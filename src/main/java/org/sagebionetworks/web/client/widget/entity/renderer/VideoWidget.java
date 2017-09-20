@@ -44,7 +44,7 @@ public class VideoWidget implements WidgetRendererPresenter {
 		} else if (vimeoVideoId != null) {
 			view.configure(VIMEO_URL_PREFIX + vimeoVideoId);
 		} else {
-			view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, width, height, authenticationController.getCurrentXsrfToken());
+			view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, width, height);
 		}
 		descriptor = widgetDescriptor;
 	}
@@ -53,7 +53,7 @@ public class VideoWidget implements WidgetRendererPresenter {
 		String mp4SynapseId = VideoConfigEditor.isRecognizedMP4FileName(filename) ? synapseId : null;
 		String oggSynapseId = VideoConfigEditor.isRecognizedOggFileName(filename) ? synapseId : null;
 		String webmSynapseId = VideoConfigEditor.isRecognizedWebMFileName(filename) ? synapseId : null;
-		view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, Integer.toString(width), Integer.toString(height), authenticationController.getCurrentXsrfToken());
+		view.configure(mp4SynapseId, oggSynapseId, webmSynapseId, Integer.toString(width), Integer.toString(height));
 	}
 	
 	@Override

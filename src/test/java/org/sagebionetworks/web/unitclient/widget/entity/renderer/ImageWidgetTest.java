@@ -29,7 +29,6 @@ public class ImageWidgetTest {
 	Map<String, String> descriptor;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	AuthenticationController mockAuthenticationController;
-	String xsrfToken = "12345";
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		mockView = mock(ImageWidgetView.class);
@@ -38,7 +37,6 @@ public class ImageWidgetTest {
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, "test name");
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentXsrfToken()).thenReturn(xsrfToken);
 	}
 	
 	@Test
@@ -50,7 +48,7 @@ public class ImageWidgetTest {
 	@Test
 	public void testConfigure() {
 		widget.configure(wikiKey,descriptor, null, null);
-		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), anyString(), anyLong(), anyBoolean(), any(Long.class), eq(xsrfToken));
+		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), anyString(), anyLong(), anyBoolean(), any(Long.class));
 	}
 	
 	@Test
@@ -78,7 +76,7 @@ public class ImageWidgetTest {
 		String synId = "syn239";
 		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
 		widget.configure(wikiKey,descriptor, null, null);
-		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), eq(synId), eq((Long)null), anyBoolean(), any(Long.class), eq(xsrfToken));
+		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), eq(synId), eq((Long)null), anyBoolean(), any(Long.class));
 	}
 
 	@Test
@@ -89,7 +87,7 @@ public class ImageWidgetTest {
 		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
 		descriptor.put(WidgetConstants.WIDGET_ENTITY_VERSION_KEY, version.toString());
 		widget.configure(wikiKey,descriptor, null, null);
-		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), eq(synId), eq(version), anyBoolean(), any(Long.class), eq(xsrfToken));
+		verify(mockView).configure(any(WikiPageKey.class), anyString(), anyString(), anyString(), eq(synId), eq(version), anyBoolean(), any(Long.class));
 	}
 	
 }

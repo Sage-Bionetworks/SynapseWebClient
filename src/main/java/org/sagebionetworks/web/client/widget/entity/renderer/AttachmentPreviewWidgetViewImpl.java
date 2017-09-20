@@ -30,7 +30,7 @@ public class AttachmentPreviewWidgetViewImpl extends FlowPanel implements Attach
 		this.setStyleName("displayInline");
 		StringBuilder sb = new StringBuilder();
 		sb.append("<a class=\"link\" href=\"");
-		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false, authController.getCurrentXsrfToken()));
+		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false));
 		sb.append("\">");
 		int lastDotIndex = fileName.lastIndexOf(".");
 		boolean isPreviewed = false;
@@ -39,7 +39,7 @@ public class AttachmentPreviewWidgetViewImpl extends FlowPanel implements Attach
 			if (DisplayUtils.isRecognizedImageContentType("image/"+extension)) {
 				sb.append("<img class=\"imageDescriptor\" ");
 				sb.append(" src=\"");
-				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true, authController.getCurrentXsrfToken()));
+				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true));
 				sb.append("\"></img>");
 				isPreviewed = true;
 			}

@@ -43,7 +43,6 @@ public class TeamBadgeTest {
 	@Mock
 	ClickHandler mockClickHandler;
 	
-	String xsrfToken = "98208";
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
@@ -52,13 +51,12 @@ public class TeamBadgeTest {
 		team.setId(principalId);
 		mockView = mock(TeamBadgeView.class);
 		badge = new TeamBadge(mockView, mockSynapseJavascriptClient, mockAuthController);
-		when(mockAuthController.getCurrentXsrfToken()).thenReturn(xsrfToken);
 	}
 	
 	@Test
 	public void testConfigure(){
 		badge.configure(team);		
-		verify(mockView).setTeam(team, null, xsrfToken, null);
+		verify(mockView).setTeam(team, null, null);
 	}
 	
 
@@ -67,7 +65,7 @@ public class TeamBadgeTest {
 		AsyncMockStubber.callSuccessWith(team).when(mockSynapseJavascriptClient).getTeam(eq(principalId), any(AsyncCallback.class));
 		badge.setMaxNameLength(max);
 		badge.configure(principalId, mockClickHandler);
-		verify(mockView).setTeam(team, max, xsrfToken, mockClickHandler);
+		verify(mockView).setTeam(team, max, mockClickHandler);
 	}
 	
 	@Test
@@ -75,7 +73,7 @@ public class TeamBadgeTest {
 		AsyncMockStubber.callSuccessWith(team).when(mockSynapseJavascriptClient).getTeam(eq(principalId), any(AsyncCallback.class));
 		badge.setMaxNameLength(max);
 		badge.configure(team);
-		verify(mockView).setTeam(team, max, xsrfToken, null);
+		verify(mockView).setTeam(team, max, null);
 	}
 	
 	@Test
@@ -89,19 +87,19 @@ public class TeamBadgeTest {
 	public void testSetNameLength() {
 		badge.setMaxNameLength(max);
 		badge.configure(team);		
-		verify(mockView).setTeam(team, max, xsrfToken, null);		
+		verify(mockView).setTeam(team, max, null);		
 	}
 	
 	@Test
 	public void testConfigureNullPrincipalId() throws Exception {
 		badge.configure((String)null);
-		verify(mockView, never()).setTeam(any(Team.class), anyInt(), anyString(), any(ClickHandler.class));
+		verify(mockView, never()).setTeam(any(Team.class), anyInt(), any(ClickHandler.class));
 	}
 	
 	@Test
 	public void testConfigureEmptyPrincipalId() throws Exception {
 		badge.configure("");
-		verify(mockView, never()).setTeam(any(Team.class), anyInt(), anyString(), any(ClickHandler.class));
+		verify(mockView, never()).setTeam(any(Team.class), anyInt(), any(ClickHandler.class));
 	}
 	
 	@Test

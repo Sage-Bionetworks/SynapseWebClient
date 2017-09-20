@@ -27,7 +27,7 @@ public class BigTeamBadge implements BigTeamBadgeView.Presenter, SynapseWidgetPr
 	}
 	
 	public void configure(Team team, String description) {
-		view.setTeam(team, description, authController.getCurrentXsrfToken());
+		view.setTeam(team, description);
 	}
 	
 	public void configure(final String teamId) {

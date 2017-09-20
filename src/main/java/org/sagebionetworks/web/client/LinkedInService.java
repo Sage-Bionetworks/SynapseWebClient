@@ -5,10 +5,9 @@ import org.sagebionetworks.web.shared.LinkedInInfo;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("linkedin")
-public interface LinkedInService extends XsrfProtectedService {
+public interface LinkedInService extends RemoteService {
 
 	public LinkedInInfo returnAuthUrl(String returnUrl);
 

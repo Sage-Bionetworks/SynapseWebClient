@@ -240,15 +240,14 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		PreviewFileHandle handle = DisplayUtils.getPreviewFileHandle(bundle);
 		FileHandle originalFileHandle = DisplayUtils.getFileHandle(bundle);
 		final PreviewFileType previewType = getPreviewFileType(handle, originalFileHandle);
-		String xsrfToken = authController.getCurrentXsrfToken();
 		if (previewType != PreviewFileType.NONE) {
 			final FileEntity fileEntity = (FileEntity)bundle.getEntity();
 			if (previewType == PreviewFileType.IMAGE) {
 				//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 				//create img
 				boolean hasPreviewFileHandle = handle != null;
-				String fullFileUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false, xsrfToken);
-				String previewFileUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), hasPreviewFileHandle, xsrfToken);
+				String fullFileUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false);
+				String previewFileUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), hasPreviewFileHandle);
 				if (isFullSize) {
 					view.setImagePreviewFull(fullFileUrl);
 				} else {
@@ -264,7 +263,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				//must be a text type of some kind
 				//try to load the text of the preview, if available
 				requestBuilder.configure(RequestBuilder.GET, 
-						DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), isGetPreviewFile, false, xsrfToken));
+						DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), isGetPreviewFile, false));
 				requestBuilder.setHeader(WebConstants.CONTENT_TYPE, contentType);
 				
 				try {

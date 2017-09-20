@@ -9,11 +9,11 @@ import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
+import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("userprofileclient")	
-public interface UserProfileClient extends XsrfProtectedService {
+public interface UserProfileClient extends RemoteService {
 
 	VerificationSubmission createVerificationSubmission(
 			VerificationSubmission verificationSubmission, String hostPageBaseURL)

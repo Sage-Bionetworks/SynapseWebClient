@@ -95,7 +95,7 @@ public class CytoscapeWidget implements CytoscapeView.Presenter, WidgetRendererP
 	public void getFileContents(final String entityId, final CallbackP<String> fileContentCallback) {
 		Long version = null;
 		synAlert.clear();
-		String url = DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), entityId, version, false, true, authenticationController.getCurrentXsrfToken());
+		String url = DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), entityId, version, false, true);
 		requestBuilder.configure(RequestBuilder.GET, url);
 		try {
 			requestBuilder.sendRequest(null, new RequestCallback() {

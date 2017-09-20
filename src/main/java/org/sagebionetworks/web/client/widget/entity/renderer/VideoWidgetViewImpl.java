@@ -20,7 +20,7 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
 	}
 
 	@Override
-	public void configure(String mp4SynapseId, String oggSynapseId, String webmSynapseId, String width, String height, String xsrfToken) {
+	public void configure(String mp4SynapseId, String oggSynapseId, String webmSynapseId, String width, String height) {
 		this.clear();
 		
 		StringBuilder builder = new StringBuilder();
@@ -38,19 +38,19 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
 		builder.append("\" controls>");
 		if (mp4SynapseId != null) {
 			builder.append("<source src=\"");
-			builder.append(DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), mp4SynapseId, null, false, xsrfToken));
+			builder.append(DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), mp4SynapseId, null, false));
 			builder.append("\" type=\"video/mp4\">");
 		}
 		
 		if (oggSynapseId != null) {
 			builder.append("<source src=\"");
-			builder.append(DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), oggSynapseId, null, false, xsrfToken));
+			builder.append(DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), oggSynapseId, null, false));
 			builder.append("\" type=\"video/ogg\">");
 		}
 		
 		if (webmSynapseId != null) {
 			builder.append("<source src=\"");
-			builder.append(DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), webmSynapseId, null, false, xsrfToken));
+			builder.append(DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), webmSynapseId, null, false));
 			builder.append("\" type=\"video/webm\">");
 		}
 		

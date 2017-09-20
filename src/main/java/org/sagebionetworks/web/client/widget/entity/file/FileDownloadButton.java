@@ -172,7 +172,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		
 		String directDownloadURL = null;
 		if (externalUrl == null)
-			directDownloadURL = DisplayUtils.createFileEntityUrl(jsniUtils.getBaseFileHandleUrl(), fileEntity.getId(), fileEntity.getVersionNumber(), false, authController.getCurrentXsrfToken());
+			directDownloadURL = DisplayUtils.createFileEntityUrl(jsniUtils.getBaseFileHandleUrl(), fileEntity.getId(), fileEntity.getVersionNumber(), false);
 		else {
 			if (externalUrl.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
 				//point to sftp proxy instead

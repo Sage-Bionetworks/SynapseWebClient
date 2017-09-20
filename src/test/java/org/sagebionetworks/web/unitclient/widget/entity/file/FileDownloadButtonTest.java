@@ -178,7 +178,7 @@ public class FileDownloadButtonTest {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		assertNotNull(widget.getFileHandle());
-		verify(mockView).setDirectDownloadLink("http://mytestbasefilehandleurl/filehandle?entityId=syn210&preview=false&proxy=false&xsrfToken=null&version=0");
+		verify(mockView).setDirectDownloadLink("http://mytestbasefilehandleurl/filehandle?entityId=syn210&preview=false&proxy=false&version=0");
 		verify(mockView).setDirectDownloadLinkVisible(true);
 		
 		// First use in SWC of Mockito.InOrder. Supports multiple mocks. This verification correctly fails if you swap the lines below.

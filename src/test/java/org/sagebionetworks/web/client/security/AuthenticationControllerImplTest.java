@@ -64,22 +64,17 @@ public class AuthenticationControllerImplTest {
 	@Mock
 	ClientCache mockClientCache;
 	@Mock
-	XsrfTokenServiceAsync mockXsrfTokenService;
-	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
 	GWTWrapper mockGWT;
 	@Mock
 	ServiceDefTarget mockServiceDefTarget;
 	@Mock
-	XsrfToken mockXsrfToken;
-	@Mock
 	HasRpcToken mockServiceHasRpcToken;
 	@Mock
 	SubscriptionClientAsync mockSubscriptionClient;
 	@Mock
 	ChallengeClientAsync mockChallengeClient;
-	String xsrfToken = "12barbaz34";
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	HashMap<String, String> serverProperties;
 	
@@ -92,14 +87,13 @@ public class AuthenticationControllerImplTest {
 		sessionData.setProfile(new UserProfile());
 		sessionData.setSession(new Session());
 		sessionData.getSession().setSessionToken("1111");
-		when(mockXsrfToken.getToken()).thenReturn(xsrfToken);
-		AsyncMockStubber.callSuccessWith(mockXsrfToken).when(mockXsrfTokenService).getNewXsrfToken(any(AsyncCallback.class));
+		
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
 		when(mockGWT.asHasRpcToken(any())).thenReturn(mockServiceHasRpcToken);
 		when(mockGWT.asServiceDefTarget(any())).thenReturn(mockServiceDefTarget);
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockXsrfTokenService, mockSynapseClient, mockGWT, mockChallengeClient, mockSubscriptionClient);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockSynapseClient, mockGWT, mockChallengeClient, mockSubscriptionClient);
 		serverProperties = new HashMap<String, String>();
 		AsyncMockStubber.callSuccessWith(serverProperties).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 	}
@@ -246,8 +240,6 @@ public class AuthenticationControllerImplTest {
 	
 	@Test
 	public void testLoginUser() {
-		verify(mockServiceDefTarget).setServiceEntryPoint(anyString());
-		
 		String username = "testusername";
 		String password = "pw";
 		String oldAuthReceipt = "1234";
@@ -274,13 +266,6 @@ public class AuthenticationControllerImplTest {
 		
 		//verify the new receipt is cached
 		verify(mockClientCache).put(eq(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT), eq(newAuthReceipt), anyLong());
-		
-		//verify xsrf token has been updated
-		verify(mockGWT).asHasRpcToken(mockSynapseClient);
-		verify(mockGWT).asHasRpcToken(mockChallengeClient);
-		verify(mockGWT).asHasRpcToken(mockSubscriptionClient);
-		verify(mockServiceHasRpcToken, times(3)).setRpcToken(mockXsrfToken);
-		verify(mockClientCache).put(eq(AuthenticationControllerImpl.XSRF_TOKEN_KEY), eq(xsrfToken), anyLong());
 		
 		verify(loginCallback).onSuccess(any(UserSessionData.class));
 	}

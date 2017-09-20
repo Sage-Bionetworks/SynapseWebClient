@@ -105,10 +105,6 @@ public class FileCellRendererImpl implements FileCellRenderer {
 		builder.append(WebConstants.FILE_HANDLE_ID_PARAM_KEY);
 		builder.append("=");
 		builder.append(association.getFileHandleId());
-		builder.append("&");
-		builder.append(WebConstants.XSRF_TOKEN_KEY);
-		builder.append("=");
-		builder.append(authController.getCurrentXsrfToken());
 		return builder.toString();
 	}
 
