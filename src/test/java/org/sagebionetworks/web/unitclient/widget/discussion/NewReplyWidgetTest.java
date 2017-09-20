@@ -70,6 +70,13 @@ public class NewReplyWidgetTest {
 	}
 
 	@Test
+	public void testConfigure() {
+		verify(mockView).resetButton();
+		verify(mockView).setReplyTextBoxVisible(true);
+		verify(mockView).setNewReplyContainerVisible(false);
+	}
+
+	@Test
 	public void testOnClickNewReply() {
 		newReplyWidget.onClickNewReply();
 		verify(mockMarkdownEditor).configure(anyString());
@@ -94,9 +101,9 @@ public class NewReplyWidgetTest {
 	@Test
 	public void testOnClickCancel() {
 		newReplyWidget.onCancel();
-		verify(mockView).resetButton();
-		verify(mockView).setReplyTextBoxVisible(true);
-		verify(mockView).setNewReplyContainerVisible(false);
+		verify(mockView, times(2)).resetButton();
+		verify(mockView, times(2)).setReplyTextBoxVisible(true);
+		verify(mockView, times(2)).setNewReplyContainerVisible(false);
 	}
 
 	@Test
@@ -120,9 +127,9 @@ public class NewReplyWidgetTest {
 		verify(mockView).showSaving();
 		verify(mockView).showSuccess(anyString(), anyString());
 		verify(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
-		verify(mockView).resetButton();
-		verify(mockView).setReplyTextBoxVisible(true);
-		verify(mockView).setNewReplyContainerVisible(false);
+		verify(mockView, times(2)).resetButton();
+		verify(mockView, times(2)).setReplyTextBoxVisible(true);
+		verify(mockView, times(2)).setNewReplyContainerVisible(false);
 		verify(mockCallback).invoke();
 	}
 
@@ -139,7 +146,7 @@ public class NewReplyWidgetTest {
 		verify(mockDiscussionForumClient).createReply(any(CreateDiscussionReply.class), any(AsyncCallback.class));
 		verifyZeroInteractions(mockCallback);
 		verify(mockSynAlert).handleException(exception);
-		verify(mockView).resetButton();
+		verify(mockView, times(2)).resetButton();
 	}
 
 	@Test

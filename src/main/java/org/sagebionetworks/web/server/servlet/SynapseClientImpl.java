@@ -308,26 +308,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	/*
-	 * Private Methods
-	 */
-	
-	private JSONObject query(String query) throws SynapseException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		return synapseClient.query(query);
-	}
-
-	public static String createJSONStringFromArray(
-			List<? extends JSONEntity> list) throws JSONObjectAdapterException {
-		JSONArrayAdapter aa = new JSONArrayAdapterImpl();
-		for (int i = 0; i < list.size(); i++) {
-			JSONObjectAdapter oa = new JSONObjectAdapterImpl();
-			list.get(i).writeToJSONObject(oa);
-			aa.put(i, oa);
-		}
-		return aa.toJSONString();
-	}
-	
 	/**
 	 * Helper to convert from the non-gwt compatible PaginatedResults to the compatible type.
 	 * @param in
@@ -1829,20 +1809,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
-	public static void lockDown(String entityId, boolean isRestricted, org.sagebionetworks.client.SynapseClient client) throws SynapseException {
-		// now lock down restricted data
-		if (isRestricted) {
-			// we only proceed if there aren't currently any access restrictions
-			RestrictableObjectDescriptor subjectId = new RestrictableObjectDescriptor();
-			subjectId.setId(entityId);
-			subjectId.setType(RestrictableObjectType.ENTITY);
-			org.sagebionetworks.reflection.model.PaginatedResults<AccessRequirement> currentARs = client.getAccessRequirements(subjectId, 1L, ZERO_OFFSET.longValue());
-			if (currentARs.getResults().isEmpty()) {
-				client.createLockAccessRequirement(entityId);
-			}
-		}
-	}
-
 	@Override
 	public String getSynapseVersions() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();

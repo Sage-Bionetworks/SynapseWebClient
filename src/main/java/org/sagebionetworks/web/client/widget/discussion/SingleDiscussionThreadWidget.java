@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
-import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
@@ -73,7 +72,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	MarkdownWidget markdownWidget;
 	LoadMoreWidgetContainer repliesContainer;
 	SubscribeButtonWidget subscribeButtonWidget;
-	MarkdownEditorWidget markdownEditor;
 	NewReplyWidget newReplyWidget;
 	NewReplyWidget secondNewReplyWidget;
 	private CallbackP<String> threadIdClickedCallback, replyIdCallback;
