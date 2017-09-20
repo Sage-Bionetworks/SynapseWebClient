@@ -19,13 +19,11 @@ import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -69,7 +67,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private DockerTab dockerTab;
 	private EntityMetadata projectMetadata;
 	private SynapseClientAsync synapseClient;
-	private AuthenticationController authenticationController;
 	// how many tabs have we determined the visibility state for?
 	private int tabVisibilityInitializedCount;
 	// how many tabs have been marked as visible
@@ -79,12 +76,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	private ActionMenuWidget actionMenu;
 	private boolean annotationsShown;
 	private CookieProvider cookies;
-	private ClientCache storage;
 	public static final boolean PUSH_TAB_URL_TO_BROWSER_HISTORY = false;
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
 			SynapseClientAsync synapseClient,
-			AuthenticationController authenticationController,
 			Tabs tabs,
 			EntityMetadata projectMetadata,
 			WikiTab wikiTab,
@@ -96,11 +91,9 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			EntityActionController controller,
 			ActionMenuWidget actionMenu,
 			CookieProvider cookies,
-			ClientCache storage,
 			SynapseJavascriptClient synapseJavascriptClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
-		this.authenticationController = authenticationController;
 		this.tabs = tabs;
 		this.wikiTab = wikiTab;
 		this.filesTab = filesTab;
@@ -112,7 +105,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.controller = controller;
 		this.actionMenu = actionMenu;
 		this.cookies = cookies;
-		this.storage = storage;
 		this.synapseJavascriptClient = synapseJavascriptClient;
 		initTabs();
 		view.setTabs(tabs.asWidget());
