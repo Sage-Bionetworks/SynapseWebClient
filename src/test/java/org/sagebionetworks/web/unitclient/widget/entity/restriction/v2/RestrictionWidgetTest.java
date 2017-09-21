@@ -268,8 +268,7 @@ public class RestrictionWidgetTest {
 		when(mockView.isNoHumanDataRadioSelected()).thenReturn(true);
 		when(mockView.isYesHumanDataRadioSelected()).thenReturn(false);
 		widget.imposeRestrictionOkClicked();
-		verify(mockView).showErrorMessage(anyString());
-		widget.imposeRestrictionCancelClicked();
+		// no-op, just hide the dialog
 		verify(mockView).setImposeRestrictionModalVisible(false);
 	}
 	
@@ -323,13 +322,11 @@ public class RestrictionWidgetTest {
 	@Test
 	public void testNotHumanDataClicked() {
 		widget.notHumanDataClicked();
-		verify(mockView).setImposeRestrictionOkButtonEnabled(false);
 		verify(mockView).setNotSensitiveHumanDataMessageVisible(true);
 	}
 	@Test
 	public void testYesHumanDataClicked() {
 		widget.yesHumanDataClicked();
-		verify(mockView).setImposeRestrictionOkButtonEnabled(true);
 		verify(mockView).setNotSensitiveHumanDataMessageVisible(false);
 	}
 	@Test

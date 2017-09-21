@@ -292,11 +292,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	}
 	
 	@Override
-	public void setImposeRestrictionOkButtonEnabled(boolean enable) {
-		imposeRestrictionOkButton.setEnabled(enable);
-	}
-	
-	@Override
 	public void setNotSensitiveHumanDataMessageVisible(boolean visible) {
 		notSensitiveHumanDataMessage.setVisible(visible);
 	}
