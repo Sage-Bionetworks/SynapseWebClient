@@ -110,8 +110,22 @@ public class GlobalApplicationStateImplTest {
 		changer.goTo(newPlace);
 		// Since this is not the current place it should actaully go there.
 		verify(mockPlaceController).goTo(newPlace);
-		
 	}
+	
+	@Test
+	public void testGoToNewPlaceError(){
+		Synapse currentPlace = new Synapse("syn123");
+		// Start with the current place 
+		when(mockPlaceController.getWhere()).thenReturn(currentPlace);
+		PlaceChanger changer = globalApplicationState.getPlaceChanger();
+		assertNotNull(changer);
+		Synapse newPlace = new Synapse("syn456");
+		String errorMessage = "error on goto";
+		doThrow(new RuntimeException(errorMessage)).when(mockPlaceController).goTo(any(Place.class));
+		changer.goTo(newPlace);
+		verify(mockSynapseJSNIUtils).consoleError(errorMessage);
+	}
+
 	
 	@Test
 	public void testUncaughtJSExceptions() {
@@ -139,7 +153,7 @@ public class GlobalApplicationStateImplTest {
 		Throwable actualException = new Exception("I am dead, Horatio");
 		Set<Throwable> causes = new LinkedHashSet<Throwable>();
 		causes.add(actualException);
-		UmbrellaException umbrellaException = new UmbrellaException(causes);
+		com.google.web.bindery.event.shared.UmbrellaException umbrellaException = new com.google.web.bindery.event.shared.UmbrellaException(causes);
 		Set<Throwable> umbrellaUmbrellaCauses = new HashSet<Throwable>();
 		umbrellaUmbrellaCauses.add(umbrellaException);
 		UmbrellaException umbrellaUmbrellaException = new UmbrellaException(umbrellaUmbrellaCauses);
@@ -165,7 +179,6 @@ public class GlobalApplicationStateImplTest {
 		changer.goTo(currenPlace);
 		// Since we are already there then just reload the page by firing an event
 		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
-		
 	}
 
 	@SuppressWarnings("unchecked")

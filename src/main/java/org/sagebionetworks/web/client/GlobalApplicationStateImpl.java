@@ -106,6 +106,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			if (ue.getCauses().size() > 0) {
 				return unwrap(ue.getCauses().iterator().next());
 			}
+		} else if (e instanceof com.google.web.bindery.event.shared.UmbrellaException) {
+			com.google.web.bindery.event.shared.UmbrellaException ue = (com.google.web.bindery.event.shared.UmbrellaException)e;
+			if (ue.getCauses().size() > 0) {
+				return unwrap(ue.getCauses().iterator().next());
+			}
 		}
 		return e;
 	}
@@ -118,7 +123,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 				public void goTo(Place place) {
 					// If we are not already on this page, go there.
 					if(!placeController.getWhere().equals(place)){
-						placeController.goTo(place);
+						try {
+							placeController.goTo(place);
+						} catch (Exception e) {
+							synapseJSNIUtils.consoleError(e.getMessage());
+						}
 					}else{
 						// We are already on this page but we want to force it to reload.
 						eventBus.fireEvent(new PlaceChangeEvent(place));
