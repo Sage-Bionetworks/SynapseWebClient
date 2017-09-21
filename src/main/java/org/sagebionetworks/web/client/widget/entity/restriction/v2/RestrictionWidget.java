@@ -193,8 +193,8 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		Boolean isNoSelected = view.isNoHumanDataRadioSelected();
 		
 		if (isNoSelected != null && isNoSelected) {
-			//this should not be possible, since the impose restrictions button is not enabled when the No radio button is selected!
-			view.showErrorMessage("Please contact the Synapse Access and Compliance Team (ACT) to discuss imposing restrictions, at act@sagebase.org");
+			// no-op, just hide the dialog
+			imposeRestrictionCancelClicked();
 		} else if ((isYesSelected == null || !isYesSelected) && (isNoSelected == null || !isNoSelected)) {
 			//no selection
 			view.showErrorMessage("You must make a selection before continuing.");
@@ -239,16 +239,12 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 	
 	@Override
 	public void notHumanDataClicked() {
-		//disable impose restriction button
-		view.setImposeRestrictionOkButtonEnabled(false);
 		//and show the warning message
 		view.setNotSensitiveHumanDataMessageVisible(true);		
 	}
 	
 	@Override
 	public void yesHumanDataClicked() {
-		//enable impose restriction button
-		view.setImposeRestrictionOkButtonEnabled(true);
 		//and hide the warning message
 		view.setNotSensitiveHumanDataMessageVisible(false);
 	}

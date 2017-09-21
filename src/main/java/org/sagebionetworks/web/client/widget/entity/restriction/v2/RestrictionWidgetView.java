@@ -28,7 +28,6 @@ public interface RestrictionWidgetView extends IsWidget, SynapseView {
 	void showAnonymousFlagModal();
 	void showVerifyDataSensitiveDialog();
 	
-	void setImposeRestrictionOkButtonEnabled(boolean enable);
 	void setNotSensitiveHumanDataMessageVisible(boolean visible);
 	Boolean isYesHumanDataRadioSelected();
 	Boolean isNoHumanDataRadioSelected();
