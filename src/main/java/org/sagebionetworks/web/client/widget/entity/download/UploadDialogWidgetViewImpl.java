@@ -24,6 +24,7 @@ public class UploadDialogWidgetViewImpl extends Composite implements UploadDialo
 		this.uploadDialog = uploadDialog;
 		uploadDialog.setSize(ModalSize.LARGE);
 		dialogContainer.setWidget(uploadDialog);
+		uploadDialog.setClosable(false);
 	}
 	
 	@Override

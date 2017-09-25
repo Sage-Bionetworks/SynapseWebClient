@@ -49,7 +49,6 @@ public interface UploaderView extends IsWidget, SynapseView, HasAttachHandlers {
 	String getS3DirectSecretKey();
 	
 	void enableUpload();
-	
 	/**
 	 * Presenter interface
 	 */
