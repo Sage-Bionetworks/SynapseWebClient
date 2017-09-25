@@ -243,7 +243,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
 						public void updateProgress(double loaded, double total) {
 							//0 < currentPartProgress < 1.  We need to add this to the chunks that have already been uploaded. And divide by the total chunk count.
 							if (!isStillUploading()) {
-								xhr.abort();
+								if (xhr != null) {
+									xhr.abort();
+								}
 							} else {
 								double currentPartProgress = loaded / total;
 								double currentProgress = (((double)(completedPartCount)) + currentPartProgress)/((double)totalPartCount);

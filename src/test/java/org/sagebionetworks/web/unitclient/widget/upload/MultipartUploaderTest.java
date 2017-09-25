@@ -1,13 +1,22 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.*;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.fixDefaultContentType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +24,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.invocation.InvocationOnMock;
@@ -76,6 +86,8 @@ public class MultipartUploaderTest {
 	AddPartResponse mockAddPartResponse;
 	@Mock
 	HasAttachHandlers mockView;
+	@Captor
+	ArgumentCaptor<ProgressCallback> progressCaptor;
 	public static final String UPLOAD_ID = "39282";
 	public static final String RESULT_FILE_HANDLE_ID = "999999";
 	public static final double FILE_SIZE=9281;
@@ -140,7 +152,7 @@ public class MultipartUploaderTest {
 		
 		when(mockView.isAttached()).thenReturn(true);
 	}
-	
+    
 	private void setPartsState(String partsState) {
 		when(mockMultipartUploadStatus.getPartsState()).thenReturn(partsState);
 	}
@@ -228,7 +240,21 @@ public class MultipartUploaderTest {
 		when(mockView.isAttached()).thenReturn(false);
 		setPartsState("10");
 		uploader.uploadSelectedFile("123", mockHandler, storageLocationId, mockView);
-		verifyZeroInteractions(mockMultipartFileUploadClient);
+		verify(mockMultipartFileUploadClient, never()).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testUploadCanceled() throws Exception {
+		// single part
+		setPartsState("0");
+		uploader.uploadSelectedFile("123", mockHandler, storageLocationId, mockView);
+		
+		//user cancels the upload
+		uploader.cancelUpload();
+		verify(synapseJsniUtils).uploadFileChunk(eq(MultipartUploaderImpl.BINARY_CONTENT_TYPE), any(JavaScriptObject.class), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), progressCaptor.capture());
+		ProgressCallback progressCallback = progressCaptor.getValue();
+		progressCallback.updateProgress(0, 1);
+		// never updated the handler because the upload has been canceled (can't verify the abort(), since xhr is a js object).
 		verifyZeroInteractions(mockHandler);
 	}
 
