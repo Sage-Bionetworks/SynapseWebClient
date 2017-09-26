@@ -92,7 +92,6 @@ public class FilesTabViewImpl implements FilesTabView {
 			public void onClick(ClickEvent event) {
 				final Modal window = new Modal();
 				window.addStyleName("modal-fullscreen");
-				window.setTitle(DisplayConstants.PROVENANCE);
 				final ModalBody body = new ModalBody();
 				final Div oldParent = (Div)w.getParent();
 				w.removeFromParent();
