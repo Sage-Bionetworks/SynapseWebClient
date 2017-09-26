@@ -118,7 +118,6 @@ public class ProvViewUtil {
 		link.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				view.setBlockCloseFullscreen(true);
 				link.setHTML(AbstractImagePrototype.create(sageImageBundle.loading16()).getHTML());
 				presenter.expand(node);
 			}

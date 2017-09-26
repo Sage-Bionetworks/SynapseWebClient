@@ -44,8 +44,6 @@ public interface ProvenanceWidgetView extends IsWidget, SynapseView {
 
 	public void setHeight(int height);
 	
-	public void setBlockCloseFullscreen(boolean blockClose);
-
 	public void markOldVersions(List<String> notCurrentNodeIds);
 	
 }

@@ -1,12 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.modal.Dialog;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Element;
@@ -18,49 +15,24 @@ import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetView, IsWidget{
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private Anchor fullScreenAnchor; 
-	private Dialog previewDialog;
 	private boolean isCode;
-	private Widget currentPopupPreviewWidget;
 	private SageImageBundle sageImageBundle;
 	
 	@Inject
-	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, IconsImageBundle iconsImageBundle, SageImageBundle sageImageBundle, Dialog dialog) {
+	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, SageImageBundle sageImageBundle) {
 		this.synapseJSNIUtils = synapseJsniUtils;
-		this.previewDialog = dialog;
 		this.sageImageBundle = sageImageBundle;
-		dialog.addStyleName("modal-fullscreen");
-		fullScreenAnchor = new Anchor(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(iconsImageBundle.fullScreen16())));
-		fullScreenAnchor.addStyleName("position-absolute");
-		fullScreenAnchor.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				showPopup();
-			}
-		});
-	}
-	
-	private void showPopup() {
-		if (currentPopupPreviewWidget != null) {
-			previewDialog.configure("Preview", currentPopupPreviewWidget, DisplayConstants.OK, null, null, true);
-			previewDialog.show();
-			if (isCode) {
-				synapseJSNIUtils.highlightCodeBlocks();
-			}
-		}
 	}
 	
 	@Override
@@ -74,36 +46,18 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
-	public void setImagePreviewFull(String fullFileUrl) {
+	public void setImagePreview(final String fullFileUrl) {
 		clear();
-		add(new Image(fullFileUrl));
-	}
-	@Override
-	public void setImagePreview(final String fullFileUrl, String previewUrl) {
-		clear();
-		Image fullImage = new Image(fullFileUrl);
-		fullImage.addStyleName("maxWidth100 maxHeight100");
-		Image previewImage = new Image();
-		add(fullScreenAnchor);
-		previewImage.addStyleName("imageButton maxWidth100 maxHeight100 margin-left-20");
-		previewImage.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				showPopup();
-			}
-		});
-		previewImage.addErrorHandler(new ErrorHandler() {
+		Image fullImage = new Image();
+		fullImage.addStyleName("imageButton maxWidth100 maxHeight100 margin-left-20");
+		fullImage.addErrorHandler(new ErrorHandler() {
 			@Override
 		    public void onError(ErrorEvent event) {
 				presenter.imagePreviewLoadFailed(event);
 		    }
 		});
-		Div div = new Div();
-		div.setHeight("200px");
-		div.add(previewImage);
-		add(div);
-		previewImage.setUrl(previewUrl);
-		currentPopupPreviewWidget = fullImage;
+		add(fullImage);
+		fullImage.setUrl(fullFileUrl);
 	}
 	
 	@Override
@@ -118,17 +72,9 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
-	public void setCodePreviewFull(String text) {
-		clear();
-		add(new HTMLPanel(getCodeHtml(text)));
-		synapseJSNIUtils.highlightCodeBlocks();
-		isCode = true;
-	}
-	
-	@Override
 	public void setCodePreview(String code) {
 		clear();
-		setExpandablePreview(getCodeHtml(code));
+		add(new HTMLPanel(getCodeHtml(code)));
 		synapseJSNIUtils.highlightCodeBlocks();
 		isCode = true;
 	}
@@ -142,15 +88,9 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
-	public void setTextPreviewFull(String text) {
-		clear();
-		add(new HTMLPanel(getTextPreviewHtml(text)));
-	}
-	
-	@Override
 	public void setTextPreview(String text) {
 		clear();
-		setExpandablePreview(getTextPreviewHtml(text));
+		add(new HTMLPanel(getTextPreviewHtml(text)));
 	}
 	
 	private String getTextPreviewHtml(String text) {
@@ -162,15 +102,9 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
-	public void setTablePreviewFull(String text, String delimiter) {
-		clear();
-		add(new HTMLPanel(getTableHtml(text, delimiter)));
-	}
-	
-	@Override
 	public void setTablePreview(String text, String delimiter) {
 		clear();
-		setExpandablePreview(getTableHtml(text, delimiter));
+		add(new HTMLPanel(getTableHtml(text, delimiter)));
 	}
 	
 	private String getTableHtml(String text, String delimiter) {
@@ -193,34 +127,14 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	
 	@Override
 	public void clear() {
-		currentPopupPreviewWidget = null;
 		isCode = false;
 		super.clear();
 	}
 	
-	private void setExpandablePreview(String html) {
-		add(fullScreenAnchor);
-		currentPopupPreviewWidget = new HTMLPanel(html);
-		ScrollPanel wrapper= new ScrollPanel(new HTMLPanel(html));
-		wrapper.setHeight("200px");
-		wrapper.addStyleName("margin-left-20");
-		add(wrapper);
-	}
-	
-	@Override
-	public void setHTMLFull(final String htmlContent) {
-		clear();
-		add(getFrame(htmlContent));
-	}
 	@Override
 	public void setHTML(final String htmlContent) {
 		clear();
-		add(fullScreenAnchor);
-		currentPopupPreviewWidget = getFrame(htmlContent);
-		ScrollPanel wrapper= new ScrollPanel(getFrame(htmlContent));
-		wrapper.setHeight("200px");
-		wrapper.addStyleName("margin-left-20");
-		add(wrapper);
+		add(getFrame(htmlContent));
 	}
 	
 	private Frame getFrame(final String htmlContent) {

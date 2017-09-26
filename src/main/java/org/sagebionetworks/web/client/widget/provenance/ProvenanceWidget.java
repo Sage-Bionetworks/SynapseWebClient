@@ -62,7 +62,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	private Map<String, String> descriptor;
 	private JsoProvider jsoProvider;
 	
-
 	private interface ProcessCallback {
 		public void onComplete();
 	}
@@ -81,7 +80,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	ProvGraph currentGraph;
 	ClientCache clientCache;
 	DateTimeUtils dateTimeUtils;
-	
 	@Inject
 	public ProvenanceWidget(ProvenanceWidgetView view, SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
@@ -397,7 +395,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		});
 	}
 
-	
 	private void buildGraphLayoutSendToView() {
 		// make sure that any references that were not returned in the header list are incorporated in the map
 		for(Reference ref : references) {
@@ -412,13 +409,13 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		// build the tree, layout and render
 		idToNode = new HashMap<String, ProvGraphNode>();
 		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, showExpand, startRefs, noExpandNode);					
+		currentGraph = graph;
 		
 		NChartCharacters characters = NChartUtil.createNChartCharacters(jsoProvider, graph.getNodes());
 		NChartLayersArray layerArray = NChartUtil.createLayers(jsoProvider, graph);
 		LayoutResult layoutResult = synapseJSNIUtils.nChartlayout(layerArray, characters);
 		NChartUtil.fillPositions(layoutResult, graph);
 		NChartUtil.repositionExpandNodes(graph);
-		currentGraph = graph;
 		view.setGraph(graph);
 	}
 	

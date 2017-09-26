@@ -210,10 +210,9 @@ public class PreviewWidgetTest {
 		previewWidget.asWidget();
 		verify(mockView).setCodePreview(anyString());
 		
-		verify(mockView, never()).setCodePreviewFull(anyString());
 		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
 		previewWidget.configure(null, descriptor, null, null);
-		verify(mockView).setCodePreviewFull(anyString());
+		verify(mockView).setCodePreview(anyString());
 
 	}
 
