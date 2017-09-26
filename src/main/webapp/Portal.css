@@ -1355,6 +1355,16 @@ h1, h2, h3, h4, h5, h6 {
 .markdowntable.border {
     border: 2px solid #dddddd;
 }
+.markdowntable.noborder {
+    border: 0px;
+}
+.markdowntable.noborder th{
+    border: 0px;
+}
+.markdowntable.noborder td{
+    border: 0px;
+}
+
 .markdowntable.center {
 	margin: auto;
 }
