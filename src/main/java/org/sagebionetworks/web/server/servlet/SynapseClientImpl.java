@@ -45,7 +45,6 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
@@ -75,16 +74,10 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
-import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
-import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.doi.Doi;
-import org.sagebionetworks.repo.model.entity.Direction;
-import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
-import org.sagebionetworks.repo.model.file.BatchFileRequest;
-import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -94,7 +87,13 @@ import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
-import org.sagebionetworks.repo.model.principal.*;
+import org.sagebionetworks.repo.model.principal.AccountCreationToken;
+import org.sagebionetworks.repo.model.principal.AddEmailInfo;
+import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
+import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
+import org.sagebionetworks.repo.model.principal.AliasType;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.project.ProjectSettingsType;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.UploadDestinationListSetting;
@@ -123,13 +122,10 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONArrayAdapterImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.table.query.ParseException;
 import org.sagebionetworks.table.query.TableQueryParser;
 import org.sagebionetworks.table.query.util.TableSqlProcessor;
@@ -162,8 +158,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import com.google.gwt.core.server.StackTraceDeobfuscator;
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
 import com.google.gwt.thirdparty.guava.common.base.Suppliers;
-
-import javax.annotation.Signed;
 
 public class SynapseClientImpl extends SynapseClientBase implements
 		SynapseClient, TokenProvider {
@@ -461,27 +455,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
-	}
-
-	@Override
-	public ArrayList<EntityHeader> getEntityHeaderBatch(List<String> entityIds)
-			throws RestServiceException {
-		try {
-			List<Reference> list = new ArrayList<Reference>();
-			for (String entityId : entityIds) {
-				Reference ref = new Reference();
-				ref.setTargetId(entityId);
-				list.add(ref);
-			}
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> results = synapseClient
-					.getEntityHeaderBatch(list);
-			ArrayList<EntityHeader> returnList = new ArrayList<EntityHeader>();
-			returnList.addAll(results.getResults());
-			return returnList;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
 	}
 
 	@Override
@@ -2583,16 +2556,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				toUpdate.setDataFileHandleId(newFileHandle.getId());
 				return synapseClient.putEntity(toUpdate);
 			}
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public BatchFileResult getFileHandleAndUrlBatch(BatchFileRequest request) throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			return synapseClient.getFileHandleAndUrlBatch(request);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

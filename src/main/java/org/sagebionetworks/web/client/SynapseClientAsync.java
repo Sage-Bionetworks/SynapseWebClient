@@ -103,8 +103,6 @@ public interface SynapseClientAsync {
 	void getEntityHeaderBatch(ReferenceList referenceList,
 			AsyncCallback<PaginatedResults<EntityHeader>> callback);
 
-	void getEntityHeaderBatch(List<String> entityIds, AsyncCallback<ArrayList<EntityHeader>> callback);
-	
 	void deleteEntityById(String entityId, AsyncCallback<Void> callback);
 	
 	void deleteEntityById(String entityId, Boolean skipTrashCan, AsyncCallback<Void> callback);
@@ -366,8 +364,6 @@ public interface SynapseClientAsync {
 
 	void getDefaultColumnsForView(ViewType type, AsyncCallback<List<ColumnModel>> callback);
 
-	void getFileHandleAndUrlBatch(BatchFileRequest request, AsyncCallback<BatchFileResult> asyncCallback);
-	
 	void deleteAccessRequirement(Long accessRequirementId, AsyncCallback<Void> callback);
 	
 	void deleteAccessApprovals(String accessRequirement, String accessorId, AsyncCallback<Void> asyncCallback);

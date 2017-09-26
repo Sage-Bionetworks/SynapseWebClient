@@ -11,10 +11,9 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -22,12 +21,12 @@ import com.google.inject.Inject;
 public class FileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
 	private Map<String, List<AsyncCallback<FileResult>>> reference2Callback = new HashMap<String, List<AsyncCallback<FileResult>>>();
 	private List<FileHandleAssociation> fileHandleAssociations = new ArrayList<FileHandleAssociation>();
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	public static final int LIMIT = 95;
 	
 	@Inject
-	public FileHandleAsyncHandlerImpl(SynapseClientAsync synapseClient, GWTWrapper gwt) {
-		this.synapseClient = synapseClient;
+	public FileHandleAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt) {
+		this.jsClient = jsClient;
 		Callback callback = new Callback() {
 			@Override
 			public void invoke() {
@@ -65,7 +64,7 @@ public class FileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
 			request.setRequestedFiles(fileHandleAssociationsCopy);
 			request.setIncludeFileHandles(true);
 			request.setIncludePreSignedURLs(false);
-			synapseClient.getFileHandleAndUrlBatch(request,new AsyncCallback<BatchFileResult>() {
+			jsClient.getFileHandleAndUrlBatch(request,new AsyncCallback<BatchFileResult>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					// go through all requested objects, and inform them of the error

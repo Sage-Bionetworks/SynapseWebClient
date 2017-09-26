@@ -8,7 +8,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -22,17 +22,17 @@ import com.google.inject.Inject;
 public class EntityContainerListWidget implements EntityContainerListWidgetView.Presenter, IsWidget {
 	EntityFinder finder;
 	EntityContainerListWidgetView view;
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	List<String> entityIds;
 	SynapseAlert synAlert;
 	boolean canEdit = true;
 	boolean showVersions = false;
 	SelectedHandler<List<Reference>> selectionHandler;
 	@Inject
-	public EntityContainerListWidget(EntityContainerListWidgetView view, EntityFinder finder, SynapseClientAsync synapseClient, SynapseAlert synAlert) {
+	public EntityContainerListWidget(EntityContainerListWidgetView view, EntityFinder finder, SynapseJavascriptClient jsClient, SynapseAlert synAlert) {
 		this.view = view;
 		this.finder = finder;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		view.setPresenter(this);
 		
@@ -55,7 +55,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 		view.setNoContainers(entityContainerIds.isEmpty());
 		synAlert.clear();
 		if (!entityContainerIds.isEmpty()) {
-			synapseClient.getEntityHeaderBatch(entityContainerIds, new AsyncCallback<ArrayList<EntityHeader>>() {
+			jsClient.getEntityHeaderBatch(entityContainerIds, new AsyncCallback<ArrayList<EntityHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					synAlert.handleException(caught);
@@ -90,7 +90,7 @@ public class EntityContainerListWidget implements EntityContainerListWidgetView.
 	 * @param id
 	 */
 	public void onAddProject(String id) {
-		synapseClient.getEntityHeaderBatch(Collections.singletonList(id), new AsyncCallback<ArrayList<EntityHeader>>() {
+		jsClient.getEntityHeaderBatch(Collections.singletonList(id), new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				finder.showError(caught.getMessage());

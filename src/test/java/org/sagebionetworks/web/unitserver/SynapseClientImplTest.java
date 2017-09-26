@@ -1469,19 +1469,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testGetEntityHeaderBatch() throws SynapseException,
-			RestServiceException, MalformedURLException,
-			JSONObjectAdapterException {
-		List<EntityHeader> headers = synapseClient
-				.getEntityHeaderBatch(new ArrayList());
-		// in the setup, we told the mockSynapse.getEntityHeaderBatch to return
-		// batchHeaderResults
-		for (int i = 0; i < batchHeaderResults.size(); i++) {
-			assertEquals(batchHeaderResults.get(i), headers.get(i));
-		}
-	}
-
-	@Test
 	public void testSendMessage() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
 		ArgumentCaptor<MessageToUser> arg = ArgumentCaptor

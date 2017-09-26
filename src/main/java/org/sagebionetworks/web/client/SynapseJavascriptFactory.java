@@ -26,6 +26,7 @@ import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
@@ -36,6 +37,8 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+
+import com.google.gwt.core.client.GWT;
 
 public class SynapseJavascriptFactory {
 	public enum OBJECT_TYPE {
@@ -69,7 +72,8 @@ public class SynapseJavascriptFactory {
 		EntityThreadCounts,
 		PaginatedIds,
 		SubscriberPagedResults,
-		SubscriberCount
+		SubscriberCount,
+		BatchFileResult
 	}
 
 	/**
@@ -155,6 +159,8 @@ public class SynapseJavascriptFactory {
 			return new SubscriberPagedResults(json);
 		case SubscriberCount :
 			return new SubscriberCount(json).getCount();
+		case BatchFileResult :
+			return new BatchFileResult(json);
 		case PaginatedResultsEntityHeader :
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<EntityHeader> entityHeaderList = new ArrayList<>();
