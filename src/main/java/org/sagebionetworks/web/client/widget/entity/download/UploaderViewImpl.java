@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -112,6 +113,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	private HandlerRegistration messageHandler;
 	FormGroup externalNameFormGroup;
 	AwsLoginView awsLoginView;
+	TabListItem externalTab;
 	
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
@@ -174,6 +176,9 @@ public class UploaderViewImpl extends FlowPanel implements
 					formFieldsPanel.setVisible(false);
 					fileUploadLabel.setVisible(false);
 					uploadBtn.setEnabled(false);
+					//SWC-1730: disable clicking on external tab
+					externalTab.setEnabled(false);
+					
 					initializeProgress();
 					presenter.handleUploads();	
 				}
@@ -316,6 +321,9 @@ public class UploaderViewImpl extends FlowPanel implements
 		}
 		awsLoginView.clear();
 		awsLoginView.setVisible(false);
+
+		//SWC-1730: enable clicking on external tab
+		externalTab.setEnabled(true);
 	}
 	
 	@Override
@@ -424,6 +432,7 @@ public class UploaderViewImpl extends FlowPanel implements
 					configureUploadButtonForExternal();
 				}
 			});
+			externalTab = tab;
 			
 			container.add(tabs);
 			container.add(tabContent);

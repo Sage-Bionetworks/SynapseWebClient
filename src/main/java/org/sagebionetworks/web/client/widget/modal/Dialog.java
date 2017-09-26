@@ -60,7 +60,7 @@ public class Dialog extends UIObject implements IsWidget, HasWidgets {
 					hide();
 			}
 		});
-		defaultButton.addClickHandler(new ClickHandler() {
+		ClickHandler defaultButtonClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				if (callback != null)
@@ -68,7 +68,9 @@ public class Dialog extends UIObject implements IsWidget, HasWidgets {
 				if (autoHide)
 					hide();
 			}
-		});
+		};
+		defaultButton.addClickHandler(defaultButtonClickHandler);
+		modal.addCloseHandler(defaultButtonClickHandler);
 	}
 	
 	public void setSize(ModalSize modalSize) {
@@ -145,6 +147,10 @@ public class Dialog extends UIObject implements IsWidget, HasWidgets {
 		modal.addStyleName(style);
 	}
 	
+	public void setClosable(boolean closable) {
+		modal.setClosable(closable);		
+	}
+	
 	public Widget asWidget() {
 		return widget;
 	}
@@ -172,4 +178,6 @@ public class Dialog extends UIObject implements IsWidget, HasWidgets {
 	public boolean remove(Widget w) {
 		return mainContent.remove(w);
 	}
+	
+	
 }

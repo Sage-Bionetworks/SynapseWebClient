@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -69,6 +70,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	private boolean isDebugLevelLogging = false;
 	JavaScriptObject blob;
 	HasAttachHandlers view;
+	boolean isCanceled;
 	
 	@Inject
 	public MultipartUploaderImpl(GWTWrapper gwt,
@@ -113,6 +115,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		this.handler = handler;
 		this.blob = blob;
 		this.view = view;
+		isCanceled = false;
 		isDebugLevelLogging = DisplayUtils.isInTestWebsite(cookies);
 		uploadLog = new StringBuilder();
 		log(gwt.getUserAgent() + "\n" + gwt.getAppVersion() + "\nDirectly uploading " + fileName + " - calculating MD5\n");
@@ -213,7 +216,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 				if (isStillUploading()) {
 					PartPresignedUrl url = batchPresignedUploadUrlResponse.getPartPresignedUrls().get(0);
 					String urlString = url.getUploadPresignedUrl();
-					XMLHttpRequest xhr = gwt.createXMLHttpRequest();
+					final XMLHttpRequest xhr = gwt.createXMLHttpRequest();
 					if (xhr != null) {
 						xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
 							@Override
@@ -239,17 +242,23 @@ public class MultipartUploaderImpl implements MultipartUploader {
 						@Override
 						public void updateProgress(double loaded, double total) {
 							//0 < currentPartProgress < 1.  We need to add this to the chunks that have already been uploaded. And divide by the total chunk count.
-							double currentPartProgress = loaded / total;
-							double currentProgress = (((double)(completedPartCount)) + currentPartProgress)/((double)totalPartCount);
-							String progressText = percentFormat.format(currentProgress*100.0) + "%";
-							// update uploadSpeed every couple of seconds
-							long msElapsed = (new Date().getTime() - startTime);
-							if (msElapsed > 0 && (msElapsed > nextProgressPoint)) {
-								double totalBytesTransfered = (request.getPartSizeBytes() * completedPartCount) + loaded;
-								uploadSpeed = "("+DisplayUtils.getFriendlySize(totalBytesTransfered / (msElapsed / 1000), true) + "/s)";
-								nextProgressPoint += 2000;
+							if (!isStillUploading()) {
+								if (xhr != null) {
+									xhr.abort();
+								}
+							} else {
+								double currentPartProgress = loaded / total;
+								double currentProgress = (((double)(completedPartCount)) + currentPartProgress)/((double)totalPartCount);
+								String progressText = percentFormat.format(currentProgress*100.0) + "%";
+								// update uploadSpeed every couple of seconds
+								long msElapsed = (new Date().getTime() - startTime);
+								if (msElapsed > 0 && (msElapsed > nextProgressPoint)) {
+									double totalBytesTransfered = (request.getPartSizeBytes() * completedPartCount) + loaded;
+									uploadSpeed = "("+DisplayUtils.getFriendlySize(totalBytesTransfered / (msElapsed / 1000), true) + "/s)";
+									nextProgressPoint += 2000;
+								}
+								handler.updateProgress(currentProgress, progressText, uploadSpeed);
 							}
-							handler.updateProgress(currentProgress, progressText, uploadSpeed);
 						}
 					};
 					synapseJsniUtils.uploadFileChunk(BINARY_CONTENT_TYPE, blob, range.getStart(), range.getEnd(), urlString, xhr, progressCallback);
@@ -262,7 +271,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 * @return True if user is still looking at the upload UI.
 	 */
 	public boolean isStillUploading() {
-		return view.isAttached();
+		return view.isAttached() && !isCanceled;
 	}
 	
 	/**
@@ -392,5 +401,10 @@ public class MultipartUploaderImpl implements MultipartUploader {
 			}
 		}
 		return contentType;
+	}
+	
+	@Override
+	public void cancelUpload() {
+		isCanceled = true;
 	}
 }

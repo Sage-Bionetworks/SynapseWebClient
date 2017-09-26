@@ -17,7 +17,7 @@ public class MultipartUploaderStub implements MultipartUploader {
 	String error;
 	String[] progressText;
 	String[] uploadSpeed;
-
+	boolean isCanceled = false;
 	/**
 	 * Respond to the handler.
 	 * @param handler
@@ -69,5 +69,13 @@ public class MultipartUploaderStub implements MultipartUploader {
 	public void uploadFile(String fileName, String contentType, JavaScriptObject blob,
 			ProgressingFileUploadHandler handler, Long storageLocationId, HasAttachHandlers view) {
 		respond(handler);
+	}
+	@Override
+	public void cancelUpload() {
+		isCanceled = true;
+	}
+	
+	public boolean isCanceled() {
+		return isCanceled;
 	}
 }

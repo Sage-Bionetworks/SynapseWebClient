@@ -324,6 +324,17 @@ public class UploaderTest {
 	}
 	
 	@Test
+	public void testCancelClicked() {
+		assertFalse(multipartUploader.isCanceled());
+		
+		uploader.cancelClicked();
+		
+		verify(view).clear();
+		verify(cancelHandler).onCancel(any(CancelEvent.class));
+		assertTrue(multipartUploader.isCanceled());
+	}
+	
+	@Test
 	public void testDirectUploadStep1Failure() throws Exception {
 		Callback mockCallback = mock(Callback.class);
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(synapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
