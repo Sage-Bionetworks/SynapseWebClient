@@ -140,7 +140,7 @@ public class PreviewWidgetTest {
 		testFileHandleList.add(fh);
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
-		verify(mockView, times(0)).setImagePreview(anyString(), anyString());
+		verify(mockView, times(0)).setImagePreview(anyString());
 	}
 	
 	@Test
@@ -152,12 +152,7 @@ public class PreviewWidgetTest {
 		testFileHandleList.add(fh);
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
-		verify(mockView).setImagePreview(anyString(), anyString());
-		
-		verify(mockView, never()).setImagePreviewFull(anyString());
-		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
-		previewWidget.configure(null, descriptor, null, null);
-		verify(mockView).setImagePreviewFull(anyString());
+		verify(mockView).setImagePreview(anyString());
 	}
 	
 	
@@ -183,7 +178,7 @@ public class PreviewWidgetTest {
 		mainFileHandle.setFileName("original.svg");
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
-		verify(mockView).setImagePreview(anyString(), anyString());
+		verify(mockView).setImagePreview(anyString());
 		
 		
 	}
@@ -195,7 +190,7 @@ public class PreviewWidgetTest {
 		mainFileHandle.setFileName("original.png");
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
-		verify(mockView).setImagePreview(anyString(), anyString());
+		verify(mockView).setImagePreview(anyString());
 	}
 	
 	@Test
@@ -209,11 +204,6 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setCodePreview(anyString());
-		
-		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
-		previewWidget.configure(null, descriptor, null, null);
-		verify(mockView).setCodePreview(anyString());
-
 	}
 
 	@Test
@@ -226,11 +216,6 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setTextPreview(anyString());
-		
-		verify(mockView, never()).setTextPreviewFull(anyString());
-		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
-		previewWidget.configure(null, descriptor, null, null);
-		verify(mockView).setTextPreviewFull(anyString());
 	}
 	
 	@Test
@@ -243,11 +228,6 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setTextPreview(anyString());
-		
-		verify(mockView, never()).setTextPreviewFull(anyString());
-		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
-		previewWidget.configure(null, descriptor, null, null);
-		verify(mockView).setTextPreviewFull(anyString());
 	}
 	
 	@Test
@@ -289,7 +269,7 @@ public class PreviewWidgetTest {
 		verify(mockView, times(0)).setTextPreview(anyString());
 		verify(mockView, times(0)).setCodePreview(anyString());
 		verify(mockView, times(0)).setTablePreview(anyString(), anyString());
-		verify(mockView, times(0)).setImagePreview(anyString(), anyString());
+		verify(mockView, times(0)).setImagePreview(anyString());
 		verify(mockView, times(0)).setPreviewWidget(any(Widget.class));
 	}
 	
@@ -459,11 +439,6 @@ public class PreviewWidgetTest {
 		verify(mockSynapseClient).isUserAllowedToRenderHTML(eq(userId), any(AsyncCallback.class));
 		verify(mockSynapseJSNIUtils, never()).sanitizeHtml(anyString());
 		verify(mockView).setHTML(html);
-		
-		verify(mockView, never()).setHTMLFull(anyString());
-		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, "syn111");
-		previewWidget.configure(null, descriptor, null, null);
-		verify(mockView).setHTMLFull(anyString());
 	}
 
 }
