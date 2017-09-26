@@ -58,7 +58,6 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	AuthenticationController authController;
 	VideoWidget videoWidget;
 	EntityBundle bundle;
-	boolean isFullSize = false;
 	SynapseJavascriptClient jsClient;
 	@Inject
 	public PreviewWidget(PreviewWidgetView view, 
@@ -134,7 +133,6 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		view.clear();
 		String entityId = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_ID_KEY);
 		String version = widgetDescriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY);
-		isFullSize = true;
 		configure(entityId, version);
 	}
 	
@@ -203,31 +201,18 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				if (escapedContent.length() > 500000) {
 					escapedContent = escapedContent.substring(0, 500000) + "\n...";
 				}
-				if (isFullSize) {
-					view.setTextPreviewFull(escapedContent);
-				} else {
-					view.setTextPreview(escapedContent);
-				}
+				view.setTextPreview(escapedContent);
 			}
 			
 			@Override
 			public void onSuccess(Boolean trustedUser) {
 				if (trustedUser) {
-					if (isFullSize) {
-						view.setHTMLFull(content);
-					} else {
-						view.setHTML(content);
-					}
+					view.setHTML(content);
 				} else {
 					// is the sanitized version the same as the original??
 					String newHtml = synapseJSNIUtils.sanitizeHtml(content);
 					if (content.equals(newHtml)) {
-						if (isFullSize) {
-							view.setHTMLFull(content);	
-						} else {
-							view.setHTML(content);
-						}
-						
+						view.setHTML(content);
 					} else {
 						onFailure(new Exception());	
 					}
@@ -245,15 +230,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			if (previewType == PreviewFileType.IMAGE) {
 				//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 				//create img
-				boolean hasPreviewFileHandle = handle != null;
 				String fullFileUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false);
-				String previewFileUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(),  ((Versionable)fileEntity).getVersionNumber(), hasPreviewFileHandle);
-				if (isFullSize) {
-					view.setImagePreviewFull(fullFileUrl);
-				} else {
-					view.setImagePreview(fullFileUrl, previewFileUrl);	
-				}
-				
+				view.setImagePreview(fullFileUrl);	
 			} else {
 				// if HTML, get the full file contents
 				view.showLoading();
@@ -287,34 +265,18 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 										
 										if (PreviewFileType.CODE == previewType) {
 											String codePreview = SafeHtmlUtils.htmlEscapeAllowEntities(responseText);
-											if (isFullSize) {
-												view.setCodePreviewFull(codePreview);	
-											} else {
-												view.setCodePreview(codePreview);
-											}
+											view.setCodePreview(codePreview);
 										} 
 										else if (PreviewFileType.CSV == previewType) {
-											if (isFullSize) {
-												view.setTablePreviewFull(responseText, ",");	
-											} else {
-												view.setTablePreview(responseText, ",");
-											}
+											view.setTablePreview(responseText, ",");
 										}
 											
 										else if (PreviewFileType.TAB == previewType) {
-											if (isFullSize) {
-												view.setTablePreviewFull(responseText, "\\t");
-											} else {
-												view.setTablePreview(responseText, "\\t");
-											}
+											view.setTablePreview(responseText, "\\t");
 										}
 											
 										else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType) {
-											if (isFullSize) {
-												view.setTextPreviewFull(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));	
-											} else {
-												view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
-											}
+											view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
 										}
 									}
 								}

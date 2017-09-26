@@ -344,7 +344,6 @@ public class FilesTab {
 		}
 		
 		//Provenance
-		configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(WIDGET_HEIGHT_PX-84));
 		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(currentEntityId, shownVersionNumber));
 		view.setProvenanceVisible(isFile);
 		if (isFile){

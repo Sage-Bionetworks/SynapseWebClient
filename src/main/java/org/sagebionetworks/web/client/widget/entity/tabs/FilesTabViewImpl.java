@@ -1,15 +1,25 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.ModalBody;
+import org.gwtbootstrap3.client.ui.ModalFooter;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.core.shared.GWT;
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.ScrollPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -25,11 +35,11 @@ public class FilesTabViewImpl implements FilesTabView {
 	@UiField
 	Column filePreviewContainer;
 	@UiField
-	Div filePreviewContainerHighlightBox;
+	Div filePreviewWidgetContainer;
 	@UiField
 	Column fileProvenanceContainer;
 	@UiField
-	Div fileProvenanceContainerHighlightBox;
+	Div fileProvenanceGraphContainer;
 	@UiField
 	SimplePanel fileModifiedAndCreatedContainer;
 	@UiField
@@ -54,10 +64,16 @@ public class FilesTabViewImpl implements FilesTabView {
 	Column discussionContainer;
 	@UiField
 	Text discussionText;
-	
+	@UiField
+	Anchor expandProvenanceLink;
+	@UiField
+	Anchor expandPreviewLink;
+	Widget provenanceGraphWidget, previewWidget;
+	HandlerRegistration expandPreviewHandlerRegistration, expandProvHandlerRegistration;
 	public interface TabsViewImplUiBinder extends UiBinder<Widget, FilesTabViewImpl> {}
 	Widget widget;
 	UserBadge createdByBadge, modifiedByBadge;
+	public static final String DEFAULT_WIDGET_HEIGHT = 197+"px";
 	@Inject
 	public FilesTabViewImpl(
 			UserBadge createdByBadge,
@@ -66,9 +82,39 @@ public class FilesTabViewImpl implements FilesTabView {
 		//empty constructor, you can include this widget in the ui xml
 		TabsViewImplUiBinder binder = GWT.create(TabsViewImplUiBinder.class);
 		widget = binder.createAndBindUi(this);
-		filePreviewContainerHighlightBox.getElement().setAttribute("highlight-box-title", "Preview");
 		this.createdByBadge = createdByBadge;
 		this.modifiedByBadge = modifiedByBadge;
+	}
+	
+	private ClickHandler getExpandClickHandler(final Widget w) {
+		return new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				final Modal window = new Modal();
+				window.addStyleName("modal-fullscreen");
+				final ModalBody body = new ModalBody();
+				final Div oldParent = (Div)w.getParent();
+				w.removeFromParent();
+				body.add(new ScrollPanel(w));
+				w.setHeight(new Double(com.google.gwt.user.client.Window.getClientHeight()).intValue() - 170 + "px");
+				ClickHandler closeHandler = new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						w.removeFromParent();
+						oldParent.add(w);
+						w.setHeight(DEFAULT_WIDGET_HEIGHT);
+						window.hide();
+					}
+				};
+				window.addCloseHandler(closeHandler);
+				window.add(body);
+				ModalFooter footer = new ModalFooter();
+				Button closeButton = new Button(DisplayConstants.CLOSE,closeHandler);
+				footer.add(closeButton);
+				window.add(footer);
+				window.show();
+			}
+		};
 	}
 	
 	@Override
@@ -96,13 +142,26 @@ public class FilesTabViewImpl implements FilesTabView {
 
 	@Override
 	public void setPreview(Widget w) {
-		filePreviewContainerHighlightBox.add(w);		
+		previewWidget = w;
+		w.setHeight(DEFAULT_WIDGET_HEIGHT);
+		filePreviewWidgetContainer.clear();
+		filePreviewWidgetContainer.add(w);
+		if (expandPreviewHandlerRegistration != null) {
+			expandPreviewHandlerRegistration.removeHandler();
+		}
+		expandPreviewHandlerRegistration = expandPreviewLink.addClickHandler(getExpandClickHandler(previewWidget));
 	}
 
 	@Override
 	public void setProvenance(Widget w) {
-		fileProvenanceContainerHighlightBox.clear();
-		fileProvenanceContainerHighlightBox.add(w);		
+		provenanceGraphWidget = w;
+		w.setHeight(DEFAULT_WIDGET_HEIGHT);
+		fileProvenanceGraphContainer.clear();
+		fileProvenanceGraphContainer.add(w);
+		if (expandProvHandlerRegistration != null) {
+			expandProvHandlerRegistration.removeHandler();
+		}
+		expandProvHandlerRegistration = expandProvenanceLink.addClickHandler(getExpandClickHandler(provenanceGraphWidget));
 	}
 
 	@Override

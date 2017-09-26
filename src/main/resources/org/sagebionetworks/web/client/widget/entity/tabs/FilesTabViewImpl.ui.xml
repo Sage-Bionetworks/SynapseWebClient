@@ -34,9 +34,10 @@
 			    			<bh:Text>Preview</bh:Text>
 			    			<w:HelpWidget helpMarkdown="Preview shows a portion of the file content. Content is only visible when the user is logged in and has satisfied all conditions for use." 
 								href="http://docs.synapse.org/articles/access_controls.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
+							<b:Anchor addStyleNames="lightGreyText" icon="ARROWS_ALT" ui:field="expandPreviewLink" pull="RIGHT" />
 			    		</bh:Div>
-			    		<g:ScrollPanel height="210px">
-			    			<bh:Div ui:field="filePreviewContainerHighlightBox" />
+			    		<g:ScrollPanel height="200px">
+			    			<bh:Div ui:field="filePreviewWidgetContainer" />
 			    		</g:ScrollPanel>
 			    	</g:FlowPanel>
 				</b:Column>
@@ -46,8 +47,9 @@
 			    			<bh:Text>Provenance</bh:Text>
 			    			<w:HelpWidget helpMarkdown="Provenance tracks the relationship between data, code and analytical results" 
 								href="http://docs.synapse.org/articles/provenance.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
+							<b:Anchor addStyleNames="lightGreyText" icon="ARROWS_ALT" ui:field="expandProvenanceLink" pull="RIGHT" />
 			    		</bh:Div>
-			    		<bh:Div ui:field="fileProvenanceContainerHighlightBox" />
+			    		<bh:Div ui:field="fileProvenanceGraphContainer" />
 			    	</g:FlowPanel>
 				</b:Column>
 				<b:Column size="MD_12" ui:field="discussionContainer">
