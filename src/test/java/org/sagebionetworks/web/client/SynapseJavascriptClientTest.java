@@ -40,6 +40,8 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.BatchFileRequest;
+import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -56,6 +58,7 @@ public class SynapseJavascriptClientTest {
 	private static SynapseJavascriptFactory synapseJsFactory = new SynapseJavascriptFactory();
 	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
 	public static final String REPO_ENDPOINT = "http://repo-endpoint/v1";
+	public static final String FILE_ENDPOINT = "http://file-endpoint/v1";
 	public static final String USER_SESSION_TOKEN = "abc123";
 	
 	@Mock
@@ -86,6 +89,7 @@ public class SynapseJavascriptClientTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGlobalAppState.getSynapseProperty(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT);
+		when(mockGlobalAppState.getSynapseProperty(FILE_SERVICE_URL_KEY)).thenReturn(FILE_ENDPOINT);
 		client = new SynapseJavascriptClient(
 				mockRequestBuilder, 
 				mockAuthController, 
@@ -410,5 +414,28 @@ public class SynapseJavascriptClientTest {
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		new Team().writeToJSONObject(adapter);
 		synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter);
+	}
+	
+	@Test
+	public void testGetFileHandleAndUrlBatch() throws RequestException, JSONObjectAdapterException {
+		BatchFileRequest fileRequest = new BatchFileRequest();
+		client.getFileHandleAndUrlBatch(fileRequest, mockAsyncCallback);
+		//verify url and method
+		String url = FILE_ENDPOINT + FILE_HANDLE_BATCH;
+		verify(mockRequestBuilder).configure(POST, url);
+		
+		verify(mockRequestBuilder).sendRequest(anyString(), requestCallbackCaptor.capture());
+		RequestCallback requestCallback = requestCallbackCaptor.getValue();
+		
+		//simulate "created" response (which is what this service returns if successful
+		BatchFileResult result = new BatchFileResult();
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		result.writeToJSONObject(adapter);
+		when(mockResponse.getStatusCode()).thenReturn(SC_CREATED);
+		when(mockResponse.getText()).thenReturn(adapter.toJSONString());
+		
+		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		
+		verify(mockAsyncCallback).onSuccess(result);
 	}
 }
