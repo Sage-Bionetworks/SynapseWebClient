@@ -154,6 +154,12 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		editVersionInfoModal.configure("Edit Version Info", "Version label", oldLabel, "Version comment", oldComment, DisplayConstants.OK);
 		editVersionInfoModal.show();
 	}
+	
+	@Override
+	public void showEditVersionInfoError(String error) {
+		editVersionInfoModal.showError(error);
+	}
+	
 	@Override
 	public void hideEditVersionInfo() {
 		editVersionInfoModal.hide();

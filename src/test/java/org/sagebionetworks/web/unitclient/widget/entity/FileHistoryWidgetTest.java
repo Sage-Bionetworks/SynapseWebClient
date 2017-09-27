@@ -178,6 +178,31 @@ public class FileHistoryWidgetTest {
 		assertEquals(testComment, capturedEntity.getVersionComment());
 		assertEquals(testLabel, capturedEntity.getVersionLabel());
 	}
+	
+	@Test
+	public void testUpdateVersionInfoNoOp() {
+		String testLabel = "testLabel";
+		String testComment = "testComment";
+		vb.setVersionLabel(testLabel);
+		vb.setVersionComment(testComment);
+		fileHistoryWidget.setEntityBundle(bundle, null);
+		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
+		verify(mockSynapseClient, never()).updateEntity(any(Entity.class), (AsyncCallback<Entity>) any());
+		verify(mockView).hideEditVersionInfo();
+	}
+	
+	@Test
+	public void testUpdateVersionInfoFailure() {
+		String errorMessage = "error";
+		Exception ex = new Exception(errorMessage);
+		String testLabel = "testLabel";
+		String testComment = "testComment";
+		fileHistoryWidget.setEntityBundle(bundle, null);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
+		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
+		verify(mockSynapseClient).updateEntity(any(Entity.class), (AsyncCallback<Entity>) any());
+		verify(mockView).showEditVersionInfoError(anyString());
+	}
 
 	@Test
 	public void testDeleteVersion() throws Exception {

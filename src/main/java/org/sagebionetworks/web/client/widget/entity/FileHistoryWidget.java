@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Objects;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -79,9 +80,10 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	private void editCurrentVersionInfo(Entity entity, String version, String comment) {
 		if (entity instanceof VersionableEntity) {
 			final VersionableEntity vb = (VersionableEntity)entity;
-			if (version != null && version.equals(vb.getVersionLabel()) &&
-				comment != null && comment.equals(vb.getVersionComment())) {
-				view.showInfo("Version Info Unchanged", "You didn't change anything about the version info.");
+			if (Objects.equals(version, vb.getVersionLabel()) &&
+				Objects.equals(comment, vb.getVersionComment())) {
+				// no-op
+				view.hideEditVersionInfo();
 				return;
 			}
 			String versionLabel = null;
@@ -97,10 +99,11 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 							if (!DisplayUtils.handleServiceException(
 									caught, globalApplicationState,
 									authenticationController.isLoggedIn(), view)) {
-								view.showErrorMessage(DisplayConstants.ERROR_UPDATE_FAILED
-										+ "\n" + caught.getMessage());
+								view.showEditVersionInfoError(DisplayConstants.ERROR_UPDATE_FAILED
+										+ ": " + caught.getMessage());
 							}
 						}
+						
 						@Override
 						public void onSuccess(Entity result) {
 							view.hideEditVersionInfo();
