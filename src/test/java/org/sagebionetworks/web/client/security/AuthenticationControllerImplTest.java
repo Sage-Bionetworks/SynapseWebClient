@@ -28,23 +28,16 @@ import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.rpc.HasRpcToken;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import com.google.gwt.user.client.rpc.XsrfToken;
-import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 
 
 /**
@@ -65,16 +58,6 @@ public class AuthenticationControllerImplTest {
 	ClientCache mockClientCache;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
-	@Mock
-	GWTWrapper mockGWT;
-	@Mock
-	ServiceDefTarget mockServiceDefTarget;
-	@Mock
-	HasRpcToken mockServiceHasRpcToken;
-	@Mock
-	SubscriptionClientAsync mockSubscriptionClient;
-	@Mock
-	ChallengeClientAsync mockChallengeClient;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	HashMap<String, String> serverProperties;
 	
@@ -91,9 +74,7 @@ public class AuthenticationControllerImplTest {
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
-		when(mockGWT.asHasRpcToken(any())).thenReturn(mockServiceHasRpcToken);
-		when(mockGWT.asServiceDefTarget(any())).thenReturn(mockServiceDefTarget);
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockSynapseClient, mockGWT, mockChallengeClient, mockSubscriptionClient);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockSynapseClient);
 		serverProperties = new HashMap<String, String>();
 		AsyncMockStubber.callSuccessWith(serverProperties).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 	}
