@@ -40,6 +40,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
@@ -406,6 +407,11 @@ public class SynapseJavascriptClientTest {
 		adapter = jsonObjectAdapter.createNew();
 		new Preview().writeToJSONObject(adapter);
 		assertTrue(synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof Preview);
+		
+		adapter = jsonObjectAdapter.createNew();
+		new DockerRepository().writeToJSONObject(adapter);
+		assertTrue(synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof DockerRepository);
+
 	}
 
 	@Test (expected=IllegalArgumentException.class)

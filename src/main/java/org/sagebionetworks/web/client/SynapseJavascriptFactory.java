@@ -98,6 +98,8 @@ public class SynapseJavascriptFactory {
 				type = OBJECT_TYPE.Link;
 			} else if (Preview.class.getName().equals(concreteType)) {
 				type = OBJECT_TYPE.Preview;
+			} else if (DockerRepository.class.getName().equals(concreteType)) {
+				type = OBJECT_TYPE.DockerRepository;
 			} else {
 				throw new IllegalArgumentException("No match found for : "+ concreteType);
 			}
