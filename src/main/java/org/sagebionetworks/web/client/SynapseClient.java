@@ -32,8 +32,6 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.file.BatchFileRequest;
-import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
@@ -98,8 +96,6 @@ public interface SynapseClient extends RemoteService{
 	public SearchResults search(SearchQuery searchQuery) throws RestServiceException; 
 	
 	public PaginatedResults<EntityHeader> getEntityHeaderBatch(ReferenceList referenceList) throws RestServiceException;
-	
-	public ArrayList<EntityHeader> getEntityHeaderBatch(List<String> entityIds) throws RestServiceException;
 	
 	/**
 	 * Update an entity.
@@ -399,8 +395,6 @@ public interface SynapseClient extends RemoteService{
 	List<ColumnModel> getDefaultColumnsForView(ViewType type) throws RestServiceException;
 
 	Entity updateFileEntity(FileEntity toUpdate, FileHandleCopyRequest copyRequest) throws RestServiceException;
-	
-	BatchFileResult getFileHandleAndUrlBatch(BatchFileRequest request) throws RestServiceException;
 	
 	void deleteAccessApprovals(String accessRequirement, String accessorId) throws RestServiceException;
 

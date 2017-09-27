@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -65,6 +64,7 @@ public class HomePresenterTest {
 	String testTeamId = "42";
 	UserSessionData testSessionData;
 	ResourceLoader mockResourceLoader;
+	
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{
 		mockView = mock(HomeView.class);
@@ -86,12 +86,7 @@ public class HomePresenterTest {
 		testBatchResults.setTotalNumberOfResults(1);
 		testBatchResults.setResults(testEvaluationResults);
 		
-		ArrayList<EntityHeader> testBatchResultsList = new ArrayList<EntityHeader>();
-		testBatchResultsList.addAll(testBatchResults.getResults());
-		
 		AsyncMockStubber.callSuccessWith(testTeamId).when(mockSynapseClient).createTeam(anyString(),any(AsyncCallback.class));
-		
-		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getEntityHeaderBatch(anyList(),any(AsyncCallback.class));
 		
 		openInvitations = new ArrayList<OpenUserInvitationBundle>();
 		AsyncMockStubber.callSuccessWith(openInvitations).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
