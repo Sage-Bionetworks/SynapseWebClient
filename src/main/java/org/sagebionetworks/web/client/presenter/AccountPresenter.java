@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import org.sagebionetworks.repo.model.SignedTokenInterface;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -9,10 +11,10 @@ import org.sagebionetworks.web.client.view.AccountView;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.shared.NotificationTokenType;
 
 public class AccountPresenter extends AbstractActivity implements AccountView.Presenter, Presenter<Account> {
 		
@@ -41,15 +43,26 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 	public void setPlace(Account place) {
 		this.place = place;
 		this.view.setPresenter(this);
-		String emailValidationToken = place.toToken();
-		validateToken(emailValidationToken);
+		synapseClient.hexDecodeAndDeserialize(NotificationTokenType.EmailValidation.name(), place.toToken(), new AsyncCallback<SignedTokenInterface>() {
+			@Override
+			public void onSuccess(SignedTokenInterface result) {
+				if (result instanceof EmailValidationSignedToken) {
+					addEmail((EmailValidationSignedToken) result);
+				}
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(DisplayConstants.ACCOUNT_CREATION_FAILURE + caught.getMessage());
+			}
+		});
 	}
-	
-	public void validateToken(String emailValidationToken) {
-		synapseClient.addEmail(emailValidationToken, new AsyncCallback<Void>() {
+
+	public void addEmail(EmailValidationSignedToken emailValidationSignedToken) {
+		synapseClient.addEmail(emailValidationSignedToken, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				//success, send to Settings to view account state
+				// success, send to Settings to view account state
 				view.showInfo(DisplayConstants.EMAIL_SUCCESS, "");
 				globalAppState.getPlaceChanger().goTo(new Profile(Profile.EDIT_PROFILE_TOKEN));
 			}
@@ -59,7 +72,7 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 			}
 		});
 	}
-	
+
 	@Override
     public String mayStop() {
         view.clear();

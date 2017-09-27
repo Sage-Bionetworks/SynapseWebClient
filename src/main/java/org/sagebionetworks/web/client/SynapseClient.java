@@ -39,6 +39,7 @@ import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -167,7 +168,7 @@ public interface SynapseClient extends RemoteService{
 	
 	public void additionalEmailValidation(String userId, String emailAddress, String callbackUrl) throws RestServiceException;
 	
-	public void addEmail(String emailValidationToken) throws RestServiceException;
+	public void addEmail(EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException;
 	
 	public String getNotificationEmail() throws RestServiceException;
 	
