@@ -220,7 +220,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	 */
 	private void lookupVersion(final AsyncCallback<Void> doneCallback) {
 		// single call to look up the latest version
-		synapseClient.getEntityHeaderBatch(lookupVersion, new AsyncCallback<ArrayList<EntityHeader>>() {
+		jsClient.getEntityHeaderBatch(lookupVersion, new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				doneCallback.onFailure(caught);

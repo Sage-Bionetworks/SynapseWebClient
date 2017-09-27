@@ -6,10 +6,10 @@ import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_GONE;
 import static org.apache.http.HttpStatus.SC_LOCKED;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static org.apache.http.HttpStatus.SC_OK;
 import static org.apache.http.HttpStatus.SC_PRECONDITION_FAILED;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
+import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import java.util.ArrayList;
@@ -17,7 +17,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -27,6 +26,7 @@ import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.PaginatedIds;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -35,17 +35,18 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
 import org.sagebionetworks.repo.model.discussion.Forum;
-import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
-import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
+import org.sagebionetworks.repo.model.file.BatchFileRequest;
+import org.sagebionetworks.repo.model.file.BatchFileResult;
+import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
+import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -66,7 +67,6 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
@@ -90,26 +90,19 @@ public class SynapseJavascriptClient {
 	public static final String USER_PROFILE_PATH = "/userProfile";
 	public static final String USER_GROUP_HEADER_BY_ALIAS = "/userGroupHeaders/aliases";
 	public static final String USER_GROUP_HEADER_BATCH_PATH = "/userGroupHeaders/batch?ids=";
-	private static final String ENTITY = "/entity";
-	private static final String PROJECT = "/project";
-	private static final String FORUM = "/forum";
-	private static final String THREAD = "/thread";
-	private static final String THREADS = "/threads";
-	private static final String THREAD_COUNT = "/threadcount";
-	private static final String THREAD_TITLE = "/title";
-	private static final String DISCUSSION_MESSAGE = "/message";
-	private static final String REPLY = "/reply";
-	private static final String REPLIES = "/replies";
-	private static final String REPLY_COUNT = "/replycount";
-	private static final String URL = "/messageUrl";
-	private static final String PIN = "/pin";
-	private static final String UNPIN = "/unpin";
-	private static final String RESTORE = "/restore";
-	private static final String MODERATORS = "/moderators";
-	private static final String SUBSCRIPTION = "/subscription";
-	
-	private static final String THREAD_COUNTS = "/threadcounts";
-	private static final String ENTITY_THREAD_COUNTS = ENTITY + THREAD_COUNTS;
+	public static final String ENTITY = "/entity";
+	public static final String PROJECT = "/project";
+	public static final String FORUM = "/forum";
+	public static final String THREAD = "/thread";
+	public static final String THREAD_COUNT = "/threadcount";
+	public static final String REPLY = "/reply";
+	public static final String REPLY_COUNT = "/replycount";
+	public static final String URL = "/messageUrl";
+	public static final String MODERATORS = "/moderators";
+	public static final String SUBSCRIPTION = "/subscription";
+	public static final String FILE_HANDLE_BATCH = "/fileHandle/batch";
+	public static final String THREAD_COUNTS = "/threadcounts";
+	public static final String ENTITY_THREAD_COUNTS = ENTITY + THREAD_COUNTS;
 	
 	public static final int RETRY_REQUEST_DELAY_MS = 2000;
 	RequestBuilderWrapper requestBuilder;
@@ -144,7 +137,7 @@ public class SynapseJavascriptClient {
 	public static final String LIMIT_PARAMETER = "limit=";
 	private static final String NEXT_PAGE_TOKEN_PARAM = "nextPageToken=";
 	
-	public String repoServiceUrl; 
+	public String repoServiceUrl,fileServiceUrl; 
 	
 	@Inject
 	public SynapseJavascriptClient(
@@ -167,6 +160,14 @@ public class SynapseJavascriptClient {
 		}
 		return repoServiceUrl;
 	}
+	
+	private String getFileServiceUrl() {
+		if (fileServiceUrl == null) {
+			fileServiceUrl = globalAppState.getSynapseProperty(FILE_SERVICE_URL_KEY);
+		}
+		return fileServiceUrl;
+	}
+
 	private void doGet(String url, OBJECT_TYPE responseType, AsyncCallback callback) {
 		requestBuilder.configure(GET, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
@@ -193,7 +194,8 @@ public class SynapseJavascriptClient {
 				public void onResponseReceived(Request request,
 						Response response) {
 					int statusCode = response.getStatusCode();
-					if (statusCode == SC_OK) {
+					// if it's a 200 level response, it's OK
+					if (statusCode > 199 && statusCode < 300) {
 						try {
 							JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
 							callback.onSuccess(jsFactory.newInstance(responseType, jsonObject));
@@ -620,6 +622,36 @@ public class SynapseJavascriptClient {
 			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
 			topic.writeToJSONObject(jsonAdapter);
 			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.SubscriberCount, callback);
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
+	}
+	
+	public void getFileHandleAndUrlBatch(BatchFileRequest request, AsyncCallback<BatchFileResult> callback) {
+		String url = getFileServiceUrl() + FILE_HANDLE_BATCH;
+		try {
+			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+			request.writeToJSONObject(jsonAdapter);
+			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.BatchFileResult, callback);
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
+	}
+	
+	public void getEntityHeaderBatch(List<String> entityIds, AsyncCallback<ArrayList<EntityHeader>> callback) {
+		List<Reference> list = new ArrayList<Reference>();
+		for (String entityId : entityIds) {
+			Reference ref = new Reference();
+			ref.setTargetId(entityId);
+			list.add(ref);
+		}
+		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/header";
+		try {
+			ReferenceList refList = new ReferenceList();
+			refList.setReferences(list);
+			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+			refList.writeToJSONObject(jsonAdapter);
+			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.PaginatedResultsEntityHeader, callback);
 		} catch (JSONObjectAdapterException e) {
 			callback.onFailure(e);
 		}

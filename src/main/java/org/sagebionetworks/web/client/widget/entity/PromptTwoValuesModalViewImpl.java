@@ -127,6 +127,7 @@ public class PromptTwoValuesModalViewImpl implements PromptTwoValuesModalView {
 
 	@Override
 	public void configure(String title, String label1, String value1, String label2, String value2, String buttonText) {
+		clear();
 		this.modal.setTitle(title);
 		this.label1.setText(label1);
 		this.valueField1.setText(value1);

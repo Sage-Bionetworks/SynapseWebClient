@@ -1,14 +1,17 @@
 package org.sagebionetworks.web.unitclient.widget.provenance;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,8 +49,8 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
-import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget.ActivityProcessItem;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -150,7 +153,7 @@ public class ProvenanceWidgetTest {
 		outputEntityList.add(header123);
 		AsyncMockStubber.callSuccessWith(outputEntity).when(mockSynapseJavascriptClient).getEntity(eq(outputEntity.getId()), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(act).when(mockSynapseClient).getActivityForEntityVersion(anyString(), anyLong(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(outputEntityList).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(outputEntityList).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(referenceHeaders).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));		
 		AsyncMockStubber.callSuccessWith(generatedBy).when(mockSynapseClient).getEntitiesGeneratedBy(eq(act.getId()), anyInt(), anyInt(), any(AsyncCallback.class));
 		

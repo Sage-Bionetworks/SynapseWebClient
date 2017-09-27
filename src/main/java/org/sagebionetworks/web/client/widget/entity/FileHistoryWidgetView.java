@@ -26,5 +26,6 @@ public interface FileHistoryWidgetView extends IsWidget, SynapseView{
 	void addVersion(VersionInfo version, boolean canEdit, boolean isVersionSelected);
 	void setEditVersionInfoButtonVisible(boolean isVisible);
 	void showEditVersionInfo(String oldLabel, String oldComment);
+	void showEditVersionInfoError(String error);
 	void hideEditVersionInfo();
 }
