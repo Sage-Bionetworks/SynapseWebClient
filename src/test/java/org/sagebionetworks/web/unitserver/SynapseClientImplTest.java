@@ -120,6 +120,7 @@ import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.message.Settings;
 import org.sagebionetworks.repo.model.principal.AddEmailInfo;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.project.ExternalS3StorageLocationSetting;
@@ -1677,8 +1678,8 @@ public class SynapseClientImplTest {
 
 	@Test
 	public void testAddEmail() throws Exception {
-		String emailAddressToken = "long synapse email token";
-		synapseClient.addEmail(emailAddressToken);
+		EmailValidationSignedToken emailValidationSignedToken = new EmailValidationSignedToken();
+		synapseClient.addEmail(emailValidationSignedToken);
 		verify(mockSynapse).addEmail(any(AddEmailInfo.class), anyBoolean());
 	}
 
