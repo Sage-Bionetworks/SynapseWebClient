@@ -37,6 +37,7 @@ import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
@@ -117,7 +118,7 @@ public interface SynapseClientAsync {
 	
 	void additionalEmailValidation(String userId, String emailAddress, String callbackUrl, AsyncCallback<Void> callback);
 	
-	void addEmail(String emailValidationToken, AsyncCallback<Void> callback);
+	void addEmail(EmailValidationSignedToken emailValidationSignedToken, AsyncCallback<Void> callback);
 	
 	void getNotificationEmail(AsyncCallback<String> callback);
 	

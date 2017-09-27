@@ -631,12 +631,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public void addEmail(String emailValidationToken)
+	public void addEmail(EmailValidationSignedToken emailValidationSignedToken)
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			AddEmailInfo newEmailInfo = new AddEmailInfo();
-			newEmailInfo.setEmailValidationToken(emailValidationToken);
+			newEmailInfo.setEmailValidationSignedToken(emailValidationSignedToken);
 			synapseClient.addEmail(newEmailInfo, true);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
