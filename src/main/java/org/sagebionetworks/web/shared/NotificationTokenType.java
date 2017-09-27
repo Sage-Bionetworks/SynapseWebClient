@@ -1,4 +1,4 @@
-package org.sagebionetworks.web.server.servlet;
+package org.sagebionetworks.web.shared;
 
 
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;

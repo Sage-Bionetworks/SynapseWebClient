@@ -155,7 +155,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
-import org.sagebionetworks.web.server.servlet.NotificationTokenType;
+import org.sagebionetworks.web.shared.NotificationTokenType;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;

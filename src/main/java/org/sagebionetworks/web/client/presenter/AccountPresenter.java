@@ -1,23 +1,20 @@
 package org.sagebionetworks.web.client.presenter;
 
 import org.sagebionetworks.repo.model.SignedTokenInterface;
-import org.sagebionetworks.repo.model.principal.AddEmailInfo;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Account;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.view.AccountView;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.server.servlet.NotificationTokenType;
+import org.sagebionetworks.web.shared.NotificationTokenType;
 
 public class AccountPresenter extends AbstractActivity implements AccountView.Presenter, Presenter<Account> {
 		
