@@ -25,6 +25,7 @@ import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEditor;
@@ -42,16 +43,13 @@ public class QueryTableConfigEditorTest {
 	QueryTableConfigView mockView;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
-	JSONObjectAdapter mockJSONObjectAdapter;
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	WikiPageKey mockWikiKey;
 	@Mock
 	GWTWrapper mockGWT;
 	JSONObjectAdapterImpl testReturnJSONObject;
 	Map<String, String> descriptor;
-	String testJSON = "{totalNumberOfResults=10,results={}}";
 	String testQuery = "select+*+from+table";
 	String decodedTestQuery = "select * from table";
 	String col1Name = WebConstants.DEFAULT_COL_NAME_CREATED_BY_PRINCIPAL_ID;
@@ -59,7 +57,7 @@ public class QueryTableConfigEditorTest {
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
-		editor = new QueryTableConfigEditor(mockView, mockSynapseClient, mockJSONObjectAdapter, mockGWT);
+		editor = new QueryTableConfigEditor(mockView, mockSynapseJavascriptClient, mockGWT);
 		
 		testReturnJSONObject = new JSONObjectAdapterImpl();
 		testReturnJSONObject.put("totalNumberOfResults", 100);
@@ -72,7 +70,6 @@ public class QueryTableConfigEditorTest {
 		results.put(0, result2);
 		results.put(0, result1);
 		testReturnJSONObject.put("results", results);
-		when(mockJSONObjectAdapter.createNew(anyString())).thenReturn(testReturnJSONObject);
 		
 		when(mockGWT.decodeQueryString(testQuery)).thenReturn(decodedTestQuery);
 		when(mockGWT.encodeQueryString(decodedTestQuery)).thenReturn(testQuery);
@@ -86,7 +83,7 @@ public class QueryTableConfigEditorTest {
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_RESULTS_KEY, "results");
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_CSS_STYLE, "myTableStyle");
 		
-		AsyncMockStubber.callSuccessWith(testJSON).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testReturnJSONObject).when(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
 		when(mockView.getQueryString()).thenReturn(testQuery);
 	}
 	
@@ -142,7 +139,7 @@ public class QueryTableConfigEditorTest {
 	public void testAutoAddColumns() {
 		editor.configure(mockWikiKey, descriptor, null);
 		editor.autoAddColumns();
-		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
 		ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List.class);
 		verify(mockView).setConfigs(captor.capture());
 		List<APITableColumnConfig> configs = captor.getValue();

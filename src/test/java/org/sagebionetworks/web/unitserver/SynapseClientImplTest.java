@@ -45,7 +45,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -152,10 +151,8 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
-import org.sagebionetworks.web.shared.NotificationTokenType;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -163,6 +160,7 @@ import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.NotificationTokenType;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
@@ -793,19 +791,6 @@ public class SynapseClientImplTest {
 
 		Project actualProject = synapseClient.getProject(projectId);
 		assertEquals(project, actualProject);
-	}
-
-	@Test
-	public void testGetJSONEntity() throws Exception {
-
-		JSONObject json = EntityFactory.createJSONObjectForEntity(entity);
-		Mockito.when(mockSynapse.getEntity(anyString())).thenReturn(json);
-
-		String testRepoUri = "/testservice";
-
-		synapseClient.getJSONEntity(testRepoUri);
-		// verify that this call uses Synapse.getEntity(testRepoUri)
-		verify(mockSynapse).getEntity(testRepoUri);
 	}
 
 	@Test

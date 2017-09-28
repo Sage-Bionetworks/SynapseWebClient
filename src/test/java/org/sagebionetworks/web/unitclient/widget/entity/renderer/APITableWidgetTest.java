@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -65,15 +66,14 @@ public class APITableWidgetTest {
 	private static final String TESTSERVICE_PATH = "/testservice";
 	APITableWidget widget;
 	APITableWidgetView mockView;
-	SynapseClientAsync mockSynapseClient;
-	JSONObjectAdapter mockJSONObjectAdapter;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	PortalGinInjector mockGinInjector;
 	APITableColumnRendererSynapseID synapseIDColumnRenderer;
 	APITableColumnRendererNone noneColumnRenderer;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	
-	String testJSON = "{totalNumberOfResults=10,results={}}";
 	Map<String, String> descriptor;
 	JSONObjectAdapter testReturnJSONObject;
 	WikiPageKey testWikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
@@ -98,8 +98,6 @@ public class APITableWidgetTest {
 	public void setup() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(APITableWidgetView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockJSONObjectAdapter = mock(JSONObjectAdapter.class);
 		mockGinInjector = mock(PortalGinInjector.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
@@ -119,13 +117,12 @@ public class APITableWidgetTest {
 		results.put(0, result2);
 		results.put(0, result1);
 		testReturnJSONObject.put("results", results);
-		when(mockJSONObjectAdapter.createNew(anyString())).thenReturn(testReturnJSONObject);
 		
 		when(mockGinInjector.getAPITableColumnRendererNone()).thenReturn(noneColumnRenderer);
 		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(synapseIDColumnRenderer);
 		
-		AsyncMockStubber.callSuccessWith(testJSON).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		widget = new APITableWidget(mockView, mockSynapseClient, mockJSONObjectAdapter, mockGinInjector, mockGlobalApplicationState, mockAuthenticationController, mockSynAlert, mockGWT);
+		AsyncMockStubber.callSuccessWith(testReturnJSONObject).when(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
+		widget = new APITableWidget(mockView, mockSynapseJavascriptClient, mockGinInjector, mockGlobalApplicationState, mockAuthenticationController, mockSynAlert, mockGWT);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, TESTSERVICE_PATH);
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "true");
@@ -151,7 +148,7 @@ public class APITableWidgetTest {
 	@Test
 	public void testConfigure() {
 		widget.configure(testWikiKey, descriptor, null, null);
-		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
 		verify(mockView).clear();
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
@@ -187,7 +184,7 @@ public class APITableWidgetTest {
 		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(failColumnRenderer);
 		widget.configure(testWikiKey, descriptor, null, null);
 		
-		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
 	}
@@ -206,7 +203,7 @@ public class APITableWidgetTest {
 	public void testServiceCallFailure() throws JSONObjectAdapterException {
 		String errorMessage = "service response error message";
 		Exception ex = new Exception(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
 		widget.configure(testWikiKey, descriptor, null, null);
 		verify(mockSynAlert).handleException(ex);
 		verify(mockView).showError(any(Widget.class));
@@ -214,7 +211,7 @@ public class APITableWidgetTest {
 	
 	@Test
 	public void testTableUnavailableFailure() throws JSONObjectAdapterException {
-		AsyncMockStubber.callFailureWith(new TableUnavilableException()).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new TableUnavilableException()).when(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
 		widget.configure(testWikiKey, descriptor, null, null);
 		verify(mockView).showTableUnavailable();
 	}
@@ -274,7 +271,7 @@ public class APITableWidgetTest {
 		widget.configure(testWikiKey, descriptor, null, null);
 		
 		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
-		verify(mockSynapseClient).getJSONEntity(arg.capture(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getJSON(arg.capture(), any(AsyncCallback.class));
 		
 		assertTrue(arg.getValue().endsWith(testUserId));
 	}
@@ -291,7 +288,7 @@ public class APITableWidgetTest {
 		widget.configure(testWikiKey, descriptor, null, null);
 		
 		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
-		verify(mockSynapseClient).getJSONEntity(arg.capture(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getJSON(arg.capture(), any(AsyncCallback.class));
 		
 		assertTrue(arg.getValue().endsWith(testUserId));
 	}

@@ -25,7 +25,6 @@ import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.entity.ContentType;
-import org.json.JSONObject;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Whitelist;
@@ -133,7 +132,18 @@ import org.sagebionetworks.table.query.util.TableSqlProcessor;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
-import org.sagebionetworks.web.shared.*;
+import org.sagebionetworks.web.shared.AccessRequirementUtils;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
+import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.NotificationTokenType;
+import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
+import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ProjectPagedResults;
+import org.sagebionetworks.web.shared.TeamBundle;
+import org.sagebionetworks.web.shared.TeamMemberBundle;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -981,22 +991,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			return convertPaginated(synapseClient
 					.getEntitiesGeneratedBy(activityId, limit, offset));
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public String getJSONEntity(String repoUri) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			JSONObject entity = synapseClient.getEntity(repoUri);
-			return entity.toString();
-		} catch (SynapseTableUnavailableException e) {
-			handleTableUnavailableException(e);
-			// TableUnavilableException is thrown in line above, should never
-			// reach the next line
-			return null;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

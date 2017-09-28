@@ -21,7 +21,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -46,8 +46,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	public static final String ENCODED_CURRENT_USER_SQL_VARIABLE = "%40CURRENT_USER";
 	private APITableWidgetView view;
 	private Map<String, String> descriptor;
-	private SynapseClientAsync synapseClient;
-	private JSONObjectAdapter jsonObjectAdapter;
+	private SynapseJavascriptClient jsClient;
 	private PortalGinInjector ginInjector;
 	private int total, rowCount;
 	private APITableConfig tableConfig;
@@ -73,14 +72,13 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	}
 	
 	@Inject
-	public APITableWidget(APITableWidgetView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, PortalGinInjector ginInjector,
+	public APITableWidget(APITableWidgetView view, SynapseJavascriptClient jsClient, PortalGinInjector ginInjector,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			SynapseAlert synAlert, GWTWrapper gwt) {
 		this.view = view;
 		view.setPresenter(this);
-		this.synapseClient = synapseClient;
-		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.jsClient = jsClient;
 		this.ginInjector = ginInjector;
 		this.synAlert = synAlert;
 		this.globalApplicationState = globalApplicationState;
@@ -141,12 +139,10 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			fullUri = fullUri.replace(CURRENT_USER_SQL_VARIABLE, userId).replace(ENCODED_CURRENT_USER_SQL_VARIABLE, userId);
 		}
 			
-		synapseClient.getJSONEntity(fullUri, new AsyncCallback<String>() {
+		jsClient.getJSON(fullUri, new AsyncCallback<JSONObjectAdapter>() {
 			@Override
-			public void onSuccess(String result) {
-				JSONObjectAdapter adapter;
+			public void onSuccess(JSONObjectAdapter adapter) {
 				try {
-					adapter = jsonObjectAdapter.createNew(result);
 					if (adapter.has("totalNumberOfResults")) {
 						total = adapter.getInt("totalNumberOfResults");
 					}
