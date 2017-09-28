@@ -109,7 +109,9 @@ public class BulkPresenterProxy extends AbstractActivity {
 	@Override
 	public void start(final AcceptsOneWidget panel, final EventBus eventBus) {
 		globalApplicationState.checkVersionCompatibility(versionCheckCallback);
-		authController.checkForUserChange();
+		if (!(place instanceof LoginPlace)) {
+			authController.checkForUserChange();	
+		}
 		globalApplicationState.setIsEditing(false);
 		// detect prefetch
 		if (panel == null && eventBus == null) return;
