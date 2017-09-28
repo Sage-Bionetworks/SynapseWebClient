@@ -198,8 +198,6 @@ public interface SynapseClient extends RemoteService{
 	
 	public PaginatedResults<Reference> getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset) throws RestServiceException;
 
-	public String getJSONEntity(String repoUri) throws RestServiceException;
-	
 	public String getRootWikiId(String ownerId, String ownerType) throws RestServiceException;
 	public FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	

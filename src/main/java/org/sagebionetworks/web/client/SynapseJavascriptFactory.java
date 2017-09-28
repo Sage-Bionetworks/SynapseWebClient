@@ -73,7 +73,8 @@ public class SynapseJavascriptFactory {
 		PaginatedIds,
 		SubscriberPagedResults,
 		SubscriberCount,
-		BatchFileResult
+		BatchFileResult,
+		JSON
 	}
 
 	/**
@@ -163,6 +164,8 @@ public class SynapseJavascriptFactory {
 			return new SubscriberCount(json).getCount();
 		case BatchFileResult :
 			return new BatchFileResult(json);
+		case JSON :
+			return json;
 		case PaginatedResultsEntityHeader :
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<EntityHeader> entityHeaderList = new ArrayList<>();

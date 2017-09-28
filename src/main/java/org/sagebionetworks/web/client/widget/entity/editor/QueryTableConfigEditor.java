@@ -12,7 +12,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
@@ -27,16 +27,14 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	private QueryTableConfigView view;
 	private Map<String, String> descriptor;
 	public static final String DEFAULT_PAGE_SIZE = "100";
-	private SynapseClientAsync synapseClient;
-	private JSONObjectAdapter jsonObjectAdapter;
+	private SynapseJavascriptClient jsClient;
 	private String servicePrefix;
 	private GWTWrapper gwt;
 	
 	@Inject
-	public QueryTableConfigEditor(QueryTableConfigView view, SynapseClientAsync synapseClient, JSONObjectAdapter jsonObjectAdapter, GWTWrapper gwt) {
+	public QueryTableConfigEditor(QueryTableConfigView view, SynapseJavascriptClient jsClient, GWTWrapper gwt) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.jsClient = jsClient;
 		this.gwt = gwt;
 		view.setPresenter(this);
 		view.initView();
@@ -90,13 +88,10 @@ public class QueryTableConfigEditor implements QueryTableConfigView.Presenter, W
 	public void autoAddColumns() {
 		// execute the current query to get the column headers, then update the column manager
 		String path = getServicePathFromView() + "+limit+10";
-		synapseClient.getJSONEntity(path, new AsyncCallback<String>() {
+		jsClient.getJSON(path, new AsyncCallback<JSONObjectAdapter>() {
 			@Override
-			public void onSuccess(String result) {
-				JSONObjectAdapter adapter;
+			public void onSuccess(JSONObjectAdapter adapter) {
 				try {
-					adapter = jsonObjectAdapter.createNew(result);
-					
 					updateDescriptorFromView();
 					APITableConfig tableConfig = new APITableConfig(descriptor);
 					///////////////////

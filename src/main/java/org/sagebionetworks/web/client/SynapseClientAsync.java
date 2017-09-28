@@ -153,8 +153,6 @@ public interface SynapseClientAsync {
 
 	void getActivity(String activityId, AsyncCallback<Activity> callback);
 		
-	public void getJSONEntity(String repoUri, AsyncCallback<String> callback);
-	
 	public void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
 	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	

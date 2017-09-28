@@ -255,6 +255,10 @@ public class SynapseJavascriptClient {
 		getEntityBundleForVersion(entityId, null, partsMask, callback);
 	}
 
+	public void getJSON(String uri, AsyncCallback<JSONObjectAdapter> callback) {
+		String url = getRepoServiceUrl() + uri;
+		doGet(url, OBJECT_TYPE.JSON, callback);
+	}
 	public void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, final AsyncCallback<EntityBundle> callback) {
 		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId;
 		if (versionNumber != null) {
