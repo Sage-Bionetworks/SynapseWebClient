@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Objects;
+
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -178,7 +180,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 	
 	public void setWikiPage(WikiPage result) {
-		if (!result.getId().equals(wikiKey.getWikiPageId())) {
+		if (!Objects.equals(result.getId(), wikiKey.getWikiPageId())) {
 			// if this result is not the wiki page that we want, then ignore.
 			return;
 		}
