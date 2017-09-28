@@ -11,11 +11,8 @@ import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
-import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -46,9 +43,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private ClientCache localStorage;
 	private AdapterFactory adapterFactory;
 	private SynapseClientAsync synapseClient;
-	private ChallengeClientAsync challengeClient;
-	private SubscriptionClientAsync subscriptionClient;
-	private GWTWrapper gwt;
 	
 	@Inject
 	public AuthenticationControllerImpl(
@@ -57,19 +51,13 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			SessionStorage sessionStorage, 
 			ClientCache localStorage, 
 			AdapterFactory adapterFactory,
-			SynapseClientAsync synapseClient,
-			GWTWrapper gwt,
-			ChallengeClientAsync challengeClient,
-			SubscriptionClientAsync subscriptionClient){
+			SynapseClientAsync synapseClient){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		this.sessionStorage = sessionStorage;
 		this.localStorage = localStorage;
 		this.adapterFactory = adapterFactory;
 		this.synapseClient = synapseClient;
-		this.challengeClient = challengeClient;
-		this.subscriptionClient = subscriptionClient;
-		this.gwt = gwt;
 	}
 
 	@Override
@@ -134,7 +122,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			}
 		});
 	}
-
 	
 	private void setUser(String token, final AsyncCallback<UserSessionData> callback) {
 		if(token == null) {
@@ -250,7 +237,23 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		String currentSession = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
 		String localSession = getCurrentUserSessionToken();
 		if (!Objects.equals(currentSession, localSession)) {
-			Window.Location.reload();	
+			Window.Location.reload();
+		}
+		
+		//also revalidate user session
+		if (currentSession != null) {
+			revalidateSession(currentSession, new AsyncCallback<UserSessionData>() {
+				@Override
+				public void onSuccess(UserSessionData result) {
+					// still valid (and call has updated expiration)
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					//invalid session token
+					Window.Location.reload();
+				}
+			});	
 		}
 	}
 }

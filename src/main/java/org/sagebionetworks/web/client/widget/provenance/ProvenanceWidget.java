@@ -132,7 +132,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 						} else {
 							startRefs.add(ref);							
 						}
-					}					 											
+					}
 				}
 			}
 		}
@@ -143,9 +143,13 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		
 		// Set max depth (default 1), undefined (false) and expand (false)		
 		maxDepth = descriptor.containsKey(WidgetConstants.PROV_WIDGET_DEPTH_KEY) ? Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DEPTH_KEY)) : 1; 
-		showUndefinedAndErrorActivity = descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY) != null ? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY)) : false;
+		showUndefinedAndErrorActivity = descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY) != null ? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY)) : true;
 		showExpand = descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY) != null ? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY)) : false;
-		if(descriptor.containsKey(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY)) setHeight(Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY)));
+		if(descriptor.containsKey(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY)) {
+			setHeight(Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY)));
+		} else {
+			setHeight(330);
+		}
 		
 		// do not create expand nodes for these (generally for previously expanded/discovered nodes without an activity)
 		noExpandNode = new HashSet<Reference>();		
@@ -380,10 +384,14 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	
 	private void lookupReferencesThenBuildGraph() {			
 		ReferenceList list = new ReferenceList();
-		list.setReferences(new ArrayList<Reference>(references));		
+		list.setReferences(new ArrayList<Reference>(references));
+		if (references.isEmpty()) {
+			view.clear();
+			return;
+		}
 		synapseClient.getEntityHeaderBatch(list, new AsyncCallback<PaginatedResults<EntityHeader>>() {
 			@Override
-			public void onSuccess(PaginatedResults<EntityHeader> headers) {					
+			public void onSuccess(PaginatedResults<EntityHeader> headers) {
 				refToHeader = ProvUtils.mapReferencesToHeaders(headers);
 				buildGraphLayoutSendToView();
 			}
