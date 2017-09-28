@@ -64,6 +64,10 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 		view.configure(canEdit, actionHandler);
 	}
 	
+	public void clear() {
+		view.clear();
+	}
+	
 	@Override
 	public void configureNextPage(final Long offset, final Long limit) {
 		synapseClient.getV2WikiHistory(wikiKey, limit, offset, new AsyncCallback<PaginatedResults<V2WikiHistorySnapshot>>() {

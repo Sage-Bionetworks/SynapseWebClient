@@ -178,6 +178,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 	
 	public void setWikiPage(WikiPage result) {
+		if (!result.getId().equals(wikiKey.getWikiPageId())) {
+			// if this result is not the wiki page that we want, then ignore.
+			return;
+		}
 		try {
 			view.setDiffVersionAlertVisible(false);
 			view.setModifiedCreatedByHistoryPanelVisible(isModifiedCreatedByHistoryVisible);
@@ -358,9 +362,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		wikiKey.setWikiPageId(currentPage.getId());
 		resetWikiMarkdown(currentPage.getMarkdown());
 		configureWikiTitle(isRootWiki, currentPage.getTitle());
-		configureHistoryWidget(canEdit);
 		view.setCreatedOn(dateTimeUtils.convertDateToSmallString(result.getCreatedOn()));
 		view.setModifiedOn(dateTimeUtils.convertDateToSmallString(result.getModifiedOn()));
+		view.setWikiHistoryVisible(false);
+		historyWidget.clear();
 	}
 	
 	@Override
@@ -427,4 +432,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		isModifiedCreatedByHistoryVisible = isVisible;
 	}
 	
+	@Override
+	public void showWikiHistory() {
+		configureHistoryWidget(canEdit);
+	}
 }

@@ -28,6 +28,7 @@ public interface WikiPageWidgetView extends IsWidget {
 		public void restoreClicked();
 		void configureWikiSubpagesWidget();
 		void configureHistoryWidget(boolean canEdit);
+		void showWikiHistory();
 	}
 	
 	void setWikiHistoryWidget(IsWidget historyWidget);
