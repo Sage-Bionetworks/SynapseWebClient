@@ -15,8 +15,11 @@
 		</g:ScrollPanel>
 		
 		<bh:Div ui:field="tablePanel" addStyleNames="tablePage">
-			<g:ScrollPanel>
-				<bh:Div>
+			<g:ScrollPanel ui:field="topScrollBar" height="18px" visible="false">
+				<bh:Div ui:field="topScrollDiv" height="18px"/>
+			</g:ScrollPanel>
+			<g:ScrollPanel ui:field="tableScrollPanel">
+				<bh:Div ui:field="tableDiv">
 					<t:Table styleName="table table-striped table-condensed">
 						<t:THead>
 							<t:TableRow ui:field="header">

@@ -4,12 +4,17 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.ScrollEvent;
+import com.google.gwt.event.dom.client.ScrollHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -45,14 +50,48 @@ public class TablePageViewImpl implements TablePageView {
 	Presenter presenter;
 	@UiField
 	Button clearFacetsButton;
-	
+	@UiField
+	ScrollPanel topScrollBar;
+	@UiField
+	ScrollPanel tableScrollPanel;
+	@UiField
+	Div topScrollDiv;
+	@UiField
+	Div tableDiv;
 	@Inject
-	public TablePageViewImpl(Binder binder){
+	public TablePageViewImpl(
+			Binder binder, 
+			final GWTWrapper gwt){
 		widget = binder.createAndBindUi(this);
 		clearFacetsButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClearFacets();
+			}
+		});
+		gwt.scheduleExecution(new Callback() {
+			@Override
+			public void invoke() {
+				if (tableScrollPanel.isAttached() && tableScrollPanel.isVisible()) {
+					// match width
+					topScrollDiv.setWidth(tableDiv.getElement().getScrollWidth() + "px");
+					boolean isScrollBarShowing = tableDiv.getElement().getScrollWidth() > tableDiv.getElement().getClientWidth();
+					topScrollBar.setVisible(isScrollBarShowing && tableScrollPanel.getOffsetHeight() > 600);
+					gwt.scheduleExecution(this, 400);
+				}
+			}
+		}, 400);
+
+		tableScrollPanel.addScrollHandler(new ScrollHandler() {
+			@Override
+			public void onScroll(ScrollEvent event) {
+				topScrollBar.setHorizontalScrollPosition(tableScrollPanel.getHorizontalScrollPosition());
+			}
+		});
+		topScrollBar.addScrollHandler(new ScrollHandler() {
+			@Override
+			public void onScroll(ScrollEvent event) {
+				tableScrollPanel.setHorizontalScrollPosition(topScrollBar.getHorizontalScrollPosition());
 			}
 		});
 	}
