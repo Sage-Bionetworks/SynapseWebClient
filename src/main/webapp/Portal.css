@@ -716,7 +716,9 @@ a.shortBtn {
 .min-width-300 {
 	min-width: 300px;
 }
-
+.table>thead>tr>th>p, .table>tbody>tr>th>p, .table>tfoot>tr>th>p, .table>thead>tr>td>p, .table>tbody>tr>td>p, .table>tfoot>tr>td>p {
+	min-height: 17px;
+}
 .profile-image-40px {
 	width: 40px;	
 }
