@@ -9,7 +9,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -257,6 +257,13 @@ public class WikiPageWidgetTest {
 		//also verify that the created by and modified by are updated when wiki page is reloaded
 		verify(mockView, times(2)).setModifiedOn(anyString());
 		verify(mockView, times(2)).setCreatedOn(anyString());
+		
+		//verify response for a different wiki is ignored (if it does not match the current wiki page id, then the markdown widget is not updated).
+		reset(mockMarkdownWidget);
+		wikiPage = new WikiPage();
+		wikiPage.setId("different wiki page id");
+		presenter.setWikiPage(wikiPage);
+		verifyZeroInteractions(mockMarkdownWidget);
 	}
 
 	@Test
