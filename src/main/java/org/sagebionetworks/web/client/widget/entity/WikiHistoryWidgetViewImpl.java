@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.THead;
@@ -25,6 +26,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -44,10 +46,12 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 	private int offset;
 	private int resultSize;
 	DateTimeUtils dateTimeUtils;
-	
+	HTML loadingUI;
 	@Inject
-	public WikiHistoryWidgetViewImpl(DateTimeUtils dateTimeUtils) {
+	public WikiHistoryWidgetViewImpl(DateTimeUtils dateTimeUtils, SageImageBundle sageImageBundle) {
 		this.dateTimeUtils = dateTimeUtils;
+		addStyleName("min-height-200");
+		loadingUI = new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, "Loading"));
 	}
 	
 	private static class HistoryEntry {
@@ -69,6 +73,8 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 		this.isFirstGetHistory = true;
 		this.offset = 0;
 		// Reset history
+		hideHistoryWidget();
+		add(loadingUI);
 		historyList = new ArrayList<V2WikiHistorySnapshot>();
 		historyEntries = new ArrayList<HistoryEntry>();
 		presenter.configureNextPage(new Long(offset), new Long(10));
@@ -223,15 +229,16 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 		historyPanel.add(wrapWidget(historyTable, "margin-top-5"));
 		historyPanel.add(loadMoreHistoryButton);
 		add(historyPanel);
+		loadingUI.removeFromParent();
 	}
 	
 	@Override
 	public void hideHistoryWidget() {
 		if(historyPanel != null) {
-			historyPanel.setVisible(false);
+			historyPanel.removeFromParent();
 		}
 		if(inlineErrorMessagePanel != null) {
-			inlineErrorMessagePanel.setVisible(false);
+			inlineErrorMessagePanel.removeFromParent();
 		}
 	}
 	

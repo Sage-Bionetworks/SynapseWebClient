@@ -121,6 +121,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				} else {
 					wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
 					historyCollapse.show();
+					presenter.showWikiHistory();
 				}
 			}
 		});
@@ -272,8 +273,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public void setWikiHistoryVisible(boolean isVisible) {
 		if (isVisible) {
 			historyCollapse.show();
+			wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
 		} else {
 			historyCollapse.hide();
+			wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
 		}
 	}
 

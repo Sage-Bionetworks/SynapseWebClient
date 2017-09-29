@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.Objects;
+
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -178,6 +180,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 	
 	public void setWikiPage(WikiPage result) {
+		if (!Objects.equals(result.getId(), wikiKey.getWikiPageId())) {
+			// if this result is not the wiki page that we want, then ignore.
+			return;
+		}
 		try {
 			view.setDiffVersionAlertVisible(false);
 			view.setModifiedCreatedByHistoryPanelVisible(isModifiedCreatedByHistoryVisible);
@@ -358,9 +364,10 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		wikiKey.setWikiPageId(currentPage.getId());
 		resetWikiMarkdown(currentPage.getMarkdown());
 		configureWikiTitle(isRootWiki, currentPage.getTitle());
-		configureHistoryWidget(canEdit);
 		view.setCreatedOn(dateTimeUtils.convertDateToSmallString(result.getCreatedOn()));
 		view.setModifiedOn(dateTimeUtils.convertDateToSmallString(result.getModifiedOn()));
+		view.setWikiHistoryVisible(false);
+		historyWidget.clear();
 	}
 	
 	@Override
@@ -427,4 +434,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		isModifiedCreatedByHistoryVisible = isVisible;
 	}
 	
+	@Override
+	public void showWikiHistory() {
+		configureHistoryWidget(canEdit);
+	}
 }
