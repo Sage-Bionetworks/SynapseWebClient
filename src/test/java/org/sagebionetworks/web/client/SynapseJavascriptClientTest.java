@@ -111,6 +111,8 @@ public class SynapseJavascriptClientTest {
 		assertTrue(getException(SC_PRECONDITION_FAILED, reason) instanceof ConflictingUpdateException);
 		assertTrue(getException(SC_GONE, reason) instanceof BadRequestException);
 		assertTrue(getException(SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE, reason) instanceof TooManyRequestsException);
+		assertTrue(getException(SC_SERVICE_UNAVAILABLE, reason) instanceof SynapseDownException);
+		assertTrue(getException(SC_CONFLICT, reason) instanceof ConflictException);
 		assertTrue(getException(-1, reason) instanceof UnknownErrorException);
 	}
 
