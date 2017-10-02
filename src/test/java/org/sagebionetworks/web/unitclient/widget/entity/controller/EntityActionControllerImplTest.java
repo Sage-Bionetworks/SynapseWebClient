@@ -557,13 +557,13 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testConfigureMoveTable(){
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
-		verify(mockActionMenu).setActionEnabled(Action.MOVE_ENTITY, false);
-		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
+		verify(mockActionMenu).setActionEnabled(Action.MOVE_ENTITY, true);
+		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, true);
 	}
 	
 	@Test
-	public void testConfigureMoveView(){
-		entityBundle.setEntity(new EntityView());
+	public void testConfigureMoveProject(){
+		entityBundle.setEntity(new Project());
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionEnabled(Action.MOVE_ENTITY, false);
 		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
@@ -1103,7 +1103,8 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testIsMovableType(){
 		assertFalse(controller.isMovableType(new Project()));
-		assertFalse(controller.isMovableType(new TableEntity()));
+		assertTrue(controller.isMovableType(new TableEntity()));
+		assertTrue(controller.isMovableType(new EntityView()));
 		assertTrue(controller.isMovableType(new FileEntity()));
 		assertTrue(controller.isMovableType(new Folder()));
 		assertTrue(controller.isMovableType(new Link()));

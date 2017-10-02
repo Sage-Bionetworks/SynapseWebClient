@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
+import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.*;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Challenge;
@@ -664,7 +664,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isMovableType(Entity entity){
-		if(entity instanceof Project || entity instanceof Table){
+		if(entity instanceof Project){
 			return false;
 		}
 		return true;
@@ -880,7 +880,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postCheckLink(){
-		getEntityFinder().configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
+		getEntityFinder().configure(CONTAINER, false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				createLink(selected.getTargetId());
@@ -945,8 +945,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});
 	}
 
-	private void postCheckMove(){
-		getEntityFinder().configure(EntityFilter.CONTAINER, false, new SelectedHandler<Reference>() {					
+	private void postCheckMove() {
+		EntityFilter filter = entityBundle.getEntity() instanceof Table ? PROJECT : CONTAINER;
+		getEntityFinder().configure(filter, false, new SelectedHandler<Reference>() {					
 			@Override
 			public void onSelected(Reference selected) {
 				moveEntity(selected.getTargetId());
