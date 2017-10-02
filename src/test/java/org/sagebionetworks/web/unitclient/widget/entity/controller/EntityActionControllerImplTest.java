@@ -27,10 +27,12 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -56,6 +58,7 @@ import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
@@ -67,6 +70,7 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
@@ -122,6 +126,13 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityActionControllerImplTest {
 
+	private static final String WIKI_TREE_PAGE_A2_TITLE = "title(A2)";
+	private static final String WIKI_TREE_PAGE_A2_ID = "A2";
+	private static final String WIKI_TREE_PAGE_A1_TITLE = "title(A1)";
+	private static final String WIKI_TREE_PAGE_A1_ID = "A1";
+	public static final String WIKI_TREE_PAGE_A_TITLE = "title(A)";
+	public static final String WIKI_TREE_PAGE_A_ID = "A";
+	public static final String WIKI_TREE_ROOT_ID = "root";
 	EntityActionControllerView mockView;
 	PreflightController mockPreflightController;
 	SynapseClientAsync mockSynapseClient;
@@ -288,6 +299,7 @@ public class EntityActionControllerImplTest {
 		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(parentWikiPageId);
 		when(mockWikiPageToDelete.getTitle()).thenReturn(wikiPageTitle);
 		AsyncMockStubber.callSuccessWith(mockWikiPageToDelete).when(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(getWikiHeaderTree()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 	}
 
 	@Test
@@ -655,21 +667,87 @@ public class EntityActionControllerImplTest {
 		verify(mockProvenanceEditorWidget).show();
 	}
 	
+	/**
+	 * Sets up the wiki header tree to have a root page (id=root) that has one child page (id=A), which has 2 children (id=A1 and id=A2). 
+	 * @return
+	 */
+	private List<V2WikiHeader> getWikiHeaderTree() {
+		List<V2WikiHeader> headers = new ArrayList<>();
+		V2WikiHeader page = new V2WikiHeader();
+		page.setId(WIKI_TREE_ROOT_ID);
+		headers.add(page);
+		page = new V2WikiHeader();
+		page.setId(WIKI_TREE_PAGE_A_ID);
+		page.setTitle(WIKI_TREE_PAGE_A_TITLE);
+		page.setParentId(WIKI_TREE_ROOT_ID);
+		headers.add(page);
+		page = new V2WikiHeader();
+		page.setId(WIKI_TREE_PAGE_A1_ID);
+		page.setTitle(WIKI_TREE_PAGE_A1_TITLE);
+		page.setParentId(WIKI_TREE_PAGE_A_ID);
+		headers.add(page);
+		page = new V2WikiHeader();
+		page.setId(WIKI_TREE_PAGE_A2_ID);
+		page.setTitle(WIKI_TREE_PAGE_A2_TITLE);
+		page.setParentId(WIKI_TREE_PAGE_A_ID);
+		headers.add(page);
+		return headers;
+	}
+	
 	@Test
-	public void testOnDeleteWikiConfirmCancel(){
-		/*
-		 *  The user must be shown a confirm dialog before a delete.  Confirm is signaled via the Callback.invoke()
-		 *  in this case we do not want to confirm.
-		 */
-		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+	public void testGetWikiHeaderMap() {
+		// set up the entity name to verify that the root wiki header title has been updated
+		Project p = new Project();
+		p.setName("project name");
+		entityBundle.setEntity(p);
+		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
+		
+		Map<String, V2WikiHeader> headerMap = controller.getWikiHeaderMap(getWikiHeaderTree());
+		
+		V2WikiHeader page = headerMap.get(WIKI_TREE_ROOT_ID);
+		assertNull(page.getParentId());
+		assertEquals(p.getName(), page.getTitle());
+		
+		page = headerMap.get(WIKI_TREE_PAGE_A_ID);
+		assertEquals(WIKI_TREE_ROOT_ID, page.getParentId());
+		assertEquals(WIKI_TREE_PAGE_A_TITLE, page.getTitle());
+		
+		page = headerMap.get(WIKI_TREE_PAGE_A1_ID);
+		assertEquals(WIKI_TREE_PAGE_A_ID, page.getParentId());
+		assertEquals(WIKI_TREE_PAGE_A1_TITLE, page.getTitle());
+		
+		page = headerMap.get(WIKI_TREE_PAGE_A2_ID);
+		assertEquals(WIKI_TREE_PAGE_A_ID, page.getParentId());
+		assertEquals(WIKI_TREE_PAGE_A2_TITLE, page.getTitle());
+	}
+	
+
+	@Test
+	public void testGetWikiChildrenMap() {
+		Map<String, List<V2WikiHeader>> childrenMap = controller.getWikiChildrenMap(getWikiHeaderTree());
+		
+		List<V2WikiHeader> children = childrenMap.get(WIKI_TREE_ROOT_ID);
+		assertTrue(children.size() == 1 && children.get(0).getId().equals(WIKI_TREE_PAGE_A_ID));
+		
+		children = childrenMap.get(WIKI_TREE_PAGE_A_ID);
+		assertTrue(children.size() == 2);
+		assertTrue(children.get(0).getId().equals(WIKI_TREE_PAGE_A1_ID) || children.get(0).getId().equals(WIKI_TREE_PAGE_A2_ID));
+		
+		assertFalse(childrenMap.containsKey(WIKI_TREE_PAGE_A1_ID));
+		assertFalse(childrenMap.containsKey(WIKI_TREE_PAGE_A2_ID));
+	}
+	
+	@Test
+	public void testOnDeleteWiki(){
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		// let's simulate that this is the root wiki.
 		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(null);
-		when(mockWikiPageToDelete.getTitle()).thenReturn("");
 		// the call under tests
 		controller.onAction(Action.DELETE_WIKI_PAGE);
-		String expectedConfirmMessage = EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE + EntityActionControllerImpl.THE_ROOT_WIKI_PAGE_AND_ALL_SUBPAGES; 
-		verify(mockView).showConfirmDialog(anyString(), eq(expectedConfirmMessage), any(Callback.class));
+		verify(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockSynapseClient).getV2WikiHeaderTree(eq(entityBundle.getEntity().getId()), eq(ObjectType.ENTITY.name()), any(AsyncCallback.class));
+		
+		verify(mockView).showDeleteWikiModal(eq(wikiPageId), any(Map.class), any(Map.class));
 
 		// should not make it to the delete wiki page call
 		verify(mockSynapseClient, never()).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
@@ -677,62 +755,31 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testOnDeleteWikiPageConfirmedDeleteFailed(){
-		// confirm the delete
-		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(parentWikiPageId);
 		String error = "some error";
 		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		
-		/*
-		 * The preflight check is confirmed by calling Callback.invoke(), in this case it must not be invoked.
-		 */
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
-		// the call under test
 		controller.onAction(Action.DELETE_WIKI_PAGE);
-		ArgumentCaptor<String> confirmMessageCaptor = ArgumentCaptor.forClass(String.class);
-		verify(mockView).showConfirmDialog(anyString(), confirmMessageCaptor.capture(), any(Callback.class));
-		//verify confirmation message contains the wiki title being deleted
-		assertTrue(confirmMessageCaptor.getValue().contains(wikiPageTitle));
+		// did not make it to the delete wiki page call
+		verify(mockSynapseClient, never()).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		
+		controller.onConfirmDeleteWiki();
+		
 		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(error);
 	}
 	
 	@Test
-	public void testOnDeleteWikiPageNullTitle(){
-		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
-		// the call under test
-		when(mockWikiPageToDelete.getTitle()).thenReturn(null);
-		controller.onAction(Action.DELETE_WIKI_PAGE);
-		ArgumentCaptor<String> confirmMessageCaptor = ArgumentCaptor.forClass(String.class);
-		verify(mockView).showConfirmDialog(anyString(), confirmMessageCaptor.capture(), any(Callback.class));
-		//verify confirmation message contains the wiki title being deleted
-		assertTrue(confirmMessageCaptor.getValue().contains(wikiPageId));
-	}
-	
-	@Test
-	public void testOnDeleteWikiPageEmptyTitle(){
-		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
-		// the call under test
-		when(mockWikiPageToDelete.getTitle()).thenReturn("");
-		controller.onAction(Action.DELETE_WIKI_PAGE);
-		ArgumentCaptor<String> confirmMessageCaptor = ArgumentCaptor.forClass(String.class);
-		verify(mockView).showConfirmDialog(anyString(), confirmMessageCaptor.capture(), any(Callback.class));
-		//verify confirmation message contains the wiki title being deleted
-		assertTrue(confirmMessageCaptor.getValue().contains(wikiPageId));
-	}
-	
-	@Test
 	public void testOnDeleteWikiPageConfirmedDeleteSuccess(){
-		// confirm the delete
-		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(parentWikiPageId);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		
-		/*
-		 * The preflight check is confirmed by calling Callback.invoke(), in this case it must not be invoked.
-		 */
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
-		// the call under test
 		controller.onAction(Action.DELETE_WIKI_PAGE);
-		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		// did not make it to the delete wiki page call
+		verify(mockSynapseClient, never()).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		
+		controller.onConfirmDeleteWiki();
+		
 		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockView).showInfo(DELETED, THE + WIKI + WAS_SUCCESSFULLY_DELETED);
 		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.WIKI, parentWikiPageId) );

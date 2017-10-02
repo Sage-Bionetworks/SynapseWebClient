@@ -74,8 +74,6 @@ import com.google.inject.Inject;
 
 public class EntityActionControllerImpl implements EntityActionController, ActionListener, EntityActionControllerView.Presenter {
 	
-	public static final String THE_ROOT_WIKI_PAGE_AND_ALL_SUBPAGES = "the root wiki page and all subpages?";
-
 	public static final String MOVE_PREFIX = "Move ";
 
 	public static final String EDIT_WIKI_PREFIX = "Edit ";
@@ -1174,6 +1172,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 		return id2Header;
 	}
+	
 	public Map<String, List<V2WikiHeader>> getWikiChildrenMap(List<V2WikiHeader> wikiHeaders) {
 		Map<String, List<V2WikiHeader>> id2Children = new HashMap<>();
 		for (V2WikiHeader v2WikiHeader : wikiHeaders) {
