@@ -334,8 +334,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigViewImpl;
-import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigView;
-import org.sagebionetworks.web.client.widget.entity.editor.BookmarkConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigView;
@@ -386,8 +384,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetView;
-import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsView;
@@ -1042,7 +1038,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WidgetRegistrar.class).to(WidgetRegistrarImpl.class);
 		
 		// UI Widget Descriptor editor
-		bind(BookmarkConfigView.class).to(BookmarkConfigViewImpl.class);
 		bind(BaseEditWidgetDescriptorView.class).to(BaseEditWidgetDescriptorViewImpl.class);
 		bind(ReferenceConfigView.class).to(ReferenceConfigViewImpl.class);
 		bind(ImageConfigViewImpl.class).in(Singleton.class);
@@ -1061,7 +1056,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(TableQueryResultWikiView.class).to(TableQueryResultWikiViewImpl.class);
 		
 		// UI Widget Renderers
-		bind(BookmarkWidgetView.class).to(BookmarkWidgetViewImpl.class);
 		bind(ReferenceWidgetView.class).to(ReferenceWidgetViewImpl.class);
 		bind(EntityListWidgetView.class).to(EntityListWidgetViewImpl.class);
 		bind(ShinySiteWidgetView.class).to(ShinySiteWidgetViewImpl.class);		
