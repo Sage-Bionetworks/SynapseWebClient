@@ -13,6 +13,24 @@
 				<b:Button ui:field="okButton" type="PRIMARY"  dataDismiss="MODAL">OK</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
+		
+		<b:Modal ui:field="deleteWikiDialog" title="Confirm Delete" closable="true" dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
+			<b:ModalBody>
+				<bh:Div>
+					<bh:Span>Are you sure you want to delete the wiki page "</bh:Span>
+					<bh:Span ui:field="wikiPageTitle"/>
+					<bh:Span>" and all subpages?</bh:Span>
+					<bh:Div><bh:Text>The following wiki page(s) will be deleted:</bh:Text></bh:Div>
+					<bh:Div ui:field="wikiHeaderTreeContainer" addStyleNames="margin-top-20 margin-bottom-20"/>
+					<bh:Span>There is <bh:Span addStyleNames="text-danger boldText">NO UNDO</bh:Span> for deleting wiki pages; once deleted these pages cannot be recovered.</bh:Span>
+				</bh:Div>
+			</b:ModalBody>
+			<b:ModalFooter>
+				<b:Button ui:field="cancelDeleteWikiButton" type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button ui:field="deleteWikiButton" type="DANGER">Delete</b:Button>
+			</b:ModalFooter>
+		</b:Modal>
+		
 		<bh:Div ui:field="extraWidgetsContainer" />
 	</g:HTMLPanel>
 </ui:UiBinder>

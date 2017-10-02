@@ -1,5 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Challenge;
@@ -18,6 +23,7 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
@@ -66,10 +72,8 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityActionControllerImpl implements EntityActionController, ActionListener {
+public class EntityActionControllerImpl implements EntityActionController, ActionListener, EntityActionControllerView.Presenter {
 	
-	public static final String THE_ROOT_WIKI_PAGE_AND_ALL_SUBPAGES = "the root wiki page and all subpages?";
-
 	public static final String MOVE_PREFIX = "Move ";
 
 	public static final String EDIT_WIKI_PREFIX = "Edit ";
@@ -105,7 +109,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EditProjectMetadataModalWidget editProjectMetadataModalWidget;
 	
 	EntityBundle entityBundle;
-	String wikiPageId;
+	String wikiPageId, parentWikiPageId;
 	Entity entity;
 	UserEntityPermissions permissions;
 	String enityTypeDisplay;
@@ -141,6 +145,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.authenticationController = authenticationController;
 		this.cookies = cookies;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
+		view.setPresenter(this);
 	}
 	
 	private ApproveUserAccessModal getApproveUserAccessModal() {
@@ -1128,27 +1133,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	public void onDeleteWiki() {
-		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
+		final WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
 		// Get the wiki page title and parent wiki id.  Go to the parent wiki if this delete is successful.
 		getSynapseJavascriptClient().getV2WikiPage(key, new AsyncCallback<V2WikiPage>() {
 			@Override
 			public void onSuccess(V2WikiPage page) {
 				// Confirm the delete with the user.
-				final String parentWikiId = page.getParentWikiId();
-				String confirmMessage;
-				if (parentWikiId == null) {
-					confirmMessage = ARE_YOU_SURE_YOU_WANT_TO_DELETE+THE_ROOT_WIKI_PAGE_AND_ALL_SUBPAGES;
-				} else if (DisplayUtils.isDefined(page.getTitle())){
-					confirmMessage = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"the wiki page \""+page.getTitle()+"\" and all subpages?";
-				} else {
-					confirmMessage = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"the wiki page ID "+page.getId()+" and all subpages?";
-				}
-				view.showConfirmDialog(CONFIRM_DELETE_TITLE, confirmMessage, new Callback() {
-					@Override
-					public void invoke() {
-						postConfirmedDeleteWiki(parentWikiId);
-					}
-				});
+				parentWikiPageId = page.getParentWikiId();
+				onDeleteWikiGetHeaderTree(key, page.getTitle());
 			}
 			
 			@Override
@@ -1156,7 +1148,49 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				view.showErrorMessage(caught.getMessage());
 			}
 		});
-		
+	}
+	
+	public void onDeleteWikiGetHeaderTree(WikiPageKey key, final String currentPageTitle) {
+		getSynapseClient().getV2WikiHeaderTree(key.getOwnerObjectId(), key.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+			public void onSuccess(List<V2WikiHeader> wikiHeaders) {
+				view.showDeleteWikiModal(wikiPageId, getWikiHeaderMap(wikiHeaders), getWikiChildrenMap(wikiHeaders));		
+			};
+		});
+	}
+	public Map<String, V2WikiHeader> getWikiHeaderMap(List<V2WikiHeader> wikiHeaders) {
+		Map<String, V2WikiHeader> id2Header = new HashMap<>();
+		for (V2WikiHeader v2WikiHeader : wikiHeaders) {
+			if (v2WikiHeader.getParentId() == null) {
+				//update the root wiki title to be the entity name
+				v2WikiHeader.setTitle(entityBundle.getEntity().getName());
+			}
+			id2Header.put(v2WikiHeader.getId(), v2WikiHeader);
+		}
+		return id2Header;
+	}
+	
+	public Map<String, List<V2WikiHeader>> getWikiChildrenMap(List<V2WikiHeader> wikiHeaders) {
+		Map<String, List<V2WikiHeader>> id2Children = new HashMap<>();
+		for (V2WikiHeader v2WikiHeader : wikiHeaders) {
+			if (v2WikiHeader.getParentId() != null) {
+				List<V2WikiHeader> children = id2Children.get(v2WikiHeader.getParentId());
+				if (children == null) {
+					children = new ArrayList<>();
+					id2Children.put(v2WikiHeader.getParentId(), children);
+				}
+				children.add(v2WikiHeader);
+			}
+		}
+		return id2Children;
+	}
+	
+	@Override
+	public void onConfirmDeleteWiki() {
+		postConfirmedDeleteWiki(parentWikiPageId);
 	}
 
 	/**
