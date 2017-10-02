@@ -1,13 +1,7 @@
 package org.sagebionetworks.web.client;
 import static com.google.gwt.http.client.RequestBuilder.GET;
 import static com.google.gwt.http.client.RequestBuilder.POST;
-import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
-import static org.apache.http.HttpStatus.SC_FORBIDDEN;
-import static org.apache.http.HttpStatus.SC_GONE;
-import static org.apache.http.HttpStatus.SC_LOCKED;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static org.apache.http.HttpStatus.SC_PRECONDITION_FAILED;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.apache.http.HttpStatus.*;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
@@ -58,11 +52,13 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.LockedException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
@@ -246,6 +242,10 @@ public class SynapseJavascriptClient {
 			return new BadRequestException(reasonStr);
 		} else if (statusCode == TOO_MANY_REQUESTS_STATUS_CODE){
 			return new TooManyRequestsException(reasonStr);
+		} else if (statusCode == SC_SERVICE_UNAVAILABLE) {
+			return new SynapseDownException(reasonStr);
+		} else if (statusCode == SC_CONFLICT) {
+			return new ConflictException(reasonStr);
 		}else {
 			return new UnknownErrorException(reasonStr);
 		}
