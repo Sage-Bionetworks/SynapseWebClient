@@ -74,7 +74,8 @@ public class SynapseJavascriptFactory {
 		SubscriberPagedResults,
 		SubscriberCount,
 		BatchFileResult,
-		JSON
+		JSON,
+		None
 	}
 
 	/**

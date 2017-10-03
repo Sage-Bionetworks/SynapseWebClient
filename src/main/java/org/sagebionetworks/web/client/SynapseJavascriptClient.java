@@ -1,7 +1,16 @@
 package org.sagebionetworks.web.client;
+import static com.google.gwt.http.client.RequestBuilder.DELETE;
 import static com.google.gwt.http.client.RequestBuilder.GET;
 import static com.google.gwt.http.client.RequestBuilder.POST;
-import static org.apache.http.HttpStatus.*;
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.http.HttpStatus.SC_CONFLICT;
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
+import static org.apache.http.HttpStatus.SC_GONE;
+import static org.apache.http.HttpStatus.SC_LOCKED;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_PRECONDITION_FAILED;
+import static org.apache.http.HttpStatus.SC_SERVICE_UNAVAILABLE;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
@@ -164,6 +173,16 @@ public class SynapseJavascriptClient {
 		return fileServiceUrl;
 	}
 
+	private void doDelete(String url, AsyncCallback callback) {
+		requestBuilder.configure(DELETE, url);
+		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		if (authController.isLoggedIn()) {
+			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
+		}
+		sendRequest(url, null, OBJECT_TYPE.None, callback);
+	}
+
+	
 	private void doGet(String url, OBJECT_TYPE responseType, AsyncCallback callback) {
 		requestBuilder.configure(GET, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
@@ -193,8 +212,14 @@ public class SynapseJavascriptClient {
 					// if it's a 200 level response, it's OK
 					if (statusCode > 199 && statusCode < 300) {
 						try {
-							JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
-							callback.onSuccess(jsFactory.newInstance(responseType, jsonObject));
+							Object responseObject;
+							if (OBJECT_TYPE.None.equals(responseType)) {
+								responseObject = null;
+							} else {
+								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
+								responseObject = jsFactory.newInstance(responseType, jsonObject);
+							}
+							callback.onSuccess(responseObject);
 						} catch (JSONObjectAdapterException e) {
 							onError(null, e);
 						}
@@ -660,5 +685,16 @@ public class SynapseJavascriptClient {
 			callback.onFailure(e);
 		}
 	}
+	
+	public void deleteMembershipInvitation(String id, AsyncCallback<Void> callback) {
+		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + id;
+		doDelete(url, callback);
+	}
+	
+	public void deleteMembershipRequest(String id, AsyncCallback<Void> callback) {
+		String url = getRepoServiceUrl() + MEMBERSHIP_REQUEST + "/" + id;
+		doDelete(url, callback);
+	}
+
 }
 

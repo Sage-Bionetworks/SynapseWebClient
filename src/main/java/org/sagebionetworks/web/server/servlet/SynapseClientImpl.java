@@ -1648,17 +1648,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
 	}
-
-	@Override
-	public void deleteMembershipInvitation(String invitationId)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			synapseClient.deleteMembershipInvitation(invitationId);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
 	
 	@Override
 	public void setIsTeamAdmin(String currentUserId, String targetUserId,
