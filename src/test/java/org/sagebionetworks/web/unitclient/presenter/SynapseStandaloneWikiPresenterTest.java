@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.presenter.SynapseStandaloneWikiPresenter;
 import org.sagebionetworks.web.client.view.SynapseStandaloneWikiView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -36,14 +37,15 @@ public class SynapseStandaloneWikiPresenterTest {
 	WikiPageKey certificationWikiKey;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	SynapseAlert mockSynAlert;
 	
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(SynapseStandaloneWikiView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		presenter = new SynapseStandaloneWikiPresenter(mockView, mockSynapseClient, mockSynapseJavascriptClient);
-		verify(mockView).setPresenter(presenter);
+		presenter = new SynapseStandaloneWikiPresenter(mockView, mockSynapseClient, mockSynapseJavascriptClient, mockSynAlert);
 		
 		testPlace = new StandaloneWiki(token);
 		
@@ -65,8 +67,7 @@ public class SynapseStandaloneWikiPresenterTest {
 		//from the page place token, it has a valid wiki page alias that matches a result from the portal properties
 		//and it successfully asks for the target wiki page and hands the markdown to the view.
 		presenter.setPlace(testPlace);
-		verify(mockView).showLoading();
-		verify(mockView, never()).showErrorMessage(anyString());
+		verify(mockSynAlert, never()).showError(anyString());
 		verify(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		verify(mockView).configure(eq(wikiPageMarkdown), any(WikiPageKey.class));
@@ -81,8 +82,7 @@ public class SynapseStandaloneWikiPresenterTest {
 		testPlace = new StandaloneWiki(ownerId, ownerType, wikiId);
 		
 		presenter.setPlace(testPlace);
-		verify(mockView).showLoading();
-		verify(mockView, never()).showErrorMessage(anyString());
+		verify(mockSynAlert, never()).showError(anyString());
 		verify(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockSynapseClient, never()).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		verify(mockView).configure(eq(wikiPageMarkdown), any(WikiPageKey.class));
@@ -95,15 +95,15 @@ public class SynapseStandaloneWikiPresenterTest {
 	public void testSetPlaceEmptyToken() {
 		testPlace = new StandaloneWiki("");
 		presenter.setPlace(testPlace);
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).showError(anyString());
 	}
 	
 	@Test
 	public void testSetPlaceFailedToGetPageNameToWikiKeyMap() {
-		String error = "failed to get wikis aliases";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
+		Exception error = new Exception("failed to get wikis aliases");
+		AsyncMockStubber.callFailureWith(error).when(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
-		verify(mockView).showErrorMessage(error);
+		verify(mockSynAlert).handleException(error);
 	}
 	
 	@Test
@@ -111,13 +111,13 @@ public class SynapseStandaloneWikiPresenterTest {
 		token = "invalid alias";
 		testPlace = new StandaloneWiki(token);
 		presenter.setPlace(testPlace);
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).showError(anyString());
 	}
 	@Test
 	public void testSetPlaceFailedToGetWikiPage() {
-		String error = "failed to get wiki";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		Exception error = new Exception("failed to get wiki");
+		AsyncMockStubber.callFailureWith(error).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.setPlace(testPlace);
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(error);
 	}
 }
