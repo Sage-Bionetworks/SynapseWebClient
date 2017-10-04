@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client;
-import static com.google.gwt.http.client.RequestBuilder.GET;
-import static com.google.gwt.http.client.RequestBuilder.POST;
+import static com.google.gwt.http.client.RequestBuilder.*;
 import static org.apache.http.HttpStatus.*;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
@@ -62,7 +61,6 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
-
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
@@ -132,7 +130,7 @@ public class SynapseJavascriptClient {
 	public static final String OFFSET_PARAMETER = "offset=";
 	public static final String LIMIT_PARAMETER = "limit=";
 	private static final String NEXT_PAGE_TOKEN_PARAM = "nextPageToken=";
-	
+	public static final String SKIP_TRASH_CAN_PARAM = "skipTrashCan";
 	public String repoServiceUrl,fileServiceUrl; 
 	
 	@Inject
@@ -164,6 +162,16 @@ public class SynapseJavascriptClient {
 		return fileServiceUrl;
 	}
 
+	private void doDelete(String url, AsyncCallback callback) {
+		requestBuilder.configure(DELETE, url);
+		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		if (authController.isLoggedIn()) {
+			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
+		}
+		sendRequest(url, null, OBJECT_TYPE.None, callback);
+	}
+
+	
 	private void doGet(String url, OBJECT_TYPE responseType, AsyncCallback callback) {
 		requestBuilder.configure(GET, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
@@ -193,8 +201,14 @@ public class SynapseJavascriptClient {
 					// if it's a 200 level response, it's OK
 					if (statusCode > 199 && statusCode < 300) {
 						try {
-							JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
-							callback.onSuccess(jsFactory.newInstance(responseType, jsonObject));
+							Object responseObject;
+							if (OBJECT_TYPE.None.equals(responseType)) {
+								responseObject = null;
+							} else {
+								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
+								responseObject = jsFactory.newInstance(responseType, jsonObject);
+							}
+							callback.onSuccess(responseObject);
 						} catch (JSONObjectAdapterException e) {
 							onError(null, e);
 						}
@@ -226,28 +240,29 @@ public class SynapseJavascriptClient {
 	}
 	
 	public static RestServiceException getException(int statusCode, String reasonStr) {
-		if (statusCode == SC_UNAUTHORIZED) {
-			return new UnauthorizedException(reasonStr);
-		} else if (statusCode == SC_FORBIDDEN) {
-			return new ForbiddenException(reasonStr);
-		} else if (statusCode == SC_NOT_FOUND) {
-			return new NotFoundException(reasonStr);
-		} else if (statusCode == SC_BAD_REQUEST) {
-			return new BadRequestException(reasonStr);
-		} else if (statusCode == SC_LOCKED) {
-			return new LockedException(reasonStr);
-		} else if (statusCode == SC_PRECONDITION_FAILED) {
-			return new ConflictingUpdateException(reasonStr);
-		} else if (statusCode == SC_GONE) {
-			return new BadRequestException(reasonStr);
-		} else if (statusCode == TOO_MANY_REQUESTS_STATUS_CODE){
-			return new TooManyRequestsException(reasonStr);
-		} else if (statusCode == SC_SERVICE_UNAVAILABLE) {
-			return new SynapseDownException(reasonStr);
-		} else if (statusCode == SC_CONFLICT) {
-			return new ConflictException(reasonStr);
-		}else {
-			return new UnknownErrorException(reasonStr);
+		switch (statusCode) {
+			case SC_UNAUTHORIZED :
+				return new UnauthorizedException(reasonStr);
+			case SC_FORBIDDEN :
+				return new ForbiddenException(reasonStr);
+			case SC_NOT_FOUND :
+				return new NotFoundException(reasonStr);
+			case SC_BAD_REQUEST :
+				return new BadRequestException(reasonStr);
+			case SC_LOCKED :
+				return new LockedException(reasonStr);
+			case SC_PRECONDITION_FAILED :
+				return new ConflictingUpdateException(reasonStr);
+			case SC_GONE : 
+				return new BadRequestException(reasonStr);
+			case TOO_MANY_REQUESTS_STATUS_CODE :
+				return new TooManyRequestsException(reasonStr);
+			case SC_SERVICE_UNAVAILABLE :
+				return new SynapseDownException(reasonStr);
+			case SC_CONFLICT :
+				return new ConflictException(reasonStr);
+			default :
+				return new UnknownErrorException(reasonStr);
 		}
 	}
 
@@ -660,5 +675,26 @@ public class SynapseJavascriptClient {
 			callback.onFailure(e);
 		}
 	}
+	
+	public void deleteMembershipInvitation(String id, AsyncCallback<Void> callback) {
+		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + id;
+		doDelete(url, callback);
+	}
+	
+	public void deleteMembershipRequest(String id, AsyncCallback<Void> callback) {
+		String url = getRepoServiceUrl() + MEMBERSHIP_REQUEST + "/" + id;
+		doDelete(url, callback);
+	}
+	public void deleteEntityById(String id, AsyncCallback<Void> callback) {
+		deleteEntityById(id, false, callback);
+	}
+	public void deleteEntityById(String id, boolean skipTrash, AsyncCallback<Void> callback) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + id;
+		if (skipTrash) {
+			url = url + "?" + SKIP_TRASH_CAN_PARAM + "=true";
+		}
+		doDelete(url, callback);
+	}
+
 }
 

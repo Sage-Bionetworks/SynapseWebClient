@@ -15,12 +15,14 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -41,8 +43,9 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityBadge implements SynapseWidgetPresenter {
+public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Presenter {
 	
+	public static final String LINK_SUCCESSFULLY_DELETED = "Successfully removed link";
 	private EntityBadgeView view;
 	private GlobalApplicationState globalAppState;
 	private EntityHeader entityHeader;
@@ -52,7 +55,7 @@ public class EntityBadge implements SynapseWidgetPresenter {
 	private FileDownloadButton fileDownloadButton;
 	private LazyLoadHelper lazyLoadHelper;
 	private DateTimeUtils dateTimeUtils;
-	
+	private PopupUtilsView popupUtils;
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
@@ -61,7 +64,8 @@ public class EntityBadge implements SynapseWidgetPresenter {
 			SynapseJavascriptClient jsClient,
 			FileDownloadButton fileDownloadButton,
 			LazyLoadHelper lazyLoadHelper,
-			DateTimeUtils dateTimeUtils) {
+			DateTimeUtils dateTimeUtils,
+			PopupUtilsView popupUtils) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
@@ -70,6 +74,7 @@ public class EntityBadge implements SynapseWidgetPresenter {
 		this.jsClient = jsClient;
 		this.fileDownloadButton = fileDownloadButton;
 		this.lazyLoadHelper = lazyLoadHelper;
+		this.popupUtils = popupUtils;
 		view.setModifiedByWidget(modifiedByUserBadge.asWidget());
 		Callback loadDataCallback = new Callback() {
 			@Override
@@ -86,6 +91,7 @@ public class EntityBadge implements SynapseWidgetPresenter {
 				getEntityBundle();
 			}
 		});
+		view.setPresenter(this);
 	}
 	
 	public void getEntityBundle() {
@@ -126,7 +132,9 @@ public class EntityBadge implements SynapseWidgetPresenter {
 			view.showAnnotationsIcon();
 			view.setAnnotations(getAnnotationsHTML(annotationList));
 		}
-		
+		if (eb.getEntity() instanceof Link && eb.getPermissions().getCanDelete()) {
+			view.showUnlinkIcon();
+		}
 		view.setSize(getContentSize(handles));
 		view.setMd5(getContentMd5(handles));
 		if (PublicPrivateBadge.isPublic(eb.getBenefactorAcl(), globalAppState.getPublicPrincipalIds())) {
@@ -238,5 +246,21 @@ public class EntityBadge implements SynapseWidgetPresenter {
 	
 	public String getEntityId() {
 		return entityHeader.getId();
+	}
+	
+	@Override
+	public void onUnlink() {
+		// delete this Link
+		jsClient.deleteEntityById(getEntityId(), new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				popupUtils.showErrorMessage(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(Void result) {
+				popupUtils.showInfo(LINK_SUCCESSFULLY_DELETED, "");
+				globalAppState.refreshPage();
+			}
+		});
 	}
 }

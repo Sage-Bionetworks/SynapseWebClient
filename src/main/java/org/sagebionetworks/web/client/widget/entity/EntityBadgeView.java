@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -34,11 +35,15 @@ public interface EntityBadgeView extends IsWidget, SynapseView, SupportsLazyLoad
 	void showSharingSetIcon();
 	void showHasWikiIcon();
 	void showAnnotationsIcon();
+	void showUnlinkIcon();
 	void setError(String error);
 	void showErrorIcon();
-	
+	void setPresenter(Presenter p);
 	String getFriendlySize(Long contentSize, boolean b);
 
 	void setDiscussionThreadIconVisible(boolean visible);
+	public interface Presenter {
+		void onUnlink();
+	}
 
 }

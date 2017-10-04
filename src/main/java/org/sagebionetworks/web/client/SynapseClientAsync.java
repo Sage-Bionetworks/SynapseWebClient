@@ -104,10 +104,6 @@ public interface SynapseClientAsync {
 	void getEntityHeaderBatch(ReferenceList referenceList,
 			AsyncCallback<PaginatedResults<EntityHeader>> callback);
 
-	void deleteEntityById(String entityId, AsyncCallback<Void> callback);
-	
-	void deleteEntityById(String entityId, Boolean skipTrashCan, AsyncCallback<Void> callback);
-
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void getUserProfile(String userId, AsyncCallback<UserProfile> callback);
@@ -195,7 +191,6 @@ public interface SynapseClientAsync {
 	void getOpenInvitations(String userId, AsyncCallback<ArrayList<OpenUserInvitationBundle>> callback);
 	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<ArrayList<OpenTeamInvitationBundle>> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
-	void deleteMembershipInvitation(String invitationId, AsyncCallback<Void> callback);
 	void updateTeam(Team team, AccessControlList teamAcl, AsyncCallback<Team> callback);
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	

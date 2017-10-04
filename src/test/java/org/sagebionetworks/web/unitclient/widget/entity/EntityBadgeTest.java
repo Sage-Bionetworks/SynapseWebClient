@@ -8,7 +8,6 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -33,6 +32,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
@@ -45,9 +45,9 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
@@ -102,6 +102,9 @@ public class EntityBadgeTest {
 	DateTimeUtils mockDateTimeUtils;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	PopupUtilsView mockPopupUtils;
+	
 	@Captor
 	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
 	
@@ -124,7 +127,7 @@ public class EntityBadgeTest {
 		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
 				mockUserBadge, mockSynapseJavascriptClient,
 				mockFileDownloadButton, mockLazyLoadHelper,
-				mockDateTimeUtils);
+				mockDateTimeUtils, mockPopupUtils);
 		
 		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		annotationList = new ArrayList<Annotation>();
@@ -316,6 +319,67 @@ public class EntityBadgeTest {
 		widget.setEntityBundle(bundle);
 		verify(mockView).showPrivateIcon();
 	}
+	
+	@Test
+	public void testCanUnlink() {
+		configure();
+		EntityBundle bundle = setupEntity(new Link());
+		when(mockPermissions.getCanDelete()).thenReturn(true);
+		
+		widget.setEntityBundle(bundle);
+		verify(mockView).showUnlinkIcon();
+	}
+
+	@Test
+	public void testUnlinkCannotDeletePermission() {
+		configure();
+		EntityBundle bundle = setupEntity(new Link());
+		when(mockPermissions.getCanDelete()).thenReturn(false);
+		
+		widget.setEntityBundle(bundle);
+		verify(mockView, never()).showUnlinkIcon();
+	}
+	
+	@Test
+	public void testUnlinkNotALink() {
+		configure();
+		EntityBundle bundle = setupEntity(new Project());
+		when(mockPermissions.getCanDelete()).thenReturn(true);
+		
+		widget.setEntityBundle(bundle);
+		verify(mockView, never()).showUnlinkIcon();
+	}
+	
+	@Test
+	public void testOnUnlink() {
+		//simulate successful delete of Link entity
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		configure();
+		EntityBundle bundle = setupEntity(new Link());
+		when(mockPermissions.getCanDelete()).thenReturn(true);
+		widget.setEntityBundle(bundle);
+		
+		widget.onUnlink();
+		verify(mockSynapseJavascriptClient).deleteEntityById(eq(entityId), any(AsyncCallback.class));
+		verify(mockPopupUtils).showInfo(EntityBadge.LINK_SUCCESSFULLY_DELETED, "");
+	}
+	
+	@Test
+	public void testOnUnlinkFailure() {
+		//simulate failure to delete of Link entity
+		String errorMessage = "error occurred";
+		Exception ex = new Exception(errorMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		configure();
+		EntityBundle bundle = setupEntity(new Link());
+		when(mockPermissions.getCanDelete()).thenReturn(true);
+		widget.setEntityBundle(bundle);
+		
+		widget.onUnlink();
+		verify(mockSynapseJavascriptClient).deleteEntityById(eq(entityId), any(AsyncCallback.class));
+		verify(mockPopupUtils).showErrorMessage(errorMessage);
+	}
+
 	
 	@Test
 	public void testLocalSharingSettings() throws Exception {

@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
@@ -25,6 +26,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	private OpenUserInvitationsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private String teamId;
 	private Callback teamRefreshCallback;
 	private Integer currentOffset;
@@ -40,7 +42,8 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 			GlobalApplicationState globalApplicationState,
 			SynapseAlert synAlert,
 			GWTWrapper gwt,
-			DateTimeUtils dateTimeUtils) {
+			DateTimeUtils dateTimeUtils,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.gwt = gwt;
@@ -49,6 +52,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		view.setSynAlert(synAlert);
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
+		this.jsClient = jsClient;
 	}
 	
 	public void clear() {
@@ -59,7 +63,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	public void removeInvitation(String invitationId) {
 		gwt.saveWindowPosition();
 		synAlert.clear();
-		synapseClient.deleteMembershipInvitation(invitationId, new AsyncCallback<Void>() {
+		jsClient.deleteMembershipInvitation(invitationId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				teamRefreshCallback.invoke();
