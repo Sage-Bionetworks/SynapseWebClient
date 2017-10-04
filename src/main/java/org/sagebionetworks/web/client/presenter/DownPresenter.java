@@ -22,6 +22,8 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class DownPresenter extends AbstractActivity implements Presenter<Down> {
+	//check back every 15s if down.
+	public static final int DELAY = 15000;
 	private DownView view;
 	GWTWrapper gwt;
 	GlobalApplicationState globalAppState;
@@ -49,7 +51,7 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 		jsClient.listUserProfiles(Collections.singletonList("-1"), new AsyncCallback<List<UserProfile>>() {
 			@Override
 			public void onSuccess(List<UserProfile> result) {
-				globalAppState.gotoLastPlace();
+				repoIsUp();
 			}
 			
 			@Override
@@ -73,7 +75,7 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 	}
 	
 	public void scheduleRepoDownCheck() {
-		gwt.scheduleExecution(checkForRepoDownCallback, 15000);
+		gwt.scheduleExecution(checkForRepoDownCallback, DELAY);
 	}
 	
 	@Override

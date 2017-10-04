@@ -100,6 +100,7 @@ public class SynapseJavascriptClient {
 	public static final String FILE_HANDLE_BATCH = "/fileHandle/batch";
 	public static final String THREAD_COUNTS = "/threadcounts";
 	public static final String ENTITY_THREAD_COUNTS = ENTITY + THREAD_COUNTS;
+	public static final String STATUS = "/admin/synapse/status";
 	
 	public static final int RETRY_REQUEST_DELAY_MS = 2000;
 	RequestBuilderWrapper requestBuilder;
@@ -227,13 +228,7 @@ public class SynapseJavascriptClient {
 						} else {
 							// getException() based on status code, 
 							// instead of using org.sagebionetworks.client.ClientUtils.throwException() and ExceptionUtil.convertSynapseException() (neither of which can be referenced here)
-							String reason = response.getStatusText();
-							try {
-								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
-								reason = jsonObject.getString("reason");
-							} catch (Throwable ex) {
-							}
-							onError(request, getException(statusCode, reason));
+							onError(request, getException(statusCode, response.getStatusText()));
 						}
 					}
 				}

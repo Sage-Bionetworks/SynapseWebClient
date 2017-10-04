@@ -4,7 +4,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.HttpStatus;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseClientException;
 import org.sagebionetworks.client.exceptions.SynapseConflictingUpdateException;
@@ -49,14 +48,7 @@ public class ExceptionUtil {
 			if (sse.getStatusCode()==HttpStatus.SC_CONFLICT) {
 				return new ConflictException(ex.getMessage());
 			} else if (sse.getStatusCode()==HttpStatus.SC_SERVICE_UNAVAILABLE) {
-				// try to get the reason out of the message
-				String reason = ex.getMessage();
-				try {
-					JSONObject json = new JSONObject(reason);
-					reason = json.getString("reason");
-				} catch(Throwable th) {
-				}
-				return new SynapseDownException(reason);
+				return new SynapseDownException(ex.getMessage());
 			}
 		} else if (ex instanceof JSONException) {
 			return new BadRequestException("The Synapse web client is calling a Synapse backend service that's not available!");
