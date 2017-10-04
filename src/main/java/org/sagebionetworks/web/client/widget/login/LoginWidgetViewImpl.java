@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.login;
 
+import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
+import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -51,10 +53,12 @@ public class LoginWidgetViewImpl extends Composite implements
 	TextBox username = null;
 	
 	private Presenter presenter;
+	JSONObjectAdapter jsonAdapter;
 	
 	@Inject
-	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder) {
+	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, JSONObjectAdapter jsonAdapter) {
 		initWidget(binder.createAndBindUi(this));
+		this.jsonAdapter = jsonAdapter;
 		final FormPanel form = new FormPanel();
 		form.setAction("/expect_405");
 		signInBtn = new SubmitButton();
@@ -134,7 +138,14 @@ public class LoginWidgetViewImpl extends Composite implements
 
 	@Override
 	public void showError(String message) {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">"+SafeHtmlUtils.htmlEscapeAllowEntities(message)+"</h4>");
+		String displayMessage = message;
+		//Try to parse json and get the "reason" key value. If it doesn't parse properly, use the original message. 
+		try {
+			JSONObjectAdapter json = jsonAdapter.createNew(message);
+			displayMessage = json.getString("reason");
+		} catch (JSONObjectAdapterException e) {
+		}
+		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">"+SafeHtmlUtils.htmlEscapeAllowEntities(displayMessage)+"</h4>");
 		clear();
 	}
 

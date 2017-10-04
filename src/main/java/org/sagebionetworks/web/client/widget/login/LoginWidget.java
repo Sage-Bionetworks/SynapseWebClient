@@ -65,9 +65,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 				view.clear();
 				if(caught instanceof ReadOnlyModeException) {
 					view.showError(DisplayConstants.LOGIN_READ_ONLY_MODE);
-				} else if(caught instanceof SynapseDownException) {
-					view.showError(DisplayConstants.LOGIN_DOWN_MODE);
-				} else if(caught instanceof LockedException) {
+				} else if(caught instanceof LockedException || caught instanceof SynapseDownException) {
 					view.showError(caught.getMessage());
 				} else {
 					synapseJsniUtils.consoleError(caught.getMessage());
