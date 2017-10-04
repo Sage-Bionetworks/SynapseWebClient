@@ -321,7 +321,7 @@ public class EntityBadgeTest {
 	}
 	
 	@Test
-	public void testCanUnlink() throws Exception {
+	public void testCanUnlink() {
 		configure();
 		EntityBundle bundle = setupEntity(new Link());
 		when(mockPermissions.getCanDelete()).thenReturn(true);
@@ -331,7 +331,7 @@ public class EntityBadgeTest {
 	}
 
 	@Test
-	public void testUnlinkCannotDeletePermission() throws Exception {
+	public void testUnlinkCannotDeletePermission() {
 		configure();
 		EntityBundle bundle = setupEntity(new Link());
 		when(mockPermissions.getCanDelete()).thenReturn(false);
@@ -341,7 +341,7 @@ public class EntityBadgeTest {
 	}
 	
 	@Test
-	public void testUnlinkNotALink() throws Exception {
+	public void testUnlinkNotALink() {
 		configure();
 		EntityBundle bundle = setupEntity(new Project());
 		when(mockPermissions.getCanDelete()).thenReturn(true);
@@ -349,6 +349,37 @@ public class EntityBadgeTest {
 		widget.setEntityBundle(bundle);
 		verify(mockView, never()).showUnlinkIcon();
 	}
+	
+	@Test
+	public void testOnUnlink() {
+		//simulate successful delete of Link entity
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		configure();
+		EntityBundle bundle = setupEntity(new Link());
+		when(mockPermissions.getCanDelete()).thenReturn(true);
+		widget.setEntityBundle(bundle);
+		
+		widget.onUnlink();
+		verify(mockSynapseJavascriptClient).deleteEntityById(eq(entityId), any(AsyncCallback.class));
+		verify(mockPopupUtils).showInfo(EntityBadge.LINK_SUCCESSFULLY_DELETED, "");
+	}
+	
+	@Test
+	public void testOnUnlinkFailure() {
+		//simulate failure to delete of Link entity
+		String errorMessage = "error occurred";
+		Exception ex = new Exception(errorMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		configure();
+		EntityBundle bundle = setupEntity(new Link());
+		when(mockPermissions.getCanDelete()).thenReturn(true);
+		widget.setEntityBundle(bundle);
+		
+		widget.onUnlink();
+		verify(mockSynapseJavascriptClient).deleteEntityById(eq(entityId), any(AsyncCallback.class));
+		verify(mockPopupUtils).showErrorMessage(errorMessage);
+	}
+
 	
 	@Test
 	public void testLocalSharingSettings() throws Exception {

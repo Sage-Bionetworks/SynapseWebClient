@@ -45,6 +45,7 @@ import com.google.inject.Inject;
 
 public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Presenter {
 	
+	public static final String LINK_SUCCESSFULLY_DELETED = "Successfully removed link";
 	private EntityBadgeView view;
 	private GlobalApplicationState globalAppState;
 	private EntityHeader entityHeader;
@@ -257,7 +258,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			}
 			@Override
 			public void onSuccess(Void result) {
-				popupUtils.showInfo("Successfully removed link", "");
+				popupUtils.showInfo(LINK_SUCCESSFULLY_DELETED, "");
 				globalAppState.refreshPage();
 			}
 		});
