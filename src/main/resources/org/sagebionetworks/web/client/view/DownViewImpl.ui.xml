@@ -10,8 +10,7 @@
 	  				<b:Image responsive="true" addStyleNames="align-center margin-bottom-40 margin-top-20" url="https://s3.amazonaws.com/static.synapse.org/stu/asleep-sm.png"/>
 	  			</b:Column>
   				<b:Column size="XS_12">
-  					<b:Heading size="H3" alignment="CENTER" text="Synapse is down for maintenance." />
-  					<b:Heading size="H3" alignment="CENTER" addStyleNames="margin-bottom-40" subText="Sad but true. We'll be back as soon as possible." />
+  					<b:Heading ui:field="messageHeading" size="H3" alignment="CENTER" text="Synapse is down for maintenance." />
   				</b:Column>
   			</b:Row>
   		</bh:Div>

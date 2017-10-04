@@ -153,7 +153,7 @@ public class DisplayUtils {
 		if (displayUtilsLogger != null && ex != null)
 			displayUtilsLogger.log(Level.SEVERE, ex.getMessage());
 		if(ex instanceof ReadOnlyModeException || ex instanceof SynapseDownException) {
-			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
+			globalApplicationState.getPlaceChanger().goTo(new Down(ex.getMessage()));
 			return true;
 		} else if(ex instanceof UnauthorizedException) {
 			// send user to login page						
@@ -192,7 +192,7 @@ public class DisplayUtils {
 			view.showErrorMessage(DisplayConstants.SYNAPSE_IN_READ_ONLY_MODE);
 			return true;
 		} else if(caught instanceof SynapseDownException) {
-			placeChanger.goTo(new Down(DEFAULT_PLACE_TOKEN));
+			placeChanger.goTo(new Down(caught.getMessage()));
 			return true;
 		}
 		return false;

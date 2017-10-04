@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
-import static com.google.gwt.http.client.RequestBuilder.*;
+import static com.google.gwt.http.client.RequestBuilder.DELETE;
+import static com.google.gwt.http.client.RequestBuilder.GET;
+import static com.google.gwt.http.client.RequestBuilder.POST;
 import static org.apache.http.HttpStatus.*;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
@@ -61,6 +63,7 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
@@ -224,7 +227,13 @@ public class SynapseJavascriptClient {
 						} else {
 							// getException() based on status code, 
 							// instead of using org.sagebionetworks.client.ClientUtils.throwException() and ExceptionUtil.convertSynapseException() (neither of which can be referenced here)
-							onError(request, getException(statusCode, response.getStatusText()));
+							String reason = response.getStatusText();
+							try {
+								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
+								reason = jsonObject.getString("reason");
+							} catch (Throwable ex) {
+							}
+							onError(request, getException(statusCode, reason));
 						}
 					}
 				}

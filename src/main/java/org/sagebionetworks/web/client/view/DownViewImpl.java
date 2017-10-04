@@ -1,16 +1,17 @@
 package org.sagebionetworks.web.client.view;
 
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DownViewImpl implements DownView {
-	private Presenter presenter;
 	private Header headerWidget;
-	
+	@UiField
+	Heading messageHeading;
 	public interface Binder extends UiBinder<Widget, DownViewImpl> {}
 	Widget widget;
 	
@@ -23,35 +24,18 @@ public class DownViewImpl implements DownView {
 	}
 
 	@Override
-	public void setPresenter(Presenter loginPresenter) {
-		this.presenter = loginPresenter;
+	public void init() {
 		headerWidget.configure(false);
 		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}
 	
+	@Override
+	public void setMessage(String message) {
+		messageHeading.setText(message);
+	}
 	
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-
-	@Override
-	public void showLoading() {
-	}
-
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-	}
-
 	@Override
 	public Widget asWidget() {
 		return widget;
 	}
-	
-	@Override
-	public void clear() {
-	}
-	
 }

@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
-
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -37,6 +35,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	PortalGinInjector ginInjector;
 	Throwable ex;
 	UserListener reloadOnLoginListener;
+	GWTWrapper gwt;
 	@Inject
 	public SynapseAlertImpl(
 			SynapseAlertView view,
@@ -49,6 +48,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		this.globalApplicationState = globalApplicationState;
 		this.authController = authController;
 		this.ginInjector = ginInjector;
+		this.gwt = gwt;
 		view.setPresenter(this);
 		view.clearState();
 		
@@ -77,7 +77,8 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 				view.showError(SERVER_STATUS_CODE_MESSAGE + sce.getStatusCode());
 			}
 		} else if(ex instanceof ReadOnlyModeException || ex instanceof SynapseDownException) {
-			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
+			String message = ex.getMessage();
+			globalApplicationState.getPlaceChanger().goTo(new Down(gwt.encodeQueryString(message)));
 		} else if(ex instanceof UnauthorizedException) {
 			// send user to login page
 			// invalid session token.  log out user and send to login place

@@ -4,12 +4,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.StandaloneWiki;
 import org.sagebionetworks.web.client.view.SynapseStandaloneWikiView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -18,18 +18,21 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class SynapseStandaloneWikiPresenter extends AbstractActivity implements SynapseStandaloneWikiView.Presenter, Presenter<StandaloneWiki> {
+public class SynapseStandaloneWikiPresenter extends AbstractActivity implements Presenter<StandaloneWiki> {
 
 	private SynapseStandaloneWikiView view;
 	private SynapseClientAsync synapseClient;
 	private Map<String, WikiPageKey> pageName2WikiKeyMap;
 	private SynapseJavascriptClient jsClient;
+	private SynapseAlert synAlert;
+	
 	@Inject
-	public SynapseStandaloneWikiPresenter(SynapseStandaloneWikiView view, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient){
+	public SynapseStandaloneWikiPresenter(SynapseStandaloneWikiView view, SynapseClientAsync synapseClient, SynapseJavascriptClient jsClient, SynapseAlert synAlert){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.jsClient = jsClient;
-		view.setPresenter(this);
+		this.synAlert = synAlert;
+		view.setSynAlert(synAlert);
 	}
 
 	@Override
@@ -40,10 +43,10 @@ public class SynapseStandaloneWikiPresenter extends AbstractActivity implements 
 	
 	@Override
 	public void setPlace(StandaloneWiki place) {
-		view.showLoading();
+		synAlert.clear();
 		final String token = place.toToken();
 		if (!DisplayUtils.isDefined(token)) {
-			view.showErrorMessage("No wiki alias or key given.");
+			synAlert.showError("No wiki alias or key given.");
 			return;
 		}
 		//Is this a wiki page key?  If not, treat it like an wiki page alias
@@ -62,7 +65,7 @@ public class SynapseStandaloneWikiPresenter extends AbstractActivity implements 
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					view.showErrorMessage(caught.getMessage());
+					synAlert.handleException(caught);
 				}
 			});
 		} else {
@@ -75,11 +78,12 @@ public class SynapseStandaloneWikiPresenter extends AbstractActivity implements 
 		if (key != null) {
 			configure(key);
 		} else {
-			view.showErrorMessage("Wiki alias not found: " + alias);
+			synAlert.showError("Wiki alias not found: " + alias);
 		}
 	}
 	
 	public void configure(final WikiPageKey wikiKey) {
+		synAlert.clear();
 		jsClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage result) {
@@ -87,14 +91,13 @@ public class SynapseStandaloneWikiPresenter extends AbstractActivity implements 
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_FAILED+caught.getMessage());
+				synAlert.handleException(caught);
 			}
 		});
 	}
 	
 	@Override
     public String mayStop() {
-        view.clear();
         return null;
     }
 }
