@@ -459,27 +459,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public void deleteEntityById(String entityId) throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			synapseClient.deleteEntityById(entityId);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public void deleteEntityById(String entityId, Boolean skipTrashCan)
-			throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			synapseClient.deleteEntityById(entityId, skipTrashCan);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
 	public void deleteEntityVersionById(String entityId, Long versionNumber)
 			throws RestServiceException {
 		try {

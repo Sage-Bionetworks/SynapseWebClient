@@ -33,6 +33,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	SynapseJSNIUtils synapseJSNIUtils;
 	SageImageBundle sageImageBundle;
 	Widget modifiedByWidget;
+	Presenter presenter;
 	public interface Binder extends UiBinder<Widget, EntityBadgeViewImpl> {	}
 	
 	@UiField
@@ -74,6 +75,8 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Icon discussionIcon;
 	@UiField
 	Tooltip discussion;
+	@UiField
+	Icon unLinkIcon;
 	Callback onAttachCallback;
 	Anchor entityAnchor;
 	
@@ -97,8 +100,19 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 				md5Field.selectAll();
 			}
 		});
+		unLinkIcon.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onUnlink();
+			}
+		});
 	}
 
+	@Override
+	public void setPresenter(Presenter p) {
+		this.presenter = p;
+	}
+	
 	@Override
 	public void setOnAttachCallback(Callback onAttachCallback) {
 		this.onAttachCallback = onAttachCallback;
@@ -269,8 +283,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public void setDiscussionThreadIconVisible(boolean visible){
 		discussionIcon.setVisible(visible);
 	}
-	/*
-	 * Private Methods
-	 */
+	@Override
+	public void showUnlinkIcon() {
+		unLinkIcon.setVisible(true);
+	}
+	
 
 }

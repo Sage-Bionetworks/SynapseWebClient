@@ -1249,7 +1249,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 */
 	public void postCheckDeleteEntity() {
 		final String entityId = this.entityBundle.getEntity().getId();
-		getSynapseClient().deleteEntityById(entityId, new AsyncCallback<Void>() {
+		getSynapseJavascriptClient().deleteEntityById(entityId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo(DELETED, THE + enityTypeDisplay + WAS_SUCCESSFULLY_DELETED); 

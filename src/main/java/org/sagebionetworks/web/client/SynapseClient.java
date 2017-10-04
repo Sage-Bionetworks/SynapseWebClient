@@ -79,10 +79,6 @@ public interface SynapseClient extends RemoteService{
 
 	public PaginatedResults<VersionInfo> getEntityVersions(String entityId, int offset, int limit) throws RestServiceException;
 
-	public void deleteEntityById(String entityId) throws RestServiceException;
-	
-	public void deleteEntityById(String entityId, Boolean skipTrashCan) throws RestServiceException;
-	
 	public void deleteEntityVersionById(String entityId, Long versionNumber) throws RestServiceException;
 	
 	public void restoreFromTrash(String entityId, String newParentId) throws RestServiceException;

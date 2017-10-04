@@ -17,9 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -106,11 +104,11 @@ public class FilesBrowserTest {
 	public void testDeleteFolder() throws Exception {
 		String id = "syn456";
 		boolean skipTrashCan = true;
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 
 		filesBrowser.setCurrentFolderEntityId(id);
 		filesBrowser.deleteFolder(skipTrashCan);
-		verify(mockSynapseClient).deleteEntityById(eq(id), eq(skipTrashCan), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).deleteEntityById(eq(id), eq(skipTrashCan), any(AsyncCallback.class));
 		verify(mockView).refreshTreeView(anyString());
 		verify(mockView).setNewFolderDialogVisible(false);
 	}
@@ -119,11 +117,11 @@ public class FilesBrowserTest {
 	@Test
 	public void testDeleteFolderFail() throws Exception {
 		String id = "syn456";
-		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception()).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 
 		filesBrowser.setCurrentFolderEntityId(id);
 		filesBrowser.deleteFolder(true);
-		verify(mockSynapseClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_FOLDER_DELETE_FAILED);
 		verify(mockView).setNewFolderDialogVisible(false);
 	}

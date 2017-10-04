@@ -831,7 +831,7 @@ public class EntityActionControllerImplTest {
 		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
 		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// Must not make it to the actual delete since preflight failed.
-		verify(mockSynapseClient, never()).deleteEntityById(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).deleteEntityById(anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -841,14 +841,14 @@ public class EntityActionControllerImplTest {
 		// confirm pre-flight
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		String error = "some error";
-		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		// the call under test
 		controller.onAction(Action.DELETE_ENTITY);
 		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
 		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// an attempt to delete should be made
-		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);
 	}
 	
@@ -858,14 +858,14 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
 		// confirm pre-flight
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true,wikiPageId, mockEntityUpdatedHandler);
 		// the call under test
 		controller.onAction(Action.DELETE_ENTITY);
 		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
 		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// an attempt to delete should be made
-		verify(mockSynapseClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(DELETED, THE + EntityTypeUtils.getDisplayName(EntityType.table) + WAS_SUCCESSFULLY_DELETED);
 		verify(mockPlaceChanger).goTo(new Synapse(parentId, null, EntityArea.TABLES, null) );
 	}
