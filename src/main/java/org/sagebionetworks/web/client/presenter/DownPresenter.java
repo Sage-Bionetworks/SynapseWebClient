@@ -78,11 +78,8 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 			}
 			
 			private void repoIsUp() {
-				if (globalAppState.getLastPlace() != null) {
-					globalAppState.gotoLastPlace();
-				} else {
-					globalAppState.getPlaceChanger().goTo(new Home(ClientProperties.DEFAULT_PLACE_TOKEN));
-				}
+				// note: if last place is not set then it will go to a default place.
+				globalAppState.gotoLastPlace();
 			}
 		});
 	}

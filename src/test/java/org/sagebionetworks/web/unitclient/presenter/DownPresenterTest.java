@@ -88,14 +88,6 @@ public class DownPresenterTest {
 	}
 	
 	@Test
-	public void testRepoUpNoLastPlace() {
-		// (note that the stack status has been set up to return READ_WRITE already
-		presenter.checkForRepoDown();
-		verify(mockPlaceChanger).goTo(placeCaptor.capture());
-		assertTrue(placeCaptor.getValue() instanceof Home);
-	}
-	
-	@Test
 	public void testRepoUpHasLastPlace() {
 		// (note that the stack status has been set up to return READ_WRITE already
 		when(mockGlobalAppState.getLastPlace()).thenReturn(mockLastPlace);
