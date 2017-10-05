@@ -101,7 +101,7 @@ public class SynapseJavascriptClient {
 	public static final String ENTITY_THREAD_COUNTS = ENTITY + THREAD_COUNTS;
 	public static final String STACK_STATUS = "/admin/synapse/status";
 	
-	public static final int RETRY_REQUEST_DELAY_MS = 5000;
+	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
 	JSONObjectAdapter jsonObjectAdapter;
@@ -171,7 +171,7 @@ public class SynapseJavascriptClient {
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(url, null, OBJECT_TYPE.None, callback);
+		sendRequest(url, null, OBJECT_TYPE.None, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 
 	
@@ -181,7 +181,7 @@ public class SynapseJavascriptClient {
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(url, null, responseType, callback);
+		sendRequest(url, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 	
 	private void doPost(String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
@@ -191,10 +191,10 @@ public class SynapseJavascriptClient {
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(url, requestData, responseType, callback);
+		sendRequest(url, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 	
-	private void sendRequest(final String url, final String requestData, final OBJECT_TYPE responseType, final AsyncCallback callback) {
+	private void sendRequest(final String url, final String requestData, final OBJECT_TYPE responseType, final int retryDelay, final AsyncCallback callback) {
 		try {
 			requestBuilder.sendRequest(requestData, new RequestCallback() {
 				@Override
@@ -222,9 +222,9 @@ public class SynapseJavascriptClient {
 							gwt.scheduleExecution(new Callback() {
 								@Override
 								public void invoke() {
-									sendRequest(url, requestData, responseType, callback);
+									sendRequest(url, requestData, responseType, retryDelay*2, callback);
 								}
-							}, RETRY_REQUEST_DELAY_MS);
+							}, retryDelay);
 						} else {
 							// getException() based on status code, 
 							// instead of using org.sagebionetworks.client.ClientUtils.throwException() and ExceptionUtil.convertSynapseException() (neither of which can be referenced here)
