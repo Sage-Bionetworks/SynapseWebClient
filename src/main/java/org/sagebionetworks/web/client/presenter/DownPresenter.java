@@ -17,8 +17,9 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class DownPresenter extends AbstractActivity implements Presenter<Down> {
+	public static final int SECOND_MS = 1000;
 	//check back every 10s if down.
-	public static final int DELAY = 10000;
+	public static final int DELAY_MS = 10000;
 	public int timeToNextRefresh;
 	private DownView view;
 	GWTWrapper gwt;
@@ -38,13 +39,13 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 		updateTimerCallback = new Callback() {
 			@Override
 			public void invoke() {
-				timeToNextRefresh -= 1000;
+				timeToNextRefresh -= SECOND_MS;
 				if (timeToNextRefresh <= 1) {
 					checkForRepoDown();
 				} else {
 					view.updateTimeToNextRefresh(timeToNextRefresh/1000);
 					view.setTimerVisible(true);
-					gwt.scheduleExecution(updateTimerCallback, 1000);
+					gwt.scheduleExecution(updateTimerCallback, SECOND_MS);
 				}
 			}
 		};
@@ -85,8 +86,8 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 	}
 	
 	public void scheduleRepoDownCheck() {
-		timeToNextRefresh = DELAY;
-		gwt.scheduleExecution(updateTimerCallback, 1000);
+		timeToNextRefresh = DELAY_MS;
+		gwt.scheduleExecution(updateTimerCallback, SECOND_MS);
 	}
 	
 	 
