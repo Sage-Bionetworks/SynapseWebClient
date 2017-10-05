@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.client.widget.login;
 
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -15,7 +13,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
@@ -24,8 +21,8 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SubmitButton;
 import com.google.gwt.user.client.ui.TextBox;
@@ -57,12 +54,10 @@ public class LoginWidgetViewImpl extends Composite implements
 	TextBox username = null;
 	
 	private Presenter presenter;
-	JSONObjectAdapter jsonAdapter;
 	
 	@Inject
-	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder, JSONObjectAdapter jsonAdapter) {
+	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder) {
 		initWidget(binder.createAndBindUi(this));
-		this.jsonAdapter = jsonAdapter;
 		final FormPanel form = new FormPanel();
 		form.setAction("/expect_405");
 		signInBtn = new SubmitButton();
