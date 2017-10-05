@@ -153,12 +153,4 @@ public class ProjectAliasServlet extends HttpServlet {
 			client.setSessionToken(sessionToken);
 		return client;
 	}
-
-	public String getBaseUrl(HttpServletRequest request) {
-		StringBuffer url = request.getRequestURL();
-		String uri = request.getRequestURI();
-		String ctx = request.getContextPath();
-		String base = url.substring(0, url.length() - uri.length() + ctx.length()) + "/";
-		return base;
-	}
 }
