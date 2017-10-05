@@ -28,6 +28,7 @@ import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
+import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -74,6 +75,7 @@ public class SynapseJavascriptFactory {
 		SubscriberPagedResults,
 		SubscriberCount,
 		BatchFileResult,
+		StackStatus,
 		JSON,
 		None
 	}
@@ -165,6 +167,8 @@ public class SynapseJavascriptFactory {
 			return new SubscriberCount(json).getCount();
 		case BatchFileResult :
 			return new BatchFileResult(json);
+		case StackStatus :
+			return new StackStatus(json);
 		case JSON :
 			return json;
 		case PaginatedResultsEntityHeader :

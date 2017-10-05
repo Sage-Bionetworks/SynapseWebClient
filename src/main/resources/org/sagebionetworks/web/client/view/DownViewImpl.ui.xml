@@ -10,7 +10,11 @@
 	  				<b:Image responsive="true" addStyleNames="align-center margin-bottom-40 margin-top-20" url="https://s3.amazonaws.com/static.synapse.org/stu/asleep-sm.png"/>
 	  			</b:Column>
   				<b:Column size="XS_12">
-  					<b:Heading ui:field="messageHeading" size="H3" alignment="CENTER" text="Synapse is down for maintenance." />
+  					<b:Heading size="H3" alignment="CENTER" text="Synapse is down." />
+  					<b:Heading ui:field="messageHeading" size="H3" alignment="CENTER" />
+  					<bh:Div ui:field="timerUI" width="100%" addStyleNames="text-align-center">
+  						<bh:Text>Retrying in</bh:Text><bh:Text ui:field="secondsText"/><bh:Text>s</bh:Text>
+  					</bh:Div>
   				</b:Column>
   			</b:Row>
   		</bh:Div>

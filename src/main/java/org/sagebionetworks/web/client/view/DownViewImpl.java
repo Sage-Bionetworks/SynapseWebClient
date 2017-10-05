@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -12,6 +14,10 @@ public class DownViewImpl implements DownView {
 	private Header headerWidget;
 	@UiField
 	Heading messageHeading;
+	@UiField
+	Text secondsText;
+	@UiField
+	Div timerUI;
 	public interface Binder extends UiBinder<Widget, DownViewImpl> {}
 	Widget widget;
 	
@@ -31,11 +37,20 @@ public class DownViewImpl implements DownView {
 	
 	@Override
 	public void setMessage(String message) {
-		messageHeading.setText(message);
+		messageHeading.setSubText(message);
+	}
+	
+	@Override
+	public void updateTimeToNextRefresh(int seconds) {
+		secondsText.setText(" " + seconds);
 	}
 	
 	@Override
 	public Widget asWidget() {
 		return widget;
+	}
+	@Override
+	public void setTimerVisible(boolean visible) {
+		timerUI.setVisible(visible);
 	}
 }

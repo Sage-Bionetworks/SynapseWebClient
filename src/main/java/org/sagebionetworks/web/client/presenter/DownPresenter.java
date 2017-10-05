@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.Collections;
-import java.util.List;
-
-import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -12,8 +9,6 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DownView;
-import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
-import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -22,46 +17,61 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class DownPresenter extends AbstractActivity implements Presenter<Down> {
-	//check back every 15s if down.
-	public static final int DELAY = 15000;
+	//check back every 10s if down.
+	public static final int DELAY = 10000;
+	public int timeToNextRefresh;
 	private DownView view;
 	GWTWrapper gwt;
 	GlobalApplicationState globalAppState;
-	Callback checkForRepoDownCallback;
+	Callback updateTimerCallback;
 	SynapseJavascriptClient jsClient;
 	@Inject
 	public DownPresenter(
-			DownView view,
-			GWTWrapper gwt,
+			final DownView view,
+			final GWTWrapper gwt,
 			GlobalApplicationState globalAppState,
-			final SynapseJavascriptClient jsClient) {
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.gwt = gwt;
 		this.globalAppState = globalAppState;
 		this.jsClient = jsClient;
-		checkForRepoDownCallback = new Callback() {
+		updateTimerCallback = new Callback() {
 			@Override
 			public void invoke() {
-				checkForRepoDown();
+				timeToNextRefresh -= 1000;
+				if (timeToNextRefresh <= 1) {
+					checkForRepoDown();
+				} else {
+					view.updateTimeToNextRefresh(timeToNextRefresh/1000);
+					view.setTimerVisible(true);
+					gwt.scheduleExecution(updateTimerCallback, 1000);
+				}
 			}
 		};
 	}
 	
 	public void checkForRepoDown() {
-		jsClient.listUserProfiles(Collections.singletonList("-1"), new AsyncCallback<List<UserProfile>>() {
+		view.setTimerVisible(false);
+		jsClient.getStackStatus(new AsyncCallback<StackStatus>() {
 			@Override
-			public void onSuccess(List<UserProfile> result) {
-				repoIsUp();
+			public void onSuccess(StackStatus status) {
+				switch(status.getStatus()) {
+				case READ_WRITE :
+					//it's up!
+					repoIsUp();
+					break;
+				case READ_ONLY :
+				case DOWN :
+					//it's down, report the message and check again later
+					view.setMessage(status.getCurrentMessage());
+					scheduleRepoDownCheck();
+				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if (caught instanceof ReadOnlyModeException || caught instanceof SynapseDownException) {
-					// still down
-					scheduleRepoDownCheck();
-				} else {
-					repoIsUp();
-				}
+				view.setMessage(caught.getMessage());
+				scheduleRepoDownCheck();
 			}
 			
 			private void repoIsUp() {
@@ -75,8 +85,11 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 	}
 	
 	public void scheduleRepoDownCheck() {
-		gwt.scheduleExecution(checkForRepoDownCallback, DELAY);
+		timeToNextRefresh = DELAY;
+		gwt.scheduleExecution(updateTimerCallback, 1000);
 	}
+	
+	 
 	
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
@@ -86,9 +99,7 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 	@Override
 	public void setPlace(Down place) {
 		view.init();
-		String message = gwt.decodeQueryString(place.toToken());
-		view.setMessage(message);
-		scheduleRepoDownCheck();
+		checkForRepoDown();
 	}
 	
 }
