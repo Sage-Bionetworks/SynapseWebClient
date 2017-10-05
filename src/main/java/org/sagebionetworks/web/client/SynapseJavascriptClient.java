@@ -40,6 +40,7 @@ import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -61,6 +62,7 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
@@ -97,8 +99,9 @@ public class SynapseJavascriptClient {
 	public static final String FILE_HANDLE_BATCH = "/fileHandle/batch";
 	public static final String THREAD_COUNTS = "/threadcounts";
 	public static final String ENTITY_THREAD_COUNTS = ENTITY + THREAD_COUNTS;
+	public static final String STACK_STATUS = "/admin/synapse/status";
 	
-	public static final int RETRY_REQUEST_DELAY_MS = 2000;
+	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
 	JSONObjectAdapter jsonObjectAdapter;
@@ -168,7 +171,7 @@ public class SynapseJavascriptClient {
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(url, null, OBJECT_TYPE.None, callback);
+		sendRequest(url, null, OBJECT_TYPE.None, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 
 	
@@ -178,7 +181,7 @@ public class SynapseJavascriptClient {
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(url, null, responseType, callback);
+		sendRequest(url, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 	
 	private void doPost(String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
@@ -188,10 +191,10 @@ public class SynapseJavascriptClient {
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(url, requestData, responseType, callback);
+		sendRequest(url, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 	
-	private void sendRequest(final String url, final String requestData, final OBJECT_TYPE responseType, final AsyncCallback callback) {
+	private void sendRequest(final String url, final String requestData, final OBJECT_TYPE responseType, final int retryDelay, final AsyncCallback callback) {
 		try {
 			requestBuilder.sendRequest(requestData, new RequestCallback() {
 				@Override
@@ -213,14 +216,15 @@ public class SynapseJavascriptClient {
 							onError(null, e);
 						}
 					} else {
-						if (statusCode == TOO_MANY_REQUESTS_STATUS_CODE) {
+						// Status code could be 0 if the preflight request failed, or if the network connection is down.
+						if (statusCode == TOO_MANY_REQUESTS_STATUS_CODE || statusCode == 0) {
 							// wait a couple of seconds and try the request again...
 							gwt.scheduleExecution(new Callback() {
 								@Override
 								public void invoke() {
-									sendRequest(url, requestData, responseType, callback);
+									sendRequest(url, requestData, responseType, retryDelay*2, callback);
 								}
-							}, RETRY_REQUEST_DELAY_MS);
+							}, retryDelay);
 						} else {
 							// getException() based on status code, 
 							// instead of using org.sagebionetworks.client.ClientUtils.throwException() and ExceptionUtil.convertSynapseException() (neither of which can be referenced here)
@@ -695,6 +699,9 @@ public class SynapseJavascriptClient {
 		}
 		doDelete(url, callback);
 	}
-
+	public void getStackStatus(AsyncCallback<StackStatus> callback) {
+		String url = getRepoServiceUrl() + STACK_STATUS;
+		doGet(url, OBJECT_TYPE.StackStatus, callback);
+	}
 }
 

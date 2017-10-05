@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
-
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -37,6 +36,7 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 	PortalGinInjector ginInjector;
 	Throwable ex;
 	UserListener reloadOnLoginListener;
+	
 	@Inject
 	public SynapseAlertImpl(
 			SynapseAlertView view,

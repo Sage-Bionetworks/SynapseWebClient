@@ -186,7 +186,7 @@ public class SynapseJavascriptClientTest {
 		requestCallback.onResponseReceived(mockRequest, mockResponse);
 		
 		//verify we'll try again later
-		verify(mockGwt).scheduleExecution(callbackCaptor.capture(), eq(RETRY_REQUEST_DELAY_MS));
+		verify(mockGwt).scheduleExecution(callbackCaptor.capture(), eq(INITIAL_RETRY_REQUEST_DELAY_MS));
 		//simulate retry
 		callbackCaptor.getValue().invoke();
 		verify(mockRequestBuilder, times(2)).sendRequest(eq((String)null), any(RequestCallback.class));
@@ -235,12 +235,17 @@ public class SynapseJavascriptClientTest {
 		requestCallback.onResponseReceived(mockRequest, mockResponse);
 		
 		//verify we'll try again later
-		verify(mockGwt).scheduleExecution(callbackCaptor.capture(), eq(RETRY_REQUEST_DELAY_MS));
+		verify(mockGwt).scheduleExecution(callbackCaptor.capture(), eq(INITIAL_RETRY_REQUEST_DELAY_MS));
 		//simulate retry
 		callbackCaptor.getValue().invoke();
-		verify(mockRequestBuilder, times(2)).sendRequest(stringCaptor.capture(), any(RequestCallback.class));
+		verify(mockRequestBuilder, times(2)).sendRequest(stringCaptor.capture(), requestCallbackCaptor.capture());
 		//verify it retries the same request
 		assertEquals(originalRequestString, stringCaptor.getValue());
+		
+		//verify exponential backoff
+		requestCallback = requestCallbackCaptor.getValue();
+		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		verify(mockGwt).scheduleExecution(callbackCaptor.capture(), eq(INITIAL_RETRY_REQUEST_DELAY_MS*2));
 	}
 	
 	@Test
