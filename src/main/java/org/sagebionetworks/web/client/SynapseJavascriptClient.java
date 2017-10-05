@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client;
-import static com.google.gwt.http.client.RequestBuilder.DELETE;
-import static com.google.gwt.http.client.RequestBuilder.GET;
-import static com.google.gwt.http.client.RequestBuilder.POST;
+import static com.google.gwt.http.client.RequestBuilder.*;
 import static org.apache.http.HttpStatus.*;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
@@ -103,7 +101,7 @@ public class SynapseJavascriptClient {
 	public static final String ENTITY_THREAD_COUNTS = ENTITY + THREAD_COUNTS;
 	public static final String STACK_STATUS = "/admin/synapse/status";
 	
-	public static final int RETRY_REQUEST_DELAY_MS = 2000;
+	public static final int RETRY_REQUEST_DELAY_MS = 5000;
 	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
 	JSONObjectAdapter jsonObjectAdapter;
@@ -218,7 +216,8 @@ public class SynapseJavascriptClient {
 							onError(null, e);
 						}
 					} else {
-						if (statusCode == TOO_MANY_REQUESTS_STATUS_CODE) {
+						// Status code could be 0 if the preflight request failed, or if the network connection is down.
+						if (statusCode == TOO_MANY_REQUESTS_STATUS_CODE || statusCode == 0) {
 							// wait a couple of seconds and try the request again...
 							gwt.scheduleExecution(new Callback() {
 								@Override
