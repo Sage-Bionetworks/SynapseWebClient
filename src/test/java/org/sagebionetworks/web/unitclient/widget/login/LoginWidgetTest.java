@@ -26,14 +26,17 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.shared.exceptions.LockedException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
 
 public class LoginWidgetTest {
 		
@@ -55,6 +58,8 @@ public class LoginWidgetTest {
 	Session mockSession;
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
+	@Mock
+	SynapseAlert mockSynAlert;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
@@ -62,7 +67,7 @@ public class LoginWidgetTest {
 		when(mockSynapseJSNIUtils.getLocationPath()).thenReturn("/Portal.html");
 		when(mockSynapseJSNIUtils.getLocationQueryString()).thenReturn("?foo=bar");
 
-		loginWidget = new LoginWidget(mockView, mockAuthController, mockGlobalApplicationState, mockSynapseJSNIUtils);
+		loginWidget = new LoginWidget(mockView, mockAuthController, mockGlobalApplicationState, mockSynAlert);
 		loginWidget.setUserListener(mockUserListener);
 		UserSessionData usd = new UserSessionData();
 		UserProfile p = new UserProfile();
@@ -72,6 +77,7 @@ public class LoginWidgetTest {
 		when(mockSession.getAcceptsTermsOfUse()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		verify(mockView).setPresenter(loginWidget);
+		verify(mockView).setSynAlert(mockSynAlert);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}
 	
@@ -111,26 +117,28 @@ public class LoginWidgetTest {
 		String u = "user";
 		String p = "pass";
 		String unhandledExceptionMessage = "unhandled exception";
-		AsyncMockStubber.callFailureWith(new Exception(unhandledExceptionMessage)).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
+		Exception ex = new Exception(unhandledExceptionMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		loginWidget.setUsernameAndPassword(u, p);
 		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
 		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
-		verify(mockSynapseJSNIUtils).consoleError(eq(unhandledExceptionMessage));
+		verify(mockSynAlert).handleException(ex);
 		verify(mockView).clear();
 		verify(mockView, never()).clearUsername();
 	}
 
 	@Test
-	public void testSetUsernameAndPasswordLockedExceptionHandling() {
+	public void testInvalidUsernamePassword() {
 		String u = "user";
 		String p = "pass";
-		String lockedMessage = "account is locked";
-		AsyncMockStubber.callFailureWith(new LockedException(lockedMessage)).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
+		String notFoundMessage = "alias not found";
+		NotFoundException ex = new NotFoundException(notFoundMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		loginWidget.setUsernameAndPassword(u, p);
 		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
 		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
-		verify(mockView).showError(lockedMessage);
 		verify(mockView).clear();
 		verify(mockView, never()).clearUsername();
+		verify(mockView).showAuthenticationFailed();
 	}
 }

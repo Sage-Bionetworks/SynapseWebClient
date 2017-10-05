@@ -45,7 +45,9 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 				} else {
 					view.updateTimeToNextRefresh(timeToNextRefresh/1000);
 					view.setTimerVisible(true);
-					gwt.scheduleExecution(updateTimerCallback, SECOND_MS);
+					if (view.isAttached()) {
+						gwt.scheduleExecution(updateTimerCallback, SECOND_MS);
+					}
 				}
 			}
 		};

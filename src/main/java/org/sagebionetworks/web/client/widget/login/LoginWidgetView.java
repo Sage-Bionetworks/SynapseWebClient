@@ -25,10 +25,7 @@ public interface LoginWidgetView extends IsWidget {
 	void clearUsername();
 	public void showAuthenticationFailed();
 	
-	public void showTermsOfUseDownloadFailed();
-	
-	public void showError(String message);
-	
+	void setSynAlert(IsWidget w);
 	public void clear();
 
 }

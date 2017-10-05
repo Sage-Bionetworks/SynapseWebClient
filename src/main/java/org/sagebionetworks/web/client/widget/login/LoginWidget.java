@@ -1,14 +1,11 @@
 package org.sagebionetworks.web.client.widget.login;
 
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.shared.exceptions.LockedException;
-import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
-import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -21,17 +18,21 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	private AuthenticationController authenticationController;	
 	private UserListener listener;	
 	private GlobalApplicationState globalApplicationState;
-	private SynapseJSNIUtils synapseJsniUtils;
+	private SynapseAlert synAlert;
 	
 	public static final String LOGIN_PLACE  = "LoginPlace";
 	
 	@Inject
-	public LoginWidget(LoginWidgetView view, AuthenticationController controller, GlobalApplicationState globalApplicationState, SynapseJSNIUtils synapseJsniUtils) {
+	public LoginWidget(LoginWidgetView view, 
+			AuthenticationController controller, 
+			GlobalApplicationState globalApplicationState, 
+			SynapseAlert synAlert) {
 		this.view = view;
 		view.setPresenter(this);
 		this.authenticationController = controller;	
 		this.globalApplicationState = globalApplicationState;
-		this.synapseJsniUtils = synapseJsniUtils;
+		this.synAlert = synAlert;
+		view.setSynAlert(synAlert);
 	}
 
 	public Widget asWidget() {
@@ -63,13 +64,10 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.clear();
-				if(caught instanceof ReadOnlyModeException) {
-					view.showError(DisplayConstants.LOGIN_READ_ONLY_MODE);
-				} else if(caught instanceof LockedException || caught instanceof SynapseDownException) {
-					view.showError(caught.getMessage());
-				} else {
-					synapseJsniUtils.consoleError(caught.getMessage());
+				if (caught instanceof NotFoundException) {
 					view.showAuthenticationFailed();
+				} else {
+					synAlert.handleException(caught);	
 				}
 			}
 		});

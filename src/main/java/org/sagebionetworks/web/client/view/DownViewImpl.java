@@ -53,4 +53,8 @@ public class DownViewImpl implements DownView {
 	public void setTimerVisible(boolean visible) {
 		timerUI.setVisible(visible);
 	}
+	@Override
+	public boolean isAttached() {
+		return widget.isAttached();
+	}
 }

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.login;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -23,6 +24,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SubmitButton;
@@ -48,6 +50,8 @@ public class LoginWidgetViewImpl extends Composite implements
 	Button registerBtn;
 	@UiField
 	org.gwtbootstrap3.client.ui.Button googleSignInButton;
+	@UiField
+	Div synAlertContainer;
 	
 	PasswordTextBox password = null;
 	TextBox username = null;
@@ -137,27 +141,14 @@ public class LoginWidgetViewImpl extends Composite implements
 	}
 
 	@Override
-	public void showError(String message) {
-		String displayMessage = message;
-		//Try to parse json and get the "reason" key value. If it doesn't parse properly, use the original message. 
-		try {
-			JSONObjectAdapter json = jsonAdapter.createNew(message);
-			displayMessage = json.getString("reason");
-		} catch (JSONObjectAdapterException e) {
-		}
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">"+SafeHtmlUtils.htmlEscapeAllowEntities(displayMessage)+"</h4>");
-		clear();
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 
 	@Override
 	public void showAuthenticationFailed() {
 		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Invalid username or password.</h4> <span class=\"text-warning\">Please try again.</span>");
-		clear();
-	}
-
-	@Override
-	public void showTermsOfUseDownloadFailed() {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Unable to Download Synapse Terms of Use.</h4>");
 		clear();
 	}
 

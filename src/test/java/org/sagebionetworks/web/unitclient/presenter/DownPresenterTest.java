@@ -57,6 +57,7 @@ public class DownPresenterTest {
 		when(mockStackStatus.getStatus()).thenReturn(StatusEnum.READ_WRITE);
 		presenter = new DownPresenter(mockView, mockGWT, mockGlobalAppState, mockSynapseJavascriptClient);
 		AsyncMockStubber.callSuccessWith(mockStackStatus).when(mockSynapseJavascriptClient).getStackStatus(any(AsyncCallback.class));
+		when(mockView.isAttached()).thenReturn(true);
 	}
 
 	@Test

@@ -7,4 +7,5 @@ public interface DownView extends IsWidget {
 	void setMessage(String message);
 	void updateTimeToNextRefresh(int seconds);
 	void setTimerVisible(boolean visible);
+	boolean isAttached();
 }
