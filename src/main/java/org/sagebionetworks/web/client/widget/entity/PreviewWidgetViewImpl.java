@@ -19,6 +19,7 @@ import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Frame;
@@ -28,7 +29,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class PreviewWidgetViewImpl extends FocusPanel implements PreviewWidgetView, IsWidget{
+public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetView, IsWidget{
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private boolean isCode;
@@ -53,17 +54,10 @@ public class PreviewWidgetViewImpl extends FocusPanel implements PreviewWidgetVi
 			}
 		}, false);
 		previewDialog.addStyleName("modal-fullscreen");
-		addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				showFullscreenPreview();
-			}
-		});
-		addStyleName("imageButton");
 	}
 	
 	private void showFullscreenPreview() {
-		dialogContent = getWidget();
+		dialogContent = getWidget(0);
 		dialogContent.removeFromParent();
 		Div panel = new Div();
 		panel.addStyleName("margin-right-20");
@@ -73,9 +67,8 @@ public class PreviewWidgetViewImpl extends FocusPanel implements PreviewWidgetVi
 	}
 	private void hideFullscreenPreview() {
 		dialogContent.removeFromParent();
-		PreviewWidgetViewImpl.this.add(dialogContent);
+		add(dialogContent);
 		previewDialog.hide();
-
 	}
 	
 	@Override
@@ -92,7 +85,7 @@ public class PreviewWidgetViewImpl extends FocusPanel implements PreviewWidgetVi
 	public void setImagePreview(final String fullFileUrl) {
 		clear();
 		Image fullImage = new Image();
-		fullImage.addStyleName("maxWidth100 maxHeight100 margin-left-20");
+		fullImage.addStyleName("imageButton maxWidth100 maxHeight100 margin-left-20");
 		fullImage.addErrorHandler(new ErrorHandler() {
 			@Override
 		    public void onError(ErrorEvent event) {
@@ -100,6 +93,12 @@ public class PreviewWidgetViewImpl extends FocusPanel implements PreviewWidgetVi
 		    }
 		});
 		add(fullImage);
+		fullImage.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				showFullscreenPreview();
+			}
+		});
 		fullImage.setUrl(fullFileUrl);
 	}
 	
