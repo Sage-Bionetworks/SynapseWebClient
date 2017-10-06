@@ -25,7 +25,7 @@ import com.google.inject.Inject;
 public class Header implements HeaderView.Presenter, IsWidget {
 
 	public static final String N_A = "n/a";
-	public static final String ANONYMOUS = "anonymous";
+	public static final String ANONYMOUS = "VISITOR_UNIQUE_ID";
 	public static final String SYNAPSE_ORG = "@synapse.org";
 	public static final String GET_SATISFACTION_SUPPORT_SITE = "http://support.sagebase.org";
 	public static final String WWW_SYNAPSE_ORG = "www.synapse.org";
