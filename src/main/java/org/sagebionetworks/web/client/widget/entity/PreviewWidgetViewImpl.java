@@ -59,9 +59,15 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	private void showFullscreenPreview() {
 		dialogContent = getWidget(0);
 		dialogContent.removeFromParent();
-		Div panel = new Div();
+		FocusPanel panel = new FocusPanel();
 		panel.addStyleName("margin-right-20");
 		panel.add(dialogContent);
+		panel.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				hideFullscreenPreview();
+			}
+		});
 		previewDialog.add(panel);
 		previewDialog.show();
 	}
