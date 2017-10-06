@@ -80,7 +80,8 @@
 	<inherits name="org.sagebionetworks.client.synpaseClientExceptions"/>
 	<inherits name="com.google.gwt.user.RemoteServiceObfuscateTypeNames" />
 
-	<!-- Limit build permutations (testing only).  Set to gecko1_8 for FF -->
+	<!-- Limit build permutations (testing only).  Set to gecko1_8 for FF
 	<set-property name="user.agent" value="safari"/>
+	-->
 
 </module>
