@@ -70,18 +70,26 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 			if (i < profiles.size() - 1) {
 				tr.addStyleName("border-bottom-1");	
 			}
-			
+
 			final UserProfile profile = profiles.get(i);
-			UserBadge renderer = ginInjector.getUserBadgeWidget();
 			MembershipInvtnSubmission invite = invitations.get(i);
 			final String inviteId = invite.getId();
 			String inviteMessage = invite.getMessage() != null ? invite.getMessage() : "";
 			String createdOn = createdOnDates.get(i);
-			
-			renderer.configure(profile);
-			
-			Div inviteDiv = new Div();
-			inviteDiv.add(new Text(inviteMessage));
+
+			IsWidget invitee;
+			if (profile != null) {
+				UserBadge renderer = ginInjector.getUserBadgeWidget();
+				renderer.configure(profile);
+				invitee = renderer;
+			} else {
+				Div inviteeDiv = new Div();
+				inviteeDiv.add(new Text(invite.getInviteeEmail()));
+				invitee = inviteeDiv;
+			}
+
+			Div invitationMessageDiv = new Div();
+			invitationMessageDiv.add(new Text(inviteMessage));
 			
 			Div createdOnDiv = new Div();
 			createdOnDiv.add(new Italic(createdOn));
@@ -100,8 +108,8 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 			
 			TableData td = new TableData();
 			td.addStyleName("padding-5");
-			td.add(renderer);
-			td.add(inviteDiv);
+			td.add(invitee);
+			td.add(invitationMessageDiv);
 			td.add(createdOnDiv);
 			tr.add(td);
 			

@@ -1594,16 +1594,34 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			// now go through and create a MembershipInvitationBundle for each
 			// pair
 
-			List<Long> userIds = new ArrayList<>();
+			List<MembershipInvtnSubmission> invitationsToUsers = new ArrayList<>();
+			List<MembershipInvtnSubmission> invitationsToEmails = new ArrayList<>();
+			// Sort the results into the two types
 			for (MembershipInvtnSubmission invite : invitations.getResults()) {
+				if (invite.getInviteeId() != null ^ invite.getInviteeEmail() != null) {
+					if (invite.getInviteeId() != null) {
+						invitationsToUsers.add(invite);
+					} else {
+						invitationsToEmails.add(invite);
+					}
+				}
+			}
+
+			// Get profiles of existing user invitees
+			List<Long> userIds = new ArrayList<>();
+			for (MembershipInvtnSubmission invite : invitationsToUsers) {
 				userIds.add(Long.parseLong(invite.getInviteeId()));
 			}
 			Map<String, UserProfile> userId2UserProfile = getUserProfiles(userIds, synapseClient);
-			
-			for (MembershipInvtnSubmission invite : invitations.getResults()) {
+			// Add invitations to return list
+			for (MembershipInvtnSubmission invite : invitationsToUsers) {
 				UserProfile profile = userId2UserProfile.get(invite.getInviteeId());
 				OpenTeamInvitationBundle b = new OpenTeamInvitationBundle(invite, profile);
 				returnList.add(b);
+			}
+			for (MembershipInvtnSubmission invite : invitationsToEmails) {
+				// Invitations to new users have a null profile
+				returnList.add(new OpenTeamInvitationBundle(invite, null));
 			}
 
 			return returnList;
