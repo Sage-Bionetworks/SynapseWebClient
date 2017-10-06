@@ -77,15 +77,11 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 			String inviteMessage = invite.getMessage() != null ? invite.getMessage() : "";
 			String createdOn = createdOnDates.get(i);
 
-			IsWidget invitee;
+			UserBadge invitee = ginInjector.getUserBadgeWidget();
 			if (profile != null) {
-				UserBadge renderer = ginInjector.getUserBadgeWidget();
-				renderer.configure(profile);
-				invitee = renderer;
+				invitee.configure(profile);
 			} else {
-				Div inviteeDiv = new Div();
-				inviteeDiv.add(new Text(invite.getInviteeEmail()));
-				invitee = inviteeDiv;
+				invitee.configureWithInviteeEmail(invite.getInviteeEmail());
 			}
 
 			Div invitationMessageDiv = new Div();

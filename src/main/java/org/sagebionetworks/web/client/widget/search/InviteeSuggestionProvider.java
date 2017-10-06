@@ -4,15 +4,9 @@ import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
-import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.widget.team.InviteWidget;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 public class InviteeSuggestionProvider {
@@ -29,7 +23,7 @@ public class InviteeSuggestionProvider {
 	public void getSuggestions(TypeFilter type, final int offset, final int pageSize, final int width, final String prefix, final AsyncCallback<SynapseSuggestionBundle> callback) {
 		if (emailRegExp.test(prefix)) {
 			List<Suggestion> oneSuggestion = new ArrayList<>();
-			oneSuggestion.add(new NewUserEmailSuggestion(prefix));
+			oneSuggestion.add(new NewUserEmailSuggestion(prefix, width));
 			SynapseSuggestionBundle suggestionBundle = new SynapseSuggestionBundle(oneSuggestion, 1);
 			callback.onSuccess(suggestionBundle);
 			return;

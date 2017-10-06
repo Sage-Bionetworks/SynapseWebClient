@@ -49,7 +49,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	private String principalId = null, username = null;
 	UserProfileAsyncHandler userProfileAsyncHandler;
 	private AdapterFactory adapterFactory;
-	
+
 	public static final ClickHandler DO_NOTHING_ON_CLICK = new ClickHandler() {
 		@Override
 		public void onClick(ClickEvent event) {
@@ -209,6 +209,15 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	public void configure(String principalId, boolean isShowCompany) {
 		this.isShowCompany = isShowCompany;
 		configure(principalId);
+	}
+
+	public void configureWithInviteeEmail(String inviteeEmail) {
+		lazyLoadHelper.setIsConfigured();
+		view.setDisplayName(inviteeEmail, inviteeEmail);
+		view.setDefaultPictureLetter(Character.toString(inviteeEmail.charAt(0)));
+		view.setDefaultPictureColor(getColor(inviteeEmail.hashCode()));
+		view.showAnonymousUserPicture();
+		view.setHref("mailto:" + inviteeEmail);
 	}
 	
 	public void loadBadge() {
