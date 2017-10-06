@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -18,12 +18,12 @@ import com.google.inject.Inject;
  */
 public class UserIdCellEditorImpl implements UserIdCellEditor{
 	UserIdCellEditorView view;
-	SynapseSuggestBox peopleSuggestWidget;
+	SynapseUserGroupSuggestBox peopleSuggestWidget;
 	UserGroupSuggestionProvider provider;
 	
 	@Inject
 	public UserIdCellEditorImpl(UserIdCellEditorView view, 
-			SynapseSuggestBox peopleSuggestWidget,
+			SynapseUserGroupSuggestBox peopleSuggestWidget,
 			UserGroupSuggestionProvider provider) {
 		this.view = view;
 		this.peopleSuggestWidget = peopleSuggestWidget;

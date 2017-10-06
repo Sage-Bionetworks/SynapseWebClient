@@ -28,9 +28,9 @@ import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -65,7 +65,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	
 	private ApproveUserAccessModalView view;
 	private SynapseAlert synAlert;
-	private SynapseSuggestBox peopleSuggestWidget;
+	private SynapseUserGroupSuggestBox peopleSuggestWidget;
 	private Map<String, AccessRequirement> arMap;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
@@ -74,7 +74,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	@Inject
 	public ApproveUserAccessModal(ApproveUserAccessModalView view,
 			SynapseAlert synAlert,
-			SynapseSuggestBox peopleSuggestBox,
+			SynapseUserGroupSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider, 
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,

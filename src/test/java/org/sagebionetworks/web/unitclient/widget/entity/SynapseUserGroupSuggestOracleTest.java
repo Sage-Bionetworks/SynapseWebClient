@@ -15,11 +15,11 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GWTTimer;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestOracle;
+import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestOracle;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestionBundle;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -27,11 +27,11 @@ import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle.Response;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 
-public class SynapseSuggestOracleTest {
+public class SynapseUserGroupSuggestOracleTest {
 
-	SynapseSuggestBox mockSuggestBox;
+	SynapseUserGroupSuggestBox mockSuggestBox;
 	UserGroupSuggestionProvider mockSuggestionProvider;
-	SynapseSuggestOracle presenter;
+	SynapseUserGroupSuggestOracle presenter;
 	UserGroupSuggestion mockSuggestion;
 	SuggestOracle.Callback mockCallback;
 	SuggestOracle.Request mockRequest;
@@ -44,14 +44,14 @@ public class SynapseSuggestOracleTest {
 	
 	@Before
 	public void setup() {
-		mockSuggestBox = mock(SynapseSuggestBox.class);
+		mockSuggestBox = mock(SynapseUserGroupSuggestBox.class);
 		mockSuggestionProvider = mock(UserGroupSuggestionProvider.class);
 		mockSuggestion = mock(UserGroupSuggestion.class);
 		mockCallback = mock(SuggestOracle.Callback.class);
 		mockRequest = mock(SuggestOracle.Request.class);
 		Mockito.when(mockRequest.getQuery()).thenReturn(query);
 		mockTimer = mock(GWTTimer.class);
-		presenter = new SynapseSuggestOracle(mockTimer);
+		presenter = new SynapseUserGroupSuggestOracle(mockTimer);
 		presenter.configure(mockSuggestBox, pageSize, mockSuggestionProvider);
 		presenter.requestSuggestions(mockRequest, mockCallback);
 		List<Suggestion> suggList = new LinkedList<>();

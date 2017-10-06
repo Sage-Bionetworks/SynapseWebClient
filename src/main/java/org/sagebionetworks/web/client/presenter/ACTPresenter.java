@@ -17,9 +17,9 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ACTView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
 
@@ -36,7 +36,7 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 	private PortalGinInjector ginInjector;
 	private SynapseAlert synAlert;
 	private GlobalApplicationState globalAppState;
-	SynapseSuggestBox peopleSuggestWidget;
+	SynapseUserGroupSuggestBox peopleSuggestWidget;
 	private VerificationStateEnum stateFilter;
 	private Long submitterIdFilter;
 	private UserBadge selectedUserBadge;
@@ -49,7 +49,7 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 	public ACTPresenter(ACTView view,
 			UserProfileClientAsync userProfileClient,
 			SynapseAlert synAlert,
-			SynapseSuggestBox peopleSuggestBox,
+			SynapseUserGroupSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider,
 			PortalGinInjector ginInjector,
 			GlobalApplicationState globalAppState,

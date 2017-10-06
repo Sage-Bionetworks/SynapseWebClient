@@ -1,14 +1,5 @@
 package org.sagebionetworks.web.client.widget.search;
 
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.SuggestBox;
-import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
-
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -18,13 +9,19 @@ import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
-import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.SuggestBox;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSuggestBoxView {
-	
+public class SynapseInviteeSuggestBoxViewImpl extends FlowPanel implements SynapseInviteeSuggestBoxView {
+
 	private Presenter presenter;
 	SuggestBox suggestBox;
 	TextBox selectedItem;
@@ -33,19 +30,19 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	SynapseAlert synAlert;
 	int originalScrollTop = -1;
 	@Inject
-	public SynapseSuggestBoxViewImpl(SageImageBundle sageImageBundle, SynapseAlert synAlert) {
+	public SynapseInviteeSuggestBoxViewImpl(SageImageBundle sageImageBundle, SynapseAlert synAlert) {
 		this.sageImageBundle = sageImageBundle;
 		this.synAlert = synAlert;
 	}
-	
+
 	@Override
-	public void configure(SynapseSuggestOracle oracle) {
+	public void configure(SynapseInviteeSuggestOracle oracle) {
 		suggestBox = new SuggestBox(oracle, new TextBox(), new SynapseSuggestionDisplay(sageImageBundle));
 		suggestBox.getValueBox().addStyleName("form-control");
-		suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
+		suggestBox.addSelectionHandler(new SelectionHandler<Suggestion>() {
 			@Override
 			public void onSelection(SelectionEvent<Suggestion> event) {
-				selectSuggestion((UserGroupSuggestion)event.getSelectedItem());
+				selectSuggestion((InviteeSuggestion)event.getSelectedItem());
 			}
 			
 		});
@@ -110,11 +107,11 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 		Label resultsLbl = ((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).getResultsLabel();
 		
 		prevBtn.setEnabled(offset != 0);
-		boolean moreResults = offset + SynapseSuggestBox.PAGE_SIZE < numResults;
+		boolean moreResults = offset + SynapseUserGroupSuggestBox.PAGE_SIZE < numResults;
 		nextBtn.setEnabled(moreResults);
 		
 		String resultsLabel = "Displaying " + (offset + 1) + " - "
-								+ (moreResults ? offset + SynapseSuggestBox.PAGE_SIZE : numResults);
+								+ (moreResults ? offset + SynapseUserGroupSuggestBox.PAGE_SIZE : numResults);
 		resultsLbl.setText(resultsLabel);
 	}
 	
@@ -127,7 +124,7 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 		selectedItemText.setText("");
 	}
 	
-	public void selectSuggestion(UserGroupSuggestion suggestion) {
+	public void selectSuggestion(InviteeSuggestion suggestion) {
 		// Update the SuggestBox's selected suggestion.
 		synAlert.clear();
 		selectedItem.setText(suggestion.getReplacementString());
@@ -187,8 +184,8 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	}
 	
 	@Override
-	public SynapseSuggestOracle getUserGroupSuggestOracle() {
-		return (SynapseSuggestOracle) suggestBox.getSuggestOracle();
+	public SynapseInviteeSuggestOracle getInviteeSuggestOracle() {
+		return (SynapseInviteeSuggestOracle) suggestBox.getSuggestOracle();
 	}
 	
 	@Override

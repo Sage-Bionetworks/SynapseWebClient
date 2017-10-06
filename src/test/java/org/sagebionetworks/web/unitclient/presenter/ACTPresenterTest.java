@@ -24,9 +24,9 @@ import org.sagebionetworks.web.client.presenter.ACTPresenter;
 import org.sagebionetworks.web.client.view.ACTView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionRowViewImpl;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
@@ -52,7 +52,7 @@ public class ACTPresenterTest {
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
-	SynapseSuggestBox mockPeopleSuggestBox;
+	SynapseUserGroupSuggestBox mockPeopleSuggestBox;
 	@Mock
 	UserGroupSuggestionProvider mockUserGroupSuggestionProvider;
 	@Mock

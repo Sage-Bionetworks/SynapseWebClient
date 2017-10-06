@@ -8,7 +8,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
 
-public class SynapseSuggestOracle extends SuggestOracle {
+public class SynapseUserGroupSuggestOracle extends SuggestOracle {
 
 	public SuggestOracle.Request request;
 	public SuggestOracle.Callback callback;
@@ -16,20 +16,20 @@ public class SynapseSuggestOracle extends SuggestOracle {
 	public int pageSize;
 	public int offset;
 	public boolean isLoading;
-	public SynapseSuggestBox suggestBox;
+	public SynapseUserGroupSuggestBox suggestBox;
 	public UserGroupSuggestionProvider provider;
 	public String searchTerm;
 	public String width;
 	private GWTTimer timer;
 	private TypeFilter type = TypeFilter.ALL;
 	@Inject
-	public SynapseSuggestOracle(GWTTimer timer) {
+	public SynapseUserGroupSuggestOracle(GWTTimer timer) {
 		this.timer = timer;
 	}
 	public void setTypeFilter(TypeFilter type) {
 		this.type = type;
 	}
-	public void configure(final SynapseSuggestBox suggestBox,
+	public void configure(final SynapseUserGroupSuggestBox suggestBox,
 			int pageSize,
 			UserGroupSuggestionProvider provider) {
 		this.isLoading = false;
@@ -84,7 +84,7 @@ public class SynapseSuggestOracle extends SuggestOracle {
 		this.request = request;
 		this.callback = callback;
 		timer.cancel();
-		timer.schedule(SynapseSuggestBox.DELAY);
+		timer.schedule(SynapseUserGroupSuggestBox.DELAY);
 	}	
 	
 	@Override

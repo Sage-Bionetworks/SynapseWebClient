@@ -11,9 +11,9 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModalView;
 
@@ -25,7 +25,7 @@ public class SelectTeamModalTest {
 	@Mock
 	SelectTeamModalView mockView;
 	@Mock
-	SynapseSuggestBox mockTeamSuggestBox;
+	SynapseUserGroupSuggestBox mockTeamSuggestBox;
 	@Mock
 	UserGroupSuggestionProvider mockProvider;
 	@Mock

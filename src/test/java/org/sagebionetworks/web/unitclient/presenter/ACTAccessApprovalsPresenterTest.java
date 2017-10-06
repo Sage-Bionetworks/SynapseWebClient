@@ -43,9 +43,9 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -73,7 +73,7 @@ public class ACTAccessApprovalsPresenterTest {
 	@Mock
 	DataAccessClientAsync mockDataAccessClient;
 	@Mock
-	SynapseSuggestBox mockPeopleSuggestWidget;
+	SynapseUserGroupSuggestBox mockPeopleSuggestWidget;
 	@Mock
 	UserGroupSuggestionProvider mockProvider;
 	@Mock

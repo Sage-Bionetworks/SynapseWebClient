@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -12,12 +12,12 @@ import com.google.inject.Inject;
 public class SelectTeamModal implements SelectTeamModalView.Presenter {
 	private SelectTeamModalView view;
 	private CallbackP<String> teamIdSelectedCallback; 
-	SynapseSuggestBox teamSuggestBox;
+	SynapseUserGroupSuggestBox teamSuggestBox;
 	UserGroupSuggestionProvider provider;
 	
 	@Inject
 	public SelectTeamModal(SelectTeamModalView view, 
-			SynapseSuggestBox teamSuggestBox,
+			SynapseUserGroupSuggestBox teamSuggestBox,
 			UserGroupSuggestionProvider provider) {
 		this.view = view;
 		this.teamSuggestBox = teamSuggestBox;
