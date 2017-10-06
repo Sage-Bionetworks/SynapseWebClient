@@ -90,7 +90,7 @@ public class PreviewWidgetViewImpl extends FocusPanel implements PreviewWidgetVi
 	
 	@Override
 	public void setImagePreview(final String fullFileUrl) {
-		clear();//
+		clear();
 		Image fullImage = new Image();
 		fullImage.addStyleName("maxWidth100 maxHeight100 margin-left-20");
 		fullImage.addErrorHandler(new ErrorHandler() {
