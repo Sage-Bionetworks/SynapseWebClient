@@ -76,6 +76,7 @@ public class SynapseJavascriptFactory {
 		SubscriberCount,
 		BatchFileResult,
 		StackStatus,
+		UserProfile,
 		JSON,
 		None
 	}
@@ -169,6 +170,8 @@ public class SynapseJavascriptFactory {
 			return new BatchFileResult(json);
 		case StackStatus :
 			return new StackStatus(json);
+		case UserProfile :
+			return new UserProfile(json);
 		case JSON :
 			return json;
 		case PaginatedResultsEntityHeader :

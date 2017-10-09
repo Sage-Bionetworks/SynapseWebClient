@@ -31,7 +31,6 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartUtil;
-import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -184,11 +183,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 
 	public void setHeight(int height) {
 		view.setHeight(height);
-	}
-			
-	@Override
-	public void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback) {
-		ProvUtils.getInfo(nodeId, jsClient, synapseClient, adapterFactory, clientCache, dateTimeUtils, idToNode, callback);
 	}
 	
 	@SuppressWarnings("unchecked")

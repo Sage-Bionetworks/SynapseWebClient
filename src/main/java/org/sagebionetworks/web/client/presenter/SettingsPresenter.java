@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -40,6 +41,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 	private SubscriptionListWidget subscriptionListWidget;
 	private PasswordStrengthWidget passwordStrengthWidget;
 	private EmailAddressesWidget emailAddressesWidget;
+	private SynapseJavascriptClient jsClient;
 	@Inject
 	public SettingsPresenter(SettingsView view,
 			AuthenticationController authenticationController,
@@ -50,7 +52,8 @@ public class SettingsPresenter implements SettingsView.Presenter {
 			UserProfileModalWidget userProfileModalWidget,
 			SubscriptionListWidget subscriptionListWidget,
 			PasswordStrengthWidget passwordStrengthWidget,
-			EmailAddressesWidget emailAddressesWidget) {
+			EmailAddressesWidget emailAddressesWidget,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
@@ -61,6 +64,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.subscriptionListWidget = subscriptionListWidget;
 		this.passwordStrengthWidget = passwordStrengthWidget;
 		this.emailAddressesWidget = emailAddressesWidget;
+		this.jsClient = jsClient;
 		view.setSubscriptionsListWidget(subscriptionListWidget.asWidget());
 		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());
 		view.setEmailAddressesWidget(emailAddressesWidget);
@@ -196,7 +200,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 				notificationSynAlert.handleException(caught);
 			}
 		};
-		synapseClient.getUserProfile(null, callback);
+		jsClient.getUserProfile(null, callback);
 	}
 	
 	public void clear() {
@@ -223,7 +227,7 @@ public class SettingsPresenter implements SettingsView.Presenter {
 					notificationSynAlert.handleException(caught);
 				}
 			};
-			synapseClient.getUserProfile(null, callback);
+			jsClient.getUserProfile(null, callback);
 			
 			subscriptionListWidget.configure();
 			if (globalApplicationState.isShowingUTCTime()) {

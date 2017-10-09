@@ -94,12 +94,6 @@ public class LoginPresenterTest {
 		loginPresenter.setPlace(place);
 	}
 	
-	private void setMyProfile(UserProfile profile) throws JSONObjectAdapterException {
-		jsonObjectAdapter = profile.writeToJSONObject(jsonObjectAdapter.createNew());
-		String userProfileJson = jsonObjectAdapter.toJSONString();
-		AsyncMockStubber.callSuccessWith(userProfileJson).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
-	}
-	
 	@Test 
 	public void testSetPlaceLogout() {
 		LoginPlace place = new LoginPlace(LoginPlace.LOGOUT_TOKEN);
@@ -157,11 +151,6 @@ public class LoginPresenterTest {
 		LoginPlace place = new LoginPlace(fakeToken);
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		
-		UserProfile profile = new UserProfile();
-		profile.setOwnerId("1233");
-		profile.setUserName("NotTemporary");
-		setMyProfile(profile);
-
 		loginPresenter.setPlace(place);
 		verify(mockAuthenticationController).revalidateSession(eq(fakeToken), any(AsyncCallback.class));
 		verify(mockGlobalApplicationState).gotoLastPlace(any(Place.class));
@@ -202,11 +191,6 @@ public class LoginPresenterTest {
 		LoginPlace place = new LoginPlace(fakeToken);
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		
-		UserProfile profile = new UserProfile();
-		profile.setOwnerId("1233");
-		profile.setUserName("valid-username");
-		setMyProfile(profile);
-		
 		loginPresenter.setPlace(place);
 		verify(mockAuthenticationController).revalidateSession(eq(fakeToken), any(AsyncCallback.class));
 	}
@@ -236,11 +220,6 @@ public class LoginPresenterTest {
 	
 	@Test 
 	public void testSetPlaceSSOLoginNotSignedToU() throws JSONObjectAdapterException {
-		UserProfile profile = new UserProfile();
-		profile.setOwnerId("1233");
-		profile.setUserName("valid-username");
-		setMyProfile(profile);
-
 		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
 		LoginPlace place = new LoginPlace(fakeToken);
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		

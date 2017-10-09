@@ -63,6 +63,7 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
@@ -421,6 +422,18 @@ public class SynapseJavascriptClient {
 		doGet(builder.toString(), OBJECT_TYPE.UserGroupHeaderResponsePage, callback);
 	}
 
+	public void getUserProfile(String userId, AsyncCallback<UserProfile> callback) {
+		String url = getRepoServiceUrl() + USER_PROFILE_PATH;
+		if (userId == null) {
+			// get my profile
+			doGet(url, OBJECT_TYPE.UserProfile, callback);
+		} else {
+			// get target profile
+			url += "/" + userId;
+			doGet(url, OBJECT_TYPE.UserProfile, callback);
+		}
+	}
+	
 	public void listUserProfiles(List<String> userIds, final AsyncCallback<List<UserProfile>> callback) {
 		List<Long> userIdsLong = new ArrayList<>();
 		for (String userId : userIds) {

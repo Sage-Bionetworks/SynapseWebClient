@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -24,6 +25,7 @@ import com.google.inject.Inject;
 public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter, IsWidget {
 	EmailAddressesWidgetView view;
 	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	SynapseAlert synAlert;
 	AuthenticationController authenticationController;
 	PopupUtilsView popupUtils;
@@ -36,12 +38,14 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 	 */
 	@Inject
 	public EmailAddressesWidget(EmailAddressesWidgetView view, 
-			SynapseClientAsync synapseClient, 
+			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert,
 			AuthenticationController authenticationController,
 			PopupUtilsView popupUtils,
 			GWTWrapper gwt) {
 		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.view = view;
 		this.synAlert = synAlert;
 		this.authenticationController = authenticationController;
@@ -96,7 +100,7 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 	public void refresh() {
 		clear();
 		view.setLoadingVisible(true);
-		synapseClient.getUserProfile(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<UserProfile>() {
+		jsClient.getUserProfile(authenticationController.getCurrentUserPrincipalId(), new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(UserProfile result) {
 				configure(result);

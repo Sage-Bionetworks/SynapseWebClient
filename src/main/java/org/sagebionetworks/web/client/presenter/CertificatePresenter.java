@@ -4,14 +4,11 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.view.CertificateView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -25,28 +22,23 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 
 	private CertificateView view;
 	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 	private SynapseClientAsync synapseClient;
 	private AdapterFactory adapterFactory;
-	private ClientCache clientCache;
 	private SynapseAlert synAlert;
-
+	private SynapseJavascriptClient jsClient;
 	
 	@Inject
 	public CertificatePresenter(CertificateView view,  
-			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			AdapterFactory adapterFactory,
-			ClientCache clientCache,
 			SynapseAlert synAlert){
 		this.view = view;
-		// Set the presenter on the view
-		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.adapterFactory = adapterFactory;
-		this.clientCache = clientCache;
 		this.synAlert = synAlert;
 		this.view.setPresenter(this);
 		view.setSynapseAlertWidget(synAlert.asWidget());
@@ -85,8 +77,7 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 		synAlert.clear();
 		view.clear();
 		view.showLoading();
-		UserBadge.getUserProfile(principalId, adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
-		
+		jsClient.getUserProfile(principalId, new AsyncCallback<UserProfile>() {
 			@Override
 			public void onSuccess(UserProfile profile) {
 				initStep2(principalId, profile);
