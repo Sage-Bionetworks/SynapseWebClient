@@ -71,25 +71,34 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 				tr.addStyleName("border-bottom-1");	
 			}
 
+			TableData td = new TableData();
+			td.addStyleName("padding-5");
 			final UserProfile profile = profiles.get(i);
-			MembershipInvtnSubmission invite = invitations.get(i);
-			final String inviteId = invite.getId();
-			String inviteMessage = invite.getMessage() != null ? invite.getMessage() : "";
-			String createdOn = createdOnDates.get(i);
-
-			UserBadge invitee = ginInjector.getUserBadgeWidget();
+			final MembershipInvtnSubmission invite = invitations.get(i);
+			String inviteeEmail = invite.getInviteeEmail();
+			UserBadge userBadge = ginInjector.getUserBadgeWidget();
 			if (profile != null) {
-				invitee.configure(profile);
-			} else {
-				invitee.configureWithInviteeEmail(invite.getInviteeEmail());
+				userBadge.configure(profile);
+				td.add(userBadge);
+				if (inviteeEmail != null) {
+					Div inviteeEmailDiv = new Div();
+					inviteeEmailDiv.add(new Text(inviteeEmail));
+					td.add(inviteeEmailDiv);
+				}
+			} else if (inviteeEmail != null) {
+				userBadge.configureWithInviteeEmail(invite.getInviteeEmail());
+				td.add(userBadge);
 			}
-
+			String inviteMessage = invite.getMessage() != null ? invite.getMessage() : "";
 			Div invitationMessageDiv = new Div();
 			invitationMessageDiv.add(new Text(inviteMessage));
-			
+			td.add(invitationMessageDiv);
+			String createdOn = createdOnDates.get(i);
 			Div createdOnDiv = new Div();
 			createdOnDiv.add(new Italic(createdOn));
-			
+			td.add(createdOnDiv);
+			tr.add(td);
+
 			//Remove invitation button
 			Button leaveButton = new Button("Remove");
 			leaveButton.setType(ButtonType.DANGER);
@@ -98,16 +107,9 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 			leaveButton.addClickHandler(new ClickHandler() {			
 				@Override
 				public void onClick(ClickEvent event) {
-					presenter.removeInvitation(inviteId);
+					presenter.removeInvitation(invite.getId());
 				}
 			});
-			
-			TableData td = new TableData();
-			td.addStyleName("padding-5");
-			td.add(invitee);
-			td.add(invitationMessageDiv);
-			td.add(createdOnDiv);
-			tr.add(td);
 			
 			td = new TableData();
 			td.add(leaveButton);

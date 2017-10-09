@@ -1598,12 +1598,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			List<MembershipInvtnSubmission> invitationsToEmails = new ArrayList<>();
 			// Sort the results into the two types
 			for (MembershipInvtnSubmission invite : invitations.getResults()) {
-				if (invite.getInviteeId() != null ^ invite.getInviteeEmail() != null) {
-					if (invite.getInviteeId() != null) {
-						invitationsToUsers.add(invite);
-					} else {
-						invitationsToEmails.add(invite);
-					}
+				String inviteeId = invite.getInviteeId();
+				String inviteeEmail = invite.getInviteeEmail();
+				if (inviteeId != null) {
+					invitationsToUsers.add(invite);
+				} else if (inviteeEmail != null) {
+					invitationsToEmails.add(invite);
 				}
 			}
 
