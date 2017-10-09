@@ -18,7 +18,9 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.*;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -31,14 +33,14 @@ public class InviteWidgetTest {
 	SynapseClientAsync mockSynapseClient;
 	InviteWidgetView mockView;
 	SynapseAlert mockSynAlert;
-	SynapseInviteeSuggestBox mockSuggestBox;
+	SynapseSuggestBox mockSuggestBox;
 	SynapseJSNIUtils mockJSNIUtils;
 	Team mockTeam;
 	String teamId = "123";
 	String userId = "testId";
 	InviteWidget inviteWidget;
 	UserGroupHeader mockHeader;
-	InviteeSuggestionProvider mockSuggestionProvider;
+	UserGroupSuggestionProvider mockSuggestionProvider;
 	UserGroupSuggestion mockSuggestion;
 	Callback mockRefreshCallback;
 	GWTWrapper mockGWTWrapper;
@@ -51,12 +53,12 @@ public class InviteWidgetTest {
 		mockView = mock(InviteWidgetView.class);
 		mockGWTWrapper = mock(GWTWrapper.class);
 		mockSynAlert = mock(SynapseAlert.class);
-		mockSuggestBox = mock(SynapseInviteeSuggestBox.class);
+		mockSuggestBox = mock(SynapseSuggestBox.class);
 		mockSuggestion = mock(UserGroupSuggestion.class);
 		mockJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockHeader = mock(UserGroupHeader.class);
 		mockTeam = mock(Team.class);
-		mockSuggestionProvider = mock(InviteeSuggestionProvider.class);
+		mockSuggestionProvider = mock(UserGroupSuggestionProvider.class);
 		inviteWidget = new InviteWidget(mockView, mockSynapseClient, mockGWTWrapper, mockSynAlert, mockSuggestBox, mockSuggestionProvider);
 		mockRefreshCallback = mock(Callback.class);
 		inviteWidget.configure(mockTeam);
@@ -73,7 +75,7 @@ public class InviteWidgetTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).inviteMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
 		when(mockSuggestion.getHeader()).thenReturn(mockHeader);
-		inviteWidget.validateAndSendInvite(mockSuggestion, invitationMessage);
+		inviteWidget.validateAndSendInvite(invitationMessage);
 		verify(mockSynapseClient).inviteMember(eq(userId), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
@@ -84,7 +86,7 @@ public class InviteWidgetTest {
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
 		when(mockSuggestion.getHeader()).thenReturn(mockHeader);
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isTeamMember(anyString(), anyLong(), any(AsyncCallback.class));
-		inviteWidget.validateAndSendInvite(mockSuggestion, invitationMessage);
+		inviteWidget.validateAndSendInvite(invitationMessage);
 		verify(mockSynAlert).showError("This user is already a member.");
 	}
 	
@@ -103,7 +105,7 @@ public class InviteWidgetTest {
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).inviteMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
 		when(mockSuggestion.getHeader()).thenReturn(mockHeader);
-		inviteWidget.validateAndSendInvite(mockSuggestion, "You are invited!");
+		inviteWidget.validateAndSendInvite("You are invited!");
 		verify(mockSynapseClient).inviteMember(eq(userId), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(caught);
 	}

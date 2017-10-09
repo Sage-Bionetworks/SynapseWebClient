@@ -136,8 +136,8 @@ public interface SynapseClient extends RemoteService{
 
 	/**
 	 * Create or update an entity
-	 * @param entity
-	 * @param annos
+	 * @param entityJson
+	 * @param annoJson
 	 * @param isNew
 	 * @return
 	 * @throws RestServiceException 
@@ -153,7 +153,7 @@ public interface SynapseClient extends RemoteService{
 
 	/**
 	 * Updates the user's profile json object 
-	 * @param userProfile json object of the user's profile
+	 * @param userProfileJson json object of the user's profile
 	 * @throws RestServiceException
 	 */
 	public void updateUserProfile(UserProfile userProfile) throws RestServiceException;
@@ -231,7 +231,7 @@ public interface SynapseClient extends RemoteService{
 	public void deleteOpenMembershipRequests(String currentUserId, String teamId) throws RestServiceException;
 	public TeamMembershipStatus requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn) throws RestServiceException;
 	public void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
-	public void inviteNewMember(String email, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
+	
 	public String getCertifiedUserPassingRecord(String userId) throws RestServiceException;
 	public String getCertificationQuiz() throws RestServiceException;
 	public PassingRecord submitCertificationQuizResponse(QuizResponse response) throws RestServiceException; 
@@ -297,7 +297,7 @@ public interface SynapseClient extends RemoteService{
 	/**
 	 * Start a new Asynchronous job of a the given type with the provided request JSON.
 	 * @param type The type of job to run.
-	 * @param body The JSON of the AsynchronousRequestBody.
+	 * @param bodyJSON The JSON of the AsynchronousRequestBody.
 	 * @return
 	 * @throws RestServiceException
 	 */
@@ -318,6 +318,8 @@ public interface SynapseClient extends RemoteService{
 	/**
 	 * Create or update an Entity.
 	 * @param entity
+	 * @param annoJson
+	 * @param isNew
 	 * @return
 	 * @throws RestServiceException 
 	 */

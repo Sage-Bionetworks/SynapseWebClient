@@ -4,9 +4,9 @@ import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -14,12 +14,12 @@ public class UserTeamSelector implements UserSelectorView.Presenter {
 	
 	private UserSelectorView view;
 	CallbackP<String> aliasCallback;
-	SynapseUserGroupSuggestBox suggestBox;
+	SynapseSuggestBox suggestBox;
 	GWTWrapper gwt;
 	
 	@Inject
 	public UserTeamSelector(UserSelectorView view, 
-			SynapseUserGroupSuggestBox suggestBox,
+			SynapseSuggestBox suggestBox, 
 			UserGroupSuggestionProvider provider,
 			GWTWrapper gwt
 			) {

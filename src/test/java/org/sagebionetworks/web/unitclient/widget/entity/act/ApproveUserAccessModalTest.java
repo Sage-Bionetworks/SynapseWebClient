@@ -46,9 +46,9 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
@@ -63,7 +63,7 @@ public class ApproveUserAccessModalTest {
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
-	SynapseUserGroupSuggestBox mockPeopleSuggestWidget;
+	SynapseSuggestBox mockPeopleSuggestWidget;
 	@Mock
 	UserGroupSuggestionProvider mockProvider; 
 	@Mock

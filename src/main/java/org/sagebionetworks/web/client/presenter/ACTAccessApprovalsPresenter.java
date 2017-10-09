@@ -24,9 +24,9 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.approval.AccessorGroupWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -49,7 +49,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	public static final String SHOW_AR_TEXT = "Show Access Requirement";
 	public static final String INVALID_AR_ID = "Invalid Access Requirement ID";
 	AccessorGroupRequest accessorGroupRequest;
-	SynapseUserGroupSuggestBox peopleSuggestWidget;
+	SynapseSuggestBox peopleSuggestWidget;
 	private UserBadge selectedUserBadge;
 	Button showHideAccessRequirementButton;
 	AccessRequirementWidget accessRequirementWidget;
@@ -65,7 +65,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 			LoadMoreWidgetContainer loadMoreContainer,
 			final Button showHideAccessRequirementButton,
 			DataAccessClientAsync dataAccessClient,
-			SynapseUserGroupSuggestBox peopleSuggestWidget,
+			SynapseSuggestBox peopleSuggestWidget,
 			UserGroupSuggestionProvider provider,
 			UserBadge selectedUserBadge,
 			AccessRequirementWidget accessRequirementWidget,

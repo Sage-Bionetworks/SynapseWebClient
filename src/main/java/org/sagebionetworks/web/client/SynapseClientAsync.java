@@ -199,7 +199,6 @@ public interface SynapseClientAsync {
 	
 	void deleteOpenMembershipRequests(String currentUserId, String teamId, AsyncCallback<Void> callback);
 	void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
-	void inviteNewMember(String email, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
 	/////////////////
 	
 	/**

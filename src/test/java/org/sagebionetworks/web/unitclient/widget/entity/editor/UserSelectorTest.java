@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.editor;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -10,14 +11,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
 import org.sagebionetworks.web.client.widget.entity.editor.UserSelectorView;
-import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.user.client.ui.Widget;
 
@@ -27,7 +29,7 @@ public class UserSelectorTest {
 	@Mock
 	UserSelectorView mockView;
 	@Mock
-	SynapseUserGroupSuggestBox mockSuggestBox;
+	SynapseSuggestBox mockSuggestBox;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock

@@ -12,9 +12,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellEditorView;
 
@@ -26,7 +26,7 @@ public class UserIdCellEditorImplTest {
 	@Mock
 	UserIdCellEditorView mockView;
 	@Mock
-	SynapseUserGroupSuggestBox mockSynapseUserGroupSuggestBox;
+	SynapseSuggestBox mockSynapseSuggestBox;
 	@Mock
 	UserGroupSuggestionProvider mockUserGroupSuggestionProvider;
 	@Mock
@@ -37,50 +37,50 @@ public class UserIdCellEditorImplTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		editor = new UserIdCellEditorImpl(mockView, mockSynapseUserGroupSuggestBox, mockUserGroupSuggestionProvider);
+		editor = new UserIdCellEditorImpl(mockView, mockSynapseSuggestBox, mockUserGroupSuggestionProvider);
 		when(mockSynapseSuggestion.getId()).thenReturn(SELECTED_USER_ID);
 	}
 	
 	@Test
 	public void testConstruction() {
 		verify(mockView).setSynapseSuggestBoxWidget(any(Widget.class));
-		verify(mockSynapseUserGroupSuggestBox).setSuggestionProvider(mockUserGroupSuggestionProvider);
-		verify(mockSynapseUserGroupSuggestBox).addItemSelectedHandler(any(CallbackP.class));
+		verify(mockSynapseSuggestBox).setSuggestionProvider(mockUserGroupSuggestionProvider);
+		verify(mockSynapseSuggestBox).addItemSelectedHandler(any(CallbackP.class));
 	}
 	
 	@Test
 	public void testUserSelected(){
 		editor.onUserSelected(mockSynapseSuggestion);
-		verify(mockSynapseUserGroupSuggestBox).clear();
-		verify(mockSynapseUserGroupSuggestBox).setText(SELECTED_USER_ID);
+		verify(mockSynapseSuggestBox).clear();
+		verify(mockSynapseSuggestBox).setText(SELECTED_USER_ID);
 	}
 	
 	@Test
 	public void testSetValueNull(){
 		editor.setValue(null);
-		verify(mockSynapseUserGroupSuggestBox).setText(null);
+		verify(mockSynapseSuggestBox).setText(null);
 	}
 	
 	@Test
 	public void testSetValueReal(){
 		String userId = "456765";
 		editor.setValue(userId);
-		verify(mockSynapseUserGroupSuggestBox).clear();
-		verify(mockSynapseUserGroupSuggestBox).setText(userId);
+		verify(mockSynapseSuggestBox).clear();
+		verify(mockSynapseSuggestBox).setText(userId);
 	}
 	
 	@Test
 	public void testGetValueEmpty(){
 		// convert empty string to null
-		when(mockSynapseUserGroupSuggestBox.getText()).thenReturn("");
+		when(mockSynapseSuggestBox.getText()).thenReturn("");
 		assertNull(editor.getValue());
-		when(mockSynapseUserGroupSuggestBox.getText()).thenReturn("   ");
+		when(mockSynapseSuggestBox.getText()).thenReturn("   ");
 		assertNull(editor.getValue());
 	}
 	
 	@Test
 	public void testGetValueReal(){
-		when(mockSynapseUserGroupSuggestBox.getText()).thenReturn(SELECTED_USER_ID);
+		when(mockSynapseSuggestBox.getText()).thenReturn(SELECTED_USER_ID);
 		assertEquals(SELECTED_USER_ID, editor.getValue());
 	}
 	
@@ -88,7 +88,7 @@ public class UserIdCellEditorImplTest {
 	public void testAddKeyDownHandler(){
 		KeyDownHandler mockKeyDownHandler = Mockito.mock(KeyDownHandler.class);
 		editor.addKeyDownHandler(mockKeyDownHandler);
-		verify(mockSynapseUserGroupSuggestBox).addKeyDownHandler(mockKeyDownHandler);
+		verify(mockSynapseSuggestBox).addKeyDownHandler(mockKeyDownHandler);
 	}
 
 
@@ -96,13 +96,13 @@ public class UserIdCellEditorImplTest {
 	public void testFireEvent() {
 		GwtEvent event = Mockito.mock(GwtEvent.class);
 		editor.fireEvent(event);
-		verify(mockSynapseUserGroupSuggestBox).fireEvent(event);
+		verify(mockSynapseSuggestBox).fireEvent(event);
 	}
 	
 	@Test
 	public void testGetTabIndex() {
 		int tabIndex = 4;
-		when(mockSynapseUserGroupSuggestBox.getTabIndex()).thenReturn(tabIndex);
+		when(mockSynapseSuggestBox.getTabIndex()).thenReturn(tabIndex);
 		assertEquals(tabIndex, editor.getTabIndex());
 	}
 	
@@ -110,13 +110,13 @@ public class UserIdCellEditorImplTest {
 	public void testSetAccessKey() {
 		char key = 'a';
 		editor.setAccessKey(key);
-		verify(mockSynapseUserGroupSuggestBox).setAccessKey(key);
+		verify(mockSynapseSuggestBox).setAccessKey(key);
 	}
 	
 	@Test
 	public void testSetTabIndex() {
 		int tabIndex = 5;
 		editor.setTabIndex(tabIndex);
-		verify(mockSynapseUserGroupSuggestBox).setTabIndex(tabIndex);
+		verify(mockSynapseSuggestBox).setTabIndex(tabIndex);
 	}
 }

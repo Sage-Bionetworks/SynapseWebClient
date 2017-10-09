@@ -1,19 +1,21 @@
 package org.sagebionetworks.web.client.widget.search;
 
+import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+
 import com.google.gwt.event.dom.client.HasKeyDownHandlers;
 import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.IsWidget;
-import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.utils.CallbackP;
 
-public interface SynapseInviteeSuggestBoxView extends IsWidget, SynapseView, Focusable, HasKeyDownHandlers {
-
+public interface SynapseSuggestBoxView extends IsWidget, SynapseView, Focusable, HasKeyDownHandlers {
+	
 	/**
 	 * Gets the string of text in the suggest box.
 	 * @return The text of the currently contained in the suggest box.
 	 */
 	String getText();
-	SynapseInviteeSuggestOracle getInviteeSuggestOracle();
+	SynapseSuggestOracle getUserGroupSuggestOracle();
 	void hideLoading();
 	void clear();
 	void updateFieldStateForSuggestions(int numResults, int offset);
@@ -26,34 +28,34 @@ public interface SynapseInviteeSuggestBoxView extends IsWidget, SynapseView, Foc
 	 * @param width The CSS unit of width (e.g. "10px", "1em")
 	 */
 	void setDisplayWidth(String width);
-
-
+	
+	
 	/**
 	 * Set the presenter.
 	 * @param presenter
 	 */
 	void setPresenter(Presenter presenter);
-
+	
 	/**
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		InviteeSuggestion getSelectedSuggestion();
-		void setSelectedSuggestion(InviteeSuggestion selectedSuggestion);
-
+		UserGroupSuggestion getSelectedSuggestion();
+		void setSelectedSuggestion(UserGroupSuggestion selectedSuggestion);
+		
 		void getPrevSuggestions();
 		void getNextSuggestions();
-
-		void addItemSelectedHandler(CallbackP<InviteeSuggestion> callback);
+		
+		void addItemSelectedHandler(CallbackP<UserGroupSuggestion> callback);
 		void showLoading();
 		void hideLoading();
 		void showErrorMessage(String message);
 		void updateFieldStateForSuggestions(int numResults,
-		                                    int offset);
+				int offset);
 		void handleOracleException(Throwable caught);
 	}
 
-	void configure(SynapseInviteeSuggestOracle oracle);
+	void configure(SynapseSuggestOracle oracle);
 	void setText(String text);
 	void setSelectedText(String displayString);
 }

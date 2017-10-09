@@ -503,7 +503,10 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlertView;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlertViewImpl;
-import org.sagebionetworks.web.client.widget.search.*;
+import org.sagebionetworks.web.client.widget.search.SearchBoxView;
+import org.sagebionetworks.web.client.widget.search.SearchBoxViewImpl;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxView;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorViewImpl;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
@@ -970,11 +973,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SearchBoxView.class).to(SearchBoxViewImpl.class);
 		
 		// User Suggest Box
-		bind(SynapseUserGroupSuggestBoxView.class).to(SynapseUserGroupSuggestBoxViewImpl.class);
-
-		// Invitee Suggest Box
-		bind(SynapseInviteeSuggestBoxView.class).to(SynapseInviteeSuggestBoxViewImpl.class);
-
+		bind(SynapseSuggestBoxView.class).to(SynapseSuggestBoxViewImpl.class);
+		
 		bind(MultipartUploader.class).to(MultipartUploaderImpl.class);
 		bind(FileInputView.class).to(FileInputViewImpl.class);
 		

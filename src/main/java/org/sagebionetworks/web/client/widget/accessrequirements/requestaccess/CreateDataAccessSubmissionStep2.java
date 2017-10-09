@@ -25,9 +25,9 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
-import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -60,7 +60,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 	AuthenticationController authController;
 	RequestInterface dataAccessRequest;
 	UserBadgeList accessorChangesList;
-	private SynapseUserGroupSuggestBox peopleSuggestWidget;
+	private SynapseSuggestBox peopleSuggestWidget;
 	FileHandleList otherDocuments;
 	PopupUtilsView popupUtils;
 	RestrictableObjectDescriptor targetSubject;
@@ -76,7 +76,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 			AuthenticationController authController,
 			PortalGinInjector ginInjector,
 			UserBadgeList accessorsList,
-			SynapseUserGroupSuggestBox peopleSuggestBox,
+			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider,
 			FileHandleList otherDocuments,
 			PopupUtilsView popupUtils) {

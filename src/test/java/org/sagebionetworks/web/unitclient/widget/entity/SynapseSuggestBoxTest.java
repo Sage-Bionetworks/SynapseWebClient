@@ -15,36 +15,36 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBoxView;
-import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestOracle;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxView;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestOracle;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
 
-public class SynapseUserGroupSuggestBoxTest {
+public class SynapseSuggestBoxTest {
 
-	SynapseUserGroupSuggestBoxView mockView;
+	SynapseSuggestBoxView mockView;
 	SynapseClientAsync mockSynapseClient;
 	SageImageBundle mockSageImageBundle;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
-	SynapseUserGroupSuggestOracle mockOracle;
-	SynapseUserGroupSuggestBox suggestBox;
+	SynapseSuggestOracle mockOracle;
+	SynapseSuggestBox suggestBox;
 	UserGroupSuggestionProvider mockSuggestionProvider;
 
 	@Before
 	public void before() {
-		mockView = mock(SynapseUserGroupSuggestBoxView.class);
+		mockView = mock(SynapseSuggestBoxView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSageImageBundle = mock(SageImageBundle.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockOracle = mock(SynapseUserGroupSuggestOracle.class);
+		mockOracle = mock(SynapseSuggestOracle.class);
 		mockSuggestionProvider = mock(UserGroupSuggestionProvider.class);
-		suggestBox = new SynapseUserGroupSuggestBox(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockSageImageBundle, mockOracle);
+		suggestBox = new SynapseSuggestBox(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockSageImageBundle, mockOracle);
 		suggestBox.setSuggestionProvider(mockSuggestionProvider);
 	}
 	

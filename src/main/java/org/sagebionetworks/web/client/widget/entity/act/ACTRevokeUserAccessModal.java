@@ -5,9 +5,9 @@ import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.SynapseUserGroupSuggestBox;
+import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -23,13 +23,13 @@ public class ACTRevokeUserAccessModal implements RevokeUserAccessModalView.Prese
 	
 	private RevokeUserAccessModalView view;
 	private SynapseAlert synAlert;
-	private SynapseUserGroupSuggestBox peopleSuggestWidget;
+	private SynapseSuggestBox peopleSuggestWidget;
 	private SynapseClientAsync synapseClient;
 	private ACTAccessRequirementInterface ar;
 	@Inject
 	public ACTRevokeUserAccessModal(RevokeUserAccessModalView view,
 			SynapseAlert synAlert,
-			SynapseUserGroupSuggestBox peopleSuggestBox,
+			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider, 
 			SynapseClientAsync synapseClient
 			) {

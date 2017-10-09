@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.event.dom.client.HasKeyDownHandlers;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -17,23 +18,23 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class SynapseUserGroupSuggestBox implements SynapseUserGroupSuggestBoxView.Presenter, SynapseWidgetPresenter, IsWidget, Focusable, HasKeyDownHandlers {
+public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, SynapseWidgetPresenter, IsWidget, Focusable, HasKeyDownHandlers {
 	
 	public static final int DELAY = 750;	// milliseconds
 	public static final int PAGE_SIZE = 10;
-	private SynapseUserGroupSuggestBoxView view;
-	private SynapseUserGroupSuggestOracle oracle;
+	private SynapseSuggestBoxView view;
+	private SynapseSuggestOracle oracle;
 	private UserGroupSuggestion selectedSuggestion;
 	private int offset;		// suggestion offset for paging
 	private CallbackP<UserGroupSuggestion> callback;
 	
 	@Inject
-	public SynapseUserGroupSuggestBox(SynapseUserGroupSuggestBoxView view,
-	                                  AuthenticationController authenticationController,
-	                                  GlobalApplicationState globalApplicationState,
-	                                  SynapseClientAsync synapseClient,
-	                                  SageImageBundle sageImageBundle,
-	                                  SynapseUserGroupSuggestOracle oracle) {
+	public SynapseSuggestBox(SynapseSuggestBoxView view,
+			AuthenticationController authenticationController,
+			GlobalApplicationState globalApplicationState,
+			SynapseClientAsync synapseClient,
+			SageImageBundle sageImageBundle, 
+			SynapseSuggestOracle oracle) {
 		this.oracle = oracle;
 		this.view = view;
 		this.view.configure(oracle);
