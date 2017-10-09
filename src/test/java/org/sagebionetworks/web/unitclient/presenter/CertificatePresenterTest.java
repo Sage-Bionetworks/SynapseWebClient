@@ -1,44 +1,32 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.quiz.MultichoiceAnswer;
-import org.sagebionetworks.repo.model.quiz.MultichoiceQuestion;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
-import org.sagebionetworks.repo.model.quiz.Question;
-import org.sagebionetworks.repo.model.quiz.Quiz;
-import org.sagebionetworks.repo.model.quiz.QuizResponse;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cache.ClientCache;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.presenter.CertificatePresenter;
-import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.CertificateView;
-import org.sagebionetworks.web.client.view.QuizView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -53,29 +41,36 @@ public class CertificatePresenterTest {
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	ClientCache mockCache;
 	SynapseAlert mockSynAlert;
 	Certificate place;
 	UserProfile profile;
 	PassingRecord passingRecord;
 	String principalId;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(CertificateView.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockCache = mock(ClientCache.class);
 		mockSynAlert = mock(SynapseAlert.class);
-		presenter = new CertificatePresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, adapterFactory,mockCache, mockSynAlert);
+		presenter = new CertificatePresenter(
+				mockView, 
+				mockGlobalApplicationState, 
+				mockSynapseClient, 
+				mockSynapseJavascriptClient, 
+				adapterFactory,
+				mockSynAlert);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(new UserSessionData());
 		profile = new UserProfile();
 		principalId = "1239";
 		profile.setOwnerId(principalId);
 		profile.setUserName("Fooooo");
-		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		
 		passingRecord = new PassingRecord();
 		String passingRecordJson = passingRecord.writeToJSONObject(adapterFactory.createNew()).toJSONString();
@@ -94,7 +89,7 @@ public class CertificatePresenterTest {
 		verify(mockView, times(2)).setPresenter(presenter);
 		verify(mockView).clear();
 		verify(mockView).showLoading();
-		verify(mockSynapseClient).getUserProfile(eq(principalId), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		verify(mockSynapseClient).getCertifiedUserPassingRecord(eq(principalId), any(AsyncCallback.class));
 		verify(mockView).showSuccess(profile, passingRecord);
 	}
@@ -103,7 +98,7 @@ public class CertificatePresenterTest {
 	public void testProfileRequestError() {
 		String error = "An error";
 		Exception caught = new Exception(error);
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		presenter.initStep1(principalId);
 		verify(mockSynAlert).handleException(caught);
 	}

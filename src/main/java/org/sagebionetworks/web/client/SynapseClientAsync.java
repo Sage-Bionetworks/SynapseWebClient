@@ -106,8 +106,6 @@ public interface SynapseClientAsync {
 
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
-	void getUserProfile(String userId, AsyncCallback<UserProfile> callback);
-	
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);
 	
 	void additionalEmailValidation(String userId, String emailAddress, String callbackUrl, AsyncCallback<Void> callback);

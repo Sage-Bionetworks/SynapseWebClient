@@ -170,7 +170,7 @@ public class ProvenanceWidgetTest {
 		modifiedByUserProfile = new UserProfile();
 		modifiedByUserProfile.setUserName("007");
 		modifiedByUserProfile.setFirstName("James");
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
 
 	}
 	

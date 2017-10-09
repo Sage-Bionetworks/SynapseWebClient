@@ -13,6 +13,7 @@ import static org.mockito.Mockito.*;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -35,6 +36,8 @@ public class UserProfileModalWidgetImplTest {
 	AuthenticationController mockAuthController;
 	@Mock
 	ClientCache mockClientCache;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	
 	UserProfile profile;
 	
@@ -45,7 +48,7 @@ public class UserProfileModalWidgetImplTest {
 		mockEditorWidget = Mockito.mock(UserProfileEditorWidget.class);
 		mockSynapse = Mockito.mock(SynapseClientAsync.class);
 		mockCallback = Mockito.mock(Callback.class);
-		widget = new UserProfileModalWidgetImpl(mockView, mockEditorWidget, mockSynapse, mockAuthController, mockClientCache);
+		widget = new UserProfileModalWidgetImpl(mockView, mockEditorWidget, mockSynapse, mockSynapseJavascriptClient, mockAuthController, mockClientCache);
 		
 		profile = new UserProfile();
 		profile.setOwnerId("123");
@@ -61,7 +64,7 @@ public class UserProfileModalWidgetImplTest {
 		profile.setSummary("My live story...");
 		profile.setProfilePicureFileHandleId("45678");
 		
-		AsyncMockStubber.callSuccessWith(profile).when(mockSynapse).getUserProfile(anyString(),any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseJavascriptClient).getUserProfile(anyString(),any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -79,7 +82,7 @@ public class UserProfileModalWidgetImplTest {
 	@Test
 	public void testShowEditProfileError(){
 		String error = "An error";
-		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapse).getUserProfile(anyString(),any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseJavascriptClient).getUserProfile(anyString(),any(AsyncCallback.class));
 		String userId = "123";
 		widget.showEditProfile(userId, mockCallback);
 		verify(mockView).showModal();
