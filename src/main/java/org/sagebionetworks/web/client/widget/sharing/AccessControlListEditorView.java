@@ -35,12 +35,12 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
 	public void setPublicAclPrincipalId(Long publicAclPrincipalId);
 	public void setAuthenticatedAclPrinciapalId(Long authenticatedPrincipalId);
+	void setSynAlert(IsWidget w);
 	/**
 	 * Set the view to a loading state while async loads
 	 */
 	public void showLoading();
 	
-	void showInfoError(String title, String message);
 	void setNotifyCheckboxVisible(boolean isVisible);
 	void setDeleteLocalACLButtonVisible(boolean isVisible);
 	void setPublicPrivateButtonVisible(boolean isVisible);
