@@ -1018,7 +1018,7 @@ a.shortBtn {
 	overflow-x: auto;
 	overflow-y: hidden;
 	text-align: justify;
-	line-height: 2em;
+	line-height: 1.8em;
 }
 
 .markdown ol { 
