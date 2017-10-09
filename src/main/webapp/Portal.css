@@ -29,10 +29,13 @@ sticky footer
 **/
 #rootPanel {
   /** set the min height of the root panel to subtract the height of the header and footer **/
-  min-height: calc(100vh - 250px);
+	min-height: calc(100vh - 250px);
+	color:#666666;
+	font-size:1em;
+	line-height:1.6em;
 }
 #footerPanel {
-  height: 150px;
+	height: 150px;
 }
 /**
 end sticky footer
@@ -1015,7 +1018,7 @@ a.shortBtn {
 	overflow-x: auto;
 	overflow-y: hidden;
 	text-align: justify;
-	line-height: 1.6em;
+	line-height: 1.8em;
 }
 
 .markdown ol { 
@@ -2835,11 +2838,6 @@ pre .apache .tag {
 	/*BODY*/
 /*-------------------------------------------------------*/
 
-body {
-	color:#666666;
-	font-size:12px;
-	line-height:1.5em;
-}
 ::selection {
 	background:#000;
 	color:#fff;
@@ -3280,14 +3278,3 @@ div.colborder {
 .separator { clear:both; height:1px; background:#ececec; }
 
 /* End Svarog css. */
-
-
-
-
-
-
-
-
-
-
-
