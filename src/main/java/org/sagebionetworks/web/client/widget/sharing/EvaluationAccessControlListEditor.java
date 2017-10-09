@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.AclUtils;
@@ -62,6 +63,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	private Map<String, UserGroupHeader> userGroupHeaders;
 	private Set<String> originalPrincipalIdSet;
 	HasChangesHandler hasChangesHandler;
+	SynapseAlert synAlert;
 	
 	@Inject
 	public EvaluationAccessControlListEditor(AccessControlListEditorView view,
@@ -69,7 +71,8 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			JSONObjectAdapter jsonObjectAdapter,
-			ChallengeClientAsync challengeClient
+			ChallengeClientAsync challengeClient,
+			SynapseAlert synAlert
 			) {
 		this.view = view;
 		this.jsClient = jsClient;
@@ -77,9 +80,10 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		
+		this.synAlert = synAlert;
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);
+		view.setSynAlert(synAlert);
 		view.setPermissionsToDisplay(getPermList(), getPermissionsToDisplay());
 		view.setNotifyCheckboxVisible(false);
 		view.setDeleteLocalACLButtonVisible(false);
@@ -233,7 +237,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	}
 	
 	private void populateAclEntries() {
-		
+		synAlert.clear();
 		for (final ResourceAccess ra : acl.getResourceAccess()) {
 			final String principalId = ra.getPrincipalId().toString();
 			final UserGroupHeader header = userGroupHeaders.get(principalId);
@@ -242,7 +246,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 					header.getUserName();
 				view.addAclEntry(new AclEntry(principalId, ra.getAccessType(), title, "", header.getIsIndividual()));
 			} else {
-				showErrorMessage("Could not find user " + principalId);
+				synAlert.showError("Could not find user " + principalId);
 			}
 		}
 	}
@@ -271,8 +275,9 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	public void setAccess(Long principalId, PermissionLevel permissionLevel) {
 		validateEditorState();
 		String currentUserId = getCurrentUserId();
+		synAlert.clear();
 		if (currentUserId != null && principalId.toString().equals(currentUserId)) {
-			showErrorMessage(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
+			synAlert.showError(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
 			return;
 		}
 		if (principalId.equals(publicPrincipalIds.getPublicAclPrincipalId()))
@@ -317,8 +322,9 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	public void removeAccess(Long principalIdToRemove) {
 		validateEditorState();
 		String currentUserId = getCurrentUserId();
-		if (currentUserId != null && principalIdToRemove.toString().equals(currentUserId)) {	
-			showErrorMessage(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
+		synAlert.clear();
+		if (currentUserId != null && principalIdToRemove.toString().equals(currentUserId)) {
+			synAlert.showError(ERROR_CANNOT_MODIFY_ACTIVE_USER_PERMISSIONS);
 			return;
 		}
 		if (principalIdToRemove.equals(publicPrincipalIds.getPublicAclPrincipalId()))
@@ -338,15 +344,16 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 			setViewDetails();
 		} else {
 			// not found
-			showErrorMessage("ACL does not have a record for " + principalIdToRemove);
+			synAlert.showError("ACL does not have a record for " + principalIdToRemove);
 		}
 	}
 
 	@Override
 	public void createAcl() {
 		validateEditorState();
+		synAlert.clear();
 		if (acl.getId().equals(evaluation.getId())) {
-			showErrorMessage("Entity already has an ACL!");
+			synAlert.showError("Entity already has an ACL!");
 			return;
 		}		
 		acl.setId(evaluation.getId());
@@ -361,7 +368,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	
 	public void pushChangesToSynapse(final Callback changesPushedCallback) {
 		validateEditorState();
-		
+		synAlert.clear();
 		// Create an async callback to receive the updated ACL from Synapse
 		AsyncCallback<AccessControlList> callback = new AsyncCallback<AccessControlList>(){
 			@Override
@@ -373,8 +380,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);
-				view.showInfoError("Error", "Permissions were not saved to Synapse");
+				synAlert.handleException(caught);
 				hasChangesHandler.hasChanges(true);
 			}
 		};
@@ -408,12 +414,9 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		if (this.acl == null) throw new IllegalStateException(NULL_ACL_MESSAGE);
 		if (this.uep == null) throw new IllegalStateException(NULL_UEP_MESSAGE);
 	}
-	
-	private void showErrorMessage(String s) {
-		view.showErrorMessage(s);
-	}
 
 	public void refresh() {
+		synAlert.clear();
 		refresh(new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
@@ -421,7 +424,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 
 			@Override
 			public void onFailure(Throwable caught) {
-				showErrorMessage(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
+				synAlert.showError(DisplayConstants.ERROR_ACL_RETRIEVAL_FAILED);
 			}
 		});
 	}

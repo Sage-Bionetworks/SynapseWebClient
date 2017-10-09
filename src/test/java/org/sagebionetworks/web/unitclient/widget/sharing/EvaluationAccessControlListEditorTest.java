@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditor;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -80,6 +81,8 @@ public class EvaluationAccessControlListEditorTest {
 	PublicPrincipalIds mockPublicPrincipalIds;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	SynapseAlert mockSynAlert;
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws JSONObjectAdapterException {
@@ -117,7 +120,8 @@ public class EvaluationAccessControlListEditorTest {
 				mockAuthenticationController,
 				mockGlobalApplicationState,
 				new JSONObjectAdapterImpl(),
-				mockChallengeClient
+				mockChallengeClient,
+				mockSynAlert
 		);
 		
 		mockHasChangesHandler = mock(EvaluationAccessControlListEditor.HasChangesHandler.class);
@@ -276,7 +280,7 @@ public class EvaluationAccessControlListEditorTest {
 		acle.setAccess(ADMIN_ID, PermissionLevel.CAN_VIEW);
 		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		
-		verify(mockACLEView).showErrorMessage(anyString());
+		verify(mockSynAlert).showError(anyString());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -301,6 +305,6 @@ public class EvaluationAccessControlListEditorTest {
 		acle.removeAccess(USER2_ID);
 		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 
-		verify(mockACLEView).showErrorMessage(anyString());
+		verify(mockSynAlert).showError(anyString());
 	}
 }
