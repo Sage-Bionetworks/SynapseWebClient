@@ -787,7 +787,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(GWTTimer.class).to(GWTTimerImpl.class);
 		
 		//RequestBuilder
-		bind(RequestBuilderWrapperImpl.class).in(Singleton.class);
 		bind(RequestBuilderWrapper.class).to(RequestBuilderWrapperImpl.class);
 		
 		// Adapter factoyr
