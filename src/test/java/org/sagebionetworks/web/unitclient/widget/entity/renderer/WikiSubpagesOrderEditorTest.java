@@ -22,14 +22,12 @@ public class WikiSubpagesOrderEditorTest {
 	
 	WikiSubpagesOrderEditorView mockView;
 	WikiSubpageOrderEditorTree mockEditorTree;
-	HasChangesHandler mockHandler;
 	
 	
 	@Before
 	public void before(){
 		mockView = Mockito.mock(WikiSubpagesOrderEditorView.class);
 		mockEditorTree = Mockito.mock(WikiSubpageOrderEditorTree.class);
-		mockHandler = Mockito.mock(HasChangesHandler.class);
 		
 		editor = new WikiSubpagesOrderEditor(mockView, mockEditorTree);
 	}
@@ -38,7 +36,7 @@ public class WikiSubpagesOrderEditorTest {
 	public void testConfigure() {
 		List<V2WikiHeader> wikiHeaders = new ArrayList<V2WikiHeader>();
 		String ownerObjectName = "A";
-		editor.configure(wikiHeaders, ownerObjectName, mockHandler);
+		editor.configure(wikiHeaders, ownerObjectName);
 		
 		verify(mockEditorTree).configure(wikiHeaders, ownerObjectName);
 		verify(mockView).configure(mockEditorTree, mockHandler);

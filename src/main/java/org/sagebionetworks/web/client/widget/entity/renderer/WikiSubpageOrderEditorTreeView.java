@@ -12,6 +12,7 @@ public interface WikiSubpageOrderEditorTreeView extends IsWidget, SynapseView {
 	void moveTreeItem(SubpageOrderEditorTreeNode node, boolean moveUp);
 	
 	void setPresenter(Presenter presenter);
+	void setSynAlert(IsWidget w);
 	
 	public interface Presenter {
 		void selectTreeItem(SubpageOrderEditorTreeNode node);

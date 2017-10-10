@@ -33,6 +33,7 @@ import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
@@ -56,6 +57,7 @@ public class SynapseJavascriptFactory {
 		Count,
 		PaginatedResultsEntityHeader,
 		V2WikiPage,
+		V2WikiOrderHint,
 		DockerRepository,
 		FileEntity,
 		Project,
@@ -132,6 +134,8 @@ public class SynapseJavascriptFactory {
 			return new Count(json).getCount();
 		case V2WikiPage :
 			return new V2WikiPage(json);
+		case V2WikiOrderHint :
+			return new V2WikiOrderHint(json);
 		case FileEntity :
 			return new FileEntity(json);
 		case DockerRepository :

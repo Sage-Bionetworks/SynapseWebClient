@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 import static com.google.gwt.http.client.RequestBuilder.DELETE;
 import static com.google.gwt.http.client.RequestBuilder.GET;
 import static com.google.gwt.http.client.RequestBuilder.POST;
+import static com.google.gwt.http.client.RequestBuilder.PUT;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
@@ -12,7 +13,7 @@ import static org.apache.http.HttpStatus.SC_PRECONDITION_FAILED;
 import static org.apache.http.HttpStatus.SC_SERVICE_UNAVAILABLE;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
-import static org.sagebionetworks.web.shared.WebConstants.*;
+import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import java.util.ArrayList;
@@ -20,7 +21,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -29,7 +29,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
@@ -60,7 +59,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.util.ValidateArgument;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -77,8 +75,8 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -96,6 +94,7 @@ public class SynapseJavascriptClient {
 	public static final String WIKI = "/wiki/";
 	public static final String WIKI2 = "/wiki2/";
 	public static final String WIKIKEY = "/wikikey";
+	public static final String WIKI_ORDER_HINT = "/wiki2orderhint";
 	public static final String CHILDREN = "/children";
 	public static final String RESTRICTION_INFORMATION = "/restrictionInformation";
 	public static final String USER_PROFILE_PATH = "/userProfile";
@@ -201,9 +200,9 @@ public class SynapseJavascriptClient {
 		sendRequest(requestBuilder, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 	
-	private void doPost(String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
+	private void doPostOrPut(RequestBuilder.Method method, String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
-		requestBuilder.configure(POST, url);
+		requestBuilder.configure(method, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		requestBuilder.setHeader(CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
@@ -211,6 +210,15 @@ public class SynapseJavascriptClient {
 		}
 		sendRequest(requestBuilder, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
+	
+	private void doPost(String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
+		doPostOrPut(POST, url, requestData, responseType, callback);
+	}
+	
+	private void doPut(String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
+		doPostOrPut(PUT, url, requestData, responseType, callback);
+	}
+
 	
 	private void sendRequest(final RequestBuilderWrapper requestBuilder, final String requestData, final OBJECT_TYPE responseType, final int retryDelay, final AsyncCallback callback) {
 		try {
@@ -734,17 +742,32 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.StackStatus, callback);
 	}
 	
-	public void updateV2WikiPage(String ownerId, ObjectType ownerType, V2WikiPage toUpdate, AsyncCallback<V2WikiPage> callback){
-		String uri = String.format(WIKI_ID_URI_TEMPLATE_V2, ownerType.name()
-				.toLowerCase(), ownerId, toUpdate.getId());
-		return putJSONEntity(getRepoEndpoint(), uri, toUpdate, V2WikiPage.class);
+	public void updateV2WikiPage(WikiPageKey key, V2WikiPage toUpdate, AsyncCallback<V2WikiPage> callback){
+		String url = getRepoServiceUrl() + "/" +
+				key.getOwnerObjectType().toLowerCase() + "/" + 
+				key.getOwnerObjectId() + WIKI2 +
+				key.getWikiPageId();
+		
+		try {
+			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+			toUpdate.writeToJSONObject(jsonAdapter);
+			doPut(url, jsonAdapter.toJSONString(), OBJECT_TYPE.V2WikiPage, callback);
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
 	}
-
-	public void updateV2WikiOrderHint(V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback) {
-		String uri = String.format(WIKI_ORDER_HINT_URI_TEMPLATE_V2, toUpdate
-				.getOwnerObjectType().name().toLowerCase(),
-				toUpdate.getOwnerId());
-		return putJSONEntity(getRepoEndpoint(), uri, toUpdate, V2WikiOrderHint.class);
+	
+	public void updateV2WikiOrderHint(WikiPageKey key, V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback) {
+		String url = getRepoServiceUrl() + "/" +
+			key.getOwnerObjectType().toLowerCase() + "/" + 
+			key.getOwnerObjectId() + WIKI_ORDER_HINT;
+		try {
+			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+			toUpdate.writeToJSONObject(jsonAdapter);
+			doPut(url, jsonAdapter.toJSONString(), OBJECT_TYPE.V2WikiOrderHint, callback);
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
 	}
 }
 

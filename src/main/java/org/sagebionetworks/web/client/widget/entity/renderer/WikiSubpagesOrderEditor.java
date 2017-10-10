@@ -57,10 +57,10 @@ public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Pres
 			public void onSuccess(final List<V2WikiHeader> wikiHeaders) {
 				synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
 					@Override
-					public void onSuccess(V2WikiOrderHint result) {
+					public void onSuccess(V2WikiOrderHint hint) {
 						// "Sort" stuff'
-						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, result);
-						editorTree.configure(selectWikiPageId, wikiHeaders, ownerObjectName, refreshCallback);
+						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, hint);
+						editorTree.configure(selectWikiPageId, wikiKey, wikiHeaders, ownerObjectName, hint, refreshCallback);
 					}
 					@Override
 					public void onFailure(Throwable caught) {

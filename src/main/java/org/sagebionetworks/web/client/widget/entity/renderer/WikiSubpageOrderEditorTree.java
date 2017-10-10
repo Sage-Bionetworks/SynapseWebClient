@@ -7,12 +7,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
-import org.sagebionetworks.schema.adapter.JSONEntity;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorViewImpl.TreeItemMovabilityCallback;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -28,24 +32,35 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 	
 	private TreeItemMovabilityCallback movabilityCallback;
 	CallbackP<String> refreshCallback;
-	SynapseClientAsync synapseClient;
-	
+	SynapseAlert synAlert;
+	SynapseJavascriptClient jsClient;
+	WikiPageKey wikiKey;
+	V2WikiOrderHint hint;
 	@Inject
 	public WikiSubpageOrderEditorTree(
 			WikiSubpageOrderEditorTreeView view,
-			SynapseClientAsync synapseClient
+			SynapseAlert synAlert,
+			SynapseJavascriptClient jsClient
 			) {
 		this.view = view;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
+		this.synAlert = synAlert;
 		header2node = new HashMap<V2WikiHeader, SubpageOrderEditorTreeNode>();
 		id2node = new HashMap<String, SubpageOrderEditorTreeNode>();
-		
-		
+		view.setSynAlert(synAlert);
 		view.setPresenter(this);
 	}
 	
-	public void configure(String selectWikiPageId, List<V2WikiHeader> wikiHeaders, String ownerObjectName, CallbackP<String> refreshCallback) {
+	public void configure(
+			String selectWikiPageId, 
+			WikiPageKey wikiKey, 
+			List<V2WikiHeader> wikiHeaders, 
+			String ownerObjectName, 
+			V2WikiOrderHint hint, 
+			CallbackP<String> refreshCallback) {
 		this.refreshCallback = refreshCallback;
+		this.wikiKey = wikiKey;
+		this.hint = hint;
 		view.clear();
 		// Make nodes for each header. Populate id2node map and header2node map.
 		for (V2WikiHeader header : wikiHeaders) {
@@ -168,28 +183,79 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 		}
 	}
 	
-	//TODO: instead of moving in the tree, update the order (or parent) and refresh.
 	public void moveUp() {
-		view.moveTreeItem(selectedNode, true);
-		
-		//TODO: get wiki hint, refresh, and select node
+		moveSelectedItem(true);
+		updateOrderHint();
 	}
 	
 	public void moveDown() {
-		view.moveTreeItem(selectedNode, false);
-		
-		//TODO: get wiki hint, refresh, and select node
+		moveSelectedItem(false);
+		updateOrderHint();
+	}
+	
+	private void updateOrderHint() {
+		List<String> newOrderHint = getIdListOrderHint();
+		hint.setIdList(newOrderHint);
+		synAlert.clear();
+		jsClient.updateV2WikiOrderHint(wikiKey, hint, new AsyncCallback<V2WikiOrderHint>() {
+			@Override
+			public void onSuccess(V2WikiOrderHint newHint) {
+				hint = newHint;
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
 	}
 	
 	public void moveLeft() {
 		String newParentId = getSelectedParent().getHeader().getParentId();
-		V2WikiHeader selectedNodeHeader = selectedNode.getHeader();
-		
-		// get the v2 wiki page,  set the new parent, and update the v2 wiki page.  then refresh.
-		synapseClient.updateWiki
+		updateSelectedParent(newParentId);
 	}
 	
+	public void moveRight() {
+		SubpageOrderEditorTreeNode parent = getSelectedParent();
+		int selectedChildIndex = getSelectedChildIndex();
+		SubpageOrderEditorTreeNode siblingAboveSelected = parent.getChildren().get(selectedChildIndex - 1);
+		//siblingAboveSelected is the new parent
+		String newParentId = siblingAboveSelected.getHeader().getId();
+		updateSelectedParent(newParentId);
+	}
 	
+	public void updateSelectedParent(final String newParentId) {
+		V2WikiHeader selectedNodeHeader = selectedNode.getHeader();
+		final WikiPageKey key = new WikiPageKey();
+		key.setOwnerObjectId(wikiKey.getOwnerObjectId());
+		key.setOwnerObjectType(wikiKey.getOwnerObjectType());
+		key.setWikiPageId(selectedNodeHeader.getId());
+		// get the v2 wiki page,  set the new parent, and update the v2 wiki page.  then refresh.
+		jsClient.getV2WikiPage(key, new AsyncCallback<V2WikiPage>() {
+			@Override
+			public void onSuccess(V2WikiPage selectedPage) {
+				selectedPage.setParentWikiId(newParentId);
+				updateWikiPage(key, selectedPage);
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
+	}
+	
+	public void updateWikiPage(WikiPageKey key, V2WikiPage page) {
+		jsClient.updateV2WikiPage(key, page, new AsyncCallback<V2WikiPage>() {
+			@Override
+			public void onSuccess(V2WikiPage result) {
+				refreshCallback.invoke(result.getId());
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
+	}
 	
 	public void moveSelectedItem(boolean moveUp) {
 		if (moveUp && !selectedCanMoveUpOrRight()) {

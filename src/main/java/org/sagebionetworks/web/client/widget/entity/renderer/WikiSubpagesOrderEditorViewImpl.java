@@ -38,7 +38,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	@Inject
 	public WikiSubpagesOrderEditorViewImpl(Binder binder) {
 		initWidget(binder.createAndBindUi(this));
-		addUpDownButtonHandlers();
+		addButtonHandlers();
 	}
 	
 	public void disableUpDownButtons() {
@@ -64,18 +64,32 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		return this;
 	}
 	
-	private void addUpDownButtonHandlers() {
+	private void addButtonHandlers() {
 		upButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				tree.moveSelectedItem(true);
+				tree.moveUp();
 			}
 		});
 		
 		downButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				tree.moveSelectedItem(false);
+				tree.moveDown();
+			}
+		});
+		
+		rightButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				tree.moveRight();
+			}
+		});
+		
+		leftButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				tree.moveLeft();
 			}
 		});
 	}
