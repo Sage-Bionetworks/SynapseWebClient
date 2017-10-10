@@ -35,7 +35,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView, SupportsLazyLoad
 	void showSharingSetIcon();
 	void showHasWikiIcon();
 	void showAnnotationsIcon();
-	void showDeleteIcon();
+	void showUnlinkIcon();
 	void setError(String error);
 	void showErrorIcon();
 	void setPresenter(Presenter p);
@@ -43,7 +43,7 @@ public interface EntityBadgeView extends IsWidget, SynapseView, SupportsLazyLoad
 
 	void setDiscussionThreadIconVisible(boolean visible);
 	public interface Presenter {
-		void onDelete();
+		void onUnlink();
 	}
 
 }
