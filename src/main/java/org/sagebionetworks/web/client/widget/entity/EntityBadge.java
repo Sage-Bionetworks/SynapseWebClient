@@ -260,7 +260,8 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	
 	@Override
 	public void onDelete() {
-		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+entityTypeDisplay+" "+currentEntity.getName()+"?";
+		String entityName = currentEntity.getName() == null ? "" : " "+currentEntity.getName();
+		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+entityTypeDisplay+entityName+"?";
 		if (currentEntity instanceof Folder) {
 			display += DELETE_FOLDER_EXPLANATION;
 		}
