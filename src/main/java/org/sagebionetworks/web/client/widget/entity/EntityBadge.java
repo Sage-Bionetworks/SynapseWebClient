@@ -7,20 +7,27 @@ import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.ARE_YOU_SURE_YOU_WANT_TO_DELETE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.CONFIRM_DELETE_TITLE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETED;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.DELETE_FOLDER_EXPLANATION;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -44,8 +51,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Presenter {
-	
-	public static final String LINK_SUCCESSFULLY_DELETED = "Successfully removed link";
 	private EntityBadgeView view;
 	private GlobalApplicationState globalAppState;
 	private EntityHeader entityHeader;
@@ -56,6 +61,9 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private LazyLoadHelper lazyLoadHelper;
 	private DateTimeUtils dateTimeUtils;
 	private PopupUtilsView popupUtils;
+	private Entity currentEntity;
+	private String entityTypeDisplay;
+	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
@@ -111,7 +119,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	public void configure(EntityHeader header) {
 		entityHeader = header;
 		view.setEntity(header);
-		view.setIcon(EntityTypeUtils.getIconTypeForEntityClassName(header.getType()));
+		view.setIcon(org.sagebionetworks.web.client.EntityTypeUtils.getIconTypeForEntityClassName(header.getType()));
 		lazyLoadHelper.setIsConfigured();
 	}
 	
@@ -124,6 +132,8 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	}
 	
 	public void setEntityBundle(EntityBundle eb) {
+		currentEntity = eb.getEntity();
+		entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(currentEntity.getClass()));
 		Annotations annotations = eb.getAnnotations();
 		String rootWikiId = eb.getRootWikiId();
 		List<FileHandle> handles = eb.getFileHandles();
@@ -132,8 +142,8 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			view.showAnnotationsIcon();
 			view.setAnnotations(getAnnotationsHTML(annotationList));
 		}
-		if (eb.getEntity() instanceof Link && eb.getPermissions().getCanDelete()) {
-			view.showUnlinkIcon();
+		if (eb.getPermissions().getCanDelete()) {
+			view.showDeleteIcon();
 		}
 		view.setSize(getContentSize(handles));
 		view.setMd5(getContentMd5(handles));
@@ -249,8 +259,22 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	}
 	
 	@Override
-	public void onUnlink() {
-		// delete this Link
+	public void onDelete() {
+		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+entityTypeDisplay+" "+currentEntity.getName()+"?";
+		if (currentEntity instanceof Folder) {
+			display += DELETE_FOLDER_EXPLANATION;
+		}
+		
+		popupUtils.showConfirmDialog(CONFIRM_DELETE_TITLE,display, new Callback() {
+			@Override
+			public void invoke() {
+				postConfirmedDeleteEntity();
+			}
+		});
+		
+	}
+	
+	public void postConfirmedDeleteEntity() {
 		jsClient.deleteEntityById(getEntityId(), new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -258,9 +282,10 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			}
 			@Override
 			public void onSuccess(Void result) {
-				popupUtils.showInfo(LINK_SUCCESSFULLY_DELETED, "");
+				popupUtils.showInfo(DELETED, THE + entityTypeDisplay + WAS_SUCCESSFULLY_DELETED); 
 				globalAppState.refreshPage();
 			}
 		});
+		
 	}
 }

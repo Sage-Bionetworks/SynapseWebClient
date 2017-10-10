@@ -76,7 +76,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	Tooltip discussion;
 	@UiField
-	Icon unLinkIcon;
+	Icon deleteIcon;
 	Callback onAttachCallback;
 	Anchor entityAnchor;
 	
@@ -100,10 +100,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 				md5Field.selectAll();
 			}
 		});
-		unLinkIcon.addClickHandler(new ClickHandler() {
+		deleteIcon.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onUnlink();
+				presenter.onDelete();
 			}
 		});
 	}
@@ -284,8 +284,8 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		discussionIcon.setVisible(visible);
 	}
 	@Override
-	public void showUnlinkIcon() {
-		unLinkIcon.setVisible(true);
+	public void showDeleteIcon() {
+		deleteIcon.setVisible(true);
 	}
 	
 
