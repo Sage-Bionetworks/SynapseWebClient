@@ -49,8 +49,8 @@ import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.Cr
 import org.sagebionetworks.web.client.widget.accessrequirements.requestaccess.CreateDataAccessSubmissionWizardStep2View;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;

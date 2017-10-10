@@ -15,11 +15,8 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBoxView;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestOracle;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.*;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;

@@ -11,8 +11,8 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -68,7 +68,7 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 					ugh.setDisplayName(team.getName());
 					ugh.setIsIndividual(false);
 					ugh.setOwnerId(team.getId());
-					UserGroupSuggestion suggestion = provider.new UserGroupSuggestion(ugh, team.getName());
+					UserGroupSuggestion suggestion = new UserGroupSuggestion(ugh, team.getName(), teamSuggestBox.getWidth());
 					teamSuggestBox.setSelectedSuggestion(suggestion);
 					teamSuggestBox.setText(team.getName());
 				}

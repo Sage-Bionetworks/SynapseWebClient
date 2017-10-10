@@ -18,9 +18,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.*;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -40,8 +38,8 @@ public class InviteWidgetTest {
 	String userId = "testId";
 	InviteWidget inviteWidget;
 	UserGroupHeader mockHeader;
-	UserGroupSuggestionProvider mockSuggestionProvider;
-	UserGroupSuggestion mockSuggestion;
+	UserGroupEmailSuggestionProvider mockSuggestionProvider;
+	UserGroupEmailSuggestion mockSuggestion;
 	Callback mockRefreshCallback;
 	GWTWrapper mockGWTWrapper;
 	
@@ -54,11 +52,11 @@ public class InviteWidgetTest {
 		mockGWTWrapper = mock(GWTWrapper.class);
 		mockSynAlert = mock(SynapseAlert.class);
 		mockSuggestBox = mock(SynapseSuggestBox.class);
-		mockSuggestion = mock(UserGroupSuggestion.class);
+		mockSuggestion = mock(UserGroupEmailSuggestion.class);
 		mockJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockHeader = mock(UserGroupHeader.class);
 		mockTeam = mock(Team.class);
-		mockSuggestionProvider = mock(UserGroupSuggestionProvider.class);
+		mockSuggestionProvider = mock(UserGroupEmailSuggestionProvider.class);
 		inviteWidget = new InviteWidget(mockView, mockSynapseClient, mockGWTWrapper, mockSynAlert, mockSuggestBox, mockSuggestionProvider);
 		mockRefreshCallback = mock(Callback.class);
 		inviteWidget.configure(mockTeam);
@@ -94,7 +92,7 @@ public class InviteWidgetTest {
 	public void testSendNoUserSelected() {
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
 		inviteWidget.validateAndSendInvite(invitationMessage);
-		verify(mockSynAlert).showError("Please select a user to send an invite to.");
+		verify(mockSynAlert).showError("Please select a user or an email address to send an invite to.");
 	}
 	
 	@SuppressWarnings("unchecked")

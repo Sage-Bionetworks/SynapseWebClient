@@ -9,7 +9,7 @@
 		dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
 		    <b:FormGroup>
-			    <b:FormLabel>User Search</b:FormLabel>
+			    <b:FormLabel>User Name or Email Address</b:FormLabel>
 			    <g:SimplePanel ui:field="suggestBoxPanel"/>
 			</b:FormGroup>
 			<b:FormGroup>
