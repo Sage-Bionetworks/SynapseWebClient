@@ -34,6 +34,7 @@
 				<t:TableHeader width="130px" addStyleNames="visible-md visible-lg">
 					<bh:Span text="ID" />
 				</t:TableHeader>
+				<t:TableHeader width="20px" />
 			</t:TableRow>
 		</t:Table>
 		<bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />

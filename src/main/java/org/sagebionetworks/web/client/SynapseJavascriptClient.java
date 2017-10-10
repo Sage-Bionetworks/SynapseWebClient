@@ -1,6 +1,16 @@
 package org.sagebionetworks.web.client;
-import static com.google.gwt.http.client.RequestBuilder.*;
-import static org.apache.http.HttpStatus.*;
+import static com.google.gwt.http.client.RequestBuilder.DELETE;
+import static com.google.gwt.http.client.RequestBuilder.GET;
+import static com.google.gwt.http.client.RequestBuilder.POST;
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.http.HttpStatus.SC_CONFLICT;
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
+import static org.apache.http.HttpStatus.SC_GONE;
+import static org.apache.http.HttpStatus.SC_LOCKED;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_PRECONDITION_FAILED;
+import static org.apache.http.HttpStatus.SC_SERVICE_UNAVAILABLE;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
@@ -102,12 +112,12 @@ public class SynapseJavascriptClient {
 	public static final String STACK_STATUS = "/admin/synapse/status";
 	
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
-	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
 	JSONObjectAdapter jsonObjectAdapter;
 	GlobalApplicationState globalAppState;
 	GWTWrapper gwt;
 	SynapseJavascriptFactory jsFactory;
+	PortalGinInjector ginInjector;
 
 	public static final String ENTITY_URI_PATH = "/entity";
 	public static final String USER = "/user";
@@ -138,18 +148,18 @@ public class SynapseJavascriptClient {
 	
 	@Inject
 	public SynapseJavascriptClient(
-			RequestBuilderWrapper requestBuilder,
 			AuthenticationController authController,
 			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalAppState,
 			GWTWrapper gwt,
-			SynapseJavascriptFactory jsFactory) {
-		this.requestBuilder = requestBuilder;
+			SynapseJavascriptFactory jsFactory,
+			PortalGinInjector ginInjector) {
 		this.authController = authController;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.globalAppState = globalAppState;
 		this.gwt = gwt;
 		this.jsFactory = jsFactory;
+		this.ginInjector = ginInjector;
 	}
 	private String getRepoServiceUrl() {
 		if (repoServiceUrl == null) {
@@ -166,35 +176,38 @@ public class SynapseJavascriptClient {
 	}
 
 	private void doDelete(String url, AsyncCallback callback) {
+		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(DELETE, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(url, null, OBJECT_TYPE.None, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
+		sendRequest(requestBuilder, null, OBJECT_TYPE.None, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 
 	
 	private void doGet(String url, OBJECT_TYPE responseType, AsyncCallback callback) {
+		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(GET, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(url, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
+		sendRequest(requestBuilder, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 	
 	private void doPost(String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
+		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(POST, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		requestBuilder.setHeader(CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(url, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
+		sendRequest(requestBuilder, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 	
-	private void sendRequest(final String url, final String requestData, final OBJECT_TYPE responseType, final int retryDelay, final AsyncCallback callback) {
+	private void sendRequest(final RequestBuilderWrapper requestBuilder, final String requestData, final OBJECT_TYPE responseType, final int retryDelay, final AsyncCallback callback) {
 		try {
 			requestBuilder.sendRequest(requestData, new RequestCallback() {
 				@Override
@@ -222,7 +235,7 @@ public class SynapseJavascriptClient {
 							gwt.scheduleExecution(new Callback() {
 								@Override
 								public void invoke() {
-									sendRequest(url, requestData, responseType, retryDelay*2, callback);
+									sendRequest(requestBuilder, requestData, responseType, retryDelay*2, callback);
 								}
 							}, retryDelay);
 						} else {

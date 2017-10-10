@@ -12,6 +12,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -107,6 +108,8 @@ public class EntityBadgeTest {
 	
 	@Captor
 	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
 	
 	Set<ResourceAccess> resourceAccessSet;
 	@Before
@@ -321,37 +324,37 @@ public class EntityBadgeTest {
 	}
 	
 	@Test
-	public void testCanUnlink() {
+	public void testCanDelete() {
 		configure();
 		EntityBundle bundle = setupEntity(new Link());
 		when(mockPermissions.getCanDelete()).thenReturn(true);
 		
 		widget.setEntityBundle(bundle);
-		verify(mockView).showUnlinkIcon();
+		verify(mockView).showDeleteIcon();
 	}
 
 	@Test
-	public void testUnlinkCannotDeletePermission() {
+	public void testDeleteCannotDeletePermission() {
 		configure();
 		EntityBundle bundle = setupEntity(new Link());
 		when(mockPermissions.getCanDelete()).thenReturn(false);
 		
 		widget.setEntityBundle(bundle);
-		verify(mockView, never()).showUnlinkIcon();
+		verify(mockView, never()).showDeleteIcon();
 	}
 	
 	@Test
-	public void testUnlinkNotALink() {
+	public void testDeleteFile() {
 		configure();
-		EntityBundle bundle = setupEntity(new Project());
+		EntityBundle bundle = setupEntity(new FileEntity());
 		when(mockPermissions.getCanDelete()).thenReturn(true);
 		
 		widget.setEntityBundle(bundle);
-		verify(mockView, never()).showUnlinkIcon();
+		verify(mockView).showDeleteIcon();
 	}
 	
 	@Test
-	public void testOnUnlink() {
+	public void testOnDelete() {
 		//simulate successful delete of Link entity
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		configure();
@@ -359,13 +362,15 @@ public class EntityBadgeTest {
 		when(mockPermissions.getCanDelete()).thenReturn(true);
 		widget.setEntityBundle(bundle);
 		
-		widget.onUnlink();
+		widget.onDelete();
+		String message = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"Link?";
+		verify(mockPopupUtils).showConfirmDialog(eq(CONFIRM_DELETE_TITLE), eq(message), callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
 		verify(mockSynapseJavascriptClient).deleteEntityById(eq(entityId), any(AsyncCallback.class));
-		verify(mockPopupUtils).showInfo(EntityBadge.LINK_SUCCESSFULLY_DELETED, "");
 	}
 	
 	@Test
-	public void testOnUnlinkFailure() {
+	public void testOnDeleteFailure() {
 		//simulate failure to delete of Link entity
 		String errorMessage = "error occurred";
 		Exception ex = new Exception(errorMessage);
@@ -375,7 +380,9 @@ public class EntityBadgeTest {
 		when(mockPermissions.getCanDelete()).thenReturn(true);
 		widget.setEntityBundle(bundle);
 		
-		widget.onUnlink();
+		widget.onDelete();
+		verify(mockPopupUtils).showConfirmDialog(eq(CONFIRM_DELETE_TITLE), anyString(), callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
 		verify(mockSynapseJavascriptClient).deleteEntityById(eq(entityId), any(AsyncCallback.class));
 		verify(mockPopupUtils).showErrorMessage(errorMessage);
 	}
