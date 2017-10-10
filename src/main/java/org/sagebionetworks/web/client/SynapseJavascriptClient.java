@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -28,6 +29,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
@@ -53,10 +55,12 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.util.ValidateArgument;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -728,6 +732,19 @@ public class SynapseJavascriptClient {
 	public void getStackStatus(AsyncCallback<StackStatus> callback) {
 		String url = getRepoServiceUrl() + STACK_STATUS;
 		doGet(url, OBJECT_TYPE.StackStatus, callback);
+	}
+	
+	public void updateV2WikiPage(String ownerId, ObjectType ownerType, V2WikiPage toUpdate, AsyncCallback<V2WikiPage> callback){
+		String uri = String.format(WIKI_ID_URI_TEMPLATE_V2, ownerType.name()
+				.toLowerCase(), ownerId, toUpdate.getId());
+		return putJSONEntity(getRepoEndpoint(), uri, toUpdate, V2WikiPage.class);
+	}
+
+	public void updateV2WikiOrderHint(V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback) {
+		String uri = String.format(WIKI_ORDER_HINT_URI_TEMPLATE_V2, toUpdate
+				.getOwnerObjectType().name().toLowerCase(),
+				toUpdate.getOwnerId());
+		return putJSONEntity(getRepoEndpoint(), uri, toUpdate, V2WikiOrderHint.class);
 	}
 }
 

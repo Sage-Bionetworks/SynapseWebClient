@@ -35,7 +35,6 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 	private Place ownerObjectLink;
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
-	private V2WikiOrderHint subpageOrderHint;
 	private boolean canEdit;
 	
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
@@ -114,17 +113,16 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 					@Override
 					public void onSuccess(V2WikiOrderHint result) {
 						// "Sort" stuff'
-						subpageOrderHint = result;
-						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, subpageOrderHint);
+						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, result);
 						view.configure(wikiHeaders, wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
-										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback(), reloadWikiPageCallback);
+										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback);
 						view.setEditOrderButtonVisible(canEdit);
 					}
 					@Override
 					public void onFailure(Throwable caught) {
 						// Failed to get order hint. Just ignore it.
 						view.configure(wikiHeaders, wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
-								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback(), reloadWikiPageCallback);
+								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback);
 						view.setEditOrderButtonVisible(canEdit);
 					}
 				});
@@ -141,28 +139,5 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 				}
 			}
 		});
-	}
-
-	private UpdateOrderHintCallback getUpdateOrderHintCallback() {
-		return new UpdateOrderHintCallback() {
-			@Override
-			public void updateOrderHint(List<String> newOrderHintIdList) {
-					subpageOrderHint.setIdList(newOrderHintIdList);
-					synapseClient.updateV2WikiOrderHint(subpageOrderHint, new AsyncCallback<V2WikiOrderHint>() {
-						@Override
-						public void onSuccess(V2WikiOrderHint result) {
-							refreshTableOfContents();
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							view.showErrorMessage(caught.getMessage());
-						}
-					});
-				}
-		};
-	}
-
-	public interface UpdateOrderHintCallback {
-		void updateOrderHint(List<String> newOrderHintIdList);
 	}
 }

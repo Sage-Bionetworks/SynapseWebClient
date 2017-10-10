@@ -2,14 +2,13 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor.HasChangesHandler;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -23,14 +22,19 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	@UiField
 	SimplePanel instructionPanel;
 	@UiField
+	SimplePanel synAlertContainer;
+	@UiField
 	Button upButton;
 	@UiField
 	Button downButton;
-	
+	@UiField
+	Button leftButton;
+	@UiField
+	Button rightButton;
+
 	private Presenter presenter;
 	private WikiSubpageOrderEditorTree tree;
-	private HasChangesHandler hasChangesHandler;
-
+	
 	@Inject
 	public WikiSubpagesOrderEditorViewImpl(Binder binder) {
 		initWidget(binder.createAndBindUi(this));
@@ -43,9 +47,9 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	}
 	
 	@Override
-	public void configure(WikiSubpageOrderEditorTree subpageTree, HasChangesHandler hasChangesHandler) {
+	public void configure(WikiSubpageOrderEditorTree subpageTree) {
 		this.tree = subpageTree;
-		this.hasChangesHandler = hasChangesHandler;
+		treePanel.clear();
 		treePanel.setWidget(tree.asWidget());
 		subpageTree.setMovabilityCallback(getTreeItemMovabilityCallback());
 	}
@@ -84,34 +88,22 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	public TreeItemMovabilityCallback getTreeItemMovabilityCallback() {
 		return new TreeItemMovabilityCallback() {
 			@Override
-			public void invoke(boolean canMoveUp, boolean canMoveDown) {
-				upButton.setEnabled(canMoveUp);
+			public void invoke(boolean canMoveUpOrRight, boolean canMoveDown, boolean canMoveLeft) {
+				upButton.setEnabled(canMoveUpOrRight);
 				downButton.setEnabled(canMoveDown);
+				leftButton.setEnabled(canMoveLeft);
+				rightButton.setEnabled(canMoveUpOrRight);
 			}
 		};
 	}
 	
 	public interface TreeItemMovabilityCallback {
-		public void invoke(boolean canMoveUp, boolean canMoveDown);
+		public void invoke(boolean canMoveUpOrRight, boolean canMoveDown, boolean canMoveLeft);
 	}
 	
 	@Override
-	public void clear() {
-		// TODO Auto-generated method stub
-	}
-
-	@Override
-	public void showLoading() {
-		// TODO Auto-generated method stub
-	}
-	
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }

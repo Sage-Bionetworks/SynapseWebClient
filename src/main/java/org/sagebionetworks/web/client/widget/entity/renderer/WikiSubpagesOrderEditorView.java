@@ -1,12 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor.HasChangesHandler;
-
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Tree;
 
-public interface WikiSubpagesOrderEditorView extends IsWidget, SynapseView {
+public interface WikiSubpagesOrderEditorView extends IsWidget {
 	
 	/**
 	 * Sets the presenter for this view.
@@ -14,8 +10,8 @@ public interface WikiSubpagesOrderEditorView extends IsWidget, SynapseView {
 	 */
 	void setPresenter(Presenter presenter);
 	
-	void configure(WikiSubpageOrderEditorTree subpageTree, HasChangesHandler hasChangesHandler);
-	
+	void configure(WikiSubpageOrderEditorTree subpageTree);
+	void setSynAlert(IsWidget w);
 	void initializeState();
 	
 	interface Presenter {}

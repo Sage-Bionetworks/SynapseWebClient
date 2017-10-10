@@ -8,6 +8,8 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.schema.adapter.JSONEntity;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorViewImpl.TreeItemMovabilityCallback;
 
@@ -25,11 +27,16 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 	private SubpageOrderEditorTreeNode selectedNode;
 	
 	private TreeItemMovabilityCallback movabilityCallback;
+	CallbackP<String> refreshCallback;
+	SynapseClientAsync synapseClient;
 	
 	@Inject
-	public WikiSubpageOrderEditorTree(WikiSubpageOrderEditorTreeView view) {
+	public WikiSubpageOrderEditorTree(
+			WikiSubpageOrderEditorTreeView view,
+			SynapseClientAsync synapseClient
+			) {
 		this.view = view;
-		
+		this.synapseClient = synapseClient;
 		header2node = new HashMap<V2WikiHeader, SubpageOrderEditorTreeNode>();
 		id2node = new HashMap<String, SubpageOrderEditorTreeNode>();
 		
@@ -37,9 +44,9 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 		view.setPresenter(this);
 	}
 	
-	public void configure(List<V2WikiHeader> wikiHeaders, String ownerObjectName) {
+	public void configure(String selectWikiPageId, List<V2WikiHeader> wikiHeaders, String ownerObjectName, CallbackP<String> refreshCallback) {
+		this.refreshCallback = refreshCallback;
 		view.clear();
-		
 		// Make nodes for each header. Populate id2node map and header2node map.
 		for (V2WikiHeader header : wikiHeaders) {
 			
@@ -68,6 +75,11 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 		}
 		
 		view.configure(overallRoot);
+		
+		SubpageOrderEditorTreeNode selectNode = id2node.get(selectWikiPageId);
+		if (selectNode != null) {
+			selectTreeItem(selectNode);
+		}
 	}
 	
 	public List<String> getIdListOrderHint() {
@@ -99,7 +111,7 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 		selectedNode = node;
 		
 		if (movabilityCallback != null) {
-			movabilityCallback.invoke(selectedCanMoveUp(), selectedCanMoveDown());
+			movabilityCallback.invoke(selectedCanMoveUpOrRight(), selectedCanMoveDown(), selectedCanMoveLeft());
 		}
 	}
 	
@@ -112,7 +124,7 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 		
 	}
 	
-	private boolean selectedCanMoveUp() {
+	private boolean selectedCanMoveUpOrRight() {
 		if (selectedNode == null) return false;
 		
 		if (selectedNode.getHeader().getParentId() == null) {
@@ -122,6 +134,17 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 		
 		int childIndex = getSelectedChildIndex();
 		if (childIndex <= 0) {
+			return false;
+		} else {
+			return true;
+		}
+	}
+	
+	private boolean selectedCanMoveLeft() {
+		if (selectedNode == null) return false;
+		
+		if (selectedNode.getHeader().getParentId() == null || getSelectedParent().getHeader().getParentId() == null) {
+			// Overall Root.
 			return false;
 		} else {
 			return true;
@@ -145,8 +168,31 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 		}
 	}
 	
+	//TODO: instead of moving in the tree, update the order (or parent) and refresh.
+	public void moveUp() {
+		view.moveTreeItem(selectedNode, true);
+		
+		//TODO: get wiki hint, refresh, and select node
+	}
+	
+	public void moveDown() {
+		view.moveTreeItem(selectedNode, false);
+		
+		//TODO: get wiki hint, refresh, and select node
+	}
+	
+	public void moveLeft() {
+		String newParentId = getSelectedParent().getHeader().getParentId();
+		V2WikiHeader selectedNodeHeader = selectedNode.getHeader();
+		
+		// get the v2 wiki page,  set the new parent, and update the v2 wiki page.  then refresh.
+		synapseClient.updateWiki
+	}
+	
+	
+	
 	public void moveSelectedItem(boolean moveUp) {
-		if (moveUp && !selectedCanMoveUp()) {
+		if (moveUp && !selectedCanMoveUpOrRight()) {
 			throw new IllegalStateException("Selected item cannot be moved up.");
 		} else if (!moveUp && !selectedCanMoveDown()) {
 			throw new IllegalStateException("Selected item cannot be moved down.");
