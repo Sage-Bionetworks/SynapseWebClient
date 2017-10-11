@@ -32,6 +32,16 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	Button leftButton;
 	@UiField
 	Button rightButton;
+	
+	@UiField
+	Button upButton2;
+	@UiField
+	Button downButton2;
+	@UiField
+	Button leftButton2;
+	@UiField
+	Button rightButton2;
+
 	@UiField
 	Span loadingUI;
 	
@@ -48,6 +58,11 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		downButton.setEnabled(false);
 		leftButton.setEnabled(false);
 		rightButton.setEnabled(false);
+		upButton2.setEnabled(false);
+		downButton2.setEnabled(false);
+		leftButton2.setEnabled(false);
+		rightButton2.setEnabled(false);
+
 	}
 	
 	@Override
@@ -64,37 +79,45 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	}
 	
 	private void addButtonHandlers() {
-		upButton.addClickHandler(new ClickHandler() {
+		ClickHandler moveUpClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				tree.moveUp();
 			}
-		});
+		};
+		upButton.addClickHandler(moveUpClickHandler);
+		upButton2.addClickHandler(moveUpClickHandler);
 		
-		downButton.addClickHandler(new ClickHandler() {
+		ClickHandler moveDownClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				tree.moveDown();
 			}
-		});
+		};
+		downButton.addClickHandler(moveDownClickHandler);
+		downButton2.addClickHandler(moveDownClickHandler);
 		
-		rightButton.addClickHandler(new ClickHandler() {
+		ClickHandler moveRightClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				setLoadingVisible(true);
 				disableDirectionalButtons();
 				tree.moveRight();
 			}
-		});
+		};
+		rightButton.addClickHandler(moveRightClickHandler);
+		rightButton2.addClickHandler(moveRightClickHandler);
 		
-		leftButton.addClickHandler(new ClickHandler() {
+		ClickHandler moveLeftClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				setLoadingVisible(true);
 				disableDirectionalButtons();
 				tree.moveLeft();
 			}
-		});
+		};
+		leftButton.addClickHandler(moveLeftClickHandler);
+		leftButton2.addClickHandler(moveLeftClickHandler);
 	}
 	
 	@Override
@@ -107,9 +130,13 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 			@Override
 			public void invoke(boolean canMoveUpOrRight, boolean canMoveDown, boolean canMoveLeft) {
 				upButton.setEnabled(canMoveUpOrRight);
+				upButton2.setEnabled(canMoveUpOrRight);
 				downButton.setEnabled(canMoveDown);
+				downButton2.setEnabled(canMoveDown);
 				leftButton.setEnabled(canMoveLeft);
+				leftButton2.setEnabled(canMoveLeft);
 				rightButton.setEnabled(canMoveUpOrRight);
+				rightButton2.setEnabled(canMoveUpOrRight);
 			}
 		};
 	}

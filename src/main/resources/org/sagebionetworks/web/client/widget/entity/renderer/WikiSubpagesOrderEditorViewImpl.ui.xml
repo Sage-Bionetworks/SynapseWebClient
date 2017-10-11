@@ -32,5 +32,25 @@
 		</bh:Span>
 		<g:SimplePanel ui:field="synAlertContainer" />
 		<g:SimplePanel ui:field="treePanel" />
+		
+		<bh:Div addStyleNames="center center-block">
+			<bh:Div>
+				<b:VerticalButtonGroup>
+				    <b:Button ui:field="upButton2" icon="ARROW_UP"/>
+				</b:VerticalButtonGroup>
+			</bh:Div>
+			<bh:Div>
+				<b:ButtonGroup>
+					<b:Button ui:field="leftButton2" icon="ARROW_LEFT" />
+				    <b:Button ui:field="rightButton2" icon="ARROW_RIGHT" />
+				</b:ButtonGroup>
+			</bh:Div>
+			<bh:Div>
+				<b:VerticalButtonGroup>
+				    <b:Button ui:field="downButton2" icon="ARROW_DOWN"/>
+				</b:VerticalButtonGroup>
+			</bh:Div>
+		</bh:Div>
+		
 	</g:FlowPanel>
 </ui:UiBinder>
