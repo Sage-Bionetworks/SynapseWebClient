@@ -1,23 +1,17 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTree.SubpageOrderEditorTreeNode;
 
-import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -131,21 +125,7 @@ public class WikiSubpageOrderEditorTreeViewImpl extends FlowPanel implements Wik
 				
 		// Add style to the selecting list item.
 		UnorderedListPanel.addStyleNameToListItem(headerId2listItem.get(toSelect.getHeader().getId()), "active");
-	}
-	
-	@Override
-	public void showLoading() {
-		// TODO Auto-generated method stub
-	}
-	
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
+		headerId2listItem.get(toSelect.getHeader().getId()).getElement().focus();
 	}
 	
 	private Widget makeListItem(final SubpageOrderEditorTreeNode node) {

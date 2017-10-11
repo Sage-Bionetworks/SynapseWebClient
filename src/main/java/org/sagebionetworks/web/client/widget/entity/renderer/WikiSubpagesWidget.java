@@ -26,7 +26,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget {
+public class WikiSubpagesWidget implements IsWidget {
 	
 	private WikiSubpagesView view;
 	private SynapseClientAsync synapseClient;
@@ -48,12 +48,13 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 		this.view = view;		
 		this.synapseClient = synapseClient;
 		this.jsClient = jsClient;
-		view.setPresenter(this);
 	}
 
-	@Override
-	public void configure(final WikiPageKey wikiKey, Callback widgetRefreshRequired, 
-			boolean embeddedInOwnerPage, CallbackP<WikiPageKey> reloadWikiPageCallback) {
+	public void configure(
+			final WikiPageKey wikiKey, 
+			Callback widgetRefreshRequired, 
+			boolean embeddedInOwnerPage, 
+			CallbackP<WikiPageKey> reloadWikiPageCallback) {
 		canEdit = false;
 		this.reloadWikiPageCallback = reloadWikiPageCallback;
 		this.wikiKey = wikiKey;
@@ -80,7 +81,6 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 		}
 	}
 	
-	@Override
 	public void setContainers(FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
 		this.wikiPageContainer = wikiPageContainer;
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
@@ -98,7 +98,6 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 	}
 
 	public Widget asWidget() {
-		view.setPresenter(this);
 		return view.asWidget();
 	}
 	

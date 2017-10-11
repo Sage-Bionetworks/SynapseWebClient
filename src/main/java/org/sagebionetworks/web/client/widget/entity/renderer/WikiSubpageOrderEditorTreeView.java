@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTree.SubpageOrderEditorTreeNode;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface WikiSubpageOrderEditorTreeView extends IsWidget, SynapseView {
+public interface WikiSubpageOrderEditorTreeView extends IsWidget {
 
 	void configure(SubpageOrderEditorTreeNode overallRoot);
 	void selectTreeItem(SubpageOrderEditorTreeNode toSelect);
@@ -13,7 +12,7 @@ public interface WikiSubpageOrderEditorTreeView extends IsWidget, SynapseView {
 	
 	void setPresenter(Presenter presenter);
 	void setSynAlert(IsWidget w);
-	
+	void clear();
 	public interface Presenter {
 		void selectTreeItem(SubpageOrderEditorTreeNode node);
 		SubpageOrderEditorTreeNode getSelectedTreeItem();

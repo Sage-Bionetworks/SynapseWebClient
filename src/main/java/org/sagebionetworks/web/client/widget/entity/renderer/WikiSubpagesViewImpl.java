@@ -18,8 +18,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView {
-
-	private Presenter presenter;
 	private WikiSubpagesOrderEditor orderEditor;
 	private static final String WELL="well";
 	private static final String COL_MD_3="col-md-3";
@@ -88,7 +86,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				wikiSubpagesContainer.clear();
 				orderEditor.configure(curWikiKey, ownerObjectName);
 				wikiSubpagesContainer.add(orderEditor.asWidget());
-				Button finishEditingOrderButton = DisplayUtils.createButton("Finish");
+				Button finishEditingOrderButton = DisplayUtils.createButton("Done");
 				finishEditingOrderButton.addStyleName("btn btn-default margin-top-10 right");
 				wikiSubpagesContainer.add(finishEditingOrderButton);
 				finishEditingOrderButton.addClickHandler(new ClickHandler() {
@@ -97,6 +95,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 						globalAppState.refreshPage();
 					}
 				});
+				DisplayUtils.scrollToTop();
 			}
 		});
 		
@@ -194,11 +193,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	public Widget asWidget() {
 		return this;
 	}	
-
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
 		
 	@Override
 	public void showErrorMessage(String message) {

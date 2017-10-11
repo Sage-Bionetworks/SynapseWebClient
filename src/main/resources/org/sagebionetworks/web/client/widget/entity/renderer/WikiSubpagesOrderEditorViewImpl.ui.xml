@@ -5,8 +5,6 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	<g:FlowPanel>
-		<g:SimplePanel ui:field="treePanel" />
-		<g:SimplePanel ui:field="synAlertContainer" />
 		<g:SimplePanel ui:field="instructionPanel">
 		    <g:Label>Select a subpage and use the arrows to move it to the desired position.  </g:Label>
 		</g:SimplePanel>
@@ -32,5 +30,7 @@
 			<g:Image resource='{sageImageBundle.loading31}' />
 			<bh:Text> Processing...</bh:Text>
 		</bh:Span>
+		<g:SimplePanel ui:field="synAlertContainer" />
+		<g:SimplePanel ui:field="treePanel" />
 	</g:FlowPanel>
 </ui:UiBinder>

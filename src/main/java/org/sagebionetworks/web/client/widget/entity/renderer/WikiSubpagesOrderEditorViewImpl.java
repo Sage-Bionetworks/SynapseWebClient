@@ -82,6 +82,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 			@Override
 			public void onClick(ClickEvent event) {
 				setLoadingVisible(true);
+				disableDirectionalButtons();
 				tree.moveRight();
 			}
 		});
@@ -90,6 +91,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 			@Override
 			public void onClick(ClickEvent event) {
 				setLoadingVisible(true);
+				disableDirectionalButtons();
 				tree.moveLeft();
 			}
 		});

@@ -13,13 +13,6 @@ import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface WikiSubpagesView extends IsWidget, SynapseView {
-
-	/**
-	 * Set the presenter.
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
-
 	/**
 	 * Configure the view with the parent id
 	 * @param entityId
