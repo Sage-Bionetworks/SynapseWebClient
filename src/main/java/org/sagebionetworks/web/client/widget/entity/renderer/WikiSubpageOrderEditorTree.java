@@ -22,6 +22,14 @@ import com.google.inject.Inject;
 
 public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeView.Presenter, SynapseWidgetPresenter {
 	
+	public static final String MOVE_DOWN_ERROR = "Selected item cannot be moved down.";
+
+	public static final String MOVE_UP_ERROR = "Selected item cannot be moved up.";
+
+	public static final String MOVE_RIGHT_ERROR = "Selected item cannot be moved right.";
+
+	public static final String MOVE_LEFT_ERROR = "Selected item cannot be moved left.";
+
 	private WikiSubpageOrderEditorTreeView view;
 	
 	private Map<V2WikiHeader, SubpageOrderEditorTreeNode> header2node;
@@ -183,12 +191,10 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 	
 	public void moveUp() {
 		moveSelectedItem(true);
-		updateOrderHint();
 	}
 	
 	public void moveDown() {
 		moveSelectedItem(false);
-		updateOrderHint();
 	}
 	
 	private void updateOrderHint() {
@@ -208,11 +214,22 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 	}
 	
 	public void moveLeft() {
+		synAlert.clear();
+		if (!selectedCanMoveLeft()) {
+			synAlert.showError(MOVE_LEFT_ERROR);
+			return;
+		}
 		String newParentId = getSelectedParent().getHeader().getParentId();
 		updateSelectedParent(newParentId);
 	}
 	
 	public void moveRight() {
+		synAlert.clear();
+		if (!selectedCanMoveUpOrRight()) {
+			synAlert.showError(MOVE_RIGHT_ERROR);
+			return;
+		}
+		
 		SubpageOrderEditorTreeNode parent = getSelectedParent();
 		int selectedChildIndex = getSelectedChildIndex();
 		SubpageOrderEditorTreeNode siblingAboveSelected = parent.getChildren().get(selectedChildIndex - 1);
@@ -256,10 +273,13 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 	}
 	
 	public void moveSelectedItem(boolean moveUp) {
+		synAlert.clear();
 		if (moveUp && !selectedCanMoveUpOrRight()) {
-			throw new IllegalStateException("Selected item cannot be moved up.");
+			synAlert.showError(MOVE_UP_ERROR);
+			return;
 		} else if (!moveUp && !selectedCanMoveDown()) {
-			throw new IllegalStateException("Selected item cannot be moved down.");
+			synAlert.showError(MOVE_DOWN_ERROR);
+			return;
 		}
 		
 		view.moveTreeItem(selectedNode, moveUp);
@@ -277,7 +297,8 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 		parent.getChildren().add(insertIndex, selectedNode);
 		
 		selectTreeItem(selectedNode);
-	
+		
+		updateOrderHint();
 	}
 	
 	private SubpageOrderEditorTreeNode getSelectedParent() {
