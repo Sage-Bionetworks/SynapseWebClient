@@ -45,7 +45,7 @@ public class WikiSubpagesOrderEditor {
 		//get wiki headers, and order
 		this.wikiKey = wikiKey;
 		this.ownerObjectName = ownerObjectName;
-		
+		view.initializeState();
 		refresh(null);
 	}
 	
@@ -78,10 +78,6 @@ public class WikiSubpagesOrderEditor {
 				view.setLoadingVisible(false);
 			}
 		});
-	}
-	
-	public void initializeState() {
-		view.initializeState();
 	}
 	
 	/**
