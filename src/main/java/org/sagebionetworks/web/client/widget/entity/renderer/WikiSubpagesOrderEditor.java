@@ -5,7 +5,6 @@ import java.util.List;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -14,7 +13,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Presenter {
+public class WikiSubpagesOrderEditor {
 	
 	private WikiSubpagesOrderEditorView view;
 	private WikiSubpageOrderEditorTree editorTree;
@@ -52,6 +51,7 @@ public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Pres
 	
 	public void refresh(final String selectWikiPageId) {
 		synAlert.clear();
+		view.setLoadingVisible(true);
 		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onSuccess(final List<V2WikiHeader> wikiHeaders) {
@@ -61,11 +61,13 @@ public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Pres
 						// "Sort" stuff'
 						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, hint);
 						editorTree.configure(selectWikiPageId, wikiKey, wikiHeaders, ownerObjectName, hint, refreshCallback);
+						view.setLoadingVisible(false);
 					}
 					@Override
 					public void onFailure(Throwable caught) {
 						// Failed to get order hint. Just ignore it.
 						synAlert.handleException(caught);
+						view.setLoadingVisible(false);
 					}
 				});
 			}
@@ -73,6 +75,7 @@ public class WikiSubpagesOrderEditor implements WikiSubpagesOrderEditorView.Pres
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
+				view.setLoadingVisible(false);
 			}
 		});
 	}

@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -31,8 +32,9 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	Button leftButton;
 	@UiField
 	Button rightButton;
-
-	private Presenter presenter;
+	@UiField
+	Span loadingUI;
+	
 	private WikiSubpageOrderEditorTree tree;
 	
 	@Inject
@@ -41,9 +43,11 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		addButtonHandlers();
 	}
 	
-	public void disableUpDownButtons() {
+	public void disableDirectionalButtons() {
 		upButton.setEnabled(false);
 		downButton.setEnabled(false);
+		leftButton.setEnabled(false);
+		rightButton.setEnabled(false);
 	}
 	
 	@Override
@@ -52,11 +56,6 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		treePanel.clear();
 		treePanel.setWidget(tree.asWidget());
 		subpageTree.setMovabilityCallback(getTreeItemMovabilityCallback());
-	}
-	
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
 	}
 	
 	@Override
@@ -82,6 +81,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		rightButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				setLoadingVisible(true);
 				tree.moveRight();
 			}
 		});
@@ -89,6 +89,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 		leftButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				setLoadingVisible(true);
 				tree.moveLeft();
 			}
 		});
@@ -96,7 +97,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	
 	@Override
 	public void initializeState() {
-		disableUpDownButtons();
+		disableDirectionalButtons();
 	}
 	
 	public TreeItemMovabilityCallback getTreeItemMovabilityCallback() {
@@ -119,5 +120,10 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+	
+	@Override
+	public void setLoadingVisible(boolean visible) {
+		loadingUI.setVisible(visible);
 	}
 }

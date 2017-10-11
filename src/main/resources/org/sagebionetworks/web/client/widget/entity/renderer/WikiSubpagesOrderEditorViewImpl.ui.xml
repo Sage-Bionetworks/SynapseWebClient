@@ -1,21 +1,36 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
-	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
-
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	<g:FlowPanel>
 		<g:SimplePanel ui:field="treePanel" />
-		<b:VerticalButtonGroup pull="RIGHT">
-		    <b:Button ui:field="upButton" icon="ARROW_UP" />
-		    <b:Button ui:field="downButton" icon="ARROW_DOWN" />
-		</b:VerticalButtonGroup>
-		<b:ButtonGroup pull="RIGHT">
-			<b:Button ui:field="leftButton" icon="ARROW_LEFT" />
-		    <b:Button ui:field="rightButton" icon="ARROW_RIGHT" />
-		</b:ButtonGroup>
-		<g:SimplePanel ui:field="instructionPanel" addStyleNames="margin-top-30">
-		    <g:Label>Select a subpage and use the arrows to move it to the desired position.</g:Label>
-		</g:SimplePanel>
 		<g:SimplePanel ui:field="synAlertContainer" />
+		<g:SimplePanel ui:field="instructionPanel">
+		    <g:Label>Select a subpage and use the arrows to move it to the desired position.  </g:Label>
+		</g:SimplePanel>
+		<bh:Div addStyleNames="center center-block">
+			<bh:Div>
+				<b:VerticalButtonGroup>
+				    <b:Button ui:field="upButton" icon="ARROW_UP"/>
+				</b:VerticalButtonGroup>
+			</bh:Div>
+			<bh:Div>
+				<b:ButtonGroup>
+					<b:Button ui:field="leftButton" icon="ARROW_LEFT" />
+				    <b:Button ui:field="rightButton" icon="ARROW_RIGHT" />
+				</b:ButtonGroup>
+			</bh:Div>
+			<bh:Div>
+				<b:VerticalButtonGroup>
+				    <b:Button ui:field="downButton" icon="ARROW_DOWN"/>
+				</b:VerticalButtonGroup>
+			</bh:Div>
+		</bh:Div>
+		<bh:Span ui:field="loadingUI" visible="false">
+			<g:Image resource='{sageImageBundle.loading31}' />
+			<bh:Text> Processing...</bh:Text>
+		</bh:Span>
 	</g:FlowPanel>
 </ui:UiBinder>

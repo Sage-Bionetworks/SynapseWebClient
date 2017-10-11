@@ -30,7 +30,7 @@ public class WikiSubpageOrderEditorTreeViewImpl extends FlowPanel implements Wik
 	private IsWidget synAlert;
 	@Inject
 	public WikiSubpageOrderEditorTreeViewImpl() {
-		addStyleName("notopmargin nav bs-sidenav well");
+		addStyleName("notopmargin nav bs-sidenav well wiki-subpages-editor-tree");
 		add(new HTML("<h4 class=\"margin-left-15\">Edit Order</h4>"));
 		
 		headerId2listItem = new HashMap<String, Widget>();

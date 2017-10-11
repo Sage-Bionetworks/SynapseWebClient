@@ -121,9 +121,8 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 	
 	@Override
 	public void selectTreeItem(SubpageOrderEditorTreeNode node) {
-		view.selectTreeItem(node);
-		
 		selectedNode = node;
+		view.selectTreeItem(node);
 		
 		if (movabilityCallback != null) {
 			movabilityCallback.invoke(selectedCanMoveUpOrRight(), selectedCanMoveDown(), selectedCanMoveLeft());

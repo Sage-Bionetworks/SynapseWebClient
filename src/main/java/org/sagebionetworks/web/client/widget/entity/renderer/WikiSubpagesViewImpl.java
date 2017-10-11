@@ -60,7 +60,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	
 	@Override
 	public void configure(final List<V2WikiHeader> wikiHeaders,
-						FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer,
+						final FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer,
 						final String ownerObjectName, Place ownerObjectLink,
 						final WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage,
 						CallbackP<WikiPageKey> wikiPageCallback) {
@@ -85,12 +85,12 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		editOrderButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				clear();
+				wikiSubpagesContainer.clear();
 				orderEditor.configure(curWikiKey, ownerObjectName);
-				add(orderEditor.asWidget());
-				Button finishEditingOrderButton = DisplayUtils.createButton("Done");
-				finishEditingOrderButton.addStyleName("btn btn-default btn-xs left");
-				add(finishEditingOrderButton);
+				wikiSubpagesContainer.add(orderEditor.asWidget());
+				Button finishEditingOrderButton = DisplayUtils.createButton("Finish");
+				finishEditingOrderButton.addStyleName("btn btn-default margin-top-10 right");
+				wikiSubpagesContainer.add(finishEditingOrderButton);
 				finishEditingOrderButton.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {

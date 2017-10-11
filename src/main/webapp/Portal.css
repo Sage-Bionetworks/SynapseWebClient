@@ -2417,6 +2417,10 @@ div.input-group > input.search-textbox {
 /* modified snippet from Bootstrap docs.css for Wiki Subpage style (minus the hidden sublists) */
 /* By default it's not affixed in mobile views, so undo that */
 
+#rootPanel .wiki-subpages-editor-tree .nav>li>a {
+	padding: 2px 5px;
+}
+
 /* First level of nav */
 .bs-sidenav {
   margin-top: 30px;
