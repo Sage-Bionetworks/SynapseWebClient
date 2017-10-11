@@ -296,9 +296,10 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 		return id2node.get(child.getHeader().getParentId());
 	}
 	
-	/*
-	 * For Testing
-	 */
+	public SubpageOrderEditorTreeNode getSubpageOrderEditorTreeNode(V2WikiHeader header) {
+		return header2node.get(header);
+	}
+	
 	public SubpageOrderEditorTreeNode getOverallRoot() {
 		return overallRoot;
 	}
