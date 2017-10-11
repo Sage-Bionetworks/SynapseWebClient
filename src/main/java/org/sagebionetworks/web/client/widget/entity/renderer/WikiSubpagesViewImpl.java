@@ -92,6 +92,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				finishEditingOrderButton.addClickHandler(new ClickHandler() {
 					@Override
 					public void onClick(ClickEvent event) {
+						wikiSubpagesContainer.clear();
 						globalAppState.refreshPage();
 					}
 				});
