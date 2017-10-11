@@ -38,8 +38,8 @@ public class InviteWidgetTest {
 	String userId = "testId";
 	InviteWidget inviteWidget;
 	UserGroupHeader mockHeader;
-	UserGroupEmailSuggestionProvider mockSuggestionProvider;
-	UserGroupEmailSuggestion mockSuggestion;
+	UserGroupSuggestionProvider mockSuggestionProvider;
+	UserGroupSuggestion mockSuggestion;
 	Callback mockRefreshCallback;
 	GWTWrapper mockGWTWrapper;
 	
@@ -52,11 +52,11 @@ public class InviteWidgetTest {
 		mockGWTWrapper = mock(GWTWrapper.class);
 		mockSynAlert = mock(SynapseAlert.class);
 		mockSuggestBox = mock(SynapseSuggestBox.class);
-		mockSuggestion = mock(UserGroupEmailSuggestion.class);
+		mockSuggestion = mock(UserGroupSuggestion.class);
 		mockJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockHeader = mock(UserGroupHeader.class);
 		mockTeam = mock(Team.class);
-		mockSuggestionProvider = mock(UserGroupEmailSuggestionProvider.class);
+		mockSuggestionProvider = mock(UserGroupSuggestionProvider.class);
 		inviteWidget = new InviteWidget(mockView, mockSynapseClient, mockGWTWrapper, mockSynAlert, mockSuggestBox, mockSuggestionProvider);
 		mockRefreshCallback = mock(Callback.class);
 		inviteWidget.configure(mockTeam);
@@ -91,8 +91,21 @@ public class InviteWidgetTest {
 	@Test
 	public void testSendNoUserSelected() {
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
+		when(mockSuggestBox.getText()).thenReturn("notAnEmailAddress");
 		inviteWidget.validateAndSendInvite(invitationMessage);
 		verify(mockSynAlert).showError("Please select a user or an email address to send an invite to.");
+	}
+
+	@Test
+	public void testSendToEmailAddress() {
+		String email = "test@example.com";
+		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
+		when(mockSuggestBox.getText()).thenReturn(email);
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).inviteNewMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		inviteWidget.validateAndSendInvite(invitationMessage);
+		verify(mockSynapseClient).inviteNewMember(eq(email), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
+		verify(mockRefreshCallback).invoke();
+		verify(mockView).hide();
 	}
 	
 	@SuppressWarnings("unchecked")

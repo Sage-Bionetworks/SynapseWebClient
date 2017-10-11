@@ -2,13 +2,11 @@ package org.sagebionetworks.web.client.widget.search;
 
 import java.util.List;
 
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
-
 public class SynapseSuggestionBundle {
-	List<Suggestion> suggestions;
+	List<UserGroupSuggestion> suggestions;
 	long totalResults;
 	
-	public SynapseSuggestionBundle(List<Suggestion> suggestions, long totalResults) {
+	public SynapseSuggestionBundle(List<UserGroupSuggestion> suggestions, long totalResults) {
 		this.totalResults = totalResults;
 		this.suggestions = suggestions;
 	}
@@ -17,7 +15,7 @@ public class SynapseSuggestionBundle {
 		return totalResults;
 	}
 	
-	public List<Suggestion> getSuggestionBundle() {
+	public List<UserGroupSuggestion> getSuggestionBundle() {
 		return suggestions;
 	}
 }

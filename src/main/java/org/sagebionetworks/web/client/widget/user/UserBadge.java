@@ -214,7 +214,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	public void configureWithInviteeEmail(String inviteeEmail) {
 		lazyLoadHelper.setIsConfigured();
 		view.setDisplayName(inviteeEmail, inviteeEmail);
-		view.setDefaultPictureLetter(Character.toString(inviteeEmail.charAt(0)));
+		view.setDefaultPictureLetter(Character.toString(inviteeEmail.charAt(0)).toUpperCase());
 		view.setDefaultPictureColor(getColor(inviteeEmail.hashCode()));
 		view.showAnonymousUserPicture();
 		view.setHref("mailto:" + inviteeEmail);

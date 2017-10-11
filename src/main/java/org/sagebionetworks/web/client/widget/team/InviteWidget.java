@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -12,8 +13,8 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.UserGroupEmailSuggestion;
-import org.sagebionetworks.web.client.widget.search.UserGroupEmailSuggestionProvider;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 
 public class InviteWidget implements InviteWidgetView.Presenter {
 	private InviteWidgetView view;
@@ -23,13 +24,14 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	private GWTWrapper gwt;
 	private SynapseAlert synAlert;
 	private SynapseSuggestBox peopleSuggestWidget;
-	
+	private static RegExp emailRegExp = RegExp.compile("[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}");
+
 	@Inject
-	public InviteWidget(InviteWidgetView view, 
-			SynapseClientAsync synapseClient, 
-			GWTWrapper gwt, SynapseAlert synAlert,
-			SynapseSuggestBox peopleSuggestBox,
-			UserGroupEmailSuggestionProvider provider) {
+	public InviteWidget(InviteWidgetView view,
+	                    SynapseClientAsync synapseClient,
+	                    GWTWrapper gwt, SynapseAlert synAlert,
+	                    SynapseSuggestBox peopleSuggestBox,
+	                    UserGroupSuggestionProvider provider) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.gwt = gwt;
@@ -65,30 +67,9 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	
 	@Override
 	public void validateAndSendInvite(final String invitationMessage) {
-		// UserGroupEmailSuggestionProvider should only provide UserGroupEmailSuggestions, so this cast should be safe
-		final UserGroupEmailSuggestion suggestion = (UserGroupEmailSuggestion) peopleSuggestWidget.getSelectedSuggestion();
-		if (suggestion == null) {
-			synAlert.showError("Please select a user or an email address to send an invite to.");
-			return;
-		}
-		if (suggestion.getEmail() != null) {
-			// The suggestion is an email address -- a new user
-			final String inviteeEmail = suggestion.getEmail();
-			synapseClient.inviteNewMember(inviteeEmail, team.getId(), invitationMessage, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
-				@Override
-				public void onSuccess(Void result) {
-					view.hide();
-					view.showInfo("Invitation Sent", "An invitation has been sent to " + inviteeEmail);
-					teamUpdatedCallback.invoke();
-				}
-
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-				}
-			});
-		} else {
-			// The suggestion is an existing user
+		final UserGroupSuggestion suggestion = peopleSuggestWidget.getSelectedSuggestion();
+		final String input = peopleSuggestWidget.getText();
+		if (suggestion != null) {
 			String ownerId = suggestion.getHeader().getOwnerId();
 			synapseClient.isTeamMember(ownerId, Long.valueOf(team.getId()), new AsyncCallback<Boolean>() {
 				@Override
@@ -105,6 +86,22 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 					}
 				}
 			});
+		} else if (emailRegExp.test(input)) {
+			synapseClient.inviteNewMember(input, team.getId(), invitationMessage, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable throwable) {
+					synAlert.handleException(throwable);
+				}
+
+				@Override
+				public void onSuccess(Void aVoid) {
+					view.hide();
+					view.showInfo("Invitation Sent", "An invitation has been sent to " + input);
+					teamUpdatedCallback.invoke();
+				}
+			});
+		} else {
+			synAlert.showError("Please select a user or an email address to send an invite to.");
 		}
 	}
 	

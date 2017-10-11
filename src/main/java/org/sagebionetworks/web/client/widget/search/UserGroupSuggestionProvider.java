@@ -9,7 +9,6 @@ import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.SuggestOracle.Suggestion;
 import com.google.inject.Inject;
 
 public class UserGroupSuggestionProvider {
@@ -24,7 +23,7 @@ public class UserGroupSuggestionProvider {
 		jsClient.getUserGroupHeadersByPrefix(prefix, type, pageSize, offset, new AsyncCallback<UserGroupHeaderResponsePage>() {
 			@Override
 			public void onSuccess(UserGroupHeaderResponsePage result) {
-				List<Suggestion> suggestions = new LinkedList<Suggestion>();
+				List<UserGroupSuggestion> suggestions = new LinkedList<>();
 				for (UserGroupHeader header : result.getChildren()) {
 					suggestions.add(new UserGroupSuggestion(header, prefix, width));
 				}

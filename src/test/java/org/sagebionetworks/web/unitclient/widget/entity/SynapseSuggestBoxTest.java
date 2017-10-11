@@ -24,10 +24,6 @@ import com.google.gwt.event.shared.GwtEvent;
 public class SynapseSuggestBoxTest {
 
 	SynapseSuggestBoxView mockView;
-	SynapseClientAsync mockSynapseClient;
-	SageImageBundle mockSageImageBundle;
-	AuthenticationController mockAuthenticationController;
-	GlobalApplicationState mockGlobalApplicationState;
 	SynapseSuggestOracle mockOracle;
 	SynapseSuggestBox suggestBox;
 	UserGroupSuggestionProvider mockSuggestionProvider;
@@ -35,13 +31,9 @@ public class SynapseSuggestBoxTest {
 	@Before
 	public void before() {
 		mockView = mock(SynapseSuggestBoxView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockSageImageBundle = mock(SageImageBundle.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockOracle = mock(SynapseSuggestOracle.class);
 		mockSuggestionProvider = mock(UserGroupSuggestionProvider.class);
-		suggestBox = new SynapseSuggestBox(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockSageImageBundle, mockOracle);
+		suggestBox = new SynapseSuggestBox(mockView, mockOracle);
 		suggestBox.setSuggestionProvider(mockSuggestionProvider);
 	}
 	
