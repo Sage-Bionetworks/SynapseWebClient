@@ -1,31 +1,12 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Set;
-import java.util.concurrent.TimeUnit;
-
+import com.google.gwt.core.server.StackTraceDeobfuscator;
+import com.google.gwt.thirdparty.guava.common.base.Supplier;
+import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.entity.ContentType;
-import org.apache.regexp.RE;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Whitelist;
@@ -43,25 +24,10 @@ import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
-import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
-import org.sagebionetworks.repo.model.file.ExternalFileHandle;
-import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
-import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
-import org.sagebionetworks.repo.model.file.FileHandleCopyResult;
-import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.*;
 import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
-import org.sagebionetworks.repo.model.principal.AccountCreationToken;
-import org.sagebionetworks.repo.model.principal.AddEmailInfo;
-import org.sagebionetworks.repo.model.principal.AliasCheckRequest;
-import org.sagebionetworks.repo.model.principal.AliasCheckResponse;
-import org.sagebionetworks.repo.model.principal.AliasType;
-import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
-import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
-import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
+import org.sagebionetworks.repo.model.principal.*;
 import org.sagebionetworks.repo.model.project.ProjectSettingsType;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.project.UploadDestinationListSetting;
@@ -73,16 +39,7 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
-import org.sagebionetworks.repo.model.table.ColumnChange;
-import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnModelPage;
-import org.sagebionetworks.repo.model.table.FacetColumnRequest;
-import org.sagebionetworks.repo.model.table.SortItem;
-import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
-import org.sagebionetworks.repo.model.table.TableUpdateRequest;
-import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
-import org.sagebionetworks.repo.model.table.ViewScope;
-import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.table.*;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -100,33 +57,20 @@ import org.sagebionetworks.table.query.util.TableSqlProcessor;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
-import org.sagebionetworks.web.shared.AccessRequirementUtils;
-import org.sagebionetworks.web.shared.EntityBundlePlus;
-import org.sagebionetworks.web.shared.MembershipRequestBundle;
-import org.sagebionetworks.web.shared.NotificationTokenType;
-import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
-import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
-import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.ProjectPagedResults;
-import org.sagebionetworks.web.shared.TeamBundle;
-import org.sagebionetworks.web.shared.TeamMemberBundle;
-import org.sagebionetworks.web.shared.TeamMemberPagedResults;
-import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.*;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
-import org.sagebionetworks.web.shared.exceptions.ConflictException;
-import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
-import org.sagebionetworks.web.shared.exceptions.TableQueryParseException;
-import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
+import org.sagebionetworks.web.shared.exceptions.*;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.core.server.StackTraceDeobfuscator;
-import com.google.gwt.thirdparty.guava.common.base.Supplier;
-import com.google.gwt.thirdparty.guava.common.base.Suppliers;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.util.*;
+import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 
 public class SynapseClientImpl extends SynapseClientBase implements
 		SynapseClient, TokenProvider {
@@ -1629,6 +1573,16 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
 	}
+
+	@Override
+	public MembershipInvtnSubmission getMembershipInvitation(MembershipInvtnSignedToken token) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getMembershipInvitation(token);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
 	
 	@Override
 	public void setIsTeamAdmin(String currentUserId, String targetUserId,
@@ -1729,7 +1683,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				fileEntity = (FileEntity) synapseClient.getEntityById(entityId);
 				//update data file handle id
 				fileEntity.setDataFileHandleId(fileHandleId);
-				fileEntity = (FileEntity)synapseClient.putEntity(fileEntity);
+				fileEntity = synapseClient.putEntity(fileEntity);
 			}
 			return fileEntity.getId();
 		} catch (SynapseException e) {
@@ -2232,7 +2186,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 
 	@Override
 	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body)
-			throws RestServiceException, ResultNotReadyException {
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
 			return synapseClient.getAsyncResult(AsynchJobType.valueOf(type.name()), jobId, body);
@@ -2302,7 +2256,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			org.sagebionetworks.reflection.model.PaginatedResults<ProjectHeader> paginatedResults = synapseClient.getMyProjects(projectListType, sortBy, sortDir, limit, offset);
-			List<ProjectHeader> headers = (List<ProjectHeader>)paginatedResults.getResults();
+			List<ProjectHeader> headers = paginatedResults.getResults();
 			List<String> lastModifiedByList = new LinkedList<String>();
 			for (ProjectHeader header: headers) {
 				if (header.getModifiedBy() != null)
@@ -2320,8 +2274,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			Long teamIdLong = Long.parseLong(teamId);
 			org.sagebionetworks.reflection.model.PaginatedResults<ProjectHeader> paginatedResults = synapseClient.getProjectsForTeam(teamIdLong, sortBy, sortDir, limit, offset);
-			
-			List<ProjectHeader> headers = (List<ProjectHeader>)paginatedResults.getResults();
+
+			List<ProjectHeader> headers = paginatedResults.getResults();
 			List<String> lastModifiedByList = new LinkedList<String>();
 			for (ProjectHeader header: headers) {
 				if (header.getModifiedBy() != null)
@@ -2338,7 +2292,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			Long userIdLong = Long.parseLong(userId);
 			org.sagebionetworks.reflection.model.PaginatedResults<ProjectHeader> paginatedResults = synapseClient.getProjectsFromUser(userIdLong, sortBy, sortDir, limit, offset);
-			List<ProjectHeader> headers = (List<ProjectHeader>)paginatedResults.getResults();
+			List<ProjectHeader> headers = paginatedResults.getResults();
 			List<String> lastModifiedByList = new LinkedList<String>();
 			for (ProjectHeader header: headers) {
 				if (header.getModifiedBy() != null)

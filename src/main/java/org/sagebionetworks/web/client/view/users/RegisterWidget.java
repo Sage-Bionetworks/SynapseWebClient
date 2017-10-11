@@ -1,5 +1,10 @@
 package org.sagebionetworks.web.client.view.users;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
+import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
+import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -7,16 +12,13 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
-
 public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidgetPresenter {
 	
 	private RegisterWidgetView view;
 	private UserAccountServiceAsync userService;
 	private GWTWrapper gwt;
 	private SynapseAlert synAlert;
+	private MembershipInvtnSignedToken membershipInvtnSignedToken;
 
 	@Inject
 	public RegisterWidget(RegisterWidgetView view, 
@@ -37,23 +39,16 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 		return view.asWidget();		
 	}
 
-	public void configure(boolean isInline) {
-		view.setInlineUI(isInline);
-	}
-	
 	/**
 	 * Create the new user account
-	 * @param username
-	 * @param email
-	 * @param firstName
-	 * @param lastName
+	 * @param newUser
 	 */
 	@Override
-	public void registerUser(String email) {
+	public void registerUser(NewUser newUser) {
 		synAlert.clear();
 		view.enableRegisterButton(false);
 		String callbackUrl = gwt.getHostPageBaseURL() + "#!NewAccount:";
-		userService.createUserStep1(email.trim(), callbackUrl, new AsyncCallback<Void>() {			
+		userService.createUserStep1(newUser, callbackUrl, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.enableRegisterButton(true);
@@ -71,6 +66,15 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 				}
 			}
 		});
+	}
+
+	@Override
+	public MembershipInvtnSignedToken getMembershipInvtnSignedToken() {
+		return membershipInvtnSignedToken;
+	}
+
+	public void setMembershipInvtnSignedToken(MembershipInvtnSignedToken membershipInvtnSignedToken) {
+		this.membershipInvtnSignedToken = membershipInvtnSignedToken;
 	}
 
 	public void setVisible(boolean isVisible) {

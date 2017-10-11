@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.server.servlet;
 
+import com.google.gwt.user.server.rpc.RemoteServiceServlet;
+import com.google.inject.Inject;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
@@ -15,9 +17,6 @@ import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.springframework.web.client.RestClientException;
-
-import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.google.inject.Inject;
 
 public class UserAccountServiceImpl extends RemoteServiceServlet implements UserAccountService, TokenProvider {
 	
@@ -130,14 +129,12 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 	
 	@Override
-	public void createUserStep1(String email, String portalEndpoint) throws RestServiceException {
+	public void createUserStep1(NewUser newUser, String portalEndpoint) throws RestServiceException {
 		validateService();
 
 		SynapseClient client = createAnonymousSynapseClient();
-		NewUser user = new NewUser();
-		user.setEmail(email);
 		try {
-			client.newAccountEmailValidation(user, portalEndpoint);
+			client.newAccountEmailValidation(newUser, portalEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

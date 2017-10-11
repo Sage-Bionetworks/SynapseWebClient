@@ -1,11 +1,5 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
-import static org.mockito.Mockito.when;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -16,7 +10,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -24,6 +17,12 @@ import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Test for the UserAccountServiceImpl
@@ -67,8 +66,10 @@ public class UserAccountServiceImplTest {
 	@Test
 	public void testCreateUserStep1() throws Exception {
 		String email = "test@jayhodgson.com";
+		NewUser newUser = new NewUser();
+		newUser.setEmail(email);
 		String endpoint = "http://127.0.0.1:8080/Portal.html?gwt.codesvr=127.0.0.1:9321";
-		userAccountService.createUserStep1(email, endpoint);
+		userAccountService.createUserStep1(newUser, endpoint);
 		verify(mockSynapse).newAccountEmailValidation(any(NewUser.class), eq(endpoint));
 	}
 

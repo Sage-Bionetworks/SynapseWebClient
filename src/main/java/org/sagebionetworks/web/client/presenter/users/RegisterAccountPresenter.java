@@ -1,17 +1,15 @@
 package org.sagebionetworks.web.client.presenter.users;
 
+import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.inject.Inject;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
-
-import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.inject.Inject;
 
 public class RegisterAccountPresenter extends AbstractActivity implements RegisterAccountView.Presenter, Presenter<RegisterAccount> {
 	private RegisterAccount place;
@@ -36,8 +34,6 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	}
 	
 	public void init() {
-		boolean isInline = false;
-		registerWidget.configure(isInline);
 		view.setRegisterWidget(registerWidget.asWidget());
 		headerWidget.configure(false);
 		headerWidget.refresh();

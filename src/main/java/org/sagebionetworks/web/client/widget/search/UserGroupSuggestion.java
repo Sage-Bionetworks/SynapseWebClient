@@ -18,11 +18,6 @@ public class UserGroupSuggestion implements IsSerializable, SuggestOracle.Sugges
 		this.width = width;
 	}
 
-	public String getName() 				{	return header.getUserName();	};
-	public UserGroupHeader getHeader()		{	return header;			}
-	public String getPrefix() 				{	return prefix;			}
-	public void setPrefix(String prefix)	{	this.prefix = prefix;	}
-
 	@Override
 	public String getDisplayString() {
 		StringBuilder result = new StringBuilder();
@@ -62,5 +57,21 @@ public class UserGroupSuggestion implements IsSerializable, SuggestOracle.Sugges
 
 	public String isIndividual() {
 		return header.getIsIndividual().toString();
+	}
+
+	public String getName() {
+		return header.getUserName();
+	}
+
+	public UserGroupHeader getHeader() {
+		return header;
+	}
+
+	public String getPrefix() {
+		return prefix;
+	}
+
+	public void setPrefix(String prefix) {
+		this.prefix = prefix;
 	}
 }

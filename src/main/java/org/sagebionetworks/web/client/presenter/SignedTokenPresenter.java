@@ -1,14 +1,12 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.List;
-
-import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.JoinTeamSignedToken;
-import org.sagebionetworks.repo.model.ResponseMessage;
-import org.sagebionetworks.repo.model.SignedTokenInterface;
+import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.inject.Inject;
+import org.sagebionetworks.repo.model.*;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
-import org.sagebionetworks.repo.model.principal.AccountCreationToken;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -18,14 +16,9 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.inject.Inject;
+import java.util.List;
 
 public class SignedTokenPresenter extends AbstractActivity implements SignedTokenView.Presenter, Presenter<SignedToken> {
 	private SignedToken place;
@@ -88,6 +81,8 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 				} else if (result instanceof JoinTeamSignedToken) {
 					isFirstTry = true;
 					handleJoinTeamToken();
+				} else if (result instanceof MembershipInvtnSignedToken) {
+					handleEmailInvitationToken();
 				} else {
 					handleSignedToken();
 				}
@@ -96,6 +91,23 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 			public void onFailure(Throwable caught) {
 				view.setLoadingVisible(false);
 				synapseAlert.handleException(caught);
+			}
+		});
+	}
+
+	public void handleEmailInvitationToken() {
+		MembershipInvtnSignedToken token = (MembershipInvtnSignedToken) signedToken;
+		synapseClient.getMembershipInvitation(token, new AsyncCallback<MembershipInvtnSubmission>() {
+			@Override
+			public void onFailure(Throwable throwable) {
+				view.setLoadingVisible(false);
+				synapseAlert.handleException(throwable);
+			}
+
+			@Override
+			public void onSuccess(MembershipInvtnSubmission membershipInvtnSubmission) {
+				// globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(membershipInvtnSubmission.getInviteeEmail()));
+				// TODO: create a new place called EmailInvitation, with its view and presenter.
 			}
 		});
 	}

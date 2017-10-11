@@ -1,37 +1,12 @@
 
 package org.sagebionetworks.web.client;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
-
-import org.sagebionetworks.repo.model.AccessApproval;
-import org.sagebionetworks.repo.model.AccessControlList;
-import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.LogEntry;
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.ProjectListSortColumn;
-import org.sagebionetworks.repo.model.ProjectListType;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.ResponseMessage;
-import org.sagebionetworks.repo.model.SignedTokenInterface;
-import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.repo.model.TeamMembershipStatus;
-import org.sagebionetworks.repo.model.TrashedEntity;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.VersionInfo;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import org.sagebionetworks.repo.model.*;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.file.BatchFileRequest;
-import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
@@ -46,32 +21,18 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
-import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.ColumnModelPage;
-import org.sagebionetworks.repo.model.table.FacetColumnRequest;
-import org.sagebionetworks.repo.model.table.SortItem;
-import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
-import org.sagebionetworks.repo.model.table.ViewScope;
-import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.table.*;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
-import org.sagebionetworks.web.shared.EntityBundlePlus;
-import org.sagebionetworks.web.shared.MembershipRequestBundle;
-import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
-import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
-import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.ProjectPagedResults;
-import org.sagebionetworks.web.shared.TeamBundle;
-import org.sagebionetworks.web.shared.TeamMemberPagedResults;
-import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.*;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import java.util.*;
 	
 public interface SynapseClientAsync {
 	void getEntityBundlePlusForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundlePlus> callback);
@@ -118,54 +79,61 @@ public interface SynapseClientAsync {
 	
 	void setNotificationEmail(String email, AsyncCallback<Void> callback);
 	void removeEmail(String email, AsyncCallback<Void> callback);
-	
-	public void getEntityBenefactorAcl(String id, AsyncCallback<AccessControlList> callback);
-	
-	public void createAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
-	
-	public void updateAcl(AccessControlList acl, boolean recursive, AsyncCallback<AccessControlList> callback);
-	
-	public void getTeamAcl(String teamId, AsyncCallback<AccessControlList> callback);
-	
-	public void deleteAcl(String ownerEntityId, AsyncCallback<AccessControlList> callback);
 
-	public void hasAccess(String ownerId, String ownerType, String accessType,AsyncCallback<Boolean> callback);
+	void getEntityBenefactorAcl(String id, AsyncCallback<AccessControlList> callback);
+
+	void createAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
+
+	void updateAcl(AccessControlList acl, boolean recursive, AsyncCallback<AccessControlList> callback);
+
+	void getTeamAcl(String teamId, AsyncCallback<AccessControlList> callback);
+
+	void deleteAcl(String ownerEntityId, AsyncCallback<AccessControlList> callback);
+
+	void hasAccess(String ownerId, String ownerType, String accessType, AsyncCallback<Boolean> callback);
 	
 	void createOrUpdateAccessRequirement(AccessRequirement arEW,
 			AsyncCallback<AccessRequirement> callback);
 
-	public void getTeamAccessRequirements(String teamId, AsyncCallback<List<AccessRequirement>> callback);
+	void getTeamAccessRequirements(String teamId, AsyncCallback<List<AccessRequirement>> callback);
 	
 	void createAccessApproval(AccessApproval aaEW,
 			AsyncCallback<AccessApproval> callback);
-	
-	public void updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
-	
-	public void createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
+
+	void updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
+
+	void createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
 	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback);
 
 	void getActivityForEntity(String entityId, AsyncCallback<Activity> callback);
 
 	void getActivity(String activityId, AsyncCallback<Activity> callback);
-		
-	public void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
-	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
+
+	void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
+
+	void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	
 	void restoreV2WikiPage(String ownerId, String ownerType, String wikiId,
 			Long versionToUpdate, AsyncCallback<V2WikiPage> callback);
-    public void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
-    void getV2WikiHeaderTree(String ownerId, String ownerType,
+
+	void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
+
+	void getV2WikiHeaderTree(String ownerId, String ownerType,
 			AsyncCallback<List<V2WikiHeader>> callback);
-    public void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback);
-    public void updateV2WikiOrderHint(V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback);
-    void getV2WikiAttachmentHandles(WikiPageKey key,
+
+	void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback);
+
+	void updateV2WikiOrderHint(V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback);
+
+	void getV2WikiAttachmentHandles(WikiPageKey key,
 			AsyncCallback<FileHandleResults> callback);
     void getV2WikiHistory(WikiPageKey key, Long limit, Long offset,
 			AsyncCallback<PaginatedResults<V2WikiHistorySnapshot>> callback);
 
-	public void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
-	public void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
+	void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
+
+	void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	
 	void getEntitiesGeneratedBy(String activityId, Integer limit,
 			Integer offset, AsyncCallback<PaginatedResults<Reference>> callback);
@@ -190,6 +158,8 @@ public interface SynapseClientAsync {
 			AsyncCallback<List<TeamRequestBundle>> asyncCallback);
 	void getOpenInvitations(String userId, AsyncCallback<ArrayList<OpenUserInvitationBundle>> callback);
 	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<ArrayList<OpenTeamInvitationBundle>> callback);
+
+	void getMembershipInvitation(MembershipInvtnSignedToken token, AsyncCallback<MembershipInvtnSubmission> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
 	void updateTeam(Team team, AccessControlList teamAcl, AsyncCallback<Team> callback);
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
