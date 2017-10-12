@@ -1583,7 +1583,27 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
+	@Override
+	public InviteeVerificationSignedToken getInviteeVerificationSignedToken(String membershipInvitationId) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			return synapseClient.getInviteeVerificationSignedToken(membershipInvitationId);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public void updateInviteeId(String membershipInvitationId, InviteeVerificationSignedToken token) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			synapseClient.updateInviteeId(membershipInvitationId, token);
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
 	@Override
 	public void setIsTeamAdmin(String currentUserId, String targetUserId,
 			String teamId, boolean isTeamAdmin) throws RestServiceException {

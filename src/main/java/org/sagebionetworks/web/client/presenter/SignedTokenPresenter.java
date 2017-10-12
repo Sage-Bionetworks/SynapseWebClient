@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -96,6 +97,9 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 	}
 
 	public void handleEmailInvitationToken() {
+		if (authController.isLoggedIn()) {
+			authController.logoutUser();
+		}
 		MembershipInvtnSignedToken token = (MembershipInvtnSignedToken) signedToken;
 		synapseClient.getMembershipInvitation(token, new AsyncCallback<MembershipInvtnSubmission>() {
 			@Override
@@ -106,8 +110,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 
 			@Override
 			public void onSuccess(MembershipInvtnSubmission membershipInvtnSubmission) {
-				// globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(membershipInvtnSubmission.getInviteeEmail()));
-				// TODO: create a new place called EmailInvitation, with its view and presenter.
+				globalApplicationState.getPlaceChanger().goTo(new EmailInvitation(membershipInvtnSubmission.getId()));
 			}
 		});
 	}

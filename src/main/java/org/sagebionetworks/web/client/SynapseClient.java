@@ -207,6 +207,10 @@ public interface SynapseClient extends RemoteService{
 
 	MembershipInvtnSubmission getMembershipInvitation(MembershipInvtnSignedToken token) throws RestServiceException;
 
+	InviteeVerificationSignedToken getInviteeVerificationSignedToken(String membershipInvitationId) throws RestServiceException;
+
+	void updateInviteeId(String membershipInvitationId, InviteeVerificationSignedToken token) throws RestServiceException;
+
 	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
 
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;

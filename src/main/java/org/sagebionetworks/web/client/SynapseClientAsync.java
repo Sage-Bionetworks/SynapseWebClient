@@ -160,6 +160,10 @@ public interface SynapseClientAsync {
 	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<ArrayList<OpenTeamInvitationBundle>> callback);
 
 	void getMembershipInvitation(MembershipInvtnSignedToken token, AsyncCallback<MembershipInvtnSubmission> callback);
+
+	void getInviteeVerificationSignedToken(String membershipInvitationId, AsyncCallback<InviteeVerificationSignedToken> callback);
+
+	void updateInviteeId(String membershipInvitationId, InviteeVerificationSignedToken token, AsyncCallback<Void> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
 	void updateTeam(Team team, AccessControlList teamAcl, AsyncCallback<Team> callback);
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
