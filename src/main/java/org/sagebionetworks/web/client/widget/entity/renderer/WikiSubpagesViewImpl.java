@@ -86,7 +86,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				wikiSubpagesContainer.clear();
 				orderEditor.configure(curWikiKey, ownerObjectName);
 				wikiSubpagesContainer.add(orderEditor.asWidget());
-				Button finishEditingOrderButton = DisplayUtils.createButton("Done");
+				Button finishEditingOrderButton = DisplayUtils.createButton("Stop Editing Order");
 				finishEditingOrderButton.addStyleName("btn btn-default margin-top-10 right");
 				wikiSubpagesContainer.add(finishEditingOrderButton);
 				finishEditingOrderButton.addClickHandler(new ClickHandler() {

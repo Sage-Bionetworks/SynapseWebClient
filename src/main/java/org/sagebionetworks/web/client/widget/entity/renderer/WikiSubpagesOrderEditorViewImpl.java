@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -20,8 +21,6 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	
 	@UiField
 	SimplePanel treePanel;
-	@UiField
-	SimplePanel instructionPanel;
 	@UiField
 	SimplePanel synAlertContainer;
 	@UiField

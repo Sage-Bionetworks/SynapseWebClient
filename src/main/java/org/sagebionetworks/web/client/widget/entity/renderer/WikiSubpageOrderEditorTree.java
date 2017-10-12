@@ -44,6 +44,7 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 	SynapseJavascriptClient jsClient;
 	WikiPageKey wikiKey;
 	V2WikiOrderHint hint;
+	boolean updatingHint = false;
 	@Inject
 	public WikiSubpageOrderEditorTree(
 			WikiSubpageOrderEditorTreeView view,
@@ -69,6 +70,7 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 		this.refreshCallback = refreshCallback;
 		this.wikiKey = wikiKey;
 		this.hint = hint;
+		updatingHint = false;
 		view.clear();
 		// Make nodes for each header. Populate id2node map and header2node map.
 		for (V2WikiHeader header : wikiHeaders) {
@@ -198,6 +200,7 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 	}
 	
 	private void updateOrderHint() {
+		updatingHint = true;
 		List<String> newOrderHint = getIdListOrderHint();
 		hint.setIdList(newOrderHint);
 		synAlert.clear();
@@ -205,10 +208,12 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 			@Override
 			public void onSuccess(V2WikiOrderHint newHint) {
 				hint = newHint;
+				updatingHint = false;
 			}
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
+				updatingHint = false;
 			}
 		});
 	}
@@ -273,6 +278,10 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 	}
 	
 	public void moveSelectedItem(boolean moveUp) {
+		if (updatingHint) {
+			//ignore fast click
+			return;
+		}
 		synAlert.clear();
 		if (moveUp && !selectedCanMoveUpOrRight()) {
 			synAlert.showError(MOVE_UP_ERROR);
