@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.widget.login.LoginWidgetView;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.shared.exceptions.LockedException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
@@ -131,8 +132,9 @@ public class LoginWidgetTest {
 	public void testInvalidUsernamePassword() {
 		String u = "user";
 		String p = "pass";
-		String notFoundMessage = "alias not found";
-		NotFoundException ex = new NotFoundException(notFoundMessage);
+		String notFoundMessage = "wrong username or password";
+		//service call responds with an Unauthorized Exception if credentials are invalid
+		UnauthorizedException ex = new UnauthorizedException(notFoundMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		loginWidget.setUsernameAndPassword(u, p);
 		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());

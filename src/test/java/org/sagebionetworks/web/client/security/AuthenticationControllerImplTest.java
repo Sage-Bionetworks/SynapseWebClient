@@ -1,17 +1,8 @@
 package org.sagebionetworks.web.client.security;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
 
@@ -28,17 +19,19 @@ import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
 import com.google.gwt.user.client.rpc.AsyncCallback;
-
 
 /**
  * @author dburdick
@@ -58,6 +51,13 @@ public class AuthenticationControllerImplTest {
 	ClientCache mockClientCache;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
+	PortalGinInjector mockGinInjector;
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	PlaceChanger mockPlaceChanger;
+	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	HashMap<String, String> serverProperties;
 	
@@ -74,9 +74,11 @@ public class AuthenticationControllerImplTest {
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockSynapseClient);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockSynapseClient, mockGinInjector);
 		serverProperties = new HashMap<String, String>();
 		AsyncMockStubber.callSuccessWith(serverProperties).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		when(mockGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}
 	
 	@Test
@@ -263,5 +265,23 @@ public class AuthenticationControllerImplTest {
 		authenticationController.loginUser(username, password, loginCallback);
 		
 		verify(loginCallback).onFailure(ex);
+	}
+	
+	@Test
+	public void testLoginUserFailureReadOnlyMode() {
+		//successfully log the user in, but put the stack into read only mode after login (so session token validation fails with a ReadOnlyException).
+		LoginResponse loginResponse = new LoginResponse();
+		loginResponse.setSessionToken("213344");
+		AsyncMockStubber.callSuccessWith(loginResponse).when(mockUserAccountService).initiateSession(any(LoginRequest.class), any(AsyncCallback.class));
+		ReadOnlyModeException ex = new ReadOnlyModeException();
+		AsyncMockStubber.callFailureWith(ex).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
+		String username = "testusername";
+		String password = "pw";
+		AsyncCallback loginCallback = mock(AsyncCallback.class);
+		
+		authenticationController.loginUser(username, password, loginCallback);
+		
+		verify(loginCallback, never()).onFailure(ex);
+		verify(mockPlaceChanger).goTo(any(Down.class));
 	}
 }
