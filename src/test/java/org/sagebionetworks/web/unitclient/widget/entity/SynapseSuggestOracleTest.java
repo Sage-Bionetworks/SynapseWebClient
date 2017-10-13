@@ -1,27 +1,24 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.SuggestOracle;
+import com.google.gwt.user.client.ui.SuggestOracle.Response;
+import org.junit.Before;
+import org.junit.Test;
+import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
+import org.sagebionetworks.web.client.GWTTimer;
+import org.sagebionetworks.web.client.widget.search.*;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
+import java.util.LinkedList;
+import java.util.List;
+
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
-
-import java.util.LinkedList;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mockito;
-import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.repo.model.principal.TypeFilter;
-import org.sagebionetworks.web.client.GWTTimer;
-import org.sagebionetworks.web.client.widget.search.*;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.SuggestOracle;
-import com.google.gwt.user.client.ui.SuggestOracle.Response;
 
 public class SynapseSuggestOracleTest {
 
@@ -92,7 +89,7 @@ public class SynapseSuggestOracleTest {
 		AsyncMockStubber.callSuccessWith(suggBundle).when(mockSuggestionProvider).getSuggestions(any(TypeFilter.class), anyInt(), anyInt(), anyInt(), anyString(), any(AsyncCallback.class));
 		presenter.getSuggestions(offset);
 		verify(mockSuggestBox).showLoading();
-		verify(mockSuggestBox, never()).setSelectedSuggestion(any(UserGroupSuggestion.class));
+		verify(mockSuggestBox).setSelectedSuggestion((UserGroupSuggestion) isNull());
 		verify(mockSuggestionProvider).getSuggestions(eq(TypeFilter.ALL), eq(offset), eq(pageSize),
 			anyInt(), eq(query), any(AsyncCallback.class));
 		verify(mockSuggestBox).hideLoading();

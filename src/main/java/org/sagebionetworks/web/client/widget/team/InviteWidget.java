@@ -69,7 +69,21 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	public void validateAndSendInvite(final String invitationMessage) {
 		final UserGroupSuggestion suggestion = peopleSuggestWidget.getSelectedSuggestion();
 		final String input = peopleSuggestWidget.getText();
-		if (suggestion != null) {
+		if (emailRegExp.test(input)) {
+			synapseClient.inviteNewMember(input, team.getId(), invitationMessage, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable throwable) {
+					synAlert.handleException(throwable);
+				}
+
+				@Override
+				public void onSuccess(Void aVoid) {
+					view.hide();
+					view.showInfo("Invitation Sent", "An invitation has been sent to " + input);
+					teamUpdatedCallback.invoke();
+				}
+			});
+		} else if (suggestion != null) {
 			String ownerId = suggestion.getHeader().getOwnerId();
 			synapseClient.isTeamMember(ownerId, Long.valueOf(team.getId()), new AsyncCallback<Boolean>() {
 				@Override
@@ -84,20 +98,6 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 					} else {
 						synAlert.showError("This user is already a member.");
 					}
-				}
-			});
-		} else if (emailRegExp.test(input)) {
-			synapseClient.inviteNewMember(input, team.getId(), invitationMessage, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
-				@Override
-				public void onFailure(Throwable throwable) {
-					synAlert.handleException(throwable);
-				}
-
-				@Override
-				public void onSuccess(Void aVoid) {
-					view.hide();
-					view.showInfo("Invitation Sent", "An invitation has been sent to " + input);
-					teamUpdatedCallback.invoke();
 				}
 			});
 		} else {

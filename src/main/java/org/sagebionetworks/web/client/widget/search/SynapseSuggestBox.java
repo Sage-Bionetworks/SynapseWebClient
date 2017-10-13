@@ -85,7 +85,9 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 			if(callback != null) {
 				callback.invoke(selectedSuggestion);
 			}
-		}		
+		} else {
+			view.setSelectedText("");
+		}
 	}
 	
 	public String getText() {
