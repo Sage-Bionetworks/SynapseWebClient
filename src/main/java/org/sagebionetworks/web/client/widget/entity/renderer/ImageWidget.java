@@ -91,6 +91,8 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 						fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
 						fha.setFileHandleId(file.getDataFileHandleId());
 						loadFromFileHandleAssociation(fha);
+					} else {
+						synAlert.showError("Synapse ID is not a File: " + entity.getId());
 					}
 				}
 				

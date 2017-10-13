@@ -19,6 +19,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public abstract class BaseFileHandleAsyncHandlerImpl {
+	
+	abstract protected boolean isIncludeFileHandles();
+	abstract protected boolean isIncludePreSignedURLs();
+
 	private Map<String, List<AsyncCallback<FileResult>>> reference2Callback = new HashMap<String, List<AsyncCallback<FileResult>>>();
 	private List<FileHandleAssociation> fileHandleAssociations = new ArrayList<FileHandleAssociation>();
 	SynapseJavascriptClient jsClient;
@@ -49,8 +53,6 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
 			executeRequests();
 		}
 	}
-	abstract protected boolean isIncludeFileHandles();
-	abstract protected boolean isIncludePreSignedURLs();
 	
 	public void executeRequests() {
 		if (!reference2Callback.isEmpty()) {
@@ -62,8 +64,8 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
 			fileHandleAssociations.clear();
 			BatchFileRequest request = new BatchFileRequest();
 			request.setRequestedFiles(fileHandleAssociationsCopy);
-			request.setIncludeFileHandles(true);
-			request.setIncludePreSignedURLs(true);
+			request.setIncludeFileHandles(isIncludeFileHandles());
+			request.setIncludePreSignedURLs(isIncludePreSignedURLs());
 			jsClient.getFileHandleAndUrlBatch(request,new AsyncCallback<BatchFileResult>() {
 				@Override
 				public void onFailure(Throwable caught) {
