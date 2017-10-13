@@ -5,6 +5,11 @@ public class WidgetConstants {
 	public static final String DIV_ID_MATHJAX_PREFIX = "mathjax-";
     public static final String FOOTNOTE_ID_WIDGET_PREFIX = "wikiFootnote";
 	
+	public static final String BOOKMARK_CONTENT_TYPE = "bookmark";
+	public static final String BOOKMARK_FRIENDLY_NAME = "Bookmark";
+	public static final String BOOKMARK_TARGET_CONTENT_TYPE = "bookmarktarget";
+	public static final String BOOKMARK_LINK_IDENTIFIER = "#Bookmark";
+	
 	public static final String YOUTUBE_CONTENT_TYPE = "youtube";
 	public static final String YOUTUBE_FRIENDLY_NAME = "YouTube";
 	
