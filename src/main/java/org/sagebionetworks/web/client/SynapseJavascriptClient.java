@@ -421,12 +421,15 @@ public class SynapseJavascriptClient {
 	}
 
 	
-	public void getWikiAttachmentFileHandles(WikiPageKey key, AsyncCallback<List<FileHandle>> callback) {
+	public void getWikiAttachmentFileHandles(WikiPageKey key, Long versionNumber, AsyncCallback<List<FileHandle>> callback) {
 		String url = getRepoServiceUrl() + "/" +
 				key.getOwnerObjectType().toLowerCase() + "/" + 
 				key.getOwnerObjectId() + WIKI +
 				key.getWikiPageId() + "/" + 
 				ATTACHMENT_HANDLES;
+		if (versionNumber != null) {
+			url += WIKI_VERSION_PARAMETER + versionNumber;
+		}
 		doGet(url, OBJECT_TYPE.FileHandleResults, callback);
 	}
 

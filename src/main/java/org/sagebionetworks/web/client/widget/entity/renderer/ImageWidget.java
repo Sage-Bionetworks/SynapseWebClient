@@ -101,7 +101,7 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 			});
 		} else {
 			// it's a wiki attachment
-			jsClient.getWikiAttachmentFileHandles(wikiKey, new AsyncCallback<List<FileHandle>>() {
+			jsClient.getWikiAttachmentFileHandles(wikiKey, wikiVersionInView, new AsyncCallback<List<FileHandle>>() {
 				public void onSuccess(List<FileHandle> fileHandles) {
 					FileHandle targetFileHandle = null;
 					String fileName = descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY);
@@ -117,6 +117,8 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 						fha.setAssociateObjectType(FileHandleAssociateType.WikiAttachment);
 						fha.setFileHandleId(targetFileHandle.getId());
 						loadFromFileHandleAssociation(fha);
+					} else {
+						synAlert.showError("Wiki attachment not found: " + fileName);
 					}
 				};
 				@Override
