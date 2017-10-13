@@ -74,7 +74,6 @@ public class WikiSubpagesTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		widget = new WikiSubpagesWidget(mockView, mockSynapseClient, mockAuthenticationController, mockSynapseJavascriptClient);
-		verify(mockView).setPresenter(widget);
 		
 		AsyncMockStubber.callSuccessWith("entity id 1").when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 		EntityBundle bundle = new EntityBundle();
