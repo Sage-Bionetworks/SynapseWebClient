@@ -5,20 +5,20 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
 import com.google.inject.Inject;
 
-public class FileHandleAsyncHandlerImpl extends BaseFileHandleAsyncHandlerImpl implements FileHandleAsyncHandler {
+public class PresignedURLAsyncHandlerImpl extends BaseFileHandleAsyncHandlerImpl implements PresignedURLAsyncHandler {
 	
 	@Inject
-	public FileHandleAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt) {
+	public PresignedURLAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt) {
 		super(jsClient, gwt);
 	}
 
 	@Override
 	protected boolean isIncludeFileHandles() {
-		return true;
+		return false;
 	}
 	
 	@Override
 	protected boolean isIncludePreSignedURLs() {
-		return false;
+		return true;
 	}
 }

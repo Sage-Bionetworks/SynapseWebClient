@@ -47,6 +47,7 @@ import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.request.ReferenceList;
@@ -111,7 +112,7 @@ public class SynapseJavascriptClient {
 	public static final String THREAD_COUNTS = "/threadcounts";
 	public static final String ENTITY_THREAD_COUNTS = ENTITY + THREAD_COUNTS;
 	public static final String STACK_STATUS = "/admin/synapse/status";
-	
+	public static final String ATTACHMENT_HANDLES = "attachmenthandles";
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	AuthenticationController authController;
 	JSONObjectAdapter jsonObjectAdapter;
@@ -418,7 +419,16 @@ public class SynapseJavascriptClient {
 		}
 		doGet(url, OBJECT_TYPE.WikiPage, callback);
 	}
+
 	
+	public void getWikiAttachmentFileHandles(WikiPageKey key, AsyncCallback<List<FileHandle>> callback) {
+		String url = getRepoServiceUrl() + "/" +
+				key.getOwnerObjectType().toLowerCase() + "/" + 
+				key.getOwnerObjectId() + WIKI +
+				key.getWikiPageId() + "/" + 
+				ATTACHMENT_HANDLES;
+		doGet(url, OBJECT_TYPE.FileHandleResults, callback);
+	}
 
 	public void getUserGroupHeadersByPrefix(String prefix, TypeFilter type, long limit, long offset, final AsyncCallback<UserGroupHeaderResponsePage> callback) {
 		String encodedPrefix = gwt.encodeQueryString(prefix);
@@ -547,7 +557,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<Entity> callback) {
-		getEntityByID(entityId, OBJECT_TYPE.Entity, null, callback);
+		getEntityByID(entityId, OBJECT_TYPE.Entity, versionNumber, callback);
 	}
 	
 	private void getEntityByID(String entityId, OBJECT_TYPE type, Long versionNumber, AsyncCallback<Entity> callback) {

@@ -48,7 +48,7 @@ public class FileHandleWidgetTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		when(mockFileResult.getFileHandle()).thenReturn(mockFileHandle);
-		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFileHandleAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		widget = new FileHandleWidget(mockView, mockAuthController, mockFileHandleAsyncHandler, mockJsniUtils);
 		when(mockFHA.getFileHandleId()).thenReturn(FILE_HANDLE_ID);
 		when(mockFileHandle.getFileName()).thenReturn(FILE_NAME);
@@ -93,7 +93,7 @@ public class FileHandleWidgetTest {
 		// setup an error.
 		String errorMessage = "an error";
 		final Throwable error = new Throwable(errorMessage);
-		AsyncMockStubber.callFailureWith(error).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(error).when(mockFileHandleAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		when(mockView.isAttached()).thenReturn(true);
 		widget.configure(mockFHA);
 		InOrder order = Mockito.inOrder(mockView);

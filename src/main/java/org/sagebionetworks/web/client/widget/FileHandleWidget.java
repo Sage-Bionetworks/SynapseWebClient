@@ -40,7 +40,7 @@ public class FileHandleWidget implements IsWidget {
 	public void configure(final FileHandleAssociation fha) {
 		fileHandleId = fha.getFileHandleId();
 		view.setLoadingVisible(true);
-		fileHandleAsynHandler.getFileHandle(fha, new AsyncCallback<FileResult>() {
+		fileHandleAsynHandler.getFileResult(fha, new AsyncCallback<FileResult>() {
 			@Override
 			public void onSuccess(FileResult result) {
 				if(view.isAttached() && result != null){
