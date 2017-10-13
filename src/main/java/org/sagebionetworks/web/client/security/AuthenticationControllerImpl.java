@@ -11,14 +11,19 @@ import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
+import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -43,7 +48,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private ClientCache localStorage;
 	private AdapterFactory adapterFactory;
 	private SynapseClientAsync synapseClient;
-	
+	private PortalGinInjector ginInjector;
 	@Inject
 	public AuthenticationControllerImpl(
 			CookieProvider cookies, 
@@ -51,13 +56,15 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			SessionStorage sessionStorage, 
 			ClientCache localStorage, 
 			AdapterFactory adapterFactory,
-			SynapseClientAsync synapseClient){
+			SynapseClientAsync synapseClient,
+			PortalGinInjector ginInjector){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		this.sessionStorage = sessionStorage;
 		this.localStorage = localStorage;
 		this.adapterFactory = adapterFactory;
 		this.synapseClient = synapseClient;
+		this.ginInjector = ginInjector;
 	}
 
 	@Override
@@ -70,7 +77,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				storeAuthenticationReceipt(username, session.getAuthenticationReceipt());
 				revalidateSession(session.getSessionToken(), callback);
 			}
-			
 			
 			@Override
 			public void onFailure(Throwable caught) {
@@ -142,8 +148,12 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				logoutUser();
-				callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE + " " + caught.getMessage()));
+				if (caught instanceof SynapseDownException || caught instanceof ReadOnlyModeException) {
+					ginInjector.getGlobalApplicationState().getPlaceChanger().goTo(new Down(ClientProperties.DEFAULT_PLACE_TOKEN));
+				} else {
+					logoutUser();
+					callback.onFailure(caught);
+				}
 			}
 		});
 	}

@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.view.HomeView;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -50,7 +51,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.cookies = cookies;
 		this.resourceLoader = resourceLoader;
 		this.jsniUtils = jsniUtils;
@@ -95,7 +95,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			@Override
 			public void onFailure(Throwable ex) {
 				//token is invalid
-				if (ex instanceof AuthenticationException) {
+				if (ex instanceof AuthenticationException || ex instanceof UnauthorizedException) {
 					// send user to login page						
 					view.showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
 					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
