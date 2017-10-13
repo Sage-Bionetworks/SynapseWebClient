@@ -72,7 +72,7 @@ public class FileCellRendererImplTest {
 		fileHandle.setFileName("filename.jpg");
 		
 		when(mockFileResult.getFileHandle()).thenReturn(fileHandle);
-		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFileHandleAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -99,7 +99,7 @@ public class FileCellRendererImplTest {
 		address = new CellAddress(tableId, column, rowId, rowVersion, tableType);
 		renderer.setCellAddresss(address);
 		renderer.setValue(fileHandleId);
-		verify(mockFileHandleAsyncHandler, never()).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		verify(mockFileHandleAsyncHandler, never()).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		verify(mockView).setLoadingVisible(false);
 		verify(mockView).setErrorText(FileCellRendererImpl.FILE_SYNAPSE_ID_UNAVAILABLE);
 	}
@@ -146,7 +146,7 @@ public class FileCellRendererImplTest {
 		String errorMessage = "an error";
 		final Throwable error = new Throwable(errorMessage);
 		
-		AsyncMockStubber.callFailureWith(error).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(error).when(mockFileHandleAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		//attached.
 		when(mockView.isAttached()).thenReturn(true);
 		renderer.setValue(fileHandleId);
@@ -161,7 +161,7 @@ public class FileCellRendererImplTest {
 	public void testSetValueFailureNotAttached(){
 		// setup an error.
 		final Throwable error = new Throwable("an error");
-		AsyncMockStubber.callFailureWith(error).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(error).when(mockFileHandleAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		//not attached.
 		when(mockView.isAttached()).thenReturn(false);
 		renderer.setValue(fileHandleId);

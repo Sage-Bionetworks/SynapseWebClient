@@ -24,7 +24,6 @@ public class LazyLoadWikiWidgetWrapper implements IsWidget {
 	public LazyLoadWikiWidgetWrapper(LazyLoadWikiWidgetWrapperView view, LazyLoadHelper lazyLoadHelper) {
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.view = view;
-		this.lazyLoadHelper = lazyLoadHelper;
 		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {

@@ -59,7 +59,7 @@ public class FileCellRendererImpl implements FileCellRenderer {
 					return;
 				}
 			}
-			fileHandleAsynHandler.getFileHandle(association, new AsyncCallback<FileResult>() {
+			fileHandleAsynHandler.getFileResult(association, new AsyncCallback<FileResult>() {
 				
 				@Override
 				public void onSuccess(FileResult result) {
