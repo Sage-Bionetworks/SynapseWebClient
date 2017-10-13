@@ -6,10 +6,7 @@ import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
-import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
-import org.sagebionetworks.schema.adapter.JSONEntity;
-import org.sagebionetworks.web.client.place.SignedToken;
 
 public enum NotificationTokenType  {
 	JoinTeam(JoinTeamSignedToken.class),

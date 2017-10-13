@@ -1,11 +1,42 @@
 package org.sagebionetworks.web.client.mvp;
 
 
-import com.google.gwt.activity.shared.Activity;
-import com.google.gwt.activity.shared.ActivityMapper;
-import com.google.gwt.place.shared.Place;
-import org.sagebionetworks.web.client.*;
-import org.sagebionetworks.web.client.place.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.logging.Logger;
+
+import org.sagebionetworks.web.client.AppLoadingView;
+import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Certificate;
+import org.sagebionetworks.web.client.place.Challenges;
+import org.sagebionetworks.web.client.place.ChangeUsername;
+import org.sagebionetworks.web.client.place.ComingSoon;
+import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.EmailInvitation;
+import org.sagebionetworks.web.client.place.ErrorPlace;
+import org.sagebionetworks.web.client.place.Governance;
+import org.sagebionetworks.web.client.place.Help;
+import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.MapPlace;
+import org.sagebionetworks.web.client.place.NewAccount;
+import org.sagebionetworks.web.client.place.PeopleSearch;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.ProjectsHome;
+import org.sagebionetworks.web.client.place.Quiz;
+import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.place.SignedToken;
+import org.sagebionetworks.web.client.place.StandaloneWiki;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.SynapseForumPlace;
+import org.sagebionetworks.web.client.place.Team;
+import org.sagebionetworks.web.client.place.TeamSearch;
+import org.sagebionetworks.web.client.place.Trash;
+import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
@@ -13,9 +44,9 @@ import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Logger;
+import com.google.gwt.activity.shared.Activity;
+import com.google.gwt.activity.shared.ActivityMapper;
+import com.google.gwt.place.shared.Place;
 
 public class AppActivityMapper implements ActivityMapper {	
 
@@ -89,8 +120,8 @@ public class AppActivityMapper implements ActivityMapper {
 	public Activity getActivity(Place place) {
 		synapseJSNIUtils.setPageTitle(DisplayConstants.DEFAULT_PAGE_TITLE);
 		synapseJSNIUtils.setPageDescription(DisplayConstants.DEFAULT_PAGE_DESCRIPTION);
-	    
-	    AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
+
+		AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
 		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();
 		
 		globalApplicationState.recordPlaceVisit(place);

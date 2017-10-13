@@ -1,5 +1,56 @@
 package org.sagebionetworks.web.client.presenter;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.sagebionetworks.web.client.AppLoadingView;
+import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.Portal;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace;
+import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionDashboardPlace;
+import org.sagebionetworks.web.client.place.ACTDataAccessSubmissionsPlace;
+import org.sagebionetworks.web.client.place.ACTPlace;
+import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
+import org.sagebionetworks.web.client.place.Account;
+import org.sagebionetworks.web.client.place.Certificate;
+import org.sagebionetworks.web.client.place.Challenges;
+import org.sagebionetworks.web.client.place.ChangeUsername;
+import org.sagebionetworks.web.client.place.ComingSoon;
+import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.EmailInvitation;
+import org.sagebionetworks.web.client.place.ErrorPlace;
+import org.sagebionetworks.web.client.place.Help;
+import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.MapPlace;
+import org.sagebionetworks.web.client.place.NewAccount;
+import org.sagebionetworks.web.client.place.PeopleSearch;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.ProjectsHome;
+import org.sagebionetworks.web.client.place.Quiz;
+import org.sagebionetworks.web.client.place.Search;
+import org.sagebionetworks.web.client.place.SignedToken;
+import org.sagebionetworks.web.client.place.StandaloneWiki;
+import org.sagebionetworks.web.client.place.SubscriptionPlace;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.SynapseForumPlace;
+import org.sagebionetworks.web.client.place.Team;
+import org.sagebionetworks.web.client.place.TeamSearch;
+import org.sagebionetworks.web.client.place.Trash;
+import org.sagebionetworks.web.client.place.Wiki;
+import org.sagebionetworks.web.client.place.users.PasswordReset;
+import org.sagebionetworks.web.client.place.users.RegisterAccount;
+import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
+import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
+import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.footer.VersionState;
+
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
@@ -9,18 +60,6 @@ import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.*;
-import org.sagebionetworks.web.client.place.*;
-import org.sagebionetworks.web.client.place.users.PasswordReset;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
-import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
-import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
-import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.footer.VersionState;
-
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * A block of presenters in the same code split that dynamically starts the

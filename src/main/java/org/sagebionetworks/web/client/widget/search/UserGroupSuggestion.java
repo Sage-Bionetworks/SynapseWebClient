@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.search;
 
-import com.google.gwt.user.client.rpc.IsSerializable;
-import com.google.gwt.user.client.ui.SuggestOracle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
+
+import com.google.gwt.user.client.rpc.IsSerializable;
+import com.google.gwt.user.client.ui.SuggestOracle;
 
 public class UserGroupSuggestion implements IsSerializable, SuggestOracle.Suggestion {
 	private UserGroupHeader header;

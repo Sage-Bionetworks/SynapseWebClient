@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.widget.search;
 
+import org.sagebionetworks.repo.model.principal.TypeFilter;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+
 import com.google.gwt.event.dom.client.HasKeyDownHandlers;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.shared.GwtEvent;
@@ -8,9 +12,6 @@ import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.repo.model.principal.TypeFilter;
-import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, SynapseWidgetPresenter, IsWidget, Focusable, HasKeyDownHandlers {
 	
@@ -24,7 +25,7 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 	
 	@Inject
 	public SynapseSuggestBox(SynapseSuggestBoxView view,
-			SynapseSuggestOracle oracle) {
+							 SynapseSuggestOracle oracle) {
 		this.oracle = oracle;
 		this.view = view;
 		this.view.configure(oracle);

@@ -186,14 +186,14 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	
 	private final Supplier<Set<String>> htmlTeamMembersCache = Suppliers.memoizeWithExpiration(teamMembersSupplier(), 1, TimeUnit.HOURS);
 
-    public Set<String> getHtmlTeamMembers() {
-        return htmlTeamMembersCache.get();
-    }
+	public Set<String> getHtmlTeamMembers() {
+		return htmlTeamMembersCache.get();
+	}
 
-    private Supplier<Set<String>> teamMembersSupplier() {
-        return new Supplier<Set<String>>() {
-            public Set<String> get() {
-            	Set<String> userIdSet = new HashSet<String>();
+	private Supplier<Set<String>> teamMembersSupplier() {
+		return new Supplier<Set<String>>() {
+			public Set<String> get() {
+				Set<String> userIdSet = new HashSet<String>();
 				try {
 					org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 					long currentOffset = 0;
@@ -211,9 +211,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					
 				}
 				return userIdSet;
-            }
-        };
-    }
+			}
+		};
+	}
 
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
@@ -1277,10 +1277,10 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					userId, MAX_LIMIT, ZERO_OFFSET);
 			List<Team> teamList = teams.getResults();
 			Collections.sort(teamList, new Comparator<Team>() {
-		        @Override
-		        public int compare(Team o1, Team o2) {
-		        	return o1.getName().compareToIgnoreCase(o2.getName());
-		        }
+				@Override
+				public int compare(Team o1, Team o2) {
+					return o1.getName().compareToIgnoreCase(o2.getName());
+				}
 			});
 			List<TeamRequestBundle> bundle = new ArrayList<TeamRequestBundle>(teamList.size());
 			for (Team team: teamList) {
@@ -2414,11 +2414,11 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	public static int safeLongToInt(long l) {
-       if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-           throw new IllegalArgumentException
-               ("Cannot safely cast "+l+" to int without changing the value.");
-       }
-       return (int) l;
+	   if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+		   throw new IllegalArgumentException
+			   ("Cannot safely cast "+l+" to int without changing the value.");
+	   }
+	   return (int) l;
    }
 
 	public String getHost(String urlString) throws RestServiceException {

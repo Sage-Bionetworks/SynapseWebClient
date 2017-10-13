@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.unitclient.view.users;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
@@ -15,9 +18,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class RegisterWidgetTest {
 	

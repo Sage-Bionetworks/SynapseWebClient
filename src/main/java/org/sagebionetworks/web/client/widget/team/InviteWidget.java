@@ -1,9 +1,5 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import com.google.gwt.regexp.shared.RegExp;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
@@ -15,6 +11,11 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
+
+import com.google.gwt.regexp.shared.RegExp;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 public class InviteWidget implements InviteWidgetView.Presenter {
 	private InviteWidgetView view;
@@ -28,10 +29,10 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 
 	@Inject
 	public InviteWidget(InviteWidgetView view,
-	                    SynapseClientAsync synapseClient,
-	                    GWTWrapper gwt, SynapseAlert synAlert,
-	                    SynapseSuggestBox peopleSuggestBox,
-	                    UserGroupSuggestionProvider provider) {
+						SynapseClientAsync synapseClient,
+						GWTWrapper gwt, SynapseAlert synAlert,
+						SynapseSuggestBox peopleSuggestBox,
+						UserGroupSuggestionProvider provider) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.gwt = gwt;
