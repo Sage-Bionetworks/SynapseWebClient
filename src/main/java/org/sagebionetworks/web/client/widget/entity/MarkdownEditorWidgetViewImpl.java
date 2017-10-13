@@ -113,6 +113,8 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	@UiField
 	public Button alphaInsertButton;
 	@UiField
+	public AnchorListItem bookmarkLink;
+	@UiField
 	public AnchorListItem externalWebsiteLink;
 	@UiField
 	public AnchorListItem supertableLink;
@@ -215,6 +217,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		synapseFormLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_FORM));
 		videoLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_VIDEO));
 		previewLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_PREVIEW));
+		bookmarkLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_BOOKMARK));
 		synapseTableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_SYNAPSE_TABLE));
 		externalWebsiteLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_EXTERNAL_WEBSITE));
 		supertableLink.addClickHandler(getClickHandler(MarkdownEditorAction.INSERT_API_SUPERTABLE));

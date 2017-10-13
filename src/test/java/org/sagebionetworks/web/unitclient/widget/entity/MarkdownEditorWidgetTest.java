@@ -427,6 +427,12 @@ public class MarkdownEditorWidgetTest {
 	}
 	
 	@Test
+	public void testHandleCommandInsertBookmark(){
+		String contentType = WidgetConstants.BOOKMARK_CONTENT_TYPE;
+		presenter.handleCommand(MarkdownEditorAction.INSERT_BOOKMARK);
+		verify(mockEditDescriptor).editNew(eq(wikiPageKey), eq(contentType));
+	}
+	@Test
 	public void testHandleCommandInsertExternalWebsite(){
 		String contentType = WidgetConstants.SHINYSITE_CONTENT_TYPE;
 		presenter.handleCommand(MarkdownEditorAction.INSERT_EXTERNAL_WEBSITE);

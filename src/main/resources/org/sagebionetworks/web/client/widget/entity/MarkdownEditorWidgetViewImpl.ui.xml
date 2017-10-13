@@ -44,6 +44,7 @@
 						<b:Button dataToggle="DROPDOWN" visible="false" ui:field="alphaInsertButton" size="EXTRA_SMALL">@ Insert</b:Button>
 					</b:Tooltip>
 					  <b:DropDownMenu>
+					    <b:AnchorListItem ui:field="bookmarkLink" text="Bookmark" />
 					    <b:AnchorListItem ui:field="challengeParticipantsLink" text="Challenge Participants List" />
 					    <b:AnchorListItem ui:field="challengeTeamsLink" text="Challenge Teams List" />
 					    <b:AnchorListItem ui:field="cytoscapeJsLink" text="Cytoscape JS Graph" />

@@ -48,7 +48,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, DialogCallback dialogCallback) { 
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
-		if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
+		if(contentTypeKey.equals(BOOKMARK_CONTENT_TYPE)) {
+			presenter = ginInjector.getBookmarkConfigEditor();
+		} else if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceConfigEditor();
 		} else if (contentTypeKey.equals(JOIN_TEAM_CONTENT_TYPE)) {
 			presenter = ginInjector.getJoinTeamConfigEditor();
@@ -112,7 +114,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	public IsWidget getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, Callback widgetRefreshRequired, Long wikiVersionInView) { 
 		//use gin to create a new instance of the proper class.
 		WidgetRendererPresenter presenter = null;
-		if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
+		if(contentTypeKey.equals(BOOKMARK_CONTENT_TYPE)) {
+			presenter = ginInjector.getBookmarkRenderer();
+		} else if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceRenderer();
 		} else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getProvenanceRenderer();
@@ -245,6 +249,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	}
 	
 	private void initWithKnownWidgets() {
+		registerWidget(BOOKMARK_CONTENT_TYPE, BOOKMARK_FRIENDLY_NAME);
 		registerWidget(REFERENCE_CONTENT_TYPE, REFERENCE_FRIENDLY_NAME);
 		registerWidget(YOUTUBE_CONTENT_TYPE, YOUTUBE_FRIENDLY_NAME);
 		registerWidget(VIMEO_CONTENT_TYPE, VIMEO_FRIENDLY_NAME);
