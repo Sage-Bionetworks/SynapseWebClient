@@ -1,10 +1,36 @@
 
 package org.sagebionetworks.web.client;
 
-import com.google.gwt.user.client.rpc.RemoteService;
-import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.*;
+import org.sagebionetworks.repo.model.AccessApproval;
+import org.sagebionetworks.repo.model.AccessControlList;
+import org.sagebionetworks.repo.model.AccessRequirement;
+import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
+import org.sagebionetworks.repo.model.LogEntry;
+import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
+import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
+import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
+import org.sagebionetworks.repo.model.ProjectListType;
+import org.sagebionetworks.repo.model.Reference;
+import org.sagebionetworks.repo.model.ResponseMessage;
+import org.sagebionetworks.repo.model.SignedTokenInterface;
+import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.TeamMembershipStatus;
+import org.sagebionetworks.repo.model.TrashedEntity;
+import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.doi.Doi;
@@ -23,20 +49,33 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.repo.model.subscription.Etag;
-import org.sagebionetworks.repo.model.table.*;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ColumnModelPage;
+import org.sagebionetworks.repo.model.table.SortItem;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.ViewScope;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.view.TeamRequestBundle;
-import org.sagebionetworks.web.shared.*;
+import org.sagebionetworks.web.shared.EntityBundlePlus;
+import org.sagebionetworks.web.shared.MembershipRequestBundle;
+import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
+import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
+import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.ProjectPagedResults;
+import org.sagebionetworks.web.shared.TeamBundle;
+import org.sagebionetworks.web.shared.TeamMemberPagedResults;
+import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 
-import java.io.IOException;
-import java.util.*;
+import com.google.gwt.user.client.rpc.RemoteService;
+import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 
 @RemoteServiceRelativePath("synapseclient")	
 public interface SynapseClient extends RemoteService{
@@ -109,13 +148,6 @@ public interface SynapseClient extends RemoteService{
 	String createOrUpdateEntity(Entity entity, Annotations annos, boolean isNew) throws RestServiceException;
 
 	/**
-	 * Returns the specified user's profile object in json string
-	 * @return
-	 * @throws RestServiceException
-	 */
-	UserProfile getUserProfile(String userId) throws RestServiceException;
-
-	/**
 	 * Updates the user's profile json object 
 	 * @param userProfile json object of the user's profile
 	 * @throws RestServiceException
@@ -159,26 +191,18 @@ public interface SynapseClient extends RemoteService{
 	PaginatedResults<Reference> getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset) throws RestServiceException;
 
 	String getRootWikiId(String ownerId, String ownerType) throws RestServiceException;
-
 	FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	 // V2 Wiki crud
 	 V2WikiPage restoreV2WikiPage(String ownerId, String ownerType, String wikiId, Long versionToUpdate) throws RestServiceException;
-
 	void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
-
 	List<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
-
 	V2WikiOrderHint getV2WikiOrderHint(WikiPageKey key) throws RestServiceException;
-
 	V2WikiOrderHint updateV2WikiOrderHint(V2WikiOrderHint toUpdate) throws RestServiceException;
-
 	FileHandleResults getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
-
 	PaginatedResults<V2WikiHistorySnapshot> getV2WikiHistory(WikiPageKey key, Long limit, Long offset) throws RestServiceException;
 
 	WikiPage createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
-
 	WikiPage updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage) throws IOException, RestServiceException;
 
 	EntityHeader addFavorite(String entityId) throws RestServiceException;
@@ -186,59 +210,37 @@ public interface SynapseClient extends RemoteService{
 	void removeFavorite(String entityId) throws RestServiceException;
 
 	String createTeam(String teamName) throws RestServiceException;
-
 	void deleteTeam(String teamId) throws RestServiceException;
-
 	PaginatedResults<Team> getTeams(String userId, Integer limit, Integer offset) throws RestServiceException;
-
 	List<TeamRequestBundle> getTeamsForUser(String userId,
-	                                        boolean includeOpenRequests) throws RestServiceException;
-
+											boolean includeOpenRequests) throws RestServiceException;
 	PaginatedResults<Team> getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
-
 	TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;
-
 	Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException;
-
 	ArrayList<OpenUserInvitationBundle> getOpenInvitations(String userId) throws RestServiceException;
-
 	ArrayList<OpenTeamInvitationBundle> getOpenTeamInvitations(String teamId, Integer limit, Integer offset) throws RestServiceException;
 	List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
-
 	MembershipInvtnSubmission getMembershipInvitation(MembershipInvtnSignedToken token) throws RestServiceException;
-
 	InviteeVerificationSignedToken getInviteeVerificationSignedToken(String membershipInvitationId) throws RestServiceException;
-
 	void updateInviteeId(String membershipInvitationId, InviteeVerificationSignedToken token) throws RestServiceException;
-
 	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
-
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;
 	Team updateTeam(Team team, AccessControlList teamAcl) throws RestServiceException;
-
 	TeamMemberPagedResults getTeamMembers(String teamId, String fragment, Integer limit, Integer offset) throws RestServiceException;
-
 	void deleteOpenMembershipRequests(String currentUserId, String teamId) throws RestServiceException;
-
 	TeamMembershipStatus requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn) throws RestServiceException;
-
 	void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
-
 	void inviteNewMember(String email, String teamId, String message, String hostPageBaseURL) throws RestServiceException;
 
 	String getCertifiedUserPassingRecord(String userId) throws RestServiceException;
-
 	String getCertificationQuiz() throws RestServiceException;
-
 	PassingRecord submitCertificationQuizResponse(QuizResponse response) throws RestServiceException;
 
 
 	String getFileEntityIdWithSameName(String fileName, String parentEntityId) throws RestServiceException, SynapseException;
-
 	String setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId) throws RestServiceException;
 
 	Doi getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
-
 	void createDoi(String entityId, Long versionNumber) throws RestServiceException;
 
 	String getSynapseVersions() throws RestServiceException;
@@ -375,9 +377,7 @@ public interface SynapseClient extends RemoteService{
 
 	Entity moveEntity(String entityId, String newParentEntityId) throws RestServiceException;
 
-    Team getTeam(String teamId) throws RestServiceException;
-
-    String getUserIdFromUsername(String username) throws RestServiceException;
+	String getUserIdFromUsername(String username) throws RestServiceException;
 
 	Etag getEtag(String objectId, ObjectType objectType) throws RestServiceException;
 

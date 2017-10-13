@@ -1,5 +1,12 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.BlockQuote;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.header.Header;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -9,12 +16,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.gwtbootstrap3.client.ui.BlockQuote;
-import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.widget.header.Header;
 
 public class EmailInvitationViewImpl extends Composite implements EmailInvitationView {
 
@@ -74,12 +75,32 @@ public class EmailInvitationViewImpl extends Composite implements EmailInvitatio
 		this.presenter = presenter;
 		headerWidget.configure(false);
 		headerWidget.refresh();
+		invitationTitle.setVisible(true);
+		invitationMessageWrapper.setVisible(true);
+		registerWidgetContainer.setVisible(true);
+		loginButton.setVisible(true);
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 
 	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
+	}
+
+	@Override
+	public void clear() {
+		invitationTitle.setVisible(false);
+		invitationMessageWrapper.setVisible(false);
+		registerWidgetContainer.setVisible(false);
+		loginButton.setVisible(false);
+	}
+
+	@Override
+	public void show() {
+		invitationTitle.setVisible(true);
+		invitationMessageWrapper.setVisible(true);
+		registerWidgetContainer.setVisible(true);
+		loginButton.setVisible(true);
 	}
 
 	public interface EmailInvitationViewImplUiBinder extends UiBinder<Widget, EmailInvitationViewImpl> {
