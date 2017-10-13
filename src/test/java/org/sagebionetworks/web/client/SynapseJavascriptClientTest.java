@@ -46,6 +46,7 @@ import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
@@ -453,5 +454,31 @@ public class SynapseJavascriptClientTest {
 		requestCallback.onResponseReceived(mockRequest, mockResponse);
 		
 		verify(mockAsyncCallback).onSuccess(result);
+	}
+	
+	@Test
+	public void testUpdateV2WikiPage() throws RequestException, JSONObjectAdapterException {
+		String ownerObjectId = "syn123";
+		String wikiPageId = "282";
+		WikiPageKey pageKey = new WikiPageKey();
+		pageKey.setOwnerObjectId(ownerObjectId);
+		pageKey.setOwnerObjectType(ObjectType.ENTITY.toString());
+		pageKey.setWikiPageId(wikiPageId);
+		
+		V2WikiPage page = new V2WikiPage();
+		page.setId(wikiPageId);
+		client.updateV2WikiPage(pageKey, page, mockAsyncCallback);
+
+		//verify url and method
+		String url = REPO_ENDPOINT + "/" + pageKey.getOwnerObjectType().toLowerCase() + "/" + ownerObjectId + WIKI2 + wikiPageId;
+		verify(mockRequestBuilder).configure(PUT, url);
+		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).setHeader(SynapseJavascriptClient.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).sendRequest(stringCaptor.capture(), requestCallbackCaptor.capture());
+		
+		//verify request data
+		String json = stringCaptor.getValue();
+		V2WikiPage request = new V2WikiPage(jsonObjectAdapter.createNew(json));
+		assertEquals(wikiPageId, request.getId());
 	}
 }

@@ -1,52 +1,99 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.junit.Assert.*;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
-import org.sagebionetworks.schema.adapter.JSONEntity;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
+import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTree;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor;
-import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditor.HasChangesHandler;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesOrderEditorView;
+import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class WikiSubpagesOrderEditorTest {
 	
 	WikiSubpagesOrderEditor editor;
-	
+
+	@Mock
 	WikiSubpagesOrderEditorView mockView;
+	@Mock
 	WikiSubpageOrderEditorTree mockEditorTree;
-	HasChangesHandler mockHandler;
+	@Mock
+	SynapseAlert mockSynAlert;
+	@Mock
+	SynapseClientAsync mockSynapseClient;
+	@Mock
+	List<V2WikiHeader> mockWikiHeaders;
+	@Mock
+	V2WikiOrderHint mockHint;
 	
-	
+	public static final String OWNER_OBJECT_NAME = "project a";
+	@Mock
+	WikiPageKey mockPageKey;
 	@Before
 	public void before(){
-		mockView = Mockito.mock(WikiSubpagesOrderEditorView.class);
-		mockEditorTree = Mockito.mock(WikiSubpageOrderEditorTree.class);
-		mockHandler = Mockito.mock(HasChangesHandler.class);
+		MockitoAnnotations.initMocks(this);
 		
-		editor = new WikiSubpagesOrderEditor(mockView, mockEditorTree);
+		editor = new WikiSubpagesOrderEditor(
+				mockView, 
+				mockEditorTree,
+				mockSynAlert,
+				mockSynapseClient);
+		AsyncMockStubber.callSuccessWith(mockWikiHeaders).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockHint).when(mockSynapseClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
+		
 	}
 	
 	@Test
 	public void testConfigure() {
-		List<V2WikiHeader> wikiHeaders = new ArrayList<V2WikiHeader>();
-		String ownerObjectName = "A";
-		editor.configure(wikiHeaders, ownerObjectName, mockHandler);
-		
-		verify(mockEditorTree).configure(wikiHeaders, ownerObjectName);
-		verify(mockView).configure(mockEditorTree, mockHandler);
+		editor.configure(mockPageKey, OWNER_OBJECT_NAME);
+		verify(mockSynAlert).clear();
+		verify(mockView).setLoadingVisible(true);
+		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockEditorTree).configure(eq((String)null), eq(mockPageKey), eq(mockWikiHeaders), eq(OWNER_OBJECT_NAME), eq(mockHint), any(CallbackP.class));
+		verify(mockView).setLoadingVisible(false);
+	}
+	
+	@Test
+	public void testConfigureGetHeaderTreeFailure() {
+		Exception ex = new Exception();
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		editor.configure(mockPageKey, OWNER_OBJECT_NAME);
+		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynAlert).handleException(ex);
+		verify(mockSynapseClient, never()).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockView).setLoadingVisible(false);
+	}
+	
+	@Test
+	public void testConfigureGetHintFailure() {
+		Exception ex = new Exception();
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
+		editor.configure(mockPageKey, OWNER_OBJECT_NAME);
+		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseClient).getV2WikiOrderHint(any(WikiPageKey.class), any(AsyncCallback.class));
+		verify(mockSynAlert).handleException(ex);
+		verify(mockView).setLoadingVisible(false);
 	}
 	
 	@Test
 	public void testGetTree() {
-		editor.configure(new ArrayList<V2WikiHeader>(), "A", mockHandler);
+		editor.configure(mockPageKey, OWNER_OBJECT_NAME);
 		assertEquals(mockEditorTree, editor.getTree());
 	}
 	

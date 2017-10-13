@@ -5,8 +5,8 @@ import java.util.List;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget.UpdateOrderHintCallback;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -18,9 +18,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView {
-
-	private Presenter presenter;
-	private WikiSubpagesOrderEditorModalWidget orderEditorModal;
+	private WikiSubpagesOrderEditor orderEditor;
 	private static final String WELL="well";
 	private static final String COL_MD_3="col-md-3";
 	private static final String COL_MD_9="col-md-9";
@@ -34,12 +32,15 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	boolean isShowingSubpages;
 	
 	private WikiSubpageNavigationTree navTree;
+	private GlobalApplicationState globalAppState;
 	
 	@Inject
-	public WikiSubpagesViewImpl(WikiSubpagesOrderEditorModalWidget orderEditorModal,
-								WikiSubpageNavigationTree navTree) {
-		this.orderEditorModal = orderEditorModal;
+	public WikiSubpagesViewImpl(WikiSubpagesOrderEditor orderEditor,
+								WikiSubpageNavigationTree navTree,
+								GlobalApplicationState globalAppState) {
+		this.orderEditor = orderEditor;
 		this.navTree = navTree;
+		this.globalAppState = globalAppState;
 		addStyleName("wikiSubpages");
 	}
 	
@@ -57,10 +58,9 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	
 	@Override
 	public void configure(final List<V2WikiHeader> wikiHeaders,
-						FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer,
+						final FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer,
 						final String ownerObjectName, Place ownerObjectLink,
-						WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage,
-						final UpdateOrderHintCallback updateOrderHintCallback,
+						final WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage,
 						CallbackP<WikiPageKey> wikiPageCallback) {
 		clear();
 		
@@ -83,8 +83,20 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		editOrderButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				orderEditorModal.configure(wikiHeaders, ownerObjectName);
-				orderEditorModal.show(updateOrderHintCallback);
+				wikiSubpagesContainer.clear();
+				orderEditor.configure(curWikiKey, ownerObjectName);
+				wikiSubpagesContainer.add(orderEditor.asWidget());
+				Button finishEditingOrderButton = DisplayUtils.createButton("Done");
+				finishEditingOrderButton.addStyleName("btn btn-default margin-top-10 right");
+				wikiSubpagesContainer.add(finishEditingOrderButton);
+				finishEditingOrderButton.addClickHandler(new ClickHandler() {
+					@Override
+					public void onClick(ClickEvent event) {
+						wikiSubpagesContainer.clear();
+						globalAppState.refreshPage();
+					}
+				});
+				DisplayUtils.scrollToTop();
 			}
 		});
 		
@@ -182,11 +194,6 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	public Widget asWidget() {
 		return this;
 	}	
-
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
 		
 	@Override
 	public void showErrorMessage(String message) {
