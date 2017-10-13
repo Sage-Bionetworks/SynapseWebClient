@@ -593,4 +593,6 @@ public interface PortalGinInjector extends Ginjector {
 	SubjectWidget getSubjectWidget();
 
 	TeamMemberRowWidget getTeamMemberRowWidget();
+  
+	RequestBuilderWrapper getRequestBuilder();
 }

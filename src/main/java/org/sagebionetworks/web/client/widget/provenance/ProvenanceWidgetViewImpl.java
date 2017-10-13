@@ -109,15 +109,18 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 			prov.setHeight(height + "px");	
 		}
 		prov.addStyleName("position-relative margin-5");
-						
+		ProvNodeContainer startingNodeContainer = null;
 		if(graph != null) {
 			container.clear();
 			// add nodes to graph
 			Set<ProvGraphNode> nodes = graph.getNodes();
 			for(ProvGraphNode node : nodes) {							
-				ProvNodeContainer container = getNodeContainer(node); 
+				ProvNodeContainer container = getNodeContainer(node);
 				nodeToContainer.put(node.getId(), container);
 				prov.add(container);
+				if (node.isStartingNode()) {
+					startingNodeContainer = container;
+				}
 			}						
 		}
 		
@@ -135,6 +138,9 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 			// look for old versions
 			presenter.findOldVersions();
 			afterJSPlumbLoad();
+		}
+		if (startingNodeContainer != null) {
+			startingNodeContainer.getElement().scrollIntoView();
 		}
 	}
 	

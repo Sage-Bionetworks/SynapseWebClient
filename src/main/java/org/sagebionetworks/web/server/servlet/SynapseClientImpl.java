@@ -426,7 +426,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	@Override
 	public UserProfile getUserProfile(String userId) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

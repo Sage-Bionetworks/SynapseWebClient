@@ -4,7 +4,11 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 
+import org.sagebionetworks.web.client.utils.Callback;
+
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -15,7 +19,9 @@ import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
@@ -28,11 +34,47 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private boolean isCode;
 	private SageImageBundle sageImageBundle;
-	
+	private Dialog previewDialog;
+	private Widget dialogContent;
 	@Inject
-	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, SageImageBundle sageImageBundle) {
+	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, 
+			SageImageBundle sageImageBundle, 
+			final Dialog previewDialog) {
 		this.synapseJSNIUtils = synapseJsniUtils;
 		this.sageImageBundle = sageImageBundle;
+		this.previewDialog = previewDialog;
+		previewDialog.configure("", null, "Close", new Dialog.Callback() {
+			@Override
+			public void onDefault() {
+				hideFullscreenPreview();
+			}
+			
+			@Override
+			public void onPrimary() {
+			}
+		}, false);
+		previewDialog.addStyleName("modal-fullscreen");
+	}
+	
+	private void showFullscreenPreview() {
+		dialogContent = getWidget(0);
+		dialogContent.removeFromParent();
+		FocusPanel panel = new FocusPanel();
+		panel.addStyleName("margin-right-20");
+		panel.add(dialogContent);
+		panel.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				hideFullscreenPreview();
+			}
+		});
+		previewDialog.add(panel);
+		previewDialog.show();
+	}
+	private void hideFullscreenPreview() {
+		dialogContent.removeFromParent();
+		add(dialogContent);
+		previewDialog.hide();
 	}
 	
 	@Override
@@ -57,6 +99,12 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		    }
 		});
 		add(fullImage);
+		fullImage.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				showFullscreenPreview();
+			}
+		});
 		fullImage.setUrl(fullFileUrl);
 	}
 	

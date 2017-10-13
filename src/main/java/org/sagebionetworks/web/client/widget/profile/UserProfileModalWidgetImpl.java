@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.profile;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -18,6 +19,7 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 	UserProfileModalView modalView;
 	UserProfileEditorWidget editorWidget;
 	SynapseClientAsync synapse;
+	SynapseJavascriptClient jsClient;
 	Callback callback;
 	AuthenticationController authController;
 	ClientCache clientCache;
@@ -26,11 +28,13 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 	public UserProfileModalWidgetImpl(UserProfileModalView view, 
 			UserProfileEditorWidget editorWidget, 
 			SynapseClientAsync synapse,
+			SynapseJavascriptClient jsClient,
 			AuthenticationController authController,
 			ClientCache clientCache){
 		this.modalView = view;
 		this.editorWidget = editorWidget;
 		this.synapse = synapse;
+		this.jsClient = jsClient;
 		this.authController = authController;
 		this.clientCache = clientCache;
 		this.modalView.setPresenter(this);
@@ -109,7 +113,7 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 		modalView.setLoading(true);
 		modalView.setProcessing(false);
 		modalView.hideError();
-		synapse.getUserProfile(userId, new AsyncCallback<UserProfile>() {
+		jsClient.getUserProfile(userId, new AsyncCallback<UserProfile>() {
 			
 			@Override
 			public void onSuccess(UserProfile profile) {

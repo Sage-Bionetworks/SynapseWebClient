@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidget;
@@ -45,6 +46,8 @@ public class EmailAddressesWidgetTest {
 	GWTWrapper mockGwt;
 	@Mock
 	UserProfile mockUserProfile;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	List<String> userEmails;
 	public static final String USER_ID = "982";
 	public static final String EMAIL1 = "one@one.com";
@@ -54,7 +57,8 @@ public class EmailAddressesWidgetTest {
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		widget = new EmailAddressesWidget(mockView, 
-				mockSynapseClient, 
+				mockSynapseClient,
+				mockSynapseJavascriptClient,
 				mockSynAlert, 
 				mockAuthenticationController, 
 				mockPopupUtils, 
@@ -70,7 +74,7 @@ public class EmailAddressesWidgetTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).removeEmail(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		
 	}
 
@@ -125,7 +129,7 @@ public class EmailAddressesWidgetTest {
 		
 		verify(mockSynapseClient).setNotificationEmail(eq(EMAIL2), any(AsyncCallback.class));
 		//reload profile
-		verify(mockSynapseClient).getUserProfile(eq(USER_ID), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserProfile(eq(USER_ID), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -170,7 +174,7 @@ public class EmailAddressesWidgetTest {
 		
 		verify(mockSynapseClient).removeEmail(eq(EMAIL2), any(AsyncCallback.class));
 		//reload profile
-		verify(mockSynapseClient).getUserProfile(eq(USER_ID), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUserProfile(eq(USER_ID), any(AsyncCallback.class));
 	}
 	
 	@Test

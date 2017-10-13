@@ -63,6 +63,8 @@ public class SynapseJavascriptClientTest {
 	public static final String USER_SESSION_TOKEN = "abc123";
 	
 	@Mock
+	PortalGinInjector mockGinInjector;
+	@Mock
 	RequestBuilderWrapper mockRequestBuilder;
 	@Mock
 	AuthenticationController mockAuthController;
@@ -91,13 +93,14 @@ public class SynapseJavascriptClientTest {
 		MockitoAnnotations.initMocks(this);
 		when(mockGlobalAppState.getSynapseProperty(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT);
 		when(mockGlobalAppState.getSynapseProperty(FILE_SERVICE_URL_KEY)).thenReturn(FILE_ENDPOINT);
+		when(mockGinInjector.getRequestBuilder()).thenReturn(mockRequestBuilder);
 		client = new SynapseJavascriptClient(
-				mockRequestBuilder, 
 				mockAuthController, 
 				jsonObjectAdapter, 
 				mockGlobalAppState, 
 				mockGwt,
-				synapseJsFactory);
+				synapseJsFactory,
+				mockGinInjector);
 	}
 	
 	@Test

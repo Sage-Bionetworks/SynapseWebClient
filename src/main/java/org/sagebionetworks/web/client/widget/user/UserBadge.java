@@ -24,7 +24,6 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.rpc.core.java.util.Collections.EmptyMap_CustomFieldSerializer;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -297,15 +296,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			clientCache.put(profile.getOwnerId() + WebConstants.USER_PROFILE_SUFFIX, adapter.toJSONString());
 		} catch (JSONObjectAdapterException e) {
 		}
-	}
-	
-	public static void getUserProfile(final String principalId, final AdapterFactory adapterFactory, SynapseClientAsync synapseClient, final ClientCache clientCache, final AsyncCallback<UserProfile> callback) {
-		UserProfile profile = getUserProfileFromCache(principalId, adapterFactory, clientCache);
-		if (profile != null) {
-			callback.onSuccess(profile);
-			return;
-		}
-		synapseClient.getUserProfile(principalId, callback); 
 	}
 	
 	public void clearState() {

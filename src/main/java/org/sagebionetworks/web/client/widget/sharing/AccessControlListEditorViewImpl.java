@@ -21,6 +21,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -48,7 +49,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private PermissionLevel[] permList;	// To enforce order.
 	private Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL);
 	private HelpWidget deleteAclHelpWidget = new HelpWidget();
-	
+	private IsWidget synAlertWidget;
 	@Inject
 	public AccessControlListEditorViewImpl(SageImageBundle sageImageBundle,
 					SharingPermissionsGrid permissionsGrid, AclAddPeoplePanel addPeoplePanel) {
@@ -111,7 +112,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			addPeoplePanel.setMakePublicButtonDisplay(isPubliclyVisible);
 		}
 	}
-	
+	@Override
+	public void setSynAlert(IsWidget w) {
+		this.synAlertWidget = w;
+	}
 	@Override
 	public void clear() {
 		super.clear();
@@ -205,6 +209,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				}
 			}
 		}
+		add(synAlertWidget);
 	}
 	
 	@Override
@@ -251,11 +256,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	@Override
 	public void showInfoSuccess(String title, String message) {
 		DisplayUtils.showInfo(title, message);
-	}
-	
-	@Override
-	public void showInfoError(String title, String message) {
-		DisplayUtils.showErrorMessage(message);
 	}
 	
 	/*

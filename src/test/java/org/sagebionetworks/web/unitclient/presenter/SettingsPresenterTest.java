@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -83,6 +84,8 @@ public class SettingsPresenterTest {
 	PasswordStrengthWidget mockPasswordStrengthWidget;
 	@Mock
 	EmailAddressesWidget mockEmailAddressesWidget;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
@@ -98,8 +101,18 @@ public class SettingsPresenterTest {
 		mockUserProfileModalWidget = mock(UserProfileModalWidget.class);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		
-		presenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockSynapseClient, 
-				mockInjector, mockUserProfileModalWidget, mockSubscriptionListWidget,mockPasswordStrengthWidget, mockEmailAddressesWidget);	
+		presenter = new SettingsPresenter(
+				mockView, 
+				mockAuthenticationController, 
+				mockUserService, 
+				mockGlobalApplicationState, 
+				mockSynapseClient, 
+				mockInjector, 
+				mockUserProfileModalWidget, 
+				mockSubscriptionListWidget,
+				mockPasswordStrengthWidget, 
+				mockEmailAddressesWidget, 
+				mockSynapseJavascriptClient);	
 		verify(mockView).setPresenter(presenter);
 		verify(mockView).setSubscriptionsListWidget(any(Widget.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -107,7 +120,7 @@ public class SettingsPresenterTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(APIKEY).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
 
-		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(email).when(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
@@ -270,7 +283,7 @@ public class SettingsPresenterTest {
 	@Test
 	public void testConfigureFailure() {
 		Exception ex = new Exception("error occurred");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		presenter.configure();
 		verify(mockView).clear();
 		verify(mockSubscriptionListWidget).configure();

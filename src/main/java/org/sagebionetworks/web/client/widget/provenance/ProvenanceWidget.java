@@ -14,7 +14,6 @@ import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -31,7 +30,6 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartUtil;
-import org.sagebionetworks.web.shared.KeyValueDisplay;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -57,7 +55,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	private SynapseClientAsync synapseClient;
 	SynapseJavascriptClient jsClient;
 	private Map<String, ProvGraphNode> idToNode = new HashMap<String, ProvGraphNode>();
-	private AdapterFactory adapterFactory;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private Map<String, String> descriptor;
 	private JsoProvider jsoProvider;
@@ -84,7 +81,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	public ProvenanceWidget(ProvenanceWidgetView view, SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController, 
-			AdapterFactory adapterFactory,
 			SynapseJSNIUtils synapseJSNIUtils,
 			JsoProvider jsoProvider, 
 			ClientCache clientCache,
@@ -94,7 +90,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.adapterFactory = adapterFactory;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.jsoProvider = jsoProvider;
 		this.clientCache = clientCache;
@@ -184,11 +179,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 
 	public void setHeight(int height) {
 		view.setHeight(height);
-	}
-			
-	@Override
-	public void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback) {
-		ProvUtils.getInfo(nodeId, jsClient, synapseClient, adapterFactory, clientCache, dateTimeUtils, idToNode, callback);
 	}
 	
 	@SuppressWarnings("unchecked")

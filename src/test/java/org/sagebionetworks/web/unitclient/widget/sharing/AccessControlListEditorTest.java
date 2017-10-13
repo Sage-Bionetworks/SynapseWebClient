@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.HasChangesHandler;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
@@ -90,6 +91,8 @@ public class AccessControlListEditorTest {
 	PublicPrincipalIds mockPublicPrincipalIds;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	SynapseAlert mockSynAlert;
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws JSONObjectAdapterException {
@@ -127,7 +130,8 @@ public class AccessControlListEditorTest {
 				mockAuthenticationController,
 				mockGlobalApplicationState, 
 				mockGwt,
-				mockSynapseJavascriptClient
+				mockSynapseJavascriptClient,
+				mockSynAlert
 		);
 		acle.configure(project, true, mockHasChangeHandler);
 		when(mockACLEView.isNotifyPeople()).thenReturn(true);
@@ -466,6 +470,31 @@ public class AccessControlListEditorTest {
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 	}
 	
+	@Test
+	public void recreateAclTest() throws Exception {
+		// SWC-3795 test.
+		// create response ACL: benefactor's
+		AsyncMockStubber.callSuccessWith(entityBundleTransport_localACL).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(inheritedACL).when(mockSynapseClient).deleteAcl(eq(ENTITY_ID), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(inheritedACL).when(mockSynapseClient).getEntityBenefactorAcl(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(localACL).when(mockSynapseClient).updateAcl(any(AccessControlList.class), anyBoolean(), any(AsyncCallback.class));
+		ArgumentCaptor<AccessControlList> captor = ArgumentCaptor.forClass(AccessControlList.class);
+		String etag = "12843";
+		localACL.setEtag(etag);
+		entityBundleTransport_localACL.setBenefactorAcl(localACL);
+
+		// update
+		acle.refresh();
+		acle.deleteAcl();
+		acle.createAcl();
+		acle.pushChangesToSynapse(false, mockPushToSynapseCallback);
+		verify(mockPushToSynapseCallback).invoke();
+		
+		verify(mockSynapseClient).updateAcl(captor.capture(), eq(false), any(AsyncCallback.class));
+		AccessControlList updateAcl = captor.getValue();
+		assertEquals(localACL.getEtag(), updateAcl.getEtag());
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void updateAclRecursiveTest() throws Exception {
@@ -506,7 +535,7 @@ public class AccessControlListEditorTest {
 		acle.setAccess(ADMIN_ID, PermissionLevel.CAN_VIEW);
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 		
-		verify(mockACLEView).showErrorMessage(anyString());
+		verify(mockSynAlert).showError(anyString());
 		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
 	}
 	
@@ -534,7 +563,7 @@ public class AccessControlListEditorTest {
 		acle.removeAccess(USER2_ID);
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 
-		verify(mockACLEView).showErrorMessage(anyString());
+		verify(mockSynAlert).showError(anyString());
 		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyBoolean(),eq(PermissionLevel.CAN_DOWNLOAD));
 	}
 }
