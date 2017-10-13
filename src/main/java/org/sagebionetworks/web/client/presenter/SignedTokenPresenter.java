@@ -105,7 +105,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 		if (authController.isLoggedIn()) {
 			authController.logoutUser();
 		}
-        globalApplicationState.getPlaceChanger().goTo(new EmailInvitation(signedEncodedToken));
+		globalApplicationState.getPlaceChanger().goTo(new EmailInvitation(signedEncodedToken));
 	}
 
 	public void handleSettingsToken() {
