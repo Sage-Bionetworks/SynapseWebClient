@@ -48,9 +48,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, DialogCallback dialogCallback) { 
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
-		if(contentTypeKey.equals(BOOKMARK_CONTENT_TYPE)) {
-			presenter = ginInjector.getBookmarkConfigEditor();
-		} else if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
+		if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
 			presenter = ginInjector.getReferenceConfigEditor();
 		} else if (contentTypeKey.equals(JOIN_TEAM_CONTENT_TYPE)) {
 			presenter = ginInjector.getJoinTeamConfigEditor();
