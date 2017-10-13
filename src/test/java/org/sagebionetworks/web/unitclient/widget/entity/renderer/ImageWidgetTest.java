@@ -135,6 +135,19 @@ public class ImageWidgetTest {
 	}
 	
 	@Test
+	public void testConfigureFromSynapseIdError() {
+		Exception ex = new Exception("so sad");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityForVersion(anyString(), anyLong(), any(AsyncCallback.class));
+		String synId = "syn239";
+		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
+		
+		widget.configure(wikiKey,descriptor, null, null);
+		
+		verify(mockSynAlert).clear();
+		verify(mockSynAlert).handleException(ex);
+	}
+	
+	@Test
 	public void testConfigureFromWikiAttachment() {
 		List<FileHandle> fileHandles = new ArrayList<>();
 		fileHandles.add(mockFileHandle1);
@@ -160,6 +173,18 @@ public class ImageWidgetTest {
 		boolean isLoggedIn = true;
 		verify(mockView).configure(eq(PRESIGNED_URL), eq(FILE_NAME), anyString(), anyString(), eq((String)null), eq(isLoggedIn));
 	}
+	
+	@Test
+	public void testConfigureFromWikiAttachmentError() {
+		Exception ex = new Exception("so sad");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getWikiAttachmentFileHandles(any(WikiPageKey.class), anyLong(), any(AsyncCallback.class));
+		
+		widget.configure(wikiKey,descriptor, null, null);
+		
+		verify(mockSynAlert).clear();
+		verify(mockSynAlert).handleException(ex);
+	}
+
 	
 	@Test
 	public void testConfigureDefaultResponsive() {
