@@ -1,52 +1,34 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-
-import java.util.Map;
-
-import static junit.framework.Assert.*;
-
-import org.eclipse.jetty.util.ajax.JSON;
+import com.google.gwt.place.shared.Place;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
-import org.sagebionetworks.schema.adapter.JSONEntity;
-import org.sagebionetworks.util.SerializationUtils;
-import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.*;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
-import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.NewAccountView;
-import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
-import org.sagebionetworks.web.shared.exceptions.ConflictException;
-import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import java.util.Map;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.*;
 
 public class NewAccountPresenterTest {
 	
@@ -158,25 +140,6 @@ public class NewAccountPresenterTest {
 
 		result = newAccountPresenter.parseEmailValidationToken("");
 		assertTrue(result.isEmpty());
-	}
-
-    @Test
-	public void testCompleteRegistrationOldToken() {
-		String firstName = "   Mara  ";
-		String lastName = " Jade     ";
-		String userName = "skywalker290";
-		String password = "  farfaraway";
-		final String emailValidationToken = "email=test@email.com";
-		newAccountPresenter.setPlace(new NewAccount(emailValidationToken));
-		newAccountPresenter.completeRegistration(userName, firstName, lastName, password);
-		verify(mockView).setLoading(true);
-		verify(mockView).setLoading(false);
-		verify(mockUserService).createUserStep2(eq(userName), eq(firstName.trim()), eq(lastName.trim()), eq(password), eq(emailValidationToken), any(AsyncCallback.class));
-
-		//should go to the login place with the new session token
-		ArgumentCaptor<Place> placeCaptor = new ArgumentCaptor<Place>();
-		verify(mockPlaceChanger).goTo(placeCaptor.capture());
-		assertEquals(testSessionToken, ((LoginPlace)placeCaptor.getValue()).toToken());
 	}
 
 	@Test

@@ -375,7 +375,9 @@ public interface SynapseClient extends RemoteService{
 
 	Entity moveEntity(String entityId, String newParentEntityId) throws RestServiceException;
 
-	String getUserIdFromUsername(String username) throws RestServiceException;
+    Team getTeam(String teamId) throws RestServiceException;
+
+    String getUserIdFromUsername(String username) throws RestServiceException;
 
 	Etag getEtag(String objectId, ObjectType objectType) throws RestServiceException;
 

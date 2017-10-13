@@ -1,18 +1,15 @@
 package org.sagebionetworks.web.client.presenter;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.inject.Inject;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
-import org.sagebionetworks.schema.adapter.JSONEntity;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.UserAccountServiceAsync;
+import org.sagebionetworks.web.client.*;
+import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -20,12 +17,8 @@ import org.sagebionetworks.web.client.view.NewAccountView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
 
-import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.AcceptsOneWidget;
-import com.google.inject.Inject;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import java.util.HashMap;
+import java.util.Map;
 
 public class NewAccountPresenter extends AbstractActivity implements NewAccountView.Presenter, Presenter<NewAccount> {
 		
@@ -138,6 +131,9 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 				view.setLoading(false);
 				//success, send to login place to continue login process (sign terms of use...)
 				view.showInfo(DisplayConstants.ACCOUNT_CREATED, "");
+				if (accountCreationToken.getEncodedMembershipInvtnSignedToken() != null) {
+					globalAppState.setLastPlace(new EmailInvitation(accountCreationToken.getEncodedMembershipInvtnSignedToken()));
+				}
 				globalAppState.getPlaceChanger().goTo(new LoginPlace(sessionToken));
 			}
 

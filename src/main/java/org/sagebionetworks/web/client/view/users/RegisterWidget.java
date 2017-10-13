@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.view.users;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -18,7 +17,7 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 	private UserAccountServiceAsync userService;
 	private GWTWrapper gwt;
 	private SynapseAlert synAlert;
-	private MembershipInvtnSignedToken membershipInvtnSignedToken;
+	private String encodedMembershipInvtnSignedToken;
 
 	@Inject
 	public RegisterWidget(RegisterWidgetView view, 
@@ -69,12 +68,12 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 	}
 
 	@Override
-	public MembershipInvtnSignedToken getMembershipInvtnSignedToken() {
-		return membershipInvtnSignedToken;
+	public String getEncodedMembershipInvtnSignedToken() {
+		return encodedMembershipInvtnSignedToken;
 	}
 
-	public void setMembershipInvtnSignedToken(MembershipInvtnSignedToken membershipInvtnSignedToken) {
-		this.membershipInvtnSignedToken = membershipInvtnSignedToken;
+	public void setEncodedMembershipInvtnSignedToken(String encodedMembershipInvtnSignedToken) {
+		this.encodedMembershipInvtnSignedToken = encodedMembershipInvtnSignedToken;
 	}
 
 	public void setVisible(boolean isVisible) {
@@ -83,5 +82,9 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 	
 	public void setEmail(String email) {
 		view.setEmail(email);
+	}
+
+	public void enableEmailAddressField(boolean enabled) {
+		view.enableEmailAddressField(enabled);
 	}
 }

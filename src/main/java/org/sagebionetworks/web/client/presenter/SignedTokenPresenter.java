@@ -66,7 +66,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 		configure(place.getTokenType(), place.getSignedEncodedToken());
 	}
 
-	public void configure(String tokenType, String signedEncodedToken) {
+	public void configure(String tokenType, final String signedEncodedToken) {
 		signedToken = null;
 		synapseAlert.clear();
 		view.clear();
@@ -83,7 +83,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 					isFirstTry = true;
 					handleJoinTeamToken();
 				} else if (result instanceof MembershipInvtnSignedToken) {
-					handleEmailInvitationToken();
+					handleEmailInvitationToken(signedEncodedToken);
 				} else {
 					handleSignedToken();
 				}
@@ -96,23 +96,11 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 		});
 	}
 
-	public void handleEmailInvitationToken() {
+	public void handleEmailInvitationToken(final String signedEncodedToken) {
 		if (authController.isLoggedIn()) {
 			authController.logoutUser();
 		}
-		MembershipInvtnSignedToken token = (MembershipInvtnSignedToken) signedToken;
-		synapseClient.getMembershipInvitation(token, new AsyncCallback<MembershipInvtnSubmission>() {
-			@Override
-			public void onFailure(Throwable throwable) {
-				view.setLoadingVisible(false);
-				synapseAlert.handleException(throwable);
-			}
-
-			@Override
-			public void onSuccess(MembershipInvtnSubmission membershipInvtnSubmission) {
-				globalApplicationState.getPlaceChanger().goTo(new EmailInvitation(membershipInvtnSubmission.getId()));
-			}
-		});
+        globalApplicationState.getPlaceChanger().goTo(new EmailInvitation(signedEncodedToken));
 	}
 
 	public void handleSettingsToken() {

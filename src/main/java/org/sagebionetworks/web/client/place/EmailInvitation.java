@@ -5,14 +5,14 @@ import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
 public class EmailInvitation extends Place {
-	public String invitationId;
+	public String signedEncodedToken;
 
 	public EmailInvitation(String token) {
-		this.invitationId = token;
+		this.signedEncodedToken = token;
 	}
 
 	public String toToken() {
-		return invitationId;
+		return signedEncodedToken;
 	}
 
 	@Prefix("!EmailInvitation")

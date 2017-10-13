@@ -38,7 +38,7 @@ public class RegisterWidgetViewImpl implements RegisterWidgetView {
 			public void onClick(ClickEvent event) {
 				NewUser newUser = new NewUser();
 				newUser.setEmail(emailAddressField.getValue());
-				newUser.setMembershipInvtnSignedToken(presenter.getMembershipInvtnSignedToken());
+				newUser.setEncodedMembershipInvtnSignedToken(presenter.getEncodedMembershipInvtnSignedToken());
 				presenter.registerUser(newUser);
 			}
 		});
@@ -90,5 +90,10 @@ public class RegisterWidgetViewImpl implements RegisterWidgetView {
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message, "");
+	}
+
+	@Override
+	public void enableEmailAddressField(boolean enabled) {
+		emailAddressField.setEnabled(enabled);
 	}
 }

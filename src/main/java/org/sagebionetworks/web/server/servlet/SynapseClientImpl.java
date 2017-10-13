@@ -442,6 +442,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
+	@Override
 	public Team getTeam(String teamId) throws RestServiceException {
 		try {
 			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

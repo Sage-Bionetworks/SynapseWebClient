@@ -26,8 +26,8 @@
 		<jackson.version>1.8.1</jackson.version>
 		<log4j.version>2.6.1</log4j.version>
 		<markdown.version>2016-01-22-a2731f7-19</markdown.version>
-		<gwtboostrap3.version>1.5.2</gwtboostrap3.version>
-		<gwtboostrap3.extras.version>1.5.2</gwtboostrap3.extras.version>
+		<gwtbootstrap3.version>1.5.2</gwtbootstrap3.version>
+		<gwtbootstrap3.extras.version>1.5.2</gwtbootstrap3.extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gwtvisualizationwrappers.version>1.6-gwt-2.7.0</gwtvisualizationwrappers.version>
 	</properties>
@@ -290,12 +290,12 @@
 		<dependency>
 			<groupId>org.gwtbootstrap3</groupId>
 			<artifactId>gwtbootstrap3</artifactId>
-			<version>${gwtboostrap3.version}</version>
+			<version>${gwtbootstrap3.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.gwtbootstrap3</groupId>
 			<artifactId>gwtbootstrap3-extras</artifactId>
-			<version>${gwtboostrap3.extras.version}</version>
+			<version>${gwtbootstrap3.extras.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.gwtvisualizationwrappers</groupId>
@@ -633,7 +633,13 @@
 		    <artifactId>jira-rest-java-client</artifactId>
 		    <version>2.0.0-m2</version>
 		</dependency>
-	</dependencies>
+		<dependency>
+			<groupId>com.googlecode.gwtquery</groupId>
+			<artifactId>gwtquery</artifactId>
+			<version>1.5-beta1</version>
+			<scope>provided</scope>
+		</dependency>
+    </dependencies>
 
 	<distributionManagement>
 		<repository>

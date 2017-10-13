@@ -147,6 +147,7 @@ public interface SynapseClientAsync {
 	 */
 	/////////////////
 	void createTeam(String teamName,AsyncCallback<String> callback);
+	void getTeam(String teamId, AsyncCallback<Team> async);
 	void deleteTeam(String teamId,AsyncCallback<Void> callback);
 	void getTeams(String userId, Integer limit, Integer offset,
 			AsyncCallback<PaginatedResults<Team>> callback);
@@ -358,4 +359,5 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void createExternalObjectStoreFileHandle(ExternalObjectStoreFileHandle fileHandle, AsyncCallback<String> callback);
+
 }
