@@ -137,6 +137,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRende
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererUserId;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.AttachmentPreviewWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.BookmarkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ButtonLinkWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.CancelControlWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeParticipantsWidget;
@@ -233,6 +234,7 @@ import org.sagebionetworks.web.client.widget.verification.VerificationSubmission
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
+import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 
 /**
  * The root portal dependency injection root.
@@ -346,6 +348,7 @@ public interface PortalGinInjector extends Ginjector {
 	public PlotlyConfigEditor getPlotlyConfigEditor();
 	
 	////// Renderers
+	public BookmarkWidget getBookmarkRenderer();
 	public ReferenceWidget getReferenceRenderer();
 	public TutorialWizard getTutorialWidgetRenderer();
 	public ProvenanceWidget getProvenanceRenderer();
