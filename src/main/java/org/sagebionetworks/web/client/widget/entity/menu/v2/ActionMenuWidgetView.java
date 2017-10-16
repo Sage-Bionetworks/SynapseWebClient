@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.menu.v2;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -32,9 +34,5 @@ public interface ActionMenuWidgetView extends IsWidget {
 	 */
 	void setBasicDividerVisible(boolean visible);
 
-	/**
-	 * Show/hide the Tools button
-	 * @param visible
-	 */
-	void setToolsButtonVisible(boolean visible);
+	void setToolsButtonIcon(String text, IconType icon);
 }

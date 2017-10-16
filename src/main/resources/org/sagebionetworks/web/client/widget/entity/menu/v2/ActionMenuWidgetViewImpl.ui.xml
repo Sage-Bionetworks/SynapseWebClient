@@ -7,25 +7,15 @@
 	<g:HTMLPanel>
 		<b:ButtonToolBar ui:field="buttonToolBar" addStyleNames="pull-right">
 			<b:ButtonGroup>
-				<a:ActionButton icon="LOCK" action="SHARE">Share</a:ActionButton>
-			</b:ButtonGroup>
-			<b:ButtonGroup>
-				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_TABLE_SCHEMA">Schema</a:ActionButton>
-			</b:ButtonGroup>
-			<b:ButtonGroup>
-				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_VIEW_SCOPE">Scope</a:ActionButton>
-			</b:ButtonGroup>
-			<b:ButtonGroup>
-				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_ANNOTATIONS">Annotations</a:ActionButton>
-			</b:ButtonGroup>
-			<b:ButtonGroup>
-				<a:ActionButton icon="TOGGLE_RIGHT" action="TOGGLE_FILE_HISTORY">File History</a:ActionButton>
-			</b:ButtonGroup>
-			<b:ButtonGroup>
 				<b:DropDown>
 					<b:Button icon="GEAR" ui:field="toolsMenu" dataToggle="DROPDOWN">Tools</b:Button>
 					<b:DropDownMenu ui:field="toolsDropDown"
 						addStyleNames="dropdown-menu-right">
+						<a:ActionMenuItem icon="LOCK" action="SHARE">Share</a:ActionMenuItem>
+						<a:ActionMenuItem icon="LOCK" action="SHOW_TABLE_SCHEMA">Schema</a:ActionMenuItem>
+						<a:ActionMenuItem icon="LOCK" action="SHOW_VIEW_SCOPE">Scope</a:ActionMenuItem>
+						<a:ActionMenuItem icon="LOCK" action="SHOW_ANNOTATIONS">Annotations</a:ActionMenuItem>
+						<a:ActionMenuItem icon="LOCK" action="SHOW_FILE_HISTORY">File History</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TELEVISION" action="PROJECT_DISPLAY">Project Display Settings</a:ActionMenuItem>
 						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_COMMIT">Add Commit</a:ActionMenuItem>
 						<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE_DATA">Upload Data To Table</a:ActionMenuItem>

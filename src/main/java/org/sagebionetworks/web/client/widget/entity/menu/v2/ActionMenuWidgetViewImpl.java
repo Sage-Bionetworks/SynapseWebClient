@@ -7,6 +7,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.Divider;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -85,8 +86,8 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	}
 
 	@Override
-	public void setToolsButtonVisible(boolean visible) {
-		toolsMenu.setVisible(visible);
+	public void setToolsButtonIcon(String text, IconType icon) {
+		toolsMenu.setText(text);
+		toolsMenu.setIcon(icon);
 	}
-
 }

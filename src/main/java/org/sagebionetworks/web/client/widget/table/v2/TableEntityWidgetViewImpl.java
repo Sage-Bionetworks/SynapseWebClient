@@ -1,9 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import org.gwtbootstrap3.client.shared.event.HiddenEvent;
-import org.gwtbootstrap3.client.shared.event.HiddenHandler;
-import org.gwtbootstrap3.client.shared.event.ShownEvent;
-import org.gwtbootstrap3.client.shared.event.ShownHandler;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Collapse;
@@ -79,33 +75,6 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		this.schemaCollapse.addShownHandler(new ShownHandler() {
-			@Override
-			public void onShown(ShownEvent event) {
-				presenter.onSchemaToggle(true);
-				
-			}
-		});
-		this.schemaCollapse.addHiddenHandler(new HiddenHandler() {
-			@Override
-			public void onHidden(HiddenEvent event) {
-				presenter.onSchemaToggle(false);
-			}
-		});
-		
-		this.scopeCollapse.addShownHandler(new ShownHandler() {
-			@Override
-			public void onShown(ShownEvent event) {
-				presenter.onScopeToggle(true);
-				
-			}
-		});
-		this.scopeCollapse.addHiddenHandler(new HiddenHandler() {
-			@Override
-			public void onHidden(HiddenEvent event) {
-				presenter.onScopeToggle(false);
-			}
-		});
 		
 		showSimpleSearch.addClickHandler(new ClickHandler() {
 			@Override
@@ -171,13 +140,8 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	}
 
 	@Override
-	public void toggleSchema() {
-		this.schemaCollapse.toggle();
-	}
-	
-	@Override
-	public void toggleScope() {
-		this.scopeCollapse.toggle();
+	public void setSchemaVisible(boolean visible) {
+		schemaCollapse.setVisible(visible);
 	}
 	
 	@Override

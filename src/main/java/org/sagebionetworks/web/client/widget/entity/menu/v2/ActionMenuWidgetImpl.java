@@ -143,8 +143,7 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	}
 
 	@Override
-	public void setToolsButtonVisible(boolean visible) {
-		view.setToolsButtonVisible(visible);
+	public void setToolsButtonIcon(String text, IconType icon) {
+		view.setToolsButtonIcon(text, icon);
 	}
-
 }

@@ -75,6 +75,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 	public void getStorageLocationSetting() {
 		Entity entity = entityBundle.getEntity();
 		view.setSFTPVisible(DisplayUtils.isInTestWebsite(cookies));
+		GWT.debugger();
 		synapseClient.getStorageLocationSetting(entity.getId(), new AsyncCallback<StorageLocationSetting>() {
 			@Override
 			public void onFailure(Throwable caught) {

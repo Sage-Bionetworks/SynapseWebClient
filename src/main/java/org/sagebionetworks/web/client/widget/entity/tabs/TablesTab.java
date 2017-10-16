@@ -27,12 +27,9 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
-import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
@@ -70,6 +67,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	TableEntityWidget v2TableWidget;
 	Map<String,String> configMap;
 	SynapseJavascriptClient jsClient;
+	ActionMenuWidget entityActionMenu;
 	
 	public static final String TABLES_HELP = "Build structured queryable data that can be described by a schema using the Tables.";
 	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "tables.html";
@@ -148,11 +146,12 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		this.projectBundleLoadError = projectBundleLoadError;
 	}
 	
-	public void configure(Entity entity, EntityUpdatedHandler handler, String areaToken) {
+	public void configure(Entity entity, EntityUpdatedHandler handler, String areaToken, ActionMenuWidget entityActionMenu) {
 		lazyInject();
 		this.entity = entity;
 		this.areaToken = areaToken;
 		this.handler = handler;
+		this.entityActionMenu = entityActionMenu;
 		metadata.setEntityUpdatedHandler(handler);
 		synAlert.clear();
 		boolean isTable = entity instanceof Table;
@@ -215,10 +214,9 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			metadata.setEntityBundle(bundle, null);
 			tableTitleBar.configure(bundle);
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
-			ActionMenuWidget actionMenu = initActionMenu(bundle);
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
 			view.setTableEntityWidget(v2TableWidget.asWidget());
-			v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), this, actionMenu);
+			v2TableWidget.configure(bundle, bundle.getPermissions().getCanCertifiedUserEdit(), this, entityActionMenu);
 			ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
 			configMap.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, Integer.toString(FilesTab.WIDGET_HEIGHT_PX-84));
 			configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(entity.getId(), null));
@@ -228,25 +226,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			areaToken = null;
 			tableListWidget.configure(bundle);
 		}
-	}
-	
-	public ActionMenuWidget initActionMenu(EntityBundle bundle) {
-		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
-		view.setActionMenu(actionMenu.asWidget());
-		final EntityActionController controller = ginInjector.createEntityActionController();
-		actionMenu.addControllerWidget(controller.asWidget());
-		
-		annotationsShown = false;
-		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				annotationsShown = !annotationsShown;
-				controller.onAnnotationsToggled(annotationsShown);
-				TablesTab.this.metadata.setAnnotationsVisible(annotationsShown);
-			}
-		});
-		controller.configure(actionMenu, bundle, true, bundle.getRootWikiId(), handler);
-		return actionMenu;
 	}
 	
 	public void getTargetBundleAndDisplay(final String entityId) {

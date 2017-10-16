@@ -9,7 +9,6 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.Query;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -119,8 +118,8 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 	public void hideEditActions() {
 		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
-		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, false);
-		this.actionMenu.setActionVisible(Action.TOGGLE_VIEW_SCOPE, false);
+		this.actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
+		this.actionMenu.setActionVisible(Action.SHOW_FILE_HISTORY, false);
 		if (!isQueryVisible) {
 			tableEntityWidget.hideFiltering();
 		}

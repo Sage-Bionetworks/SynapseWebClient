@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -48,9 +49,11 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
+import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
@@ -61,6 +64,7 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -107,6 +111,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EvaluationSubmitter submitter;
 	EditFileMetadataModalWidget editFileMetadataModalWidget;
 	EditProjectMetadataModalWidget editProjectMetadataModalWidget;
+	AnnotationsRendererWidget annotationsRendererWidget;
+	FileHistoryWidget fileHistoryWidget;
 	
 	EntityBundle entityBundle;
 	String wikiPageId, parentWikiPageId;
@@ -271,6 +277,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 		return evalEditor;
 	}
+	public void configureToolsMenu(ActionMenuWidget actionMenu) {
+		if (entityBundle.getEntity() instanceof Project) {
+//			actionMenu.
+		}
+	}
 	
 	@Override
 	public void configure(ActionMenuWidget actionMenu,
@@ -284,15 +295,19 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
 		this.isCurrentVersion = isCurrentVersion;
 		this.enityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
+
+		// hide all commands by default
+		for (Action action : Action.values()) {
+			actionMenu.setActionVisible(action, false);	
+		}
+		configureToolsMenu(actionMenu);
 		
 		if (!isUserAuthenticated) {
-			actionMenu.setToolsButtonVisible(false);
 			if (permissions.getCanPublicRead()) {
 				configureAnnotations();
 				configureFileHistory();
 			}
 		} else {
-			actionMenu.setToolsButtonVisible(true);
 			// Setup the actions
 			configureDeleteAction();
 			configureShareAction();
@@ -316,6 +331,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureCreateChallenge();
 			configureApproveUserAccess();
 			configureManageAccessRequirements();
+			configureTableCommands();
 		}
 	}
 	
@@ -464,6 +480,25 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getSelectTeamModal().show();
 	}
 	
+	private void configureTableCommands() {
+		if(entityBundle.getEntity() instanceof Table ) {
+			boolean canEditResults = entityBundle.getPermissions().getCanCertifiedUserEdit();
+			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEditResults);
+			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
+			actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
+			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
+			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, !(entityBundle.getEntity() instanceof TableEntity));
+			actionMenu.setBasicDivderVisible(canEditResults);
+		} else {
+			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
+			actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, false);
+			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
+			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+			actionMenu.setBasicDivderVisible(false);
+		}
+	}
+	
 	private void configureFileUpload() {
 		if(entityBundle.getEntity() instanceof FileEntity ){
 			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, permissions.getCanCertifiedUserEdit());
@@ -536,38 +571,19 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureAnnotations(){
-		actionMenu.setActionVisible(Action.TOGGLE_ANNOTATIONS, true);
-		actionMenu.setActionEnabled(Action.TOGGLE_ANNOTATIONS, true);
-		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, this);
+		actionMenu.setActionVisible(Action.SHOW_ANNOTATIONS, true);
+		actionMenu.setActionEnabled(Action.SHOW_ANNOTATIONS, true);
+		actionMenu.addActionListener(Action.SHOW_ANNOTATIONS, this);
 	}
 	
-	@Override
-	public void onAnnotationsToggled(boolean shown) {
-		if(shown){
-			actionMenu.setActionIcon(Action.TOGGLE_ANNOTATIONS, IconType.TOGGLE_DOWN);
-		}else{
-			actionMenu.setActionIcon(Action.TOGGLE_ANNOTATIONS, IconType.TOGGLE_RIGHT);
-		}
-	}
-	
-
 	private void configureFileHistory(){
 		if(entityBundle.getEntity() instanceof FileEntity){
-			actionMenu.setActionVisible(Action.TOGGLE_FILE_HISTORY, true);
-			actionMenu.setActionEnabled(Action.TOGGLE_FILE_HISTORY, true);
-			actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, this);
+			actionMenu.setActionVisible(Action.SHOW_FILE_HISTORY, true);
+			actionMenu.setActionEnabled(Action.SHOW_FILE_HISTORY, true);
+			actionMenu.addActionListener(Action.SHOW_FILE_HISTORY, this);
 		}else{
-			actionMenu.setActionVisible(Action.TOGGLE_FILE_HISTORY, false);
-			actionMenu.setActionEnabled(Action.TOGGLE_FILE_HISTORY, false);
-		}
-	}
-	
-	@Override
-	public void onFileHistoryToggled(boolean shown) {
-		if(shown){
-			actionMenu.setActionIcon(Action.TOGGLE_FILE_HISTORY, IconType.TOGGLE_DOWN);
-		}else{
-			actionMenu.setActionIcon(Action.TOGGLE_FILE_HISTORY, IconType.TOGGLE_RIGHT);
+			actionMenu.setActionVisible(Action.SHOW_FILE_HISTORY, false);
+			actionMenu.setActionEnabled(Action.SHOW_FILE_HISTORY, false);
 		}
 	}
 	
@@ -603,7 +619,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionEnabled(Action.ADD_EVALUATION_QUEUE, false);
 		}
 	}
-
 	
 	private void configureEditFileMetadataAction(){
 		if(entityBundle.getEntity() instanceof FileEntity){
@@ -644,7 +659,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionEnabled(Action.DELETE_WIKI_PAGE, false);
 		}
 	}
-	
 	
 	private void configureShareAction(){
 		actionMenu.setActionEnabled(Action.SHARE, true);
@@ -787,6 +801,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case MANAGE_ACCESS_REQUIREMENTS:
 			onManageAccessRequirements();
 			break;
+		case SHOW_ANNOTATIONS :
+			onShowAnnotations();
+			break;
+		case SHOW_FILE_HISTORY : 
+			onShowFileHistory();
 		default:
 			break;
 		}
@@ -826,6 +845,35 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				postChangeStorageLocation();
 			}
 		});
+	}
+	
+	private AnnotationsRendererWidget getAnnotationsRendererWidget() {
+		if (annotationsRendererWidget == null) {
+			annotationsRendererWidget = ginInjector.getAnnotationsRendererWidget();
+			view.setAnnotationsRendererWidget(annotationsRendererWidget);
+		}
+		return annotationsRendererWidget;
+	}
+	
+	private FileHistoryWidget getFileHistoryWidget() {
+		if (fileHistoryWidget == null) {
+			fileHistoryWidget = ginInjector.getFileHistoryWidget();
+			view.setFileHistoryWidget(fileHistoryWidget);
+		}
+		return fileHistoryWidget;
+	}
+	
+	private void onShowAnnotations() {
+		// configure and show annotations
+		getAnnotationsRendererWidget().configure(entityBundle, entityBundle.getPermissions().getCanCertifiedUserEdit());
+		view.showAnnotations();
+	}
+	
+	private void onShowFileHistory() {
+		// configure and show file history
+		getFileHistoryWidget().setEntityBundle(entityBundle, getVersion());
+		getFileHistoryWidget().setEntityUpdatedHandler(entityUpdateHandler);
+		view.showFileHistory();
 	}
 	
 	private void postChangeStorageLocation() {

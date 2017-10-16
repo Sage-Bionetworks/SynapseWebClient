@@ -91,6 +91,7 @@ import org.sagebionetworks.web.client.widget.entity.act.ACTRevokeUserAccessModal
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -460,6 +461,7 @@ public interface PortalGinInjector extends Ginjector {
 	public AnnotationEditor getAnnotationEditor();
 	public FileHistoryRowView getFileHistoryRow();
 	public FileHistoryWidget getFileHistoryWidget();
+	public AnnotationsRendererWidget getAnnotationsRendererWidget();
 	
 	public JoinTeamConfigEditor getJoinTeamConfigEditor();
 	public ModifiedCreatedByWidget getModifiedCreatedByWidget();

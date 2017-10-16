@@ -45,6 +45,8 @@ public interface ActionMenuWidget extends IsWidget {
 	 */
 	public void setActionIcon(Action action, IconType icon);
 	
+	public void setToolsButtonIcon(String text, IconType icon);
+	
 	/**
 	 * Add a new listener to an action.
 	 * 
@@ -87,9 +89,4 @@ public interface ActionMenuWidget extends IsWidget {
 	 */
 	public void setBasicDivderVisible(boolean visible);
 
-	/**
-	 * Show/hide the Tools button
-	 * @param visible
-	 */
-	public void setToolsButtonVisible(boolean visible);
 }

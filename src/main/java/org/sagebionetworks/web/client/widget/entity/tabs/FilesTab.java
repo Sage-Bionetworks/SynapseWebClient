@@ -78,7 +78,6 @@ public class FilesTab {
 	String currentEntityId;
 	Long shownVersionNumber;
 	boolean isMostRecentVersion;
-	boolean annotationsShown, fileHistoryShown;
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	
 	public static int WIDGET_HEIGHT_PX = 270;
@@ -88,6 +87,7 @@ public class FilesTab {
 	EntityBundle projectBundle;
 	Throwable projectBundleLoadError;
 	String projectEntityId;
+	CallbackP<EntityBundle> bundleUpdatedCallback;
 	
 	@Inject
 	public FilesTab(Tab tab, PortalGinInjector ginInjector) {
@@ -303,7 +303,9 @@ public class FilesTab {
 		showProjectInfoCallack.invoke(isProject);
 		
 		view.showLoading(false);
-		
+		if (!isProject && bundleUpdatedCallback != null) {
+			bundleUpdatedCallback.invoke(bundle);
+		}
 		//Breadcrumb
 		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		view.clearActionMenuContainer();
@@ -328,10 +330,7 @@ public class FilesTab {
 		boolean isMetadataVisible = isFile || isFolder;
 		view.setMetadataVisible(isMetadataVisible);
 		if (isMetadataVisible) {
-			initActionMenu(bundle);
 			metadata.setEntityBundle(bundle, shownVersionNumber);
-			//File History
-			metadata.setFileHistoryVisible(isFile && shownVersionNumber != null);	
 		}
 		EntityArea area = isProject ? EntityArea.FILES : null;
 		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(currentEntityId, shownVersionNumber, area, null));
@@ -380,35 +379,9 @@ public class FilesTab {
 			wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
 		}
 	}
-	
-	public void initActionMenu(EntityBundle bundle) {
-		ActionMenuWidget actionMenu = ginInjector.createActionMenuWidget();
-		view.setActionMenu(actionMenu.asWidget());
-		final EntityActionController controller = ginInjector.createEntityActionController();
-		actionMenu.addControllerWidget(controller.asWidget());
-		
-		annotationsShown = false;
-		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				annotationsShown = !annotationsShown;
-				controller.onAnnotationsToggled(annotationsShown);
-				FilesTab.this.metadata.setAnnotationsVisible(annotationsShown);
-			}
-		});
-		fileHistoryShown = shownVersionNumber != null;
-		actionMenu.addActionListener(Action.TOGGLE_FILE_HISTORY, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				fileHistoryShown = !fileHistoryShown;
-				controller.onFileHistoryToggled(fileHistoryShown);
-				FilesTab.this.metadata.setFileHistoryVisible(fileHistoryShown);
-			}
-		});
-		controller.configure(actionMenu, bundle, isMostRecentVersion, bundle.getRootWikiId(), handler);
-		controller.setIsShowingVersion(shownVersionNumber != null);
+	public void setUpdateEntityBundle(CallbackP<EntityBundle> bundleUpdatedCallback) {
+		this.bundleUpdatedCallback = bundleUpdatedCallback;
 	}
-	
 	/**
 	 * Return the entity currently being shown by this tab.
 	 * @return

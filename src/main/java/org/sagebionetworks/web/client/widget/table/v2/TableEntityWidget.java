@@ -144,13 +144,9 @@ public class TableEntityWidget implements IsWidget,
 	 * Setup the actions for this widget.
 	 */
 	private void configureActions() {
-		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEditResults);
-		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
-		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
-		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
-		this.actionMenu.setActionVisible(Action.TOGGLE_VIEW_SCOPE, !TableType.table.equals(tableType));
-		this.actionMenu.setBasicDivderVisible(canEditResults);
 		// Listen to action events.
+		view.setScopeVisible(false);
+		view.setSchemaVisible(false);
 		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
@@ -169,20 +165,19 @@ public class TableEntityWidget implements IsWidget,
 				onEditResults();
 			}
 		});
-		this.actionMenu.setActionListener(Action.TOGGLE_TABLE_SCHEMA, new ActionListener() {
+		this.actionMenu.setActionListener(Action.SHOW_TABLE_SCHEMA, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
-				view.toggleSchema();
+				view.setSchemaVisible(true);
 			}
 		});
 		
-		this.actionMenu.setActionListener(Action.TOGGLE_VIEW_SCOPE, new ActionListener() {
+		this.actionMenu.setActionListener(Action.SHOW_VIEW_SCOPE, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
-				view.toggleScope();
+				view.setScopeVisible(true);
 			}
 		});
-
 	}
 
 	/**
@@ -466,24 +461,6 @@ public class TableEntityWidget implements IsWidget,
 			public void onCanceled() {			
 			}
 		});
-	}
-
-	@Override
-	public void onSchemaToggle(boolean shown) {
-		if(shown){
-			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_DOWN);
-		}else{
-			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
-		}
-	}
-	
-	@Override
-	public void onScopeToggle(boolean shown) {
-		if(shown){
-			actionMenu.setActionIcon(Action.TOGGLE_VIEW_SCOPE, IconType.TOGGLE_DOWN);
-		}else{
-			actionMenu.setActionIcon(Action.TOGGLE_VIEW_SCOPE, IconType.TOGGLE_RIGHT);
-		}
 	}
 
 	@Override

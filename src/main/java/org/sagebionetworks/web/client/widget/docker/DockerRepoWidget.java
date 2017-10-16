@@ -43,7 +43,6 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 	private EntityActionController controller;
 	private DockerCommitListWidget dockerCommitListWidget;
 	private CookieProvider cookies;
-	private boolean isAnnotationsShown;
 	private boolean canEdit;
 	private DockerRepository entity;
 
@@ -107,15 +106,6 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 	}
 
 	private void configureActionMenu(EntityBundle bundle) {
-		isAnnotationsShown = false;
-		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				isAnnotationsShown = !isAnnotationsShown;
-				controller.onAnnotationsToggled(isAnnotationsShown);
-				DockerRepoWidget.this.metadata.setAnnotationsVisible(isAnnotationsShown);
-			}
-		});
 		controller.configure(actionMenu, bundle, true, bundle.getRootWikiId(), handler);
 		boolean isEditableDockerRepo = entity instanceof DockerRepository && canEdit;
 		this.actionMenu.setActionVisible(Action.ADD_COMMIT, isEditableDockerRepo && DisplayUtils.isInTestWebsite(cookies));

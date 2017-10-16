@@ -27,9 +27,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTab;
@@ -72,11 +70,14 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	// how many tabs have been marked as visible
 	private int visibleTabCount;
 	
-	private EntityActionController controller;
-	private ActionMenuWidget actionMenu;
-	private boolean annotationsShown;
+	private EntityActionController projectActionController;
+	private ActionMenuWidget projectActionMenu;
+	private EntityActionController entityActionController;
+	private ActionMenuWidget entityActionMenu;
+
 	private CookieProvider cookies;
 	public static final boolean PUSH_TAB_URL_TO_BROWSER_HISTORY = false;
+	private CallbackP<EntityBundle> updateTargetCallback;
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
 			SynapseClientAsync synapseClient,
@@ -88,8 +89,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			ChallengeTab adminTab,
 			DiscussionTab discussionTab,
 			DockerTab dockerTab,
-			EntityActionController controller,
-			ActionMenuWidget actionMenu,
+			EntityActionController projectActionController,
+			ActionMenuWidget projectActionMenu,
+			EntityActionController entityActionController,
+			ActionMenuWidget entityActionMenu,
 			CookieProvider cookies,
 			SynapseJavascriptClient synapseJavascriptClient) {
 		this.view = view;
@@ -102,8 +105,10 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.discussionTab = discussionTab;
 		this.dockerTab = dockerTab;
 		this.projectMetadata = projectMetadata;
-		this.controller = controller;
-		this.actionMenu = actionMenu;
+		this.projectActionController = projectActionController;
+		this.projectActionMenu = projectActionMenu;
+		this.entityActionController = entityActionController;
+		this.entityActionMenu = entityActionMenu;
 		this.cookies = cookies;
 		this.synapseJavascriptClient = synapseJavascriptClient;
 		initTabs();
@@ -111,18 +116,19 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		view.setProjectMetadata(projectMetadata.asWidget());
 		view.setPresenter(this);
 		
-		actionMenu.addControllerWidget(controller.asWidget());
-		view.setActionMenu(actionMenu.asWidget());
+		projectActionMenu.addControllerWidget(projectActionController.asWidget());
+		view.setProjectActionMenu(projectActionMenu.asWidget());
 		
-		annotationsShown = false;
-		actionMenu.addActionListener(Action.TOGGLE_ANNOTATIONS, new ActionListener() {
+		entityActionMenu.addControllerWidget(entityActionController.asWidget());
+		view.setEntityActionMenu(entityActionMenu.asWidget());
+		
+		updateTargetCallback = new CallbackP<EntityBundle>() {
 			@Override
-			public void onAction(Action action) {
-				annotationsShown = !annotationsShown;
-				EntityPageTop.this.controller.onAnnotationsToggled(annotationsShown);
-				EntityPageTop.this.projectMetadata.setAnnotationsVisible(annotationsShown);
+			public void invoke(EntityBundle newTargetEntityBundle) {
+				//TODO: look at params
+				EntityPageTop.this.entityActionController.configure(EntityPageTop.this.entityActionMenu, projectBundle, true, null, entityUpdateHandler);
 			}
-		});
+		};
 	}
 	private void initTabs() {
 		tabs.addTab(wikiTab.asTab());
@@ -165,6 +171,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				configureFilesTab();
 			};
 		});
+		filesTab.setUpdateEntityBundle(updateTargetCallback);
 		tablesTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
 				configureTablesTab();
@@ -351,7 +358,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		
 		if (projectBundle != null) {
 			String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
-			controller.configure(actionMenu, projectBundle, true, wikiId, entityUpdateHandler);
+			projectActionController.configure(projectActionMenu, projectBundle, true, wikiId, entityUpdateHandler);
 		}
 		
 		// set all content stale
@@ -408,7 +415,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public void configureTablesTab() {
 		if (tablesTab.asTab().isContentStale()) {
 			tablesTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
-			tablesTab.configure(entity, entityUpdateHandler, tablesAreaToken);
+			tablesTab.configure(entity, entityUpdateHandler, tablesAreaToken, entityActionMenu);
 			tablesTab.asTab().setContentStale(false);
 		}
 	}
@@ -461,7 +468,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 				@Override
 				public void invoke(String wikiPageId) {
-					controller.configure(actionMenu, projectBundle, true, wikiPageId, entityUpdateHandler);
+					projectActionController.configure(projectActionMenu, projectBundle, true, wikiPageId, entityUpdateHandler);
 				}
 			};
 			wikiTab.setWikiReloadHandler(wikiReloadHandler);

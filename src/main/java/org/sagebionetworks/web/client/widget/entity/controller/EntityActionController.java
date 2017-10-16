@@ -33,14 +33,6 @@ public interface EntityActionController extends IsWidget {
 	 * Share dialog selected.
 	 */
 	public void onShare();
-	
-	/**
-	 * Annotations toggled
-	 * @param shown
-	 */
-	void onAnnotationsToggled(boolean shown);
-
-	void onFileHistoryToggled(boolean shown);
 
 	void setIsShowingVersion(boolean isShowingVersion);
 }
