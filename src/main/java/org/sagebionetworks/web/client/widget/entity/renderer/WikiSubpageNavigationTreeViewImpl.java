@@ -67,7 +67,7 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 		ul.add(w, styleName);
 		if (!root.getChildren().isEmpty()) {
 			UnorderedListPanel subList = new UnorderedListPanel();
-			subList.addStyleName("nav");
+			subList.addStyleName("nav wiki-tree-nav");
 			final Div subListContainer = new Div();
 			subListContainer.add(subList);
 			ul.add(subListContainer);

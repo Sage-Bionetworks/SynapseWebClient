@@ -27,19 +27,19 @@ import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
+import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-
-import com.google.gwt.core.client.GWT;
 
 public class SynapseJavascriptFactory {
 	public enum OBJECT_TYPE {
@@ -56,6 +56,7 @@ public class SynapseJavascriptFactory {
 		Count,
 		PaginatedResultsEntityHeader,
 		V2WikiPage,
+		V2WikiOrderHint,
 		DockerRepository,
 		FileEntity,
 		Project,
@@ -77,6 +78,7 @@ public class SynapseJavascriptFactory {
 		BatchFileResult,
 		StackStatus,
 		UserProfile,
+		FileHandleResults,
 		JSON,
 		None
 	}
@@ -132,6 +134,8 @@ public class SynapseJavascriptFactory {
 			return new Count(json).getCount();
 		case V2WikiPage :
 			return new V2WikiPage(json);
+		case V2WikiOrderHint :
+			return new V2WikiOrderHint(json);
 		case FileEntity :
 			return new FileEntity(json);
 		case DockerRepository :
@@ -172,6 +176,8 @@ public class SynapseJavascriptFactory {
 			return new StackStatus(json);
 		case UserProfile :
 			return new UserProfile(json);
+		case FileHandleResults :
+			return new FileHandleResults(json).getList();
 		case JSON :
 			return json;
 		case PaginatedResultsEntityHeader :

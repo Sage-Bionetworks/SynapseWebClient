@@ -69,8 +69,8 @@ public class FileHandleAsyncHandlerImplTest {
 		verifyZeroInteractions(mockSynapseJavascriptClient);
 		
 		//simulate single file response for multiple requests for that file
-		fileHandleAsyncHandler.getFileHandle(mockFileAssociation, mockCallback);
-		fileHandleAsyncHandler.getFileHandle(mockFileAssociation, mockCallback2);
+		fileHandleAsyncHandler.getFileResult(mockFileAssociation, mockCallback);
+		fileHandleAsyncHandler.getFileResult(mockFileAssociation, mockCallback2);
 		
 		resultList.add(mockFileResult);
 		
@@ -85,7 +85,7 @@ public class FileHandleAsyncHandlerImplTest {
 		//simulate exception response
 		Exception ex = new Exception("problem loading batch");
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getFileHandleAndUrlBatch(any(BatchFileRequest.class), any(AsyncCallback.class));
-		fileHandleAsyncHandler.getFileHandle(mockFileAssociation, mockCallback);
+		fileHandleAsyncHandler.getFileResult(mockFileAssociation, mockCallback);
 		fileHandleAsyncHandler.executeRequests();
 		
 		verify(mockCallback).onFailure(ex);
@@ -95,7 +95,7 @@ public class FileHandleAsyncHandlerImplTest {
 	public void testNotFound() {
 		when(mockFileResult.getFileHandleId()).thenReturn("another id");
 		//add one, simulate different file response
-		fileHandleAsyncHandler.getFileHandle(mockFileAssociation, mockCallback);
+		fileHandleAsyncHandler.getFileResult(mockFileAssociation, mockCallback);
 		resultList.add(mockFileResult);
 		
 		fileHandleAsyncHandler.executeRequests();
@@ -109,11 +109,11 @@ public class FileHandleAsyncHandlerImplTest {
 		for (int i = 0; i < FileHandleAsyncHandlerImpl.LIMIT; i++) {
 			FileHandleAssociation mockFha = Mockito.mock(FileHandleAssociation.class);
 			when(mockFha.getFileHandleId()).thenReturn("file handle id = " + i);		
-			fileHandleAsyncHandler.getFileHandle(mockFha, mockCallback);	
+			fileHandleAsyncHandler.getFileResult(mockFha, mockCallback);	
 		}
 		verifyZeroInteractions(mockSynapseJavascriptClient);
 
-		fileHandleAsyncHandler.getFileHandle(mockFileAssociation, mockCallback);
+		fileHandleAsyncHandler.getFileResult(mockFileAssociation, mockCallback);
 		verify(mockSynapseJavascriptClient).getFileHandleAndUrlBatch(any(BatchFileRequest.class), any(AsyncCallback.class));
 	}
 }

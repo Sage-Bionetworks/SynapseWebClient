@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 import static com.google.gwt.http.client.RequestBuilder.DELETE;
 import static com.google.gwt.http.client.RequestBuilder.GET;
 import static com.google.gwt.http.client.RequestBuilder.POST;
+import static com.google.gwt.http.client.RequestBuilder.PUT;
 import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
 import static org.apache.http.HttpStatus.SC_CONFLICT;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
@@ -12,7 +13,7 @@ import static org.apache.http.HttpStatus.SC_PRECONDITION_FAILED;
 import static org.apache.http.HttpStatus.SC_SERVICE_UNAVAILABLE;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
-import static org.sagebionetworks.web.shared.WebConstants.*;
+import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import java.util.ArrayList;
@@ -47,12 +48,14 @@ import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -73,8 +76,8 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -92,6 +95,7 @@ public class SynapseJavascriptClient {
 	public static final String WIKI = "/wiki/";
 	public static final String WIKI2 = "/wiki2/";
 	public static final String WIKIKEY = "/wikikey";
+	public static final String WIKI_ORDER_HINT = "/wiki2orderhint";
 	public static final String CHILDREN = "/children";
 	public static final String RESTRICTION_INFORMATION = "/restrictionInformation";
 	public static final String USER_PROFILE_PATH = "/userProfile";
@@ -111,7 +115,7 @@ public class SynapseJavascriptClient {
 	public static final String THREAD_COUNTS = "/threadcounts";
 	public static final String ENTITY_THREAD_COUNTS = ENTITY + THREAD_COUNTS;
 	public static final String STACK_STATUS = "/admin/synapse/status";
-	
+	public static final String ATTACHMENT_HANDLES = "attachmenthandles";
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	AuthenticationController authController;
 	JSONObjectAdapter jsonObjectAdapter;
@@ -197,9 +201,9 @@ public class SynapseJavascriptClient {
 		sendRequest(requestBuilder, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 	
-	private void doPost(String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
+	private void doPostOrPut(RequestBuilder.Method method, String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
-		requestBuilder.configure(POST, url);
+		requestBuilder.configure(method, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		requestBuilder.setHeader(CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
@@ -207,6 +211,15 @@ public class SynapseJavascriptClient {
 		}
 		sendRequest(requestBuilder, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
+	
+	private void doPost(String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
+		doPostOrPut(POST, url, requestData, responseType, callback);
+	}
+	
+	private void doPut(String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
+		doPostOrPut(PUT, url, requestData, responseType, callback);
+	}
+
 	
 	private void sendRequest(final RequestBuilderWrapper requestBuilder, final String requestData, final OBJECT_TYPE responseType, final int retryDelay, final AsyncCallback callback) {
 		try {
@@ -418,7 +431,19 @@ public class SynapseJavascriptClient {
 		}
 		doGet(url, OBJECT_TYPE.WikiPage, callback);
 	}
+
 	
+	public void getWikiAttachmentFileHandles(WikiPageKey key, Long versionNumber, AsyncCallback<List<FileHandle>> callback) {
+		String url = getRepoServiceUrl() + "/" +
+				key.getOwnerObjectType().toLowerCase() + "/" + 
+				key.getOwnerObjectId() + WIKI +
+				key.getWikiPageId() + "/" + 
+				ATTACHMENT_HANDLES;
+		if (versionNumber != null) {
+			url += WIKI_VERSION_PARAMETER + versionNumber;
+		}
+		doGet(url, OBJECT_TYPE.FileHandleResults, callback);
+	}
 
 	public void getUserGroupHeadersByPrefix(String prefix, TypeFilter type, long limit, long offset, final AsyncCallback<UserGroupHeaderResponsePage> callback) {
 		String encodedPrefix = gwt.encodeQueryString(prefix);
@@ -547,7 +572,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getEntityForVersion(String entityId, Long versionNumber, AsyncCallback<Entity> callback) {
-		getEntityByID(entityId, OBJECT_TYPE.Entity, null, callback);
+		getEntityByID(entityId, OBJECT_TYPE.Entity, versionNumber, callback);
 	}
 	
 	private void getEntityByID(String entityId, OBJECT_TYPE type, Long versionNumber, AsyncCallback<Entity> callback) {
@@ -728,6 +753,34 @@ public class SynapseJavascriptClient {
 	public void getStackStatus(AsyncCallback<StackStatus> callback) {
 		String url = getRepoServiceUrl() + STACK_STATUS;
 		doGet(url, OBJECT_TYPE.StackStatus, callback);
+	}
+	
+	public void updateV2WikiPage(WikiPageKey key, V2WikiPage toUpdate, AsyncCallback<V2WikiPage> callback){
+		String url = getRepoServiceUrl() + "/" +
+				key.getOwnerObjectType().toLowerCase() + "/" + 
+				key.getOwnerObjectId() + WIKI2 +
+				key.getWikiPageId();
+		
+		try {
+			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+			toUpdate.writeToJSONObject(jsonAdapter);
+			doPut(url, jsonAdapter.toJSONString(), OBJECT_TYPE.V2WikiPage, callback);
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
+	}
+	
+	public void updateV2WikiOrderHint(WikiPageKey key, V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback) {
+		String url = getRepoServiceUrl() + "/" +
+			key.getOwnerObjectType().toLowerCase() + "/" + 
+			key.getOwnerObjectId() + WIKI_ORDER_HINT;
+		try {
+			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+			toUpdate.writeToJSONObject(jsonAdapter);
+			doPut(url, jsonAdapter.toJSONString(), OBJECT_TYPE.V2WikiOrderHint, callback);
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+		}
 	}
 }
 

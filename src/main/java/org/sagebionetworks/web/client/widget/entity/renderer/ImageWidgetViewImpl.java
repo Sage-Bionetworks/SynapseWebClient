@@ -1,15 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Visibility;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -20,42 +20,43 @@ import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 
-	private Presenter presenter;
-	private SynapseJSNIUtils synapseJsniUtils;
 	private GlobalApplicationState globalApplicationState;
 	private ClientCache clientCache;
 	private static final int MAX_IMAGE_WIDTH = 940;
 	//if image fails to load from the given source, it will try to load from the cache (this is for the case when the image has been uploaded, but the wiki has not yet been saved)
 	private boolean hasTriedCache;
 	private Image image;
+	IsWidget synAlert;
+	Presenter p;
 	@Inject
-	public ImageWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, GlobalApplicationState globalApplicationState, ClientCache clientCache) {
-		this.synapseJsniUtils = synapseJsniUtils;
+	public ImageWidgetViewImpl(GlobalApplicationState globalApplicationState, ClientCache clientCache) {
 		this.globalApplicationState = globalApplicationState;
 		this.clientCache = clientCache;
 	}
 
 	@Override
-	public void configure(WikiPageKey wikiKey, final String fileName,
-			final String scale, String alignment, final String synapseId, final Long version, final boolean isLoggedIn, Long wikiVersion) {
-		this.clear();
+	public void setSynAlert(IsWidget w) {
+		synAlert = w;
+		add(synAlert);
+	}
+	@Override
+	public void setPresenter(Presenter p) {
+		this.p = p;
+	}
+	
+	@Override
+	public void configure(final String url, final String fileName,
+			final String scale, String alignment, final String synapseId, final boolean isLoggedIn) {
+		clear();
+		add(synAlert);
 		hasTriedCache = false;
 		// Add a html panel that contains the image src from the attachments server (to pull asynchronously)
-		
-		final String url;
-		// If the wiki page is showing a different/old version, we need to get the URL to that version's attachments
-		if(wikiVersion != null) {
-			url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, version, false) :
-				DisplayUtils.createVersionOfWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false, wikiVersion);
-		} else {
-			url = synapseId != null ? DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), synapseId, version, false) :
-				DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false);
-		}
 		
 		image = new Image();
 		if (synapseId != null) {
@@ -80,7 +81,7 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 			}else if (WidgetConstants.FLOAT_CENTER.equalsIgnoreCase(trimmedAlignment)) {
 				image.addStyleName("align-center");
 			} else if (!WidgetConstants.FLOAT_NONE.equalsIgnoreCase(trimmedAlignment)) {
-				showError("Alignment value not recognized: " + alignment);
+				p.handleLoadingError("Alignment value not recognized: " + alignment);
 				return;
 			}
 		}
@@ -98,15 +99,15 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 				}
 				if (synapseId != null) {
 					if (!isLoggedIn) 
-						showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + "You may need to log in to gain access to this image content (" + synapseId+")");
+						p.handleLoadingError(DisplayConstants.IMAGE_FAILED_TO_LOAD + "You may need to log in to gain access to this image content (" + synapseId+")");
 					else 
-						showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + "Unable to view image " + synapseId);
+						p.handleLoadingError(DisplayConstants.IMAGE_FAILED_TO_LOAD + "Unable to view image " + synapseId);
 				}
 
 				else if (fileName != null)
-					showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + fileName);
+					p.handleLoadingError(DisplayConstants.IMAGE_FAILED_TO_LOAD + fileName);
 				else
-					showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + url);
+					p.handleLoadingError(DisplayConstants.IMAGE_FAILED_TO_LOAD + url);
 		    }
 		});
 		image.addLoadHandler(new LoadHandler() {
@@ -136,7 +137,7 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 					image.getElement().getStyle().setVisibility(Visibility.VISIBLE);
 				} catch (Throwable e) {
 					remove(image);
-					showError(DisplayConstants.IMAGE_FAILED_TO_LOAD + e.getMessage());
+					p.handleLoadingError(DisplayConstants.IMAGE_FAILED_TO_LOAD + e.getMessage());
 				}
 			}
 
@@ -156,23 +157,8 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 		}
 	}
 
-	public void showError(String error) {
-		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(error)));
-	}
-
 	@Override
 	public Widget asWidget() {
 		return this;
 	}	
-
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
-
-
-	/*
-	 * Private Methods
-	 */
-
 }

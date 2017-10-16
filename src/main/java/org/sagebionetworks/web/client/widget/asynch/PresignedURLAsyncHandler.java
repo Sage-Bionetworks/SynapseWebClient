@@ -5,6 +5,6 @@ import org.sagebionetworks.repo.model.file.FileResult;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
-public interface FileHandleAsyncHandler {
+public interface PresignedURLAsyncHandler {
 	void getFileResult(FileHandleAssociation fileHandleAssociation, AsyncCallback<FileResult> callback);
 }
