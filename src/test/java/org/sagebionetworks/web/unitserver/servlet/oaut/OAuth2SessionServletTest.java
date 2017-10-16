@@ -98,8 +98,7 @@ public class OAuth2SessionServletTest {
 		String email = "first.last@domain.com";
 		when(mockClient.validateOAuthAuthenticationCode(argument.capture())).thenThrow(new SynapseNotFoundException(email));
 		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.GOOGLE_OAUTH_2_0.name());
-		String authCode = "authCode";
-		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn(authCode);
+		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn(email);
 		servlet.doGet(mockRequest, mockResponse);
 		verify(mockResponse).sendRedirect("/#!RegisterAccount:first.last@domain.com");
 	}
