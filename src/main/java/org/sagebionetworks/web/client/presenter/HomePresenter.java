@@ -2,19 +2,15 @@ package org.sagebionetworks.web.client.presenter;
 
 import java.util.Date;
 
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
@@ -71,8 +67,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		view.refresh();
 		if(authenticationController.isLoggedIn()) {
 			view.showLoggedInUI(authenticationController.getCurrentUserSessionData());
-			//validate token
-			validateToken();
+			//note that the session token is validated on every place change (and on app load)
 			twitterHeight = TWITTER_MINIMAL_HEIGHT;
 		} else {
 			if (cookies.getCookie(CookieKeys.USER_LOGGED_IN_RECENTLY) != null) {
@@ -85,29 +80,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		}
 		loadNewsFeed();
 	}
-		
-	public void validateToken() {
-		AsyncCallback<UserSessionData> callback = new AsyncCallback<UserSessionData>() {
-			@Override
-			public void onSuccess(UserSessionData result) {
-				//do nothing
-			}
-			@Override
-			public void onFailure(Throwable ex) {
-				//token is invalid
-				if (ex instanceof AuthenticationException || ex instanceof UnauthorizedException) {
-					// send user to login page						
-					view.showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
-					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-				}
-			}
-		};
-		UserSessionData userSessionData = authenticationController.getCurrentUserSessionData();
-		if (userSessionData != null) {
-			authenticationController.revalidateSession(authenticationController.getCurrentUserSessionToken(), callback);
-		}
-	}
-	
 	public void loadNewsFeed(){
 		long uniqueId = new Date().getTime();
 		final String twitterElementId = TWITTER_ELEMENT_ID+uniqueId;
