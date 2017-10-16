@@ -30,13 +30,11 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.WebResource;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -123,21 +121,6 @@ public class HomePresenterTest {
 		Home place = Mockito.mock(Home.class);
 		homePresenter.setPlace(place);
 		verify(mockView).refresh();
-	}
-	
-	@Test
-	public void testValidateTokenSSO() {
-		homePresenter.validateToken();
-		verify(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
-	}
-	
-
-	@Test
-	public void testInvalidToken() {
-		AsyncMockStubber.callFailureWith(new AuthenticationException()).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
-		homePresenter.validateToken();
-		verify(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
-		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
 	@Test

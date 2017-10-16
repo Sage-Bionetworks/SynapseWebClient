@@ -143,4 +143,20 @@ public class LoginWidgetTest {
 		verify(mockView, never()).clearUsername();
 		verify(mockView).showAuthenticationFailed();
 	}
+	
+	@Test
+	public void testInvalidPassword() {
+		String u = "user";
+		String p = "pass";
+		String notFoundMessage = "wrong password";
+		UnauthorizedException ex = new UnauthorizedException(notFoundMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
+		loginWidget.setUsernameAndPassword(u, p);
+		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
+		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
+		verify(mockView).clear();
+		verify(mockView, never()).clearUsername();
+		verify(mockView).showAuthenticationFailed();
+	}
+
 }
