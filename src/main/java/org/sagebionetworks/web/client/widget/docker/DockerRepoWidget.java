@@ -13,13 +13,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
-import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
-import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.DockerTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -27,20 +21,16 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
+public class DockerRepoWidget {
 	public static final String DOCKER_PULL_COMMAND = "docker pull ";
 
-	private PreflightController preflightController;
 	private DockerRepoWidgetView view;
-	private SynapseAlert synAlert;
 	private WikiPageWidget wikiPageWidget;
 	private ProvenanceWidget provWidget;
 	private EntityUpdatedHandler handler;
-	private ActionMenuWidget actionMenu;
 	private EntityMetadata metadata;
 	private ModifiedCreatedByWidget modifiedCreatedBy;
 	private DockerTitleBar dockerTitleBar;
-	private EntityActionController controller;
 	private DockerCommitListWidget dockerCommitListWidget;
 	private CookieProvider cookies;
 	private boolean canEdit;
@@ -48,40 +38,28 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 
 	@Inject
 	public DockerRepoWidget(
-			PreflightController preflightController,
 			DockerRepoWidgetView view,
-			SynapseAlert synAlert,
 			WikiPageWidget wikiPageWidget,
 			ProvenanceWidget provWidget,
-			ActionMenuWidget actionMenu,
 			DockerTitleBar dockerTitleBar,
 			EntityMetadata metadata,
 			ModifiedCreatedByWidget modifiedCreatedBy,
-			EntityActionController controller,
 			DockerCommitListWidget dockerCommitListWidget,
 			CookieProvider cookies
 			) {
-		this.preflightController = preflightController;
 		this.view = view;
-		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.provWidget = provWidget;
-		this.actionMenu = actionMenu;
 		this.dockerTitleBar = dockerTitleBar;
 		this.metadata = metadata;
 		this.modifiedCreatedBy = modifiedCreatedBy;
-		this.controller = controller;
 		this.dockerCommitListWidget = dockerCommitListWidget;
 		this.cookies = cookies;
-		actionMenu.addControllerWidget(controller.asWidget());
-		view.setPresenter(this);
-		view.setSynapseAlert(synAlert.asWidget());
 		view.setWikiPage(wikiPageWidget.asWidget());
 		view.setProvenance(provWidget.asWidget());
 		view.setTitlebar(dockerTitleBar.asWidget());
 		view.setEntityMetadata(metadata.asWidget());
 		view.setModifiedCreatedBy(modifiedCreatedBy);
-		view.setActionMenu(actionMenu.asWidget());
 		view.setDockerCommitListWidget(dockerCommitListWidget.asWidget());
 	}
 
@@ -99,31 +77,9 @@ public class DockerRepoWidget implements DockerRepoWidgetView.Presenter{
 		modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 		configureWikiPage(bundle);
 		configureProvenance(entity.getId());
-		configureActionMenu(bundle);
 		view.setDockerPullCommand(DOCKER_PULL_COMMAND + entity.getRepositoryName());
 		dockerCommitListWidget.configure(entity.getId(), false);
 		view.setProvenanceWidgetVisible(DisplayUtils.isInTestWebsite(cookies));
-	}
-
-	private void configureActionMenu(EntityBundle bundle) {
-		controller.configure(actionMenu, bundle, true, bundle.getRootWikiId(), handler);
-		boolean isEditableDockerRepo = entity instanceof DockerRepository && canEdit;
-		this.actionMenu.setActionVisible(Action.ADD_COMMIT, isEditableDockerRepo && DisplayUtils.isInTestWebsite(cookies));
-		this.actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, isEditableDockerRepo);
-		this.actionMenu.setActionVisible(Action.EDIT_PROVENANCE, isEditableDockerRepo && DisplayUtils.isInTestWebsite(cookies));
-		this.actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, false);
-		this.actionMenu.setActionVisible(Action.MOVE_ENTITY, false);
-		this.actionMenu.setActionListener(Action.ADD_COMMIT, new ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onAddCommit();
-			}
-		});
-	}
-
-	private void onAddCommit() {
-		// TODO Auto-generated method stub
-		
 	}
 
 	private void configureProvenance(final String entityId) {

@@ -55,19 +55,18 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	boolean annotationsShown;
 	EntityUpdatedHandler handler;
 	QueryTokenProvider queryTokenProvider;
-	Entity entity;
 	EntityBundle projectBundle;
+	EntityBundle entityBundle;
 	Throwable projectBundleLoadError;
 	String projectEntityId;
 	String areaToken;
 	StuAlert synAlert;
 	PortalGinInjector ginInjector;
 	ModifiedCreatedByWidget modifiedCreatedBy;
-	CallbackP<Boolean> showProjectInfoCallack;
 	TableEntityWidget v2TableWidget;
 	Map<String,String> configMap;
-	SynapseJavascriptClient jsClient;
 	ActionMenuWidget entityActionMenu;
+	CallbackP<String> updateEntityCallback;
 	
 	public static final String TABLES_HELP = "Build structured queryable data that can be described by a schema using the Tables.";
 	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "tables.html";
@@ -90,7 +89,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			this.metadata = ginInjector.getEntityMetadata();
 			this.queryTokenProvider = ginInjector.getQueryTokenProvider();
 			this.synAlert = ginInjector.getStuAlert();
-			this.jsClient = ginInjector.getSynapseJavascriptClient();
 			this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
 			
 			view.setBreadcrumb(breadcrumb.asWidget());
@@ -105,7 +103,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 				@Override
 				public void invoke(String entityId) {
 					areaToken = null;
-					getTargetBundleAndDisplay(entityId);
+					updateEntityCallback.invoke(entityId);
 				}
 			});
 			initBreadcrumbLinkClickedHandler();
@@ -113,6 +111,10 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		}
 	}
 	
+	public void setUpdateEntityCallback(CallbackP<String> updateEntityCallback) {
+		this.updateEntityCallback = updateEntityCallback;
+	}
+
 	@Override
 	public void onPersistSuccess(EntityUpdatedEvent event) {
 		if (handler != null) {
@@ -126,11 +128,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 				//if this is the project id, then just reconfigure from the project bundle
 				Synapse synapse = (Synapse)place;
 				String entityId = synapse.getEntityId();
-				if (entityId.equals(projectEntityId)) {
-				    showProjectLevelUI();
-				} else {
-				    getTargetBundleAndDisplay(entityId);
-				}
+				updateEntityCallback.invoke(entityId);
 			};
 		};
 		breadcrumb.setLinkClickedHandler(breadcrumbClicked);
@@ -146,29 +144,20 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		this.projectBundleLoadError = projectBundleLoadError;
 	}
 	
-	public void configure(Entity entity, EntityUpdatedHandler handler, String areaToken, ActionMenuWidget entityActionMenu) {
+	public void configure(EntityBundle entityBundle, EntityUpdatedHandler handler, String areaToken, ActionMenuWidget entityActionMenu) {
 		lazyInject();
-		this.entity = entity;
 		this.areaToken = areaToken;
 		this.handler = handler;
 		this.entityActionMenu = entityActionMenu;
 		metadata.setEntityUpdatedHandler(handler);
 		synAlert.clear();
-		boolean isTable = entity instanceof Table;
-		
-		if (!isTable) {
-			//configure based on project
-			showProjectLevelUI();
-		} else {
-			getTargetBundleAndDisplay(entity.getId());
-		}
+		setTargetBundle(entityBundle);
 	}
 	
 	public void showProjectLevelUI() {
 		String title = projectEntityId;
 		if (projectBundle != null) {
 			title = projectBundle.getEntity().getName();
-			setTargetBundle(projectBundle);	
 		} else {
 			showError(projectBundleLoadError);
 		}
@@ -183,7 +172,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			view.setBreadcrumbVisible(false);
 			view.setTableListVisible(false);
 			view.setTitlebarVisible(false);
-			showProjectInfoCallack.invoke(false);
 			view.clearActionMenuContainer();
 			view.clearTableEntityWidget();
 			modifiedCreatedBy.setVisible(false);
@@ -197,18 +185,20 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	}
 	
 	public void setTargetBundle(EntityBundle bundle) {
-		this.entity = bundle.getEntity();
+		this.entityBundle = bundle;
+		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, EntityArea.TABLES, null));
+		Entity entity = bundle.getEntity();
 		boolean isTable = entity instanceof Table;
 		boolean isProject = entity instanceof Project;
 		view.setEntityMetadataVisible(isTable);
 		view.setBreadcrumbVisible(isTable);
 		view.setTableListVisible(isProject);
 		view.setTitlebarVisible(isTable);
-		showProjectInfoCallack.invoke(isProject);
 		view.clearActionMenuContainer();
 		view.clearTableEntityWidget();
 		modifiedCreatedBy.setVisible(false);
 		view.setProvenanceVisible(isTable);
+		
 		if (isTable) {
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
 			metadata.setEntityBundle(bundle, null);
@@ -225,30 +215,8 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		} else if (isProject) {
 			areaToken = null;
 			tableListWidget.configure(bundle);
+			showProjectLevelUI();
 		}
-	}
-	
-	public void getTargetBundleAndDisplay(final String entityId) {
-		synAlert.clear();
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | DOI | TABLE_DATA | BENEFACTOR_ACL;
-		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
-			@Override
-			public void onSuccess(EntityBundle bundle) {
-				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(entityId, null, EntityArea.TABLES, null));
-				setTargetBundle(bundle);
-				// note: let TableEntityWidget query control browser history.  when the query is run, push url into the stack. 
-				tab.showTab(false);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				tab.setEntityNameAndPlace(entityId, new Synapse(entityId, null, EntityArea.TABLES, null));
-				showError(caught);
-				tab.showTab(false);
-			}			
-		};
-		
-		jsClient.getEntityBundle(entityId, mask, callback);
 	}
 	
 	public Tab asTab(){
@@ -263,21 +231,9 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			} else {
 				areaToken = "";
 			}
-			tab.setEntityNameAndPlace(entity.getName(), new Synapse(entity.getId(), null, EntityArea.TABLES, areaToken));
+			tab.setEntityNameAndPlace(entityBundle.getEntity().getName(), new Synapse(entityBundle.getEntity().getId(), null, EntityArea.TABLES, areaToken));
 			tab.showTab(true);
 		}
-	}
-	
-	public void setShowProjectInfoCallback(CallbackP<Boolean> callback) {
-		showProjectInfoCallack = callback;
-		tab.addTabClickedCallback(new CallbackP<Tab>() {
-			@Override
-			public void invoke(Tab param) {
-				boolean isProject = entity instanceof Project;
-				showProjectInfoCallack.invoke(isProject);
-			}
-		});
-
 	}
 	
 	public Query getQueryString() {
@@ -288,9 +244,5 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			}
 		}
 		return null;
-	}
-	
-	public Entity getCurrentEntity() {
-		return entity;
 	}
 }

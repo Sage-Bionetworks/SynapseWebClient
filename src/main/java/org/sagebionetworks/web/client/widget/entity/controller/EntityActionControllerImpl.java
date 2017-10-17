@@ -1,10 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
+import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.*;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.Challenge;
@@ -54,6 +57,7 @@ import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
+import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
@@ -64,7 +68,6 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -98,7 +101,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String RENAME_PREFIX = "Rename ";
 	
 	public static final int IS_ACT_MEMBER_MASK = 0x20;
-
+	EntityArea currentArea;
+	
 	EntityActionControllerView view;
 	PreflightController preflightController;
 	SynapseClientAsync synapseClient;
@@ -112,6 +116,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EditFileMetadataModalWidget editFileMetadataModalWidget;
 	EditProjectMetadataModalWidget editProjectMetadataModalWidget;
 	AnnotationsRendererWidget annotationsRendererWidget;
+	EditAnnotationsDialog editAnnotationsDialog;
 	FileHistoryWidget fileHistoryWidget;
 	
 	EntityBundle entityBundle;
@@ -285,7 +290,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	@Override
 	public void configure(ActionMenuWidget actionMenu,
-			EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageId, EntityUpdatedHandler handler) {
+			EntityBundle entityBundle, boolean isCurrentVersion, String wikiPageId, EntityArea currentArea,  EntityUpdatedHandler handler) {
 		this.entityBundle = entityBundle;
 		this.wikiPageId = wikiPageId;
 		this.entityUpdateHandler = handler;
@@ -295,6 +300,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.isUserAuthenticated = authenticationController.isLoggedIn();
 		this.isCurrentVersion = isCurrentVersion;
 		this.enityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
+		this.currentArea = currentArea;
 
 		// hide all commands by default
 		for (Action action : Action.values()) {
@@ -395,7 +401,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.EDIT_PROVENANCE, this);
-			actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, "Edit "+enityTypeDisplay + " Provenance");
+			actionMenu.setActionText(Action.EDIT_PROVENANCE, "Edit "+enityTypeDisplay + " Provenance");
 		} else {
 			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, false);
 			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, false);
@@ -636,7 +642,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureRenameAction(){
-		if(isRenameOnly(entityBundle.getEntity())) {
+		if(isRenameOnly(entityBundle.getEntity()) && !(entityBundle.getEntity() instanceof DockerRepository)) {
 			actionMenu.setActionVisible(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.CHANGE_ENTITY_NAME, permissions.getCanEdit());
 			actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, RENAME_PREFIX+enityTypeDisplay);
@@ -683,7 +689,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	 * @return
 	 */
 	public boolean isMovableType(Entity entity){
-		if(entity instanceof Project){
+		if(entity instanceof Project || entity instanceof DockerRepository){
 			return false;
 		}
 		return true;
@@ -791,9 +797,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case CREATE_DOI:
 			onCreateDOI();
 			break;
-		case ADD_COMMIT:
-			onAddCommit();
-			break;
 		case ADD_EVALUATION_QUEUE:
 			onAddEvaluationQueue();
 			break;
@@ -819,12 +822,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void onApproveUserAccess() {
 		getApproveUserAccessModal().configure(entityBundle);
 		getApproveUserAccessModal().show();
-	}
-	
-
-	private void onAddCommit() {
-		// TODO Auto-generated method stub
-		
 	}
 	
 	private void onAddEvaluationQueue() {
@@ -860,6 +857,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return annotationsRendererWidget;
 	}
 	
+	private EditAnnotationsDialog getEditAnnotationsDialog() {
+		if (editAnnotationsDialog == null) {
+			editAnnotationsDialog = ginInjector.getEditAnnotationsDialog();
+		}
+		return editAnnotationsDialog;
+	}
+	
 	private FileHistoryWidget getFileHistoryWidget() {
 		if (fileHistoryWidget == null) {
 			fileHistoryWidget = ginInjector.getFileHistoryWidget();
@@ -870,8 +874,19 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void onShowAnnotations() {
 		// configure and show annotations
-		getAnnotationsRendererWidget().configure(entityBundle, entityBundle.getPermissions().getCanCertifiedUserEdit());
-		view.showAnnotations();
+		if (entityBundle.getPermissions().getCanCertifiedUserEdit()) {
+			// show editor, if user passes preflight test
+			preflightController.checkUploadToEntity(entityBundle, new Callback() {
+				@Override
+				public void invoke() {
+					getEditAnnotationsDialog().configure(entityBundle, entityUpdateHandler);
+				}
+			});
+		} else {
+			// show renderer
+			getAnnotationsRendererWidget().configure(entityBundle);
+			view.showAnnotations();
+		}
 	}
 	
 	private void onShowFileHistory() {

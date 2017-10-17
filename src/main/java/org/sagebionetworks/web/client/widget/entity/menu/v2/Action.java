@@ -9,8 +9,6 @@ package org.sagebionetworks.web.client.widget.entity.menu.v2;
  */
 public enum Action {
 
-	// Docker specific
-	ADD_COMMIT,
 	// Table specific
 	SHOW_TABLE_SCHEMA,
 	SHOW_VIEW_SCOPE,

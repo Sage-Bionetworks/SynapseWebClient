@@ -5,7 +5,10 @@ import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
 import static org.sagebionetworks.repo.model.EntityBundle.DOI;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
+import static org.sagebionetworks.repo.model.EntityBundle.FILE_NAME;
+import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
@@ -47,7 +50,7 @@ import com.google.inject.Inject;
 public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter, IsWidget  {
 	private EntityPageTopView view;
 	private EntityUpdatedHandler entityUpdateHandler;
-	private EntityBundle projectBundle;
+	private EntityBundle projectBundle, filesEntityBundle, tablesEntityBundle, dockerEntityBundle;
 	private Throwable projectBundleLoadError;
 	private Entity entity;
 	private SynapseJavascriptClient synapseJavascriptClient;
@@ -135,42 +138,32 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		tabs.addTab(discussionTab.asTab());
 		tabs.addTab(dockerTab.asTab());
 		
-		CallbackP<EntityBundle> updateTargetCallback = new CallbackP<EntityBundle>() {
+		CallbackP<String> entitySelectedCallback = new CallbackP<String>() {
 			@Override
-			public void invoke(EntityBundle newTargetEntityBundle) {
-				//TODO: look at params
-				entityActionController.configure(entityActionMenu, newTargetEntityBundle, true, null, entityUpdateHandler);
+			public void invoke(String newEntityId) {
+				// always the current version from tab entity click
+				configureEntity(newEntityId, null);
 			}
 		};
-		filesTab.setUpdateEntityBundle(updateTargetCallback);
+		filesTab.setUpdateEntityCallback(entitySelectedCallback);
+		tablesTab.setUpdateEntityCallback(entitySelectedCallback);
+		dockerTab.setUpdateEntityCallback(entitySelectedCallback);
 
-		CallbackP<Boolean> showHideProjectInfoCallback = new CallbackP<Boolean>() {
-			public void invoke(Boolean visible) {
-				view.setProjectInformationVisible(visible);
-			};
-		};
-		filesTab.setShowProjectInfoCallback(showHideProjectInfoCallback);
-		tablesTab.setShowProjectInfoCallback(showHideProjectInfoCallback);
-		dockerTab.setShowProjectInfoCallback(showHideProjectInfoCallback);
-		
 		// lazy init tabs, and show project information (if set)
 		wikiTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
 				configureWikiTab();
-				view.setProjectInformationVisible(projectBundle != null);
 			};
 		});
 		adminTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
 				configureAdminTab();
-				view.setProjectInformationVisible(projectBundle != null);
 			};
 		});
 		
 		discussionTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
 				configureDiscussionTab();
-				view.setProjectInformationVisible(projectBundle != null);
 			};
 		});
 		filesTab.setTabClickedCallback(new CallbackP<Tab>() {
@@ -188,7 +181,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				configureDockerTab();
 			};
 		});
-		
 	}
 	
     /**
@@ -214,25 +206,63 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     public void configureProject() {
     	view.setLoadingVisible(true);
     	hideTabs();
-    	int mask = ENTITY | ANNOTATIONS | PERMISSIONS | FILE_HANDLES | ROOT_WIKI_ID | DOI | TABLE_DATA | ACL | BENEFACTOR_ACL;
+    	int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
 		projectBundle = null;
 		projectBundleLoadError = null;
 		view.setProjectInformationVisible(false);
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
-				projectBundle = bundle;
+				// by default, all tab entity bundles point to the project entity bundle
+				projectBundle = filesEntityBundle = tablesEntityBundle = dockerEntityBundle = bundle;
 				projectMetadata.setEntityBundle(projectBundle, null);
-				showSelectedTabs();
+				configureEntity(entity.getId(), filesVersionNumber);
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
 				projectBundleLoadError = caught;
-				showSelectedTabs();
+				configureEntity(entity.getId(), filesVersionNumber);
 			}
 		};
 		synapseJavascriptClient.getEntityBundle(projectHeader.getId(), mask, callback);
+    }
+    
+    public void configureEntity(String entityId, final Long version) {
+    	view.setLoadingVisible(true);
+    	int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
+		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
+			@Override
+			public void onSuccess(EntityBundle bundle) {
+				updateTabEntityBundle(bundle);
+				boolean isCurrentVersion = version == null;
+				entityActionController.configure(entityActionMenu, bundle, isCurrentVersion, null, area, entityUpdateHandler);
+				view.setProjectInformationVisible(bundle.getEntity() instanceof Project);
+				showSelectedTabs();
+			}
+
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+				showSelectedTabs();
+			}
+		};
+		synapseJavascriptClient.getEntityBundleForVersion(entityId, version, mask, callback);
+    }
+    
+    public void updateTabEntityBundle(EntityBundle bundle) {
+		switch (area) {
+			case FILES:
+				filesEntityBundle = bundle;
+				break;
+			case TABLES:
+				tablesEntityBundle = bundle;
+				break;
+			case DOCKER:
+				dockerEntityBundle = bundle;
+				break;
+			default:
+		}
     }
     
     public void showSelectedTabs() {
@@ -364,7 +394,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		
 		if (projectBundle != null) {
 			String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
-			projectActionController.configure(projectActionMenu, projectBundle, true, wikiId, entityUpdateHandler);
+			projectActionController.configure(projectActionMenu, projectBundle, true, wikiId, null, entityUpdateHandler);
 		}
 		
 		// set all content stale
@@ -421,17 +451,20 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	public void configureTablesTab() {
 		if (tablesTab.asTab().isContentStale()) {
 			tablesTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
-			tablesTab.configure(entity, entityUpdateHandler, tablesAreaToken, entityActionMenu);
+			tablesTab.configure(tablesEntityBundle, entityUpdateHandler, tablesAreaToken, entityActionMenu);
 			tablesTab.asTab().setContentStale(false);
 		}
+		entityActionController.configure(entityActionMenu, tablesEntityBundle, true, null, area, entityUpdateHandler);
 	}
 	
 	public void configureFilesTab() {
 		if (filesTab.asTab().isContentStale()) {
 			filesTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
-			filesTab.configure(entity, entityUpdateHandler, filesVersionNumber);
+			filesTab.configure(filesEntityBundle, entityUpdateHandler, filesVersionNumber);
 			filesTab.asTab().setContentStale(false);
 		}
+		boolean isCurrentVersion = filesVersionNumber == null;
+		entityActionController.configure(entityActionMenu, filesEntityBundle, isCurrentVersion, null, area, entityUpdateHandler);
 	}
 	
 	public void configureWikiTab() {
@@ -474,12 +507,19 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 				@Override
 				public void invoke(String wikiPageId) {
-					projectActionController.configure(projectActionMenu, projectBundle, true, wikiPageId, entityUpdateHandler);
+					entityActionController.configure(entityActionMenu, projectBundle, true, wikiPageId, area, entityUpdateHandler);
 				}
 			};
 			wikiTab.setWikiReloadHandler(wikiReloadHandler);
 			wikiTab.asTab().setContentStale(false);
 		}
+		
+		// on configure of wiki tab, always update the entity action controller with the correct wiki page
+		String wikiId = wikiAreaToken;
+		if (projectBundle != null) {
+			wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
+		}
+		entityActionController.configure(entityActionMenu, projectBundle, true, wikiId, area, entityUpdateHandler);
 	}
 	
 	public void configureAdminTab() {
@@ -488,6 +528,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			adminTab.configure(projectId, projectHeader.getName());
 			adminTab.asTab().setContentStale(false);
 		}
+		entityActionController.configure(entityActionMenu, projectBundle, true, null, area, entityUpdateHandler);
 	}
 
 	public void configureDiscussionTab() {
@@ -500,14 +541,16 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 			discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate);
 			discussionTab.asTab().setContentStale(false);
 		}
+		entityActionController.configure(entityActionMenu, projectBundle, true, null, area, entityUpdateHandler);
 	}
 
 	public void configureDockerTab() {
 		if (dockerTab.asTab().isContentStale()) {
 			dockerTab.setProject(projectHeader.getId(), projectBundle, projectBundleLoadError);
-			dockerTab.configure(entity, entityUpdateHandler, dockerAreaToken);
+			dockerTab.configure(dockerEntityBundle, entityUpdateHandler, dockerAreaToken);
 			dockerTab.asTab().setContentStale(false);
 		}
+		entityActionController.configure(entityActionMenu, dockerEntityBundle, true, null, area, entityUpdateHandler);
 	}
 
 	@Override

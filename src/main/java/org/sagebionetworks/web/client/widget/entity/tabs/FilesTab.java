@@ -1,15 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import static org.sagebionetworks.repo.model.EntityBundle.*;
-import static org.sagebionetworks.repo.model.EntityBundle.DOI;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.repo.model.EntityBundle.FILE_NAME;
-import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
-
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -39,23 +29,16 @@ import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
-import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
-import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class FilesTab {
@@ -75,20 +58,16 @@ public class FilesTab {
 	GlobalApplicationState globalApplicationState;
 	DiscussionThreadListWidget discussionThreadListWidget;
 	
-	Entity currentEntity;
-	String currentEntityId;
-	Long shownVersionNumber;
-	boolean isMostRecentVersion;
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	
 	public static int WIDGET_HEIGHT_PX = 270;
 	Map<String,String> configMap;
 	
-	CallbackP<Boolean> showProjectInfoCallack;
 	EntityBundle projectBundle;
 	Throwable projectBundleLoadError;
 	String projectEntityId;
-	CallbackP<EntityBundle> bundleUpdatedCallback;
+	EntityBundle entityBundle;
+	CallbackP<String> updateEntityCallback;
 	
 	@Inject
 	public FilesTab(Tab tab, PortalGinInjector ginInjector) {
@@ -136,7 +115,7 @@ public class FilesTab {
 			CallbackP<String> entityClicked = new CallbackP<String> () {
 				@Override
 				public void invoke(String id) {
-					getTargetBundleAndDisplay(id, null);
+					updateEntityCallback.invoke(id);
 				}
 			};
 			filesBrowser.setEntityClickedHandler(entityClicked);
@@ -149,31 +128,13 @@ public class FilesTab {
 				//if this is the project id, then just reconfigure from the project bundle
 				Synapse synapse = (Synapse)place;
 				String entityId = synapse.getEntityId();
-				Long versionNumber = synapse.getVersionNumber();
-				if (entityId.equals(projectEntityId)) {
-				    shownVersionNumber = null;
-				    showProjectLevelUI();
-				    tab.showTab();
-				} else {
-				    getTargetBundleAndDisplay(entityId, versionNumber);
-				}
+				updateEntityCallback.invoke(entityId);
 			};
 		};
 		breadcrumb.setLinkClickedHandler(breadcrumbClicked);
 	}
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
 		tab.addTabClickedCallback(onClickCallback);
-	}
-	
-	public void setShowProjectInfoCallback(CallbackP<Boolean> callback) {
-		showProjectInfoCallack = callback;
-		tab.addTabClickedCallback(new CallbackP<Tab>() {
-			@Override
-			public void invoke(Tab param) {
-				boolean isProject = currentEntity instanceof Project;
-				showProjectInfoCallack.invoke(isProject);
-			}
-		});
 	}
 	
 	public void resetView() {
@@ -200,10 +161,8 @@ public class FilesTab {
 		this.projectBundleLoadError = projectBundleLoadError;
 	}
 	
-	public void configure(Entity targetEntity, EntityUpdatedHandler handler, Long versionNumber) {
+	public void configure(EntityBundle targetEntityBundle, EntityUpdatedHandler handler, Long versionNumber) {
 		lazyInject();
-		this.currentEntity = targetEntity;
-		this.currentEntityId = targetEntity.getId();
 		this.handler = handler;
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		metadata.setEntityUpdatedHandler(handler);
@@ -213,25 +172,12 @@ public class FilesTab {
 		resetView();
 		view.showLoading(true);
 		
-		boolean isFile = targetEntity instanceof FileEntity;
-		boolean isFolder = targetEntity instanceof Folder;
-		tab.setEntityNameAndPlace(targetEntity.getName(), new Synapse(currentEntityId, shownVersionNumber, null, null));
-		//if we are not being configured with a file or folder, then project level should be shown
-		if (!(isFile || isFolder)) {
-			//configure based on the project bundle
-			showProjectLevelUI();
-		} else {
-			RefreshAlert refreshAlert = ginInjector.getRefreshAlert();
-			view.setRefreshAlert(refreshAlert.asWidget());
-			refreshAlert.configure(targetEntity.getId(), ObjectType.ENTITY);
-			getTargetBundleAndDisplay(targetEntity.getId(), versionNumber);
-		}
+		setTargetBundle(targetEntityBundle);
 	}
 	
 	public void showProjectLevelUI() {
 		String title = projectEntityId;
 		if (projectBundle != null) {
-			setTargetBundle(projectBundle);
 			title = projectBundle.getEntity().getName();
 		} else {
 			showError(projectBundleLoadError);
@@ -254,59 +200,36 @@ public class FilesTab {
 	public static boolean equal(Object a, Object b) {
 		return a == b || (a != null && a.equals(b));
 	}
-	  
-	public void getTargetBundleAndDisplay(String entityId, final Long versionNumber) {
-		shownVersionNumber = versionNumber;
-		currentEntityId = entityId;
-		synAlert.clear();
-		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL;
-		AsyncCallback<EntityBundlePlus> ebpCallback = new AsyncCallback<EntityBundlePlus> () {
-
-			@Override
-			public void onFailure(Throwable caught) {
-				showError(caught);
-				tab.setEntityNameAndPlace(currentEntityId, new Synapse(currentEntityId, shownVersionNumber, null, null));
-				tab.showTab();
-			}
-
-			@Override
-			public void onSuccess(EntityBundlePlus result) {
-				EntityBundle bundle = result.getEntityBundle();
-				// either versionNumber and result.getLatestVersionNumber will both be null if non-Versionable
-				isMostRecentVersion = versionNumber == null || versionNumber == result.getLatestVersionNumber();
-				// will be null for non-Versionable entities
-				if (bundle.getEntity() instanceof Link) {
-					//short circuit.  redirect to target entity
-					Reference ref = ((Link)bundle.getEntity()).getLinksTo();
-					//go to link target
-					String entityId = ref.getTargetId();
-					shownVersionNumber = ref.getTargetVersionNumber();
-					globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, shownVersionNumber, null, null));
-					return;
-				}
-				setTargetBundle(bundle);
-				tab.showTab();
-			}
-			
-		};
-		synapseClient.getEntityBundlePlusForVersion(entityId, versionNumber, mask, ebpCallback);
-	}
-	
-	
 	
 	public void setTargetBundle(EntityBundle bundle) {
-		currentEntity = bundle.getEntity();
-		currentEntityId = currentEntity.getId();
+		if (bundle.getEntity() instanceof Link) {
+			//short circuit.  redirect to target entity
+			Reference ref = ((Link)bundle.getEntity()).getLinksTo();
+			//go to link target
+			String entityId = ref.getTargetId();
+			Long shownVersionNumber = ref.getTargetVersionNumber();
+			globalApplicationState.getPlaceChanger().goTo(new Synapse(entityId, shownVersionNumber, null, null));
+			return;
+		}
+		
+		Entity currentEntity = bundle.getEntity();
+		final String currentEntityId = currentEntity.getId();
 		boolean isFile = currentEntity instanceof FileEntity;
 		boolean isFolder = currentEntity instanceof Folder;
 		boolean isProject = currentEntity instanceof Project;
 		
-		showProjectInfoCallack.invoke(isProject);
+		if (!(isFile || isFolder)) {
+			//configure based on the project bundle
+			showProjectLevelUI();
+			return;
+		} else {
+			RefreshAlert refreshAlert = ginInjector.getRefreshAlert();
+			view.setRefreshAlert(refreshAlert.asWidget());
+			refreshAlert.configure(currentEntity.getId(), ObjectType.ENTITY);
+		}
 		
 		view.showLoading(false);
-		if (!isProject) {
-			bundleUpdatedCallback.invoke(bundle);
-		}
+		
 		//Breadcrumb
 		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		view.clearActionMenuContainer();
@@ -330,6 +253,7 @@ public class FilesTab {
 		//Metadata
 		boolean isMetadataVisible = isFile || isFolder;
 		view.setMetadataVisible(isMetadataVisible);
+		final Long shownVersionNumber = isFile ? ((Versionable)bundle.getEntity()).getVersionNumber() : null;
 		if (isMetadataVisible) {
 			metadata.setEntityBundle(bundle, shownVersionNumber);
 		}
@@ -380,15 +304,9 @@ public class FilesTab {
 			wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);
 		}
 	}
-	public void setUpdateEntityBundle(CallbackP<EntityBundle> bundleUpdatedCallback) {
-		this.bundleUpdatedCallback = bundleUpdatedCallback;
-	}
-	/**
-	 * Return the entity currently being shown by this tab.
-	 * @return
-	 */
-	public Entity getCurrentEntity() {
-		return currentEntity;
+
+	public void setUpdateEntityCallback(CallbackP<String> updateEntityCallback) {
+		this.updateEntityCallback = updateEntityCallback;
 	}
 	
 	public Tab asTab(){

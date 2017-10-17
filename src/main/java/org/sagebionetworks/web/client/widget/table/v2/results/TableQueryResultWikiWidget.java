@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
@@ -100,7 +101,7 @@ public class TableQueryResultWikiWidget implements WidgetRendererPresenter, Quer
 			@Override
 			public void onSuccess(EntityBundle bundle) {
 				boolean isCurrentVersion = true;
-				entityActionController.configure(actionMenu, bundle, isCurrentVersion, bundle.getRootWikiId(), null);
+				entityActionController.configure(actionMenu, bundle, isCurrentVersion, bundle.getRootWikiId(), EntityArea.TABLES, null);
 				boolean canEdit = false;
 				tableEntityWidget.configure(bundle, canEdit, TableQueryResultWikiWidget.this, actionMenu);
 				hideEditActions();
