@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -8,7 +7,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -24,9 +22,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	Div tabsUI;
 	@UiField
-	HTMLPanel loadingUI;
-	
-	private Presenter presenter;
+	Span loadingUI;
 	
 	//project level info
 	@UiField
@@ -60,11 +56,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public Widget asWidget() {
 		return this;
-	}
-
-	@Override
-	public void setPresenter(Presenter p) {
-		presenter = p;
 	}
 
 	@Override

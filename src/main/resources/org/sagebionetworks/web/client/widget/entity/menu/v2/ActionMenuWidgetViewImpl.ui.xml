@@ -4,7 +4,7 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	<g:HTMLPanel>
+	<bh:Span>
 		<b:ButtonToolBar ui:field="buttonToolBar" addStyleNames="pull-right margin-right-5">
 			<b:ButtonGroup>
 				<b:DropDown>
@@ -45,5 +45,5 @@
 			</b:ButtonGroup>
 		</b:ButtonToolBar>
 		<bh:Div ui:field="controllerContainer"/>
-	</g:HTMLPanel>
+	</bh:Span>
 </ui:UiBinder>

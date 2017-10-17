@@ -125,7 +125,6 @@ public class DockerTab implements DockerTabView.Presenter{
 		view.setBreadcrumbVisible(isRepo);
 		view.setDockerRepoListVisible(isProject);
 		view.setDockerRepoWidgetVisible(isRepo);
-		view.clearDockerRepoWidget();
 		if (isRepo) {
 			List<LinkData> links = new ArrayList<LinkData>();
 			Place projectPlace = new Synapse(projectEntityId);
@@ -147,6 +146,7 @@ public class DockerTab implements DockerTabView.Presenter{
 	}
 
 	public void setProject(String projectEntityId, EntityBundle projectBundle, Throwable projectBundleLoadError) {
+		this.projectEntityId = projectEntityId;
 		this.projectBundle = projectBundle;
 		this.projectBundleLoadError = projectBundleLoadError;
 	}

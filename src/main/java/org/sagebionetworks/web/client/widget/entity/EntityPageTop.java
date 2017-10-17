@@ -17,6 +17,8 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Table;
@@ -41,13 +43,12 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidgetPresenter, IsWidget  {
+public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	private EntityPageTopView view;
 	private EntityUpdatedHandler entityUpdateHandler;
 	private EntityBundle projectBundle, filesEntityBundle, tablesEntityBundle, dockerEntityBundle;
@@ -119,7 +120,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		initTabs();
 		view.setTabs(tabs.asWidget());
 		view.setProjectMetadata(projectMetadata.asWidget());
-		view.setPresenter(this);
 		
 		projectActionMenu.addControllerWidget(projectActionController.asWidget());
 		view.setProjectActionMenu(projectActionMenu.asWidget());
@@ -251,18 +251,29 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
     }
     
     public void updateTabEntityBundle(EntityBundle bundle) {
-		switch (area) {
-			case FILES:
-				filesEntityBundle = bundle;
-				break;
-			case TABLES:
-				tablesEntityBundle = bundle;
-				break;
-			case DOCKER:
-				dockerEntityBundle = bundle;
-				break;
-			default:
-		}
+    	Entity entity = bundle.getEntity();
+    	if (entity instanceof Project) {
+	    	switch (area) {
+				case FILES:
+					filesEntityBundle = bundle;
+					break;
+				case TABLES:
+					tablesEntityBundle = bundle;
+					break;
+				case DOCKER:
+					dockerEntityBundle = bundle;
+					break;
+				default:
+			}
+    	} else {
+    		if (entity instanceof FileEntity || entity instanceof Folder) {
+    			filesEntityBundle = bundle;
+    		} else if (entity instanceof Table) {
+    			tablesEntityBundle = bundle;
+    		} else if (entity instanceof DockerRepository) {
+    			dockerEntityBundle = bundle;
+    		}
+    	}
     }
     
     public void showSelectedTabs() {
@@ -442,7 +453,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 	@Override
 	public Widget asWidget() {
 		if(entity != null) {
-			view.setPresenter(this);
 			return view.asWidget();
 		}
 		return null;
@@ -552,8 +562,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		}
 		entityActionController.configure(entityActionMenu, dockerEntityBundle, true, null, area, entityUpdateHandler);
 	}
-
-	@Override
+	
 	public void fireEntityUpdatedEvent() {
 		EntityUpdatedEvent event = new EntityUpdatedEvent();
 		entityUpdateHandler.onPersistSuccess(event);
