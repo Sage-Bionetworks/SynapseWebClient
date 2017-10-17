@@ -10,6 +10,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -37,6 +38,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -77,7 +79,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 
 	private CookieProvider cookies;
 	public static final boolean PUSH_TAB_URL_TO_BROWSER_HISTORY = false;
-	private CallbackP<EntityBundle> updateTargetCallback;
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
 			SynapseClientAsync synapseClient,
@@ -111,6 +112,7 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		this.entityActionMenu = entityActionMenu;
 		this.cookies = cookies;
 		this.synapseJavascriptClient = synapseJavascriptClient;
+		
 		initTabs();
 		view.setTabs(tabs.asWidget());
 		view.setProjectMetadata(projectMetadata.asWidget());
@@ -118,17 +120,12 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		
 		projectActionMenu.addControllerWidget(projectActionController.asWidget());
 		view.setProjectActionMenu(projectActionMenu.asWidget());
+		projectActionMenu.setToolsButtonIcon("Project Settings", IconType.GEAR);
 		
 		entityActionMenu.addControllerWidget(entityActionController.asWidget());
 		view.setEntityActionMenu(entityActionMenu.asWidget());
 		
-		updateTargetCallback = new CallbackP<EntityBundle>() {
-			@Override
-			public void invoke(EntityBundle newTargetEntityBundle) {
-				//TODO: look at params
-				EntityPageTop.this.entityActionController.configure(EntityPageTop.this.entityActionMenu, projectBundle, true, null, entityUpdateHandler);
-			}
-		};
+		
 	}
 	private void initTabs() {
 		tabs.addTab(wikiTab.asTab());
@@ -137,6 +134,16 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 		tabs.addTab(adminTab.asTab());
 		tabs.addTab(discussionTab.asTab());
 		tabs.addTab(dockerTab.asTab());
+		
+		CallbackP<EntityBundle> updateTargetCallback = new CallbackP<EntityBundle>() {
+			@Override
+			public void invoke(EntityBundle newTargetEntityBundle) {
+				//TODO: look at params
+				entityActionController.configure(entityActionMenu, newTargetEntityBundle, true, null, entityUpdateHandler);
+			}
+		};
+		filesTab.setUpdateEntityBundle(updateTargetCallback);
+
 		CallbackP<Boolean> showHideProjectInfoCallback = new CallbackP<Boolean>() {
 			public void invoke(Boolean visible) {
 				view.setProjectInformationVisible(visible);
@@ -171,7 +178,6 @@ public class EntityPageTop implements EntityPageTopView.Presenter, SynapseWidget
 				configureFilesTab();
 			};
 		});
-		filesTab.setUpdateEntityBundle(updateTargetCallback);
 		tablesTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
 				configureTablesTab();

@@ -19,7 +19,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	@UiField
-	Row projectMetaContainer;
+	Div projectMetaContainer;
 	
 	@UiField
 	Div tabsUI;

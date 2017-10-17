@@ -395,6 +395,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.EDIT_PROVENANCE, this);
+			actionMenu.setActionText(Action.CHANGE_ENTITY_NAME, "Edit "+enityTypeDisplay + " Provenance");
 		} else {
 			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, false);
 			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, false);
@@ -405,6 +406,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(entityBundle.getEntity() instanceof Folder || entityBundle.getEntity() instanceof Project){
 			actionMenu.setActionVisible(Action.CHANGE_STORAGE_LOCATION, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.CHANGE_STORAGE_LOCATION, permissions.getCanEdit());
+			actionMenu.setActionText(Action.CHANGE_STORAGE_LOCATION, "Change "+enityTypeDisplay + " Storage Location");
 			actionMenu.setActionListener(Action.CHANGE_STORAGE_LOCATION, this);
 		} else {
 			actionMenu.setActionVisible(Action.CHANGE_STORAGE_LOCATION, false);
@@ -422,6 +424,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				//show command if not returned, thus not in existence
 				actionMenu.setActionVisible(Action.CREATE_DOI, true);
 				actionMenu.setActionEnabled(Action.CREATE_DOI, true);
+				actionMenu.setActionText(Action.CREATE_DOI, "Create DOI for  "+enityTypeDisplay);
 			}
 		}
 	}
@@ -564,6 +567,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.CREATE_LINK, true);
 			actionMenu.setActionEnabled(Action.CREATE_LINK, true);
 			actionMenu.setActionListener(Action.CREATE_LINK, this);
+			actionMenu.setActionText(Action.CREATE_LINK, "Save Link to "+enityTypeDisplay);
 		}else{
 			actionMenu.setActionVisible(Action.CREATE_LINK, false);
 			actionMenu.setActionEnabled(Action.CREATE_LINK, false);
@@ -664,6 +668,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionEnabled(Action.SHARE, true);
 		actionMenu.setActionVisible(Action.SHARE, true);
 		actionMenu.setActionListener(Action.SHARE, this);
+		actionMenu.setActionText(Action.SHARE, enityTypeDisplay + " Sharing Settings");
 		GlobalApplicationState globalAppState = getGlobalApplicationState();
 		if(PublicPrivateBadge.isPublic(entityBundle.getBenefactorAcl(), globalAppState.getPublicPrincipalIds())){
 			actionMenu.setActionIcon(Action.SHARE, IconType.GLOBE);

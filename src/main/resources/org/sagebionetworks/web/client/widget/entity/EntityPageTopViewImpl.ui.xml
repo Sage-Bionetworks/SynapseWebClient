@@ -11,13 +11,13 @@
 				<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
 				&nbsp;Loading...
 			</g:HTMLPanel>
-			<b:Row addStyleNames="margin-left-15 margin-right-15 padding-top-15 projectMetadata" ui:field="projectMetaContainer" visible="false">
+			<b:Row addStyleNames="padding-top-15 projectMetadata" >
 				<b:Column size="XS_12">
-					<bh:Div addStyleNames="margin-left-15 margin-right-15">
+					<bh:Div>
 						<bh:Span ui:field="entityActionMenuContainer"/>
 						<bh:Span ui:field="projectActionMenuContainer"/>
 					</bh:Div>
-					<bh:Div addStyleNames="margin-left-15 margin-right-15">
+					<bh:Div addStyleNames="margin-left-15 margin-right-15" ui:field="projectMetaContainer" visible="false">
 						<g:SimplePanel ui:field="projectMetadataContainer"/>
 						<g:SimplePanel ui:field="projectDescriptionContainer"/>
 					</bh:Div>

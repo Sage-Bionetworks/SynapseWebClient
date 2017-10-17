@@ -53,6 +53,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -303,7 +304,7 @@ public class FilesTab {
 		showProjectInfoCallack.invoke(isProject);
 		
 		view.showLoading(false);
-		if (!isProject && bundleUpdatedCallback != null) {
+		if (!isProject) {
 			bundleUpdatedCallback.invoke(bundle);
 		}
 		//Breadcrumb
