@@ -168,10 +168,7 @@ public class FilesTab {
 		metadata.setEntityUpdatedHandler(handler);
 		filesBrowser.setEntityUpdatedHandler(handler);
 		
-		//reset view
-		resetView();
 		view.showLoading(true);
-		
 		setTargetBundle(targetEntityBundle);
 	}
 	
@@ -202,6 +199,7 @@ public class FilesTab {
 	}
 	
 	public void setTargetBundle(EntityBundle bundle) {
+		resetView();
 		if (bundle.getEntity() instanceof Link) {
 			//short circuit.  redirect to target entity
 			Reference ref = ((Link)bundle.getEntity()).getLinksTo();
@@ -221,17 +219,14 @@ public class FilesTab {
 		if (!(isFile || isFolder)) {
 			//configure based on the project bundle
 			showProjectLevelUI();
-			return;
 		} else {
 			RefreshAlert refreshAlert = ginInjector.getRefreshAlert();
 			view.setRefreshAlert(refreshAlert.asWidget());
 			refreshAlert.configure(currentEntity.getId(), ObjectType.ENTITY);
+			breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		}
 		
 		view.showLoading(false);
-		
-		//Breadcrumb
-		breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		view.clearActionMenuContainer();
 		//Preview
 		view.setPreviewVisible(isFile && !bundle.getFileHandles().isEmpty());		

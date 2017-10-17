@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -127,9 +128,20 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		
 		entityActionMenu.addControllerWidget(entityActionController.asWidget());
 		view.setEntityActionMenu(entityActionMenu.asWidget());
-		
-		
 	}
+	
+	public CallbackP<String> getEntitySelectedCallback(final EntityArea newArea) {
+		return new CallbackP<String>() {
+			@Override
+			public void invoke(String newEntityId) {
+				area = newArea;
+				// always the current version from tab entity click
+				Long version = null;
+				configureEntity(newEntityId, version);
+			}
+		};
+	}
+	
 	private void initTabs() {
 		tabs.addTab(wikiTab.asTab());
 		tabs.addTab(filesTab.asTab());
@@ -138,16 +150,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		tabs.addTab(discussionTab.asTab());
 		tabs.addTab(dockerTab.asTab());
 		
-		CallbackP<String> entitySelectedCallback = new CallbackP<String>() {
-			@Override
-			public void invoke(String newEntityId) {
-				// always the current version from tab entity click
-				configureEntity(newEntityId, null);
-			}
-		};
-		filesTab.setUpdateEntityCallback(entitySelectedCallback);
-		tablesTab.setUpdateEntityCallback(entitySelectedCallback);
-		dockerTab.setUpdateEntityCallback(entitySelectedCallback);
+		filesTab.setUpdateEntityCallback(getEntitySelectedCallback(EntityArea.FILES));
+		tablesTab.setUpdateEntityCallback(getEntitySelectedCallback(EntityArea.TABLES));
+		dockerTab.setUpdateEntityCallback(getEntitySelectedCallback(EntityArea.DOCKER));
 
 		// lazy init tabs, and show project information (if set)
 		wikiTab.setTabClickedCallback(new CallbackP<Tab>() {
@@ -213,16 +218,20 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
+				view.setLoadingVisible(false);
 				// by default, all tab entity bundles point to the project entity bundle
 				projectBundle = filesEntityBundle = tablesEntityBundle = dockerEntityBundle = bundle;
 				projectMetadata.setEntityBundle(projectBundle, null);
 				configureEntity(entity.getId(), filesVersionNumber);
+				showSelectedTabs();
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setLoadingVisible(false);
 				projectBundleLoadError = caught;
 				configureEntity(entity.getId(), filesVersionNumber);
+				showSelectedTabs();
 			}
 		};
 		synapseJavascriptClient.getEntityBundle(projectHeader.getId(), mask, callback);
@@ -234,46 +243,95 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
-				updateTabEntityBundle(bundle);
+				updateEntityBundle(bundle);
 				boolean isCurrentVersion = version == null;
 				entityActionController.configure(entityActionMenu, bundle, isCurrentVersion, null, area, entityUpdateHandler);
 				view.setProjectInformationVisible(bundle.getEntity() instanceof Project);
-				showSelectedTabs();
+				reconfigureCurrentArea();
+				view.setLoadingVisible(false);
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
-				showSelectedTabs();
+				view.setLoadingVisible(false);
 			}
 		};
 		synapseJavascriptClient.getEntityBundleForVersion(entityId, version, mask, callback);
     }
     
-    public void updateTabEntityBundle(EntityBundle bundle) {
-    	Entity entity = bundle.getEntity();
+    public void reconfigureCurrentArea() {
+    	switch (area) {
+			case FILES:
+				configureFilesTab();
+				tabs.showTab(filesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+				break;
+			case WIKI:
+				configureWikiTab();
+				tabs.showTab(wikiTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+				break;
+			case TABLES:
+				configureTablesTab();
+				tabs.showTab(tablesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+				break;
+			case ADMIN:
+				configureAdminTab();
+				tabs.showTab(adminTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+				break;
+			case DISCUSSION:
+				configureDiscussionTab();
+				tabs.showTab(discussionTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+				break;
+			case DOCKER:
+				configureDockerTab();
+				tabs.showTab(dockerTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+				break;
+			default:
+		}
+    }
+    
+    public void updateEntityBundle(EntityBundle bundle) {
+    	entity = bundle.getEntity();
     	if (entity instanceof Project) {
 	    	switch (area) {
 				case FILES:
-					filesEntityBundle = bundle;
+					fileChanged(bundle);
 					break;
 				case TABLES:
-					tablesEntityBundle = bundle;
+					tableChanged(bundle);
 					break;
 				case DOCKER:
-					dockerEntityBundle = bundle;
+					dockerChanged(bundle);
 					break;
 				default:
 			}
     	} else {
     		if (entity instanceof FileEntity || entity instanceof Folder) {
-    			filesEntityBundle = bundle;
+    			fileChanged(bundle);
     		} else if (entity instanceof Table) {
-    			tablesEntityBundle = bundle;
+    			tableChanged(bundle);
     		} else if (entity instanceof DockerRepository) {
-    			dockerEntityBundle = bundle;
+    			dockerChanged(bundle);
     		}
     	}
+    }
+    
+    private void dockerChanged(EntityBundle bundle) {
+    	dockerEntityBundle = bundle;
+		area = EntityArea.DOCKER;
+		dockerTab.asTab().setContentStale(true);
+    }
+    
+    private void tableChanged(EntityBundle bundle) {
+    	tablesEntityBundle = bundle;
+		area = EntityArea.TABLES;
+		tablesTab.asTab().setContentStale(true);
+    }
+    
+    private void fileChanged(EntityBundle bundle) {
+    	filesEntityBundle = bundle;
+		area = EntityArea.FILES;
+		filesTab.asTab().setContentStale(true);
     }
     
     public void showSelectedTabs() {
@@ -415,33 +473,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		adminTab.asTab().setContentStale(true);
 		discussionTab.asTab().setContentStale(true);
 		dockerTab.asTab().setContentStale(true);
-		switch (area) {
-			case FILES:
-				configureFilesTab();
-				tabs.showTab(filesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
-				break;
-			case WIKI:
-				configureWikiTab();
-				tabs.showTab(wikiTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
-				break;
-			case TABLES:
-				configureTablesTab();
-				tabs.showTab(tablesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
-				break;
-			case ADMIN:
-				configureAdminTab();
-				tabs.showTab(adminTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
-				break;
-			case DISCUSSION:
-				configureDiscussionTab();
-				tabs.showTab(discussionTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
-				break;
-			case DOCKER:
-				configureDockerTab();
-				tabs.showTab(dockerTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
-				break;
-			default:
-		}
+		reconfigureCurrentArea();
 	}
 
     public void clearState() {

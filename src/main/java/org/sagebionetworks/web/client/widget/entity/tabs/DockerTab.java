@@ -116,6 +116,7 @@ public class DockerTab implements DockerTabView.Presenter{
 	}
 
 	public void setTargetBundle(EntityBundle bundle) {
+		resetView();
 		view.clearDockerRepoWidget();
 		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, null, null));
 		tab.showTab();
@@ -127,7 +128,7 @@ public class DockerTab implements DockerTabView.Presenter{
 		view.setDockerRepoWidgetVisible(isRepo);
 		if (isRepo) {
 			List<LinkData> links = new ArrayList<LinkData>();
-			Place projectPlace = new Synapse(projectEntityId);
+			Place projectPlace = new Synapse(projectEntityId, null, EntityArea.DOCKER, null);
 			String projectName = bundle.getPath().getPath().get(1).getName();
 			links.add(new LinkData(projectName, EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()), projectPlace));
 			breadcrumb.configure(links, ((DockerRepository)entity).getRepositoryName());

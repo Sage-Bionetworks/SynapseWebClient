@@ -12,7 +12,7 @@
 					<bh:Div>
 						<bh:Span ui:field="entityActionMenuContainer"/>
 						<bh:Span ui:field="projectActionMenuContainer"/>
-						<bh:Span ui:field="loadingUI" addStyleNames="margin-right-5 center">
+						<bh:Span ui:field="loadingUI" addStyleNames="margin-right-5 right">
 							<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
 							<bh:Span text="Loading..."></bh:Span>
 						</bh:Span>
