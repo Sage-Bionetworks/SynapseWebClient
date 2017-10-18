@@ -74,7 +74,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 
 			@Override
 			public void onSuccess(SignedTokenInterface token) {
-				synapseClient.getMembershipInvitation((MembershipInvtnSignedToken) token, new AsyncCallback<MembershipInvtnSubmission>() {
+				jsClient.getMembershipInvitation((MembershipInvtnSignedToken) token, new AsyncCallback<MembershipInvtnSubmission>() {
 					@Override
 					public void onFailure(Throwable throwable) {
 						synapseAlert.handleException(throwable);

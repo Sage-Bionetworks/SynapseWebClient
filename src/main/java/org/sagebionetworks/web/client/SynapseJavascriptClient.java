@@ -1,4 +1,5 @@
 package org.sagebionetworks.web.client;
+
 import static com.google.gwt.http.client.RequestBuilder.DELETE;
 import static com.google.gwt.http.client.RequestBuilder.GET;
 import static com.google.gwt.http.client.RequestBuilder.POST;
@@ -29,6 +30,8 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
+import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
+import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
@@ -729,6 +732,18 @@ public class SynapseJavascriptClient {
 		} catch (JSONObjectAdapterException e) {
 			callback.onFailure(e);
 		}
+	}
+
+	public void getMembershipInvitation(MembershipInvtnSignedToken token, AsyncCallback<MembershipInvtnSubmission> callback) {
+		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + token.getMembershipInvitationId();
+		JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
+		try {
+			token.writeToJSONObject(jsonAdapter);
+		} catch (JSONObjectAdapterException e) {
+			callback.onFailure(e);
+			return;
+		}
+		doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.MembershipInvtnSubmission, callback);
 	}
 	
 	public void deleteMembershipInvitation(String id, AsyncCallback<Void> callback) {

@@ -16,8 +16,6 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
-import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
@@ -189,7 +187,6 @@ public interface SynapseClientAsync {
 			AsyncCallback<List<TeamRequestBundle>> asyncCallback);
 	void getOpenInvitations(String userId, AsyncCallback<ArrayList<OpenUserInvitationBundle>> callback);
 	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<ArrayList<OpenTeamInvitationBundle>> callback);
-	void getMembershipInvitation(MembershipInvtnSignedToken token, AsyncCallback<MembershipInvtnSubmission> callback);
 	void getInviteeVerificationSignedToken(String membershipInvitationId, AsyncCallback<InviteeVerificationSignedToken> callback);
 	void updateInviteeId(String membershipInvitationId, InviteeVerificationSignedToken token, AsyncCallback<Void> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
