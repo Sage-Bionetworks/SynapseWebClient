@@ -26,12 +26,11 @@ import org.sagebionetworks.web.shared.NotificationTokenType;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.query.client.Function;
-import com.google.gwt.query.client.GQuery;
-import com.google.gwt.query.client.plugins.deferred.PromiseRPC;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
 public class EmailInvitationPresenter extends AbstractActivity implements EmailInvitationView.Presenter, Presenter<EmailInvitation> {
+	private String encodedMembershipInvtnSignedToken;
 	private EmailInvitationView view;
 	private RegisterWidget registerWidget;
 	private SynapseClientAsync synapseClient;
@@ -66,99 +65,99 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	public void setPlace(EmailInvitation place) {
 		view.setPresenter(this);
 		view.clear();
-		final String encodedMembershipInvtnSignedToken = place.toToken();
-		PromiseRPC<SignedTokenInterface> promise = new PromiseRPC<>();
-		synapseClient.hexDecodeAndDeserialize(NotificationTokenType.EmailInvitation.name(), encodedMembershipInvtnSignedToken, promise);
-		promise.then(new Function() {
+		encodedMembershipInvtnSignedToken = place.toToken();
+		synapseClient.hexDecodeAndDeserialize(NotificationTokenType.EmailInvitation.name(), encodedMembershipInvtnSignedToken, new AsyncCallback<SignedTokenInterface>() {
 			@Override
-			public PromiseRPC<MembershipInvtnSubmission> f(Object... args) {
-				MembershipInvtnSignedToken token = (MembershipInvtnSignedToken) args[0];
-				PromiseRPC<MembershipInvtnSubmission> promise = new PromiseRPC<>();
-				synapseClient.getMembershipInvitation(token, promise);
-				return promise;
-			}
-		}).done(new Function() {
-			@Override
-			public void f() {
-				MembershipInvtnSubmission mis = (MembershipInvtnSubmission) arguments(0);
-				if (authController.isLoggedIn()) {
-					bindInvitationToAuthenticatedUser(mis.getId());
-				} else {
-					view.show();
-					registerWidget.enableEmailAddressField(false);
-					view.setRegisterWidget(registerWidget.asWidget());
-					view.setSynapseAlertContainer(synapseAlert.asWidget());
-					EmailInvitationPresenter.this.registerWidget.setEncodedMembershipInvtnSignedToken(encodedMembershipInvtnSignedToken);
-					EmailInvitationPresenter.this.registerWidget.setEmail(mis.getInviteeEmail());
-					setupInvitationMessage(mis);
-				}
-			}
-		}).fail(new Function() {
-			@Override
-			public void f() {
-				Throwable throwable = arguments(0);
+			public void onFailure(Throwable throwable) {
 				synapseAlert.handleException(throwable);
+			}
+
+			@Override
+			public void onSuccess(SignedTokenInterface token) {
+				synapseClient.getMembershipInvitation((MembershipInvtnSignedToken) token, new AsyncCallback<MembershipInvtnSubmission>() {
+					@Override
+					public void onFailure(Throwable throwable) {
+						synapseAlert.handleException(throwable);
+					}
+
+					@Override
+					public void onSuccess(MembershipInvtnSubmission mis) {
+						if (authController.isLoggedIn()) {
+							bindInvitationToAuthenticatedUser(mis.getId());
+						} else {
+							initializeView(mis);
+						}
+					}
+				});
 			}
 		});
 	}
 
 	private void bindInvitationToAuthenticatedUser(final String misId) {
-		PromiseRPC<InviteeVerificationSignedToken> promise = new PromiseRPC<>();
-		synapseClient.getInviteeVerificationSignedToken(misId, promise);
-		promise.then(new Function() {
+		synapseClient.getInviteeVerificationSignedToken(misId, new AsyncCallback<InviteeVerificationSignedToken>() {
 			@Override
-			public PromiseRPC<Void> f(Object... args) {
-				InviteeVerificationSignedToken token = (InviteeVerificationSignedToken) args[0];
-				PromiseRPC<Void> promise = new PromiseRPC<>();
-				synapseClient.updateInviteeId(misId, token, promise);
-				return promise;
-			}
-		}).done(new Function() {
-			@Override
-			public void f() {
-				placeChanger.goTo(new Profile(authController.getCurrentUserPrincipalId(), Synapse.ProfileArea.TEAMS));
-			}
-		}).fail(new Function() {
-			@Override
-			public void f() {
-				Throwable throwable = arguments(0);
+			public void onFailure(Throwable throwable) {
 				synapseAlert.handleException(throwable);
+			}
+
+			@Override
+			public void onSuccess(InviteeVerificationSignedToken token) {
+				synapseClient.updateInviteeId(misId, token, new AsyncCallback<Void>() {
+					@Override
+					public void onFailure(Throwable throwable) {
+						synapseAlert.handleException(throwable);
+					}
+
+					@Override
+					public void onSuccess(Void aVoid) {
+						placeChanger.goTo(new Profile(authController.getCurrentUserPrincipalId(), Synapse.ProfileArea.TEAMS));
+					}
+				});
 			}
 		});
 	}
 
-	private void setupInvitationMessage(final MembershipInvtnSubmission mis) {
-		PromiseRPC<Team> teamPromise = new PromiseRPC<>();
-		PromiseRPC<UserProfile> userPromise = new PromiseRPC<>();
-		jsClient.getTeam(mis.getTeamId(), teamPromise);
-		jsClient.getUserProfile(mis.getCreatedBy(), userPromise);
-		GQuery.when(teamPromise, userPromise)
-		.done(new Function() {
-			public void f() {
-				Team team = (Team) arguments(0, 0);
-				UserProfile userProfile = (UserProfile) arguments(1, 0);
-				String title = "You have been invited to join ";
-				String teamName = team.getName();
-				if (teamName != null) {
-					title += " the team " + teamName;
-				} else {
-					title += " a team";
-				}
-				String displayName = getDisplayName(userProfile);
-				if (displayName != null) {
-					title += " by " + displayName;
-				}
-				EmailInvitationPresenter.this.view.setInvitationTitle(title);
-				String message = mis.getMessage();
-				if (message != null) {
-					EmailInvitationPresenter.this.view.setInvitationMessage(mis.getMessage());
-				}
-			}
-		}).fail(new Function() {
+	private void initializeView(final MembershipInvtnSubmission mis) {
+		view.show();
+		registerWidget.enableEmailAddressField(false);
+		view.setRegisterWidget(registerWidget.asWidget());
+		view.setSynapseAlertContainer(synapseAlert.asWidget());
+		EmailInvitationPresenter.this.registerWidget.setEncodedMembershipInvtnSignedToken(encodedMembershipInvtnSignedToken);
+		EmailInvitationPresenter.this.registerWidget.setEmail(mis.getInviteeEmail());
+		jsClient.getTeam(mis.getTeamId(), new AsyncCallback<Team>() {
 			@Override
-			public void f() {
-				Throwable throwable = arguments(0);
+			public void onFailure(Throwable throwable) {
 				synapseAlert.handleException(throwable);
+			}
+
+			@Override
+			public void onSuccess(final Team team) {
+				jsClient.getUserProfile(mis.getCreatedBy(), new AsyncCallback<UserProfile>() {
+					@Override
+					public void onFailure(Throwable throwable) {
+						synapseAlert.handleException(throwable);
+					}
+
+					@Override
+					public void onSuccess(UserProfile userProfile) {
+						String title = "You have been invited to join ";
+						String teamName = team.getName();
+						if (teamName != null) {
+							title += " the team " + teamName;
+						} else {
+							title += " a team";
+						}
+						String displayName = getDisplayName(userProfile);
+						if (displayName != null) {
+							title += " by " + displayName;
+						}
+						EmailInvitationPresenter.this.view.setInvitationTitle(title);
+						String message = mis.getMessage();
+						if (message != null) {
+							EmailInvitationPresenter.this.view.setInvitationMessage(mis.getMessage());
+						}
+					}
+				});
 			}
 		});
 	}
