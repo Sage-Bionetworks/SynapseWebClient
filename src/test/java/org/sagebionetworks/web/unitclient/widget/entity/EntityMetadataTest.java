@@ -53,13 +53,9 @@ public class EntityMetadataTest {
 	@Mock
 	AuthenticationController mockAuthenticationController;
 	@Mock
-	AnnotationsRendererWidget mockAnnotationsWidget;
-	@Mock
 	DoiWidget mockDoiWidget;
 	@Mock
 	RestrictionWidget mockRestrictionWidgetV2;
-	@Mock
-	FileHistoryWidget mockFileHistoryWidget;
 	@Mock
 	Doi mockDoi;
 	@Mock
@@ -76,16 +72,13 @@ public class EntityMetadataTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new EntityMetadata(mockView, mockDoiWidget, mockAnnotationsWidget, 
-				mockFileHistoryWidget, mockSynapseClient, mockJSNI, mockRestrictionWidgetV2, mockCookies);
-		when(mockInjector.getFileHistoryWidget()).thenReturn(mockFileHistoryWidget);
+		widget = new EntityMetadata(mockView, mockDoiWidget, 
+				mockSynapseClient, mockJSNI, mockRestrictionWidgetV2, mockCookies);
 	}
 	
 	@Test
 	public void testConstruction() {
 		verify(mockView).setDoiWidget(any(IsWidget.class));
-		verify(mockView).setAnnotationsRendererWidget(any(IsWidget.class));
-		verify(mockView).setFileHistoryWidget(any(IsWidget.class));
 		verify(mockView).setRestrictionWidgetV2(any(IsWidget.class));
 		verify(mockRestrictionWidgetV2).setShowChangeLink(true);
 		verify(mockRestrictionWidgetV2).setShowIfProject(false);
@@ -113,7 +106,6 @@ public class EntityMetadataTest {
 		verify(mockView).setDetailedMetadataVisible(true);
 		verify(mockView).setRestrictionPanelVisible(false);
 		verify(mockDoiWidget).configure(mockDoi, entityId);
-		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 		verify(mockRestrictionWidgetV2).configure(project, canChangePermissions);
 		verify(mockView, never()).setRestrictionWidgetV2Visible(false);
 	}
@@ -136,10 +128,7 @@ public class EntityMetadataTest {
 		Long versionNumber = null;
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
-		verify(mockFileHistoryWidget, never()).setEntityBundle(bundle, versionNumber);
-		verify(mockFileHistoryWidget, never()).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
-		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 	}
 	
 	@Test
@@ -160,10 +149,7 @@ public class EntityMetadataTest {
 		Long versionNumber = null;
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
-		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
-		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
-		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 	}
 	
 	@Test
@@ -185,10 +171,7 @@ public class EntityMetadataTest {
 		bundle.setDoi(mockDoi);
 		widget.setEntityBundle(bundle, versionNumber);
 		verify(mockView).setDetailedMetadataVisible(true);
-		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
-		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
-		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 	}
 	
 	@Test
