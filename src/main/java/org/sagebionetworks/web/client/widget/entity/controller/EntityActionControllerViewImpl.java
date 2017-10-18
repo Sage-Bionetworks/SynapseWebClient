@@ -16,7 +16,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
-import com.google.gwt.dom.client.Node;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -148,7 +147,15 @@ public class EntityActionControllerViewImpl implements
 		annotationsDialog.show();
 	}
 	@Override
+	public void hideAnnotations() {
+		annotationsDialog.hide();
+	}
+	@Override
 	public void showFileHistory() {
 		fileHistoryDialog.show();
+	}
+	@Override
+	public void hideFileHistory() {
+		fileHistoryDialog.hide();
 	}
 }

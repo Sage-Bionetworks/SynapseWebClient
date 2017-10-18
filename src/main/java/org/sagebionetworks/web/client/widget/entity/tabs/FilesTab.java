@@ -169,7 +169,7 @@ public class FilesTab {
 		filesBrowser.setEntityUpdatedHandler(handler);
 		
 		view.showLoading(true);
-		setTargetBundle(targetEntityBundle);
+		setTargetBundle(targetEntityBundle, versionNumber);
 	}
 	
 	public void showProjectLevelUI() {
@@ -198,7 +198,7 @@ public class FilesTab {
 		return a == b || (a != null && a.equals(b));
 	}
 	
-	public void setTargetBundle(EntityBundle bundle) {
+	public void setTargetBundle(EntityBundle bundle, final Long versionNumber) {
 		resetView();
 		if (bundle.getEntity() instanceof Link) {
 			//short circuit.  redirect to target entity
@@ -248,12 +248,11 @@ public class FilesTab {
 		//Metadata
 		boolean isMetadataVisible = isFile || isFolder;
 		view.setMetadataVisible(isMetadataVisible);
-		final Long shownVersionNumber = isFile ? ((Versionable)bundle.getEntity()).getVersionNumber() : null;
 		if (isMetadataVisible) {
-			metadata.setEntityBundle(bundle, shownVersionNumber);
+			metadata.setEntityBundle(bundle, versionNumber);
 		}
 		EntityArea area = isProject ? EntityArea.FILES : null;
-		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(currentEntityId, shownVersionNumber, area, null));
+		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(currentEntityId, versionNumber, area, null));
 		
 		//File Browser
 		boolean isFilesBrowserVisible = isProject || isFolder;
@@ -263,7 +262,7 @@ public class FilesTab {
 		}
 		
 		//Provenance
-		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(currentEntityId, shownVersionNumber));
+		configMap.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, DisplayUtils.createEntityVersionString(currentEntityId, versionNumber));
 		view.setProvenanceVisible(isFile);
 		if (isFile){
 			ProvenanceWidget provWidget = ginInjector.getProvenanceRenderer();
@@ -289,11 +288,11 @@ public class FilesTab {
 						view.setWikiPageWidgetVisible(false);
 					}
 				};
-			wikiPageWidget.configure(new WikiPageKey(currentEntityId, ObjectType.ENTITY.toString(), bundle.getRootWikiId(), shownVersionNumber), canEdit, wikiCallback, false);
+			wikiPageWidget.configure(new WikiPageKey(currentEntityId, ObjectType.ENTITY.toString(), bundle.getRootWikiId(), versionNumber), canEdit, wikiCallback, false);
 			CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 				@Override
 				public void invoke(String wikiPageId) {
-					wikiPageWidget.configure(new WikiPageKey(currentEntityId, ObjectType.ENTITY.toString(), wikiPageId, shownVersionNumber), canEdit, wikiCallback, false);
+					wikiPageWidget.configure(new WikiPageKey(currentEntityId, ObjectType.ENTITY.toString(), wikiPageId, versionNumber), canEdit, wikiCallback, false);
 				}
 			};
 			wikiPageWidget.setWikiReloadHandler(wikiReloadHandler);

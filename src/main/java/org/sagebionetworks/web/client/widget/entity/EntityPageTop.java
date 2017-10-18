@@ -243,7 +243,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
-				updateEntityBundle(bundle);
+				updateEntityBundle(bundle, version);
 				boolean isCurrentVersion = version == null;
 				entityActionController.configure(entityActionMenu, bundle, isCurrentVersion, null, area, entityUpdateHandler);
 				view.setProjectInformationVisible(bundle.getEntity() instanceof Project);
@@ -290,12 +290,12 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		}
     }
     
-    public void updateEntityBundle(EntityBundle bundle) {
+    public void updateEntityBundle(EntityBundle bundle, Long version) {
     	entity = bundle.getEntity();
     	if (entity instanceof Project) {
 	    	switch (area) {
 				case FILES:
-					fileChanged(bundle);
+					fileChanged(bundle, version);
 					break;
 				case TABLES:
 					tableChanged(bundle);
@@ -307,7 +307,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			}
     	} else {
     		if (entity instanceof FileEntity || entity instanceof Folder) {
-    			fileChanged(bundle);
+    			fileChanged(bundle, version);
     		} else if (entity instanceof Table) {
     			tableChanged(bundle);
     		} else if (entity instanceof DockerRepository) {
@@ -328,8 +328,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		tablesTab.asTab().setContentStale(true);
     }
     
-    private void fileChanged(EntityBundle bundle) {
+    private void fileChanged(EntityBundle bundle, Long version) {
     	filesEntityBundle = bundle;
+    	filesVersionNumber = version;
 		area = EntityArea.FILES;
 		filesTab.asTab().setContentStale(true);
     }

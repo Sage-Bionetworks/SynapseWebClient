@@ -117,7 +117,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EditProjectMetadataModalWidget editProjectMetadataModalWidget;
 	AnnotationsRendererWidget annotationsRendererWidget;
 	EditAnnotationsDialog editAnnotationsDialog;
-	FileHistoryWidget fileHistoryWidget;
 	
 	EntityBundle entityBundle;
 	String wikiPageId, parentWikiPageId;
@@ -282,11 +281,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 		return evalEditor;
 	}
-	public void configureToolsMenu(ActionMenuWidget actionMenu) {
-		if (entityBundle.getEntity() instanceof Project) {
-//			actionMenu.
-		}
-	}
 	
 	@Override
 	public void configure(ActionMenuWidget actionMenu,
@@ -306,7 +300,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		for (Action action : Action.values()) {
 			actionMenu.setActionVisible(action, false);	
 		}
-		configureToolsMenu(actionMenu);
+		view.hideAnnotations();
+		view.hideFileHistory();
 		
 		if (!isUserAuthenticated) {
 			if (permissions.getCanPublicRead()) {
@@ -583,14 +578,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void configureAnnotations(){
 		actionMenu.setActionVisible(Action.SHOW_ANNOTATIONS, true);
 		actionMenu.setActionEnabled(Action.SHOW_ANNOTATIONS, true);
-		actionMenu.addActionListener(Action.SHOW_ANNOTATIONS, this);
+		actionMenu.setActionListener(Action.SHOW_ANNOTATIONS, this);
 	}
 	
 	private void configureFileHistory(){
 		if(entityBundle.getEntity() instanceof FileEntity){
 			actionMenu.setActionVisible(Action.SHOW_FILE_HISTORY, true);
 			actionMenu.setActionEnabled(Action.SHOW_FILE_HISTORY, true);
-			actionMenu.addActionListener(Action.SHOW_FILE_HISTORY, this);
+			actionMenu.setActionListener(Action.SHOW_FILE_HISTORY, this);
 		}else{
 			actionMenu.setActionVisible(Action.SHOW_FILE_HISTORY, false);
 			actionMenu.setActionEnabled(Action.SHOW_FILE_HISTORY, false);
@@ -864,14 +859,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return editAnnotationsDialog;
 	}
 	
-	private FileHistoryWidget getFileHistoryWidget() {
-		if (fileHistoryWidget == null) {
-			fileHistoryWidget = ginInjector.getFileHistoryWidget();
-			view.setFileHistoryWidget(fileHistoryWidget);
-		}
-		return fileHistoryWidget;
-	}
-	
 	private void onShowAnnotations() {
 		// configure and show annotations
 		if (entityBundle.getPermissions().getCanCertifiedUserEdit()) {
@@ -890,9 +877,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void onShowFileHistory() {
+		FileHistoryWidget fileHistoryWidget = ginInjector.getFileHistoryWidget();
+		view.setFileHistoryWidget(fileHistoryWidget);
 		// configure and show file history
-		getFileHistoryWidget().setEntityBundle(entityBundle, getVersion());
-		getFileHistoryWidget().setEntityUpdatedHandler(entityUpdateHandler);
+		fileHistoryWidget.setEntityBundle(entityBundle, getVersion(), isCurrentVersion);
+		fileHistoryWidget.setEntityUpdatedHandler(entityUpdateHandler);
 		view.showFileHistory();
 	}
 	

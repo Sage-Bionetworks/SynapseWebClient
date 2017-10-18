@@ -769,8 +769,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AnnotationsRendererWidgetView.class).to(AnnotationsRendererWidgetViewImpl.class);
 		
 		//file history
-		bind(FileHistoryWidget.class).in(Singleton.class);
-		bind(FileHistoryWidgetViewImpl.class).in(Singleton.class);
 		bind(FileHistoryWidgetView.class).to(FileHistoryWidgetViewImpl.class);
 		
 		// the logger
