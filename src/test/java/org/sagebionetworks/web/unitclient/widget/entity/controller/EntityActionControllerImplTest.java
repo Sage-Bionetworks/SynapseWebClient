@@ -380,6 +380,26 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
 		verify(mockActionMenu, times(2)).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+		verify(mockActionMenu).setBasicDivderVisible(true);
+	}
+	
+	@Test
+	public void testConfigureTableNoEdit(){
+		setPublicCanRead();
+		permissions.setCanCertifiedUserEdit(false);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		
+		// for a table entity, do not show file history
+		verify(mockActionMenu, times(2)).setActionVisible(Action.SHOW_FILE_HISTORY, false);
+		verify(mockActionMenu).setActionEnabled(Action.SHOW_FILE_HISTORY, false);
+		
+		//verify other table commands. the current user cannot edit
+		verify(mockActionMenu, times(2)).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
+		verify(mockActionMenu, times(2)).setActionVisible(Action.EDIT_TABLE_DATA, false);
+		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
+		verify(mockActionMenu).setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
+		verify(mockActionMenu, times(2)).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
+		verify(mockActionMenu).setBasicDivderVisible(false);
 	}
 	
 	@Test
@@ -405,7 +425,7 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu, times(2)).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, false);
 		verify(mockActionMenu, times(2)).setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
 		verify(mockActionMenu, times(2)).setActionVisible(Action.SHOW_VIEW_SCOPE, false);
-
+		verify(mockActionMenu).setBasicDivderVisible(false);
 	}
 	
 	@Test

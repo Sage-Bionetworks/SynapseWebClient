@@ -1,18 +1,28 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.HIDE;
+import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.SCHEMA;
+import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.SCOPE;
+import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.SHOW;
 
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -39,6 +49,7 @@ import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.table.QueryChangeHandler;
 import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
@@ -86,6 +97,8 @@ public class TableEntityWidgetTest {
 	String facetBasedSql = "select * from syn123 where x>1";
 	@Mock
 	FileViewClientsHelp mockFileViewClientsHelp;
+	@Captor
+	ArgumentCaptor<ActionListener> actionListenerCaptor;
 	
 	@Before
 	public void before(){
@@ -200,27 +213,8 @@ public class TableEntityWidgetTest {
 		boolean canEdit = true;
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
 		
-		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
-		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, true);
-		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
-		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
-		
-		verify(mockActionMenu).setBasicDivderVisible(true);
 		// download files help not visible for Table, only Views
 		verify(mockQueryInputWidget).setDownloadFilesVisible(false);
-	}
-	
-	@Test
-	public void testConfigureNoEdit(){
-		boolean canEdit = false;
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
-		
-		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
-		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
-		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
-		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
-		
-		verify(mockActionMenu).setBasicDivderVisible(false);
 	}
 	
 	@Test
@@ -229,29 +223,8 @@ public class TableEntityWidgetTest {
 		configureBundleWithView(ViewType.file);
 		
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
-		
-		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, true);
-		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, true);
-		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
-		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
-		
-		verify(mockActionMenu).setBasicDivderVisible(true);
 		// verify download help is shown for file views
 		verify(mockQueryInputWidget).setDownloadFilesVisible(true);
-	}
-	@Test
-	public void testConfigureViewNoEdit(){
-		boolean canEdit = false;
-		configureBundleWithView(ViewType.file);
-		
-		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
-		
-		verify(mockActionMenu).setActionVisible(Action.EDIT_TABLE_DATA, false);
-		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
-		verify(mockActionMenu).setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
-		verify(mockActionMenu).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
-		
-		verify(mockActionMenu).setBasicDivderVisible(false);
 	}
 		
 	@Test
@@ -401,21 +374,33 @@ public class TableEntityWidgetTest {
 	}
 	
 	@Test
-	public void testOnSchemaToggleShown(){
+	public void testShowSchema(){
 		boolean canEdit = true;
-		boolean schemaShown = true;
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
-		widget.onSchemaToggle(schemaShown);
-		verify(mockActionMenu).setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_DOWN);
+		verify(mockActionMenu).setActionListener(eq(Action.SHOW_TABLE_SCHEMA), actionListenerCaptor.capture());
+		ActionListener listener = actionListenerCaptor.getValue();
+		verify(mockView).setSchemaVisible(false);
+		listener.onAction(Action.SHOW_TABLE_SCHEMA);
+		verify(mockView).setSchemaVisible(true);
+		verify(mockActionMenu).setActionText(Action.SHOW_TABLE_SCHEMA, HIDE + SCHEMA);
+		listener.onAction(Action.SHOW_TABLE_SCHEMA);
+		verify(mockView, times(2)).setSchemaVisible(false);
+		verify(mockActionMenu, times(2)).setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + SCHEMA);
 	}
 	
 	@Test
-	public void testOnSchemaToggleHide(){
+	public void testShowViewScope(){
 		boolean canEdit = true;
-		boolean schemaShown = false;
 		widget.configure(entityBundle, canEdit, mockQueryChangeHandler, mockActionMenu);
-		widget.onSchemaToggle(schemaShown);
-		verify(mockActionMenu).setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
+		verify(mockActionMenu).setActionListener(eq(Action.SHOW_VIEW_SCOPE), actionListenerCaptor.capture());
+		ActionListener listener = actionListenerCaptor.getValue();
+		verify(mockView).setScopeVisible(false);
+		listener.onAction(Action.SHOW_VIEW_SCOPE);
+		verify(mockView).setScopeVisible(true);
+		verify(mockActionMenu).setActionText(Action.SHOW_VIEW_SCOPE, HIDE + SCOPE);
+		listener.onAction(Action.SHOW_VIEW_SCOPE);
+		verify(mockView, times(2)).setScopeVisible(false);
+		verify(mockActionMenu, times(2)).setActionText(Action.SHOW_VIEW_SCOPE, SHOW + SCOPE);
 	}
 	
 	@Test
