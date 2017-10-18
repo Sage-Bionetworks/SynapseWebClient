@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table.v2;
 import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.getTableType;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -27,7 +26,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultsListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -79,7 +77,11 @@ public class TableEntityWidget implements IsWidget,
 	CopyTextModal copyTextModal;
 	SynapseClientAsync synapseClient;
 	FileViewClientsHelp fileViewClientsHelp;
-	
+	boolean isShowingSchema, isShowingScope;
+	public static final String SHOW = "Show ";
+	public static final String HIDE = "Hide ";
+	public static final String SCOPE = "Scope";
+	public static final String SCHEMA = "Schema";
 	@Inject
 	public TableEntityWidget(TableEntityWidgetView view,
 			TableQueryResultWidget queryResultsWidget,
@@ -146,8 +148,12 @@ public class TableEntityWidget implements IsWidget,
 	 */
 	private void configureActions() {
 		// Listen to action events.
+		isShowingScope = false;
+		isShowingSchema = false;
 		view.setScopeVisible(false);
 		view.setSchemaVisible(false);
+		actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW+SCHEMA);
+		actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, SHOW+SCOPE);
 		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
@@ -169,14 +175,20 @@ public class TableEntityWidget implements IsWidget,
 		this.actionMenu.setActionListener(Action.SHOW_TABLE_SCHEMA, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
-				view.setSchemaVisible(true);
+				isShowingSchema = !isShowingSchema;
+				view.setSchemaVisible(isShowingSchema);
+				String showHide = isShowingSchema ? HIDE : SHOW;
+				actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, showHide+SCHEMA);
 			}
 		});
 		
 		this.actionMenu.setActionListener(Action.SHOW_VIEW_SCOPE, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
-				view.setScopeVisible(true);
+				isShowingScope = !isShowingScope;
+				view.setScopeVisible(isShowingScope);
+				String showHide = isShowingScope ? HIDE : SHOW;
+				actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide+SCOPE);
 			}
 		});
 	}
