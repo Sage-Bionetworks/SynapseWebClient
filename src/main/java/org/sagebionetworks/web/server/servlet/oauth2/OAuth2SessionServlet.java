@@ -63,7 +63,7 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 			resp.sendRedirect(LOGIN_PLACE+token.getSessionToken());
 		} catch (SynapseNotFoundException e) {
 			// Send the user to register
-			resp.sendRedirect(REGISTER_ACCOUNT+e.getMessage());
+			resp.sendRedirect(REGISTER_ACCOUNT+athenticationCode);
 		}catch (SynapseForbiddenException e) {
 			resp.setStatus(HttpStatus.FORBIDDEN.value());
 			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
