@@ -382,10 +382,10 @@ public class TableEntityWidgetTest {
 		verify(mockView).setSchemaVisible(false);
 		listener.onAction(Action.SHOW_TABLE_SCHEMA);
 		verify(mockView).setSchemaVisible(true);
-		verify(mockActionMenu).setActionText(Action.SHOW_TABLE_SCHEMA, HIDE + SCHEMA);
+		verify(mockActionMenu).setActionText(Action.SHOW_TABLE_SCHEMA, HIDE + "Table" + SCHEMA);
 		listener.onAction(Action.SHOW_TABLE_SCHEMA);
 		verify(mockView, times(2)).setSchemaVisible(false);
-		verify(mockActionMenu, times(2)).setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + SCHEMA);
+		verify(mockActionMenu, times(2)).setActionText(Action.SHOW_TABLE_SCHEMA, SHOW + "Table" + SCHEMA);
 	}
 	
 	@Test
@@ -397,10 +397,10 @@ public class TableEntityWidgetTest {
 		verify(mockView).setScopeVisible(false);
 		listener.onAction(Action.SHOW_VIEW_SCOPE);
 		verify(mockView).setScopeVisible(true);
-		verify(mockActionMenu).setActionText(Action.SHOW_VIEW_SCOPE, HIDE + SCOPE);
+		verify(mockActionMenu).setActionText(Action.SHOW_VIEW_SCOPE, HIDE + SCOPE + "Table");
 		listener.onAction(Action.SHOW_VIEW_SCOPE);
 		verify(mockView, times(2)).setScopeVisible(false);
-		verify(mockActionMenu, times(2)).setActionText(Action.SHOW_VIEW_SCOPE, SHOW + SCOPE);
+		verify(mockActionMenu, times(2)).setActionText(Action.SHOW_VIEW_SCOPE, SHOW + SCOPE + "Table");
 	}
 	
 	@Test
