@@ -64,7 +64,7 @@ public class WikiTabTest {
 		WikiPageWidget.Callback callback = mock(WikiPageWidget.Callback.class);
 		tab.configure(entityId, entityName, wikiPageId, canEdit, callback);
 		
-		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), eq(callback), eq(true));
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), eq(callback));
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(entityName), captor.capture());
 		Synapse place = captor.getValue();

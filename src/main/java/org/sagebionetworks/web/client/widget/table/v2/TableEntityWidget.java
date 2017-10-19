@@ -144,7 +144,6 @@ public class TableEntityWidget implements IsWidget,
 		configureActions();
 		checkState();
 		initSimpleAdvancedQueryState();
-		
 	}
 	
 	/**

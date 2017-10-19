@@ -19,14 +19,12 @@ public interface WikiPageWidgetView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		public void configure(WikiPageKey inWikiKey, Boolean canEdit, Callback callback, boolean showSubpages);
 		public void showPreview(final Long versionToPreview, Long currentVersion);
 		void restoreConfirmed();
 		void resetWikiMarkdown(String markdown);
 		void reloadWikiPage();
 		void showRestoreWarning(Long versionToRestore);
 		public void restoreClicked();
-		void configureWikiSubpagesWidget();
 		void configureHistoryWidget(boolean canEdit);
 		void showWikiHistory();
 	}

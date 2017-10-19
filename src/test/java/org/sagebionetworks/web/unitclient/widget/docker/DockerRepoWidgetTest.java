@@ -107,7 +107,7 @@ public class DockerRepoWidgetTest {
 	@Test
 	public void testConfigure() {
 		dockerRepoWidget.configure(mockEntityBundle, mockHandler);
-		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class), eq(false));
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockWikiPageWidget).setWikiReloadHandler(any(CallbackP.class));
 		verify(mockProvWidget).configure(any(Map.class));
 		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);
@@ -125,7 +125,7 @@ public class DockerRepoWidgetTest {
 		canEdit = false;
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
 		dockerRepoWidget.configure(mockEntityBundle, mockHandler);
-		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class), eq(false));
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockWikiPageWidget).setWikiReloadHandler(any(CallbackP.class));
 		verify(mockProvWidget).configure(any(Map.class));
 		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);

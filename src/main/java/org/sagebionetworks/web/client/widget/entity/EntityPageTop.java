@@ -43,7 +43,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -545,8 +544,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			};
 			
 			wikiTab.configure(projectHeader.getId(), projectHeader.getName(), wikiId, 
-					canEdit, callback);
-			
+					canEdit, callback, entityActionMenu);
 			if (isWikiTabShown) {
 				//initially push the configured place into the browser history
 				tabs.showTab(wikiTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);

@@ -52,7 +52,8 @@ public class HelpViewImpl extends Composite implements HelpView {
 			@Override
 			public void noWikiFound() {
 			}
-		}, true);
+		});
+		wikiPage.showSubpages(null);
 	}
 	
 	@Override

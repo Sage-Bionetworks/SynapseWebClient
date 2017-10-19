@@ -114,7 +114,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 				//get wiki terms
 				view.setWikiTermsWidgetVisible(true);
 	 			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), rootWikiId);
-	 			wikiPageWidget.configure(wikiKey, false, null, false);
+	 			wikiPageWidget.configure(wikiKey, false, null);
 			}
 		});
 		createAccessRequirementButton.configure(ar, refreshCallback);

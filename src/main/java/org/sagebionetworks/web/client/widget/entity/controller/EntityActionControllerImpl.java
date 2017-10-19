@@ -74,6 +74,7 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -316,6 +317,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureEditWiki();
 			configureViewWikiSource();
 			configureAddWikiSubpage();
+			configureReorderWikiSubpages();
 			configureDeleteWikiAction();
 			configureMove();
 			configureLink();
@@ -555,6 +557,26 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 
+	private void configureReorderWikiSubpages() {
+		if(isWikiableConfig() && entityBundle.getEntity() instanceof Project){
+			// shown if there's more than one page
+			getSynapseClient().getV2WikiHeaderTree(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), new AsyncCallback<List<V2WikiHeader>>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					actionMenu.setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
+					actionMenu.setActionEnabled(Action.REORDER_WIKI_SUBPAGES, false);
+				}
+				public void onSuccess(List<V2WikiHeader> wikiHeaders) {
+					boolean isMoreThanOne = wikiHeaders.size() > 1;
+					actionMenu.setActionVisible(Action.REORDER_WIKI_SUBPAGES, isMoreThanOne && permissions.getCanEdit());
+					actionMenu.setActionEnabled(Action.REORDER_WIKI_SUBPAGES, isMoreThanOne && permissions.getCanEdit());
+				};
+			});
+		} else{
+			actionMenu.setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
+			actionMenu.setActionEnabled(Action.REORDER_WIKI_SUBPAGES, false);
+		}
+	}
 	
 	private void configureAddWikiSubpage(){
 		if(isWikiableConfig() && entityBundle.getEntity() instanceof Project){
