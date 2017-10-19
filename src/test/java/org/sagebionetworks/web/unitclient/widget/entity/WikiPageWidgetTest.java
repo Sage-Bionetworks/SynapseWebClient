@@ -51,6 +51,7 @@ import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHand
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -94,6 +95,8 @@ public class WikiPageWidgetTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Captor
 	ArgumentCaptor<CallbackP<WikiPageKey>> callbackPCaptor;
+	@Mock
+	ActionMenuWidget mockActionMenuWidget;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
 	WikiPageWidget presenter;
@@ -134,7 +137,6 @@ public class WikiPageWidgetTest {
 	
 	@Test
 	public void testConfigure() throws JSONObjectAdapterException{
-		boolean showSubpages = true;
 		boolean canEdit = true;
 		String suffix = "-test-suffix";
 		String formattedDate = "today";
@@ -144,9 +146,6 @@ public class WikiPageWidgetTest {
 		verify(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), any(Long.class));
 		verify(mockView).setWikiHistoryWidget(any(IsWidget.class));
-		verify(mockView).setWikiSubpagesContainers(any(WikiSubpagesWidget.class));
-		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean());
-		verify(mockView).setWikiSubpagesWidget(mockSubpages);
 		verify(mockView).setModifiedCreatedByHistoryPanelVisible(true);
 		verify(mockView).setModifiedOn(formattedDate);
 		verify(mockView).setCreatedOn(formattedDate);
@@ -155,6 +154,11 @@ public class WikiPageWidgetTest {
 		verify(mockView).scrollWikiHeadingIntoView();
 		verify(mockView).setWikiHistoryVisible(false);
 		verify(mockHistoryWidget).clear();
+		
+		presenter.showSubpages(mockActionMenuWidget);
+		verify(mockView).setWikiSubpagesWidget(mockSubpages);
+		verify(mockView).setWikiSubpagesContainers(any(WikiSubpagesWidget.class));
+		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), any(CallbackP.class), any(ActionMenuWidget.class));
 		
 		verify(mockHistoryWidget, never()).configure(any(WikiPageKey.class), anyBoolean(), any(ActionHandler.class));
 		presenter.showWikiHistory();
@@ -237,7 +241,6 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testReloadWikiPageSuccess() {
 		boolean canEdit = true;
-		boolean showSubpages = true;
 		presenter.setWikiReloadHandler(mockCallbackP);
 		WikiPageKey wikiPageKey = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, 1L);
 		WikiPage wikiPage = new WikiPage();
@@ -247,7 +250,8 @@ public class WikiPageWidgetTest {
 		
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null);
 		
-		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean());
+		presenter.showSubpages(mockActionMenuWidget);
+		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), callbackPCaptor.capture(), any(ActionMenuWidget.class));
 		// invoke subpage clicked
 		callbackPCaptor.getValue().invoke(wikiPageKey);
 		verify(mockSynapseJavascriptClient, times(2)).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));

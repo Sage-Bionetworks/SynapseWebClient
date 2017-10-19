@@ -18,6 +18,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -33,6 +34,8 @@ public class WikiTabTest {
 	CallbackP<String> mockWikiReloadHandler;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	ActionMenuWidget mockActionMenuWidget;
 	WikiTab tab;
 	
 	@Before
@@ -62,7 +65,7 @@ public class WikiTabTest {
 		String wikiPageId = "9";
 		Boolean canEdit = true;
 		WikiPageWidget.Callback callback = mock(WikiPageWidget.Callback.class);
-		tab.configure(entityId, entityName, wikiPageId, canEdit, callback);
+		tab.configure(entityId, entityName, wikiPageId, canEdit, callback, mockActionMenuWidget);
 		
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), eq(callback));
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
