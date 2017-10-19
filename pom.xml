@@ -199,13 +199,14 @@
 					<module>org.sagebionetworks.web.Portal</module>
 					<!-- GWT compiler options -->
 			        <compileReport>false</compileReport>
-					<!-- <soycDetailed>true</soycDetailed> -->
+					<!-- Disabled because it causes an EmptyStackException on GWT 2.8.1
+					 <soycDetailed>true</soycDetailed> -->
 			        <encoding>${project.build.sourceEncoding}</encoding>
 			        <logLevel>INFO</logLevel>
 			        <sourceLevel>auto</sourceLevel>
 			        <extraJvmArgs>-Xmx2048m -Xms2048m</extraJvmArgs>
 			        
-			        <!-- set enableClosureCompiler to false to generate source maps and compile report
+			        <!-- Does not work on GWT 2.8.1
 			        <enableClosureCompiler>true</enableClosureCompiler> -->
 			        
 					<!--           <fragmentCount>12</fragmentCount> -->					
