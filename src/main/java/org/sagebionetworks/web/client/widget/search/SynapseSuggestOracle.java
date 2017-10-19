@@ -81,7 +81,7 @@ public class SynapseSuggestOracle extends SuggestOracle {
 				public void onFailure(Throwable caught) {
 					suggestBox.hideLoading();
 					suggestBox.handleOracleException(caught);
-				}	
+				}
 			});
 		}
 	}

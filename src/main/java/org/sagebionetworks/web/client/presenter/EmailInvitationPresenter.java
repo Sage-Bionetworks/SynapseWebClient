@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.sagebionetworks.web.client.DisplayUtils.getDisplayName;
 
+import java.util.function.Consumer;
+
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
@@ -19,11 +23,16 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.FutureUtils;
 import org.sagebionetworks.web.client.view.EmailInvitationView;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.NotificationTokenType;
 
+import com.google.common.util.concurrent.FluentFuture;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -66,55 +75,111 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 		view.setPresenter(this);
 		view.clear();
 		encodedMembershipInvtnSignedToken = place.toToken();
-		synapseClient.hexDecodeAndDeserialize(NotificationTokenType.EmailInvitation.name(), encodedMembershipInvtnSignedToken, new AsyncCallback<SignedTokenInterface>() {
-			@Override
-			public void onFailure(Throwable throwable) {
-				synapseAlert.handleException(throwable);
-			}
 
-			@Override
-			public void onSuccess(SignedTokenInterface token) {
-				jsClient.getMembershipInvitation((MembershipInvtnSignedToken) token, new AsyncCallback<MembershipInvtnSubmission>() {
-					@Override
-					public void onFailure(Throwable throwable) {
-						synapseAlert.handleException(throwable);
-					}
+		Consumer<AsyncCallback<SignedTokenInterface>> hexDecodeClosure =
+				cb -> synapseClient.hexDecodeAndDeserialize(NotificationTokenType.EmailInvitation.name(), encodedMembershipInvtnSignedToken, cb);
+		FutureUtils.getFuture(hexDecodeClosure)
+				.transformAsync(
+						token -> {
+							Consumer<AsyncCallback<MembershipInvtnSubmission>> getMembershipInvitationClosure =
+									cb -> jsClient.getMembershipInvitation((MembershipInvtnSignedToken) token, cb);
+							return FutureUtils.getFuture(getMembershipInvitationClosure);
+						},
+						directExecutor()
+				).addCallback(
+						new FutureCallback<MembershipInvtnSubmission>() {
+							@Override
+							public void onSuccess(@Nullable MembershipInvtnSubmission mis) {
+								if (authController.isLoggedIn()) {
+									bindInvitationToAuthenticatedUser(mis.getId());
+								} else {
+									initializeView(mis);
+								}
+							}
 
-					@Override
-					public void onSuccess(MembershipInvtnSubmission mis) {
-						if (authController.isLoggedIn()) {
-							bindInvitationToAuthenticatedUser(mis.getId());
-						} else {
-							initializeView(mis);
-						}
-					}
-				});
-			}
-		});
+							@Override
+							public void onFailure(Throwable throwable) {
+								synapseAlert.handleException(throwable);
+							}
+						},
+						directExecutor()
+				);
+
+//		synapseClient.hexDecodeAndDeserialize(NotificationTokenType.EmailInvitation.name(), encodedMembershipInvtnSignedToken, new AsyncCallback<SignedTokenInterface>() {
+//			@Override
+//			public void onFailure(Throwable throwable) {
+//				synapseAlert.handleException(throwable);
+//			}
+//
+//			@Override
+//			public void onSuccess(SignedTokenInterface token) {
+//				jsClient.getMembershipInvitation((MembershipInvtnSignedToken) token, new AsyncCallback<MembershipInvtnSubmission>() {
+//					@Override
+//					public void onFailure(Throwable throwable) {
+//						synapseAlert.handleException(throwable);
+//					}
+//
+//					@Override
+//					public void onSuccess(MembershipInvtnSubmission mis) {
+//						if (authController.isLoggedIn()) {
+//							bindInvitationToAuthenticatedUser(mis.getId());
+//						} else {
+//							initializeView(mis);
+//						}
+//					}
+//				});
+//			}
+//		});
 	}
 
+
 	private void bindInvitationToAuthenticatedUser(final String misId) {
-		synapseClient.getInviteeVerificationSignedToken(misId, new AsyncCallback<InviteeVerificationSignedToken>() {
-			@Override
-			public void onFailure(Throwable throwable) {
-				synapseAlert.handleException(throwable);
-			}
+		Consumer<AsyncCallback<InviteeVerificationSignedToken>> closure = cb -> synapseClient.getInviteeVerificationSignedToken(misId, cb);
+		FutureUtils.getFuture(closure)
+//		futureClient.getInviteeVerificationSignedToken(misId)
+				.transformAsync(
+//						token -> futureClient.updateInviteeId(misId, token),
+						token -> {
+							Consumer<AsyncCallback<Void>> closure2 = cb -> synapseClient.updateInviteeId(misId, token, cb);
+							return FutureUtils.getFuture(closure2);
+						},
+						directExecutor()
+				).addCallback(
+						new FutureCallback<Void>() {
+							@Override
+							public void onSuccess(@Nullable Void aVoid) {
+								placeChanger.goTo(new Profile(authController.getCurrentUserPrincipalId(), Synapse.ProfileArea.TEAMS));
+							}
 
-			@Override
-			public void onSuccess(InviteeVerificationSignedToken token) {
-				synapseClient.updateInviteeId(misId, token, new AsyncCallback<Void>() {
-					@Override
-					public void onFailure(Throwable throwable) {
-						synapseAlert.handleException(throwable);
-					}
+							@Override
+							public void onFailure(Throwable throwable) {
+								synapseAlert.handleException(throwable);
+							}
+						},
+						directExecutor()
+				);
 
-					@Override
-					public void onSuccess(Void aVoid) {
-						placeChanger.goTo(new Profile(authController.getCurrentUserPrincipalId(), Synapse.ProfileArea.TEAMS));
-					}
-				});
-			}
-		});
+//		synapseClient.getInviteeVerificationSignedToken(misId, new AsyncCallback<InviteeVerificationSignedToken>() {
+//			@Override
+//			public void onFailure(Throwable throwable) {
+//				synapseAlert.handleException(throwable);
+//			}
+//
+//			@Override
+//			public void onSuccess(InviteeVerificationSignedToken token) {
+//				synapseClient.updateInviteeId(misId, token, new AsyncCallback<Void>() {
+//					@Override
+//					public void onFailure(Throwable throwable) {
+//						synapseAlert.handleException(throwable);
+//					}
+//
+//					@Override
+//					public void onSuccess(Void aVoid) {
+//						placeChanger.goTo(new Profile(authController.getCurrentUserPrincipalId(), Synapse.ProfileArea.TEAMS));
+//					}
+//				});
+//			}
+//		});
 	}
 
 	private void initializeView(final MembershipInvtnSubmission mis) {
@@ -124,42 +189,81 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 		view.setSynapseAlertContainer(synapseAlert.asWidget());
 		EmailInvitationPresenter.this.registerWidget.setEncodedMembershipInvtnSignedToken(encodedMembershipInvtnSignedToken);
 		EmailInvitationPresenter.this.registerWidget.setEmail(mis.getInviteeEmail());
-		jsClient.getTeam(mis.getTeamId(), new AsyncCallback<Team>() {
-			@Override
-			public void onFailure(Throwable throwable) {
-				synapseAlert.handleException(throwable);
-			}
 
-			@Override
-			public void onSuccess(final Team team) {
-				jsClient.getUserProfile(mis.getCreatedBy(), new AsyncCallback<UserProfile>() {
-					@Override
-					public void onFailure(Throwable throwable) {
-						synapseAlert.handleException(throwable);
-					}
 
-					@Override
-					public void onSuccess(UserProfile userProfile) {
-						String title = "You have been invited to join ";
-						String teamName = team.getName();
-						if (teamName != null) {
-							title += " the team " + teamName;
-						} else {
-							title += " a team";
-						}
-						String displayName = getDisplayName(userProfile);
-						if (displayName != null) {
-							title += " by " + displayName;
-						}
-						EmailInvitationPresenter.this.view.setInvitationTitle(title);
-						String message = mis.getMessage();
-						if (message != null) {
-							EmailInvitationPresenter.this.view.setInvitationMessage(mis.getMessage());
-						}
-					}
-				});
-			}
-		});
+		ListenableFuture<Team> teamFuture = FutureUtils.getFuture(cb -> jsClient.getTeam(mis.getTeamId(), cb));
+		ListenableFuture<UserProfile> userProfileFuture = FutureUtils.getFuture(cb -> jsClient.getUserProfile(mis.getCreatedBy(), cb));
+		FluentFuture<Void> combinedFuture = FluentFuture.from(
+				Futures.whenAllComplete(teamFuture, userProfileFuture)
+						.call(() -> {
+							Team team = teamFuture.get();
+							UserProfile userProfile = userProfileFuture.get();
+							String title = "You have been invited to join ";
+							String teamName = team.getName();
+							if (teamName != null) {
+								title += " the team " + teamName;
+							} else {
+								title += " a team";
+							}
+							String displayName = getDisplayName(userProfile);
+							if (displayName != null) {
+								title += " by " + displayName;
+							}
+							EmailInvitationPresenter.this.view.setInvitationTitle(title);
+							String message = mis.getMessage();
+							if (message != null) {
+								EmailInvitationPresenter.this.view.setInvitationMessage(mis.getMessage());
+							}
+							return null;
+						},
+						directExecutor())
+		);
+		combinedFuture.catchingAsync(
+				Throwable.class,
+				e -> {
+					synapseAlert.handleException(e);
+					return null;
+				},
+				directExecutor()
+		);
+
+
+//		jsClient.getTeam(mis.getTeamId(), new AsyncCallback<Team>() {
+//			@Override
+//			public void onFailure(Throwable throwable) {
+//				synapseAlert.handleException(throwable);
+//			}
+//
+//			@Override
+//			public void onSuccess(final Team team) {
+//				jsClient.getUserProfile(mis.getCreatedBy(), new AsyncCallback<UserProfile>() {
+//					@Override
+//					public void onFailure(Throwable throwable) {
+//						synapseAlert.handleException(throwable);
+//					}
+//
+//					@Override
+//					public void onSuccess(UserProfile userProfile) {
+//						String title = "You have been invited to join ";
+//						String teamName = team.getName();
+//						if (teamName != null) {
+//							title += " the team " + teamName;
+//						} else {
+//							title += " a team";
+//						}
+//						String displayName = getDisplayName(userProfile);
+//						if (displayName != null) {
+//							title += " by " + displayName;
+//						}
+//						EmailInvitationPresenter.this.view.setInvitationTitle(title);
+//						String message = mis.getMessage();
+//						if (message != null) {
+//							EmailInvitationPresenter.this.view.setInvitationMessage(mis.getMessage());
+//						}
+//					}
+//				});
+//			}
+//		});
 	}
 
 	@Override
