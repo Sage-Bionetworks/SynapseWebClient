@@ -28,11 +28,7 @@ public interface ActionMenuWidgetView extends IsWidget {
 	 */
 	void addControllerWidget(IsWidget controllerWidget);
 
-	/**
-	 * Show/hide the basic divider.
-	 * @param visible
-	 */
-	void setBasicDividerVisible(boolean visible);
-
 	void setToolsButtonIcon(String text, IconType icon);
+
+	void setACTDividerVisible(boolean visible);
 }

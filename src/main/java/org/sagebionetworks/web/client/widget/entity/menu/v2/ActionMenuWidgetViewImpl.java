@@ -25,9 +25,6 @@ import com.google.inject.Inject;
 public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	
 	public interface Binder extends UiBinder<Widget, ActionMenuWidgetViewImpl> {}
-
-	@UiField
-	Divider basicDivider;
 	@UiField
 	ButtonToolBar buttonToolBar;
 	@UiField
@@ -36,6 +33,8 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	Button toolsMenu;
 	
 	Widget widget;
+	@UiField
+	Divider actDivider;
 
 	
 	@Inject
@@ -79,10 +78,10 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	public void addControllerWidget(IsWidget controllerWidget) {
 		controllerContainer.add(controllerWidget);
 	}
-
+	
 	@Override
-	public void setBasicDividerVisible(boolean visible) {
-		this.basicDivider.setVisible(visible);
+	public void setACTDividerVisible(boolean visible){
+		actDivider.setVisible(visible);
 	}
 
 	@Override

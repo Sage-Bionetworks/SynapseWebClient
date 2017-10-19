@@ -138,8 +138,8 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	}
 
 	@Override
-	public void setBasicDivderVisible(boolean visible) {
-		view.setBasicDividerVisible(visible);
+	public void setACTDividerVisible(boolean visible) {
+		view.setACTDividerVisible(visible);
 	}
 
 	@Override

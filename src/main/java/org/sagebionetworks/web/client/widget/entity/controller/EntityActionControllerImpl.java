@@ -341,13 +341,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
 		actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, false);	
 		actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
-		if (authenticationController.isLoggedIn()) {
+		actionMenu.setACTDividerVisible(false);
+		if (authenticationController.isLoggedIn() && !EntityArea.WIKI.equals(currentArea)) {
 			isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 				@Override
 				public void invoke(Boolean isACT) {
 					if (isACT) {
 						actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
-						actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);	
+						actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);
+						actionMenu.setACTDividerVisible(true);
 					}
 				}
 			});
@@ -358,13 +360,15 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, false);
 		actionMenu.setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, false);	
 		actionMenu.setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, this);
-		if (authenticationController.isLoggedIn()) {
+		actionMenu.setACTDividerVisible(false);
+		if (authenticationController.isLoggedIn() && !EntityArea.WIKI.equals(currentArea)) {
 			isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 				@Override
 				public void invoke(Boolean isACT) {
 					if (isACT) {
 						actionMenu.setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
 						actionMenu.setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+						actionMenu.setACTDividerVisible(true);
 					}
 				}
 			});
@@ -392,7 +396,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureProvenance() {
-		if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof DockerRepository || entityBundle.getEntity() instanceof Table) {
+		if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof Table) {
 			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.EDIT_PROVENANCE, this);
@@ -404,7 +408,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureChangeStorageLocation() {
-		if(entityBundle.getEntity() instanceof Folder || entityBundle.getEntity() instanceof Project){
+		if(entityBundle.getEntity() instanceof Folder || 
+				(entityBundle.getEntity() instanceof Project && currentArea == null)){
 			actionMenu.setActionVisible(Action.CHANGE_STORAGE_LOCATION, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.CHANGE_STORAGE_LOCATION, permissions.getCanEdit());
 			actionMenu.setActionText(Action.CHANGE_STORAGE_LOCATION, "Change "+enityTypeDisplay + " Storage Location");
@@ -419,7 +424,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		boolean canEdit = permissions.getCanEdit();
 		actionMenu.setActionVisible(Action.CREATE_DOI, false);
 		actionMenu.setActionEnabled(Action.CREATE_DOI, false);
-		if (canEdit) {
+		if (canEdit && !isTopLevelProjectToolsMenu()) {
 			actionMenu.setActionListener(Action.CREATE_DOI, this);
 			if (entityBundle.getDoi() == null) {
 				//show command if not returned, thus not in existence
@@ -434,7 +439,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		actionMenu.setActionVisible(Action.CREATE_CHALLENGE, false);
 		actionMenu.setActionEnabled(Action.CREATE_CHALLENGE, false);
 		boolean canEdit = permissions.getCanEdit();
-		if(entityBundle.getEntity() instanceof Project && canEdit && DisplayUtils.isInTestWebsite(cookies)) {
+		if(entityBundle.getEntity() instanceof Project && canEdit && (DisplayUtils.isInTestWebsite(cookies) || EntityArea.ADMIN.equals(currentArea))) {
 			actionMenu.setActionListener(Action.CREATE_CHALLENGE, this);
 			//find out if this project has a challenge
 			getChallengeClient().getChallengeForProject(entity.getId(), new AsyncCallback<Challenge>() {
@@ -488,18 +493,18 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(entityBundle.getEntity() instanceof Table ) {
 			boolean canEditResults = entityBundle.getPermissions().getCanCertifiedUserEdit();
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEditResults);
+			actionMenu.setActionText(Action.UPLOAD_TABLE_DATA, "Upload Data to " + enityTypeDisplay);
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
 			actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
+			actionMenu.setActionText(Action.DOWNLOAD_TABLE_QUERY_RESULTS, "Download " + enityTypeDisplay + " Data");
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, true);
 			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, !(entityBundle.getEntity() instanceof TableEntity));
-			actionMenu.setBasicDivderVisible(canEditResults);
 		} else {
 			actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 			actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
 			actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, false);
 			actionMenu.setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
 			actionMenu.setActionVisible(Action.SHOW_VIEW_SCOPE, false);
-			actionMenu.setBasicDivderVisible(false);
 		}
 	}
 	
@@ -514,8 +519,20 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 
+	private boolean isTopLevelProjectToolsMenu() {
+		return entityBundle.getEntity() instanceof Project && currentArea != null;
+	}
+	
+	private boolean isWikiableConfig() {
+		if (entityBundle.getEntity() instanceof Project) {
+			return EntityArea.WIKI.equals(currentArea);
+		} 
+		return isWikiableType(entityBundle.getEntity());
+	}
+	
+	
 	private void configureEditWiki(){
-		if(isWikiableType(entityBundle.getEntity())){
+		if(isWikiableConfig()){
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.EDIT_WIKI_PAGE, this);
@@ -528,7 +545,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void configureViewWikiSource(){
 		//only visible if entity may have a wiki, and user can't Edit the wiki
-		if(isWikiableType(entityBundle.getEntity())){
+		if(isWikiableConfig()){
 			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, !permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.VIEW_WIKI_SOURCE, !permissions.getCanEdit());
 			actionMenu.setActionListener(Action.VIEW_WIKI_SOURCE, this);
@@ -540,7 +557,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 	
 	private void configureAddWikiSubpage(){
-		if(entityBundle.getEntity() instanceof Project){
+		if(isWikiableConfig() && entityBundle.getEntity() instanceof Project){
 			actionMenu.setActionVisible(Action.ADD_WIKI_SUBPAGE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.ADD_WIKI_SUBPAGE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.ADD_WIKI_SUBPAGE, this);
@@ -564,7 +581,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureLink(){
-		if(isLinkType(entityBundle.getEntity())){
+		if(isLinkType(entityBundle.getEntity()) && !isTopLevelProjectToolsMenu()){
 			actionMenu.setActionVisible(Action.CREATE_LINK, true);
 			actionMenu.setActionEnabled(Action.CREATE_LINK, true);
 			actionMenu.setActionListener(Action.CREATE_LINK, this);
@@ -576,9 +593,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureAnnotations(){
-		actionMenu.setActionVisible(Action.SHOW_ANNOTATIONS, true);
-		actionMenu.setActionEnabled(Action.SHOW_ANNOTATIONS, true);
-		actionMenu.setActionListener(Action.SHOW_ANNOTATIONS, this);
+		if (isTopLevelProjectToolsMenu()) {
+			actionMenu.setActionVisible(Action.SHOW_ANNOTATIONS, false);
+		} else {
+			actionMenu.setActionVisible(Action.SHOW_ANNOTATIONS, true);
+			actionMenu.setActionEnabled(Action.SHOW_ANNOTATIONS, true);
+			actionMenu.setActionListener(Action.SHOW_ANNOTATIONS, this);
+		}
 	}
 	
 	private void configureFileHistory(){
@@ -597,6 +618,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.SUBMIT_TO_CHALLENGE, true);
 			actionMenu.setActionEnabled(Action.SUBMIT_TO_CHALLENGE, true);
 			actionMenu.setActionListener(Action.SUBMIT_TO_CHALLENGE, this);
+			actionMenu.setActionText(Action.SUBMIT_TO_CHALLENGE, "Submit "+enityTypeDisplay+" to Challenge");
 		}else{
 			actionMenu.setActionVisible(Action.SUBMIT_TO_CHALLENGE, false);
 			actionMenu.setActionEnabled(Action.SUBMIT_TO_CHALLENGE, false);
@@ -604,7 +626,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureEditProjectMetadataAction(){
-		if(entityBundle.getEntity() instanceof Project){
+		if(entityBundle.getEntity() instanceof Project && currentArea == null){
 			actionMenu.setActionVisible(Action.EDIT_PROJECT_METADATA, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_PROJECT_METADATA, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.EDIT_PROJECT_METADATA, this);
@@ -649,13 +671,17 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureDeleteAction(){
-		actionMenu.setActionVisible(Action.DELETE_ENTITY, permissions.getCanDelete());
-		actionMenu.setActionEnabled(Action.DELETE_ENTITY, permissions.getCanDelete());
-		actionMenu.setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+enityTypeDisplay);
-		actionMenu.setActionListener(Action.DELETE_ENTITY, this);
+		if (isTopLevelProjectToolsMenu()) {
+			actionMenu.setActionVisible(Action.DELETE_ENTITY, false);
+		} else {
+			actionMenu.setActionVisible(Action.DELETE_ENTITY, permissions.getCanDelete());
+			actionMenu.setActionEnabled(Action.DELETE_ENTITY, permissions.getCanDelete());
+			actionMenu.setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+enityTypeDisplay);
+			actionMenu.setActionListener(Action.DELETE_ENTITY, this);
+		}
 	}
 	private void configureDeleteWikiAction(){
-		if(entityBundle.getEntity() instanceof Project){
+		if(isWikiableConfig() && entityBundle.getEntity() instanceof Project){
 			actionMenu.setActionVisible(Action.DELETE_WIKI_PAGE, permissions.getCanDelete());
 			actionMenu.setActionEnabled(Action.DELETE_WIKI_PAGE, permissions.getCanDelete());
 			actionMenu.setActionListener(Action.DELETE_WIKI_PAGE, this);
@@ -666,15 +692,19 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureShareAction(){
-		actionMenu.setActionEnabled(Action.SHARE, true);
-		actionMenu.setActionVisible(Action.SHARE, true);
-		actionMenu.setActionListener(Action.SHARE, this);
-		actionMenu.setActionText(Action.SHARE, enityTypeDisplay + " Sharing Settings");
-		GlobalApplicationState globalAppState = getGlobalApplicationState();
-		if(PublicPrivateBadge.isPublic(entityBundle.getBenefactorAcl(), globalAppState.getPublicPrincipalIds())){
-			actionMenu.setActionIcon(Action.SHARE, IconType.GLOBE);
-		}else{
-			actionMenu.setActionIcon(Action.SHARE, IconType.LOCK);
+		if (isTopLevelProjectToolsMenu()) {
+			actionMenu.setActionVisible(Action.SHARE, false);
+		} else {
+			actionMenu.setActionEnabled(Action.SHARE, true);
+			actionMenu.setActionVisible(Action.SHARE, true);
+			actionMenu.setActionListener(Action.SHARE, this);
+			actionMenu.setActionText(Action.SHARE, enityTypeDisplay + " Sharing Settings");
+			GlobalApplicationState globalAppState = getGlobalApplicationState();
+			if(PublicPrivateBadge.isPublic(entityBundle.getBenefactorAcl(), globalAppState.getPublicPrincipalIds())){
+				actionMenu.setActionIcon(Action.SHARE, IconType.GLOBE);
+			}else{
+				actionMenu.setActionIcon(Action.SHARE, IconType.LOCK);
+			}	
 		}
 	}
 	

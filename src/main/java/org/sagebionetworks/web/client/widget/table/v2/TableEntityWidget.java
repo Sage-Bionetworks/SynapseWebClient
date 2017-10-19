@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModels
 import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
@@ -80,8 +81,9 @@ public class TableEntityWidget implements IsWidget,
 	boolean isShowingSchema, isShowingScope;
 	public static final String SHOW = "Show ";
 	public static final String HIDE = "Hide ";
-	public static final String SCOPE = "Scope";
-	public static final String SCHEMA = "Schema";
+	public static final String SCOPE = "Scope of ";
+	public static final String SCHEMA = " Schema";
+	String entityTypeDisplay;
 	@Inject
 	public TableEntityWidget(TableEntityWidgetView view,
 			TableQueryResultWidget queryResultsWidget,
@@ -138,11 +140,13 @@ public class TableEntityWidget implements IsWidget,
 		this.view.configure(bundle, this.canEdit);
 		this.uploadTableModalWidget.configure(table.getParentId(), tableId);
 		this.actionMenu = actionMenu;
+		this.entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
 		configureActions();
 		checkState();
 		initSimpleAdvancedQueryState();
+		
 	}
-
+	
 	/**
 	 * Setup the actions for this widget.
 	 */
@@ -152,8 +156,8 @@ public class TableEntityWidget implements IsWidget,
 		isShowingSchema = false;
 		view.setScopeVisible(false);
 		view.setSchemaVisible(false);
-		actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW+SCHEMA);
-		actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, SHOW+SCOPE);
+		actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW+entityTypeDisplay+SCHEMA);
+		actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, SHOW + SCOPE + entityTypeDisplay);
 		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
@@ -178,7 +182,7 @@ public class TableEntityWidget implements IsWidget,
 				isShowingSchema = !isShowingSchema;
 				view.setSchemaVisible(isShowingSchema);
 				String showHide = isShowingSchema ? HIDE : SHOW;
-				actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, showHide+SCHEMA);
+				actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, showHide+entityTypeDisplay+SCHEMA);
 			}
 		});
 		
@@ -188,7 +192,7 @@ public class TableEntityWidget implements IsWidget,
 				isShowingScope = !isShowingScope;
 				view.setScopeVisible(isShowingScope);
 				String showHide = isShowingScope ? HIDE : SHOW;
-				actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide+SCOPE);
+				actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide + SCOPE + entityTypeDisplay);
 			}
 		});
 	}

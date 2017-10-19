@@ -157,32 +157,38 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		// lazy init tabs, and show project information (if set)
 		wikiTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
+				area = EntityArea.WIKI;
 				configureWikiTab();
 			};
 		});
 		adminTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
+				area = EntityArea.ADMIN;
 				configureAdminTab();
 			};
 		});
 		
 		discussionTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
+				area = EntityArea.DISCUSSION;
 				configureDiscussionTab();
 			};
 		});
 		filesTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
+				area = EntityArea.FILES;
 				configureFilesTab();
 			};
 		});
 		tablesTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
+				area = EntityArea.TABLES;
 				configureTablesTab();
 			};
 		});
 		dockerTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
+				area = EntityArea.DOCKER;
 				configureDockerTab();
 			};
 		});
