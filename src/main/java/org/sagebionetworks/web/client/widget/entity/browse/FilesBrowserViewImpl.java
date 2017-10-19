@@ -33,85 +33,25 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
 	private Presenter presenter;
 	private EntityTreeBrowser entityTreeBrowser;
-	private UploadDialogWidget uploader;
-	private QuizInfoDialog quizInfoDialog;
-	private SharingAndDataUseConditionWidget sharingAndDataUseWidget;
 	private Widget widget;
 
 	@UiField
-	SimplePanel uploaderContainer;
-	@UiField
-	SimplePanel quizInfoDialogContainer;
-	@UiField
-	ButtonToolBar topBar;
-	@UiField
-	Button uploadButton;
-	@UiField
-	Button addFolderButton;
-	@UiField
 	SimplePanel files;
-	@UiField
-	Modal newFolderDialog;
-	@UiField
-	TextBox folderNameField;
-	@UiField
-	SimplePanel sharingAndDataUseContainer;
-	@UiField
-	Button cancelNewFolderButton;
-	@UiField
-	Button okNewFolderButton;
 
 	@Inject
 	public FilesBrowserViewImpl(FilesBrowserViewImplUiBinder binder,
-			UploadDialogWidget uploader,
-			SharingAndDataUseConditionWidget sharingAndDataUseWidget,
-			QuizInfoDialog quizInfoDialog, EntityTreeBrowser entityTreeBrowser) {
+			EntityTreeBrowser entityTreeBrowser) {
 		widget = binder.createAndBindUi(this);
-		this.uploader = uploader;
 		this.entityTreeBrowser = entityTreeBrowser;
-		this.sharingAndDataUseWidget = sharingAndDataUseWidget;
-		this.quizInfoDialog = quizInfoDialog;
 		uploaderContainer.setWidget(uploader.asWidget());
 		quizInfoDialogContainer.setWidget(quizInfoDialog.asWidget());
 		sharingAndDataUseContainer.setWidget(sharingAndDataUseWidget.asWidget());
-		addFolderButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				// for additional functionality, it now creates the folder up
-				// front, and the dialog will rename (and change share and data
-				// use)
-				presenter.addFolderClicked();
-			}
-		});
+		
 
 		uploadButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.uploadButtonClicked();
-			}
-		});
-
-		okNewFolderButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.updateFolderName(folderNameField.getText());
-			}
-		});
-		ClickHandler deleteCancelledHandler = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.deleteFolder(true);
-			}
-		};
-		newFolderDialog.addCloseHandler(deleteCancelledHandler);
-		cancelNewFolderButton.addClickHandler(deleteCancelledHandler);
-
-		folderNameField.addKeyDownHandler(new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					okNewFolderButton.click();
-				}
 			}
 		});
 
@@ -121,12 +61,8 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	}
 
 	@Override
-	public void configure(String entityId, boolean canCertifiedUserAddChild) {
+	public void configure(String entityId) {
 		entityTreeBrowser.configure(entityId);
-		
-		if (canCertifiedUserAddChild) {
-			topBar.setVisible(true);
-		}
 	}
 	
 	public void setEntitySelectedHandler(org.sagebionetworks.web.client.events.EntitySelectedHandler handler) {
@@ -139,11 +75,6 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	}
 	
 	@Override
-	public void showQuizInfoDialog() {
-		quizInfoDialog.show();
-	}
-
-	@Override
 	public void showUploadDialog(String entityId){
 		EntityUpdatedHandler handler = new EntityUpdatedHandler() {
 			@Override
@@ -155,22 +86,6 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 				entityId, handler, null, true);
 		uploader.setUploaderLinkNameVisible(true);
 		uploader.show();
-	}
-
-	@Override
-	public void showFolderEditDialog(final String folderEntityId) {
-		folderNameField.setText("");
-		Callback refreshSharingAndDataUseWidget = new Callback() {
-			@Override
-			public void invoke() {
-				// entity was updated by the sharing and data use widget.
-				sharingAndDataUseWidget.setEntity(folderEntityId);
-			}
-		};
-		sharingAndDataUseWidget.configure(folderEntityId, true,
-				refreshSharingAndDataUseWidget);
-		newFolderDialog.show();
-		addFolderButton.setFocus(false);
 	}
 
 	@Override
@@ -200,21 +115,11 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
 	@Override
 	public void clear() {
-		topBar.setVisible(false);
 		entityTreeBrowser.clear();
 	}
 
 	@Override
 	public void refreshTreeView(String entityId) {
 		entityTreeBrowser.configure(entityId);
-	}
-
-	@Override
-	public void setNewFolderDialogVisible(boolean visible) {
-		if (visible) {
-			newFolderDialog.show();
-		} else {
-			newFolderDialog.hide();
-		}
 	}
 }

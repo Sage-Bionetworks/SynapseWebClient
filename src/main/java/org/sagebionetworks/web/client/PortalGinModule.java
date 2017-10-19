@@ -319,6 +319,8 @@ import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryViewImpl;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorView;
 import org.sagebionetworks.web.client.widget.entity.dialog.BaseEditWidgetDescriptorViewImpl;
+import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidgetView;
+import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.AwsLoginView;
 import org.sagebionetworks.web.client.widget.entity.download.AwsLoginViewImpl;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidgetView;
@@ -1240,6 +1242,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(WizardProgressWidgetView.class).to(WizardProgressWidgetViewImpl.class);
 		bind(UploadDialogWidgetView.class).to(UploadDialogWidgetViewImpl.class);
+		bind(AddFolderDialogWidgetView.class).to(AddFolderDialogWidgetViewImpl.class);
 		
 		bind(LoginModalView.class).to(LoginModalViewImpl.class);
 		
