@@ -38,6 +38,8 @@
 						<a:ActionMenuItem icon="EXTERNAL_LINK" iconFixedWidth="true" action="CREATE_DOI">Create DOI</a:ActionMenuItem>
 						<a:ActionMenuItem icon="LINK" iconFixedWidth="true" action="CREATE_LINK">Save Link</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_ENTITY">Delete</a:ActionMenuItem>
+						<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_FILE">Upload or Link to a File</a:ActionMenuItem>
+						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="CREATE_FOLDER">Add New Folder</a:ActionMenuItem>
 						<b:Divider ui:field="actDivider" visible="false" />
 						<a:ActionMenuItem icon="FLAG" iconFixedWidth="true" action="APPROVE_USER_ACCESS">Change User Access</a:ActionMenuItem>
 						<a:ActionMenuItem icon="FLAG" iconFixedWidth="true" action="MANAGE_ACCESS_REQUIREMENTS">(ACT) Manage Access Requirements</a:ActionMenuItem>

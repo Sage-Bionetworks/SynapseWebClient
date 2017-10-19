@@ -9,6 +9,7 @@ public interface AddFolderDialogWidgetView extends IsWidget {
 	void show();
 	void setSynAlert(IsWidget w);
 	void setSharingAndDataUseWidget(IsWidget w);
+	void setSaveEnabled(boolean enabled);
 	
 	/**
 	 * Presenter interface

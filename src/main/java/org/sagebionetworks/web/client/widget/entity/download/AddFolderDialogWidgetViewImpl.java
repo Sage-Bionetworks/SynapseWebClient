@@ -73,6 +73,7 @@ public class AddFolderDialogWidgetViewImpl implements AddFolderDialogWidgetView 
 	@Override
 	public void show() {
 		folderNameField.setText("");
+		setSaveEnabled(true);
 		newFolderDialog.show();
 	}
 
@@ -89,5 +90,9 @@ public class AddFolderDialogWidgetViewImpl implements AddFolderDialogWidgetView 
 	@Override
 	public void hide() {
 		newFolderDialog.hide();
+	}
+	@Override
+	public void setSaveEnabled(boolean enabled) {
+		okNewFolderButton.setEnabled(enabled);
 	}
 }

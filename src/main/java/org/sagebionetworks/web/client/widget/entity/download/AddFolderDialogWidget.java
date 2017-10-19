@@ -106,6 +106,7 @@ public class AddFolderDialogWidget implements AddFolderDialogWidgetView.Presente
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setSaveEnabled(true);
 				synAlert.handleException(caught);
 			}
 		});
@@ -113,6 +114,7 @@ public class AddFolderDialogWidget implements AddFolderDialogWidgetView.Presente
 	
 	@Override
 	public void updateFolderName(final String newFolderName) {
+		view.setSaveEnabled(false);
 		jsClient.getEntity(currentFolderEntityId, OBJECT_TYPE.Folder, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity result) {
@@ -122,6 +124,7 @@ public class AddFolderDialogWidget implements AddFolderDialogWidgetView.Presente
 			}
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setSaveEnabled(true);
 				synAlert.handleException(caught);
 			}
 		});

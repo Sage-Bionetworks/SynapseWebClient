@@ -166,7 +166,6 @@ public class FilesTab {
 		this.handler = handler;
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		metadata.setEntityUpdatedHandler(handler);
-		filesBrowser.setEntityUpdatedHandler(handler);
 		
 		view.showLoading(true);
 		setTargetBundle(targetEntityBundle, versionNumber);
@@ -258,7 +257,7 @@ public class FilesTab {
 		boolean isFilesBrowserVisible = isProject || isFolder;
 		view.setFileBrowserVisible(isFilesBrowserVisible);
 		if (isFilesBrowserVisible) {
-			filesBrowser.configure(currentEntityId, bundle.getPermissions().getCanCertifiedUserAddChild(), bundle.getPermissions().getIsCertifiedUser());	
+			filesBrowser.configure(currentEntityId);	
 		}
 		
 		//Provenance

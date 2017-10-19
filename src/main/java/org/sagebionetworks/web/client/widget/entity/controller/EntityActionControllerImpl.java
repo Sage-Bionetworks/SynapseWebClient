@@ -60,6 +60,7 @@ import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRender
 import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
+import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -74,7 +75,6 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -140,6 +140,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	UserProfileClientAsync userProfileClient;
 	PortalGinInjector ginInjector;
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
+	AddFolderDialogWidget addFolderDialogWidget;
 	boolean isShowingVersion = false;
 	
 	@Inject
@@ -159,6 +160,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		view.setPresenter(this);
 	}
 	
+	private AddFolderDialogWidget getAddFolderDialogWidget() {
+		if (addFolderDialogWidget == null) {
+			addFolderDialogWidget = ginInjector.getAddFolderDialogWidget();
+		}
+		return addFolderDialogWidget;
+	}
 	private ApproveUserAccessModal getApproveUserAccessModal() {
 		if (approveUserAccessModal == null) {
 			approveUserAccessModal = ginInjector.getApproveUserAccessModal();
@@ -335,6 +342,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureApproveUserAccess();
 			configureManageAccessRequirements();
 			configureTableCommands();
+			configureAddFolder();
+			configureUploadNewFileEntity();
 		}
 	}
 	
@@ -377,7 +386,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 	
-
 	public void onSelectChallengeTeam(String id) {
 		Challenge c = new Challenge();
 		c.setProjectId(entity.getId());
@@ -407,6 +415,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, false);
 			actionMenu.setActionEnabled(Action.EDIT_PROVENANCE, false);
 		}
+	}
+	
+	private boolean isContainerOnFilesTab() {
+		return (entityBundle.getEntity() instanceof Folder || 
+				(entityBundle.getEntity() instanceof Project && EntityArea.FILES.equals(currentArea)));
 	}
 	
 	private void configureChangeStorageLocation() {
@@ -532,6 +545,27 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return isWikiableType(entityBundle.getEntity());
 	}
 	
+	private void configureUploadNewFileEntity() {
+		if(isContainerOnFilesTab()){
+			actionMenu.setActionVisible(Action.UPLOAD_FILE, permissions.getCanCertifiedUserEdit());
+			actionMenu.setActionEnabled(Action.UPLOAD_FILE, permissions.getCanCertifiedUserEdit());
+			actionMenu.setActionListener(Action.UPLOAD_FILE, this);
+		}else{
+			actionMenu.setActionVisible(Action.UPLOAD_FILE, false);
+			actionMenu.setActionEnabled(Action.UPLOAD_FILE, false);
+		}
+	}
+	
+	private void configureAddFolder() {
+		if(isContainerOnFilesTab()){
+			actionMenu.setActionVisible(Action.CREATE_FOLDER, permissions.getCanCertifiedUserEdit());
+			actionMenu.setActionEnabled(Action.CREATE_FOLDER, permissions.getCanCertifiedUserEdit());
+			actionMenu.setActionListener(Action.CREATE_FOLDER, this);
+		}else{
+			actionMenu.setActionVisible(Action.CREATE_FOLDER, false);
+			actionMenu.setActionEnabled(Action.CREATE_FOLDER, false);
+		}
+	}
 	
 	private void configureEditWiki(){
 		if(isWikiableConfig()){
@@ -861,11 +895,42 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case SHOW_FILE_HISTORY : 
 			onShowFileHistory();
+			break;
+		case UPLOAD_FILE :
+			onUploadNewFileEntity();
+			break;
+		case CREATE_FOLDER :
+			onCreateFolder();
+			break;
 		default:
 			break;
 		}
 	}
+	
+	private void onUploadNewFileEntity() {
+		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				UploadDialogWidget uploader = getUploadDialogWidget();
+				uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null,
+						entityBundle.getEntity().getId(), entityUpdateHandler, null, true);
+				uploader.setUploaderLinkNameVisible(true);
+				uploader.show();		
+			}
+		});
+	}
+	
+	private void onCreateFolder() {
+		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
+			@Override
+			public void invoke() {
+				AddFolderDialogWidget w = getAddFolderDialogWidget();
+				w.show(entityBundle.getEntity().getId());
+			}
+		});
 
+	}
+	
 	private void onApproveUserAccess() {
 		getApproveUserAccessModal().configure(entityBundle);
 		getApproveUserAccessModal().show();
