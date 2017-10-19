@@ -80,8 +80,11 @@
 	<inherits name="org.sagebionetworks.client.synpaseClientExceptions"/>
 	<inherits name="com.google.gwt.user.RemoteServiceObfuscateTypeNames" />
 
-	<!-- Limit build permutations (testing only).  Set to gecko1_8 for FF
-	<set-property name="user.agent" value="safari"/>
-	-->
+	<inherits name="com.google.common.util.concurrent.Concurrent"/>
 
+	<!-- Limit build permutations (testing only).  Set to gecko1_8 for FF -->
+	<set-property name="user.agent" value="safari"/>
+
+	<set-configuration-property name="gin.classloading.exceptedPackages" value="com.google.gwt.core.client"/>
+	<set-configuration-property name="gin.classloading.exceptedPackages" value="com.google.gwt.core.client.impl"/>
 </module>
