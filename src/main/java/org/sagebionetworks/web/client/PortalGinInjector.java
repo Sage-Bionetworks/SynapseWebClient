@@ -185,6 +185,8 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidge
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
@@ -563,4 +565,6 @@ public interface PortalGinInjector extends Ginjector {
 	public TeamMemberRowWidget getTeamMemberRowWidget();
 	public RequestBuilderWrapper getRequestBuilder();
 	public EditAnnotationsDialog getEditAnnotationsDialog();
+	public CreateTableViewWizard getCreateTableViewWizard();
+	public UploadTableModalWidget getUploadTableModalWidget();
 }

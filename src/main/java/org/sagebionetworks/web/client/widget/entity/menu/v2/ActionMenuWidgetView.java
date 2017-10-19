@@ -31,4 +31,5 @@ public interface ActionMenuWidgetView extends IsWidget {
 	void setToolsButtonIcon(String text, IconType icon);
 
 	void setACTDividerVisible(boolean visible);
+	void setNoActionsAvailableVisible(boolean visible);
 }

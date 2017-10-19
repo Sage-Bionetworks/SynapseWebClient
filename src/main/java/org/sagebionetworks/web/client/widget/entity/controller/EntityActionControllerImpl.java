@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
@@ -69,6 +70,10 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -141,8 +146,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	PortalGinInjector ginInjector;
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	AddFolderDialogWidget addFolderDialogWidget;
+	CreateTableViewWizard createTableViewWizard;
 	boolean isShowingVersion = false;
-	
+	WizardCallback entityUpdatedWizardCallback;
+	UploadTableModalWidget uploadTableModalWidget;
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
 			PreflightController preflightController,
@@ -158,6 +165,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.cookies = cookies;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		view.setPresenter(this);
+		entityUpdatedWizardCallback = new WizardCallback() {
+			@Override
+			public void onFinished() {
+				entityUpdateHandler.onPersistSuccess(null);
+			}
+			
+			@Override
+			public void onCanceled() {
+			}
+		};
 	}
 	
 	private AddFolderDialogWidget getAddFolderDialogWidget() {
@@ -220,6 +237,20 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			this.view.addWidget(accessControlListModalWidget);
 		}
 		return accessControlListModalWidget;
+	}
+	private CreateTableViewWizard getCreateTableViewWizard() {
+		if (createTableViewWizard == null) {
+			createTableViewWizard = ginInjector.getCreateTableViewWizard();
+			this.view.addWidget(createTableViewWizard.asWidget());
+		}
+		return createTableViewWizard;
+	}
+	private UploadTableModalWidget getUploadTableModalWidget() {
+		if (uploadTableModalWidget == null) {
+			uploadTableModalWidget = ginInjector.getUploadTableModalWidget();
+			view.addWidget(uploadTableModalWidget);
+		}
+		return uploadTableModalWidget;
 	}
 	
 	private RenameEntityModalWidget getRenameEntityModalWidget() {
@@ -305,9 +336,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.currentArea = currentArea;
 
 		// hide all commands by default
-		for (Action action : Action.values()) {
-			actionMenu.setActionVisible(action, false);	
-		}
+		actionMenu.hideAllActions();
 		view.hideAnnotations();
 		view.hideFileHistory();
 		
@@ -342,8 +371,33 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureApproveUserAccess();
 			configureManageAccessRequirements();
 			configureTableCommands();
+			configureProjectLevelTableCommands();
 			configureAddFolder();
 			configureUploadNewFileEntity();
+		}
+	}
+	
+	private void configureProjectLevelTableCommands() {
+		if (entityBundle.getEntity() instanceof Project && EntityArea.TABLES.equals(currentArea)) {
+			// show tables top level commands
+			boolean canEditResults = entityBundle.getPermissions().getCanCertifiedUserEdit();
+			actionMenu.setActionVisible(Action.UPLOAD_TABLE, canEditResults);
+			actionMenu.setActionEnabled(Action.UPLOAD_TABLE, canEditResults);	
+			actionMenu.setActionListener(Action.UPLOAD_TABLE, this);
+			actionMenu.setActionVisible(Action.ADD_TABLE, canEditResults);
+			actionMenu.setActionEnabled(Action.ADD_TABLE, canEditResults);	
+			actionMenu.setActionListener(Action.ADD_TABLE, this);
+			actionMenu.setActionVisible(Action.ADD_FILE_VIEW, canEditResults);
+			actionMenu.setActionEnabled(Action.ADD_FILE_VIEW, canEditResults);	
+			actionMenu.setActionListener(Action.ADD_FILE_VIEW, this);
+			actionMenu.setActionVisible(Action.ADD_PROJECT_VIEW, canEditResults);
+			actionMenu.setActionEnabled(Action.ADD_PROJECT_VIEW, canEditResults);	
+			actionMenu.setActionListener(Action.ADD_PROJECT_VIEW, this);
+		} else {
+			actionMenu.setActionVisible(Action.UPLOAD_TABLE, false);
+			actionMenu.setActionVisible(Action.ADD_TABLE, false);
+			actionMenu.setActionVisible(Action.ADD_FILE_VIEW, false);
+			actionMenu.setActionVisible(Action.ADD_PROJECT_VIEW, false);
 		}
 	}
 	
@@ -417,11 +471,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 	
-	private boolean isContainerOnFilesTab() {
-		return (entityBundle.getEntity() instanceof Folder || 
-				(entityBundle.getEntity() instanceof Project && EntityArea.FILES.equals(currentArea)));
-	}
-	
 	private void configureChangeStorageLocation() {
 		if(entityBundle.getEntity() instanceof Folder || 
 				(entityBundle.getEntity() instanceof Project && currentArea == null)){
@@ -439,7 +488,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		boolean canEdit = permissions.getCanEdit();
 		actionMenu.setActionVisible(Action.CREATE_DOI, false);
 		actionMenu.setActionEnabled(Action.CREATE_DOI, false);
-		if (canEdit && !isTopLevelProjectToolsMenu()) {
+		if (canEdit && !isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
 			actionMenu.setActionListener(Action.CREATE_DOI, this);
 			if (entityBundle.getDoi() == null) {
 				//show command if not returned, thus not in existence
@@ -534,19 +583,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 
-	private boolean isTopLevelProjectToolsMenu() {
-		return entityBundle.getEntity() instanceof Project && currentArea != null;
-	}
-	
-	private boolean isWikiableConfig() {
-		if (entityBundle.getEntity() instanceof Project) {
-			return EntityArea.WIKI.equals(currentArea);
-		} 
-		return isWikiableType(entityBundle.getEntity());
-	}
-	
 	private void configureUploadNewFileEntity() {
-		if(isContainerOnFilesTab()){
+		if(isContainerOnFilesTab(entityBundle.getEntity(), currentArea)){
 			actionMenu.setActionVisible(Action.UPLOAD_FILE, permissions.getCanCertifiedUserEdit());
 			actionMenu.setActionEnabled(Action.UPLOAD_FILE, permissions.getCanCertifiedUserEdit());
 			actionMenu.setActionListener(Action.UPLOAD_FILE, this);
@@ -557,7 +595,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureAddFolder() {
-		if(isContainerOnFilesTab()){
+		if(isContainerOnFilesTab(entityBundle.getEntity(), currentArea)){
 			actionMenu.setActionVisible(Action.CREATE_FOLDER, permissions.getCanCertifiedUserEdit());
 			actionMenu.setActionEnabled(Action.CREATE_FOLDER, permissions.getCanCertifiedUserEdit());
 			actionMenu.setActionListener(Action.CREATE_FOLDER, this);
@@ -568,7 +606,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureEditWiki(){
-		if(isWikiableConfig()){
+		if(isWikiableConfig(entityBundle.getEntity(), currentArea)){
 			actionMenu.setActionVisible(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.EDIT_WIKI_PAGE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.EDIT_WIKI_PAGE, this);
@@ -581,7 +619,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void configureViewWikiSource(){
 		//only visible if entity may have a wiki, and user can't Edit the wiki
-		if(isWikiableConfig()){
+		if(isWikiableConfig(entityBundle.getEntity(), currentArea)){
 			actionMenu.setActionVisible(Action.VIEW_WIKI_SOURCE, !permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.VIEW_WIKI_SOURCE, !permissions.getCanEdit());
 			actionMenu.setActionListener(Action.VIEW_WIKI_SOURCE, this);
@@ -592,7 +630,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void configureReorderWikiSubpages() {
-		if(isWikiableConfig() && entityBundle.getEntity() instanceof Project){
+		if(isWikiableConfig(entityBundle.getEntity(), currentArea) && entityBundle.getEntity() instanceof Project){
 			// shown if there's more than one page
 			getSynapseClient().getV2WikiHeaderTree(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), new AsyncCallback<List<V2WikiHeader>>() {
 				@Override
@@ -613,7 +651,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureAddWikiSubpage(){
-		if(isWikiableConfig() && entityBundle.getEntity() instanceof Project){
+		if(isWikiableConfig(entityBundle.getEntity(), currentArea) && entityBundle.getEntity() instanceof Project){
 			actionMenu.setActionVisible(Action.ADD_WIKI_SUBPAGE, permissions.getCanEdit());
 			actionMenu.setActionEnabled(Action.ADD_WIKI_SUBPAGE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.ADD_WIKI_SUBPAGE, this);
@@ -637,7 +675,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureLink(){
-		if(isLinkType(entityBundle.getEntity()) && !isTopLevelProjectToolsMenu()){
+		if(isLinkType(entityBundle.getEntity()) && 
+				!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)){
 			actionMenu.setActionVisible(Action.CREATE_LINK, true);
 			actionMenu.setActionEnabled(Action.CREATE_LINK, true);
 			actionMenu.setActionListener(Action.CREATE_LINK, this);
@@ -649,7 +688,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureAnnotations(){
-		if (isTopLevelProjectToolsMenu()) {
+		if (isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
 			actionMenu.setActionVisible(Action.SHOW_ANNOTATIONS, false);
 		} else {
 			actionMenu.setActionVisible(Action.SHOW_ANNOTATIONS, true);
@@ -727,7 +766,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureDeleteAction(){
-		if (isTopLevelProjectToolsMenu()) {
+		if (isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
 			actionMenu.setActionVisible(Action.DELETE_ENTITY, false);
 		} else {
 			actionMenu.setActionVisible(Action.DELETE_ENTITY, permissions.getCanDelete());
@@ -737,7 +776,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 	private void configureDeleteWikiAction(){
-		if(isWikiableConfig() && entityBundle.getEntity() instanceof Project){
+		if(isWikiableConfig(entityBundle.getEntity(), currentArea) && 
+				entityBundle.getEntity() instanceof Project){
 			actionMenu.setActionVisible(Action.DELETE_WIKI_PAGE, permissions.getCanDelete());
 			actionMenu.setActionEnabled(Action.DELETE_WIKI_PAGE, permissions.getCanDelete());
 			actionMenu.setActionListener(Action.DELETE_WIKI_PAGE, this);
@@ -748,7 +788,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureShareAction(){
-		if (isTopLevelProjectToolsMenu()) {
+		if (isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
 			actionMenu.setActionVisible(Action.SHARE, false);
 		} else {
 			actionMenu.setActionEnabled(Action.SHARE, true);
@@ -762,6 +802,22 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				actionMenu.setActionIcon(Action.SHARE, IconType.LOCK);
 			}	
 		}
+	}
+	
+	public boolean isTopLevelProjectToolsMenu(Entity entity, EntityArea area) {
+		return entity instanceof Project && area != null;
+	}
+	
+	public boolean isWikiableConfig(Entity entity, EntityArea area) {
+		if (entity instanceof Project) {
+			return EntityArea.WIKI.equals(area);
+		} 
+		return isWikiableType(entity);
+	}
+	
+	public boolean isContainerOnFilesTab(Entity entity, EntityArea area) {
+		return (entity instanceof Folder || 
+				(entity instanceof Project && EntityArea.FILES.equals(area)));
 	}
 	
 	/**
@@ -902,11 +958,67 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case CREATE_FOLDER :
 			onCreateFolder();
 			break;
+		case UPLOAD_TABLE :
+			onUploadTable();
+			break;
+		case ADD_TABLE :
+			onAddTable();
+			break;
+		case ADD_FILE_VIEW :
+			onAddFileView();
+			break;
+		case ADD_PROJECT_VIEW :
+			onAddProjectView();
+			break;
 		default:
 			break;
 		}
 	}
+	public void onUploadTable() {
+		// This operation creates an entity and uploads data to the entity so both checks must pass.
+		preflightController.checkCreateEntityAndUpload(entityBundle, TableEntity.class.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postCheckUploadTable();
+			}
+		});
+	}
+	private void postCheckUploadTable(){
+		getUploadTableModalWidget().showModal(entityUpdatedWizardCallback);
+	}
 	
+	public void onAddFileView() {
+		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postCheckCreateTableOrView(TableType.fileview);
+			}
+		});
+	}
+	
+	public void onAddProjectView() {
+		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postCheckCreateTableOrView(TableType.projectview);
+			}
+		});
+	}
+	
+	public void onAddTable() {
+		preflightController.checkCreateEntity(entityBundle, TableEntity.class.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postCheckCreateTableOrView(TableType.table);
+			}
+		});
+	}
+	
+	private void postCheckCreateTableOrView(TableType type) {
+		getCreateTableViewWizard().configure(entityBundle.getEntity().getId(), type);
+		getCreateTableViewWizard().showModal(entityUpdatedWizardCallback);
+	}
+
 	private void onUploadNewFileEntity() {
 		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
 			@Override

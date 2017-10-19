@@ -64,6 +64,9 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	@Override
 	public void setActionVisible(Action action, boolean visible) {
 		getActionView(action).setVisible(visible);
+		if (visible) {
+			view.setNoActionsAvailableVisible(false);
+		}
 	}
 
 	@Override
@@ -118,10 +121,18 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	@Override
 	public void reset() {
 		// Hide all widgets and clear all Listeners
+		hideAllActions();
 		for (Action action : this.actionListenerMap.keySet()) {
-			getActionView(action).setVisible(false);
 			getActionListeners(action).clear();
 		}
+	}
+	
+	@Override
+	public void hideAllActions() {
+		for (Action action : this.actionListenerMap.keySet()) {
+			getActionView(action).setVisible(false);
+		}
+		view.setNoActionsAvailableVisible(true);
 	}
 
 	@Override

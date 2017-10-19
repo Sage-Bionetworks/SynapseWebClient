@@ -7,6 +7,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.Divider;
+import org.gwtbootstrap3.client.ui.DropDownHeader;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 
@@ -35,7 +36,8 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	Widget widget;
 	@UiField
 	Divider actDivider;
-
+	@UiField
+	DropDownHeader noActionsAvailable;
 	
 	@Inject
 	public ActionMenuWidgetViewImpl(Binder binder){
@@ -88,5 +90,9 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	public void setToolsButtonIcon(String text, IconType icon) {
 		toolsMenu.setText(text);
 		toolsMenu.setIcon(icon);
+	}
+	@Override
+	public void setNoActionsAvailableVisible(boolean visible) {
+		noActionsAvailable.setVisible(visible);
 	}
 }
