@@ -235,7 +235,6 @@ import org.sagebionetworks.web.client.widget.verification.VerificationSubmission
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.inject.client.GinModules;
 import com.google.gwt.inject.client.Ginjector;
-import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 
 /**
  * The root portal dependency injection root.
@@ -504,6 +503,7 @@ public interface PortalGinInjector extends Ginjector {
 	Breadcrumb getBreadcrumb();
 	SynapseClientAsync getSynapseClientAsync();
 	SynapseJavascriptClient getSynapseJavascriptClient();
+	SynapseFutureClient getSynapseFutureClient();
 	StuAlert getStuAlert();
 	FilesTabView getFilesTabView();
 	FileTitleBar getFileTitleBar();

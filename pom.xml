@@ -200,7 +200,7 @@
 					<!-- GWT compiler options -->
 			        <compileReport>false</compileReport>
 					<!-- Disabled because it causes an EmptyStackException on GWT 2.8.1
-					 <soycDetailed>true</soycDetailed> -->
+					<soycDetailed>true</soycDetailed> -->
 			        <encoding>${project.build.sourceEncoding}</encoding>
 			        <logLevel>INFO</logLevel>
 			        <sourceLevel>auto</sourceLevel>
