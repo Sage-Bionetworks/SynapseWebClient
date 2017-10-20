@@ -434,10 +434,14 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	public void onClickDeletedThreadCommand() {
 		if (view.isDeletedThreadListVisible()) {
 			view.setDeletedThreadListVisible(false);
-			actionMenu.setActionText(Action.SHOW_DELETED_THREADS, "Show Deleted Threads");
+			if (actionMenu != null) {
+				actionMenu.setActionText(Action.SHOW_DELETED_THREADS, "Show Deleted Threads");	
+			}
 		} else {
 			view.setDeletedThreadListVisible(true);
-			actionMenu.setActionText(Action.SHOW_DELETED_THREADS, "Hide Deleted Threads");
+			if (actionMenu != null) {
+				actionMenu.setActionText(Action.SHOW_DELETED_THREADS, "Hide Deleted Threads");
+			}
 			deletedThreadListWidget.configure(forumId, isCurrentUserModerator,
 					moderatorIds, null, DiscussionFilter.DELETED_ONLY);
 		}
