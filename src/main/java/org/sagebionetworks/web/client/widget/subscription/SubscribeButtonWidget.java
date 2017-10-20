@@ -11,15 +11,16 @@ import org.sagebionetworks.repo.model.subscription.SubscriptionRequest;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,7 +36,8 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
 	Callback onSubscribeCallback, onUnsubscribeCallback;
-	
+	ActionMenuWidget actionMenu;
+	ActionMenuWidget.ActionListener subscribeActionListener, unsubscribeActionListener;
 	boolean iconOnly;
 	@Inject
 	public SubscribeButtonWidget(SubscribeButtonWidgetView view, 
@@ -51,6 +53,18 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 		iconOnly = false;
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
+		subscribeActionListener = new ActionMenuWidget.ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				onSubscribe();
+			}
+		};
+		unsubscribeActionListener = new ActionMenuWidget.ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				onUnsubscribe();
+			}
+		};
 	}
 	
 	
@@ -64,6 +78,11 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	}
 	
 	public void showFollowButton() {
+		if (actionMenu != null) {
+			actionMenu.setActionListener(Action.FOLLOW, subscribeActionListener);
+			actionMenu.setActionText(Action.FOLLOW, "Follow " + StringUtils.toCamelCase(type.toString()));
+		}
+
 		if (iconOnly) {
 			view.showFollowIcon();
 		} else {
@@ -72,6 +91,11 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	}
 	
 	public void showUnfollowButton() {
+		if (actionMenu != null) {
+			actionMenu.setActionListener(Action.FOLLOW, unsubscribeActionListener);
+			actionMenu.setActionText(Action.FOLLOW, "Unfollow " + StringUtils.toCamelCase(type.toString()));
+		}
+
 		if (iconOnly) {
 			view.showUnfollowIcon();
 		} else {
@@ -96,6 +120,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	public void configure(SubscriptionObjectType type, String id, ActionMenuWidget actionMenu) {
 		this.id = id;
 		this.type = type;
+		this.actionMenu = actionMenu;
 		if (!authController.isLoggedIn()) {
 			showFollowButton();
 		} else {

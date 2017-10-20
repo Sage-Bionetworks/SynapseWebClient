@@ -29,6 +29,7 @@ import org.sagebionetworks.web.client.view.SynapseForumView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -112,7 +113,7 @@ public class SynapseForumPresenterTest {
 		presenter.setPlace(mockPlace);
 		presenter.showForum(entityId);
 		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class),
-				eq(DEFAULT_IS_MODERATOR), any(CallbackP.class), any(Callback.class));
+				eq(DEFAULT_IS_MODERATOR), any(ActionMenuWidget.class), any(CallbackP.class), any(Callback.class));
 	}
 
 }
