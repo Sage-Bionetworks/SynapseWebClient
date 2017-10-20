@@ -65,7 +65,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	public static DiscussionThreadBundle defaultThreadBundle;
 	public SingleDiscussionThreadWidget defaultThreadWidget;
 	public SubscribersWidget forumSubscribersWidget;
-	
+	public DiscussionThreadBundle currentThreadBundle;
 	boolean isForumConfigured;
 	@Inject
 	public ForumWidget(
@@ -325,6 +325,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
+				currentThreadBundle = result;
 				singleThreadWidget.configure(result, replyId, isCurrentUserModerator, moderatorIds, actionMenu, new Callback(){
 					@Override
 					public void invoke() {
@@ -338,9 +339,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 				view.setShowAllThreadsButtonVisible(true);
 				view.setSortRepliesButtonVisible(true);
 				view.setMainContainerVisible(true);
+				updateActionMenuCommands();
 			}
 		});
-		updateActionMenuCommands();
 	}
 
 	public void showForum() {
@@ -395,9 +396,9 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			actionMenu.setActionVisible(Action.FOLLOW, true);
 			actionMenu.setActionVisible(Action.CREATE_THREAD, !isSingleThread);
 			actionMenu.setActionVisible(Action.SHOW_DELETED_THREADS, !isSingleThread && isCurrentUserModerator);
-			actionMenu.setActionVisible(Action.EDIT_THREAD, isSingleThread);
-			actionMenu.setActionVisible(Action.PIN_THREAD, isSingleThread);
-			actionMenu.setActionVisible(Action.DELETE_THREAD, isSingleThread);
+			actionMenu.setActionVisible(Action.EDIT_THREAD, isSingleThread && currentThreadBundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
+			actionMenu.setActionVisible(Action.PIN_THREAD, isSingleThread && isCurrentUserModerator);
+			actionMenu.setActionVisible(Action.DELETE_THREAD, isSingleThread && isCurrentUserModerator);
 		}
 	}
 

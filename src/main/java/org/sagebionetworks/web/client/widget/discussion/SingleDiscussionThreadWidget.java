@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
@@ -92,6 +93,9 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private SubscribersWidget threadSubscribersWidget;
 	Topic threadTopic = new Topic();
 	private ActionMenuWidget actionMenu;
+	ActionMenuWidget.ActionListener editActionListener, unpinActionListener, pinActionListener, deleteActionListener;
+	Boolean isPinned;
+	
 	@Inject
 	public SingleDiscussionThreadWidget(
 			SingleDiscussionThreadWidgetView view,
@@ -162,6 +166,31 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			}
 		};
 		threadTopic.setObjectType(SubscriptionObjectType.THREAD);
+		editActionListener = new ActionMenuWidget.ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				onClickEditThread();
+			}
+		};
+		pinActionListener = new ActionMenuWidget.ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				onClickPinThread();
+			}
+		};
+		unpinActionListener = new ActionMenuWidget.ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				onClickUnpinThread();
+			}
+		};
+		
+		deleteActionListener = new ActionMenuWidget.ActionListener() {
+			@Override
+			public void onAction(Action action) {
+				onClickDeleteThread();
+			}
+		};
 	}
 
 	@Override
@@ -233,17 +262,32 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setRestoreIconVisible(isDeleted);
 		threadTopic.setObjectId(bundle.getId());
 		threadSubscribersWidget.configure(threadTopic);
+		isPinned = bundle.getIsPinned();
+		if (isPinned == null) {
+			isPinned = false;
+		}
 		if (!isDeleted) {
 			view.setDeleteIconVisible(isCurrentUserModerator);
-
-			Boolean isPinned = bundle.getIsPinned();
-			if (isPinned == null) {
-				isPinned = false;
-			}
 			view.setUnpinIconVisible(isCurrentUserModerator && isPinned);
 			view.setPinIconVisible(isCurrentUserModerator && !isPinned);
 			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 			view.setThreadLink(TopicUtils.buildThreadLink(projectId, threadId));
+		}
+		configureActionMenu();
+	}
+	
+	public void configureActionMenu() {
+		if (actionMenu != null) {
+			actionMenu.setActionListener(Action.EDIT_THREAD, editActionListener);
+			actionMenu.setActionListener(Action.DELETE_THREAD, deleteActionListener);
+			if (isPinned) {
+				// thread is pinned
+				actionMenu.setActionListener(Action.PIN_THREAD, unpinActionListener);
+				actionMenu.setActionText(Action.PIN_THREAD, "Unpin Thread");
+			} else {
+				actionMenu.setActionListener(Action.PIN_THREAD, pinActionListener);
+				actionMenu.setActionText(Action.PIN_THREAD, "Pin Thread");
+			}
 		}
 	}
 	
@@ -473,6 +517,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			public void onSuccess(Void result) {
 				view.setPinIconVisible(false);
 				view.setUnpinIconVisible(true);
+				isPinned = true;
+				configureActionMenu();
 			}
 		});
 	}
@@ -490,6 +536,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			public void onSuccess(Void result) {
 				view.setPinIconVisible(true);
 				view.setUnpinIconVisible(false);
+				isPinned = false;
+				configureActionMenu();
 			}
 		});
 	}
