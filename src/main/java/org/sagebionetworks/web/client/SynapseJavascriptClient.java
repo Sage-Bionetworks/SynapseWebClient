@@ -14,6 +14,7 @@ import static org.apache.http.HttpStatus.SC_PRECONDITION_FAILED;
 import static org.apache.http.HttpStatus.SC_SERVICE_UNAVAILABLE;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
@@ -30,6 +31,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
+import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.PaginatedIds;
@@ -61,6 +63,7 @@ import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
+import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
@@ -79,6 +82,7 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -147,7 +151,9 @@ public class SynapseJavascriptClient {
 	
 	public static final String MEMBERSHIP_INVITATION = "/membershipInvitation";
 	public static final String OPEN_MEMBERSHIP_INVITATION_COUNT = MEMBERSHIP_INVITATION + "/openInvitationCount";
-	
+	public static final String INVITEE_VERIFICATION_SIGNED_TOKEN = "/inviteeVerificationSignedToken";
+	public static final String INVITEE_ID = "/inviteeId";
+
 	public static final String OFFSET_PARAMETER = "offset=";
 	public static final String LIMIT_PARAMETER = "limit=";
 	private static final String NEXT_PAGE_TOKEN_PARAM = "nextPageToken=";
@@ -204,7 +210,14 @@ public class SynapseJavascriptClient {
 		sendRequest(requestBuilder, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 	
-	private void doPostOrPut(RequestBuilder.Method method, String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
+	private void doPostOrPut(RequestBuilder.Method method, String url, JSONEntity requestObject, OBJECT_TYPE responseType, AsyncCallback callback) {
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		try {
+			requestObject.writeToJSONObject(adapter);
+		} catch (JSONObjectAdapterException exception) {
+			callback.onFailure(exception);
+			return;
+		}
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(method, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
@@ -212,15 +225,15 @@ public class SynapseJavascriptClient {
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(requestBuilder, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
+		sendRequest(requestBuilder, adapter.toJSONString(), responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 	
-	private void doPost(String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
-		doPostOrPut(POST, url, requestData, responseType, callback);
+	private void doPost(String url, JSONEntity requestObject, OBJECT_TYPE responseType, AsyncCallback callback) {
+		doPostOrPut(POST, url, requestObject, responseType, callback);
 	}
 	
-	private void doPut(String url, String requestData, OBJECT_TYPE responseType, AsyncCallback callback) {
-		doPostOrPut(PUT, url, requestData, responseType, callback);
+	private void doPut(String url, JSONEntity requestObject, OBJECT_TYPE responseType, AsyncCallback callback) {
+		doPostOrPut(PUT, url, requestObject, responseType, callback);
 	}
 
 	
@@ -321,30 +334,23 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + TEAM + "/" + teamId;
 		doGet(url, OBJECT_TYPE.Team, callback);
 	}
+
+	public FluentFuture<Team> getTeam(String teamId) {
+		String url = getRepoServiceUrl() + TEAM + "/" + teamId;
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.Team, cb));
+	}
 	
 	public void getRestrictionInformation(String subjectId, RestrictableObjectType type, final AsyncCallback<RestrictionInformationResponse> callback)  {
 		String url = getRepoServiceUrl() + RESTRICTION_INFORMATION;
 		RestrictionInformationRequest request = new RestrictionInformationRequest();
 		request.setObjectId(subjectId);
 		request.setRestrictableObjectType(type);
-		try {
-			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
-			request.writeToJSONObject(jsonAdapter);
-			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.RestrictionInformationResponse, callback);
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-		}
+		doPost(url, request, OBJECT_TYPE.RestrictionInformationResponse, callback);
 	}
 	
 	public void getEntityChildren(EntityChildrenRequest request, final AsyncCallback<EntityChildrenResponse> callback) {
 		String url = getRepoServiceUrl() + ENTITY_URI_PATH + CHILDREN;
-		try {
-			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
-			request.writeToJSONObject(jsonAdapter);
-			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.EntityChildrenResponse, callback);
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-		}
+		doPost(url, request, OBJECT_TYPE.EntityChildrenResponse, callback);
 	}
 	
 	public void getV2WikiPageAsV1(WikiPageKey key, AsyncCallback<WikiPage> callback) {
@@ -474,6 +480,17 @@ public class SynapseJavascriptClient {
 			doGet(url, OBJECT_TYPE.UserProfile, callback);
 		}
 	}
+
+	public FluentFuture<UserProfile> getUserProfile(String userId) {
+		String url = getRepoServiceUrl() + USER_PROFILE_PATH;
+		// If userId is null, we get the current user's profile.
+		if (userId != null) {
+			// If it's not null, we get the indicated user's profile.
+			url += "/" + userId;
+		}
+		final String finalUrl = url;
+		return getFuture(cb -> doGet(finalUrl, OBJECT_TYPE.UserProfile, cb));
+	}
 	
 	public void listUserProfiles(List<String> userIds, final AsyncCallback<List<UserProfile>> callback) {
 		List<Long> userIdsLong = new ArrayList<>();
@@ -485,15 +502,9 @@ public class SynapseJavascriptClient {
 
 	private void listUserProfilesFromUserIds(List<Long> userIds, final AsyncCallback<List<UserProfile>> callback) {
 		String url = getRepoServiceUrl() + USER_PROFILE_PATH;
-		try {
-			IdList idList = new IdList();
-			idList.setList(userIds);
-			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
-			idList.writeToJSONObject(jsonAdapter);
-			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.ListWrapperUserProfile, callback);
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-		}
+		IdList idList = new IdList();
+		idList.setList(userIds);
+		doPost(url, idList, OBJECT_TYPE.ListWrapperUserProfile, callback);
 	}
 	
 	public void getFavorites(final AsyncCallback<List<EntityHeader>> callback) {
@@ -537,15 +548,9 @@ public class SynapseJavascriptClient {
 			ArrayList<String> aliases,
 			AsyncCallback<List<UserGroupHeader>> callback) {
 		String url = getRepoServiceUrl() + USER_GROUP_HEADER_BY_ALIAS;
-		try {
-			AliasList list = new AliasList();
-			list.setList(aliases);
-			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
-			list.writeToJSONObject(jsonAdapter);
-			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.UserGroupHeaderResponse, callback);
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-		}
+		AliasList list = new AliasList();
+		list.setList(aliases);
+		doPost(url, list, OBJECT_TYPE.UserGroupHeaderResponse, callback);
 	}
 	public void getUserGroupHeadersById(
 			List<String> ids,
@@ -665,13 +670,7 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + ENTITY_THREAD_COUNTS;
 		EntityIdList idList = new EntityIdList();
 		idList.setIdList(entityIds);
-		try {
-			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
-			idList.writeToJSONObject(jsonAdapter);
-			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.EntityThreadCounts, callback);
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-		}
+		doPost(url, idList, OBJECT_TYPE.EntityThreadCounts, callback);
 	}
 	
 	public void getModerators(String forumId, Long limit, Long offset, AsyncCallback<PaginatedIds> callback) {
@@ -684,35 +683,17 @@ public class SynapseJavascriptClient {
 		if (nextPageToken != null) {
 			url += "?" + NEXT_PAGE_TOKEN_PARAM + nextPageToken;
 		}
-		try {
-			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
-			topic.writeToJSONObject(jsonAdapter);
-			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.SubscriberPagedResults, callback);
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-		}
+		doPost(url, topic, OBJECT_TYPE.SubscriberPagedResults, callback);
 	}
 
 	public void getSubscribersCount(Topic topic, AsyncCallback<Long> callback) {
 		String url = getRepoServiceUrl() + SUBSCRIPTION+"/subscribers/count";
-		try {
-			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
-			topic.writeToJSONObject(jsonAdapter);
-			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.SubscriberCount, callback);
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-		}
+		doPost(url, topic, OBJECT_TYPE.SubscriberCount, callback);
 	}
 	
 	public void getFileHandleAndUrlBatch(BatchFileRequest request, AsyncCallback<BatchFileResult> callback) {
 		String url = getFileServiceUrl() + FILE_HANDLE_BATCH;
-		try {
-			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
-			request.writeToJSONObject(jsonAdapter);
-			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.BatchFileResult, callback);
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-		}
+		doPost(url, request, OBJECT_TYPE.BatchFileResult, callback);
 	}
 	
 	public void getEntityHeaderBatch(List<String> entityIds, AsyncCallback<ArrayList<EntityHeader>> callback) {
@@ -723,29 +704,26 @@ public class SynapseJavascriptClient {
 			list.add(ref);
 		}
 		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/header";
-		try {
-			ReferenceList refList = new ReferenceList();
-			refList.setReferences(list);
-			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
-			refList.writeToJSONObject(jsonAdapter);
-			doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.PaginatedResultsEntityHeader, callback);
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-		}
+		ReferenceList refList = new ReferenceList();
+		refList.setReferences(list);
+		doPost(url, refList, OBJECT_TYPE.PaginatedResultsEntityHeader, callback);
 	}
 
-	public void getMembershipInvitation(MembershipInvtnSignedToken token, AsyncCallback<MembershipInvtnSubmission> callback) {
+	public FluentFuture<MembershipInvtnSubmission> getMembershipInvitation(MembershipInvtnSignedToken token) {
 		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + token.getMembershipInvitationId();
-		JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
-		try {
-			token.writeToJSONObject(jsonAdapter);
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-			return;
-		}
-		doPost(url, jsonAdapter.toJSONString(), OBJECT_TYPE.MembershipInvtnSubmission, callback);
+		return getFuture(cb -> doPost(url, token, OBJECT_TYPE.MembershipInvtnSubmission, cb));
 	}
-	
+
+	public FluentFuture<InviteeVerificationSignedToken> getInviteeVerificationSignedToken(String membershipInvitationId) {
+		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + membershipInvitationId + INVITEE_VERIFICATION_SIGNED_TOKEN;
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.InviteeVerificationSignedToken, cb));
+	}
+
+	public FluentFuture<Void> updateInviteeId(InviteeVerificationSignedToken token) {
+		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + token.getMembershipInvitationId() + INVITEE_ID;
+		return getFuture(cb -> doPut(url, token, OBJECT_TYPE.None, cb));
+	}
+
 	public void deleteMembershipInvitation(String id, AsyncCallback<Void> callback) {
 		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + id;
 		doDelete(url, callback);
@@ -755,6 +733,7 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + MEMBERSHIP_REQUEST + "/" + id;
 		doDelete(url, callback);
 	}
+
 	public void deleteEntityById(String id, AsyncCallback<Void> callback) {
 		deleteEntityById(id, false, callback);
 	}
@@ -776,26 +755,14 @@ public class SynapseJavascriptClient {
 				key.getOwnerObjectId() + WIKI2 +
 				key.getWikiPageId();
 		
-		try {
-			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
-			toUpdate.writeToJSONObject(jsonAdapter);
-			doPut(url, jsonAdapter.toJSONString(), OBJECT_TYPE.V2WikiPage, callback);
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-		}
+		doPut(url, toUpdate, OBJECT_TYPE.V2WikiPage, callback);
 	}
 	
 	public void updateV2WikiOrderHint(WikiPageKey key, V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback) {
 		String url = getRepoServiceUrl() + "/" +
 			key.getOwnerObjectType().toLowerCase() + "/" + 
 			key.getOwnerObjectId() + WIKI_ORDER_HINT;
-		try {
-			JSONObjectAdapter jsonAdapter = jsonObjectAdapter.createNew();
-			toUpdate.writeToJSONObject(jsonAdapter);
-			doPut(url, jsonAdapter.toJSONString(), OBJECT_TYPE.V2WikiOrderHint, callback);
-		} catch (JSONObjectAdapterException e) {
-			callback.onFailure(e);
-		}
+		doPut(url, toUpdate, OBJECT_TYPE.V2WikiOrderHint, callback);
 	}
 }
 

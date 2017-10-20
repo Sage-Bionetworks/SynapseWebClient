@@ -22,4 +22,10 @@ public class FutureUtils {
 		});
 		return FluentFuture.from(future);
 	}
+
+	public static <T> FluentFuture<T> getFailedFuture(Throwable throwable) {
+		SettableFuture<T> future = SettableFuture.create();
+		future.setException(throwable);
+		return future;
+	}
 }

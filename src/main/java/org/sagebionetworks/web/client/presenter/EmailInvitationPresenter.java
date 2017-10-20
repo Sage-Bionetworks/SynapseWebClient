@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseFutureClient;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -36,6 +37,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	private String encodedMISignedToken;
 	private EmailInvitationView view;
 	private RegisterWidget registerWidget;
+	private SynapseJavascriptClient jsClient;
 	private SynapseFutureClient futureClient;
 	private SynapseAlert synapseAlert;
 	private AuthenticationController authController;
@@ -44,12 +46,14 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	@Inject
 	public EmailInvitationPresenter(EmailInvitationView view,
 									RegisterWidget registerWidget,
+									SynapseJavascriptClient jsClient,
 									SynapseFutureClient futureClient,
 									SynapseAlert synapseAlert,
 									AuthenticationController authController,
 									GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.registerWidget = registerWidget;
+		this.jsClient = jsClient;
 		this.futureClient = futureClient;
 		this.synapseAlert = synapseAlert;
 		this.authController = authController;
@@ -69,7 +73,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 
 		futureClient.hexDecodeAndDeserialize(NotificationTokenType.EmailInvitation.name(), encodedMISignedToken)
 			.transformAsync(
-					token -> futureClient.getMembershipInvitation((MembershipInvtnSignedToken) token),
+					token -> jsClient.getMembershipInvitation((MembershipInvtnSignedToken) token),
 					directExecutor()
 			).addCallback(
 					new FutureCallback<MembershipInvtnSubmission>() {
@@ -92,9 +96,9 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	}
 
 	private void bindInvitationToAuthenticatedUser(final String misId) {
-		futureClient.getInviteeVerificationSignedToken(misId)
+		jsClient.getInviteeVerificationSignedToken(misId)
 			.transformAsync(
-					token -> futureClient.updateInviteeId(misId, token),
+					jsClient::updateInviteeId,
 					directExecutor()
 			).addCallback(
 					new FutureCallback<Void>() {
@@ -123,8 +127,8 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 		ListenableFuture<Team> teamFuture;
 		ListenableFuture<UserProfile> userProfileFuture;
 
-		teamFuture = futureClient.getTeam(mis.getTeamId());
-		userProfileFuture = futureClient.getUserProfile(mis.getCreatedBy());
+		teamFuture = jsClient.getTeam(mis.getTeamId());
+		userProfileFuture = jsClient.getUserProfile(mis.getCreatedBy());
 		FluentFuture.from(whenAllComplete(teamFuture, userProfileFuture)
 				.call(() -> {
 							// Retrieve the resolved values from the futures
