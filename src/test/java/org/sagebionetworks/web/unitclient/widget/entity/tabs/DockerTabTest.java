@@ -98,6 +98,7 @@ public class DockerTabTest {
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
+		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
 		when(mockDockerRepoEntity.getId()).thenReturn(dockerRepoEntityId);
 		when(mockDockerRepoEntity.getName()).thenReturn(dockerRepoName);
 		when(mockDockerRepoEntityBundle.getEntity()).thenReturn(mockDockerRepoEntity);
@@ -162,7 +163,7 @@ public class DockerTabTest {
 		verify(mockView).setDockerRepoListVisible(true);
 		verify(mockView, times(2)).clearDockerRepoWidget();
 		verify(mockUpdateEntityCallback, never()).invoke(anyString());
-		verify(mockDockerRepoListWidget).configure(mockProjectEntityBundle);
+		verify(mockDockerRepoListWidget).configure(projectEntityId);
 	}
 
 	@Test
@@ -174,7 +175,7 @@ public class DockerTabTest {
 		tab.configure(mockProjectEntityBundle, mockEntityUpdatedHandler, areaToken);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockTab).setEntityNameAndPlace(eq(projectEntityId), any(Synapse.class));
-		verify(mockDockerRepoListWidget, never()).configure(mockProjectEntityBundle);
+		verify(mockDockerRepoListWidget, never()).configure(projectEntityId);
 		verify(mockSynAlert).handleException(mockProjectBundleLoadError);
 	}
 
@@ -201,7 +202,7 @@ public class DockerTabTest {
 		assertEquals(list.get(0).getIconType(), EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()));
 		verify(mockGinInjector).createNewDockerRepoWidget();
 		verify(mockView).setDockerRepoWidget(any(Widget.class));
-		verify(mockDockerRepoListWidget, never()).configure(mockProjectEntityBundle);
+		verify(mockDockerRepoListWidget, never()).configure(projectEntityId);
 	}
 
 	@Test
