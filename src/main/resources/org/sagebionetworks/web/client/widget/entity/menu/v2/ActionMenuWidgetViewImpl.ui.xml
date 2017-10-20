@@ -53,8 +53,9 @@
 						<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_THREAD">Delete Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
 						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="CREATE_EXTERNAL_DOCKER_REPO">Add External Repository</a:ActionMenuItem>
 						<b:Divider ui:field="actDivider" visible="false" />
+						<b:DropDownHeader ui:field="actHeader">ACT Tools</b:DropDownHeader>
 						<a:ActionMenuItem icon="FLAG" iconFixedWidth="true" action="APPROVE_USER_ACCESS">Change User Access</a:ActionMenuItem>
-						<a:ActionMenuItem icon="FLAG" iconFixedWidth="true" action="MANAGE_ACCESS_REQUIREMENTS">(ACT) Manage Access Requirements</a:ActionMenuItem>
+						<a:ActionMenuItem icon="FLAG" iconFixedWidth="true" action="MANAGE_ACCESS_REQUIREMENTS">Manage Access Requirements</a:ActionMenuItem>
 					</b:DropDownMenu>
 				</b:DropDown>
 			</b:ButtonGroup>

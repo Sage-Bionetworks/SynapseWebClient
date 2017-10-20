@@ -38,7 +38,8 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	Divider actDivider;
 	@UiField
 	DropDownHeader noActionsAvailable;
-	
+	@UiField
+	DropDownHeader actHeader;
 	@Inject
 	public ActionMenuWidgetViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
@@ -84,6 +85,7 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@Override
 	public void setACTDividerVisible(boolean visible){
 		actDivider.setVisible(visible);
+		actHeader.setVisible(visible);
 	}
 
 	@Override
