@@ -81,6 +81,7 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -350,42 +351,35 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		view.hideAnnotations();
 		view.hideFileHistory();
 		
-		if (!isUserAuthenticated) {
-			if (permissions.getCanPublicRead()) {
-				configureAnnotations();
-				configureFileHistory();
-			}
-		} else {
-			// Setup the actions
-			configureDeleteAction();
-			configureShareAction();
-			configureRenameAction();
-			configureEditWiki();
-			configureViewWikiSource();
-			configureAddWikiSubpage();
-			configureReorderWikiSubpages();
-			configureDeleteWikiAction();
-			configureMove();
-			configureLink();
-			configureSubmit();
-			configureAnnotations();
-			configureFileHistory();
-			configureFileUpload();
-			configureProvenance();
-			configureChangeStorageLocation();
-			configureCreateDOI();
-			configureEditProjectMetadataAction();
-			configureEditFileMetadataAction();
-			configureAddEvaluationAction();
-			configureCreateChallenge();
-			configureApproveUserAccess();
-			configureManageAccessRequirements();
-			configureTableCommands();
-			configureProjectLevelTableCommands();
-			configureAddFolder();
-			configureUploadNewFileEntity();
-			configureAddExternalDockerRepo();
-		}
+		// Setup the actions
+		configureDeleteAction();
+		configureShareAction();
+		configureRenameAction();
+		configureEditWiki();
+		configureViewWikiSource();
+		configureAddWikiSubpage();
+		configureReorderWikiSubpages();
+		configureDeleteWikiAction();
+		configureMove();
+		configureLink();
+		configureSubmit();
+		configureAnnotations();
+		configureFileHistory();
+		configureFileUpload();
+		configureProvenance();
+		configureChangeStorageLocation();
+		configureCreateDOI();
+		configureEditProjectMetadataAction();
+		configureEditFileMetadataAction();
+		configureAddEvaluationAction();
+		configureCreateChallenge();
+		configureApproveUserAccess();
+		configureManageAccessRequirements();
+		configureTableCommands();
+		configureProjectLevelTableCommands();
+		configureAddFolder();
+		configureUploadNewFileEntity();
+		configureAddExternalDockerRepo();
 	}
 	
 	private void configureAddExternalDockerRepo() {
