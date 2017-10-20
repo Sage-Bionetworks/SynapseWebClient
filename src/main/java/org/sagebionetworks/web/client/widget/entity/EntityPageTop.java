@@ -585,10 +585,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			if (projectBundle != null) {
 				canModerate = projectBundle.getPermissions().getCanModerate();
 			}
-			discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate);
+			discussionTab.configure(projectId, projectHeader.getName(), discussionAreaToken, canModerate, entityActionMenu);
 			discussionTab.asTab().setContentStale(false);
 		}
 		entityActionController.configure(entityActionMenu, projectBundle, true, null, area, entityUpdateHandler);
+		discussionTab.updateActionMenuCommands();
 	}
 
 	public void configureDockerTab() {

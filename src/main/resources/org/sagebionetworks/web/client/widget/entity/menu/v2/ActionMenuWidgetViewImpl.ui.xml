@@ -45,6 +45,12 @@
 						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_TABLE">Add Table</a:ActionMenuItem>
 						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_FILE_VIEW">Add File View</a:ActionMenuItem>
 						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_PROJECT_VIEW">Add Project View</a:ActionMenuItem>
+						<a:ActionMenuItem icon="ENVELOPE_O" iconFixedWidth="true" action="FOLLOW">Follow</a:ActionMenuItem> <!-- text and icon updated by listener -->
+						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="CREATE_THREAD">Create New Thread</a:ActionMenuItem>
+						<a:ActionMenuItem icon="TRASH_O" iconFixedWidth="true" action="SHOW_DELETED_THREADS">Show Deleted Threads</a:ActionMenuItem> <!-- text and icon updated by listener -->
+						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_THREAD">Edit Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
+						<a:ActionMenuItem icon="THUMB_TACK" iconFixedWidth="true" action="PIN_THREAD">Pin Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
+						<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_THREAD">Delete Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
 						<b:Divider ui:field="actDivider" visible="false" />
 						<a:ActionMenuItem icon="FLAG" iconFixedWidth="true" action="APPROVE_USER_ACCESS">Change User Access</a:ActionMenuItem>
 						<a:ActionMenuItem icon="FLAG" iconFixedWidth="true" action="MANAGE_ACCESS_REQUIREMENTS">(ACT) Manage Access Requirements</a:ActionMenuItem>

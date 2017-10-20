@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -90,7 +91,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private boolean isThreadDeleted;
 	private SubscribersWidget threadSubscribersWidget;
 	Topic threadTopic = new Topic();
-	
+	private ActionMenuWidget actionMenu;
 	@Inject
 	public SingleDiscussionThreadWidget(
 			SingleDiscussionThreadWidgetView view,
@@ -168,7 +169,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		return view.asWidget();
 	}
 
-	public void configure(DiscussionThreadBundle bundle, String replyId, Boolean isCurrentUserModerator, Set<String> moderatorIds, Callback deleteOrRestoreCallback) {
+	public void configure(DiscussionThreadBundle bundle, String replyId, Boolean isCurrentUserModerator, Set<String> moderatorIds, ActionMenuWidget actionMenu, Callback deleteOrRestoreCallback) {
 		this.title = bundle.getTitle();
 		this.isCurrentUserModerator = isCurrentUserModerator;
 		this.threadId = bundle.getId();
@@ -177,6 +178,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.projectId = bundle.getProjectId();
 		this.moderatorIds = moderatorIds;
 		this.isThreadDeleted = bundle.getIsDeleted();
+		this.actionMenu = actionMenu;
 		configureView(bundle);
 		boolean isAuthorModerator = moderatorIds.contains(bundle.getCreatedBy());
 		view.setIsAuthorModerator(isAuthorModerator);
@@ -273,7 +275,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				configure(result, replyId, isCurrentUserModerator, moderatorIds, deleteOrRestoreCallback);
+				configure(result, replyId, isCurrentUserModerator, moderatorIds, actionMenu, deleteOrRestoreCallback);
 			}
 		});
 	}
@@ -282,7 +284,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		synAlert.clear();
 		markdownWidget.clear();
 		view.setLoadingMessageVisible(true);
-		subscribeButtonWidget.configure(SubscriptionObjectType.THREAD, threadId);
+		subscribeButtonWidget.configure(SubscriptionObjectType.THREAD, threadId, actionMenu);
 		jsClient.getThreadUrl(messageKey, new AsyncCallback<String>(){
 
 			@Override

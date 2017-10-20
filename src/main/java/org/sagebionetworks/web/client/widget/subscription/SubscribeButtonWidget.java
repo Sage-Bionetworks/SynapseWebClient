@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -90,8 +91,9 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	/**
 	 * @param type Topic subscription object type
 	 * @param id Topic subscription object id
+	 * @param actionMenu if provided, will set the follow/unfollow command, and listen for action
 	 */
-	public void configure(SubscriptionObjectType type, String id) {
+	public void configure(SubscriptionObjectType type, String id, ActionMenuWidget actionMenu) {
 		this.id = id;
 		this.type = type;
 		if (!authController.isLoggedIn()) {

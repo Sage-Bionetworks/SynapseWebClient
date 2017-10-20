@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.view.SynapseForumView;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -83,7 +84,8 @@ public class SynapseForumPresenter extends AbstractActivity implements SynapseFo
 				globalApplicationState.pushCurrentPlace(place);
 			}
 		};
-		forumWidget.configure(entityId, place.getParameterizedToken(), DEFAULT_IS_MODERATOR, paramChangeCallback, urlChangeCallback);
+		ActionMenuWidget actionMenu = null;
+		forumWidget.configure(entityId, place.getParameterizedToken(), DEFAULT_IS_MODERATOR, actionMenu, paramChangeCallback, urlChangeCallback);
 	}
 	
 	@Override
