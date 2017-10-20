@@ -373,8 +373,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureEditFileMetadataAction();
 		configureAddEvaluationAction();
 		configureCreateChallenge();
-		configureApproveUserAccess();
-		configureManageAccessRequirements();
+		configureACTCommands();
 		configureTableCommands();
 		configureProjectLevelTableCommands();
 		configureAddFolder();
@@ -415,38 +414,22 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		}
 	}
 	
-	private void configureApproveUserAccess() {
+	private void configureACTCommands() {
 		// TODO: remove APPROVE_USER_ACCESS command (after new ACT feature is released, where the system supports the workflow)
 		actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, false);
-		actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, false);	
-		actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, this);
+		actionMenu.setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, false);
 		actionMenu.setACTDividerVisible(false);
-		if (authenticationController.isLoggedIn() && !EntityArea.WIKI.equals(currentArea)) {
+		//show ACT commands if this is the Project Settings tools menu, or if the entity is not a project (looking at a child entity)
+		if (authenticationController.isLoggedIn() && 
+				!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
 			isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 				@Override
 				public void invoke(Boolean isACT) {
 					if (isACT) {
 						actionMenu.setActionVisible(Action.APPROVE_USER_ACCESS, true);
-						actionMenu.setActionEnabled(Action.APPROVE_USER_ACCESS, true);
-						actionMenu.setACTDividerVisible(true);
-					}
-				}
-			});
-		}
-	}
-
-	private void configureManageAccessRequirements() {
-		actionMenu.setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, false);
-		actionMenu.setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, false);	
-		actionMenu.setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, this);
-		actionMenu.setACTDividerVisible(false);
-		if (authenticationController.isLoggedIn() && !EntityArea.WIKI.equals(currentArea)) {
-			isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
-				@Override
-				public void invoke(Boolean isACT) {
-					if (isACT) {
+						actionMenu.setActionListener(Action.APPROVE_USER_ACCESS, EntityActionControllerImpl.this);
 						actionMenu.setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
-						actionMenu.setActionEnabled(Action.MANAGE_ACCESS_REQUIREMENTS, true);
+						actionMenu.setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, EntityActionControllerImpl.this);
 						actionMenu.setACTDividerVisible(true);
 					}
 				}
