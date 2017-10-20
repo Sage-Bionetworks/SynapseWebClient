@@ -68,6 +68,7 @@ import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
+import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
@@ -567,4 +568,5 @@ public interface PortalGinInjector extends Ginjector {
 	public EditAnnotationsDialog getEditAnnotationsDialog();
 	public CreateTableViewWizard getCreateTableViewWizard();
 	public UploadTableModalWidget getUploadTableModalWidget();
+	public AddExternalRepoModal getAddExternalRepoModal();
 }

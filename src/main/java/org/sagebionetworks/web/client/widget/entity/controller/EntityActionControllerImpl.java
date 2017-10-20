@@ -51,6 +51,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
+import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
@@ -150,6 +151,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	boolean isShowingVersion = false;
 	WizardCallback entityUpdatedWizardCallback;
 	UploadTableModalWidget uploadTableModalWidget;
+	AddExternalRepoModal addExternalRepoModal;
+	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
 			PreflightController preflightController,
@@ -168,7 +171,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		entityUpdatedWizardCallback = new WizardCallback() {
 			@Override
 			public void onFinished() {
-				entityUpdateHandler.onPersistSuccess(null);
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
 			}
 			
 			@Override
@@ -253,6 +256,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return uploadTableModalWidget;
 	}
 	
+	private AddExternalRepoModal getAddExternalRepoModal() {
+		if (addExternalRepoModal == null) {
+			addExternalRepoModal = ginInjector.getAddExternalRepoModal();
+			view.addWidget(addExternalRepoModal.asWidget());
+		}
+		return addExternalRepoModal;
+	}
 	private RenameEntityModalWidget getRenameEntityModalWidget() {
 		if (renameEntityModalWidget == null) {
 			renameEntityModalWidget = ginInjector.getRenameEntityModalWidget();
@@ -374,6 +384,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			configureProjectLevelTableCommands();
 			configureAddFolder();
 			configureUploadNewFileEntity();
+			configureAddExternalDockerRepo();
+		}
+	}
+	
+	private void configureAddExternalDockerRepo() {
+		if (entityBundle.getEntity() instanceof Project && EntityArea.DOCKER.equals(currentArea)) {
+			actionMenu.setActionVisible(Action.CREATE_EXTERNAL_DOCKER_REPO, entityBundle.getPermissions().getCanCertifiedUserEdit());
+			actionMenu.setActionListener(Action.CREATE_EXTERNAL_DOCKER_REPO, this);
+		} else {
+			actionMenu.setActionVisible(Action.CREATE_EXTERNAL_DOCKER_REPO, false);
 		}
 	}
 	
@@ -970,10 +990,32 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case ADD_PROJECT_VIEW :
 			onAddProjectView();
 			break;
+		case CREATE_EXTERNAL_DOCKER_REPO :
+			onCreateExternalDockerRepo();
+			break;
 		default:
 			break;
 		}
 	}
+	public void onCreateExternalDockerRepo() {
+		// This operation creates an entity and uploads data to the entity so both checks must pass.
+		preflightController.checkCreateEntity(entityBundle, DockerRepository.class.getName(), new Callback() {
+			@Override
+			public void invoke() {
+				postCheckCreateExternalDockerRepo();
+			}
+		});
+	}
+	private void postCheckCreateExternalDockerRepo(){
+		getAddExternalRepoModal().configuration(entityBundle.getEntity().getId(), new Callback() {
+			@Override
+			public void invoke() {
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}
+		});
+		getAddExternalRepoModal().show();
+	}
+	
 	public void onUploadTable() {
 		// This operation creates an entity and uploads data to the entity so both checks must pass.
 		preflightController.checkCreateEntityAndUpload(entityBundle, TableEntity.class.getName(), new Callback() {
