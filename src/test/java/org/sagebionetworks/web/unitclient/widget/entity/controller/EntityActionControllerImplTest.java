@@ -414,15 +414,6 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
-	public void testConfigureNotPublicAnonymous(){
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		entityBundle.getPermissions().setCanPublicRead(false);
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
-		verify(mockActionMenu, never()).setActionVisible(any(Action.class), eq(true));
-		verify(mockActionMenu, never()).setActionListener(any(Action.class), any(ActionListener.class));
-	}
-	
-	@Test
 	public void testConfigureNotPublicIsLoggedIn(){
 		entityBundle.getPermissions().setCanPublicRead(false);
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
@@ -455,6 +446,7 @@ public class EntityActionControllerImplTest {
 	public void testConfigureNoWiki(){
 		entityBundle.setEntity(new Project());
 		entityBundle.setRootWikiId(null);
+		currentEntityArea = EntityArea.WIKI;
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionListener(Action.EDIT_WIKI_PAGE, controller);
@@ -485,6 +477,7 @@ public class EntityActionControllerImplTest {
 	public void testConfigureDeleteWiki(){
 		entityBundle.setEntity(new Project());
 		entityBundle.setRootWikiId("7890");
+		currentEntityArea = EntityArea.WIKI;
 		controller.configure(mockActionMenu, entityBundle,true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_WIKI_PAGE, true);
 		verify(mockActionMenu).setActionListener(Action.DELETE_WIKI_PAGE, controller);
@@ -495,6 +488,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(new Project());
 		entityBundle.setRootWikiId("7890");
 		permissions.setCanDelete(false);
+		currentEntityArea = EntityArea.WIKI;
 		controller.configure(mockActionMenu, entityBundle,true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.DELETE_WIKI_PAGE, false);
 		verify(mockActionMenu).setActionListener(Action.DELETE_WIKI_PAGE, controller);
@@ -649,6 +643,7 @@ public class EntityActionControllerImplTest {
 		boolean canEdit = true;
 		entityBundle.getPermissions().setCanEdit(canEdit);
 		entityBundle.setEntity(new DockerRepository());
+		currentEntityArea = EntityArea.DOCKER;
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
 		verify(mockActionMenu).setActionListener(Action.EDIT_PROVENANCE, controller);
@@ -1362,6 +1357,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testConfigureNoWikiSubpageProject(){
 		entityBundle.setEntity(new Project());
+		currentEntityArea = EntityArea.WIKI;
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, true);
 		verify(mockActionMenu).setActionListener(Action.ADD_WIKI_SUBPAGE, controller);
@@ -1677,7 +1673,6 @@ public class EntityActionControllerImplTest {
 		entityBundle.setRootWikiId("7890");
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, false);
-		verify(mockActionMenu).setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, controller);
 		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, false);
 		
 		verify(mockActionMenu, never()).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
@@ -1695,6 +1690,7 @@ public class EntityActionControllerImplTest {
 		
 		verify(mockActionMenu).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
 		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, true);
+		verify(mockActionMenu).setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, controller);
 	}
 	
 	@Test

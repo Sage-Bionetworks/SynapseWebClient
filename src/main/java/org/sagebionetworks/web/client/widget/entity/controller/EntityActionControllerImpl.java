@@ -452,7 +452,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureProvenance() {
-		if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof Table) {
+		if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof DockerRepository || entityBundle.getEntity() instanceof Table) {
 			actionMenu.setActionVisible(Action.EDIT_PROVENANCE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.EDIT_PROVENANCE, this);
 			actionMenu.setActionText(Action.EDIT_PROVENANCE, "Edit "+enityTypeDisplay + " Provenance");
