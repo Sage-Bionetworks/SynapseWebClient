@@ -80,7 +80,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	public void showFollowButton() {
 		if (actionMenu != null) {
 			actionMenu.setActionListener(Action.FOLLOW, subscribeActionListener);
-			actionMenu.setActionText(Action.FOLLOW, "Follow " + StringUtils.toCamelCase(type.toString()));
+			actionMenu.setActionText(Action.FOLLOW, "Follow " + StringUtils.toTitleCase(type.toString()));
 		}
 
 		if (iconOnly) {
@@ -93,7 +93,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 	public void showUnfollowButton() {
 		if (actionMenu != null) {
 			actionMenu.setActionListener(Action.FOLLOW, unsubscribeActionListener);
-			actionMenu.setActionText(Action.FOLLOW, "Unfollow " + StringUtils.toCamelCase(type.toString()));
+			actionMenu.setActionText(Action.FOLLOW, "Unfollow " + StringUtils.toTitleCase(type.toString()));
 		}
 
 		if (iconOnly) {

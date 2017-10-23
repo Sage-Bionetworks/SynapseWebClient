@@ -45,7 +45,10 @@ public class StringUtils {
 		}
 	}
 	
-	public static String toCamelCase(String s) {
+	public static String toTitleCase(String s) {
+		if (s == null) {
+			return null;
+		}
 		StringBuilder output = new StringBuilder();
 		boolean isNextUpperCase = true;
 		for (char c : s.toLowerCase().toCharArray()) {
@@ -57,6 +60,7 @@ public class StringUtils {
 			}
 			output.append(c);
 		}
+		
 		return output.toString();
 	}
 }
