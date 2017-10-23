@@ -65,6 +65,7 @@ import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -270,7 +271,8 @@ public class SynapseClientImplTest {
 	@Mock
 	EntityHeader mockEntityHeader;
 	List<EntityHeader> entityChildrenPage;
-	
+	@Mock
+	Challenge mockChallenge;
 	public static final String OLD_COLUMN_MODEL_ID1 = "4444";
 	public static final String OLD_COLUMN_MODEL_ID2 = "4445";
 	public static final String NEW_COLUMN_MODEL_ID = "837837";
@@ -2364,6 +2366,9 @@ public class SynapseClientImplTest {
 	
 	@Test
 	public void testIsChallenge() throws RestServiceException, SynapseException {
+		when(mockSynapse.getChallengeForProject(anyString())).thenReturn(mockChallenge);
+		assertTrue(synapseClient.isChallenge("syn123"));
+		
 		org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
 		Evaluation e = new Evaluation();
 		e.setId(EVAL_ID_1);
@@ -2372,6 +2377,7 @@ public class SynapseClientImplTest {
 		testResults.setResults(Collections.singletonList(e));
 		
 		when(mockSynapse.getEvaluationByContentSource(anyString(),anyInt(),anyInt())).thenReturn(testResults);
+		when(mockSynapse.getChallengeForProject(anyString())).thenThrow(new SynapseNotFoundException());
 		
 		userEvaluationPermissions = new UserEvaluationPermissions();
 		userEvaluationPermissions.setCanChangePermissions(true);
