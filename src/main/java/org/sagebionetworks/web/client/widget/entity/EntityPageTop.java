@@ -49,6 +49,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
+	public static final String PROJECT_SETTINGS = "Project Settings";
 	private EntityPageTopView view;
 	private EntityUpdatedHandler entityUpdateHandler;
 	private EntityBundle projectBundle, filesEntityBundle, tablesEntityBundle, dockerEntityBundle;
@@ -71,8 +72,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	private DockerTab dockerTab;
 	private EntityMetadata projectMetadata;
 	private SynapseClientAsync synapseClient;
-	// how many tabs have we determined the visibility state for?
-	private int tabVisibilityInitializedCount;
 	// how many tabs have been marked as visible
 	private int visibleTabCount;
 	
@@ -123,7 +122,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		
 		projectActionMenu.addControllerWidget(projectActionController.asWidget());
 		view.setProjectActionMenu(projectActionMenu.asWidget());
-		projectActionMenu.setToolsButtonIcon("Project Settings", IconType.GEAR);
+		projectActionMenu.setToolsButtonIcon(PROJECT_SETTINGS, IconType.GEAR);
 		
 		entityActionMenu.addControllerWidget(entityActionController.asWidget());
 		view.setEntityActionMenu(entityActionMenu.asWidget());
@@ -227,8 +226,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				// by default, all tab entity bundles point to the project entity bundle
 				projectBundle = filesEntityBundle = tablesEntityBundle = dockerEntityBundle = bundle;
 				projectMetadata.setEntityBundle(projectBundle, null);
-				configureEntity(entity.getId(), filesVersionNumber);
+				initAreaToken();
 				showSelectedTabs();
+				configureEntity(entity.getId(), filesVersionNumber);
 			}
 
 			@Override
@@ -264,7 +264,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		};
 		synapseJavascriptClient.getEntityBundleForVersion(entityId, version, mask, callback);
     }
-    
+
     public void reconfigureCurrentArea() {
     	switch (area) {
 			case FILES:
@@ -298,7 +298,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
     public void updateEntityBundle(EntityBundle bundle, Long version) {
     	entity = bundle.getEntity();
     	if (entity instanceof Project) {
-	    	switch (area) {
+    		switch (area) {
 				case FILES:
 					fileChanged(bundle, version);
 					break;
@@ -341,8 +341,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
     }
     
     public void showSelectedTabs() {
-    	// after all tab visilibity has been determined, then move on to configure the currently selected tab
-    	tabVisibilityInitializedCount = 0;
     	visibleTabCount = 0;
     	// SWC-3137: show all tabs, until project display settings state persists.  Challenge is still dependent on content.
     	// always show the discussion tab
@@ -373,7 +371,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			@Override
 			public void onSuccess(Boolean isContent) {
 				view.setLoadingVisible(false);
-				tabVisibilityInitializedCount++;
 				if (isContent) {
 					visibleTabCount++;
 				}
@@ -382,15 +379,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				}
 				
 				tab.setTabListItemVisible(isContent);
-				configureCurrentAreaTabAfterComplete();
 			}
 		};
-    }
-    
-    public void configureCurrentAreaTabAfterComplete() {
-    	if (tabVisibilityInitializedCount == tabs.getTabCount()) {
-    		configureCurrentAreaTab();
-    	}
     }
     
     public void hideTabs() {
@@ -431,7 +421,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
     	return EntityArea.WIKI;
     }
 
-	public void configureCurrentAreaTab() {
+	public void initAreaToken() {
 		if (entity instanceof Project) {
 			view.setProjectInformationVisible(true);
 		}
@@ -479,7 +469,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		adminTab.asTab().setContentStale(true);
 		discussionTab.asTab().setContentStale(true);
 		dockerTab.asTab().setContentStale(true);
-		reconfigureCurrentArea();
 	}
 
     public void clearState() {
