@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWi
 import org.sagebionetworks.web.client.widget.discussion.SubscribersWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.NewDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
@@ -94,6 +95,8 @@ public class ForumWidgetTest {
 	ArgumentCaptor<Topic> topicCaptor;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
+	@Captor
+	ArgumentCaptor<ActionMenuWidget.ActionListener> actionListenerCaptor;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
@@ -351,7 +354,25 @@ public class ForumWidgetTest {
 		ParameterizedToken param = new ParameterizedToken(areaToken);
 		forumWidget.configure(entityId, param, canModerate, mockActionMenuWidget, mockParamChangeCallback, mockCallback);
 
-		verify(mockAvailableThreadListWidget).configure(anyString(), eq(canModerate), eq(moderatorIds), any(CallbackP.class), any(DiscussionFilter.class));		
+		verify(mockAvailableThreadListWidget).configure(anyString(), eq(canModerate), eq(moderatorIds), any(CallbackP.class), any(DiscussionFilter.class));
+		
+		//verify action menu configuration
+		verify(mockActionMenuWidget).setActionListener(eq(Action.CREATE_THREAD), actionListenerCaptor.capture());
+		actionListenerCaptor.getValue().onAction(Action.CREATE_THREAD);
+		verify(mockNewDiscussionThreadModal).show();
+		
+		when(mockView.isDeletedThreadListVisible()).thenReturn(false);
+		verify(mockActionMenuWidget).setActionListener(eq(Action.SHOW_DELETED_THREADS), actionListenerCaptor.capture());
+		actionListenerCaptor.getValue().onAction(Action.SHOW_DELETED_THREADS);
+		verify(mockView).setDeletedThreadListVisible(true);
+		
+		// verify action menu commands updated for forum
+		verify(mockActionMenuWidget).setActionVisible(Action.FOLLOW, true);
+		verify(mockActionMenuWidget).setActionVisible(Action.CREATE_THREAD, true);
+		verify(mockActionMenuWidget).setActionVisible(Action.SHOW_DELETED_THREADS, true);
+		verify(mockActionMenuWidget).setActionVisible(Action.EDIT_THREAD, false);
+		verify(mockActionMenuWidget).setActionVisible(Action.PIN_THREAD, false);
+		verify(mockActionMenuWidget).setActionVisible(Action.DELETE_THREAD, false);
 	}
 
 	@Test
@@ -380,7 +401,16 @@ public class ForumWidgetTest {
 		String replyId = null;
 		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
 		ParameterizedToken param = new ParameterizedToken(areaToken);
+		canModerate = true;
 		forumWidget.configure(entityId, param, canModerate, mockActionMenuWidget, mockParamChangeCallback, mockCallback);
+
+		//verify action menu commands updated for single thread where the user can moderate
+		verify(mockActionMenuWidget).setActionVisible(Action.FOLLOW, true);
+		verify(mockActionMenuWidget).setActionVisible(Action.CREATE_THREAD, false);
+		verify(mockActionMenuWidget).setActionVisible(Action.SHOW_DELETED_THREADS, false);
+		verify(mockActionMenuWidget).setActionVisible(Action.EDIT_THREAD, true);
+		verify(mockActionMenuWidget).setActionVisible(Action.PIN_THREAD, true);
+		verify(mockActionMenuWidget).setActionVisible(Action.DELETE_THREAD, true);
 
 		verify(mockStuAlert, atLeastOnce()).clear();
 		
@@ -413,6 +443,28 @@ public class ForumWidgetTest {
 		verify(mockCallback).invoke();
 	}
 	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void testConfigureSingleThreadCannotModerate() {
+		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle).when(mockSynapseJavascriptClient)
+				.getThread(anyString(), any(AsyncCallback.class));
+
+		String entityId = "syn1";
+		String threadId = "007";
+		String areaToken = ForumWidget.THREAD_ID_KEY + "=" + threadId;
+		ParameterizedToken param = new ParameterizedToken(areaToken);
+		canModerate = false;
+		forumWidget.configure(entityId, param, canModerate, mockActionMenuWidget, mockParamChangeCallback, mockCallback);
+
+		// verify action menu commands updated for single thread where the user cannot moderate
+		verify(mockActionMenuWidget).setActionVisible(Action.FOLLOW, true);
+		verify(mockActionMenuWidget).setActionVisible(Action.CREATE_THREAD, false);
+		verify(mockActionMenuWidget).setActionVisible(Action.SHOW_DELETED_THREADS, false);
+		// current user is the creator of the thread, so user can still edit thread
+		verify(mockActionMenuWidget).setActionVisible(Action.EDIT_THREAD, true);
+		verify(mockActionMenuWidget).setActionVisible(Action.PIN_THREAD, false);
+		verify(mockActionMenuWidget).setActionVisible(Action.DELETE_THREAD, false);
+	}
 
 	@SuppressWarnings("unchecked")
 	@Test
