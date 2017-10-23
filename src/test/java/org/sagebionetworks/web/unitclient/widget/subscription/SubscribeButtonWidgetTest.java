@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SubscriptionView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetView;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidget;
@@ -59,6 +60,8 @@ public class SubscribeButtonWidgetTest {
 	SubscribeButtonWidget widget;
 	@Mock
 	Subscription mockSubscription;
+	@Mock
+	ActionMenuWidget mockActionMenuWidget;
 	private static final String TEST_OBJECT_ID = "3";
 	private static final String TEST_SUBSCRIPTION_ID = "8837";
 	@Before
@@ -126,7 +129,7 @@ public class SubscribeButtonWidgetTest {
 	@Test
 	public void testAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		widget.configure(SubscriptionObjectType.THREAD, "123");
+		widget.configure(SubscriptionObjectType.THREAD, "123", mockActionMenuWidget);
 		//show the follow button.  on click, send to the login place
 		verify(mockView).showFollowButton();
 		
@@ -138,7 +141,7 @@ public class SubscribeButtonWidgetTest {
 	
 	@Test
 	public void testConfigureSubscribed() {
-		widget.configure(SubscriptionObjectType.THREAD, "123");
+		widget.configure(SubscriptionObjectType.THREAD, "123", mockActionMenuWidget);
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
 		verify(mockView).showUnfollowButton();
@@ -147,7 +150,7 @@ public class SubscribeButtonWidgetTest {
 	@Test
 	public void testConfigureUnsubscribed() {
 		when(mockSubscriptionPagedResults.getTotalNumberOfResults()).thenReturn(0L);
-		widget.configure(SubscriptionObjectType.THREAD, "123");
+		widget.configure(SubscriptionObjectType.THREAD, "123", mockActionMenuWidget);
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
 		verify(mockView).showFollowButton();
@@ -158,7 +161,7 @@ public class SubscribeButtonWidgetTest {
 		Exception ex = new Exception("error");
 		AsyncMockStubber.callFailureWith(ex).when(mockSubscriptionClient)
 			.listSubscription(any(SubscriptionRequest.class), any(AsyncCallback.class));
-		widget.configure(SubscriptionObjectType.THREAD, "123");
+		widget.configure(SubscriptionObjectType.THREAD, "123", mockActionMenuWidget);
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
 		verify(mockSynAlert).handleException(ex);

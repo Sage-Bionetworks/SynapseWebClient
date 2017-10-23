@@ -218,7 +218,6 @@ public class FilesTabTest {
 		
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		verify(mockFilesBrowser).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
@@ -232,7 +231,7 @@ public class FilesTabTest {
 		verify(mockView, times(2)).setProvenanceVisible(false);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setFileBrowserVisible(true);
-		verify(mockFilesBrowser).configure(projectEntityId, canCertifiedUserAddChild, isCertifiedUser);
+		verify(mockFilesBrowser).configure(projectEntityId);
 		
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab, times(2)).setEntityNameAndPlace(eq(projectName), captor.capture());
@@ -273,7 +272,6 @@ public class FilesTabTest {
 
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		verify(mockFilesBrowser).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		
 		verify(mockView).setFileTitlebarVisible(false);
 		verify(mockView).setFileTitlebarVisible(true);
@@ -332,7 +330,6 @@ public class FilesTabTest {
 		
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		verify(mockFilesBrowser).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView).setFolderTitlebarVisible(false);
@@ -359,7 +356,7 @@ public class FilesTabTest {
 		verify(mockView).setWikiPageWidgetVisible(true);
 		
 		verify(mockView).setFileBrowserVisible(true);
-		verify(mockFilesBrowser).configure(folderEntityId, canCertifiedUserAddChild, isCertifiedUser);
+		verify(mockFilesBrowser).configure(folderEntityId);
 		
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(folderName), captor.capture());
