@@ -19,13 +19,6 @@ public interface ActionMenuWidget extends IsWidget {
 	public void reset();
 	
 	/**
-	 * Enable/disable an action in the menu.
-	 * @param action
-	 * @param enabled
-	 */
-	public void setActionEnabled(Action action, boolean enabled);
-	
-	/**
 	 * Show or hide an action.
 	 * @param action
 	 * @param visible
