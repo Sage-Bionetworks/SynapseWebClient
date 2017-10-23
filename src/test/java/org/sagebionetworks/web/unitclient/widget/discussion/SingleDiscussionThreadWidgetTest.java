@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -15,14 +14,13 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.LIMIT;
+import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.*;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -39,9 +37,9 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -57,6 +55,7 @@ import org.sagebionetworks.web.client.widget.discussion.SubscribersWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
@@ -130,10 +129,14 @@ public class SingleDiscussionThreadWidgetTest {
 	ArgumentCaptor<Topic> topicCaptor;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
+	@Captor
+	ArgumentCaptor<ActionMenuWidget.ActionListener> actionListenerCaptor;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
+	@Mock
+	PopupUtilsView mockPopupUtils;
 	Set<String> moderatorIds;
 	SingleDiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -153,7 +156,8 @@ public class SingleDiscussionThreadWidgetTest {
 				mockDateTimeUtils, mockRequestBuilder, mockAuthController,
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
 				mockRepliesContainer, mockSubscribeButtonWidget, mockNewReplyWidget,
-				mockNewReplyWidget, mockSubscribersWidget, mockSynapseJavascriptClient);
+				mockNewReplyWidget, mockSubscribersWidget, mockSynapseJavascriptClient,
+				mockPopupUtils);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
 		moderatorIds = new HashSet<String>();
@@ -232,6 +236,58 @@ public class SingleDiscussionThreadWidgetTest {
 		assertEquals(SubscriptionObjectType.THREAD, topicCaptor.getValue().getObjectType());
 	}
 
+	@Test
+	public void testActionMenu() {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		String threadId = "1";
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle(threadId, "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
+		
+		//verify edit
+		verify(mockActionMenuWidget).setActionListener(eq(Action.EDIT_THREAD), actionListenerCaptor.capture());
+		ActionMenuWidget.ActionListener actionListener = actionListenerCaptor.getValue();
+		actionListener.onAction(Action.EDIT_THREAD);
+		verify(mockEditThreadModal).show();
+		
+		//verify delete
+		verify(mockActionMenuWidget).setActionListener(eq(Action.DELETE_THREAD), actionListenerCaptor.capture());
+		actionListener = actionListenerCaptor.getValue();
+		actionListener.onAction(Action.EDIT_THREAD);
+		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+
+		//verify pin thread
+		verify(mockActionMenuWidget).setActionText(eq(Action.PIN_THREAD), eq(PIN_THREAD_ACTION_TEXT));
+		verify(mockActionMenuWidget).setActionListener(eq(Action.PIN_THREAD), actionListenerCaptor.capture());
+		actionListener = actionListenerCaptor.getValue();
+		actionListener.onAction(Action.EDIT_THREAD);
+		verify(mockDiscussionForumClientAsync).pinThread(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testUnpinActionMenu() {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		boolean isPinned = true;
+		String threadId = "1";
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle(threadId, "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
+		
+		//verify unpin thread
+		verify(mockActionMenuWidget).setActionText(eq(Action.PIN_THREAD), eq(UNPIN_THREAD_ACTION_TEXT));
+		verify(mockActionMenuWidget).setActionListener(eq(Action.PIN_THREAD), actionListenerCaptor.capture());
+		ActionMenuWidget.ActionListener actionListener = actionListenerCaptor.getValue();
+		actionListener.onAction(Action.EDIT_THREAD);
+		verify(mockDiscussionForumClientAsync).unpinThread(anyString(), any(AsyncCallback.class));
+	}
+	
 	@Test
 	public void testConfigureDeletedThread() {
 		boolean isDeleted = true;
@@ -755,9 +811,9 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testOnClickDeleteThread() {
 		discussionThreadWidget.onClickDeleteThread();
-		ArgumentCaptor<SimpleCallback> captor = ArgumentCaptor.forClass(SimpleCallback.class);
-		verify(mockView).showConfirm(anyString(), anyString(), anyString(), anyString(), captor.capture());
-		captor.getValue().callback();
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), captor.capture());
+		captor.getValue().invoke();
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClientAsync).markThreadAsDeleted(anyString(), any(AsyncCallback.class));
 	}
@@ -765,9 +821,9 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testOnClickRestoreThread() {
 		discussionThreadWidget.onClickRestore();
-		ArgumentCaptor<SimpleCallback> captor = ArgumentCaptor.forClass(SimpleCallback.class);
-		verify(mockView).showConfirm(anyString(), anyString(), anyString(), anyString(), captor.capture());
-		captor.getValue().callback();
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), captor.capture());
+		captor.getValue().invoke();
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClientAsync).restoreThread(anyString(), any(AsyncCallback.class));
 	}

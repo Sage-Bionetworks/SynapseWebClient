@@ -1,13 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_DELETE;
-import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_RESTORE;
-import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYLE;
-import static org.sagebionetworks.web.client.DisplayConstants.PRIMARY_BUTTON_STYLE;
-
 import java.util.Set;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
@@ -17,6 +11,7 @@ import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -46,6 +41,8 @@ import com.google.inject.Inject;
 
 public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidgetView.Presenter{
 
+	public static final String PIN_THREAD_ACTION_TEXT = "Pin Thread";
+	public static final String UNPIN_THREAD_ACTION_TEXT = "Unpin Thread";
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
 	public static final Boolean DEFAULT_ASCENDING = true;
 	public static final Long LIMIT = 5L;
@@ -95,6 +92,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private ActionMenuWidget actionMenu;
 	ActionMenuWidget.ActionListener editActionListener, unpinActionListener, pinActionListener, deleteActionListener;
 	Boolean isPinned;
+	PopupUtilsView popupUtils;
 	
 	@Inject
 	public SingleDiscussionThreadWidget(
@@ -114,7 +112,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			NewReplyWidget newReplyWidget,
 			NewReplyWidget secondNewReplyWidget,
 			SubscribersWidget threadSubscribersWidget,
-			SynapseJavascriptClient jsClient
+			SynapseJavascriptClient jsClient,
+			PopupUtilsView popupUtils
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -133,6 +132,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.secondNewReplyWidget = secondNewReplyWidget;
 		this.threadSubscribersWidget = threadSubscribersWidget;
 		this.jsClient = jsClient;
+		this.popupUtils = popupUtils;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setAuthor(authorWidget.asWidget());
@@ -231,7 +231,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 	private Callback getNewReplyCallback() {
 		return new Callback() {
-
 			@Override
 			public void invoke() {
 				reconfigureThread();
@@ -283,10 +282,10 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			if (isPinned) {
 				// thread is pinned
 				actionMenu.setActionListener(Action.PIN_THREAD, unpinActionListener);
-				actionMenu.setActionText(Action.PIN_THREAD, "Unpin Thread");
+				actionMenu.setActionText(Action.PIN_THREAD, UNPIN_THREAD_ACTION_TEXT);
 			} else {
 				actionMenu.setActionListener(Action.PIN_THREAD, pinActionListener);
-				actionMenu.setActionText(Action.PIN_THREAD, "Pin Thread");
+				actionMenu.setActionText(Action.PIN_THREAD, PIN_THREAD_ACTION_TEXT);
 			}
 		}
 	}
@@ -471,10 +470,9 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	
 	@Override
 	public void onClickDeleteThread() {
-		view.showConfirm(DELETE_CONFIRM_MESSAGE, CONFIRM_DELETE_DIALOG_TITLE, BUTTON_DELETE, DANGER_BUTTON_STYLE, new SimpleCallback(){
-
+		popupUtils.showConfirmDialog(CONFIRM_DELETE_DIALOG_TITLE, DELETE_CONFIRM_MESSAGE, new Callback() {
 			@Override
-			public void callback() {
+			public void invoke() {
 				deleteThread();
 			}
 		});
@@ -555,10 +553,9 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	}
 
 	public void onClickRestore() {
-		view.showConfirm(RESTORE_CONFIRM_MESSAGE, CONFIRM_RESTORE_DIALOG_TITLE, BUTTON_RESTORE, PRIMARY_BUTTON_STYLE, new SimpleCallback(){
-
+		popupUtils.showConfirmDialog(CONFIRM_RESTORE_DIALOG_TITLE, RESTORE_CONFIRM_MESSAGE, new Callback() {
 			@Override
-			public void callback() {
+			public void invoke() {
 				restoreThread();
 			}
 		});
