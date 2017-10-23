@@ -14,7 +14,6 @@ import com.google.inject.Inject;
  * Render entity annotations
  */
 public class AnnotationsRendererWidget implements IsWidget {
-	private EntityBundle bundle;
 	private AnnotationsRendererWidgetView view;
 	private AnnotationTransformer annotationTransformer;
 	EntityUpdatedHandler entityUpdatedHandler;
@@ -35,7 +34,6 @@ public class AnnotationsRendererWidget implements IsWidget {
 	}
 
 	public void configure(EntityBundle bundle) {
-		this.bundle = bundle;
 		annotationsList = annotationTransformer.annotationsToList(bundle.getAnnotations());
 		if (!annotationsList.isEmpty())
 			view.configure(annotationsList);

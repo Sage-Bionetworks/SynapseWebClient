@@ -34,7 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.junit.Before;
@@ -94,6 +94,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
+import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
@@ -109,6 +110,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.EntityActionContr
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.ProvenanceEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWidget;
+import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -116,6 +118,9 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.Act
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -206,6 +211,14 @@ public class EntityActionControllerImplTest {
 	AnnotationsRendererWidget mockAnnotationsRendererWidget;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	AddFolderDialogWidget mockAddFolderDialogWidget;
+	@Mock
+	CreateTableViewWizard mockCreateTableViewWizard;
+	@Mock
+	UploadTableModalWidget mockUploadTableModalWidget;
+	@Mock
+	AddExternalRepoModal mockAddExternalRepoModal; 
 	
 	Set<ResourceAccess> resourceAccessSet;
 	
@@ -264,6 +277,10 @@ public class EntityActionControllerImplTest {
 		when(mockPortalGinInjector.getAnnotationsRendererWidget()).thenReturn(mockAnnotationsRendererWidget);
 		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockSynapseJavascriptClient);
+		when(mockPortalGinInjector.getCreateTableViewWizard()).thenReturn(mockCreateTableViewWizard);
+		when(mockPortalGinInjector.getUploadTableModalWidget()).thenReturn(mockUploadTableModalWidget);
+		when(mockPortalGinInjector.getAddExternalRepoModal()).thenReturn(mockAddExternalRepoModal);
+		when(mockPortalGinInjector.getAddFolderDialogWidget()).thenReturn(mockAddFolderDialogWidget);
 		// The controller under test.
 		controller = new EntityActionControllerImpl(mockView,
 				mockPreflightController,
@@ -353,6 +370,91 @@ public class EntityActionControllerImplTest {
 		ra.setPrincipalId(PUBLIC_USER_ID);
 		resourceAccessSet.add(ra);
 	}
+	
+	@Test
+	public void testConfigureProjectLevelTableCommandsCanEdit(){
+		entityBundle.setEntity(new Project());
+		currentEntityArea = EntityArea.TABLES;
+		boolean canCertifiedUserEdit = true;
+		permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE, canCertifiedUserEdit);
+		verify(mockActionMenu).setActionListener(Action.UPLOAD_TABLE, controller);
+		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE, canCertifiedUserEdit);
+		verify(mockActionMenu).setActionListener(Action.ADD_TABLE, controller);
+		verify(mockActionMenu).setActionVisible(Action.ADD_FILE_VIEW, canCertifiedUserEdit);
+		verify(mockActionMenu).setActionListener(Action.ADD_FILE_VIEW, controller);
+		verify(mockActionMenu).setActionVisible(Action.ADD_PROJECT_VIEW, canCertifiedUserEdit);
+		verify(mockActionMenu).setActionListener(Action.ADD_PROJECT_VIEW, controller);
+	}
+	@Test
+	public void testConfigureProjectLevelTableCommandsCannotEdit(){
+		entityBundle.setEntity(new Project());
+		currentEntityArea = EntityArea.TABLES;
+		boolean canCertifiedUserEdit = false;
+		permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE, canCertifiedUserEdit);
+		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE, canCertifiedUserEdit);
+		verify(mockActionMenu).setActionVisible(Action.ADD_FILE_VIEW, canCertifiedUserEdit);
+		verify(mockActionMenu).setActionVisible(Action.ADD_PROJECT_VIEW, canCertifiedUserEdit);
+	}
+	@Test
+	public void testConfigureProjectLevelTableCommandsCanEditNotOnTablesTab(){
+		entityBundle.setEntity(new Project());
+		currentEntityArea = EntityArea.FILES;
+		boolean canCertifiedUserEdit = true;
+		permissions.setCanCertifiedUserEdit(canCertifiedUserEdit);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		
+		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_TABLE, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_FILE_VIEW, false);
+		verify(mockActionMenu).setActionVisible(Action.ADD_PROJECT_VIEW, false);
+	}
+	
+	@Test
+	public void testConfigureReorderWikiSubpagesWithTree(){
+		entityBundle.setEntity(new Project());
+		currentEntityArea = EntityArea.WIKI;
+		boolean canEdit = true;
+		permissions.setCanEdit(canEdit);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionVisible(Action.REORDER_WIKI_SUBPAGES, true);
+	}
+
+	@Test
+	public void testConfigureReorderWikiSubpagesNoTree(){
+		AsyncMockStubber.callSuccessWith(new ArrayList<V2WikiHeader>()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
+		entityBundle.setEntity(new Project());
+		currentEntityArea = EntityArea.WIKI;
+		boolean canEdit = true;
+		permissions.setCanEdit(canEdit);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
+	}
+	
+	@Test
+	public void testConfigureReorderWikiSubpagesNoEdit(){
+		entityBundle.setEntity(new Project());
+		currentEntityArea = EntityArea.WIKI;
+		boolean canEdit = false;
+		permissions.setCanEdit(canEdit);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
+	}
+	@Test
+	public void testConfigureReorderWikiSubpagesNotOnProject(){
+		entityBundle.setEntity(new Folder());
+		currentEntityArea = null;
+		boolean canEdit = true;
+		permissions.setCanEdit(canEdit);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionVisible(Action.REORDER_WIKI_SUBPAGES, false);
+	}
+
 	
 	@Test
 	public void testConfigurePublicReadTable(){
@@ -1119,11 +1221,42 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testIsMovableType(){
 		assertFalse(controller.isMovableType(new Project()));
+		assertFalse(controller.isMovableType(new DockerRepository()));
 		assertTrue(controller.isMovableType(new TableEntity()));
 		assertTrue(controller.isMovableType(new EntityView()));
 		assertTrue(controller.isMovableType(new FileEntity()));
 		assertTrue(controller.isMovableType(new Folder()));
 		assertTrue(controller.isMovableType(new Link()));
+	}
+	
+	@Test
+	public void testIsTopLevelProjectToolsMenu() {
+		// is a top level tools menu if the target entity is a Project, and the area is set
+		assertTrue(controller.isTopLevelProjectToolsMenu(new Project(), EntityArea.FILES));
+		assertTrue(controller.isTopLevelProjectToolsMenu(new Project(), EntityArea.DISCUSSION));
+		// if the area is not set, then it's the Project Settings) 
+		assertFalse(controller.isTopLevelProjectToolsMenu(new Project(), null));
+		// if looking at a specific child (file/table/...), then it is not a top level project tools menu for that area.
+		assertFalse(controller.isTopLevelProjectToolsMenu(new FileEntity(), null));
+	}
+
+	@Test
+	public void testIsContainerOnFilesTab() {
+		// for commands like upload.  can be used on a Folder, or when looking at a Project on the Files tab (root file/folder container).
+		assertTrue(controller.isContainerOnFilesTab(new Project(), EntityArea.FILES));
+		assertTrue(controller.isContainerOnFilesTab(new Folder(), null));
+		assertFalse(controller.isContainerOnFilesTab(new Project(), EntityArea.WIKI));
+		assertFalse(controller.isContainerOnFilesTab(new Project(), EntityArea.DISCUSSION));
+	}
+	
+	@Test
+	public void testIsWikableConfig(){
+		//if entity is a project, must be in Wiki area for wiki commands to show up in the tools menu. 
+		assertTrue(controller.isWikiableConfig(new Project(), EntityArea.WIKI));
+		assertFalse(controller.isWikiableConfig(new Project(), EntityArea.TABLES));
+		assertFalse(controller.isWikiableConfig(new Project(), EntityArea.FILES));
+		assertFalse(controller.isWikiableConfig(new TableEntity(), null));
+		assertTrue(controller.isWikiableConfig(new FileEntity(), null));
 	}
 	
 	@Test
@@ -1526,7 +1659,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testOnShowAnnotationsCanEditAndCertified() {
 		entityBundle.getPermissions().setCanCertifiedUserEdit(true);
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
 		
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		controller.onAction(Action.SHOW_ANNOTATIONS);
@@ -1691,8 +1824,9 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.MANAGE_ACCESS_REQUIREMENTS, true);
 		verify(mockActionMenu).setActionVisible(Action.APPROVE_USER_ACCESS, true);
 		verify(mockActionMenu).setActionListener(Action.MANAGE_ACCESS_REQUIREMENTS, controller);
+		verify(mockActionMenu).setACTDividerVisible(true);
 	}
-	
+
 	@Test
 	public void testOnManageAccessRequirements(){
 		entityBundle.setEntity(new Folder());
@@ -1701,6 +1835,68 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.MANAGE_ACCESS_REQUIREMENTS);
 		verify(mockPlaceChanger).goTo(any(AccessRequirementsPlace.class));
 	}
-
-
+	
+	@Test
+	public void testUploadNewFileEntity(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		String folderId = "syn1292";
+		Entity parentFolder = new Folder();
+		parentFolder.setId(folderId);
+		entityBundle.setEntity(parentFolder);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		controller.onAction(Action.UPLOAD_FILE);
+		boolean isEntity = true;
+		Entity currentFileEntity = null;
+		CallbackP<String> fileHandleIdCallback = null;
+		verify(mockUploader).configure(
+				DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, 
+				currentFileEntity, 
+				folderId,
+				mockEntityUpdatedHandler,
+				fileHandleIdCallback,
+				isEntity);
+		verify(mockUploader).setUploaderLinkNameVisible(true);
+		verify(mockUploader).show();
+	}
+	
+	@Test
+	public void testCreateFolder(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		controller.onAction(Action.CREATE_FOLDER);
+		verify(mockAddFolderDialogWidget).show(entityId);
+	}
+	
+	@Test
+	public void testAddTable(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		controller.onAction(Action.ADD_TABLE);
+		verify(mockCreateTableViewWizard).configure(entityId, TableType.table);
+		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
+	}
+	@Test
+	public void testAddFileView(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		controller.onAction(Action.ADD_FILE_VIEW);
+		verify(mockCreateTableViewWizard).configure(entityId, TableType.fileview);
+		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
+	}
+	@Test
+	public void testAddProjectView(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		controller.onAction(Action.ADD_PROJECT_VIEW);
+		verify(mockCreateTableViewWizard).configure(entityId, TableType.projectview);
+		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
+	}
+	@Test
+	public void testCreateExternalDockerRepo(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		controller.onAction(Action.CREATE_EXTERNAL_DOCKER_REPO);
+		verify(mockAddExternalRepoModal).configuration(eq(entityId), any(Callback.class));
+		verify(mockAddExternalRepoModal).show();
+	}
 }

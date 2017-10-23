@@ -604,7 +604,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void configureReorderWikiSubpages() {
-		if(isWikiableConfig(entityBundle.getEntity(), currentArea) && entityBundle.getEntity() instanceof Project){
+		if(isWikiableConfig(entityBundle.getEntity(), currentArea) && 
+				entityBundle.getEntity() instanceof Project &&
+				permissions.getCanEdit()){
 			// shown if there's more than one page
 			getSynapseClient().getV2WikiHeaderTree(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), new AsyncCallback<List<V2WikiHeader>>() {
 				@Override
@@ -613,7 +615,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				}
 				public void onSuccess(List<V2WikiHeader> wikiHeaders) {
 					boolean isMoreThanOne = wikiHeaders.size() > 1;
-					actionMenu.setActionVisible(Action.REORDER_WIKI_SUBPAGES, isMoreThanOne && permissions.getCanEdit());
+					actionMenu.setActionVisible(Action.REORDER_WIKI_SUBPAGES, isMoreThanOne);
 				};
 			});
 		} else{
@@ -1062,7 +1064,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		// configure and show annotations
 		if (entityBundle.getPermissions().getCanCertifiedUserEdit()) {
 			// show editor, if user passes preflight test
-			preflightController.checkUploadToEntity(entityBundle, new Callback() {
+			preflightController.checkUpdateEntity(entityBundle, new Callback() {
 				@Override
 				public void invoke() {
 					getEditAnnotationsDialog().configure(entityBundle, entityUpdateHandler);

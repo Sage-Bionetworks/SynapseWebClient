@@ -1,15 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -21,7 +22,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -38,14 +38,10 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.SessionStorage;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
-import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
@@ -168,9 +164,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigureNoWikiPageNotFound(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		boolean showSubpages = true;
 		boolean canEdit = false;
-		String suffix = "-test-suffix";
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null);
 		
 		verify(mockStuAlert, never()).handleException(any(Exception.class));
@@ -183,9 +177,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigureNoWikiPageNotFoundCanEdit(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		boolean showSubpages = true;
 		boolean canEdit = true;
-		String suffix = "-test-suffix";
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null);
 		
 		verify(mockStuAlert, never()).handleException(any(Exception.class));
@@ -199,8 +191,6 @@ public class WikiPageWidgetTest {
 	public void testConfigureNoWikiPageError(){
 		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		boolean canEdit = false;
-		boolean showSubpages = true;
-		String suffix = "-test-suffix";
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null);
 		verify(mockStuAlert).handleException(any(Exception.class));
 		verify(mockView).setMainPanelVisible(false);
@@ -210,9 +200,7 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigureOtherErrorGettingWikiPage(){
 		AsyncMockStubber.callFailureWith(new RuntimeException("another error")).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		boolean showSubpages = true;
 		boolean canEdit = true;
-		String suffix = "-test-suffix";
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null);
 		verify(mockStuAlert).handleException(any(Exception.class));
 		verify(mockView).setMainPanelVisible(false);
@@ -221,7 +209,6 @@ public class WikiPageWidgetTest {
 	
 	@Test
 	public void testShowWikiHistory(){
-		boolean showSubpages = true;
 		boolean canEdit = true;
 		presenter.setModifiedCreatedByHistoryVisible(false);
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null);
@@ -249,7 +236,6 @@ public class WikiPageWidgetTest {
 		AsyncMockStubber.callSuccessWith(wikiPage).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null);
-		
 		presenter.showSubpages(mockActionMenuWidget);
 		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), callbackPCaptor.capture(), any(ActionMenuWidget.class));
 		// invoke subpage clicked
@@ -272,7 +258,6 @@ public class WikiPageWidgetTest {
 
 	@Test
 	public void testReloadWikiPageFailure() {
-		boolean showSubpages = true;
 		boolean canEdit = false;
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null);
 		
