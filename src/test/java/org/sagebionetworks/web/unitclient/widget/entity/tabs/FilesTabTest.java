@@ -17,9 +17,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -28,7 +28,6 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -111,7 +110,7 @@ public class FilesTabTest {
 	@Mock
 	ProvenanceWidget mockProvenanceWidget;
 	@Mock
-	CallbackP<String> mockUpdateEntityCallback;
+	CallbackP<String> mockEntitySelectedCallback;
 	@Mock
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
 	@Mock
@@ -120,6 +119,8 @@ public class FilesTabTest {
 	DiscussionThreadListWidget mockDiscussionThreadListWidget;
 	@Mock
 	DiscussionThreadBundle mockBundle;
+	@Captor
+	ArgumentCaptor<CallbackP> callbackPCaptor;
 	
 	FilesTab tab;
 	String projectEntityId = "syn9";
@@ -155,7 +156,7 @@ public class FilesTabTest {
 		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
 		when(mockPortalGinInjector.getDiscussionThreadListWidget()).thenReturn(mockDiscussionThreadListWidget);
 		
-		tab.setUpdateEntityCallback(mockUpdateEntityCallback);
+		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
 		
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
@@ -201,6 +202,15 @@ public class FilesTabTest {
 	public void testSetTabClickedCallback() {
 		tab.setTabClickedCallback(mockOnClickCallback);
 		verify(mockTab).addTabClickedCallback(mockOnClickCallback);
+	}
+	
+	@Test
+	public void testClickFilesBrowser() {
+		//verify that clicking on an item in the files browser sends the event back to the entity page top (to get the new target entity)
+		String newEntityId = "syn9839248";
+		verify(mockFilesBrowser).setEntityClickedHandler(callbackPCaptor.capture());
+		callbackPCaptor.getValue().invoke(newEntityId);
+		verify(mockEntitySelectedCallback).invoke(newEntityId);
 	}
 
 	@Test

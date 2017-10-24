@@ -20,6 +20,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -94,12 +95,14 @@ public class TablesTabTest {
 	@Mock
 	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
-	CallbackP<String> mockUpdateEntityCallback;
+	CallbackP<String> mockEntitySelectedCallback;
 	@Mock
 	TableEntityWidget mockTableEntityWidget;
 	@Mock
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
-	
+	@Captor
+	ArgumentCaptor<CallbackP> callbackPCaptor;
+
 	String projectEntityId = "syn666666";
 	String projectName = "a test project";
 	String tableEntityId = "syn22";
@@ -125,7 +128,7 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
 		when(mockPortalGinInjector.getProvenanceRenderer()).thenReturn(mockProvenanceWidget);
 		
-		tab.setUpdateEntityCallback(mockUpdateEntityCallback);
+		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
@@ -161,6 +164,15 @@ public class TablesTabTest {
 	public void testSetTabClickedCallback() {
 		tab.setTabClickedCallback(mockOnClickCallback);
 		verify(mockTab).addTabClickedCallback(mockOnClickCallback);
+	}
+
+	@Test
+	public void testClickTable() {
+		//verify that clicking on an item in the tables list sends the event back to the entity page top (to get the new target entity)
+		String newEntityId = "syn9839838";
+		verify(mockTableListWidget).setTableClickedCallback(callbackPCaptor.capture());
+		callbackPCaptor.getValue().invoke(newEntityId);
+		verify(mockEntitySelectedCallback).invoke(newEntityId);
 	}
 
 	@Test

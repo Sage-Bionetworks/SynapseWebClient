@@ -1,14 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
-import static org.sagebionetworks.repo.model.EntityBundle.DOI;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
-import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
-import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
-import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
-import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
-
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -18,7 +9,6 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -39,7 +29,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
@@ -66,7 +55,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	TableEntityWidget v2TableWidget;
 	Map<String,String> configMap;
 	ActionMenuWidget entityActionMenu;
-	CallbackP<String> updateEntityCallback;
+	CallbackP<String> entitySelectedCallback;
 	
 	public static final String TABLES_HELP = "Build structured queryable data that can be described by a schema using the Tables.";
 	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "tables.html";
@@ -103,7 +92,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 				@Override
 				public void invoke(String entityId) {
 					areaToken = null;
-					updateEntityCallback.invoke(entityId);
+					entitySelectedCallback.invoke(entityId);
 				}
 			});
 			initBreadcrumbLinkClickedHandler();
@@ -111,8 +100,8 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		}
 	}
 	
-	public void setUpdateEntityCallback(CallbackP<String> updateEntityCallback) {
-		this.updateEntityCallback = updateEntityCallback;
+	public void setEntitySelectedCallback(CallbackP<String> entitySelectedCallback) {
+		this.entitySelectedCallback = entitySelectedCallback;
 	}
 
 	@Override
@@ -128,7 +117,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 				//if this is the project id, then just reconfigure from the project bundle
 				Synapse synapse = (Synapse)place;
 				String entityId = synapse.getEntityId();
-				updateEntityCallback.invoke(entityId);
+				entitySelectedCallback.invoke(entityId);
 			};
 		};
 		breadcrumb.setLinkClickedHandler(breadcrumbClicked);

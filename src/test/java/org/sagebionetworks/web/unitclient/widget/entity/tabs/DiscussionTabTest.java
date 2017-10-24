@@ -122,4 +122,10 @@ public class DiscussionTabTest {
 	public void testAsTab() {
 		assertEquals(mockTab, tab.asTab());
 	}
+	@Test
+	public void testUpdateActionMenuCommands() {
+		tab.updateActionMenuCommands();
+		verify(mockForumWidget).updateActionMenuCommands();
+	}
+
 }

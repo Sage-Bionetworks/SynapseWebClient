@@ -67,7 +67,7 @@ public class FilesTab {
 	Throwable projectBundleLoadError;
 	String projectEntityId;
 	EntityBundle entityBundle;
-	CallbackP<String> updateEntityCallback;
+	CallbackP<String> entitySelectedCallback;
 	
 	@Inject
 	public FilesTab(Tab tab, PortalGinInjector ginInjector) {
@@ -115,7 +115,7 @@ public class FilesTab {
 			CallbackP<String> entityClicked = new CallbackP<String> () {
 				@Override
 				public void invoke(String id) {
-					updateEntityCallback.invoke(id);
+					entitySelectedCallback.invoke(id);
 				}
 			};
 			filesBrowser.setEntityClickedHandler(entityClicked);
@@ -128,7 +128,7 @@ public class FilesTab {
 				//if this is the project id, then just reconfigure from the project bundle
 				Synapse synapse = (Synapse)place;
 				String entityId = synapse.getEntityId();
-				updateEntityCallback.invoke(entityId);
+				entitySelectedCallback.invoke(entityId);
 			};
 		};
 		breadcrumb.setLinkClickedHandler(breadcrumbClicked);
@@ -298,8 +298,8 @@ public class FilesTab {
 		}
 	}
 
-	public void setUpdateEntityCallback(CallbackP<String> updateEntityCallback) {
-		this.updateEntityCallback = updateEntityCallback;
+	public void setEntitySelectedCallback(CallbackP<String> entitySelectedCallback) {
+		this.entitySelectedCallback = entitySelectedCallback;
 	}
 	
 	public Tab asTab(){

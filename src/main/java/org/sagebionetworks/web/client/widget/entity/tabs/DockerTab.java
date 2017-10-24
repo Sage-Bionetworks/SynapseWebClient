@@ -38,7 +38,7 @@ public class DockerTab implements DockerTabView.Presenter{
 	String projectEntityId;
 	String areaToken;
 	EntityUpdatedHandler handler;
-	CallbackP<String> updateEntityCallback;
+	CallbackP<String> entitySelectedCallback;
 	
 	@Inject
 	public DockerTab(
@@ -72,12 +72,12 @@ public class DockerTab implements DockerTabView.Presenter{
 				//if this is the project id, then just reconfigure from the project bundle
 				Synapse synapse = (Synapse)place;
 				String entityId = synapse.getEntityId();
-				updateEntityCallback.invoke(entityId);
+				entitySelectedCallback.invoke(entityId);
 			};
 		});
 	}
-	public void setUpdateEntityCallback(CallbackP<String> updateEntityCallback) {
-		this.updateEntityCallback = updateEntityCallback;
+	public void setEntitySelectedCallback(CallbackP<String> entitySelectedCallback) {
+		this.entitySelectedCallback = entitySelectedCallback;
 	}
 	
 	public void setTabClickedCallback(CallbackP<Tab> onClickCallback) {
@@ -96,6 +96,7 @@ public class DockerTab implements DockerTabView.Presenter{
 		String title = projectEntityId;
 		if (projectBundle != null) {
 			title = projectBundle.getEntity().getName();
+			dockerRepoListWidget.configure(projectBundle.getEntity().getId());
 		} else {
 			showError(projectBundleLoadError);
 		}
@@ -138,7 +139,6 @@ public class DockerTab implements DockerTabView.Presenter{
 				repoWidget.configure(bundle, handler);
 			} else if (isProject) {
 				areaToken = null;
-				dockerRepoListWidget.configure(bundle.getEntity().getId());
 				showProjectLevelUI();
 			}
 		} else {

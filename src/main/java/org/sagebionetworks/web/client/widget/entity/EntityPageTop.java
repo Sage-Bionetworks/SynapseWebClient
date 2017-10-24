@@ -148,9 +148,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		tabs.addTab(discussionTab.asTab());
 		tabs.addTab(dockerTab.asTab());
 
-		filesTab.setUpdateEntityCallback(getEntitySelectedCallback(EntityArea.FILES));
-		tablesTab.setUpdateEntityCallback(getEntitySelectedCallback(EntityArea.TABLES));
-		dockerTab.setUpdateEntityCallback(getEntitySelectedCallback(EntityArea.DOCKER));
+		filesTab.setEntitySelectedCallback(getEntitySelectedCallback(EntityArea.FILES));
+		tablesTab.setEntitySelectedCallback(getEntitySelectedCallback(EntityArea.TABLES));
+		dockerTab.setEntitySelectedCallback(getEntitySelectedCallback(EntityArea.DOCKER));
 
 		// lazy init tabs, and show project information (if set)
 		wikiTab.setTabClickedCallback(new CallbackP<Tab>() {

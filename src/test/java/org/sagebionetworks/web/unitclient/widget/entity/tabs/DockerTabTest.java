@@ -16,6 +16,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -77,7 +78,10 @@ public class DockerTabTest {
 	EntityBundle mockDockerRepoEntityBundle;
 	@Mock
 	EntityPath path;
-	
+	@Captor
+	ArgumentCaptor<CallbackP> callbackPCaptor;
+	@Mock
+	CallbackP<String> mockEntitySelectedCallback;
 	DockerTab tab;
 
 	String projectEntityId = "syn123";
@@ -136,8 +140,14 @@ public class DockerTabTest {
 		verify(mockView).setDockerRepoList(any(Widget.class));
 		verify(mockView).setSynapseAlert(any(Widget.class));
 		verify(mockTab).configure(anyString(), anyString(), anyString());
-		verify(mockBreadcrumb).setLinkClickedHandler(any(CallbackP.class));
+		verify(mockBreadcrumb).setLinkClickedHandler(callbackPCaptor.capture());
 		verify(mockTab).setContent(any(Widget.class));
+		
+		// test click on breadcrumb
+		String newEntityId = "syn9898989822";
+		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
+		callbackPCaptor.getValue().invoke(new Synapse(newEntityId));
+		verify(mockEntitySelectedCallback).invoke(newEntityId);
 	}
 
 	@Test
@@ -154,7 +164,7 @@ public class DockerTabTest {
 	@Test
 	public void testConfigureWithProject() {
 		String areaToken = null;
-		tab.setUpdateEntityCallback(mockUpdateEntityCallback);
+		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockProjectEntityBundle, mockEntityUpdatedHandler, areaToken);
 		verify(mockSynAlert, atLeastOnce()).clear();
@@ -170,7 +180,7 @@ public class DockerTabTest {
 	public void testConfigureWithProjectFailure() {
 		String areaToken = null;
 		mockProjectEntityBundle = null;
-		tab.setUpdateEntityCallback(mockUpdateEntityCallback);
+		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, mockProjectBundleLoadError);
 		tab.configure(mockProjectEntityBundle, mockEntityUpdatedHandler, areaToken);
 		verify(mockSynAlert, atLeastOnce()).clear();
@@ -183,7 +193,7 @@ public class DockerTabTest {
 	@Test
 	public void testConfigureWithDockerRepoEntity() {
 		String areaToken = null;
-		tab.setUpdateEntityCallback(mockUpdateEntityCallback);
+		tab.setEntitySelectedCallback(mockUpdateEntityCallback);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, mockProjectBundleLoadError);
 		tab.configure(mockDockerRepoEntityBundle, mockEntityUpdatedHandler, areaToken);
 		verify(mockTab).setEntityNameAndPlace(eq(dockerRepoName), any(Synapse.class));
