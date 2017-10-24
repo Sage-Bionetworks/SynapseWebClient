@@ -120,7 +120,6 @@ public class DockerTab implements DockerTabView.Presenter{
 		if (bundle != null) {
 			resetView();
 			view.clearDockerRepoWidget();
-			tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, null, null));
 			tab.showTab();
 			Entity entity = bundle.getEntity();
 			boolean isRepo = entity instanceof DockerRepository;
@@ -129,6 +128,7 @@ public class DockerTab implements DockerTabView.Presenter{
 			view.setDockerRepoListVisible(isProject);
 			view.setDockerRepoWidgetVisible(isRepo);
 			if (isRepo) {
+				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, null, null));
 				List<LinkData> links = new ArrayList<LinkData>();
 				Place projectPlace = new Synapse(projectEntityId, null, EntityArea.DOCKER, null);
 				String projectName = bundle.getPath().getPath().get(1).getName();

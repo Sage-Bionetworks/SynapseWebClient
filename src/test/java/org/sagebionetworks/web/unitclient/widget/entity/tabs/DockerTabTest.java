@@ -168,7 +168,7 @@ public class DockerTabTest {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockProjectEntityBundle, mockEntityUpdatedHandler, areaToken);
 		verify(mockSynAlert, atLeastOnce()).clear();
-		verify(mockTab, times(2)).setEntityNameAndPlace(eq(projectName), any(Synapse.class));
+		verify(mockTab).setEntityNameAndPlace(eq(projectName), any(Synapse.class));
 		verify(mockView, times(2)).setBreadcrumbVisible(false);
 		verify(mockView).setDockerRepoListVisible(true);
 		verify(mockView, times(2)).clearDockerRepoWidget();
