@@ -5,7 +5,6 @@ import static com.google.common.util.concurrent.Futures.whenAllComplete;
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
 import static org.sagebionetworks.web.client.DisplayUtils.getDisplayName;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
@@ -78,11 +77,11 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 			).addCallback(
 					new FutureCallback<MembershipInvtnSubmission>() {
 						@Override
-						public void onSuccess(@Nullable MembershipInvtnSubmission mis) {
-							if (authController.isLoggedIn()) {
-								bindInvitationToAuthenticatedUser(mis.getId());
-							} else {
+						public void onSuccess(MembershipInvtnSubmission mis) {
+							if (!authController.isLoggedIn()) {
 								initializeView(mis);
+							} else {
+								bindInvitationToAuthenticatedUser(mis.getId());
 							}
 						}
 
@@ -103,7 +102,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 			).addCallback(
 					new FutureCallback<Void>() {
 						@Override
-						public void onSuccess(@Nullable Void aVoid) {
+						public void onSuccess(Void aVoid) {
 							placeChanger.goTo(new Profile(authController.getCurrentUserPrincipalId(), Synapse.ProfileArea.TEAMS));
 						}
 
