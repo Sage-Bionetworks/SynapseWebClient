@@ -2567,8 +2567,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		// are there any evaluations that the current user can edit?
 		try {
 			Challenge challenge = synapseClient.getChallengeForProject(projectId);
-			//found a challenge!
-			return true;
+			// found a challenge!
+			// return true if user has edit access to the project
+			return synapseClient.canAccess(challenge.getProjectId(), ACCESS_TYPE.UPDATE);
 		} catch (Exception e) {
 			return ChallengeClientImpl.getShareableEvaluations(projectId, synapseClient).size() > 0;
 		}

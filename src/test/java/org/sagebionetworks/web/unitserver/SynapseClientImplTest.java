@@ -2367,6 +2367,7 @@ public class SynapseClientImplTest {
 	@Test
 	public void testIsChallenge() throws RestServiceException, SynapseException {
 		when(mockSynapse.getChallengeForProject(anyString())).thenReturn(mockChallenge);
+		when(mockSynapse.canAccess(anyString(), eq(ACCESS_TYPE.UPDATE))).thenReturn(true);
 		assertTrue(synapseClient.isChallenge("syn123"));
 		
 		org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = new org.sagebionetworks.reflection.model.PaginatedResults<Evaluation>();
