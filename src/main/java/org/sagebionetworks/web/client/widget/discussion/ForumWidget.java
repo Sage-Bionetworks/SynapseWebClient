@@ -301,6 +301,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	public void resetView() {
 		view.setMainContainerVisible(false);
 		view.setSingleThreadUIVisible(false);
+		view.setNewThreadButtonVisible(false);
 		view.setThreadListUIVisible(false);
 		view.setShowAllThreadsButtonVisible(false);
 		view.setSortRepliesButtonVisible(false);
@@ -359,6 +360,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			}
 		});
 		view.setThreadListUIVisible(true);
+		view.setNewThreadButtonVisible(true);
 		view.setMainContainerVisible(true);
 		view.setSubscribersWidgetVisible(true);
 		if (!isForumConfigured) {

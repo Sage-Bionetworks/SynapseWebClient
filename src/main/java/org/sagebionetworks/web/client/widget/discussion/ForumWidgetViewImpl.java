@@ -16,7 +16,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ForumWidgetViewImpl implements ForumWidgetView {
-
+	
+	@UiField
+	Button newThreadButton;
 	@UiField
 	SimplePanel threadListContainer;
 	@UiField
@@ -56,6 +58,12 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@Inject
 	public ForumWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
+		newThreadButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClickNewThread();
+			}
+		});
 		showAllThreadsButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -123,7 +131,10 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	public void setThreadListUIVisible(boolean visible) {
 		threadListContainer.setVisible(visible);
 	}
-	
+	@Override
+	public void setNewThreadButtonVisible(boolean visible) {
+		newThreadButton.setVisible(visible);
+	}
 	@Override
 	public void setShowAllThreadsButtonVisible(boolean visible) {
 		showAllThreadsButton.setVisible(visible);
