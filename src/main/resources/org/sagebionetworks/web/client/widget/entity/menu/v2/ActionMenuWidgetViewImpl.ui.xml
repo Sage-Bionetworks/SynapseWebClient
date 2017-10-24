@@ -17,6 +17,8 @@
 						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_FILE_METADATA">Edit File Metadata</a:ActionMenuItem>
 						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="CHANGE_ENTITY_NAME">Rename</a:ActionMenuItem>
 						<a:ActionMenuItem icon="INFO_CIRCLE" iconFixedWidth="true" action="SHOW_ANNOTATIONS">Annotations</a:ActionMenuItem>
+						<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_FILE">Upload or Link to a File</a:ActionMenuItem>
+						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="CREATE_FOLDER">Add New Folder</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TABLE" iconFixedWidth="true" action="SHOW_TABLE_SCHEMA">Schema</a:ActionMenuItem>
 						<a:ActionMenuItem icon="HDD_O" iconFixedWidth="true" action="SHOW_VIEW_SCOPE">Scope</a:ActionMenuItem>
 						<a:ActionMenuItem icon="DATABASE" iconFixedWidth="true" action="CHANGE_STORAGE_LOCATION">Change Storage Location</a:ActionMenuItem>
@@ -39,8 +41,6 @@
 						<a:ActionMenuItem icon="EXTERNAL_LINK" iconFixedWidth="true" action="CREATE_DOI">Create DOI</a:ActionMenuItem>
 						<a:ActionMenuItem icon="LINK" iconFixedWidth="true" action="CREATE_LINK">Save Link</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_ENTITY">Delete</a:ActionMenuItem>
-						<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_FILE">Upload or Link to a File</a:ActionMenuItem>
-						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="CREATE_FOLDER">Add New Folder</a:ActionMenuItem>
 						<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE">Upload a Table</a:ActionMenuItem>
 						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_TABLE">Add Table</a:ActionMenuItem>
 						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_FILE_VIEW">Add File View</a:ActionMenuItem>
