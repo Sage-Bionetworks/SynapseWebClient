@@ -114,6 +114,7 @@ public class AddFolderDialogWidget implements AddFolderDialogWidgetView.Presente
 	
 	@Override
 	public void updateFolderName(final String newFolderName) {
+		synAlert.clear();
 		view.setSaveEnabled(false);
 		jsClient.getEntity(currentFolderEntityId, OBJECT_TYPE.Folder, new AsyncCallback<Entity>() {
 			@Override
