@@ -139,7 +139,7 @@ public class SelfSignAccessRequirementWidgetTest {
 	@Test
 	public void testSetRequirementWithWikiTerms() {
 		widget.setRequirement(mockAccessRequirement, mockRefreshCallback);
-		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class), eq(false));
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class));
 	}
 	
 	@Test

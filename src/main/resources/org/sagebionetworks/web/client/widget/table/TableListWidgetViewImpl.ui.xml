@@ -18,21 +18,9 @@
 					</b:DropDownMenu>
 				</b:ButtonGroup>
 			</b:Column>
-			<b:Column size="XS_12 SM_11 MD_9" pull="SM_1 MD_3">
-				<b:ButtonToolBar>
-					<b:Button ui:field="addTable" icon="PLUS">Add Table</b:Button>
-					<b:Button ui:field="uploadTable" icon="UPLOAD">Upload Table</b:Button>
-					<b:Button ui:field="addFileView" visible="false" />
-					<b:Button ui:field="addProjectView" visible="false" />
-			</b:ButtonToolBar>
-			</b:Column>
 		</b:Row>
 		
 		<b:ListGroup ui:field="tablesList" />
 		<bh:Div ui:field="loadMoreWidgetContainer"/>
-		<!-- Slot for the upload table model dialog -->
-		<g:SimplePanel ui:field="uploadTableModalPanel" />
-		<!-- Slot for the create file view wizard -->
-		<g:SimplePanel ui:field="fileViewWizardContainer" />
 	</g:HTMLPanel>
 </ui:UiBinder>

@@ -7,19 +7,22 @@
 	<g:HTMLPanel styleName="margin-left-15 margin-right-15">		
 		<!--Project level information -->
 		<bh:Div addStyleNames="min-height-48">
-			<g:HTMLPanel ui:field="loadingUI" addStyleNames="center-block center margin-top-20">
-				<g:Image styleName="displayInline" resource='{sageImageBundle.loading31}' />
-				&nbsp;Loading...
-			</g:HTMLPanel>
-			<b:Row addStyleNames="margin-left-15 margin-right-15 padding-top-15 projectMetadata" ui:field="projectMetaContainer" visible="false">
-				<b:Column size="XS_12">
-					<bh:Div addStyleNames="margin-left-15 margin-right-15">
-						<g:SimplePanel ui:field="projectActionMenuContainer"/>
-					</bh:Div>
-					<bh:Div addStyleNames="margin-left-15 margin-right-15">
+			<b:Row addStyleNames="padding-top-15 projectMetadata" >
+				<b:Column size="XS_12,SM_6">
+					<bh:Div addStyleNames="margin-left-15 margin-right-15" ui:field="projectMetaContainer" visible="false">
 						<g:SimplePanel ui:field="projectMetadataContainer"/>
 						<g:SimplePanel ui:field="projectDescriptionContainer"/>
 					</bh:Div>
+				</b:Column>
+				<b:Column size="XS_12,SM_2">
+					<bh:Span ui:field="loadingUI" addStyleNames="margin-right-5">
+						<g:Image resource='{sageImageBundle.loading31}' />
+						<bh:Span text="Loading..."></bh:Span>
+					</bh:Span>
+				</b:Column>
+				<b:Column size="XS_12,SM_4">
+					<bh:Span ui:field="entityActionMenuContainer"/>
+					<bh:Span ui:field="projectActionMenuContainer"/>
 				</b:Column>
 			</b:Row>
 		</bh:Div>

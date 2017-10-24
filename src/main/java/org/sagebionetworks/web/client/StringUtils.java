@@ -1,4 +1,6 @@
 package org.sagebionetworks.web.client;
+
+
 /**
  * Utilities for working with strings.
  * 
@@ -43,4 +45,22 @@ public class StringUtils {
 		}
 	}
 	
+	public static String toTitleCase(String s) {
+		if (s == null) {
+			return null;
+		}
+		StringBuilder output = new StringBuilder();
+		boolean isNextUpperCase = true;
+		for (char c : s.toLowerCase().toCharArray()) {
+			if (!Character.isLetterOrDigit(c)) {
+				isNextUpperCase = true;
+			} else if (isNextUpperCase) {
+				c = Character.toUpperCase(c);
+				isNextUpperCase = false;
+			}
+			output.append(c);
+		}
+		
+		return output.toString();
+	}
 }

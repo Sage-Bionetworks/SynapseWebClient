@@ -60,13 +60,12 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		this.view.setPresenter(this);
 	}
 	
-	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber, boolean isCurrentVersion) {
 		this.bundle = bundle;
 		this.versionNumber = versionNumber;
 		this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-		boolean isShowingCurrentVersion = versionNumber == null;
-		view.setEntityBundle(bundle.getEntity(), !isShowingCurrentVersion);
-		view.setEditVersionInfoButtonVisible(isShowingCurrentVersion && canEdit);
+		view.setEntityBundle(bundle.getEntity(), !isCurrentVersion);
+		view.setEditVersionInfoButtonVisible(isCurrentVersion && canEdit);
 		
 		//initialize versions
 		onPageChange(WebConstants.ZERO_OFFSET);

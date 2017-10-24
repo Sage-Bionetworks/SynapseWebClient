@@ -130,7 +130,7 @@ public class CreateACTAccessRequirementStep2Test {
 		when(mockACTAccessRequirement.getIsIRBApprovalRequired()).thenReturn(false);
 		when(mockACTAccessRequirement.getIsValidatedProfileRequired()).thenReturn(true);
 		widget.configure(mockACTAccessRequirement);
-		verify(mockWikiPageRenderer).configure(wikiPageKeyCaptor.capture(), eq(false), eq((WikiPageWidget.Callback)null), eq(false));
+		verify(mockWikiPageRenderer).configure(wikiPageKeyCaptor.capture(), eq(false), eq((WikiPageWidget.Callback)null));
 		WikiPageKey key = wikiPageKeyCaptor.getValue();
 		assertEquals(AR_ID.toString(), key.getOwnerObjectId());
 		assertEquals(ObjectType.ACCESS_REQUIREMENT.toString(), key.getOwnerObjectType());

@@ -1,18 +1,15 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.gwtbootstrap3.client.ui.constants.IconType;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface ForumWidgetView extends IsWidget{
 
 	public interface Presenter {
-		void onClickNewThread();
 		void onClickShowAllThreads();
 		Widget asWidget();
-		void onClickDeletedThreadButton();
 		void onSortReplies(boolean ascending);
+		void onClickNewThread();
 	}
 
 	void setPresenter(Presenter presenter);
@@ -29,12 +26,9 @@ public interface ForumWidgetView extends IsWidget{
 	void setSortRepliesButtonVisible(boolean visible);
 	void setDefaultThreadWidget(Widget w);
 	void setDefaultThreadWidgetVisible(boolean visible);
-	void showNewThreadTooltip();
 	boolean isDeletedThreadListVisible();
 	void setDeletedThreadListVisible(boolean visible);
 	void setDeletedThreadList(Widget widget);
-	void setDeletedThreadButtonVisible(boolean visible);
-	void setDeletedThreadButtonIcon(IconType icon);
 	void setMainContainerVisible(boolean visible);
 	void setSubscribersWidget(Widget w);
 	void setSubscribersWidgetVisible(boolean visible);

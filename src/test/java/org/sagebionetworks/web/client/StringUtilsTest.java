@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -76,5 +76,14 @@ public class StringUtilsTest {
 	@Test
 	public void testTrimWithEmptyAsNullOkay(){
 		assertEquals("a", StringUtils.trimWithEmptyAsNull("a"));
+	}
+	
+	@Test
+	public void testToTitleCase(){
+		assertNull(StringUtils.toTitleCase(null));
+		assertEquals("", StringUtils.toTitleCase(""));
+		assertEquals("Hello", StringUtils.toTitleCase("hello"));
+		assertEquals("Hello World", StringUtils.toTitleCase("hello world"));
+		assertEquals("Hello World", StringUtils.toTitleCase("heLLo WORLD"));
 	}
 }

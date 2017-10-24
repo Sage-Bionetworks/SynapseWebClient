@@ -33,22 +33,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	
 	public interface Binder extends UiBinder<HTMLPanel, TableListWidgetViewImpl> {}
 	
-
 	@UiField
 	ListGroup tablesList;
-	@UiField
-	Button addTable;
-	@UiField
-	Button addFileView;
-	@UiField
-	Button addProjectView;
-	
-	@UiField
-	Button uploadTable;
-	@UiField
-	SimplePanel uploadTableModalPanel;
-	@UiField
-	SimplePanel fileViewWizardContainer;
 	@UiField
 	Div loadMoreWidgetContainer;
 	@UiField
@@ -72,11 +58,6 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public TableListWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
 		this.panel = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
-		HTML html = new HTML("<i class=\"fa fa-plus\" ></i>&nbsp;Add File View" + DisplayConstants.BETA_BADGE_HTML);
-		addFileView.add(html);
-		html = new HTML("<i class=\"fa fa-plus\" ></i>&nbsp;Add Project View" + DisplayConstants.BETA_BADGE_HTML);
-		addProjectView.add(html);
-		
 		createdOnDesc.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -137,30 +118,6 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		this.addTable.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onAddTable();
-			}
-		});
-		this.addFileView.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onAddFileView();
-			}
-		});
-		this.uploadTable.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onUploadTable();
-			}
-		});
-		addProjectView.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onAddProjectView();
-			}
-		});
 	}
 	
 	@Override
@@ -186,41 +143,10 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	public void clear() {
 		tablesList.clear();
 	}
-
-	@Override
-	public void setAddTableVisible(boolean visibile) {
-		this.addTable.setVisible(visibile);
-	}
-	
-	@Override
-	public void setAddFileViewVisible(boolean visible) {
-		addFileView.setVisible(visible);
-	}
-	@Override
-	public void setAddProjectViewVisible(boolean visible) {
-		addProjectView.setVisible(visible);
-	}
-	
-	@Override
-	public void setUploadTableVisible(boolean visibile) {
-		this.uploadTable.setVisible(visibile);
-	}
-
-	@Override
-	public void addUploadTableModal(IsWidget uploadTableModalWidget) {
-		this.uploadTableModalPanel.add(uploadTableModalWidget);
-	}
-	
-	@Override
-	public void addWizard(IsWidget wizard) {
-		fileViewWizardContainer.clear();
-		fileViewWizardContainer.add(wizard);
-	}
 	
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
-
 }

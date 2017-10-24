@@ -38,11 +38,7 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class DockerRepoWidgetTest {
 	@Mock
-	private PreflightController mockPreflightController;
-	@Mock
 	private DockerRepoWidgetView mockView;
-	@Mock
-	private SynapseAlert mockSynAlert;
 	@Mock
 	private WikiPageWidget mockWikiPageWidget;
 	@Mock
@@ -62,10 +58,6 @@ public class DockerRepoWidgetTest {
 	@Mock
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
 	@Mock
-	ActionMenuWidget mockActionMenu;
-	@Mock
-	EntityActionController mockController;
-	@Mock
 	DockerCommitListWidget mockDockerCommitListWidget;
 	@Mock
 	CookieProvider mockCookieProvider;
@@ -83,10 +75,10 @@ public class DockerRepoWidgetTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		dockerRepoWidget = new DockerRepoWidget(mockPreflightController,
-				mockView, mockSynAlert, mockWikiPageWidget, mockProvWidget,
-				mockActionMenu, mockDockerTitleBar, mockMetadata,
-				mockModifiedCreatedBy, mockController, mockDockerCommitListWidget,
+		dockerRepoWidget = new DockerRepoWidget(
+				mockView, mockWikiPageWidget, mockProvWidget,
+				mockDockerTitleBar, mockMetadata,
+				mockModifiedCreatedBy, mockDockerCommitListWidget,
 				mockCookieProvider);
 		when(mockEntity.getId()).thenReturn(entityId);
 		when(mockEntity.getRepositoryName()).thenReturn(repoName);
@@ -103,15 +95,11 @@ public class DockerRepoWidgetTest {
 
 	@Test
 	public void testConstruction() {
-		verify(mockView).setPresenter(dockerRepoWidget);
-		verify(mockView).setSynapseAlert(any(Widget.class));
 		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setProvenance(any(Widget.class));
 		verify(mockView).setEntityMetadata(any(Widget.class));
 		verify(mockView).setModifiedCreatedBy(any(Widget.class));
 		verify(mockView).setTitlebar(any(Widget.class));
-		verify(mockView).setActionMenu(any(Widget.class));
-		verify(mockActionMenu).addControllerWidget(any(Widget.class));
 		verify(mockView).setDockerCommitListWidget(any(Widget.class));
 	}
 
@@ -119,7 +107,7 @@ public class DockerRepoWidgetTest {
 	@Test
 	public void testConfigure() {
 		dockerRepoWidget.configure(mockEntityBundle, mockHandler);
-		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class), eq(false));
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockWikiPageWidget).setWikiReloadHandler(any(CallbackP.class));
 		verify(mockProvWidget).configure(any(Map.class));
 		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);
@@ -127,35 +115,17 @@ public class DockerRepoWidgetTest {
 		verify(mockMetadata).setEntityBundle(mockEntityBundle, null);
 		verify(mockDockerTitleBar).configure(mockEntity);
 		verify(mockModifiedCreatedBy).configure(createdOn, createdBy, modifiedOn, modifiedBy);
-		verify(mockActionMenu).addActionListener(eq(Action.TOGGLE_ANNOTATIONS), any(ActionListener.class));
-		verify(mockController).configure(mockActionMenu, mockEntityBundle, true, rootWikiId, mockHandler);
-		verify(mockActionMenu).setActionVisible(Action.ADD_COMMIT, false);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, canEdit);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, false);
-		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
-		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
-		verify(mockActionMenu, never()).setActionVisible(eq(Action.DELETE_ENTITY), anyBoolean());
-		verify(mockActionMenu).setActionListener(eq(Action.ADD_COMMIT), any(ActionListener.class));
 		verify(mockDockerCommitListWidget).configure(entityId, false);
 		verify(mockView).setProvenanceWidgetVisible(false);
 	}
-
-	@Test
-	public void testConfigureAlphaMode() {
-		when(mockCookieProvider.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
-		dockerRepoWidget.configure(mockEntityBundle, mockHandler);
-		verify(mockView).setProvenanceWidgetVisible(true);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, canEdit);
-		verify(mockActionMenu).setActionVisible(Action.ADD_COMMIT, canEdit);
-	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigureCannotEdit() {
 		canEdit = false;
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
 		dockerRepoWidget.configure(mockEntityBundle, mockHandler);
-		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class), eq(false));
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockWikiPageWidget).setWikiReloadHandler(any(CallbackP.class));
 		verify(mockProvWidget).configure(any(Map.class));
 		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);
@@ -163,14 +133,5 @@ public class DockerRepoWidgetTest {
 		verify(mockMetadata).setEntityBundle(mockEntityBundle, null);
 		verify(mockDockerTitleBar).configure(mockEntity);
 		verify(mockModifiedCreatedBy).configure(createdOn, createdBy, modifiedOn, modifiedBy);
-		verify(mockActionMenu).addActionListener(eq(Action.TOGGLE_ANNOTATIONS), any(ActionListener.class));
-		verify(mockController).configure(mockActionMenu, mockEntityBundle, true, rootWikiId, mockHandler);
-		verify(mockActionMenu).setActionVisible(Action.ADD_COMMIT, false);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_WIKI_PAGE, false);
-		verify(mockActionMenu).setActionVisible(Action.EDIT_PROVENANCE, false);
-		verify(mockActionMenu).setActionVisible(Action.CHANGE_ENTITY_NAME, false);
-		verify(mockActionMenu).setActionVisible(Action.MOVE_ENTITY, false);
-		verify(mockActionMenu, never()).setActionVisible(eq(Action.DELETE_ENTITY), anyBoolean());
-		verify(mockActionMenu).setActionListener(eq(Action.ADD_COMMIT), any(ActionListener.class));
 	}
 }

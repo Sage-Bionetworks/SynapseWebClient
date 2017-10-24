@@ -7,6 +7,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -61,7 +63,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 						final FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer,
 						final String ownerObjectName, Place ownerObjectLink,
 						final WikiPageKey curWikiKey, boolean isEmbeddedInOwnerPage,
-						CallbackP<WikiPageKey> wikiPageCallback) {
+						CallbackP<WikiPageKey> wikiPageCallback,
+						ActionMenuWidget actionMenu) {
 		clear();
 		
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
@@ -79,8 +82,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		showHideButton = DisplayUtils.createButton("");
 		editOrderButton = DisplayUtils.createButton("Edit Order");
 		editOrderButton.addStyleName("btn btn-default btn-xs left");
-
-		editOrderButton.addClickHandler(new ClickHandler() {
+		final ClickHandler editOrderClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				wikiSubpagesContainer.clear();
@@ -98,8 +100,16 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				});
 				DisplayUtils.scrollToTop();
 			}
-		});
-		
+		};
+		editOrderButton.addClickHandler(editOrderClickHandler);
+		if (actionMenu != null) {
+			actionMenu.setActionListener(Action.REORDER_WIKI_SUBPAGES, new ActionMenuWidget.ActionListener() {
+				@Override
+				public void onAction(Action action) {
+					editOrderClickHandler.onClick(null);
+				}
+			});
+		}
 		showHideButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

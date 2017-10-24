@@ -4,13 +4,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface DockerRepoWidgetView {
-
-	public interface Presenter{
-		
-	}
-
-	void setPresenter(Presenter presenter);
-
 	void setProvenance(Widget widget);
 
 	Widget asWidget();
@@ -26,8 +19,6 @@ public interface DockerRepoWidgetView {
 	void setEntityMetadata(Widget widget);
 
 	void setModifiedCreatedBy(IsWidget widget);
-
-	void setActionMenu(Widget widget);
 
 	void setDockerCommitListWidget(Widget widget);
 
