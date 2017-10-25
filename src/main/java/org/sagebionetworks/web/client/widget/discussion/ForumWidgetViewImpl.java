@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.widget.discussion;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
-import org.gwtbootstrap3.client.ui.Tooltip;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -13,13 +11,12 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ForumWidgetViewImpl implements ForumWidgetView {
-
+	
 	@UiField
 	Button newThreadButton;
 	@UiField
@@ -41,10 +38,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@UiField
 	Span subscribeButtonContainer;
 	@UiField
-	Tooltip newThreadTooltip;
-	@UiField
-	Button deletedThreadButton;
-	@UiField
 	SimplePanel deletedThreadListContainer;
 	@UiField
 	Div deleteThreadsArea;
@@ -57,11 +50,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@UiField
 	AnchorListItem sortRepliesDescending;
 	
-	Timer newThreadTooltipHider = new Timer() { 
-	    public void run() {
-	    	newThreadTooltip.hide();
-	    } 
-	};
 	private Presenter presenter;
 
 	Widget widget;
@@ -80,12 +68,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onClickShowAllThreads();
-			}
-		});
-		deletedThreadButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClickDeletedThreadButton();
 			}
 		});
 		sortRepliesAscending.addClickHandler(new ClickHandler() {
@@ -149,12 +131,10 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	public void setThreadListUIVisible(boolean visible) {
 		threadListContainer.setVisible(visible);
 	}
-
 	@Override
 	public void setNewThreadButtonVisible(boolean visible) {
 		newThreadButton.setVisible(visible);
 	}
-
 	@Override
 	public void setShowAllThreadsButtonVisible(boolean visible) {
 		showAllThreadsButton.setVisible(visible);
@@ -189,12 +169,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	public void setSubscribersWidgetVisible(boolean visible) {
 		subscribersContainer.setVisible(visible);
 	}
-	
-	@Override
-	public void showNewThreadTooltip() {
-		newThreadTooltip.show();
-		newThreadTooltipHider.schedule(5000);
-	}
 
 	@Override
 	public boolean isDeletedThreadListVisible() {
@@ -210,16 +184,6 @@ public class ForumWidgetViewImpl implements ForumWidgetView {
 	@Override
 	public void setDeletedThreadList(Widget widget) {
 		deletedThreadListContainer.add(widget);
-	}
-
-	@Override
-	public void setDeletedThreadButtonVisible(boolean visible) {
-		deletedThreadButton.setVisible(visible);
-	}
-
-	@Override
-	public void setDeletedThreadButtonIcon(IconType icon) {
-		deletedThreadButton.setIcon(icon);
 	}
 
 	@Override

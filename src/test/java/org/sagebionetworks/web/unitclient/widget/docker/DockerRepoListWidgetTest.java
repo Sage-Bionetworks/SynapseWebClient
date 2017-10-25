@@ -47,21 +47,13 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class DockerRepoListWidgetTest {
 	@Mock
-	private PreflightController mockPreflightController;
-	@Mock
 	private DockerRepoListWidgetView mockView;
 	@Mock
 	private BasicPaginationWidget mockPaginationWidget;
 	@Mock
-	private AddExternalRepoModal mockAddExternalRepoModal;
-	@Mock
-	private EntityBundle mockProjectBundle;
-	@Mock
 	private Project mockProject;
 	@Mock
 	private SynapseAlert mockSynAlert;
-	@Mock
-	private UserEntityPermissions mockUserEntityPermissions;
 	@Mock
 	private LoadMoreWidgetContainer mockMembersContainer;
 	@Mock
@@ -77,14 +69,13 @@ public class DockerRepoListWidgetTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		dockerRepoListWidget = new DockerRepoListWidget(mockView,
-				mockAddExternalRepoModal, mockPreflightController, mockMembersContainer,
-				mockSynAlert, mockSynapseJavascriptClient);
+		dockerRepoListWidget = new DockerRepoListWidget(
+				mockView,
+				mockMembersContainer,
+				mockSynAlert, 
+				mockSynapseJavascriptClient);
 		projectId = "syn123";
-		when(mockProjectBundle.getEntity()).thenReturn(mockProject);
 		when(mockProject.getId()).thenReturn(projectId);
-		when(mockProjectBundle.getPermissions()).thenReturn(mockUserEntityPermissions);
-		when(mockUserEntityPermissions.getCanAddChild()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseJavascriptClient)
 			.getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		searchResults = new ArrayList<EntityHeader>();
@@ -93,8 +84,6 @@ public class DockerRepoListWidgetTest {
 
 	@Test
 	public void testConstruction() {
-		verify(mockView).setPresenter(dockerRepoListWidget);
-		verify(mockView).addExternalRepoModal(any(Widget.class));
 		verify(mockView).setMembersContainer(mockMembersContainer);
 		verify(mockView).setSynAlert(any(Widget.class));
 	}
@@ -103,29 +92,6 @@ public class DockerRepoListWidgetTest {
 	public void testAsWidget() {
 		dockerRepoListWidget.asWidget();
 		verify(mockView).asWidget();
-	}
-
-	@Test
-	public void testOnClickAddExternalRepo() {
-		dockerRepoListWidget.configure(mockProjectBundle);
-		dockerRepoListWidget.onClickAddExternalRepo();
-		verify(mockPreflightController).checkCreateEntity(eq(mockProjectBundle), eq(DockerRepository.class.getName()), any(Callback.class));
-	}
-
-	@Test
-	public void testOnClickAddExternalRepoPreflightFailed(){
-		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkCreateEntity(eq(mockProjectBundle), eq(DockerRepository.class.getName()), any(Callback.class));
-		dockerRepoListWidget.configure(mockProjectBundle);
-		dockerRepoListWidget.onClickAddExternalRepo();
-		verify(mockAddExternalRepoModal, never()).show();
-	}
-
-	@Test
-	public void testOnClickAddExternalRepoPreflightPassed(){
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(eq(mockProjectBundle), eq(DockerRepository.class.getName()), any(Callback.class));
-		dockerRepoListWidget.configure(mockProjectBundle);
-		dockerRepoListWidget.onClickAddExternalRepo();
-		verify(mockAddExternalRepoModal).show();
 	}
 
 	@Test
@@ -151,22 +117,22 @@ public class DockerRepoListWidgetTest {
 		DockerRepository bundle2 = new DockerRepository();
 		AsyncMockStubber.callSuccessWith(bundle1, bundle2)
 			.when(mockSynapseJavascriptClient).getEntity(anyString(), any(OBJECT_TYPE.class), any(AsyncCallback.class));
-		dockerRepoListWidget.configure(mockProjectBundle);
-		verify(mockAddExternalRepoModal).configuration(eq(projectId), any(Callback.class));
+		dockerRepoListWidget.configure(projectId);
+		//simulate that view is attached
+		dockerRepoListWidget.loadMore();
 		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockView).clear();
 		verify(mockView, atLeastOnce()).addRepo(bundle1);
 		verify(mockView, atLeastOnce()).addRepo(bundle2);
 		verify(mockSynapseJavascriptClient).getEntity(eq(id1), any(OBJECT_TYPE.class), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient).getEntity(eq(id2), any(OBJECT_TYPE.class), any(AsyncCallback.class));
-		verify(mockView).setAddExternalRepoButtonVisible(true);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigurationSuccessOverOnePage() {
-		dockerRepoListWidget.configure(mockProjectBundle);
-		verify(mockAddExternalRepoModal).configuration(eq(projectId), any(Callback.class));
+		dockerRepoListWidget.configure(projectId);
+		dockerRepoListWidget.loadMore();
 		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 	}
 
@@ -176,8 +142,8 @@ public class DockerRepoListWidgetTest {
 		Throwable error = new Throwable();
 		AsyncMockStubber.callFailureWith(error)
 			.when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
-		dockerRepoListWidget.configure(mockProjectBundle);
-		verify(mockAddExternalRepoModal).configuration(eq(projectId), any(Callback.class));
+		dockerRepoListWidget.configure(projectId);
+		dockerRepoListWidget.loadMore();
 		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockView).clear();
 		verify(mockView, never()).addRepo(any(DockerRepository.class));
@@ -200,8 +166,8 @@ public class DockerRepoListWidgetTest {
 		Throwable error = new Throwable();
 		AsyncMockStubber.callFailureWith(error)
 			.when(mockSynapseJavascriptClient).getEntity(eq(id2), any(OBJECT_TYPE.class), any(AsyncCallback.class));
-		dockerRepoListWidget.configure(mockProjectBundle);
-		verify(mockAddExternalRepoModal).configuration(eq(projectId), any(Callback.class));
+		dockerRepoListWidget.configure(projectId);
+		dockerRepoListWidget.loadMore();
 		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockView).clear();
 		verify(mockView).addRepo(bundle);
@@ -226,8 +192,8 @@ public class DockerRepoListWidgetTest {
 		Throwable error = new Throwable();
 		AsyncMockStubber.callFailureWith(error)
 			.when(mockSynapseJavascriptClient).getEntity(eq(id1), any(OBJECT_TYPE.class), any(AsyncCallback.class));
-		dockerRepoListWidget.configure(mockProjectBundle);
-		verify(mockAddExternalRepoModal).configuration(eq(projectId), any(Callback.class));
+		dockerRepoListWidget.configure(projectId);
+		dockerRepoListWidget.loadMore();
 		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockView).addRepo(bundle);
 		verify(mockSynapseJavascriptClient).getEntity(eq(id1), any(OBJECT_TYPE.class), any(AsyncCallback.class));
@@ -236,19 +202,12 @@ public class DockerRepoListWidgetTest {
 	}
 
 	@Test
-	public void testConfigurationWithoutUploadPermission() {
-		when(mockUserEntityPermissions.getCanAddChild()).thenReturn(false);
-		dockerRepoListWidget.configure(mockProjectBundle);
-		verify(mockView).setAddExternalRepoButtonVisible(false);
-	}
-	
-	@Test
 	public void testLoadMore() {
 		when(mockResults.getNextPageToken()).thenReturn("not null");
-		dockerRepoListWidget.configure(mockProjectBundle);
-		verify(mockAddExternalRepoModal).configuration(eq(projectId), any(Callback.class));
+		dockerRepoListWidget.configure(projectId);
+		dockerRepoListWidget.loadMore();
 		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
-		verify(mockMembersContainer).setIsMore(true);
+		verify(mockMembersContainer, times(2)).setIsMore(true);
 		when(mockResults.getNextPageToken()).thenReturn(null);
 		dockerRepoListWidget.loadMore();
 		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));

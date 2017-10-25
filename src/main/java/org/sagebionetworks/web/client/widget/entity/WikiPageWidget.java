@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -51,7 +52,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	private WikiPageKey wikiKey;
 	private Boolean canEdit;
 	private WikiPage currentPage;
-	private boolean showSubpages;
 	
 	// widgets
 	private StuAlert stuAlert;
@@ -116,14 +116,13 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	}
 
 	public void configure(final WikiPageKey wikiKey, final Boolean canEdit,
-			final Callback callback, final boolean showSubpages) {
+			final Callback callback) {
 		clear();
 		view.setMainPanelVisible(true);
 		view.setLoadingVisible(true);
 		// migrate fields to passed parameters?
 		this.canEdit = canEdit;
 		this.wikiKey = wikiKey;
-		this.showSubpages = showSubpages;
 		this.isCurrentVersion = true;
 		this.versionInView = null;
 		this.stuAlert.clear();
@@ -140,11 +139,12 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 				}
 			};
 		}
-		view.setWikiSubpagesWidgetVisible(showSubpages);
-		if (showSubpages) {
-			configureWikiSubpagesWidget();	
-		}
 		reloadWikiPage();
+	}
+	
+	public void showSubpages(ActionMenuWidget actionMenu) {
+		view.setWikiSubpagesWidgetVisible(true);
+		configureWikiSubpagesWidget(actionMenu);
 	}
 	
 	public void checkUseCachedWikiPage(final WikiPage cachedWikiPage) {
@@ -242,8 +242,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		}
 	}
 	
-	@Override
-	public void configureWikiSubpagesWidget() {
+	public void configureWikiSubpagesWidget(ActionMenuWidget actionMenu) {
 		//check configuration of wikiKey
 		view.setWikiSubpagesContainers(wikiSubpages);
 		wikiSubpages.configure(wikiKey, null, true, new CallbackP<WikiPageKey>() {
@@ -258,7 +257,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 				if (wikiReloadHandler != null) {
 					wikiReloadHandler.invoke(wikiKey.getWikiPageId());
 				}
-			}});
+			}}, actionMenu);
 		view.setWikiSubpagesWidget(wikiSubpages);
 	}
 	
@@ -291,7 +290,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		
 	private void refresh() {
 		view.setMainPanelVisible(true);
-		configure(wikiKey, canEdit, callback, showSubpages);
+		configure(wikiKey, canEdit, callback);
 	}
 
 	@Override
@@ -392,10 +391,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		if (caught instanceof NotFoundException && callback != null) {
 			callback.noWikiFound();
 		}
-		if (showSubpages) {
-			view.setMarkdownVisible(false);
-			view.setWikiHistoryVisible(false);
-		}
+		view.setMarkdownVisible(false);
+		view.setWikiHistoryVisible(false);
 		if (caught instanceof NotFoundException) {
 			if (canEdit) {
 				view.setNoWikiCanEditMessageVisible(true);

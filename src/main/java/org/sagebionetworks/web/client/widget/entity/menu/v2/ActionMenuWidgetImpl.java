@@ -57,13 +57,11 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	}
 
 	@Override
-	public void setActionEnabled(Action action, boolean enabled) {
-		getActionView(action).setEnabled(enabled);
-	}
-
-	@Override
 	public void setActionVisible(Action action, boolean visible) {
 		getActionView(action).setVisible(visible);
+		if (visible) {
+			view.setNoActionsAvailableVisible(false);
+		}
 	}
 
 	@Override
@@ -118,10 +116,18 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	@Override
 	public void reset() {
 		// Hide all widgets and clear all Listeners
+		hideAllActions();
 		for (Action action : this.actionListenerMap.keySet()) {
-			getActionView(action).setVisible(false);
 			getActionListeners(action).clear();
 		}
+	}
+	
+	@Override
+	public void hideAllActions() {
+		for (Action action : this.actionListenerMap.keySet()) {
+			getActionView(action).setVisible(false);
+		}
+		view.setNoActionsAvailableVisible(true);
 	}
 
 	@Override
@@ -138,13 +144,12 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	}
 
 	@Override
-	public void setBasicDivderVisible(boolean visible) {
-		view.setBasicDividerVisible(visible);
+	public void setACTDividerVisible(boolean visible) {
+		view.setACTDividerVisible(visible);
 	}
 
 	@Override
-	public void setToolsButtonVisible(boolean visible) {
-		view.setToolsButtonVisible(visible);
+	public void setToolsButtonIcon(String text, IconType icon) {
+		view.setToolsButtonIcon(text, icon);
 	}
-
 }

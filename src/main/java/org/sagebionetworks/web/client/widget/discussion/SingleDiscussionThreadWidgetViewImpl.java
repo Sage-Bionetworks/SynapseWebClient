@@ -1,17 +1,11 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_CANCEL;
-import static org.sagebionetworks.web.client.DisplayConstants.DEFAULT_BUTTON_STYLE;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.IconStack;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
-import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -186,17 +180,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@Override
 	public void setDeleteIconVisible(boolean visible) {
 		deleteIcon.setVisible(visible);
-	}
-
-	@Override
-	public void showConfirm(String deleteConfirmMessage, String dialogTitle, String buttonName, String buttonStyle, final SimpleCallback deleteCallback) {
-		DialogOptions options = DialogOptions.newOptions(deleteConfirmMessage);
-		options.setCloseButton(false);
-		options.setTitle(dialogTitle);
-		options.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE);
-		options.addButton(buttonName, buttonStyle, deleteCallback);
-		
-		Bootbox.dialog(options);
 	}
 
 	@Override

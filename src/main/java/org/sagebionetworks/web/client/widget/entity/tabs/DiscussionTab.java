@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.inject.Inject;
@@ -45,7 +46,7 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator) {
+	public void configure(final String entityId, String entityName, String areaToken, Boolean isCurrentUserModerator, ActionMenuWidget actionMenu) {
 		lazyInject();
 		this.entityId = entityId;
 		this.entityName = entityName;
@@ -63,9 +64,13 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 				tab.showTab();
 			}
 		};
-		forumWidget.configure(entityId, params, isCurrentUserModerator, updateParamsCallback, updateURLCallback);
+		forumWidget.configure(entityId, params, isCurrentUserModerator, actionMenu, updateParamsCallback, updateURLCallback);
 	}
 
+	public void updateActionMenuCommands() {
+		forumWidget.updateActionMenuCommands();
+	}
+	
 	public void checkForSynapseForum() {
 		String forumSynapseId = globalAppState.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY);
 		if (forumSynapseId.equals(entityId)) {

@@ -46,7 +46,14 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 
 	void addWidget(IsWidget asWidget);
 	void showDeleteWikiModal(String wikiPageId, Map<String, V2WikiHeader> id2HeaderMap, Map<String, List<V2WikiHeader>> id2ChildrenMap);
+	void setAnnotationsRendererWidget(IsWidget w);
+	void showAnnotations();
+	void hideAnnotations();
+	void setFileHistoryWidget(IsWidget w);
+	void showFileHistory();
+	void hideFileHistory();
 	void setPresenter(Presenter p);
+	
 	public interface Presenter {
 		void onConfirmDeleteWiki();
 	}

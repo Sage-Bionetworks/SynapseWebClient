@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
@@ -36,6 +37,7 @@ public class WikiSubpagesWidget implements IsWidget {
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
 	private boolean canEdit;
+	private ActionMenuWidget actionMenu;
 	
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
 	private boolean isEmbeddedInOwnerPage;
@@ -54,11 +56,13 @@ public class WikiSubpagesWidget implements IsWidget {
 			final WikiPageKey wikiKey, 
 			Callback widgetRefreshRequired, 
 			boolean embeddedInOwnerPage, 
-			CallbackP<WikiPageKey> reloadWikiPageCallback) {
+			CallbackP<WikiPageKey> reloadWikiPageCallback,
+			ActionMenuWidget actionMenu) {
 		canEdit = false;
 		this.reloadWikiPageCallback = reloadWikiPageCallback;
 		this.wikiKey = wikiKey;
 		this.isEmbeddedInOwnerPage = embeddedInOwnerPage;
+		this.actionMenu = actionMenu;
 		view.clear();
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
@@ -114,14 +118,14 @@ public class WikiSubpagesWidget implements IsWidget {
 						// "Sort" stuff'
 						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, result);
 						view.configure(wikiHeaders, wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
-										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback);
+										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
 						view.setEditOrderButtonVisible(canEdit);
 					}
 					@Override
 					public void onFailure(Throwable caught) {
 						// Failed to get order hint. Just ignore it.
 						view.configure(wikiHeaders, wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
-								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback);
+								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
 						view.setEditOrderButtonVisible(canEdit);
 					}
 				});

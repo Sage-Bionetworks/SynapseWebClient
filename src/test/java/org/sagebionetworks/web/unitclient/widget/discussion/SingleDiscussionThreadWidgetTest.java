@@ -5,7 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anySet;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -15,14 +14,13 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.LIMIT;
+import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.*;
 
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -39,9 +37,9 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -57,6 +55,8 @@ import org.sagebionetworks.web.client.widget.discussion.SubscribersWidget;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -129,8 +129,14 @@ public class SingleDiscussionThreadWidgetTest {
 	ArgumentCaptor<Topic> topicCaptor;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
+	@Captor
+	ArgumentCaptor<ActionMenuWidget.ActionListener> actionListenerCaptor;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	ActionMenuWidget mockActionMenuWidget;
+	@Mock
+	PopupUtilsView mockPopupUtils;
 	Set<String> moderatorIds;
 	SingleDiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -150,7 +156,8 @@ public class SingleDiscussionThreadWidgetTest {
 				mockDateTimeUtils, mockRequestBuilder, mockAuthController,
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
 				mockRepliesContainer, mockSubscribeButtonWidget, mockNewReplyWidget,
-				mockNewReplyWidget, mockSubscribersWidget, mockSynapseJavascriptClient);
+				mockNewReplyWidget, mockSubscribersWidget, mockSynapseJavascriptClient,
+				mockPopupUtils);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
 		moderatorIds = new HashSet<String>();
@@ -194,7 +201,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle(threadId, "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).setCreatedOn(anyString());
@@ -230,6 +237,58 @@ public class SingleDiscussionThreadWidgetTest {
 	}
 
 	@Test
+	public void testActionMenu() {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		String threadId = "1";
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle(threadId, "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
+		
+		//verify edit
+		verify(mockActionMenuWidget).setActionListener(eq(Action.EDIT_THREAD), actionListenerCaptor.capture());
+		ActionMenuWidget.ActionListener actionListener = actionListenerCaptor.getValue();
+		actionListener.onAction(Action.EDIT_THREAD);
+		verify(mockEditThreadModal).show();
+		
+		//verify delete
+		verify(mockActionMenuWidget).setActionListener(eq(Action.DELETE_THREAD), actionListenerCaptor.capture());
+		actionListener = actionListenerCaptor.getValue();
+		actionListener.onAction(Action.EDIT_THREAD);
+		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+
+		//verify pin thread
+		verify(mockActionMenuWidget).setActionText(eq(Action.PIN_THREAD), eq(PIN_THREAD_ACTION_TEXT));
+		verify(mockActionMenuWidget).setActionListener(eq(Action.PIN_THREAD), actionListenerCaptor.capture());
+		actionListener = actionListenerCaptor.getValue();
+		actionListener.onAction(Action.EDIT_THREAD);
+		verify(mockDiscussionForumClientAsync).pinThread(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testUnpinActionMenu() {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		boolean isPinned = true;
+		String threadId = "1";
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle(threadId, "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
+		
+		//verify unpin thread
+		verify(mockActionMenuWidget).setActionText(eq(Action.PIN_THREAD), eq(UNPIN_THREAD_ACTION_TEXT));
+		verify(mockActionMenuWidget).setActionListener(eq(Action.PIN_THREAD), actionListenerCaptor.capture());
+		ActionMenuWidget.ActionListener actionListener = actionListenerCaptor.getValue();
+		actionListener.onAction(Action.EDIT_THREAD);
+		verify(mockDiscussionForumClientAsync).unpinThread(anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
 	public void testConfigureDeletedThread() {
 		boolean isDeleted = true;
 		boolean canModerate = false;
@@ -239,7 +298,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle(threadId, "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).setCreatedOn(anyString());
@@ -271,7 +330,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle(threadId, "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockGinInjector, never()).getReplyCountAlert();
 		verify(mockDiscussionForumClientAsync, never()).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
@@ -289,7 +348,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle(threadId, "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockRefreshAlert).configure(threadId);
 	}
 
@@ -302,7 +361,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).setCreatedOn(anyString());
@@ -320,7 +379,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockView).setIsAuthorModerator(true);
 	}
 	
@@ -333,7 +392,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockView).setEditedLabelVisible(true);
 	}
 
@@ -347,7 +406,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockView).setEditIconVisible(true);
 	}
 
@@ -360,7 +419,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).setCreatedOn(anyString());
@@ -380,7 +439,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockView).setPinIconVisible(false);
 		verify(mockView).setUnpinIconVisible(true);
 	}
@@ -394,7 +453,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockView).setPinIconVisible(false);
 		verify(mockView).setUnpinIconVisible(false);
 	}
@@ -408,7 +467,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		AsyncMockStubber.callSuccessWith(null)
 			.when(mockDiscussionForumClientAsync).pinThread(anyString(), any(AsyncCallback.class));
 		reset(mockView);
@@ -428,7 +487,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		Exception ex = new Exception("failed");
 		AsyncMockStubber.callFailureWith(ex)
 			.when(mockDiscussionForumClientAsync).pinThread(anyString(), any(AsyncCallback.class));
@@ -447,7 +506,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds,mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		AsyncMockStubber.callSuccessWith(null)
 			.when(mockDiscussionForumClientAsync).unpinThread(anyString(), any(AsyncCallback.class));
 		reset(mockView);
@@ -466,7 +525,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		Exception ex = new Exception("failed");
 		AsyncMockStubber.callFailureWith(ex)
 			.when(mockDiscussionForumClientAsync).unpinThread(anyString(), any(AsyncCallback.class));
@@ -496,7 +555,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockRepliesContainer, atLeastOnce()).clear();
 		verify(mockView).setShowAllRepliesButtonVisible(false);
@@ -519,7 +578,7 @@ public class SingleDiscussionThreadWidgetTest {
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.setReplyIdCallback(mockReplyIdCallback);
-		discussionThreadWidget.configure(threadBundle, replyId, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, replyId, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockRepliesContainer, atLeastOnce()).clear();
 		verify(mockView).setShowAllRepliesButtonVisible(true);
@@ -543,7 +602,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, replyId, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, replyId, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockSynAlert).handleException(ex);;
 	}
 
@@ -579,7 +638,7 @@ public class SingleDiscussionThreadWidgetTest {
 				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
 						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(), 
 						any(DiscussionFilter.class), any(AsyncCallback.class));
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
@@ -609,7 +668,7 @@ public class SingleDiscussionThreadWidgetTest {
 						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(), 
 						any(DiscussionFilter.class), any(AsyncCallback.class));
 		
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
@@ -632,7 +691,7 @@ public class SingleDiscussionThreadWidgetTest {
 				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
 						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 						any(DiscussionFilter.class), any(AsyncCallback.class));
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
@@ -660,7 +719,7 @@ public class SingleDiscussionThreadWidgetTest {
 				.when(mockDiscussionForumClientAsync).getRepliesForThread(anyString(), anyLong(),
 						anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
 						any(DiscussionFilter.class), any(AsyncCallback.class));
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), anyBoolean(),
@@ -683,7 +742,7 @@ public class SingleDiscussionThreadWidgetTest {
 				1L, 1L, new Date(), "messageKey", isDeleted, CREATED_BY, isEdited, isPinned);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockSynapseJavascriptClient).getThreadUrl(anyString(), any(AsyncCallback.class));
-		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockRequestBuilder, never()).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder, never()).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
@@ -691,7 +750,7 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
-		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.THREAD, threadId);
+		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.THREAD, threadId, mockActionMenuWidget);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -709,7 +768,7 @@ public class SingleDiscussionThreadWidgetTest {
 				.when(mockSynapseJavascriptClient).getThreadUrl(anyString(), any(AsyncCallback.class));
 		RequestBuilderMockStubber.callOnError(null, new Exception())
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
@@ -737,7 +796,7 @@ public class SingleDiscussionThreadWidgetTest {
 				.when(mockSynapseJavascriptClient).getThreadUrl(anyString(), any(AsyncCallback.class));
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse)
 				.when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), anyString());
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
@@ -752,9 +811,9 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testOnClickDeleteThread() {
 		discussionThreadWidget.onClickDeleteThread();
-		ArgumentCaptor<SimpleCallback> captor = ArgumentCaptor.forClass(SimpleCallback.class);
-		verify(mockView).showConfirm(anyString(), anyString(), anyString(), anyString(), captor.capture());
-		captor.getValue().callback();
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), captor.capture());
+		captor.getValue().invoke();
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClientAsync).markThreadAsDeleted(anyString(), any(AsyncCallback.class));
 	}
@@ -762,9 +821,9 @@ public class SingleDiscussionThreadWidgetTest {
 	@Test
 	public void testOnClickRestoreThread() {
 		discussionThreadWidget.onClickRestore();
-		ArgumentCaptor<SimpleCallback> captor = ArgumentCaptor.forClass(SimpleCallback.class);
-		verify(mockView).showConfirm(anyString(), anyString(), anyString(), anyString(), captor.capture());
-		captor.getValue().callback();
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
+		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), captor.capture());
+		captor.getValue().invoke();
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClientAsync).restoreThread(anyString(), any(AsyncCallback.class));
 	}
@@ -779,7 +838,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		AsyncMockStubber.callSuccessWith((Void) null)
 				.when(mockDiscussionForumClientAsync).markThreadAsDeleted(anyString(), any(AsyncCallback.class));
 		discussionThreadWidget.deleteThread();
@@ -799,7 +858,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).markThreadAsDeleted(anyString(), any(AsyncCallback.class));
 		discussionThreadWidget.deleteThread();
@@ -818,7 +877,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		AsyncMockStubber.callSuccessWith((Void) null)
 				.when(mockDiscussionForumClientAsync).restoreThread(anyString(), any(AsyncCallback.class));
 		discussionThreadWidget.restoreThread();
@@ -838,7 +897,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		AsyncMockStubber.callFailureWith(new Exception())
 				.when(mockDiscussionForumClientAsync).restoreThread(anyString(), any(AsyncCallback.class));
 		discussionThreadWidget.restoreThread();
@@ -876,7 +935,7 @@ public class SingleDiscussionThreadWidgetTest {
 		String threadId = "123";
 		DiscussionThreadBundle bundle = DiscussionTestUtils.createThreadBundle(threadId, "title", Arrays.asList("1"),
 				1L, 1L, new Date(), "messageKey", isDeleted, CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		reset(mockView);
 		AsyncMockStubber.callSuccessWith(bundle)
 		.when(mockSynapseJavascriptClient).getThread(anyString(), any(AsyncCallback.class));
@@ -898,7 +957,7 @@ public class SingleDiscussionThreadWidgetTest {
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
 				Arrays.asList("123"), 0L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
-		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockCallback);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
 		
 		verify(mockDiscussionForumClientAsync).getRepliesForThread(anyString(),
 				anyLong(), anyLong(), any(DiscussionReplyOrder.class), eq(ascending),

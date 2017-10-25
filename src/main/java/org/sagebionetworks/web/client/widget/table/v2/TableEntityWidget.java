@@ -3,9 +3,9 @@ package org.sagebionetworks.web.client.widget.table.v2;
 import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.getTableType;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
-import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
@@ -78,7 +78,12 @@ public class TableEntityWidget implements IsWidget,
 	CopyTextModal copyTextModal;
 	SynapseClientAsync synapseClient;
 	FileViewClientsHelp fileViewClientsHelp;
-	
+	boolean isShowingSchema, isShowingScope;
+	public static final String SHOW = "Show ";
+	public static final String HIDE = "Hide ";
+	public static final String SCOPE = "Scope of ";
+	public static final String SCHEMA = " Schema";
+	String entityTypeDisplay;
 	@Inject
 	public TableEntityWidget(TableEntityWidgetView view,
 			TableQueryResultWidget queryResultsWidget,
@@ -135,22 +140,23 @@ public class TableEntityWidget implements IsWidget,
 		this.view.configure(bundle, this.canEdit);
 		this.uploadTableModalWidget.configure(table.getParentId(), tableId);
 		this.actionMenu = actionMenu;
+		this.entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
 		configureActions();
 		checkState();
 		initSimpleAdvancedQueryState();
 	}
-
+	
 	/**
 	 * Setup the actions for this widget.
 	 */
 	private void configureActions() {
-		this.actionMenu.setActionVisible(Action.UPLOAD_TABLE_DATA, canEditResults);
-		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, canEditResults);
-		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, true);
-		this.actionMenu.setActionVisible(Action.TOGGLE_TABLE_SCHEMA, true);
-		this.actionMenu.setActionVisible(Action.TOGGLE_VIEW_SCOPE, !TableType.table.equals(tableType));
-		this.actionMenu.setBasicDivderVisible(canEditResults);
 		// Listen to action events.
+		isShowingScope = false;
+		isShowingSchema = false;
+		view.setScopeVisible(false);
+		view.setSchemaVisible(false);
+		actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, SHOW+entityTypeDisplay+SCHEMA);
+		actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, SHOW + SCOPE + entityTypeDisplay);
 		this.actionMenu.setActionListener(Action.UPLOAD_TABLE_DATA, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
@@ -169,20 +175,25 @@ public class TableEntityWidget implements IsWidget,
 				onEditResults();
 			}
 		});
-		this.actionMenu.setActionListener(Action.TOGGLE_TABLE_SCHEMA, new ActionListener() {
+		this.actionMenu.setActionListener(Action.SHOW_TABLE_SCHEMA, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
-				view.toggleSchema();
+				isShowingSchema = !isShowingSchema;
+				view.setSchemaVisible(isShowingSchema);
+				String showHide = isShowingSchema ? HIDE : SHOW;
+				actionMenu.setActionText(Action.SHOW_TABLE_SCHEMA, showHide+entityTypeDisplay+SCHEMA);
 			}
 		});
 		
-		this.actionMenu.setActionListener(Action.TOGGLE_VIEW_SCOPE, new ActionListener() {
+		this.actionMenu.setActionListener(Action.SHOW_VIEW_SCOPE, new ActionListener() {
 			@Override
 			public void onAction(Action action) {
-				view.toggleScope();
+				isShowingScope = !isShowingScope;
+				view.setScopeVisible(isShowingScope);
+				String showHide = isShowingScope ? HIDE : SHOW;
+				actionMenu.setActionText(Action.SHOW_VIEW_SCOPE, showHide + SCOPE + entityTypeDisplay);
 			}
 		});
-
 	}
 
 	/**
@@ -466,24 +477,6 @@ public class TableEntityWidget implements IsWidget,
 			public void onCanceled() {			
 			}
 		});
-	}
-
-	@Override
-	public void onSchemaToggle(boolean shown) {
-		if(shown){
-			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_DOWN);
-		}else{
-			actionMenu.setActionIcon(Action.TOGGLE_TABLE_SCHEMA, IconType.TOGGLE_RIGHT);
-		}
-	}
-	
-	@Override
-	public void onScopeToggle(boolean shown) {
-		if(shown){
-			actionMenu.setActionIcon(Action.TOGGLE_VIEW_SCOPE, IconType.TOGGLE_DOWN);
-		}else{
-			actionMenu.setActionIcon(Action.TOGGLE_VIEW_SCOPE, IconType.TOGGLE_RIGHT);
-		}
 	}
 
 	@Override

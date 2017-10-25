@@ -21,14 +21,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -76,7 +73,6 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.upload.MultipartUploaderStub;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 

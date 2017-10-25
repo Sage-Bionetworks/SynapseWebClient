@@ -5,11 +5,11 @@ import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 
 public class GlobalApplicationStateViewImpl implements
 		GlobalApplicationStateView {
-	private static final int MONTH = 1000*60*60*24*7*4; //about a month
+	private static final int UNLIMITED_TIME = 0;
 	
 	@Override
 	public void showVersionOutOfDateGlobalMessage() {
-		DisplayUtils.showError(DisplayConstants.NEW_VERSION_AVAILABLE, DisplayConstants.NEW_VERSION_INSTRUCTIONS, MONTH);
+		DisplayUtils.showError(DisplayConstants.NEW_VERSION_AVAILABLE, DisplayConstants.NEW_VERSION_INSTRUCTIONS, UNLIMITED_TIME);
 	}
 	
 	@Override

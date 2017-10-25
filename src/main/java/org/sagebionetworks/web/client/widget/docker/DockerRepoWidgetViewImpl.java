@@ -33,12 +33,9 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	@UiField
 	SimplePanel dockerModifiedAndCreatedContainer;
 	@UiField
-	SimplePanel dockerActionMenuContainer;
-	@UiField
 	Div dockerCommitListContainer;
 
 	public interface Binder extends UiBinder<Widget, DockerRepoWidgetViewImpl> {}
-	private Presenter presenter;
 	Widget widget;
 
 	@Inject
@@ -50,11 +47,6 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 				dockerPullCommand.selectAll();
 			}
 		});
-	}
-
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
 	}
 
 	@Override
@@ -95,11 +87,6 @@ public class DockerRepoWidgetViewImpl implements DockerRepoWidgetView{
 	@Override
 	public void setModifiedCreatedBy(IsWidget widget) {
 		dockerModifiedAndCreatedContainer.add(widget);
-	}
-
-	@Override
-	public void setActionMenu(Widget w) {
-		dockerActionMenuContainer.add(w);
 	}
 
 	@Override

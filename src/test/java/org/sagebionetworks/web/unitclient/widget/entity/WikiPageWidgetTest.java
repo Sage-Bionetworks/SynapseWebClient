@@ -1,15 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -21,7 +22,6 @@ import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -38,19 +38,16 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.SessionStorage;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
-import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
-import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -94,6 +91,8 @@ public class WikiPageWidgetTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Captor
 	ArgumentCaptor<CallbackP<WikiPageKey>> callbackPCaptor;
+	@Mock
+	ActionMenuWidget mockActionMenuWidget;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
 	WikiPageWidget presenter;
@@ -134,19 +133,15 @@ public class WikiPageWidgetTest {
 	
 	@Test
 	public void testConfigure() throws JSONObjectAdapterException{
-		boolean showSubpages = true;
 		boolean canEdit = true;
 		String suffix = "-test-suffix";
 		String formattedDate = "today";
 		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(formattedDate);
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null, showSubpages);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), any(Long.class));
 		verify(mockView).setWikiHistoryWidget(any(IsWidget.class));
-		verify(mockView).setWikiSubpagesContainers(any(WikiSubpagesWidget.class));
-		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), any(CallbackP.class));
-		verify(mockView).setWikiSubpagesWidget(mockSubpages);
 		verify(mockView).setModifiedCreatedByHistoryPanelVisible(true);
 		verify(mockView).setModifiedOn(formattedDate);
 		verify(mockView).setCreatedOn(formattedDate);
@@ -156,6 +151,11 @@ public class WikiPageWidgetTest {
 		verify(mockView).setWikiHistoryVisible(false);
 		verify(mockHistoryWidget).clear();
 		
+		presenter.showSubpages(mockActionMenuWidget);
+		verify(mockView).setWikiSubpagesWidget(mockSubpages);
+		verify(mockView).setWikiSubpagesContainers(any(WikiSubpagesWidget.class));
+		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), any(CallbackP.class), any(ActionMenuWidget.class));
+		
 		verify(mockHistoryWidget, never()).configure(any(WikiPageKey.class), anyBoolean(), any(ActionHandler.class));
 		presenter.showWikiHistory();
 		verify(mockHistoryWidget).configure(any(WikiPageKey.class), anyBoolean(), any(ActionHandler.class));
@@ -164,10 +164,8 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigureNoWikiPageNotFound(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		boolean showSubpages = true;
 		boolean canEdit = false;
-		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null);
 		
 		verify(mockStuAlert, never()).handleException(any(Exception.class));
 		verify(mockView).setMarkdownVisible(false);
@@ -179,10 +177,8 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigureNoWikiPageNotFoundCanEdit(){
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		boolean showSubpages = true;
 		boolean canEdit = true;
-		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null);
 		
 		verify(mockStuAlert, never()).handleException(any(Exception.class));
 		verify(mockView).setMarkdownVisible(false);
@@ -195,9 +191,7 @@ public class WikiPageWidgetTest {
 	public void testConfigureNoWikiPageError(){
 		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		boolean canEdit = false;
-		boolean showSubpages = true;
-		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null);
 		verify(mockStuAlert).handleException(any(Exception.class));
 		verify(mockView).setMainPanelVisible(false);
 		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
@@ -206,10 +200,8 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testConfigureOtherErrorGettingWikiPage(){
 		AsyncMockStubber.callFailureWith(new RuntimeException("another error")).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		boolean showSubpages = true;
 		boolean canEdit = true;
-		String suffix = "-test-suffix";
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null, showSubpages);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), null, null), canEdit, null);
 		verify(mockStuAlert).handleException(any(Exception.class));
 		verify(mockView).setMainPanelVisible(false);
 		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
@@ -217,10 +209,9 @@ public class WikiPageWidgetTest {
 	
 	@Test
 	public void testShowWikiHistory(){
-		boolean showSubpages = true;
 		boolean canEdit = true;
 		presenter.setModifiedCreatedByHistoryVisible(false);
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null, showSubpages);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null);
 		verify(mockView).setModifiedCreatedByHistoryPanelVisible(false);
 	}
 	
@@ -237,7 +228,6 @@ public class WikiPageWidgetTest {
 	@Test
 	public void testReloadWikiPageSuccess() {
 		boolean canEdit = true;
-		boolean showSubpages = true;
 		presenter.setWikiReloadHandler(mockCallbackP);
 		WikiPageKey wikiPageKey = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, 1L);
 		WikiPage wikiPage = new WikiPage();
@@ -245,9 +235,9 @@ public class WikiPageWidgetTest {
 		presenter.setWikiPageKey(wikiPageKey);
 		AsyncMockStubber.callSuccessWith(wikiPage).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null, showSubpages);
-		
-		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), callbackPCaptor.capture());
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null);
+		presenter.showSubpages(mockActionMenuWidget);
+		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), callbackPCaptor.capture(), any(ActionMenuWidget.class));
 		// invoke subpage clicked
 		callbackPCaptor.getValue().invoke(wikiPageKey);
 		verify(mockSynapseJavascriptClient, times(2)).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
@@ -268,9 +258,8 @@ public class WikiPageWidgetTest {
 
 	@Test
 	public void testReloadWikiPageFailure() {
-		boolean showSubpages = true;
 		boolean canEdit = false;
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null, showSubpages);
+		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null);
 		
 		// fail to reload wiki page
 		AsyncMockStubber.callFailureWith(new BadRequestException()).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
@@ -300,7 +289,7 @@ public class WikiPageWidgetTest {
 		currentV2WikiPage.setEtag(etag);
 		AsyncMockStubber.callSuccessWith(currentV2WikiPage).when(mockSynapseJavascriptClient).getV2WikiPage(eq(wikiPageKey), any(AsyncCallback.class));
 		
-		presenter.configure(wikiPageKey, false, null, false);
+		presenter.configure(wikiPageKey, false, null);
 		verify(mockSynapseJavascriptClient, never()).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockMarkdownWidget).configure(eq(md), eq(wikiPageKey), anyLong());
 	}
@@ -326,7 +315,7 @@ public class WikiPageWidgetTest {
 		currentV2WikiPage.setId(wikiPageKey.getWikiPageId());
 		AsyncMockStubber.callSuccessWith(currentV2WikiPage).when(mockSynapseJavascriptClient).getV2WikiPage(eq(wikiPageKey), any(AsyncCallback.class));
 		
-		presenter.configure(wikiPageKey, false, null, false);
+		presenter.configure(wikiPageKey, false, null);
 		verify(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockMarkdownWidget).configure(eq(testPage.getMarkdown()), eq(wikiPageKey), anyLong());
 	}

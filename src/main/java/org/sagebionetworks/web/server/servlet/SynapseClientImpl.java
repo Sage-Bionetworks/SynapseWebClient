@@ -39,6 +39,7 @@ import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -2619,7 +2620,14 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	
 	private boolean isChallenge(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
 		// are there any evaluations that the current user can edit?
-		return ChallengeClientImpl.getShareableEvaluations(projectId, synapseClient).size() > 0;
+		try {
+			Challenge challenge = synapseClient.getChallengeForProject(projectId);
+			// found a challenge!
+			// return true if user has edit access to the project
+			return synapseClient.canAccess(challenge.getProjectId(), ACCESS_TYPE.UPDATE);
+		} catch (Exception e) {
+			return ChallengeClientImpl.getShareableEvaluations(projectId, synapseClient).size() > 0;
+		}
 	}
 	
 	@Override

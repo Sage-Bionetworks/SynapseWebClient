@@ -117,7 +117,7 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 	}
 	
 	private void configureWiki() {
-		wikiPageRenderer.configure(wikiKey, false, null, false);
+		wikiPageRenderer.configure(wikiKey, false, null);
 	}
 	
 	@Override

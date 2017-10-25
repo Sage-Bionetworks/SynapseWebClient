@@ -69,6 +69,7 @@ import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
+import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
@@ -92,6 +93,8 @@ import org.sagebionetworks.web.client.widget.entity.act.ACTRevokeUserAccessModal
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
+import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -103,6 +106,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWi
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
+import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigView;
@@ -183,6 +187,8 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidge
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
@@ -437,6 +443,7 @@ public interface PortalGinInjector extends Ginjector {
 	// Asynchronous
 	AsynchronousProgressWidget creatNewAsynchronousProgressWidget();
 
+<<<<<<< HEAD
 	UserTeamBadge getUserTeamBadgeWidget();
 	TeamBadge getTeamBadgeWidget();
 	BigTeamBadge getBigTeamBadgeWidget();
@@ -464,6 +471,7 @@ public interface PortalGinInjector extends Ginjector {
 	AnnotationEditor getAnnotationEditor();
 	FileHistoryRowView getFileHistoryRow();
 	FileHistoryWidget getFileHistoryWidget();
+	AnnotationsRendererWidget getAnnotationsRendererWidget();
 
 	JoinTeamConfigEditor getJoinTeamConfigEditor();
 	ModifiedCreatedByWidget getModifiedCreatedByWidget();
@@ -482,6 +490,7 @@ public interface PortalGinInjector extends Ginjector {
 	DiscussionThreadCountAlert getDiscussionThreadCountAlert();
 
 	// docker
+<<<<<<< HEAD
 	DockerRepoWidget createNewDockerRepoWidget();
 	DockerCommitRowWidget createNewDockerCommitRowWidget();
 
@@ -562,4 +571,90 @@ public interface PortalGinInjector extends Ginjector {
 	SubjectWidget getSubjectWidget();
 	TeamMemberRowWidget getTeamMemberRowWidget();
 	RequestBuilderWrapper getRequestBuilder();
+=======
+	public DockerRepoWidget createNewDockerRepoWidget();
+	public DockerCommitRowWidget createNewDockerCommitRowWidget();
+	
+	public LoginWidget getLoginWidget();
+	public FileClientsHelp getFileClientsHelp();
+	public LoadMoreWidgetContainer getLoadMoreProjectsWidgetContainer();
+	public RadioWidget createNewRadioWidget();
+	public EntityListRowBadge getEntityListRowBadge();
+	public CancelControlWidget getCancelControlWidget();
+	public FacetColumnResultSliderRangeWidget getFacetColumnResultSliderRangeWidget();
+	public FacetColumnResultRangeWidget getFacetColumnResultRangeWidget();
+	public FacetColumnResultValuesWidget getFacetColumnResultValuesWidget();
+	public FacetColumnResultDateRangeWidget getFacetColumnResultDateRangeWidget();
+	
+	public DiscussionTabView getDiscussionTabView();
+	public ForumWidget getForumWidget();
+	public DockerTabView getDockerTabView();
+	public DockerRepoListWidget getDockerRepoListWidget();
+	public Breadcrumb getBreadcrumb();
+	public SynapseClientAsync getSynapseClientAsync();
+	public SynapseJavascriptClient getSynapseJavascriptClient();
+	public StuAlert getStuAlert();
+	public FilesTabView getFilesTabView();
+	public FileTitleBar getFileTitleBar();
+	public BasicTitleBar getBasicTitleBar();
+	public EntityMetadata getEntityMetadata();
+	public FilesBrowser getFilesBrowser();
+	public WikiPageWidget getWikiPageWidget();
+	public DiscussionThreadListWidget getDiscussionThreadListWidget();
+	public ChallengeTabView getChallengeTabView();
+	public ChallengeWidget getChallengeWidget();
+	public TablesTabView getTablesTabView();
+	public QueryTokenProvider getQueryTokenProvider();
+	public SettingsPresenter getSettingsPresenter();
+	public AccessControlListModalWidget getAccessControlListModalWidget();
+	public RenameEntityModalWidget getRenameEntityModalWidget();
+	public EditFileMetadataModalWidget getEditFileMetadataModalWidget();
+	public EditProjectMetadataModalWidget getEditProjectMetadataModalWidget();
+	public EntityFinder getEntityFinder();
+	public UploadDialogWidget getUploadDialogWidget();
+	public AddFolderDialogWidget getAddFolderDialogWidget();
+	public WikiMarkdownEditor getWikiMarkdownEditor();
+	public ProvenanceEditorWidget getProvenanceEditorWidget();
+	public StorageLocationWidget getStorageLocationWidget();
+	public EvaluationEditorModal getEvaluationEditorModal();
+	public SelectTeamModal getSelectTeamModal();
+	public ApproveUserAccessModal getApproveUserAccessModal();
+	public ACTRevokeUserAccessModal getACTRevokeUserAccessModal();
+	public ChallengeClientAsync getChallengeClientAsync();
+	public UserProfileClientAsync getUserProfileClientAsync();
+	public DataAccessClientAsync getDataAccessClientAsync();
+	public MultipartFileUploadClientAsync getMultipartFileUploadClientAsync();
+	public DiscussionForumClientAsync getDiscussionForumClientAsync();
+	public DockerClientAsync getDockerClientAsync();
+	public JiraClientAsync getJiraClientAsync();
+	public LinkedInServiceAsync getLinkedInServiceAsync();
+	public StackConfigServiceAsync getStackConfigServiceAsync();
+	public SubscriptionClientAsync getSubscriptionClientAsync();
+	public UserAccountServiceAsync getUserAccountServiceAsync();
+	public EntityIdCellRendererImpl getEntityIdCellRenderer();
+	public UserIdCellRendererImpl getUserIdCellRenderer();
+	
+	public CreateDataAccessRequestWizard getCreateDataAccessRequestWizard();
+	public ManagedACTAccessRequirementWidget getManagedACTAccessRequirementWidget();
+	public ACTAccessRequirementWidget getACTAccessRequirementWidget();
+	public LockAccessRequirementWidget getLockAccessRequirementWidget();
+	public TermsOfUseAccessRequirementWidget getTermsOfUseAccessRequirementWidget();
+	public FileHandleWidget getFileHandleWidget();
+	public CreateAccessRequirementWizard getCreateAccessRequirementWizard();
+	public ProfileCertifiedValidatedWidget getProfileCertifiedValidatedWidget();
+	public ACTDataAccessSubmissionWidget getACTDataAccessSubmissionWidget();
+	public OpenSubmissionWidget getOpenSubmissionWidget();
+	public DateTimeUtils getDateTimeUtils();
+	public AccessorGroupWidget getAccessorGroupWidget();
+	public AccessRequirementWidget getAccessRequirementWidget();
+	public SelfSignAccessRequirementWidget getSelfSignAccessRequirementWidget();
+	
+	public SubjectWidget getSubjectWidget();
+	public TeamMemberRowWidget getTeamMemberRowWidget();
+	public RequestBuilderWrapper getRequestBuilder();
+	public EditAnnotationsDialog getEditAnnotationsDialog();
+	public CreateTableViewWizard getCreateTableViewWizard();
+	public UploadTableModalWidget getUploadTableModalWidget();
+	public AddExternalRepoModal getAddExternalRepoModal();
+>>>>>>> 3eb1ace73c2ceb5121d14c142df108dc1c5a6d32
 }

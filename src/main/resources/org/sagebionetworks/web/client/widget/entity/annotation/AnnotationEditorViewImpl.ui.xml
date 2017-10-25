@@ -5,16 +5,16 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<t:Table>
 		<t:TableRow>
-			<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
+			<t:TableData addStyleNames="vertical-align-top min-width-200" paddingRight="2">
 				<b:FormGroup ui:field="formGroup">
 					<b:TextBox ui:field="keyField"/>
 					<b:HelpBlock ui:field="helpBlock"/>
 				</b:FormGroup>
 			</t:TableData>
-			<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
+			<t:TableData addStyleNames="vertical-align-top min-width-150" paddingRight="2">
 				<g:ListBox ui:field="typeComboBox" styleName="form-control" />
 			</t:TableData>
-			<t:TableData addStyleNames="vertical-align-top" paddingRight="2">
+			<t:TableData addStyleNames="vertical-align-top min-width-200" paddingRight="2">
 				<g:FlowPanel ui:field="editorsContainer" />
 			</t:TableData>
 		</t:TableRow>
