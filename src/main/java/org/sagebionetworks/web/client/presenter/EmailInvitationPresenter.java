@@ -43,13 +43,14 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	private PlaceChanger placeChanger;
 
 	@Inject
-	public EmailInvitationPresenter(EmailInvitationView view,
-									RegisterWidget registerWidget,
-									SynapseJavascriptClient jsClient,
-									SynapseFutureClient futureClient,
-									SynapseAlert synapseAlert,
-									AuthenticationController authController,
-									GlobalApplicationState globalApplicationState) {
+	public EmailInvitationPresenter(
+			EmailInvitationView view,
+			RegisterWidget registerWidget,
+			SynapseJavascriptClient jsClient,
+			SynapseFutureClient futureClient,
+			SynapseAlert synapseAlert,
+			AuthenticationController authController,
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.registerWidget = registerWidget;
 		this.jsClient = jsClient;
@@ -120,8 +121,8 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 		registerWidget.enableEmailAddressField(false);
 		view.setRegisterWidget(registerWidget.asWidget());
 		view.setSynapseAlertContainer(synapseAlert.asWidget());
-		EmailInvitationPresenter.this.registerWidget.setEncodedMembershipInvtnSignedToken(encodedMISignedToken);
-		EmailInvitationPresenter.this.registerWidget.setEmail(mis.getInviteeEmail());
+		registerWidget.setEncodedMembershipInvtnSignedToken(encodedMISignedToken);
+		registerWidget.setEmail(mis.getInviteeEmail());
 
 		ListenableFuture<Team> teamFuture;
 		ListenableFuture<UserProfile> userProfileFuture;
@@ -144,10 +145,10 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 							if (displayName != null) {
 								title += " by " + displayName;
 							}
-							EmailInvitationPresenter.this.view.setInvitationTitle(title);
+							view.setInvitationTitle(title);
 							String message = mis.getMessage();
 							if (message != null) {
-								EmailInvitationPresenter.this.view.setInvitationMessage(mis.getMessage());
+								view.setInvitationMessage(mis.getMessage());
 							}
 							return null;
 						},
