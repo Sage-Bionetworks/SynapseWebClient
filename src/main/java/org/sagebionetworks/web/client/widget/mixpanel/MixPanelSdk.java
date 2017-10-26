@@ -9,16 +9,12 @@ import com.google.inject.Inject;
  *
  */
 public class MixPanelSdk {
-	String currentUserId = null;
 	@Inject
 	public MixPanelSdk() {
 	}
 
 	public void initialize(final String userId, final String email) {
-		if (!userId.equals(currentUserId)) {
-			_initialize(userId, email);
-			currentUserId = userId;
-		}
+		_initialize(userId, email);
 	}
 
 	private static native void _initialize(
