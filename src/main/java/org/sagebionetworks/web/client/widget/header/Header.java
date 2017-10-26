@@ -15,7 +15,7 @@ import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
-import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
+import org.sagebionetworks.web.client.widget.mixpanel.MixPanelSdk;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -41,7 +41,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private FavoriteWidget favWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private StuAnnouncementWidget stuAnnouncementWidget;
-	private PendoSdk pendoSdk;
+	private MixPanelSdk mixPanelSdk;
 	
 	@Inject
 	public Header(HeaderView view, 
@@ -51,7 +51,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			FavoriteWidget favWidget, 
 			SynapseJSNIUtils synapseJSNIUtils, 
 			StuAnnouncementWidget stuAnnouncementWidget,
-			PendoSdk pendoSdk) {
+			MixPanelSdk mixPanelSdk) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -60,7 +60,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.clear();
 		this.stuAnnouncementWidget = stuAnnouncementWidget;
-		this.pendoSdk = pendoSdk;
+		this.mixPanelSdk = mixPanelSdk;
 		view.setPresenter(this);
 		stuAnnouncementWidget.init();
 		initStagingAlert();
@@ -122,9 +122,9 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
 		if (authenticationController.isLoggedIn()) {
 			String userName = userSessionData.getProfile().getUserName();
-			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
+			mixPanelSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
 		} else {
-			pendoSdk.initialize(ANONYMOUS, N_A);
+			mixPanelSdk.initialize(ANONYMOUS, N_A);
 		}
 	}
 
