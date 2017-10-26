@@ -443,7 +443,6 @@ public interface PortalGinInjector extends Ginjector {
 	// Asynchronous
 	AsynchronousProgressWidget creatNewAsynchronousProgressWidget();
 
-<<<<<<< HEAD
 	UserTeamBadge getUserTeamBadgeWidget();
 	TeamBadge getTeamBadgeWidget();
 	BigTeamBadge getBigTeamBadgeWidget();
@@ -490,7 +489,6 @@ public interface PortalGinInjector extends Ginjector {
 	DiscussionThreadCountAlert getDiscussionThreadCountAlert();
 
 	// docker
-<<<<<<< HEAD
 	DockerRepoWidget createNewDockerRepoWidget();
 	DockerCommitRowWidget createNewDockerCommitRowWidget();
 
@@ -533,6 +531,7 @@ public interface PortalGinInjector extends Ginjector {
 	EntityFinder getEntityFinder();
 	UploadDialogWidget getUploadDialogWidget();
 	WikiMarkdownEditor getWikiMarkdownEditor();
+	AddFolderDialogWidget getAddFolderDialogWidget();
 	ProvenanceEditorWidget getProvenanceEditorWidget();
 	StorageLocationWidget getStorageLocationWidget();
 	EvaluationEditorModal getEvaluationEditorModal();
@@ -571,90 +570,8 @@ public interface PortalGinInjector extends Ginjector {
 	SubjectWidget getSubjectWidget();
 	TeamMemberRowWidget getTeamMemberRowWidget();
 	RequestBuilderWrapper getRequestBuilder();
-=======
-	public DockerRepoWidget createNewDockerRepoWidget();
-	public DockerCommitRowWidget createNewDockerCommitRowWidget();
-	
-	public LoginWidget getLoginWidget();
-	public FileClientsHelp getFileClientsHelp();
-	public LoadMoreWidgetContainer getLoadMoreProjectsWidgetContainer();
-	public RadioWidget createNewRadioWidget();
-	public EntityListRowBadge getEntityListRowBadge();
-	public CancelControlWidget getCancelControlWidget();
-	public FacetColumnResultSliderRangeWidget getFacetColumnResultSliderRangeWidget();
-	public FacetColumnResultRangeWidget getFacetColumnResultRangeWidget();
-	public FacetColumnResultValuesWidget getFacetColumnResultValuesWidget();
-	public FacetColumnResultDateRangeWidget getFacetColumnResultDateRangeWidget();
-	
-	public DiscussionTabView getDiscussionTabView();
-	public ForumWidget getForumWidget();
-	public DockerTabView getDockerTabView();
-	public DockerRepoListWidget getDockerRepoListWidget();
-	public Breadcrumb getBreadcrumb();
-	public SynapseClientAsync getSynapseClientAsync();
-	public SynapseJavascriptClient getSynapseJavascriptClient();
-	public StuAlert getStuAlert();
-	public FilesTabView getFilesTabView();
-	public FileTitleBar getFileTitleBar();
-	public BasicTitleBar getBasicTitleBar();
-	public EntityMetadata getEntityMetadata();
-	public FilesBrowser getFilesBrowser();
-	public WikiPageWidget getWikiPageWidget();
-	public DiscussionThreadListWidget getDiscussionThreadListWidget();
-	public ChallengeTabView getChallengeTabView();
-	public ChallengeWidget getChallengeWidget();
-	public TablesTabView getTablesTabView();
-	public QueryTokenProvider getQueryTokenProvider();
-	public SettingsPresenter getSettingsPresenter();
-	public AccessControlListModalWidget getAccessControlListModalWidget();
-	public RenameEntityModalWidget getRenameEntityModalWidget();
-	public EditFileMetadataModalWidget getEditFileMetadataModalWidget();
-	public EditProjectMetadataModalWidget getEditProjectMetadataModalWidget();
-	public EntityFinder getEntityFinder();
-	public UploadDialogWidget getUploadDialogWidget();
-	public AddFolderDialogWidget getAddFolderDialogWidget();
-	public WikiMarkdownEditor getWikiMarkdownEditor();
-	public ProvenanceEditorWidget getProvenanceEditorWidget();
-	public StorageLocationWidget getStorageLocationWidget();
-	public EvaluationEditorModal getEvaluationEditorModal();
-	public SelectTeamModal getSelectTeamModal();
-	public ApproveUserAccessModal getApproveUserAccessModal();
-	public ACTRevokeUserAccessModal getACTRevokeUserAccessModal();
-	public ChallengeClientAsync getChallengeClientAsync();
-	public UserProfileClientAsync getUserProfileClientAsync();
-	public DataAccessClientAsync getDataAccessClientAsync();
-	public MultipartFileUploadClientAsync getMultipartFileUploadClientAsync();
-	public DiscussionForumClientAsync getDiscussionForumClientAsync();
-	public DockerClientAsync getDockerClientAsync();
-	public JiraClientAsync getJiraClientAsync();
-	public LinkedInServiceAsync getLinkedInServiceAsync();
-	public StackConfigServiceAsync getStackConfigServiceAsync();
-	public SubscriptionClientAsync getSubscriptionClientAsync();
-	public UserAccountServiceAsync getUserAccountServiceAsync();
-	public EntityIdCellRendererImpl getEntityIdCellRenderer();
-	public UserIdCellRendererImpl getUserIdCellRenderer();
-	
-	public CreateDataAccessRequestWizard getCreateDataAccessRequestWizard();
-	public ManagedACTAccessRequirementWidget getManagedACTAccessRequirementWidget();
-	public ACTAccessRequirementWidget getACTAccessRequirementWidget();
-	public LockAccessRequirementWidget getLockAccessRequirementWidget();
-	public TermsOfUseAccessRequirementWidget getTermsOfUseAccessRequirementWidget();
-	public FileHandleWidget getFileHandleWidget();
-	public CreateAccessRequirementWizard getCreateAccessRequirementWizard();
-	public ProfileCertifiedValidatedWidget getProfileCertifiedValidatedWidget();
-	public ACTDataAccessSubmissionWidget getACTDataAccessSubmissionWidget();
-	public OpenSubmissionWidget getOpenSubmissionWidget();
-	public DateTimeUtils getDateTimeUtils();
-	public AccessorGroupWidget getAccessorGroupWidget();
-	public AccessRequirementWidget getAccessRequirementWidget();
-	public SelfSignAccessRequirementWidget getSelfSignAccessRequirementWidget();
-	
-	public SubjectWidget getSubjectWidget();
-	public TeamMemberRowWidget getTeamMemberRowWidget();
-	public RequestBuilderWrapper getRequestBuilder();
-	public EditAnnotationsDialog getEditAnnotationsDialog();
-	public CreateTableViewWizard getCreateTableViewWizard();
-	public UploadTableModalWidget getUploadTableModalWidget();
-	public AddExternalRepoModal getAddExternalRepoModal();
->>>>>>> 3eb1ace73c2ceb5121d14c142df108dc1c5a6d32
+	EditAnnotationsDialog getEditAnnotationsDialog();
+	CreateTableViewWizard getCreateTableViewWizard();
+	UploadTableModalWidget getUploadTableModalWidget();
+	AddExternalRepoModal getAddExternalRepoModal();
 }
