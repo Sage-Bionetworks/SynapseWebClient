@@ -186,7 +186,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		QueryBundleRequest qbr = new QueryBundleRequest();
 		qbr.setPartMask(ALL_PARTS_MASK);
 		Query query = new Query();
-		query.setSql("select etag from " + fileViewEntityId + " where etag='"+oldEtag+"'");
+		query.setSql("select * from " + fileViewEntityId + " where ROW_ETAG='"+oldEtag+"'");
 		query.setOffset(DEFAULT_OFFSET);
 		query.setLimit(DEFAULT_LIMIT);
 		query.setIsConsistent(true);

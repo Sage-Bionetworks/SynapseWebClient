@@ -371,6 +371,7 @@ public class TableEntityWidget implements IsWidget,
 		builder.append(SELECT_FROM);
 		builder.append(this.tableId);
 		Query query = new Query();
+		query.setIncludeEntityEtag(true);
 		query.setSql(builder.toString());
 		query.setOffset(DEFAULT_OFFSET);
 		query.setLimit(DEFAULT_LIMIT);

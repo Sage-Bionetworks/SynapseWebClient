@@ -170,9 +170,6 @@ public class ColumnModelsEditorWidgetTest {
 		verify(mockColumnModelTableRowEditorWidget2).setToBeDefaultFileViewColumn();
 		verify(mockColumnModelTableRowEditorWidget1).setCanHaveDefault(false);
 		verify(mockColumnModelTableRowEditorWidget2).setCanHaveDefault(false);
-		//verify etag column selection is not enabled
-		verify(mockColumnModelTableRowEditorWidget1).setSelectVisible(true);
-		verify(mockColumnModelTableRowEditorWidget2).setSelectVisible(false);
 	}
 	
 	@Test
