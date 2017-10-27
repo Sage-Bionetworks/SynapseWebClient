@@ -26,6 +26,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
+import org.sagebionetworks.repo.model.file.FileResultFailureCode;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -65,6 +66,8 @@ public class ImageWidgetTest {
 	FileHandle mockFileHandle2;
 	@Captor
 	ArgumentCaptor<FileHandleAssociation> fhaCaptor;
+	@Captor
+	ArgumentCaptor<Throwable> throwableCaptor;
 	
 	public static final String PRESIGNED_URL = "https://s3.presigned/image.jpg";
 	public static final String FILE_NAME = "image.jpg";
@@ -173,6 +176,25 @@ public class ImageWidgetTest {
 		boolean isLoggedIn = true;
 		verify(mockView).configure(eq(PRESIGNED_URL), eq(FILE_NAME), anyString(), anyString(), eq((String)null), eq(isLoggedIn));
 	}
+	
+	@Test
+	public void testConfigureFromSynapseIdGetFileResultError() {
+		when(mockFileResult.getPreSignedURL()).thenReturn(null);
+		when(mockFileResult.getFailureCode()).thenReturn(FileResultFailureCode.UNAUTHORIZED);
+		AsyncMockStubber.callSuccessWith(mockFileEntity).when(mockSynapseJavascriptClient).getEntityForVersion(anyString(), anyLong(), any(AsyncCallback.class));
+		String synId = "syn239";
+		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
+		String dataFileHandleId = "8765";
+		when(mockFileEntity.getId()).thenReturn(synId);
+		when(mockFileEntity.getDataFileHandleId()).thenReturn(dataFileHandleId);
+		
+		widget.configure(wikiKey,descriptor, null, null);
+		verify(mockPresignedURLAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		
+		verify(mockSynAlert).handleException(throwableCaptor.capture());
+		assertTrue(throwableCaptor.getValue().getMessage().contains(FileResultFailureCode.UNAUTHORIZED.toString()));
+	}
+	
 	
 	@Test
 	public void testConfigureFromWikiAttachmentError() {
