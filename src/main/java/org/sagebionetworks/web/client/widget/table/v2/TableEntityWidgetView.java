@@ -15,15 +15,6 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface TableEntityWidgetView extends IsWidget {
 	
 	public interface Presenter extends EntityUpdatedHandler {
-		/**
-		 * Called when the schema is shown or hidden.
-		 */
-		void onSchemaToggle(boolean shown);
-		/**
-		 * Called when the view scope is shown or hidden.
-		 */
-		void onScopeToggle(boolean shown);
-		
 		void onShowSimpleSearch();
 		void onShowAdvancedSearch();
 	}
@@ -92,18 +83,8 @@ public interface TableEntityWidgetView extends IsWidget {
 	 */
 	
 	public void addModalWidget(IsWidget w);
-
-	/**
-	 * Show or hide the table schema.
-	 */
-	public void toggleSchema();
-
-	/**
-	 * Show or hide the view scope.
-	 */
-	public void toggleScope();
-
 	void setScopeVisible(boolean visible);
+	void setSchemaVisible(boolean visible);
 	
 	void showErrorMessage(String message);
 	void showConfirmDialog(String title, String confirmationMessage, Callback yesCallback);

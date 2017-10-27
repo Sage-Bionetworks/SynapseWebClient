@@ -123,7 +123,7 @@ public class TermsOfUseAccessRequirementWidgetTest {
 	@Test
 	public void testSetRequirementWithWikiTerms() {
 		widget.setRequirement(mockTermsOfUseAccessRequirement, mockRefreshCallback);
-		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class), eq(false));
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class));
 		verify(mockView, never()).setTerms(anyString());
 		verify(mockView, never()).showTermsUI();
 	}

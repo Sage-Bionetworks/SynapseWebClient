@@ -80,7 +80,7 @@ public class CreateBasicAccessRequirementStep2Test {
 		widget.configure(mockTermsOfUseAccessRequirement);
 		verify(mockView).setOldTermsVisible(false);
 		verify(mockView).setOldTerms("");
-		verify(mockWikiPageRenderer).configure(wikiPageKeyCaptor.capture(), eq(false), eq((WikiPageWidget.Callback)null), eq(false));
+		verify(mockWikiPageRenderer).configure(wikiPageKeyCaptor.capture(), eq(false), eq((WikiPageWidget.Callback)null));
 		WikiPageKey key = wikiPageKeyCaptor.getValue();
 		assertEquals(AR_ID.toString(), key.getOwnerObjectId());
 		assertEquals(ObjectType.ACCESS_REQUIREMENT.toString(), key.getOwnerObjectType());
@@ -101,7 +101,7 @@ public class CreateBasicAccessRequirementStep2Test {
 		widget.configure(mockTermsOfUseAccessRequirement);
 		verify(mockView).setOldTermsVisible(true);
 		verify(mockView).setOldTerms(tou);
-		verify(mockWikiPageRenderer).configure(wikiPageKeyCaptor.capture(), eq(false), eq((WikiPageWidget.Callback)null), eq(false));
+		verify(mockWikiPageRenderer).configure(wikiPageKeyCaptor.capture(), eq(false), eq((WikiPageWidget.Callback)null));
 		WikiPageKey key = wikiPageKeyCaptor.getValue();
 		assertEquals(AR_ID.toString(), key.getOwnerObjectId());
 		assertEquals(ObjectType.ACCESS_REQUIREMENT.toString(), key.getOwnerObjectType());

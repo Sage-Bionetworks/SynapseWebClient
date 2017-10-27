@@ -68,6 +68,7 @@ import org.sagebionetworks.web.client.widget.discussion.ReplyWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitRowWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
+import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
@@ -91,6 +92,8 @@ import org.sagebionetworks.web.client.widget.entity.act.ACTRevokeUserAccessModal
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationEditor;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
+import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
@@ -102,6 +105,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.StorageLocationWi
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
+import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigView;
@@ -182,6 +186,8 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidge
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
+import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryResultEditorWidget;
@@ -460,6 +466,7 @@ public interface PortalGinInjector extends Ginjector {
 	public AnnotationEditor getAnnotationEditor();
 	public FileHistoryRowView getFileHistoryRow();
 	public FileHistoryWidget getFileHistoryWidget();
+	public AnnotationsRendererWidget getAnnotationsRendererWidget();
 	
 	public JoinTeamConfigEditor getJoinTeamConfigEditor();
 	public ModifiedCreatedByWidget getModifiedCreatedByWidget();
@@ -518,6 +525,7 @@ public interface PortalGinInjector extends Ginjector {
 	public EditProjectMetadataModalWidget getEditProjectMetadataModalWidget();
 	public EntityFinder getEntityFinder();
 	public UploadDialogWidget getUploadDialogWidget();
+	public AddFolderDialogWidget getAddFolderDialogWidget();
 	public WikiMarkdownEditor getWikiMarkdownEditor();
 	public ProvenanceEditorWidget getProvenanceEditorWidget();
 	public StorageLocationWidget getStorageLocationWidget();
@@ -557,4 +565,8 @@ public interface PortalGinInjector extends Ginjector {
 	public SubjectWidget getSubjectWidget();
 	public TeamMemberRowWidget getTeamMemberRowWidget();
 	public RequestBuilderWrapper getRequestBuilder();
+	public EditAnnotationsDialog getEditAnnotationsDialog();
+	public CreateTableViewWizard getCreateTableViewWizard();
+	public UploadTableModalWidget getUploadTableModalWidget();
+	public AddExternalRepoModal getAddExternalRepoModal();
 }

@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget.Callback;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -40,10 +41,11 @@ public class WikiTab {
 	}
 	
 	public void configure(String entityId, String entityName, String wikiPageId, Boolean canEdit,
-			Callback callback) {
+			Callback callback, ActionMenuWidget actionMenu) {
 		lazyInject();
 		WikiPageKey wikiPageKey = new WikiPageKey(entityId, ObjectType.ENTITY.name(), wikiPageId);
-		wikiPageWidget.configure(wikiPageKey, canEdit, callback, true);
+		wikiPageWidget.configure(wikiPageKey, canEdit, callback);
+		wikiPageWidget.showSubpages(actionMenu);
 		setEntityNameAndPlace(entityId, entityName, wikiPageId);
 	}
 	

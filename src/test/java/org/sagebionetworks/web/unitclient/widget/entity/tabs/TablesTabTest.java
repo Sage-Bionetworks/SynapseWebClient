@@ -5,32 +5,29 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Query;
@@ -39,8 +36,6 @@ import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -48,7 +43,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
-import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
@@ -59,9 +53,7 @@ import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 public class TablesTabTest {
@@ -84,11 +76,7 @@ public class TablesTabTest {
 	@Mock
 	StuAlert mockSynapseAlert;
 	@Mock
-	SynapseClientAsync mockSynapseClientAsync;
-	@Mock
 	PortalGinInjector mockPortalGinInjector;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
 
 	@Mock
 	EntityBundle mockProjectEntityBundle;
@@ -105,16 +93,16 @@ public class TablesTabTest {
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
 	@Mock
-	EntityActionController mockEntityActionController;
-	@Mock
 	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
-	CallbackP<Boolean> mockProjectInfoCallback;
+	CallbackP<String> mockEntitySelectedCallback;
 	@Mock
 	TableEntityWidget mockTableEntityWidget;
 	@Mock
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
-	
+	@Captor
+	ArgumentCaptor<CallbackP> callbackPCaptor;
+
 	String projectEntityId = "syn666666";
 	String projectName = "a test project";
 	String tableEntityId = "syn22";
@@ -137,20 +125,15 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.getEntityMetadata()).thenReturn(mockEntityMetadata);
 		when(mockPortalGinInjector.getQueryTokenProvider()).thenReturn(queryTokenProvider);
 		when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
-		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClientAsync);
 		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
 		when(mockPortalGinInjector.getProvenanceRenderer()).thenReturn(mockProvenanceWidget);
-		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockSynapseJavascriptClient);
 		
-		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
-		AccessRequirement tou = new TermsOfUseAccessRequirement();
+		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
 		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		
-		when(mockPortalGinInjector.createActionMenuWidget()).thenReturn(mockActionMenuWidget);
-		when(mockPortalGinInjector.createEntityActionController()).thenReturn(mockEntityActionController);
 		when(mockPortalGinInjector.createNewTableEntityWidget()).thenReturn(mockTableEntityWidget);
 		
 		when(mockTableEntityBundle.getEntity()).thenReturn(mockTableEntity);
@@ -160,8 +143,6 @@ public class TablesTabTest {
 		
 		when(mockFileViewEntity.getId()).thenReturn(tableEntityId);
 		when(mockFileViewEntity.getName()).thenReturn(tableName);
-		
-		AsyncMockStubber.callSuccessWith(mockTableEntityBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		
 		// setup a complex query.
 		query = new Query();
@@ -186,6 +167,15 @@ public class TablesTabTest {
 	}
 
 	@Test
+	public void testClickTable() {
+		//verify that clicking on an item in the tables list sends the event back to the entity page top (to get the new target entity)
+		String newEntityId = "syn9839838";
+		verify(mockTableListWidget).setTableClickedCallback(callbackPCaptor.capture());
+		callbackPCaptor.getValue().invoke(newEntityId);
+		verify(mockEntitySelectedCallback).invoke(newEntityId);
+	}
+
+	@Test
 	public void testConfigureUsingTable() {
 		String areaToken = null;
 		
@@ -195,7 +185,7 @@ public class TablesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockTableEntity, mockEntityUpdatedHandler, areaToken);
+		tab.configure(mockTableEntityBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
 		
 		verifyTableConfiguration();
 	}
@@ -211,16 +201,13 @@ public class TablesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockFileViewEntity, mockEntityUpdatedHandler, areaToken);
+		tab.configure(mockTableEntityBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
 		
 		verifyTableConfiguration();
 	}
 	
 	private void verifyTableConfiguration() {
-		verify(mockSynapseJavascriptClient).getEntityBundle(eq(tableEntityId), anyInt(), any(AsyncCallback.class));
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.TABLES));
-		verify(mockPortalGinInjector).createActionMenuWidget();
-		verify(mockPortalGinInjector).createEntityActionController();
 		verify(mockBasicTitleBar).configure(mockTableEntityBundle);
 		verify(mockEntityMetadata).setEntityBundle(mockTableEntityBundle, null);
 		verify(mockTableEntityWidget).configure(eq(mockTableEntityBundle), eq(true), eq(tab), eq(mockActionMenuWidget));
@@ -237,9 +224,6 @@ public class TablesTabTest {
 		verify(mockView).clearTableEntityWidget();
 		verify(mockModifiedCreatedBy).setVisible(false);
 
-		//hide project info
-		verify(mockProjectInfoCallback).invoke(false);
-		
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(tableName), captor.capture());
 		Synapse place = (Synapse)captor.getValue();
@@ -262,7 +246,7 @@ public class TablesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(file, mockEntityUpdatedHandler, areaToken);
+		tab.configure(mockProjectEntityBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
 		verify(mockModifiedCreatedBy, Mockito.never()).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockView).setEntityMetadataVisible(false);
@@ -274,8 +258,6 @@ public class TablesTabTest {
 		verify(mockModifiedCreatedBy).setVisible(false);
 		verify(mockView).setProvenanceVisible(false);
 		verify(mockView, never()).setProvenanceVisible(true);
-		//show project info
-		verify(mockProjectInfoCallback).invoke(true);
 		
 		verify(mockTableListWidget).configure(mockProjectEntityBundle);
 		
@@ -293,14 +275,14 @@ public class TablesTabTest {
 	
 	private Synapse getNewPlace(String expectedName) {
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
-		verify(mockTab).setEntityNameAndPlace(eq(expectedName), captor.capture());
+		verify(mockTab, atLeastOnce()).setEntityNameAndPlace(eq(expectedName), captor.capture());
 		return (Synapse)captor.getValue();
 	}
 
 	@Test
 	public void testSetTableQueryWithNoToken() {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockTableEntity, mockEntityUpdatedHandler, null);
+		tab.configure(mockTableEntityBundle, mockEntityUpdatedHandler, null, mockActionMenuWidget);
 		
 		reset(mockTab);
 		when(mockTab.isTabPaneVisible()).thenReturn(true);
@@ -315,7 +297,7 @@ public class TablesTabTest {
 	@Test
 	public void testSetQueryPaneNotVisible() {
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockTableEntity, mockEntityUpdatedHandler, null);
+		tab.configure(mockTableEntityBundle, mockEntityUpdatedHandler, null, mockActionMenuWidget);
 		reset(mockTab);
 		when(mockTab.isTabPaneVisible()).thenReturn(false);
 		when(mockTableEntityWidget.getDefaultQuery()).thenReturn(query);
@@ -333,7 +315,7 @@ public class TablesTabTest {
 		// Start with a token.
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockTableEntity, mockEntityUpdatedHandler, TablesTab.TABLE_QUERY_PREFIX + startToken);
+		tab.configure(mockTableEntityBundle, mockEntityUpdatedHandler, TablesTab.TABLE_QUERY_PREFIX + startToken, mockActionMenuWidget);
 		
 		reset(mockTab);
 		when(mockTab.isTabPaneVisible()).thenReturn(true);
@@ -353,23 +335,23 @@ public class TablesTabTest {
 		String queryAreaToken;
 		Query query1 = null;
 		queryAreaToken = null;
-		tab.configure(mockTableEntity, mockEntityUpdatedHandler, queryAreaToken);
+		tab.configure(mockTableEntityBundle, mockEntityUpdatedHandler, queryAreaToken, mockActionMenuWidget);
 		query1 = tab.getQueryString();
 		assertNull(query1);
 		
 		queryAreaToken = "something else";
-		tab.configure(mockTableEntity, mockEntityUpdatedHandler, queryAreaToken);
+		tab.configure(mockTableEntityBundle, mockEntityUpdatedHandler, queryAreaToken, mockActionMenuWidget);
 		query1 = tab.getQueryString();
 		assertNull(query1);
 		String token = queryTokenProvider.queryToToken(query);
 		queryAreaToken = "query/"+token;
-		tab.configure(mockTableEntity, mockEntityUpdatedHandler, queryAreaToken);
+		tab.configure(mockTableEntityBundle, mockEntityUpdatedHandler, queryAreaToken, mockActionMenuWidget);
 		query1 = tab.getQueryString();
 		assertEquals(query, query1);
 		query.setSql("SELECT 'query/' FROM syn123 LIMIT 1");
 		token = queryTokenProvider.queryToToken(query);
 		queryAreaToken = "query/"+token;
-		tab.configure(mockTableEntity, mockEntityUpdatedHandler, queryAreaToken);
+		tab.configure(mockTableEntityBundle, mockEntityUpdatedHandler, queryAreaToken, mockActionMenuWidget);
 		query1 = tab.getQueryString();
 		assertEquals(query, query1);
 	}
@@ -385,7 +367,6 @@ public class TablesTabTest {
 		verify(mockView).clearActionMenuContainer();
 		verify(mockView).clearTableEntityWidget();
 		verify(mockView).clearActionMenuContainer();
-		verify(mockProjectInfoCallback).invoke(false);
 		verify(mockModifiedCreatedBy).setVisible(false);
 		verify(mockView).setProvenanceVisible(false);
 	}

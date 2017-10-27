@@ -105,7 +105,7 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 			public void onSuccess(String rootWikiId) {
 				//get wiki terms
 	 			WikiPageKey wikiKey = new WikiPageKey(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), rootWikiId);
-	 			wikiPageWidget.configure(wikiKey, false, null, false);
+	 			wikiPageWidget.configure(wikiKey, false, null);
 			}
 		});
 		createAccessRequirementButton.configure(ar, refreshCallback);

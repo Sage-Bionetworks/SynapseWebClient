@@ -72,6 +72,7 @@ public class FileHistoryWidgetTest {
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	BasicPaginationWidget mockPaginationWidget;
 	public static final Long DEFAULT_MOCK_VERSION_COUNT = 2L;
+	boolean isOnCurrentVersion;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -127,13 +128,13 @@ public class FileHistoryWidgetTest {
 		.when(mockSynapseClient)
 		.getEntityVersions(anyString(), anyInt(), anyInt(),
 				any(AsyncCallback.class));
-		
+		isOnCurrentVersion = true;
 	}
 
 	@Test
 	public void testOnPageChange() throws Exception {
 		//with null version
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		fileHistoryWidget.setEntityBundle(bundle, null, isOnCurrentVersion);
 				
 		verify(mockView).clearVersions();
 		verify(mockPaginationWidget).configure(FileHistoryWidget.VERSION_LIMIT.longValue(), 0L, DEFAULT_MOCK_VERSION_COUNT, fileHistoryWidget);
@@ -163,14 +164,14 @@ public class FileHistoryWidgetTest {
 				fail("Called onSuccess on a failure");
 			}
 		};
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		fileHistoryWidget.setEntityBundle(bundle, null, isOnCurrentVersion);
 	}
 
 	@Test
 	public void testUpdateVersionInfo() throws Exception {
 		String testLabel = "testLabel";
 		String testComment = "testComment";
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		fileHistoryWidget.setEntityBundle(bundle, null, isOnCurrentVersion);
 		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
 		ArgumentCaptor<Entity> entityCaptor = ArgumentCaptor.forClass(Entity.class);
 		verify(mockSynapseClient).updateEntity(entityCaptor.capture(), (AsyncCallback<Entity>) any());
@@ -185,7 +186,7 @@ public class FileHistoryWidgetTest {
 		String testComment = "testComment";
 		vb.setVersionLabel(testLabel);
 		vb.setVersionComment(testComment);
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		fileHistoryWidget.setEntityBundle(bundle, null, isOnCurrentVersion);
 		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
 		verify(mockSynapseClient, never()).updateEntity(any(Entity.class), (AsyncCallback<Entity>) any());
 		verify(mockView).hideEditVersionInfo();
@@ -197,7 +198,7 @@ public class FileHistoryWidgetTest {
 		Exception ex = new Exception(errorMessage);
 		String testLabel = "testLabel";
 		String testComment = "testComment";
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		fileHistoryWidget.setEntityBundle(bundle, null, isOnCurrentVersion);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
 		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
 		verify(mockSynapseClient).updateEntity(any(Entity.class), (AsyncCallback<Entity>) any());
@@ -206,14 +207,14 @@ public class FileHistoryWidgetTest {
 
 	@Test
 	public void testDeleteVersion() throws Exception {
-		fileHistoryWidget.setEntityBundle(bundle, 20L);
+		fileHistoryWidget.setEntityBundle(bundle, 20L, isOnCurrentVersion);
 		fileHistoryWidget.deleteVersion(vb.getVersionNumber());
 		verify(mockSynapseClient).deleteEntityVersionById(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<Void>) any());
 	}
 	
 	@Test
 	public void testOnEdit() {
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		fileHistoryWidget.setEntityBundle(bundle, null, isOnCurrentVersion);
 		String oldComment = "an old comment";
 		vb.setVersionComment(oldComment);
 		String oldLabel = "an old label";
@@ -225,7 +226,7 @@ public class FileHistoryWidgetTest {
 	
 	@Test
 	public void testOnEditFailedPreflight() {
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		fileHistoryWidget.setEntityBundle(bundle, null, isOnCurrentVersion);
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
 		fileHistoryWidget.onEditVersionInfoClicked();
 		verify(mockView, never()).showEditVersionInfo(anyString(), anyString());
@@ -233,7 +234,7 @@ public class FileHistoryWidgetTest {
 	
 	@Test
 	public void testOnEditLabelFailedPreflight() {
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		fileHistoryWidget.setEntityBundle(bundle, null, isOnCurrentVersion);
 		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
 		fileHistoryWidget.onEditVersionInfoClicked();
 		verify(mockView, never()).showEditVersionInfo(anyString(), anyString());
@@ -242,7 +243,7 @@ public class FileHistoryWidgetTest {
 	@Test
 	public void testSetEntityBundleCanEditCurrent() {
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(true);
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		fileHistoryWidget.setEntityBundle(bundle, null, isOnCurrentVersion);
 		
 		//auto expand version history = false
 		verify(mockView).setEntityBundle(vb, false);
@@ -251,8 +252,10 @@ public class FileHistoryWidgetTest {
 	
 	@Test
 	public void testSetEntityBundleCanEditPrevious() {
+		//showing a previous version
+		isOnCurrentVersion = false;
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(true);
-		fileHistoryWidget.setEntityBundle(bundle, 24L);
+		fileHistoryWidget.setEntityBundle(bundle, 24L, isOnCurrentVersion);
 
 		//auto expand version history = true
 		verify(mockView).setEntityBundle(vb, true);
@@ -262,7 +265,7 @@ public class FileHistoryWidgetTest {
 	@Test
 	public void testSetEntityBundleNoEditCurrent() {
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(false);
-		fileHistoryWidget.setEntityBundle(bundle, null);
+		fileHistoryWidget.setEntityBundle(bundle, null, isOnCurrentVersion);
 		
 		//auto expand version history = false
 		verify(mockView).setEntityBundle(vb, false);
@@ -271,8 +274,10 @@ public class FileHistoryWidgetTest {
 	
 	@Test
 	public void testSetEntityBundleNoEditPrevious() {
+		//showing a previous version
+		isOnCurrentVersion = false;
 		when(bundle.getPermissions().getCanCertifiedUserEdit()).thenReturn(false);
-		fileHistoryWidget.setEntityBundle(bundle, 24L);
+		fileHistoryWidget.setEntityBundle(bundle, 24L, isOnCurrentVersion);
 
 		//auto expand version history = false
 		verify(mockView).setEntityBundle(vb, true);

@@ -158,7 +158,7 @@ public class ACTAccessRequirementWidgetTest {
 	@Test
 	public void testSetRequirementWithWikiTerms() {
 		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);
-		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class), eq(false));
+		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(false), any(WikiPageWidget.Callback.class));
 		verify(mockView, never()).setTerms(anyString());
 		verify(mockView, never()).showTermsUI();
 	}

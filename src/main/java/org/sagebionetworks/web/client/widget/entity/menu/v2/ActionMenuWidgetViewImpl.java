@@ -7,6 +7,8 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.Divider;
+import org.gwtbootstrap3.client.ui.DropDownHeader;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -24,9 +26,6 @@ import com.google.inject.Inject;
 public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	
 	public interface Binder extends UiBinder<Widget, ActionMenuWidgetViewImpl> {}
-
-	@UiField
-	Divider basicDivider;
 	@UiField
 	ButtonToolBar buttonToolBar;
 	@UiField
@@ -35,8 +34,12 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	Button toolsMenu;
 	
 	Widget widget;
-
-	
+	@UiField
+	Divider actDivider;
+	@UiField
+	DropDownHeader noActionsAvailable;
+	@UiField
+	DropDownHeader actHeader;
 	@Inject
 	public ActionMenuWidgetViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
@@ -78,15 +81,20 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	public void addControllerWidget(IsWidget controllerWidget) {
 		controllerContainer.add(controllerWidget);
 	}
-
+	
 	@Override
-	public void setBasicDividerVisible(boolean visible) {
-		this.basicDivider.setVisible(visible);
+	public void setACTDividerVisible(boolean visible){
+		actDivider.setVisible(visible);
+		actHeader.setVisible(visible);
 	}
 
 	@Override
-	public void setToolsButtonVisible(boolean visible) {
-		toolsMenu.setVisible(visible);
+	public void setToolsButtonIcon(String text, IconType icon) {
+		toolsMenu.setText(text);
+		toolsMenu.setIcon(icon);
 	}
-
+	@Override
+	public void setNoActionsAvailableVisible(boolean visible) {
+		noActionsAvailable.setVisible(visible);
+	}
 }

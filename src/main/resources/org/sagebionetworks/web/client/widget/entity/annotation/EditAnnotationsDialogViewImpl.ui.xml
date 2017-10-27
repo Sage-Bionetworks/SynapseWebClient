@@ -9,13 +9,13 @@
 			<b:ModalBody>
 				<t:Table width="80%">
 					<t:TableRow>
-						<t:TableHeader addStyleNames="text-align-center">
+						<t:TableHeader addStyleNames="min-width-200">
 							<b.html:Text>Key</b.html:Text>
 						</t:TableHeader>
-						<t:TableHeader addStyleNames="text-align-center">
+						<t:TableHeader addStyleNames="min-width-150">
 							<b.html:Text>Type</b.html:Text>
 						</t:TableHeader>
-						<t:TableHeader addStyleNames="text-align-center">
+						<t:TableHeader addStyleNames="min-width-200">
 							<b.html:Text>Value</b.html:Text>
 						</t:TableHeader>
 					</t:TableRow>

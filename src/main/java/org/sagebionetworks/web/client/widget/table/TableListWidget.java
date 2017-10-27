@@ -10,21 +10,11 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
-import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
-import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -37,53 +27,28 @@ import com.google.inject.Inject;
  * @author John
  *
  */
-public class TableListWidget implements TableListWidgetView.Presenter, TableCreatedHandler, IsWidget {
-	private PreflightController preflightController;
+public class TableListWidget implements TableListWidgetView.Presenter, IsWidget {
 	private TableListWidgetView view;
 	private SynapseJavascriptClient jsClient;
-	private UploadTableModalWidget uploadTableModalWidget;
-	private CreateTableViewWizard createTableViewWizard;
-	private boolean canEdit;
 	private EntityChildrenRequest query;
 	private EntityBundle parentBundle;
 	private CallbackP<String> onTableClickCallback;
-	private CookieProvider cookies;
-	WizardCallback refreshTablesCallback;
 	private LoadMoreWidgetContainer loadMoreWidget;
 	private SynapseAlert synAlert;
 	
 	@Inject
-	public TableListWidget(PreflightController preflightController,
+	public TableListWidget(
 			TableListWidgetView view,
 			SynapseJavascriptClient jsClient,
-			UploadTableModalWidget uploadTableModalWidget,
-			CookieProvider cookies,
-			CreateTableViewWizard createTableViewWizard,
 			LoadMoreWidgetContainer loadMoreWidget, 
 			SynapseAlert synAlert) {
-		this.preflightController = preflightController;
 		this.view = view;
 		this.jsClient = jsClient;
-		this.uploadTableModalWidget = uploadTableModalWidget;
-		this.createTableViewWizard = createTableViewWizard;
 		this.loadMoreWidget = loadMoreWidget;
-		this.cookies = cookies;
 		this.synAlert = synAlert;
 		this.view.setPresenter(this);
 		this.view.setLoadMoreWidget(loadMoreWidget);
-		this.view.addUploadTableModal(uploadTableModalWidget);
-		this.view.addWizard(createTableViewWizard.asWidget());
 		view.setSynAlert(synAlert);
-		refreshTablesCallback = new WizardCallback() {
-			@Override
-			public void onFinished() {
-				tableCreated();
-			}
-			
-			@Override
-			public void onCanceled() {
-			}
-		};
 		loadMoreWidget.configure(new Callback() {
 			@Override
 			public void invoke() {
@@ -100,8 +65,6 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 	 */
 	public void configure(EntityBundle parentBundle) {
 		this.parentBundle = parentBundle;
-		this.canEdit = parentBundle.getPermissions().getCanEdit();
-		this.uploadTableModalWidget.configure(parentBundle.getEntity().getId(), null);
 		view.resetSortUI();
 		loadData();
 	}
@@ -160,95 +123,12 @@ public class TableListWidget implements TableListWidgetView.Presenter, TableCrea
 		for (EntityHeader header : results) {
 			view.addTableListItem(header);
 		}
-		//Must have edit and showAddTables for the buttons to be visible.
-		view.setAddTableVisible(this.canEdit);
-		view.setUploadTableVisible(this.canEdit);
-		view.setAddFileViewVisible(this.canEdit);
-		view.setAddProjectViewVisible(this.canEdit);
 	}
     
 	@Override
 	public Widget asWidget() {
 		view.setPresenter(this);
 		return view.asWidget();		
-	}
-
-	@Override
-	public void onUploadTable() {
-		// This operation creates an entity and uploads data to the entity so both checks must pass.
-		preflightController.checkCreateEntityAndUpload(parentBundle, TableEntity.class.getName(), new Callback() {
-			@Override
-			public void invoke() {
-				postCheckUploadTable();
-			}
-		});
-	}
-	/**
-	 * Called after a successful preflight check.
-	 */
-	private void postCheckUploadTable(){
-		this.uploadTableModalWidget.showModal(refreshTablesCallback);
-	}
-
-	@Override
-	public void onAddFileView() {
-		preflightController.checkCreateEntity(parentBundle, EntityView.class.getName(), new Callback() {
-			@Override
-			public void invoke() {
-				postCheckCreateFileView();
-			}
-		});
-	}
-	/**
-	 * Called after all pre-flight checks are performed on a file view.
-	 */
-	private void postCheckCreateFileView() {
-		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.fileview);
-		this.createTableViewWizard.showModal(refreshTablesCallback);
-	}
-	
-	@Override
-	public void onAddProjectView() {
-		preflightController.checkCreateEntity(parentBundle, EntityView.class.getName(), new Callback() {
-			@Override
-			public void invoke() {
-				postCheckCreateProjectView();
-			}
-		});
-	}
-	
-	/**
-	 * Called after all pre-flight checks are performed on a project view.
-	 */
-	private void postCheckCreateProjectView() {
-		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.projectview);
-		this.createTableViewWizard.showModal(refreshTablesCallback);
-	}
-	
-	@Override
-	public void onAddTable() {
-		preflightController.checkCreateEntity(parentBundle, TableEntity.class.getName(), new Callback() {
-			@Override
-			public void invoke() {
-				postCheckCreateTable();
-			}
-		});
-
-	}
-	
-	/**
-	 * Called after all pre-flight checks are performed on a table.
-	 */
-	private void postCheckCreateTable(){
-		this.createTableViewWizard.configure(parentBundle.getEntity().getId(), TableType.table);
-		this.createTableViewWizard.showModal(refreshTablesCallback);
-	}
-	
-
-	@Override
-	public void tableCreated() {
-		// Back to page one.
-		loadData();
 	}
 	
 	/**

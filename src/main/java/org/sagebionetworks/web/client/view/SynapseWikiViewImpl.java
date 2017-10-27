@@ -71,6 +71,7 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 			@Override
 			public void noWikiFound() {
 			}
-		}, true);
+		});
+		wikiPage.showSubpages(null);
 	}
 }

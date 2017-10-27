@@ -12,17 +12,11 @@ import com.google.gwt.user.client.ui.IsWidget;
  */
 public interface ActionMenuWidget extends IsWidget {
 
+	public void hideAllActions();
 	/**
 	 * Reset this action menu.  This will clear all listeners and hide all action.
 	 */
 	public void reset();
-	
-	/**
-	 * Enable/disable an action in the menu.
-	 * @param action
-	 * @param enabled
-	 */
-	public void setActionEnabled(Action action, boolean enabled);
 	
 	/**
 	 * Show or hide an action.
@@ -44,6 +38,8 @@ public interface ActionMenuWidget extends IsWidget {
 	 * @param icon
 	 */
 	public void setActionIcon(Action action, IconType icon);
+	
+	public void setToolsButtonIcon(String text, IconType icon);
 	
 	/**
 	 * Add a new listener to an action.
@@ -81,15 +77,6 @@ public interface ActionMenuWidget extends IsWidget {
 	 */
 	public void addControllerWidget(IsWidget controllerWidget);
 
-	/**
-	 * Show/hide the divider between basic commands and specific commands.
-	 * @param visible
-	 */
-	public void setBasicDivderVisible(boolean visible);
+	void setACTDividerVisible(boolean visible);
 
-	/**
-	 * Show/hide the Tools button
-	 * @param visible
-	 */
-	public void setToolsButtonVisible(boolean visible);
 }

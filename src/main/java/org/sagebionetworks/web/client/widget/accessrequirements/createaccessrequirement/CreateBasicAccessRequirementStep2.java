@@ -120,7 +120,7 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 	}
 	
 	private void configureWiki() {
-		wikiPageRenderer.configure(wikiKey, false, null, false);
+		wikiPageRenderer.configure(wikiKey, false, null);
 	}
 	
 	@Override

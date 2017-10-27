@@ -26,6 +26,7 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
@@ -107,14 +108,14 @@ public class TableQueryResultWikiWidgetTest {
 		boolean isCurrentVersion = true;
 		String wikiPageRootId = null;
 		EntityUpdatedHandler entityUpdatedHandler = null;
-		verify(mockEntityActionController).configure(mockActionMenu, mockEntityBundle, isCurrentVersion, wikiPageRootId, entityUpdatedHandler);
+		verify(mockEntityActionController).configure(mockActionMenu, mockEntityBundle, isCurrentVersion, wikiPageRootId, EntityArea.TABLES, entityUpdatedHandler);
 		boolean canEdit = false;
 		verify(mockTableEntityWidget).configure(mockEntityBundle, canEdit, widget, mockActionMenu);
 		
 		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
 		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.EDIT_TABLE_DATA, false);
-		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.TOGGLE_TABLE_SCHEMA, false);
-		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.TOGGLE_VIEW_SCOPE, false);
+		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
+		verify(mockActionMenu, atLeastOnce()).setActionVisible(Action.SHOW_TABLE_SCHEMA, false);
 		verify(mockTableEntityWidget, never()).hideFiltering();
 	}
 	

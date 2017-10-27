@@ -102,14 +102,6 @@ public class ActionMenuWidgetImplTest {
 		verify(mockDelete).setVisible(true);
 		verify(mockRename, never()).setVisible(true);
 	}
-
-	@Test
-	public void testActionEnabled(){
-		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
-		widget.setActionEnabled(Action.DELETE_ENTITY, true);
-		verify(mockDelete).setEnabled(true);
-		verify(mockRename, never()).setEnabled(anyBoolean());
-	}
 	
 	@Test
 	public void testActionSetText(){

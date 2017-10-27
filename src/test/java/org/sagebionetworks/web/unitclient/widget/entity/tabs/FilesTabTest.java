@@ -3,23 +3,23 @@ package org.sagebionetworks.web.unitclient.widget.entity.tabs;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -28,16 +28,12 @@ import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -50,21 +46,16 @@ import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
-import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
-import org.sagebionetworks.web.shared.EntityBundlePlus;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 public class FilesTabTest {
@@ -91,15 +82,11 @@ public class FilesTabTest {
 	@Mock
 	StuAlert mockSynapseAlert;
 	@Mock
-	SynapseClientAsync mockSynapseClientAsync;
-	@Mock
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
 	EntityBundle mockProjectEntityBundle;
 	@Mock
 	EntityBundle mockEntityBundle;
-	@Mock
-	EntityBundlePlus mockEntityBundlePlus;
 	@Mock
 	List<FileHandle> mockFileHandles;
 	@Mock
@@ -121,13 +108,9 @@ public class FilesTabTest {
 	@Mock
 	UserEntityPermissions mockPermissions;
 	@Mock
-	ActionMenuWidget mockActionMenuWidget;
-	@Mock
-	EntityActionController mockEntityActionController;
-	@Mock
 	ProvenanceWidget mockProvenanceWidget;
 	@Mock
-	CallbackP<Boolean> mockProjectInfoCallback;
+	CallbackP<String> mockEntitySelectedCallback;
 	@Mock
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
 	@Mock
@@ -136,9 +119,9 @@ public class FilesTabTest {
 	DiscussionThreadListWidget mockDiscussionThreadListWidget;
 	@Mock
 	DiscussionThreadBundle mockBundle;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
-
+	@Captor
+	ArgumentCaptor<CallbackP> callbackPCaptor;
+	
 	FilesTab tab;
 	String projectEntityId = "syn9";
 	String projectName = "proyecto";
@@ -153,9 +136,8 @@ public class FilesTabTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		AccessRequirement tou = new TermsOfUseAccessRequirement();
 		when(mockProjectEntityBundle.getEntity()).thenReturn(mockProjectEntity);
-		when(mockProjectEntity.getId()).thenReturn(entityId);
+		when(mockProjectEntity.getId()).thenReturn(projectEntityId);
 		when(mockProjectEntity.getName()).thenReturn(projectName);
 		when(mockProjectEntityBundle.getPermissions()).thenReturn(mockPermissions);
 		when(mockPortalGinInjector.getRefreshAlert()).thenReturn(mockRefreshAlert);
@@ -170,13 +152,11 @@ public class FilesTabTest {
 		when(mockPortalGinInjector.getPreviewWidget()).thenReturn(mockPreviewWidget);
 		when(mockPortalGinInjector.getWikiPageWidget()).thenReturn(mockWikiPageWidget);
 		when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
-		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClientAsync);
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
 		when(mockPortalGinInjector.getDiscussionThreadListWidget()).thenReturn(mockDiscussionThreadListWidget);
-		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockSynapseJavascriptClient);
 		
-		tab.setShowProjectInfoCallback(mockProjectInfoCallback);
+		tab.setEntitySelectedCallback(mockEntitySelectedCallback);
 		
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
@@ -185,14 +165,7 @@ public class FilesTabTest {
 		when(mockFileEntity.getId()).thenReturn(fileEntityId);
 		when(mockFileEntity.getName()).thenReturn(fileName);
 		when(mockEntityBundle.getPermissions()).thenReturn(mockPermissions);
-		when(mockEntityBundlePlus.getEntityBundle()).thenReturn(mockEntityBundle);
-		when(mockEntityBundlePlus.getLatestVersionNumber()).thenReturn(null);
 		
-		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockEntityBundlePlus).when(mockSynapseClientAsync).getEntityBundlePlusForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
-		
-		when(mockPortalGinInjector.createActionMenuWidget()).thenReturn(mockActionMenuWidget);
-		when(mockPortalGinInjector.createEntityActionController()).thenReturn(mockEntityActionController);
 		when(mockPortalGinInjector.getProvenanceRenderer()).thenReturn(mockProvenanceWidget);
 		when(mockLinkEntity.getLinksTo()).thenReturn(mockReference);
 		when(mockReference.getTargetId()).thenReturn(linkEntityId);
@@ -230,11 +203,19 @@ public class FilesTabTest {
 		tab.setTabClickedCallback(mockOnClickCallback);
 		verify(mockTab).addTabClickedCallback(mockOnClickCallback);
 	}
+	
+	@Test
+	public void testClickFilesBrowser() {
+		//verify that clicking on an item in the files browser sends the event back to the entity page top (to get the new target entity)
+		String newEntityId = "syn9839248";
+		verify(mockFilesBrowser).setEntityClickedHandler(callbackPCaptor.capture());
+		callbackPCaptor.getValue().invoke(newEntityId);
+		verify(mockEntitySelectedCallback).invoke(newEntityId);
+	}
 
 	@Test
 	public void testConfigureUsingProject() {
 		//configures using a project if the target entity is anything other than a file or folder.
-		TableEntity table = mock(TableEntity.class);
 		Long version = null;
 		
 		boolean canCertifiedUserAddChild = true;
@@ -243,11 +224,10 @@ public class FilesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(table, mockEntityUpdatedHandler, version);
+		tab.configure(mockProjectEntityBundle, mockEntityUpdatedHandler, version);
 		
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		verify(mockFilesBrowser).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView, times(2)).setFolderTitlebarVisible(false);
@@ -255,14 +235,13 @@ public class FilesTabTest {
 		verify(mockView, times(2)).setMetadataVisible(false);
 		verify(mockView, times(2)).setWikiPageWidgetVisible(false);
 		
-		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
+		//note: breadcrumbs are not shown on the project level
 		//show project info
-		verify(mockProjectInfoCallback).invoke(true);
 		verify(mockView, times(2)).clearActionMenuContainer();
 		verify(mockView, times(2)).setProvenanceVisible(false);
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setFileBrowserVisible(true);
-		verify(mockFilesBrowser).configure(entityId, canCertifiedUserAddChild, isCertifiedUser);
+		verify(mockFilesBrowser).configure(projectEntityId);
 		
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab, times(2)).setEntityNameAndPlace(eq(projectName), captor.capture());
@@ -280,7 +259,8 @@ public class FilesTabTest {
 	@Test
 	public void testConfigureWithFileNoFileHandles() {
 		Long version = 4L;
-		tab.configure(mockFileEntity, mockEntityUpdatedHandler, version);
+		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
+		tab.configure(mockEntityBundle, mockEntityUpdatedHandler, version);
 		
 		verify(mockView, times(2)).setPreviewVisible(false);
 		verify(mockView, never()).setPreviewVisible(true);
@@ -295,14 +275,13 @@ public class FilesTabTest {
 		when(mockPermissions.getCanCertifiedUserAddChild()).thenReturn(canCertifiedUserAddChild);
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		when(mockEntityBundle.getFileHandles()).thenReturn(mockFileHandles);
+		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockFileEntity, mockEntityUpdatedHandler, version);
-		
-		verify(mockSynapseClientAsync).getEntityBundlePlusForVersion(eq(fileEntityId), eq(version), anyInt(), any(AsyncCallback.class));
+		tab.configure(mockEntityBundle, mockEntityUpdatedHandler, version);
+
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		verify(mockFilesBrowser).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		
 		verify(mockView).setFileTitlebarVisible(false);
 		verify(mockView).setFileTitlebarVisible(true);
@@ -318,13 +297,8 @@ public class FilesTabTest {
 		verify(mockPreviewWidget).configure(mockEntityBundle);
 		
 		verify(mockEntityMetadata).setEntityBundle(mockEntityBundle, version);
-		//show file history since we are asking for a specific version
-		verify(mockEntityMetadata).setFileHistoryVisible(true);
-		
 		
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
-		//hide project info
-		verify(mockProjectInfoCallback).invoke(false);
 		
 		verify(mockView, times(2)).clearActionMenuContainer();
 		verify(mockView).setProvenanceVisible(true);
@@ -332,8 +306,6 @@ public class FilesTabTest {
 		verify(mockView).setWikiPageWidgetVisible(true);
 		
 		verify(mockView, times(2)).setFileBrowserVisible(false);
-		verify(mockPortalGinInjector).createActionMenuWidget();
-		verify(mockPortalGinInjector).createEntityActionController();
 		verify(mockPortalGinInjector).getProvenanceRenderer();
 
 		verify(mockView).setRefreshAlert(any(Widget.class));
@@ -341,7 +313,7 @@ public class FilesTabTest {
 		verify(mockRefreshAlert).configure(fileEntityId, ObjectType.ENTITY);
 
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
-		verify(mockTab, times(2)).setEntityNameAndPlace(eq(fileName), captor.capture());
+		verify(mockTab).setEntityNameAndPlace(eq(fileName), captor.capture());
 		Synapse place = (Synapse)captor.getValue();
 		assertEquals(fileEntityId, place.getEntityId());
 		assertEquals(version, place.getVersionNumber());
@@ -350,7 +322,6 @@ public class FilesTabTest {
 
 		verify(mockDiscussionThreadListWidget).configure(fileEntityId, null, null);
 		verify(mockView).setDiscussionThreadListWidgetVisible(true);
-		verify(mockEntityActionController).setIsShowingVersion(true);
 	}
 	
 
@@ -365,12 +336,10 @@ public class FilesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockFolderEntity, mockEntityUpdatedHandler, version);
+		tab.configure(mockEntityBundle, mockEntityUpdatedHandler, version);
 		
-		verify(mockSynapseClientAsync).getEntityBundlePlusForVersion(eq(folderEntityId), anyLong(), anyInt(), any(AsyncCallback.class));
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		verify(mockFilesBrowser).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		
 		verify(mockView, times(2)).setFileTitlebarVisible(false);
 		verify(mockView).setFolderTitlebarVisible(false);
@@ -387,13 +356,9 @@ public class FilesTabTest {
 		verify(mockBasicTitleBar).configure(mockEntityBundle);
 		
 		verify(mockEntityMetadata).setEntityBundle(mockEntityBundle, version);
-		//show file history since we are asking for a specific version
-		verify(mockEntityMetadata).setFileHistoryVisible(false);
 		
 		
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
-		//hide project info
-		verify(mockProjectInfoCallback).invoke(false);
 		
 		verify(mockView, times(2)).clearActionMenuContainer();
 		verify(mockView, times(2)).setProvenanceVisible(false);
@@ -401,12 +366,10 @@ public class FilesTabTest {
 		verify(mockView).setWikiPageWidgetVisible(true);
 		
 		verify(mockView).setFileBrowserVisible(true);
-		verify(mockFilesBrowser).configure(folderEntityId, canCertifiedUserAddChild, isCertifiedUser);
-		verify(mockPortalGinInjector).createActionMenuWidget();
-		verify(mockPortalGinInjector).createEntityActionController();
+		verify(mockFilesBrowser).configure(folderEntityId);
 		
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
-		verify(mockTab, times(2)).setEntityNameAndPlace(eq(folderName), captor.capture());
+		verify(mockTab).setEntityNameAndPlace(eq(folderName), captor.capture());
 		Synapse place = (Synapse)captor.getValue();
 		assertEquals(folderEntityId, place.getEntityId());
 		assertNull(place.getVersionNumber());
@@ -414,13 +377,12 @@ public class FilesTabTest {
 		assertNull(place.getAreaToken());
 
 		verify(mockView, atLeastOnce()).setDiscussionThreadListWidgetVisible(false);
-		verify(mockEntityActionController).setIsShowingVersion(false);
 	}
 
 	@Test
 	public void testGetLinkBundleAndDisplay() {
 		when(mockEntityBundle.getEntity()).thenReturn(mockLinkEntity);
-		tab.getTargetBundleAndDisplay("syn303033", null);
+		tab.setTargetBundle(mockEntityBundle, null);
 		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
 		verify(mockPlaceChanger).goTo(captor.capture());
 		Synapse place = (Synapse)captor.getValue();

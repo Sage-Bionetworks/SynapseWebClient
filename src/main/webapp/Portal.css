@@ -823,7 +823,7 @@ a.shortBtn {
 	margin-top: 15px;
 }
 
-.margin-top-20 {
+.margin-top-20, #rootPanel .margin-top-20 {
 	margin-top: 20px;
 }
 

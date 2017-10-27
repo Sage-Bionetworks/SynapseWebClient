@@ -16,7 +16,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.regexp.shared.MatchResult;
 import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -89,15 +88,16 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 				//if null, then still show the default UI
 				if (location != null) {
 					//set up the view
+					String banner = location.getBanner() != null ? location.getBanner().trim() : "";
 					if (location instanceof ExternalS3StorageLocationSetting) {
 						ExternalS3StorageLocationSetting setting = (ExternalS3StorageLocationSetting) location;
 						view.setBaseKey(setting.getBaseKey().trim());
 						view.setBucket(setting.getBucket().trim());
-						view.setExternalS3Banner(setting.getBanner().trim());
+						view.setExternalS3Banner(banner);
 						view.selectExternalS3Storage();
 					} else if (location instanceof ExternalObjectStorageLocationSetting) {
 						ExternalObjectStorageLocationSetting setting = (ExternalObjectStorageLocationSetting) location;
-						view.setExternalObjectStoreBanner(setting.getBanner().trim());
+						view.setExternalObjectStoreBanner(banner);
 						view.setExternalObjectStoreBucket(setting.getBucket().trim());
 						view.setExternalObjectStoreEndpointUrl(setting.getEndpointUrl().trim());
 						view.selectExternalObjectStore();
@@ -105,7 +105,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 						view.setSFTPVisible(true);
 						ExternalStorageLocationSetting setting= (ExternalStorageLocationSetting) location;
 						view.setSFTPUrl(setting.getUrl().trim());
-						view.setSFTPBanner(setting.getBanner().trim());
+						view.setSFTPBanner(banner);
 						view.selectSFTPStorage();
 					}
 				}
