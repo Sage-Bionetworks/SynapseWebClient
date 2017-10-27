@@ -178,25 +178,6 @@ public class ImageWidgetTest {
 	}
 	
 	@Test
-	public void testConfigureFromSynapseIdGetFileResultError() {
-		when(mockFileResult.getPreSignedURL()).thenReturn(null);
-		when(mockFileResult.getFailureCode()).thenReturn(FileResultFailureCode.UNAUTHORIZED);
-		AsyncMockStubber.callSuccessWith(mockFileEntity).when(mockSynapseJavascriptClient).getEntityForVersion(anyString(), anyLong(), any(AsyncCallback.class));
-		String synId = "syn239";
-		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
-		String dataFileHandleId = "8765";
-		when(mockFileEntity.getId()).thenReturn(synId);
-		when(mockFileEntity.getDataFileHandleId()).thenReturn(dataFileHandleId);
-		
-		widget.configure(wikiKey,descriptor, null, null);
-		verify(mockPresignedURLAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
-		
-		verify(mockSynAlert).handleException(throwableCaptor.capture());
-		assertTrue(throwableCaptor.getValue().getMessage().contains(FileResultFailureCode.UNAUTHORIZED.toString()));
-	}
-	
-	
-	@Test
 	public void testConfigureFromWikiAttachmentError() {
 		Exception ex = new Exception("so sad");
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getWikiAttachmentFileHandles(any(WikiPageKey.class), anyLong(), any(AsyncCallback.class));

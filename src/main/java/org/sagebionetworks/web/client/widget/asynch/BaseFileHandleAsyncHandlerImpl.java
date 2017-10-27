@@ -14,9 +14,9 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.inject.Inject;
 
 public abstract class BaseFileHandleAsyncHandlerImpl {
 	
@@ -89,8 +89,23 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
 					for (FileResult fileResult : results.getRequestedFiles()) {
 						List<AsyncCallback<FileResult>> callbacks = reference2CallbackCopy.remove(fileResult.getFileHandleId());
 						if (callbacks != null) {
-							for (AsyncCallback<FileResult> callback : callbacks) {
-								callback.onSuccess(fileResult);	
+							if (fileResult.getFailureCode() != null) {
+								Exception ex = null;
+								switch(fileResult.getFailureCode()) {
+									case NOT_FOUND:
+										ex = new NotFoundException();
+										break;
+									case UNAUTHORIZED:
+										ex = new UnauthorizedException();
+										break;
+								}
+								for (AsyncCallback<FileResult> callback : callbacks) {
+									callback.onFailure(ex);	
+								}
+							} else {
+								for (AsyncCallback<FileResult> callback : callbacks) {
+									callback.onSuccess(fileResult);	
+								}	
 							}
 						}
 					}

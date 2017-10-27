@@ -56,16 +56,12 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	private void loadFromFileHandleAssociation(FileHandleAssociation fha) {
 		presignedURLAsyncHandler.getFileResult(fha, new AsyncCallback<FileResult>() {
 			public void onSuccess(FileResult fileResult) {
-				if (fileResult.getFailureCode() != null) {
-					onFailure(new Exception("Unable to access image file: " + fileResult.getFailureCode().toString()));
-				} else {
-					view.configure(fileResult.getPreSignedURL(),
-							descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY),
-							descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY),
-							descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY),
-							descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY), 
-							authenticationController.isLoggedIn());
-				}
+				view.configure(fileResult.getPreSignedURL(),
+						descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY),
+						descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY),
+						descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY),
+						descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY), 
+						authenticationController.isLoggedIn());
 			};
 			@Override
 			public void onFailure(Throwable caught) {
