@@ -10,7 +10,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.EntityRow;
 import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Row;
@@ -129,10 +128,7 @@ public class RowSetUtils {
 			PartialRow pr = new PartialRow();
 			if(original != null){
 				pr.setRowId(original.getRowId());
-				if (original instanceof EntityRow) {
-					EntityRow originalEntityRow = (EntityRow) original;
-					pr.setEtag(originalEntityRow.getEtag());
-				}
+				pr.setEtag(original.getEtag());
 			}
 			pr.setValues(map);
 			return pr;
