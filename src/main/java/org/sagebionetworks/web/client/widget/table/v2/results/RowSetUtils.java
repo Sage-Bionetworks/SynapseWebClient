@@ -115,7 +115,7 @@ public class RowSetUtils {
 				if(original == null){
 					map.put(header.getId(), trimWithEmptyAsNull(updateValue));
 				}else{
-					if(isValueChanged(original.getValues().get(i), updateValue) || ETAG_COLUMN_NAME.equals(header.getName())){
+					if(isValueChanged(original.getValues().get(i), updateValue)){
 						map.put(header.getId(), trimWithEmptyAsNull(updateValue));
 					}
 				}
@@ -128,6 +128,7 @@ public class RowSetUtils {
 			PartialRow pr = new PartialRow();
 			if(original != null){
 				pr.setRowId(original.getRowId());
+				pr.setEtag(original.getEtag());
 			}
 			pr.setValues(map);
 			return pr;

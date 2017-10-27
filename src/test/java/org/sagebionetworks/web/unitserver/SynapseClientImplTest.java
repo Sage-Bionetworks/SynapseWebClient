@@ -2337,7 +2337,7 @@ public class SynapseClientImplTest {
 		List<FacetColumnRequest> selectedFacets = Collections.singletonList(request);
 		List<ColumnModel> schema = Collections.singletonList(mockNewColumnModel);
 		String newSql = synapseClient.generateSqlWithFacets(sql, selectedFacets, schema);
-		assertEquals("SELECT * FROM syn123 WHERE ( ( col1 = 'a' ) )", newSql);
+		assertEquals("SELECT * FROM syn123 WHERE ( ( \"col1\" = 'a' ) )", newSql);
 	}
 
 	@Test
