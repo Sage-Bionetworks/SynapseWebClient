@@ -15,8 +15,8 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
-		<synapse.version>2017-10-27-2776-43fd00e54c</synapse.version>
-		<gwtVersion>2.8.1</gwtVersion>
+		<synapse.version>203.0-11-gbe67a33</synapse.version>
+		<gwtVersion>2.8.0-beta1</gwtVersion>
 		<org.springframework.version>4.3.3.RELEASE</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
 		<ginVersion>2.1.2</ginVersion>
