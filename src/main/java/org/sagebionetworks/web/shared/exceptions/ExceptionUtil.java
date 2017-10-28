@@ -10,6 +10,7 @@ import org.sagebionetworks.client.exceptions.SynapseConflictingUpdateException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseLockedException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseResultNotReadyException;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
@@ -43,6 +44,8 @@ public class ExceptionUtil {
 			return new TooManyRequestsException(ex.getMessage());
 		} else if (ex instanceof SynapseConflictingUpdateException) {
 			return new ConflictingUpdateException(ex.getMessage());
+		} else if (ex instanceof SynapseResultNotReadyException) {
+			return new ResultNotReadyException(((SynapseResultNotReadyException) ex).getJobStatus());
 		} else if (ex instanceof SynapseServerException) {
 			SynapseServerException sse = (SynapseServerException)ex;
 			if (sse.getStatusCode()==HttpStatus.SC_CONFLICT) {
