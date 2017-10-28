@@ -12,11 +12,11 @@
 	<properties>
 		<!-- Synapse Web Client -->
 		<!-- GWT needs at least java 1.5 -->
-		<maven.compiler.source>1.7</maven.compiler.source>
-		<maven.compiler.target>1.7</maven.compiler.target>
+		<maven.compiler.source>1.8</maven.compiler.source>
+		<maven.compiler.target>1.8</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
-		<synapse.version>203.0-11-gbe67a33</synapse.version>
-		<gwtVersion>2.8.0-beta1</gwtVersion>
+		<synapse.version>2017-10-27-2776-43fd00e54c</synapse.version>
+		<gwtVersion>2.8.1</gwtVersion>
 		<org.springframework.version>4.3.3.RELEASE</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
 		<ginVersion>2.1.2</ginVersion>
@@ -26,8 +26,8 @@
 		<jackson.version>1.8.1</jackson.version>
 		<log4j.version>2.6.1</log4j.version>
 		<markdown.version>2016-01-22-a2731f7-19</markdown.version>
-		<gwtboostrap3.version>1.5.2</gwtboostrap3.version>
-		<gwtboostrap3.extras.version>1.5.2</gwtboostrap3.extras.version>
+		<gwtbootstrap3.version>1.5.2</gwtbootstrap3.version>
+		<gwtbootstrap3.extras.version>1.5.2</gwtbootstrap3.extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gwtvisualizationwrappers.version>1.6-gwt-2.7.0</gwtvisualizationwrappers.version>
 	</properties>
@@ -93,24 +93,24 @@
 	</pluginRepositories>
 
 	<build>
-	    <resources>
-	      <resource>
-	        <directory>src/main/resources</directory>
-	        <filtering>true</filtering>
-	        <includes>
-	          <include>**/*.properties</include>
-	        </includes>
-	      </resource>
-	      <resource>
-	        <directory>src/main/resources</directory>
-	        <filtering>false</filtering>
-	        <excludes>
-	          <exclude>**/*.properties</exclude>
-	        </excludes>
-	      </resource>
-	    </resources>	    
+		<resources>
+		  <resource>
+			<directory>src/main/resources</directory>
+			<filtering>true</filtering>
+			<includes>
+			  <include>**/*.properties</include>
+			</includes>
+		  </resource>
+		  <resource>
+			<directory>src/main/resources</directory>
+			<filtering>false</filtering>
+			<excludes>
+			  <exclude>**/*.properties</exclude>
+			</excludes>
+		  </resource>
+		</resources>
 
-    		<!-- Generate compiled stuff in the folder used for developing mode -->
+		<!-- Generate compiled stuff in the folder used for developing mode -->
 		<outputDirectory>${webappDirectory}/WEB-INF/classes</outputDirectory>
 
 		<pluginManagement>
@@ -198,16 +198,17 @@
 					<i18nMessagesBundle>org.sagebionetworks.web.client.Messages</i18nMessagesBundle>
 					<module>org.sagebionetworks.web.Portal</module>
 					<!-- GWT compiler options -->
-			        <compileReport>false</compileReport>
-			        <soycDetailed>true</soycDetailed>
-			        <encoding>${project.build.sourceEncoding}</encoding>
-			        <logLevel>INFO</logLevel>
-			        <sourceLevel>auto</sourceLevel>
-			        <extraJvmArgs>-Xmx2048m -Xms2048m -XX:PermSize=512m -XX:MaxPermSize=1024m</extraJvmArgs>
-			        
-			        <!-- set enableClosureCompiler to false to generate source maps and compile report -->
-			        <enableClosureCompiler>true</enableClosureCompiler>
-			        
+					<compileReport>false</compileReport>
+					<!-- Disabled because it causes an EmptyStackException on GWT 2.8.1
+					<soycDetailed>true</soycDetailed> -->
+					<encoding>${project.build.sourceEncoding}</encoding>
+					<logLevel>INFO</logLevel>
+					<sourceLevel>auto</sourceLevel>
+					<extraJvmArgs>-Xmx2048m -Xms2048m</extraJvmArgs>
+
+					<!-- Does not work on GWT 2.8.1
+					<enableClosureCompiler>true</enableClosureCompiler> -->
+
 					<!--           <fragmentCount>12</fragmentCount> -->					
 				</configuration>
 			</plugin>
@@ -290,12 +291,12 @@
 		<dependency>
 			<groupId>org.gwtbootstrap3</groupId>
 			<artifactId>gwtbootstrap3</artifactId>
-			<version>${gwtboostrap3.version}</version>
+			<version>${gwtbootstrap3.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.gwtbootstrap3</groupId>
 			<artifactId>gwtbootstrap3-extras</artifactId>
-			<version>${gwtboostrap3.extras.version}</version>
+			<version>${gwtbootstrap3.extras.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.gwtvisualizationwrappers</groupId>
@@ -414,10 +415,10 @@
 			<version>${org.springframework.version}</version>
 			<scope>test</scope>
 		</dependency>
-			<!-- Used for timer triggers (cron-like)
-			Note: spring-context-support also depends on this libary as an optional dependancy.
-			Since spring-context-support version 4.0.2-RELEASE uses quartz version 1.8.6 that 
-			is the version of quartz we are using.  See the  spring-context-support pom.xml.-->
+		<!-- Used for timer triggers (cron-like)
+		Note: spring-context-support also depends on this libary as an optional dependancy.
+		Since spring-context-support version 4.0.2-RELEASE uses quartz version 1.8.6 that
+		is the version of quartz we are using.  See the  spring-context-support pom.xml.-->
 		<dependency>
 			<groupId>org.quartz-scheduler</groupId>
 			<artifactId>quartz</artifactId>
@@ -593,33 +594,39 @@
 
 		<dependency>
 			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+			<version>23.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
 			<artifactId>guava-gwt</artifactId>
-			<version>17.0</version>
+			<version>23.0</version>
 		</dependency>
 		
 		<!-- Prov Tree layout -->
 		<dependency>
-            <groupId>org.abego.treelayout</groupId>
-            <artifactId>org.abego.treelayout.core</artifactId>
-            <version>1.0.1</version>
-        </dependency>
+			<groupId>org.abego.treelayout</groupId>
+			<artifactId>org.abego.treelayout.core</artifactId>
+			<version>1.0.1</version>
+		</dependency>
 
 		<!-- note: This refers to a custom POM in the SageBionetworks artifactory, omitting Guice 2.0 -->
 		<dependency>
-		    <groupId>org.openid4java</groupId>
-		    <artifactId>openid4java-nodeps</artifactId>
-		    <version>0.9.6.sb</version>
+			<groupId>org.openid4java</groupId>
+			<artifactId>openid4java-nodeps</artifactId>
+			<version>0.9.6.sb</version>
 		</dependency>
-    	
-    	<dependency>
-      		<groupId>net.sourceforge.nekohtml</groupId>
-      		<artifactId>nekohtml</artifactId>
-       		<version>1.9.14</version>
-    	</dependency>
+
 		<dependency>
-		        <groupId>org.apache.james</groupId>
-		        <artifactId>apache-mime4j</artifactId>
-		        <version>0.6.1</version>
+			<groupId>net.sourceforge.nekohtml</groupId>
+			<artifactId>nekohtml</artifactId>
+			<version>1.9.14</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.james</groupId>
+			<artifactId>apache-mime4j</artifactId>
+			<version>0.6.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.mockito</groupId>
@@ -629,9 +636,9 @@
 		</dependency>
 		
 		<dependency>
-		    <groupId>com.atlassian.jira</groupId>
-		    <artifactId>jira-rest-java-client</artifactId>
-		    <version>2.0.0-m2</version>
+			<groupId>com.atlassian.jira</groupId>
+			<artifactId>jira-rest-java-client</artifactId>
+			<version>2.0.0-m2</version>
 		</dependency>
 	</dependencies>
 
