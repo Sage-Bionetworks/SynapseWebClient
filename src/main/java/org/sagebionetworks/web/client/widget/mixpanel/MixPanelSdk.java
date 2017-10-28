@@ -9,23 +9,31 @@ import com.google.inject.Inject;
  *
  */
 public class MixPanelSdk {
+	String currentUser = null;
 	@Inject
 	public MixPanelSdk() {
 	}
 
 	public void initialize(final String userId, final String email) {
-		_initialize(userId, email);
+		if (!userId.equals(currentUser)) {
+			_changeUser(userId, email);	
+		}
 	}
-
-	private static native void _initialize(
+	
+	public void trackClick(String description) {
+		_track("click", description);
+	}
+	
+	private static native void _changeUser(
 			String userId,
 			String synapseEmail) /*-{
 		$wnd.mixpanel.identify(userId);
 	    $wnd.mixpanel.register({
 	        "email": synapseEmail
     	});
-	    $wnd.mixpanel.track_links("#rootPanel a", "click link", 
-	    	{"referrer": $doc.referrer}
-	    );
+    }-*/;
+	
+	private static native void _track(String eventType, String eventDescription) /*-{
+		$wnd.mixpanel.track(eventType, {"description" : eventDescription});
 	}-*/;
 }
