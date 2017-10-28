@@ -2234,10 +2234,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
 			return synapseClient.getAsyncResult(AsynchJobType.valueOf(type.name()), jobId, body);
-		} catch (SynapseResultNotReadyException e){
-			// This occurs when the job is not ready.
-			// Re-throw the ResultNotReadyException with the status JSON.
-			throw new ResultNotReadyException(e.getJobStatus());
 		}catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
