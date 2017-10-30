@@ -70,8 +70,8 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 
 	@Override
 	public void setPlace(EmailInvitation place) {
-		view.setPresenter(this);
 		view.clear();
+		view.setPresenter(this);
 		encodedMISignedToken = place.toToken();
 
 		futureClient.hexDecodeAndDeserialize(NotificationTokenType.EmailInvitation.name(), encodedMISignedToken)
