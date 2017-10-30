@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.ContentTypeUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
 public class TableFileValidator extends AbstractFileValidator {
@@ -14,11 +14,11 @@ public class TableFileValidator extends AbstractFileValidator {
 			invalidMessage = WebConstants.INVALID_ENTITY_NAME_MESSAGE;
 			return false;
 		} else if (contentType != null) {
-			 return DisplayUtils.isRecognizedTableContentType(contentType);
+			 return ContentTypeUtils.isRecognizedTableContentType(contentType);
 		} else {
 			String filename = file.getFileName();
 			String extension = filename.substring(filename.lastIndexOf(".")+1);
-			return DisplayUtils.isRecognizedTableContentType("text/"+extension);
+			return ContentTypeUtils.isRecognizedTableContentType("text/"+extension);
 		}
 	}
 	

@@ -75,7 +75,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 			results = new FileMetadata[fileNames.length];
 			for(int i=0; i<fileNames.length; i++){
 				String name = fileNames[i];
-				String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(inputId, i), name);
+				String contentType = org.sagebionetworks.web.client.ContentTypeUtils.fixDefaultContentType(synapseJsniUtils.getContentType(inputId, i), name);
 				double fileSize = synapseJsniUtils.getFileSize(synapseJsniUtils.getFileBlob(i, inputId));
 				results[i] = new FileMetadata(name, contentType, fileSize);
 			}
@@ -83,26 +83,6 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 		return results;
 	}
 	
-	private String fixDefaultContentType(String type, String fileName) {
-		String contentType = type;
-		String lowercaseFilename = fileName.toLowerCase();
-		if (type == null || type.trim().length() == 0) {
-			if (ContentTypeUtils.isRecognizedCodeFileName(fileName)) {
-				contentType = ContentTypeUtils.PLAIN_TEXT;
-			}
-			else if (lowercaseFilename.endsWith(".tsv") || lowercaseFilename.endsWith(".tab")) {
-				contentType = WebConstants.TEXT_TAB_SEPARATED_VALUES;
-			}
-			else if (lowercaseFilename.endsWith(".csv")) {
-				contentType = WebConstants.TEXT_COMMA_SEPARATED_VALUES;
-			}
-			else if (lowercaseFilename.endsWith(".txt")) {
-				contentType = ContentTypeUtils.PLAIN_TEXT;
-			}
-		}
-		return contentType;
-	}
-
 	@Override
 	public void onFileSelected() {
 		fileMetaArr = getSelectedFileMetadata();

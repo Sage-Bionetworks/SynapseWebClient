@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
 import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.PLEASE_SELECT_A_FILE;
-import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.fixDefaultContentType;
 
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
+import org.sagebionetworks.web.client.ContentTypeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -124,7 +124,7 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 		}
 		this.fileName = names[fileIndex];
 		this.blob = synapseJsniUtils.getFileBlob(fileIndex, fileInputId);
-		contentType = fixDefaultContentType(synapseJsniUtils.getContentType(fileInputId, fileIndex), fileName);
+		contentType = ContentTypeUtils.fixDefaultContentType(synapseJsniUtils.getContentType(fileInputId, fileIndex), fileName);
 		
 		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
 			@Override

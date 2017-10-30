@@ -22,6 +22,10 @@ public class ClientProperties {
 	public static final String[] TABLE_CONTENT_TYPES = new String[] {"application/vnd.ms-excel", "text/csv","text/tab-separated-values","text/plain", "text/txt", "text", "text/", "text/tsv"};
 	public static final HashSet<String> TABLE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(TABLE_CONTENT_TYPES));
 	
+	public static final String[] PLAIN_TEXT_EXTENSIONS = new String[] {".txt", ".cwl", ".wdl"};
+	public static final HashSet<String> PLAIN_TEXT_EXTENSIONS_SET = new HashSet<String>(Arrays.asList(PLAIN_TEXT_EXTENSIONS));
+	
+	
 	public static final double BASE = 1024, KB = BASE, MB = KB*BASE, GB = MB*BASE, TB = GB*BASE;
 	
 	/**
