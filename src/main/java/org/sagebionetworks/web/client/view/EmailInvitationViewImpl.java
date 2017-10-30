@@ -75,10 +75,6 @@ public class EmailInvitationViewImpl extends Composite implements EmailInvitatio
 		this.presenter = presenter;
 		headerWidget.configure(false);
 		headerWidget.refresh();
-		invitationTitle.setVisible(true);
-		invitationMessageWrapper.setVisible(true);
-		registerWidgetContainer.setVisible(true);
-		loginButton.setVisible(true);
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 
@@ -96,7 +92,7 @@ public class EmailInvitationViewImpl extends Composite implements EmailInvitatio
 	}
 
 	@Override
-	public void show() {
+	public void showNotLoggedInUI() {
 		invitationTitle.setVisible(true);
 		invitationMessageWrapper.setVisible(true);
 		registerWidgetContainer.setVisible(true);

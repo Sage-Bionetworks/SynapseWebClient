@@ -53,9 +53,12 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.registerWidget = registerWidget;
+		this.registerWidget.enableEmailAddressField(false);
+		this.view.setRegisterWidget(this.registerWidget.asWidget());
 		this.jsClient = jsClient;
 		this.futureClient = futureClient;
 		this.synapseAlert = synapseAlert;
+		this.view.setSynapseAlertContainer(this.synapseAlert.asWidget());
 		this.authController = authController;
 		this.placeChanger = globalApplicationState.getPlaceChanger();
 	}
@@ -117,10 +120,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	}
 
 	private void initializeView(final MembershipInvtnSubmission mis) {
-		view.show();
-		registerWidget.enableEmailAddressField(false);
-		view.setRegisterWidget(registerWidget.asWidget());
-		view.setSynapseAlertContainer(synapseAlert.asWidget());
+		view.showNotLoggedInUI();
 		registerWidget.setEncodedMembershipInvtnSignedToken(encodedMISignedToken);
 		registerWidget.setEmail(mis.getInviteeEmail());
 

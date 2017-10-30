@@ -18,7 +18,7 @@ public interface EmailInvitationView extends IsWidget {
 
 	void clear();
 
-	void show();
+	void showNotLoggedInUI();
 
 	interface Presenter {
 		void onLoginClick();

@@ -95,7 +95,7 @@ public class EmailInvitationPresenterTest {
 		when(inviterProfile.getLastName()).thenReturn("Last");
 		when(inviterProfile.getUserName()).thenReturn("Nick");
 		presenter.setPlace(place);
-		verify(view).show();
+		verify(view).showNotLoggedInUI();
 		verify(registerWidget).enableEmailAddressField(false);
 		verify(view).setRegisterWidget(registerWidget.asWidget());
 		verify(view).setSynapseAlertContainer(synapseAlert.asWidget());
