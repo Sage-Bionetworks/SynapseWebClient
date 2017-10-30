@@ -32,4 +32,9 @@ public interface ActionMenuWidgetView extends IsWidget {
 
 	void setACTDividerVisible(boolean visible);
 	void setNoActionsAvailableVisible(boolean visible);
+	void setPresenter(Presenter p);
+	public interface Presenter {
+		void onToolsMenuClicked();
+	}
+
 }

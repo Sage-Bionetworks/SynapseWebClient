@@ -156,6 +156,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	public void onDashboardClick() {
 		if (authenticationController.isLoggedIn()) {
 			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
+			mixPanelSdk.trackClick("Header -> My Dashboard");
 		} else {
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}	

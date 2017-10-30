@@ -6,38 +6,44 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Mockito.*;
 
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
+import org.sagebionetworks.web.client.widget.mixpanel.MixPanelSdk;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionView;
 
 public class ActionMenuWidgetImplTest {
 	
+	@Mock
 	ActionView mockRename;
+	@Mock
 	ActionView mockDelete;
+	@Mock
 	ActionMenuWidgetView mockView;
+	@Mock
 	ActionListener mockActionListener;
+	@Mock
+	MixPanelSdk mockMixPanelSdk;
 	
 	@Before
 	public void before(){
-		mockRename = Mockito.mock(ActionView.class);
+		MockitoAnnotations.initMocks(this);
 		when(mockRename.getAction()).thenReturn(Action.CHANGE_ENTITY_NAME);
-		mockDelete = Mockito.mock(ActionView.class);
 		when(mockDelete.getAction()).thenReturn(Action.DELETE_ENTITY);
 		List<ActionView> actionView = Arrays.asList(mockRename, mockDelete);
-		mockView = Mockito.mock(ActionMenuWidgetView.class);
 		when(mockView.listActionViews()).thenReturn(actionView);
-		mockActionListener = Mockito.mock(ActionListener.class);
 	}
 	
 	@Test
 	public void testConstructorHappy(){
-		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
+		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView, mockMixPanelSdk);
 		// Each view should be hidden
 		verify(mockRename).setVisible(false);
 		verify(mockDelete).setVisible(false);
@@ -49,18 +55,18 @@ public class ActionMenuWidgetImplTest {
 		List<ActionView> actionView = Arrays.asList(mockRename, mockRename);
 		mockView = Mockito.mock(ActionMenuWidgetView.class);
 		when(mockView.listActionViews()).thenReturn(actionView);
-		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
+		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView, mockMixPanelSdk);
 	}
 	
 	@Test (expected=IllegalArgumentException.class)
 	public void testConstructorNullAction(){
 		when(mockRename.getAction()).thenReturn(null);
-		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
+		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView, mockMixPanelSdk);
 	}
 	
 	@Test
 	public void testSetActionListener(){
-		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
+		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView, mockMixPanelSdk);
 		ActionListener mockActionListener2 = Mockito.mock(ActionListener.class);
 		widget.setActionListener(Action.CHANGE_ENTITY_NAME, mockActionListener2);
 		widget.setActionListener(Action.CHANGE_ENTITY_NAME, mockActionListener);
@@ -72,7 +78,7 @@ public class ActionMenuWidgetImplTest {
 	
 	@Test
 	public void testAddActionListener(){
-		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
+		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView, mockMixPanelSdk);
 		ActionListener mockActionListener2 = Mockito.mock(ActionListener.class);
 		widget.addActionListener(Action.CHANGE_ENTITY_NAME, mockActionListener2);
 		widget.addActionListener(Action.CHANGE_ENTITY_NAME, mockActionListener);
@@ -84,7 +90,7 @@ public class ActionMenuWidgetImplTest {
 	
 	@Test
 	public void testReset(){
-		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
+		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView, mockMixPanelSdk);
 		widget.setActionListener(Action.CHANGE_ENTITY_NAME, mockActionListener);
 		// Now reset the the widget
 		widget.reset();
@@ -96,7 +102,7 @@ public class ActionMenuWidgetImplTest {
 	
 	@Test
 	public void testActionVisible(){
-		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
+		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView, mockMixPanelSdk);
 		verify(mockDelete).setVisible(false);
 		widget.setActionVisible(Action.DELETE_ENTITY, true);
 		verify(mockDelete).setVisible(true);
@@ -105,7 +111,7 @@ public class ActionMenuWidgetImplTest {
 	
 	@Test
 	public void testActionSetText(){
-		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
+		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView, mockMixPanelSdk);
 		String text = "new delete text";
 		widget.setActionText(Action.DELETE_ENTITY, text);
 		verify(mockDelete).setText(text);
@@ -114,7 +120,7 @@ public class ActionMenuWidgetImplTest {
 	
 	@Test
 	public void testActionSetIcon(){
-		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
+		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView, mockMixPanelSdk);
 		IconType icon = IconType.TRASH_O;
 		widget.setActionIcon(Action.DELETE_ENTITY, icon);
 		verify(mockDelete).setIcon(icon);
