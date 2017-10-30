@@ -205,7 +205,7 @@ public class SynapseJavascriptFactory {
 			return list;
 		case MembershipInvtnSubmission:
 			return new MembershipInvtnSubmission(json);
-			case InviteeVerificationSignedToken:
+		case InviteeVerificationSignedToken:
 			return new InviteeVerificationSignedToken(json);
 		default:
 			throw new IllegalArgumentException("No match found for : "+ type);
