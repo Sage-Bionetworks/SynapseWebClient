@@ -98,7 +98,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 	private void bindInvitationToAuthenticatedUser(final String misId) {
 		jsClient.getInviteeVerificationSignedToken(misId)
 			.transformAsync(
-					jsClient::updateInviteeId,
+					token -> jsClient.updateInviteeId(token),
 					directExecutor()
 			).addCallback(
 					new FutureCallback<Void>() {
