@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import static org.sagebionetworks.web.client.ValidationUtils.isValidEmail;
+
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
@@ -12,7 +14,6 @@ import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 
-import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -25,7 +26,6 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	private GWTWrapper gwt;
 	private SynapseAlert synAlert;
 	private SynapseSuggestBox peopleSuggestWidget;
-	private static RegExp emailRegExp = RegExp.compile("[a-z0-9._%+-]+@[a-z0-9.-]+\\.[a-z]{2,4}");
 
 	@Inject
 	public InviteWidget(InviteWidgetView view,
@@ -70,7 +70,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 	public void validateAndSendInvite(final String invitationMessage) {
 		final UserGroupSuggestion suggestion = peopleSuggestWidget.getSelectedSuggestion();
 		final String input = peopleSuggestWidget.getText();
-		if (emailRegExp.test(input)) {
+		if (isValidEmail(input)) {
 			synapseClient.inviteNewMember(input, team.getId(), invitationMessage, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 				@Override
 				public void onFailure(Throwable throwable) {

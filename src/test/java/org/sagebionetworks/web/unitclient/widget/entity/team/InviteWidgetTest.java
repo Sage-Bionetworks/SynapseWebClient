@@ -100,7 +100,7 @@ public class InviteWidgetTest {
 
 	@Test
 	public void testSendToEmailAddress() {
-		String email = "test@example.com";
+		String email = "Test@eXample.coM";
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
 		when(mockSuggestBox.getText()).thenReturn(email);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).inviteNewMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
