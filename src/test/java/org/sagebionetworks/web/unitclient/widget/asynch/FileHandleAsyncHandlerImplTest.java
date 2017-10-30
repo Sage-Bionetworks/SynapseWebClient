@@ -5,12 +5,15 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -18,11 +21,14 @@ import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
+import org.sagebionetworks.repo.model.file.FileResultFailureCode;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandlerImpl;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -45,6 +51,8 @@ public class FileHandleAsyncHandlerImplTest {
 	FileResult mockFileResult;
 	@Mock
 	FileHandleAssociation mockFileAssociation;
+	@Captor
+	ArgumentCaptor<Throwable> throwableCaptor;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -78,6 +86,38 @@ public class FileHandleAsyncHandlerImplTest {
 		verify(mockSynapseJavascriptClient).getFileHandleAndUrlBatch(any(BatchFileRequest.class), any(AsyncCallback.class));
 		verify(mockCallback).onSuccess(mockFileResult);
 		verify(mockCallback2).onSuccess(mockFileResult);
+	}
+	
+	@Test
+	public void testSuccessFileHandleNotFound() {
+		//simulate single file response for multiple requests for that file
+		fileHandleAsyncHandler.getFileResult(mockFileAssociation, mockCallback);
+		when(mockFileResult.getFailureCode()).thenReturn(FileResultFailureCode.NOT_FOUND);
+		
+		resultList.add(mockFileResult);
+		
+		fileHandleAsyncHandler.executeRequests();
+		
+		verify(mockSynapseJavascriptClient).getFileHandleAndUrlBatch(any(BatchFileRequest.class), any(AsyncCallback.class));
+		verify(mockCallback).onFailure(throwableCaptor.capture());
+		Throwable th = throwableCaptor.getValue();
+		assertTrue(th instanceof NotFoundException);
+	}
+	
+	@Test
+	public void testSuccessFileHandleUnauthorized() {
+		//simulate single file response for multiple requests for that file
+		fileHandleAsyncHandler.getFileResult(mockFileAssociation, mockCallback);
+		when(mockFileResult.getFailureCode()).thenReturn(FileResultFailureCode.UNAUTHORIZED);
+		
+		resultList.add(mockFileResult);
+		
+		fileHandleAsyncHandler.executeRequests();
+		
+		verify(mockSynapseJavascriptClient).getFileHandleAndUrlBatch(any(BatchFileRequest.class), any(AsyncCallback.class));
+		verify(mockCallback).onFailure(throwableCaptor.capture());
+		Throwable th = throwableCaptor.getValue();
+		assertTrue(th instanceof UnauthorizedException);
 	}
 	
 	@Test

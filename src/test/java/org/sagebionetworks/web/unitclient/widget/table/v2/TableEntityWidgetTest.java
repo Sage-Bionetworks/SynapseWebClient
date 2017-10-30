@@ -190,6 +190,7 @@ public class TableEntityWidgetTest {
 		Query query = new Query();
 		query.setSql(expected);
 		query.setIsConsistent(true);
+		query.setIncludeEntityEtag(true);
 		query.setLimit(TableEntityWidget.DEFAULT_LIMIT);
 		query.setOffset(TableEntityWidget.DEFAULT_OFFSET);
 		assertEquals(query, widget.getDefaultQuery());
