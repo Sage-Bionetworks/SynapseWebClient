@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.mixpanel.MixPanelSdk;
+import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -42,6 +43,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private StuAnnouncementWidget stuAnnouncementWidget;
 	private MixPanelSdk mixPanelSdk;
+	private PendoSdk pendoSdk;
 	
 	@Inject
 	public Header(HeaderView view, 
@@ -51,6 +53,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			FavoriteWidget favWidget, 
 			SynapseJSNIUtils synapseJSNIUtils, 
 			StuAnnouncementWidget stuAnnouncementWidget,
+			PendoSdk pendoSdk,
 			MixPanelSdk mixPanelSdk) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -61,6 +64,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.clear();
 		this.stuAnnouncementWidget = stuAnnouncementWidget;
 		this.mixPanelSdk = mixPanelSdk;
+		this.pendoSdk = pendoSdk;
 		view.setPresenter(this);
 		stuAnnouncementWidget.init();
 		initStagingAlert();
@@ -122,8 +126,10 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
 		if (authenticationController.isLoggedIn()) {
 			String userName = userSessionData.getProfile().getUserName();
+			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
 			mixPanelSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
 		} else {
+			pendoSdk.initialize(ANONYMOUS, N_A);
 			mixPanelSdk.initialize(ANONYMOUS, N_A);
 		}
 	}

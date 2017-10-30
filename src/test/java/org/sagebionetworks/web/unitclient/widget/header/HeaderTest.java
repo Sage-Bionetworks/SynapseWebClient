@@ -43,6 +43,7 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidget;
 import org.sagebionetworks.web.client.widget.mixpanel.MixPanelSdk;
+import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.place.shared.Place;
@@ -64,6 +65,8 @@ public class HeaderTest {
 	@Mock
 	StuAnnouncementWidget mockStuAnnouncementWidget;
 	@Mock
+	PendoSdk mockPendoSdk;
+	@Mock
 	MixPanelSdk mockMixPanelSdk;
 	@Mock
 	UserSessionData mockUserSessionData;
@@ -84,7 +87,7 @@ public class HeaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget, mockMixPanelSdk);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget, mockPendoSdk, mockMixPanelSdk);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
@@ -268,6 +271,8 @@ public class HeaderTest {
 		verify(mockView).setUser(mockUserSessionData);
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
+		
+		verify(mockPendoSdk).initialize(userId, userName + SYNAPSE_ORG);
 		verify(mockMixPanelSdk).initialize(userId, userName + SYNAPSE_ORG);
 	}
 	
@@ -281,6 +286,7 @@ public class HeaderTest {
 		verify(mockView).setUser(null);
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
+		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);
 		verify(mockMixPanelSdk).initialize(ANONYMOUS, N_A);
 	}
 }
