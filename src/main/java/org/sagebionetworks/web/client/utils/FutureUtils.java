@@ -45,13 +45,22 @@ public class FutureUtils {
 	}
 
 	/**
+	 * Returns a failed future with its exception set to the given Throwable
+	 *
+	 * @return a failed future with its exception set to the given Throwable
+	 */
+	public static <T> FluentFuture<T> getFailedFuture(Throwable e) {
+		SettableFuture<T> future = SettableFuture.create();
+		future.setException(e);
+		return FluentFuture.from(future);
+	}
+
+	/**
 	 * Returns a failed future with its exception set to a new Throwable.
 	 *
 	 * @return a failed future with its exception set to a new Throwable
 	 */
 	public static <T> FluentFuture<T> getFailedFuture() {
-		SettableFuture<T> future = SettableFuture.create();
-		future.setException(new Throwable());
-		return FluentFuture.from(future);
+		return getFailedFuture(new Throwable());
 	}
 }
