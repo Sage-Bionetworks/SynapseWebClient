@@ -16,7 +16,6 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
@@ -218,8 +217,7 @@ public interface SynapseClient extends RemoteService{
 	ArrayList<OpenUserInvitationBundle> getOpenInvitations(String userId) throws RestServiceException;
 	ArrayList<OpenTeamInvitationBundle> getOpenTeamInvitations(String teamId, Integer limit, Integer offset) throws RestServiceException;
 	List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
-	InviteeVerificationSignedToken getInviteeVerificationSignedToken(String membershipInvitationId) throws RestServiceException;
-	void updateInviteeId(String membershipInvitationId, InviteeVerificationSignedToken token) throws RestServiceException;
+
 	void setIsTeamAdmin(String currentUserId, String targetUserId, String teamId, boolean isTeamAdmin) throws RestServiceException;
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId) throws RestServiceException;
 	Team updateTeam(Team team, AccessControlList teamAcl) throws RestServiceException;
