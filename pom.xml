@@ -30,6 +30,7 @@
 		<gwtbootstrap3.extras.version>1.5.2</gwtbootstrap3.extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gwtvisualizationwrappers.version>1.6-gwt-2.7.0</gwtvisualizationwrappers.version>
+		<gwt.module.suffix></gwt.module.suffix>
 	</properties>
 
 	<repositories>
@@ -196,7 +197,7 @@
 					<runTarget>Portal.html</runTarget>
 					<hostedWebapp>${webappDirectory}</hostedWebapp>
 					<i18nMessagesBundle>org.sagebionetworks.web.client.Messages</i18nMessagesBundle>
-					<module>org.sagebionetworks.web.Portal</module>
+					<module>org.sagebionetworks.web.Portal${gwt.module.suffix}</module>
 					<!-- GWT compiler options -->
 					<compileReport>false</compileReport>
 					<!-- Disabled because it causes an EmptyStackException on GWT 2.8.1
@@ -286,7 +287,6 @@
 			</plugin>
 		</plugins>
 	</build>
-
 	<dependencies>
 		<dependency>
 			<groupId>org.gwtbootstrap3</groupId>
