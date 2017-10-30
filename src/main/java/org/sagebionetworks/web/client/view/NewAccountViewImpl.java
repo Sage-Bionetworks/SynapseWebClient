@@ -1,27 +1,17 @@
 package org.sagebionetworks.web.client.view;
 
-import com.google.gwt.user.client.ui.SimplePanel;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.ValidationUtils;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.event.dom.client.BlurEvent;
-import com.google.gwt.event.dom.client.BlurHandler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.KeyUpEvent;
-import com.google.gwt.event.dom.client.KeyUpHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -88,14 +78,11 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 	
 	// Apply to all input fields if clickEvent is enter
 	public void init() {
-		KeyDownHandler register = new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					registerBtn.click();
-				}
+		KeyDownHandler register = event -> {
+			if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+				registerBtn.click();
 			}
-		};		
+		};
 		emailField.addKeyDownHandler(register);
 		firstNameField.addKeyDownHandler(register);
 		lastNameField.addKeyDownHandler(register);
@@ -103,42 +90,19 @@ public class NewAccountViewImpl extends Composite implements NewAccountView {
 		password1Field.addKeyDownHandler(register);
 		password2Field.addKeyDownHandler(register);
 		
-		registerBtn.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if(checkUsernameFormat() && checkPassword1() && checkPassword2() && checkPasswordMatch()) {
-					// formatting is ok. submit to presenter (will fail if one is taken)
-					presenter.completeRegistration(userNameField.getValue(), firstNameField.getValue(), lastNameField.getValue(), password1Field.getValue());
-				}
+		registerBtn.addClickHandler(event -> {
+			if(checkUsernameFormat() && checkPassword1() && checkPassword2() && checkPasswordMatch()) {
+				// formatting is ok. submit to presenter (will fail if one is taken)
+				presenter.completeRegistration(userNameField.getValue(), firstNameField.getValue(), lastNameField.getValue(), password1Field.getValue());
 			}
 		});
-		
-		userNameField.addBlurHandler(new BlurHandler() {
-			@Override
-			public void onBlur(BlurEvent event) {
-				if (checkUsernameFormat())
-					presenter.checkUsernameAvailable(userNameField.getValue());
-			}
+		userNameField.addBlurHandler(event -> {
+			if (checkUsernameFormat())
+				presenter.checkUsernameAvailable(userNameField.getValue());
 		});
-		password1Field.addBlurHandler(new BlurHandler() {
-			@Override
-			public void onBlur(BlurEvent event) {
-				checkPassword1();
-			}
-		});
-		password1Field.addKeyUpHandler(new KeyUpHandler() {
-			@Override
-			public void onKeyUp(KeyUpEvent event) {
-				presenter.passwordChanged(password1Field.getText());
-			}
-		});
-		
-		password2Field.addBlurHandler(new BlurHandler() {
-			@Override
-			public void onBlur(BlurEvent event) {
-				checkPassword2();
-			}
-		});
+		password1Field.addBlurHandler(event -> checkPassword1());
+		password1Field.addKeyUpHandler(event -> presenter.passwordChanged(password1Field.getText()));
+		password2Field.addBlurHandler(event -> checkPassword2());
 	}
 
 	private boolean checkUsernameFormat() {

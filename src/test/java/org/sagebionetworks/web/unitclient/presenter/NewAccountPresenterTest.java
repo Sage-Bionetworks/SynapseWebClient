@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
 import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -10,8 +9,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,7 +20,6 @@ import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -46,18 +42,13 @@ public class NewAccountPresenterTest {
 	NewAccountView mockView;
 	UserAccountServiceAsync mockUserService;
 	GlobalApplicationState mockGlobalApplicationState;
-	@Mock
-	GWTWrapper mockGWT;
 	RegisterAccount place = Mockito.mock(RegisterAccount.class);
 	SynapseClientAsync mockSynapseClient;
 	AuthenticationController mockAuthController;
 	PlaceChanger mockPlaceChanger;
 	@Mock
 	PasswordStrengthWidget mockPasswordStrengthWidget;
-	
-	String username = "Ms.Information";
-	String firstName = "Hello";
-	String lastName = "Goodbye";
+
 	String testSessionToken = "1239381foobar";
 	@Before
 	public void setup() {
@@ -69,7 +60,7 @@ public class NewAccountPresenterTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, mockGWT, mockPasswordStrengthWidget);
+		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, mockPasswordStrengthWidget);
 		verify(mockView).setPresenter(newAccountPresenter);
 		
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_NAME.toString()), any(AsyncCallback.class));
@@ -90,17 +81,6 @@ public class NewAccountPresenterTest {
 		verify(mockView).setPresenter(newAccountPresenter);
 	}
 	
-	@Test
-	public void testSetPlaceEncodedToken() {
-		String token = "firstname=&amp;lastname=&amp;email=decode-test%40j.com&amp;timestamp=2016-08-11T22%3A21%3A16.111%2B0000&amp;domain=SYNAPSE&amp;mac=gLaTfdsfB0TSy6JMsfdsuA1k%3D";
-		String decodedToken = "firstname=&lastname=&email=decode-test%40j.com&timestamp=2016-08-11T22%3A22%3A59.022%2B0000&domain=SYNAPSE&mac=EckukfdsGjPbzLVVaaaaLs%3D";
-		NewAccount newPlace = Mockito.mock(NewAccount.class);
-		when(newPlace.toToken()).thenReturn(token);
-		when(mockGWT.decodeQueryString(token)).thenReturn(decodedToken);
-		newAccountPresenter.setPlace(newPlace);
-		assertEquals(decodedToken, newAccountPresenter.getEmailValidationToken());
-	}
-
 	@Test
 	public void testIsUsernameAvailableTooSmall() {
 		//should not check if too short
@@ -136,20 +116,6 @@ public class NewAccountPresenterTest {
 		verify(mockSynapseClient).isAliasAvailable(anyString(), eq(AliasType.USER_EMAIL.toString()), any(AsyncCallback.class));
 		//attempts to go to the last place
 		verify(mockGlobalApplicationState).gotoLastPlace();
-	}
-
-	@Test
-	public void testParseValidationToken() {
-		newAccountPresenter = new NewAccountPresenter(mockView, mockSynapseClient, mockGlobalApplicationState, mockUserService, mockAuthController, new GWTStub(), mockPasswordStrengthWidget);
-		String token = "firstname=&lastname=&email=unittest%40jayhodgson.com&timestamp=2014-09-03T23%3A45%3A57.788%2B0000&domain=SYNAPSE&mac=DyXg5wUR3aqDABpnvYE%3D";
-		Map<String, String> result = newAccountPresenter.parseEmailValidationToken(token);
-		assertEquals("unittest@jayhodgson.com", result.get("email"));
-
-		result = newAccountPresenter.parseEmailValidationToken(null);
-		assertTrue(result.isEmpty());
-
-		result = newAccountPresenter.parseEmailValidationToken("");
-		assertTrue(result.isEmpty());
 	}
 
 	@Test
