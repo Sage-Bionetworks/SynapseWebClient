@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.EmailInvitationPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.EmailInvitationView;
@@ -82,7 +83,11 @@ public class EmailInvitationPresenterTest {
 		when(jsClient.getInviteeVerificationSignedToken(mis.getId())).thenReturn(getDoneFuture(inviteeVerificationSignedToken));
 		when(jsClient.updateInviteeId(inviteeVerificationSignedToken)).thenReturn(getDoneFuture(null));
 		presenter.setPlace(place);
-		verify(placeChanger).goTo(any(Profile.class));
+		verify(jsClient).getInviteeVerificationSignedToken(mis.getId());
+		verify(jsClient).updateInviteeId(inviteeVerificationSignedToken);
+		ArgumentCaptor<Profile> captor = ArgumentCaptor.forClass(Profile.class);
+		verify(placeChanger).goTo(captor.capture());
+		assertEquals(Synapse.ProfileArea.TEAMS, captor.getValue().getArea());
 	}
 
 	@Test
