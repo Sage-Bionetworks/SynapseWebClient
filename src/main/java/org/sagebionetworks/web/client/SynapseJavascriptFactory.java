@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Count;
+import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -92,7 +93,9 @@ public class SynapseJavascriptFactory {
 		if (OBJECT_TYPE.Entity.equals(type) && json.has("concreteType")) {
 			// attempt to construct based on concreteType
 			String concreteType = json.getString("concreteType");
-			return EntityInstanceFactory.singleton().newInstance(concreteType);
+			Entity entity = EntityInstanceFactory.singleton().newInstance(concreteType);
+			entity.initializeFromJSONObject(json);
+			return entity;
 		} 
 		switch (type) {
 		case EntityBundle :
