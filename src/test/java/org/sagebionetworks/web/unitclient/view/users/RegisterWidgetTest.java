@@ -36,7 +36,7 @@ public class RegisterWidgetTest {
 	RegisterWidget widget;
 	String email = "test@test.com";
 	NewUser newUser;
-	
+
 	@Before
 	public void setup() {
 		newUser = new NewUser();
@@ -51,7 +51,7 @@ public class RegisterWidgetTest {
 	
 	@Test
 	public void testRegisterUser() {
-		widget.registerUser(newUser);
+		widget.registerUser(email);
 		verify(mockView).enableRegisterButton(false);
 		verify(mockView).showInfo(DisplayConstants.ACCOUNT_EMAIL_SENT);
 		verify(mockView).enableRegisterButton(true);
@@ -62,7 +62,7 @@ public class RegisterWidgetTest {
 	@Test
 	public void testRegisterUserUserExists() {
 		AsyncMockStubber.callFailureWith(new ConflictException("user exists")).when(mockUserService).createUserStep1(any(NewUser.class), anyString(), any(AsyncCallback.class));
-		widget.registerUser(newUser);
+		widget.registerUser(email);
 		verify(mockSynAlert).showError(DisplayConstants.ERROR_EMAIL_ALREADY_EXISTS);
 	}
 
@@ -70,7 +70,7 @@ public class RegisterWidgetTest {
 	public void testRegisterUserServiceFailure() {
 		Exception ex = new Exception("unknown");
 		AsyncMockStubber.callFailureWith(ex).when(mockUserService).createUserStep1(any(NewUser.class), anyString(), any(AsyncCallback.class));
-		widget.registerUser(newUser);
+		widget.registerUser(email);
 		
 		verify(mockSynAlert).handleException(ex);
 	}
