@@ -33,10 +33,11 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	private UpdatingAsynchProgressHandler handler;
 	private OneTimeReference<AsynchronousProgressHandler> oneTimeReference;
 	private boolean isCanceled;
-
+	private SynapseJavascriptClient jsClient;
+	
 	@Inject
 	public AsynchronousJobTrackerImpl(SynapseClientAsync synapseClient,
-			TimerProvider timerProvider, 
+			TimerProvider timerProvider,
 			SynapseJavascriptClient jsClient) {
 		super();
 		this.synapseClient = synapseClient;
@@ -118,42 +119,37 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	 * 
 	 */
 	private void checkAndWait(AsynchronousRequestBody requestBody) {
-		AsyncCallback<AsynchronousResponseBody> callback = new AsyncCallback<AsynchronousResponseBody>() {
-			@Override
-			public void onSuccess(AsynchronousResponseBody response) {
-				// nothing to do if canceled.
-				if (!isCanceled) {
-					oneTimeOnComplete(response);
-				}
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-				// nothing to do if canceled.
-				if (!isCanceled) {
-					// When the job is not
-					if(caught instanceof ResultNotReadyException){
-						ResultNotReadyException rnre = (ResultNotReadyException) caught;
-						// Extract the status
-						AsynchronousJobStatus status = rnre.getStatus();
-						handler.onUpdate(status);
-						// start the timer and wait for another push
-						timerProvider.schedule(waitTimeMS);
-					}else{
-						// Failed.
-						oneTimeOnFailure(caught);
-					}
-				}
-
-			}
-		};
 		// Get the current status
-		if (AsynchType.TableQuery.equals(type)) {
-			String entityId = ((QueryBundleRequest) requestBody).getEntityId();
-			jsClient.getTableQueryJobResults(entityId, jobId, callback);
-		} else {
-			synapseClient.getAsynchJobResults(this.type, this.jobId, requestBody, callback);	
-		}
+		jsClient.getAsynchJobResults(this.type, this.jobId, requestBody,
+				new AsyncCallback<AsynchronousResponseBody>() {
+					@Override
+					public void onSuccess(AsynchronousResponseBody response) {
+						// nothing to do if canceled.
+						if (!isCanceled) {
+							oneTimeOnComplete(response);
+						}
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						// nothing to do if canceled.
+						if (!isCanceled) {
+							// When the job is not
+							if(caught instanceof ResultNotReadyException){
+								ResultNotReadyException rnre = (ResultNotReadyException) caught;
+								// Extract the status
+								AsynchronousJobStatus status = rnre.getStatus();
+								handler.onUpdate(status);
+								// start the timer and wait for another push
+								timerProvider.schedule(waitTimeMS);
+							}else{
+								// Failed.
+								oneTimeOnFailure(caught);
+							}
+						}
+
+					}
+				});
 	}
 
 	/**

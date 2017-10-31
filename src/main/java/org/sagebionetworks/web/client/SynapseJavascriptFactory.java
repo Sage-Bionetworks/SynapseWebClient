@@ -27,6 +27,10 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsyncJobId;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
+import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBodyInstanceFactory;
+
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -93,6 +97,7 @@ public class SynapseJavascriptFactory {
 		StackStatus,
 		UserProfile,
 		FileHandleResults,
+		AsyncResponse,
 		JSON,
 		MembershipInvitation,
 		InviteeVerificationSignedToken,
@@ -117,7 +122,20 @@ public class SynapseJavascriptFactory {
 			Entity entity = EntityInstanceFactory.singleton().newInstance(concreteType);
 			entity.initializeFromJSONObject(json);
 			return entity;
-		} 
+		}
+		if (OBJECT_TYPE.AsyncResponse.equals(type)) {
+			if (json.has("concreteType")) {
+				String concreteType = json.getString("concreteType");
+				AsynchronousResponseBodyInstanceFactory asyncResponseFactory = AsynchronousResponseBodyInstanceFactory.singleton();
+				AsynchronousResponseBody response = asyncResponseFactory.newInstance(concreteType);
+				response.initializeFromJSONObject(json);
+				return response;
+			} else {
+				GWT.debugger();
+				AsynchronousJobStatus status = new AsynchronousJobStatus(json);
+				throw new ResultNotReadyException(status);
+			}
+		}
 		switch (type) {
 		case EntityBundle :
 			return new EntityBundle(json);
