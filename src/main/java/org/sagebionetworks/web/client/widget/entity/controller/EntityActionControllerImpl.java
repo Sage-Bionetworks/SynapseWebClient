@@ -956,6 +956,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});
 	}
 	private void postCheckUploadTable(){
+		getUploadTableModalWidget().configure(entityBundle.getEntity().getId(), null);
 		getUploadTableModalWidget().showModal(entityUpdatedWizardCallback);
 	}
 	
