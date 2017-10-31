@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.Count;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityInstanceFactory;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
@@ -91,25 +92,7 @@ public class SynapseJavascriptFactory {
 		if (OBJECT_TYPE.Entity.equals(type) && json.has("concreteType")) {
 			// attempt to construct based on concreteType
 			String concreteType = json.getString("concreteType");
-			if (FileEntity.class.getName().equals(concreteType)) {
-				type = OBJECT_TYPE.FileEntity;
-			} else if (Folder.class.getName().equals(concreteType)) {
-				type = OBJECT_TYPE.Folder;
-			} else if (EntityView.class.getName().equals(concreteType)) {
-				type = OBJECT_TYPE.EntityView;
-			} else if (TableEntity.class.getName().equals(concreteType)) {
-				type = OBJECT_TYPE.TableEntity;
-			} else if (Project.class.getName().equals(concreteType)) {
-				type = OBJECT_TYPE.Project;
-			} else if (Link.class.getName().equals(concreteType)) {
-				type = OBJECT_TYPE.Link;
-			} else if (Preview.class.getName().equals(concreteType)) {
-				type = OBJECT_TYPE.Preview;
-			} else if (DockerRepository.class.getName().equals(concreteType)) {
-				type = OBJECT_TYPE.DockerRepository;
-			} else {
-				throw new IllegalArgumentException("No match found for : "+ concreteType);
-			}
+			return EntityInstanceFactory.singleton().newInstance(concreteType);
 		} 
 		switch (type) {
 		case EntityBundle :
