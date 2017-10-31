@@ -14,6 +14,10 @@ public interface EmailInvitationView extends IsWidget {
 
 	void setPresenter(Presenter presenter);
 
+	void showLoading();
+
+	void hideLoading();
+
 	void showInfo(String title, String message);
 
 	void clear();

@@ -70,6 +70,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 
 	@Override
 	public void setPlace(EmailInvitation place) {
+		view.showLoading();
 		view.clear();
 		view.setPresenter(this);
 		encodedMISignedToken = place.toToken();
@@ -91,11 +92,13 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 
 						@Override
 						public void onFailure(Throwable throwable) {
+							view.hideLoading();
 							synapseAlert.handleException(throwable);
 						}
 					},
 					directExecutor()
 			);
+
 	}
 
 	private void bindInvitationToAuthenticatedUser(final String misId) {
@@ -112,6 +115,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 
 						@Override
 						public void onFailure(Throwable throwable) {
+							view.hideLoading();
 							synapseAlert.handleException(throwable);
 						}
 					},
@@ -123,6 +127,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 		view.showNotLoggedInUI();
 		registerWidget.setEncodedMembershipInvtnSignedToken(encodedMISignedToken);
 		registerWidget.setEmail(mis.getInviteeEmail());
+		view.hideLoading();
 
 		ListenableFuture<Team> teamFuture;
 		ListenableFuture<UserProfile> userProfileFuture;

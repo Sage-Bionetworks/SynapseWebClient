@@ -5,33 +5,22 @@
 			 xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >
 
-	<g:HTMLPanel>
-		<b:Row>
-			<b:Column size="XS_12, MD_6" offset="MD_3">
-				<g:SimplePanel ui:field="synapseAlertContainer"/>
-			</b:Column>
-		</b:Row>
-		<div class="container margin-top-15 min-height-400">
-			<b:Container fluid="true">
-				<b:Row>
-					<b:Column size="SM_3"></b:Column>
-					<b:Column size="SM_6">
-						<b:Heading ui:field="invitationTitle" size="H4" addStyleNames="margin-top-20"/>
-						<b:BlockQuote ui:field="invitationMessageWrapper" visible="false">
-							<b:Heading ui:field="invitationMessage" size="H5" addStyleNames="margin-top-10"/>
-						</b:BlockQuote>
-						<b:Row>
-							<bh:Div ui:field="registerWidgetContainer" addStyleNames="margin-top-10"/>
-						</b:Row>
-						<b:Row>
-							<bh:Div width="100%">
-								<b:Button ui:field="loginButton" text="Already have an account?" size="LARGE" width="100%" addStyleNames="margin-top-10"/>
-							</bh:Div>
-						</b:Row>
-					</b:Column>
-					<b:Column size="SM_3"></b:Column>
-				</b:Row>
-			</b:Container>
-		</div>
-	</g:HTMLPanel>
+	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
+	<b:Container fluid="true">
+		<bh:Div ui:field="loading" visible="false" addStyleNames="margin-top-100">
+			<g:Image resource='{sageImageBundle.loading31}' addStyleNames="center-block"/>
+			<b:Heading size="H4" text="Loading..." addStyleNames="text-center"/>
+		</bh:Div>
+		<b:Column size="XS_12, MD_6" offset="MD_3">
+			<g:SimplePanel ui:field="synapseAlertContainer"/>
+			<bh:Div ui:field="notLoggedInContainer" visible="false">
+				<b:Heading ui:field="invitationTitle" size="H4" addStyleNames="margin-top-20"/>
+				<b:BlockQuote ui:field="invitationMessageWrapper" visible="false">
+					<b:Heading ui:field="invitationMessage" size="H5" addStyleNames="margin-top-10"/>
+				</b:BlockQuote>
+				<bh:Div ui:field="registerWidgetContainer" addStyleNames="margin-top-10"/>
+				<b:Button ui:field="loginButton" text="Already have an account?" size="LARGE" width="100%" addStyleNames="margin-top-10"/>
+			</bh:Div>
+		</b:Column>
+	</b:Container>
 </ui:UiBinder>

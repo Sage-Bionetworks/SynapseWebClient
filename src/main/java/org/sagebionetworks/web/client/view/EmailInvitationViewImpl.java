@@ -18,7 +18,10 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EmailInvitationViewImpl extends Composite implements EmailInvitationView {
-
+	@UiField
+	Div loading;
+	@UiField
+	Div notLoggedInContainer;
 	@UiField
 	SimplePanel synapseAlertContainer;
 	@UiField
@@ -79,24 +82,29 @@ public class EmailInvitationViewImpl extends Composite implements EmailInvitatio
 	}
 
 	@Override
+	public void showLoading() {
+		loading.setVisible(true);
+	}
+
+	@Override
+	public void hideLoading() {
+		loading.setVisible(false);
+	}
+
+	@Override
 	public void showInfo(String title, String message) {
 		DisplayUtils.showInfo(title, message);
 	}
 
 	@Override
 	public void clear() {
-		invitationTitle.setVisible(false);
+		notLoggedInContainer.setVisible(false);
 		invitationMessageWrapper.setVisible(false);
-		registerWidgetContainer.setVisible(false);
-		loginButton.setVisible(false);
 	}
 
 	@Override
 	public void showNotLoggedInUI() {
-		invitationTitle.setVisible(true);
-		invitationMessageWrapper.setVisible(true);
-		registerWidgetContainer.setVisible(true);
-		loginButton.setVisible(true);
+		notLoggedInContainer.setVisible(true);
 	}
 
 	public interface EmailInvitationViewImplUiBinder extends UiBinder<Widget, EmailInvitationViewImpl> {
