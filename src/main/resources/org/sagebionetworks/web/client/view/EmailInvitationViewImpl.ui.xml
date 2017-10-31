@@ -6,7 +6,7 @@
 >
 
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
-	<b:Container fluid="true">
+	<b:Container>
 		<bh:Div ui:field="loading" visible="false" addStyleNames="margin-top-100">
 			<g:Image resource='{sageImageBundle.loading31}' addStyleNames="center-block"/>
 			<b:Heading size="H4" text="Loading..." addStyleNames="text-center"/>
