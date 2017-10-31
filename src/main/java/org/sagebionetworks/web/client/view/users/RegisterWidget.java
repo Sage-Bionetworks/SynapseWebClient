@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.view.users;
 
+import static org.sagebionetworks.web.client.ValidationUtils.isValidEmail;
+
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -41,10 +43,17 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 
 	/**
 	 * Create the new user account
-	 * @param newUser
+	 * @param email
 	 */
 	@Override
-	public void registerUser(NewUser newUser) {
+	public void registerUser(String email) {
+		NewUser newUser = new NewUser();
+		if (!isValidEmail(email)) {
+			synAlert.showError(DisplayConstants.INVALID_EMAIL);
+			return;
+		}
+		newUser.setEmail(email);
+		newUser.setEncodedMembershipInvtnSignedToken(encodedMembershipInvtnSignedToken);
 		synAlert.clear();
 		view.enableRegisterButton(false);
 		String callbackUrl = gwt.getHostPageBaseURL() + "#!NewAccount:";

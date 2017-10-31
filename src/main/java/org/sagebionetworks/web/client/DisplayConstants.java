@@ -277,6 +277,7 @@ public class DisplayConstants {
 	public static final String UPLOAD_DESTINATION = "All uploaded files will be stored in ";
 	public static final String DOWNLOAD_CREDENTIALS_REQUIRED = "Sign in to download from ";
 	public static final String SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT = "Successfully linked the external account to your Synapse profile.";
+	public static final String INVALID_EMAIL = "Email address is not valid.";
 
 	// Button styles
 	public static final String PRIMARY_BUTTON_STYLE = "btn-primary";

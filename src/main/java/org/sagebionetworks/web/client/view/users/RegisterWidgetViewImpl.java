@@ -2,14 +2,9 @@ package org.sagebionetworks.web.client.view.users;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.web.client.DisplayUtils;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.TextBox;
@@ -38,22 +33,10 @@ public class RegisterWidgetViewImpl implements RegisterWidgetView {
 	}
 
 	public void initClickHandlers() {
-		registerBtn.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				NewUser newUser = new NewUser();
-				newUser.setEmail(emailAddressField.getValue());
-				newUser.setEncodedMembershipInvtnSignedToken(presenter.getEncodedMembershipInvtnSignedToken());
-				presenter.registerUser(newUser);
-			}
-		});
-		
-		emailAddressField.addKeyDownHandler(new KeyDownHandler() {
-		    @Override
-		    public void onKeyDown(KeyDownEvent event) {
-		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-		        	registerBtn.click();
-		        }
+		registerBtn.addClickHandler(event -> presenter.registerUser(emailAddressField.getValue()));
+		emailAddressField.addKeyDownHandler(event -> {
+		    if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+			    registerBtn.click();
 		    }
 		});
 	}

@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.view.users;
 
-import org.sagebionetworks.repo.model.auth.NewUser;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -20,7 +18,7 @@ public interface RegisterWidgetView extends IsWidget {
 	 * Presenter interface
 	 */
 	interface Presenter {
-		void registerUser(NewUser newUser);
+		void registerUser(String email);
 
 		String getEncodedMembershipInvtnSignedToken();
 	}
