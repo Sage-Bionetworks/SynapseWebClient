@@ -25,7 +25,6 @@ import com.google.inject.Inject;
 public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 
 	private SynapseClientAsync synapseClient;
-	private SynapseJavascriptClient jsClient;
 	private TimerProvider timerProvider;
 	private int waitTimeMS;
 	private AsynchType type;

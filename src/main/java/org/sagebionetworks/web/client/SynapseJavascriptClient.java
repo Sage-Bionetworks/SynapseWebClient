@@ -206,7 +206,6 @@ public class SynapseJavascriptClient {
 
 	public static final String ASYNC_START = "/async/start";
 	public static final String ASYNC_GET = "/async/get/";
-	public static final String TABLE_QUERY = "/table/query";
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	
@@ -333,10 +332,10 @@ public class SynapseJavascriptClient {
 								responseObject = jsFactory.newInstance(responseType, jsonObject);
 							}
 							callback.onSuccess(responseObject);
-						} catch (Exception e) {
-							onError(null, e);
 						} catch (ResultNotReadyException e) {
 							onError(request, e);
+						} catch (Exception e) {
+							onError(null, e);
 						}
 					} else {
 						// Status code could be 0 if the preflight request failed, or if the network connection is down.
@@ -862,6 +861,119 @@ public class SynapseJavascriptClient {
 	public FluentFuture<Entity> createEntity(Entity entity) {
 		String url = getRepoServiceUrl() + ENTITY;
 		return getFuture(cb -> doPost(url, entity, OBJECT_TYPE.Entity, cb));
+	}
+	
+	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(ViewType viewType) {
+		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + viewType.name();
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, cb));
+	}
+	
+	public FluentFuture<Void> deleteMembershipRequest(String requestId) {
+		String url = getRepoServiceUrl() + MEMBERSHIP_REQUEST + "/" + requestId;
+		return getFuture(cb -> doDelete(url, cb));
+	}
+	
+	public FluentFuture<Void> deleteMembershipInvitation(String inviteId) {
+		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + inviteId;
+		return getFuture(cb -> doDelete(url, cb));
+	}
+	
+	private FluentFuture<Void> logError(LogEntry entry) {
+		String url = getRepoServiceUrl() + LOG;
+		return getFuture(cb -> doPost(url, entry, OBJECT_TYPE.None, cb));
+	}
+	
+	public FluentFuture<Void> logError(String label, Throwable ex) {
+		LogEntry entry = new LogEntry();
+		String exceptionString = ex.getMessage();
+		String outputExceptionString = exceptionString.substring(0, Math.min(exceptionString.length(), MAX_LOG_ENTRY_LABEL_SIZE));
+		entry.setLabel(getSynapseVersionInfo() + ": " + label + ": " + outputExceptionString);
+		entry.setMessage(gwt.getCurrentURL() + " : \n" + ex.getMessage());
+		return logError(entry);
+	}
+	
+	public FluentFuture<PaginatedTeamIds> getUserTeams(String userId, boolean isAscendingOrder, String nextPageToken) {
+		String urlBuilder = getRepoServiceUrl() + USER + "/" + userId + TEAM + "/id?" + 
+				ASCENDING_PARAM + Boolean.toString(isAscendingOrder) + "&sort=TEAM_NAME";
+		if (nextPageToken != null) {
+			urlBuilder += "&" + NEXT_PAGE_TOKEN_PARAM + nextPageToken;
+		}
+		final String url = urlBuilder;
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.PaginatedTeamIds, cb));
+	}
+	
+	public FluentFuture<List<Team>> listTeams(List<String> teamIds) {
+		List<Long> teamIdsLong = new ArrayList<>();
+		for (String teamId : teamIds) {
+			teamIdsLong.add(Long.parseLong(teamId));
+		}
+		String url = getRepoServiceUrl() + TEAM + "List";
+		IdList idList = new IdList();
+		idList.setList(teamIdsLong);
+		return getFuture(cb -> doPost(url, idList, OBJECT_TYPE.ListWrapperTeam, cb));
+	}
+	
+	public String getProfilePicturePreviewUrl(String ownerId) {
+		return getRepoServiceUrl() + USER_PROFILE_PATH+"/"+ownerId+PROFILE_IMAGE_PREVIEW+"?"+REDIRECT_PARAMETER+"true";
+	}
+	
+	public String getTeamIconUrl(String teamId) {
+		return getRepoServiceUrl() + TEAM + "/" + teamId + ICON + "?" + REDIRECT_PARAMETER +"true";
+	}
+	
+	public void startTableQueryJob(QueryBundleRequest request, AsyncCallback<String> callback) {
+		String entityId = request.getEntityId();
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + TABLE_QUERY + ASYNC_START;
+		doPost(url, request, OBJECT_TYPE.AsyncJobId, callback);
+	}
+
+	public void login(LoginRequest loginRequest, AsyncCallback<LoginResponse> callback) {
+		String url = getAuthServiceUrl() + "/login";
+		doPost(url, loginRequest, OBJECT_TYPE.LoginResponse, callback);
+	}
+	
+	public void getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
+		getProjects(projectListType, null, null, limit, offset, sortBy, sortDir, projectHeadersCallback);
+	}
+	
+	public void getProjectsForTeam(String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
+		getProjects(ProjectListType.TEAM_PROJECTS, null, teamId, limit, offset, sortBy, sortDir, projectHeadersCallback);
+	}
+	
+	public void getUserProjects(String userId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
+		getProjects(ProjectListType.OTHER_USER_PROJECTS, userId, null, limit, offset, sortBy, sortDir, projectHeadersCallback);
+	}
+	
+	private void getProjects(ProjectListType projectListType, String userId, String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
+		String url = getRepoServiceUrl() + PROJECTS_URI_PATH + '/' + projectListType.name();
+		if (userId != null) {
+			url += USER + '/' + userId;
+		}
+		if (teamId != null) {
+			url += TEAM + '/' + teamId;
+		}
+
+		if (sortBy == null) {
+			sortBy = ProjectListSortColumn.LAST_ACTIVITY;
+		}
+		if (sortDir == null) {
+			sortDir = SortDirection.DESC;
+		}
+
+		url += '?' + OFFSET_PARAMETER + offset + '&' + LIMIT_PARAMETER + limit + "&sort=" + sortBy.name() + "&sortDirection="
+				+ sortDir.name();
+		doGet(url, OBJECT_TYPE.PaginatedResultProjectHeader, projectHeadersCallback);
+	}
+	
+	public void getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody request, AsyncCallback<AsynchronousResponseBody> callback) {
+		String endpoint;
+		if (AsynchType.BulkFileDownload.equals(type)) {
+			endpoint = getFileServiceUrl();
+		} else {
+			endpoint = getRepoServiceUrl();
+		}
+		String url = type.getResultUrl(jobId, request);
+		doGet(endpoint + url, OBJECT_TYPE.AsyncResponse, callback);
 	}
 }
 

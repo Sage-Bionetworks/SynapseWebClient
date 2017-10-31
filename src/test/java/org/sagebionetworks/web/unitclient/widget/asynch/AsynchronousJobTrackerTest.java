@@ -12,6 +12,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.client.AsynchJobType;
 import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
@@ -130,7 +131,7 @@ public class AsynchronousJobTrackerTest {
 		// Simulate start
 		AsyncMockStubber.callSuccessWith(jobId).when(mockJsClient).startTableQueryJob(any(QueryBundleRequest.class), any(AsyncCallback.class));
 		// simulate three calls
-		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, responseBody).when(mockJsClient).getTableQueryJobResults(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callMixedWith(startNotReady, middleNotReady, doneNotReady, responseBody).when(mockJsClient).getAsynchJobResults(any(AsynchType.class), anyString(), any(), any(AsyncCallback.class));
 		tracker.startAndTrack(type, requestBody, waitTimeMS, mockHandler);
 		// Update should occur for all three phases
 		verify(mockHandler).onUpdate(start);
