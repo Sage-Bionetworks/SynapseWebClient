@@ -1866,7 +1866,14 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.CREATE_FOLDER);
 		verify(mockAddFolderDialogWidget).show(entityId);
 	}
-	
+	@Test
+	public void testUploadTable(){
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntityAndUpload(any(EntityBundle.class), anyString(), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		controller.onAction(Action.UPLOAD_TABLE);
+		verify(mockUploadTableModalWidget).configure(entityId, null);
+		verify(mockUploadTableModalWidget).showModal(any(WizardCallback.class));
+	}
 	@Test
 	public void testAddTable(){
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
