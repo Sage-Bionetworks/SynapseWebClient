@@ -185,14 +185,14 @@ public class OpenUserInvitationsWidgetTest {
 	public void testMoreResultsUnavailable() throws Exception {
 		setupGetOpenTeamInvitations(OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT - 1, 0);
 		widget.configure(teamId, mockTeamUpdatedCallback);
-		verify(mockView).hideMoreButton();
+		verify(mockView, times(2)).hideMoreButton();
 	}
 
 	@Test
 	public void testNoResultsAvailable() throws Exception {
 		setupGetOpenTeamInvitations(0, 0);
 		widget.configure(teamId, mockTeamUpdatedCallback);
-		verify(mockView).hideMoreButton();
+		verify(mockView, times(2)).hideMoreButton();
 	}
 
 	@Test
@@ -206,7 +206,7 @@ public class OpenUserInvitationsWidgetTest {
 		reset(mockSynapseClient);
 		setupGetOpenTeamInvitations(0, 0);
 		widget.getNextBatch();
-		verify(mockView).hideMoreButton();
+		verify(mockView, times(3)).hideMoreButton();
 		//offset should now be 1*OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT
 		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), eq(OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT), eq(OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT), any(AsyncCallback.class));
 	}
@@ -222,7 +222,7 @@ public class OpenUserInvitationsWidgetTest {
 		reset(mockSynapseClient);
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(),anyInt(),any(AsyncCallback.class));
 		widget.getNextBatch();
-		verify(mockView).hideMoreButton();
+		verify(mockView, times(3)).hideMoreButton();
 		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), eq(OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT), eq(OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT), any(AsyncCallback.class));
 	}
 }
