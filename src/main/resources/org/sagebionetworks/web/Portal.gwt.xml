@@ -82,9 +82,7 @@
 
 	<inherits name="com.google.common.util.concurrent.Concurrent"/>
 
-	<!-- Limit build permutations (testing only).  Set to gecko1_8 for FF
-	<set-property name="user.agent" value="safari"/>
-	-->
+	<!-- To limit build permutations, add "<gwt.module.suffix>Debug</gwt.module.suffix>" property to your local maven settings.xml file (<user_home>/.m2/settings.xml)-->
 
 	<!-- Workaround for GWT 2.8RC1+ as per https://github.com/gwtproject/gwt/issues/9311 -->
 	<set-configuration-property name="gin.classloading.exceptedPackages" value="com.google.gwt.core.client"/>
