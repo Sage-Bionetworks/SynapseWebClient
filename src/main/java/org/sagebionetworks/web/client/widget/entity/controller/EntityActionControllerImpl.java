@@ -692,7 +692,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureAddEvaluationAction(){
-		if(entityBundle.getEntity() instanceof Project && DisplayUtils.isInTestWebsite(cookies)){
+		if(entityBundle.getEntity() instanceof Project && currentArea == null && DisplayUtils.isInTestWebsite(cookies)){
 			actionMenu.setActionVisible(Action.ADD_EVALUATION_QUEUE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.ADD_EVALUATION_QUEUE, this);
 		}else{
