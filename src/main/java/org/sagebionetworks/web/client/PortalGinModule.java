@@ -231,7 +231,6 @@ import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryRowView;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryRowViewImpl;
-import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
@@ -676,6 +675,8 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsViewBas
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsViewImpl;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeView;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadgeViewImpl;
+import org.sagebionetworks.web.client.widget.team.EmailInvitationBadgeView;
+import org.sagebionetworks.web.client.widget.team.EmailInvitationBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditorView;
@@ -1100,7 +1101,8 @@ public class PortalGinModule extends AbstractGinModule {
 				
 		bind(WikiPageWidgetView.class).to(WikiPageWidgetViewImpl.class);
 		bind(UserBadgeView.class).to(UserBadgeViewImpl.class);
-		
+		bind(EmailInvitationBadgeView.class).to(EmailInvitationBadgeViewImpl.class);
+
 		bind(EntityBadgeView.class).to(EntityBadgeViewImpl.class);
 		
 		bind(TutorialWizardView.class).to(TutorialWizardViewImpl.class);

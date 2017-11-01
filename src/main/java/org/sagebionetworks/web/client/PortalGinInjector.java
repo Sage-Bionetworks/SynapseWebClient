@@ -226,6 +226,7 @@ import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ImportTableViewColumnsButton;
 import org.sagebionetworks.web.client.widget.team.BigTeamBadge;
+import org.sagebionetworks.web.client.widget.team.EmailInvitationBadge;
 import org.sagebionetworks.web.client.widget.team.JoinTeamConfigEditor;
 import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
@@ -400,6 +401,7 @@ public interface PortalGinInjector extends Ginjector {
 	
 	// Other widgets
 	UserBadge getUserBadgeWidget();
+	EmailInvitationBadge getEmailInvitationBadgeWidget();
 	VersionTimer getVersionTimer();
 	Md5Link getMd5Link();
 	QuestionContainerWidget getQuestionContainerWidget();
