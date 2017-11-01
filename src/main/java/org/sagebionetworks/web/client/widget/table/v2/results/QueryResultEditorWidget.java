@@ -54,7 +54,6 @@ public class QueryResultEditorWidget implements
 	Callback callback;
 	String tableId;
 	TableType tableType;
-	String etagColumnId;
 	
 	@Inject
 	public QueryResultEditorWidget(QueryResultEditorView view,
@@ -97,7 +96,6 @@ public class QueryResultEditorWidget implements
 		view.setButtonToolbarVisible(isTable);
 		view.showEditor();
 		this.tableId = QueryBundleUtils.getTableId(bundle);
-		this.etagColumnId = getEtagColumnId();
 	}
 
 	@Override
@@ -142,9 +140,6 @@ public class QueryResultEditorWidget implements
 		PartialRowSet prs = RowSetUtils.buildDelta(startingBundle.getQueryResult()
 				.getQueryResults(), pageWidget.extractRowSet(), pageWidget
 				.extractHeaders());
-		if (!TableType.table.equals(tableType)) {
-			removeEtagOnlyRows(etagColumnId, prs);
-		}
 		return prs;
 	}
 
@@ -247,26 +242,6 @@ public class QueryResultEditorWidget implements
 		return -1;
 	}
 	
-	public String getEtagColumnId() {
-		List<ColumnModel> columnModels = pageWidget.extractHeaders();
-		for (ColumnModel columnModel : columnModels) {
-			if (ETAG_COLUMN_NAME.equals(columnModel.getName())) {
-				return columnModel.getId();
-			}
-		}
-		return null;
-	}
-	
-	public void removeEtagOnlyRows(String etagColumnId, PartialRowSet prs) {
-		List<PartialRow> changes = new ArrayList<PartialRow>();
-		for (PartialRow pr : prs.getRows()) {
-			if (pr.getValues().size() > 1 || !pr.getValues().containsKey(etagColumnId)) {
-				changes.add(pr);
-			}
-		}
-		prs.setRows(changes);
-	}
-	
 	@Override
 	public void onSave() {
 		view.setErrorMessageVisible(false);
@@ -313,8 +288,8 @@ public class QueryResultEditorWidget implements
 						if (!TableType.table.equals(tableType)) {
 							int successIndex = getFirstIndexOfEntityUpdateResultSuccess(response);
 							if (successIndex > -1) {
-								Map<String, String> values = prs.getRows().get(successIndex).getValues();
-								String etag = values.get(etagColumnId);
+								PartialRow pr = prs.getRows().get(successIndex);
+								String etag = pr.getEtag();
 								Date now = new Date();
 								clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, etag, now.getTime() + MESSAGE_EXPIRE_TIME);
 							}

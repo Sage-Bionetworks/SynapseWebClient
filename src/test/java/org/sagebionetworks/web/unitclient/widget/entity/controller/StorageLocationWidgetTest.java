@@ -130,6 +130,21 @@ public class StorageLocationWidgetTest {
 		verify(mockView).setLoading(false);
 	}
 	
+
+	@Test
+	public void testNullBanner() {
+		ExternalS3StorageLocationSetting entityStorageLocationSetting = new ExternalS3StorageLocationSetting();
+		String baseKey = "key";
+		String bucket = "a.bucket     ";
+		String banner = null;
+		entityStorageLocationSetting.setBanner(banner);
+		entityStorageLocationSetting.setBucket(bucket);
+		entityStorageLocationSetting.setBaseKey(baseKey);
+		AsyncMockStubber.callSuccessWith(entityStorageLocationSetting).when(mockSynapseClient).getStorageLocationSetting(anyString(), any(AsyncCallback.class));
+		widget.getStorageLocationSetting();
+		verify(mockView).setExternalS3Banner("");
+	}
+	
 	@Test
 	public void testGetStorageLocationSettingExternalS3() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");

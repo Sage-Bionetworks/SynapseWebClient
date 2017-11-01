@@ -26,6 +26,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
+import org.sagebionetworks.repo.model.file.FileResultFailureCode;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -65,6 +66,8 @@ public class ImageWidgetTest {
 	FileHandle mockFileHandle2;
 	@Captor
 	ArgumentCaptor<FileHandleAssociation> fhaCaptor;
+	@Captor
+	ArgumentCaptor<Throwable> throwableCaptor;
 	
 	public static final String PRESIGNED_URL = "https://s3.presigned/image.jpg";
 	public static final String FILE_NAME = "image.jpg";
