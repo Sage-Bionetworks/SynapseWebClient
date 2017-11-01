@@ -122,16 +122,6 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	}
 
 	@Override
-	public void hideInvitations() {
-		invitationsContainer.setVisible(false);
-	}
-
-	@Override
-	public void showInvitations() {
-		invitationsContainer.setVisible(true);
-	}
-
-	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);

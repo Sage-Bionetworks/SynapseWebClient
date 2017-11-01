@@ -87,7 +87,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 
 	@Override
 	public void getNextBatch() {
-		synAlert.clear();
+		view.hideMoreButton();
 		// Show up to INVITATION_BATCH_LIMIT invitations extended by teamId
 		synapseClient.getOpenTeamInvitations(teamId, INVITATION_BATCH_LIMIT, currentOffset, new AsyncCallback<ArrayList<OpenTeamInvitationBundle>>() {
 			@Override
@@ -110,7 +110,6 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	}
 
 	private void addInvitations(List<OpenTeamInvitationBundle> bundles) {
-		view.hideInvitations();
 		// Add the invitations to the view
 		for (OpenTeamInvitationBundle b : bundles) {
 			MembershipInvtnSubmission mis = b.getMembershipInvtnSubmission();
@@ -129,7 +128,6 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 				synAlert.showError("Membership invitation with ID " + mis.getId() + " is not in a valid state.");
 			}
 		}
-		view.showInvitations();
 	}
 
 	private void updateMoreButton(int resultSize) {

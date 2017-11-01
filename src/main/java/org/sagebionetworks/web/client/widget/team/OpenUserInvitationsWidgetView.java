@@ -17,10 +17,6 @@ public interface OpenUserInvitationsWidgetView extends IsWidget {
 
 	void showMoreButton();
 
-	void hideInvitations();
-
-	void showInvitations();
-
 	void setSynAlert(IsWidget w);
 
 	void addInvitation(EmailInvitationBadge badge, String misId, String message, String createdOn);
