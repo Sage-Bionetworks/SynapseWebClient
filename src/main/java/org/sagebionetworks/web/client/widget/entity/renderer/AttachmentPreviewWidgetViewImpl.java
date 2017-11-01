@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.sagebionetworks.web.client.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -36,7 +37,7 @@ public class AttachmentPreviewWidgetViewImpl extends FlowPanel implements Attach
 		boolean isPreviewed = false;
 		if (lastDotIndex > -1) {
 			String extension = fileName.substring(lastDotIndex+1);
-			if (DisplayUtils.isRecognizedImageContentType("image/"+extension)) {
+			if (ContentTypeUtils.isRecognizedImageContentType("image/"+extension)) {
 				sb.append("<img class=\"imageDescriptor\" ");
 				sb.append(" src=\"");
 				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true));

@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.shared.GWT;
@@ -102,7 +101,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		String fileName = names[fileIndex];
 
 		JavaScriptObject blob = synapseJsniUtils.getFileBlob(fileIndex, fileInputId);
-		String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(fileInputId, fileIndex), fileName);
+		String contentType = org.sagebionetworks.web.client.ContentTypeUtils.fixDefaultContentType(synapseJsniUtils.getContentType(fileInputId, fileIndex), fileName);
 		
 		uploadFile(fileName, contentType, blob, handler, storageLocationId, view);
 	}
@@ -380,29 +379,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		uploadLog = new StringBuilder();
 	}
 
-	public static String fixDefaultContentType(String type, String fileName) {
-		String contentType = type;
-		String lowercaseFilename = fileName.toLowerCase();
-		if (type == null || type.trim().length() == 0) {
-			if (ContentTypeUtils.isRecognizedCodeFileName(fileName)) {
-				contentType = ContentTypeUtils.PLAIN_TEXT;
-			}
-			else if (lowercaseFilename.endsWith(".tsv") || lowercaseFilename.endsWith(".tab")) {
-				contentType = WebConstants.TEXT_TAB_SEPARATED_VALUES;
-			}
-			else if (lowercaseFilename.endsWith(".csv")) {
-				contentType = WebConstants.TEXT_COMMA_SEPARATED_VALUES;
-			}
-			else if (lowercaseFilename.endsWith(".txt")) {
-				contentType = ContentTypeUtils.PLAIN_TEXT;
-			} else {
-				// fall back to the least specific official MIME type...
-				contentType = ContentTypeUtils.APPLICATION_OCTET_STREAM;
-			}
-		}
-		return contentType;
-	}
-	
 	@Override
 	public void cancelUpload() {
 		isCanceled = true;

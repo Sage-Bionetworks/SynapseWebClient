@@ -16,8 +16,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.fixDefaultContentType;
-
+import static org.sagebionetworks.web.client.ContentTypeUtils.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -359,6 +358,10 @@ public class MultipartUploaderTest {
 		// should fix text files as well
 		inputFilename = "file.TXT";
 		assertEquals(ContentTypeUtils.PLAIN_TEXT, fixDefaultContentType(inputContentType, inputFilename));
+		
+		// should workflow files
+		assertEquals(ContentTypeUtils.PLAIN_TEXT, fixDefaultContentType(inputContentType, "test.wDL"));
+		assertEquals(ContentTypeUtils.PLAIN_TEXT, fixDefaultContentType(inputContentType, "test.Cwl"));
 		
 		// test default
 		inputContentType = null;

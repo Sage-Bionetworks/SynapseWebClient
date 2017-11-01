@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -34,7 +35,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.AddAttachmentHelper;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
-import org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -560,7 +560,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				long fileSize = (long)synapseJsniUtils.getFileSize(blob);
 				String fileName = fileNames[currIndex];
 				String contentType = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID, currIndex);
-				contentType = MultipartUploaderImpl.fixDefaultContentType(contentType, fileName);
+				contentType = ContentTypeUtils.fixDefaultContentType(contentType, fileName);
 				if (isUpdating) {
 					//existing entity
 					updateExternalFileEntity(entityId, path, fileName, fileSize, contentType, hexValue, storageLocationId);

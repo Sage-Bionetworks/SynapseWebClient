@@ -3,11 +3,9 @@ package org.sagebionetworks.web.client;
 
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 import static org.sagebionetworks.web.client.ClientProperties.GB;
-import static org.sagebionetworks.web.client.ClientProperties.IMAGE_CONTENT_TYPES_SET;
 import static org.sagebionetworks.web.client.ClientProperties.KB;
 import static org.sagebionetworks.web.client.ClientProperties.MB;
 import static org.sagebionetworks.web.client.ClientProperties.STYLE_DISPLAY_INLINE;
-import static org.sagebionetworks.web.client.ClientProperties.TABLE_CONTENT_TYPES_SET;
 import static org.sagebionetworks.web.client.ClientProperties.TB;
 
 import java.util.Date;
@@ -849,32 +847,6 @@ public class DisplayUtils {
 		return ref;		
 	}
 		
-	public static boolean isRecognizedImageContentType(String contentType) {
-		String lowerContentType = contentType.toLowerCase();
-		return IMAGE_CONTENT_TYPES_SET.contains(lowerContentType);
-	}
-	
-	public static boolean isRecognizedTableContentType(String contentType) {
-		String lowerContentType = contentType.toLowerCase();
-		return TABLE_CONTENT_TYPES_SET.contains(lowerContentType);
-	}
-	
-	public static boolean isTextType(String contentType) {
-		return contentType.toLowerCase().startsWith("text/");
-	}
-	
-	public static boolean isCSV(String contentType) {
-		return contentType != null && contentType.toLowerCase().startsWith("text/csv");
-	}
-	
-	public static boolean isTAB(String contentType) {
-		return contentType != null && contentType.toLowerCase().startsWith(WebConstants.TEXT_TAB_SEPARATED_VALUES);
-	}
-	
-	public static boolean isHTML(String contentType) {
-		return contentType != null && contentType.toLowerCase().startsWith("text/html");
-	}
-	
 	/**
 	 * Return a preview filehandle associated with this bundle (or null if unavailable)
 	 * @param bundle

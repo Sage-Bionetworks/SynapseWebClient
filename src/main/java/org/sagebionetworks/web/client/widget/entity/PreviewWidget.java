@@ -30,6 +30,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -83,36 +84,36 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		if (previewHandle == null && originalFileHandle != null && originalFileHandle instanceof S3FileHandle) {
 			String contentType = originalFileHandle.getContentType();
 			if (contentType != null) {
-				if (DisplayUtils.isRecognizedImageContentType(contentType)) {
+				if (org.sagebionetworks.web.client.ContentTypeUtils.isRecognizedImageContentType(contentType)) {
 					previewFileType = PreviewFileType.IMAGE;	
-				} else if (DisplayUtils.isHTML(contentType)) {
+				} else if (org.sagebionetworks.web.client.ContentTypeUtils.isHTML(contentType)) {
 					previewFileType = PreviewFileType.HTML;	
 				}
 			}
 		} else if (previewHandle != null && originalFileHandle != null) {
 			String contentType = previewHandle.getContentType();
 			if (contentType != null) {
-				if (DisplayUtils.isRecognizedImageContentType(contentType)) {
+				if (org.sagebionetworks.web.client.ContentTypeUtils.isRecognizedImageContentType(contentType)) {
 					previewFileType = PreviewFileType.IMAGE;
 				}
-				else if (DisplayUtils.isTextType(contentType)) {
+				else if (org.sagebionetworks.web.client.ContentTypeUtils.isTextType(contentType)) {
 					//some kind of text
-					if (DisplayUtils.isHTML(originalFileHandle.getContentType())) {
+					if (org.sagebionetworks.web.client.ContentTypeUtils.isHTML(originalFileHandle.getContentType())) {
 						 previewFileType = PreviewFileType.HTML;
 					}
 					else if (ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){
 						previewFileType = PreviewFileType.CODE;
 					}
-					else if (DisplayUtils.isCSV(contentType)) {
+					else if (org.sagebionetworks.web.client.ContentTypeUtils.isCSV(contentType)) {
 						if (APPLICATION_ZIP.equals(originalFileHandle.getContentType()))
 							previewFileType = PreviewFileType.ZIP;
 						else
 							previewFileType = PreviewFileType.CSV;
 					}
-					else if (DisplayUtils.isCSV(originalFileHandle.getContentType())){
+					else if (org.sagebionetworks.web.client.ContentTypeUtils.isCSV(originalFileHandle.getContentType())){
 						previewFileType = PreviewFileType.CSV;
 					}
-					else if (DisplayUtils.isTAB(contentType) || DisplayUtils.isTAB(originalFileHandle.getContentType())) {
+					else if (org.sagebionetworks.web.client.ContentTypeUtils.isTAB(contentType) || org.sagebionetworks.web.client.ContentTypeUtils.isTAB(originalFileHandle.getContentType())) {
 						previewFileType = PreviewFileType.TAB;
 					}
 					else {
