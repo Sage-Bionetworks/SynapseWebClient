@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.view.users;
 
+import static org.sagebionetworks.web.client.ValidationUtils.isValidEmail;
+
+import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -17,6 +20,7 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 	private UserAccountServiceAsync userService;
 	private GWTWrapper gwt;
 	private SynapseAlert synAlert;
+	private String encodedMembershipInvtnSignedToken;
 
 	@Inject
 	public RegisterWidget(RegisterWidgetView view, 
@@ -37,23 +41,23 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 		return view.asWidget();		
 	}
 
-	public void configure(boolean isInline) {
-		view.setInlineUI(isInline);
-	}
-	
 	/**
 	 * Create the new user account
-	 * @param username
 	 * @param email
-	 * @param firstName
-	 * @param lastName
 	 */
 	@Override
 	public void registerUser(String email) {
+		NewUser newUser = new NewUser();
+		if (!isValidEmail(email)) {
+			synAlert.showError(DisplayConstants.INVALID_EMAIL);
+			return;
+		}
+		newUser.setEmail(email);
+		newUser.setEncodedMembershipInvtnSignedToken(encodedMembershipInvtnSignedToken);
 		synAlert.clear();
 		view.enableRegisterButton(false);
 		String callbackUrl = gwt.getHostPageBaseURL() + "#!NewAccount:";
-		userService.createUserStep1(email.trim(), callbackUrl, new AsyncCallback<Void>() {			
+		userService.createUserStep1(newUser, callbackUrl, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				view.enableRegisterButton(true);
@@ -73,11 +77,24 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 		});
 	}
 
+	@Override
+	public String getEncodedMembershipInvtnSignedToken() {
+		return encodedMembershipInvtnSignedToken;
+	}
+
+	public void setEncodedMembershipInvtnSignedToken(String encodedMembershipInvtnSignedToken) {
+		this.encodedMembershipInvtnSignedToken = encodedMembershipInvtnSignedToken;
+	}
+
 	public void setVisible(boolean isVisible) {
 		view.setVisible(isVisible);
 	}
 	
 	public void setEmail(String email) {
 		view.setEmail(email);
+	}
+
+	public void enableEmailAddressField(boolean enabled) {
+		view.enableEmailAddressField(enabled);
 	}
 }

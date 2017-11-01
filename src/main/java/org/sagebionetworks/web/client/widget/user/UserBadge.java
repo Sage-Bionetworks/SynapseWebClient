@@ -48,7 +48,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	private String principalId = null, username = null;
 	UserProfileAsyncHandler userProfileAsyncHandler;
 	private AdapterFactory adapterFactory;
-	
+
 	public static final ClickHandler DO_NOTHING_ON_CLICK = new ClickHandler() {
 		@Override
 		public void onClick(ClickEvent event) {
@@ -145,7 +145,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		return getColor(profile.getUserName().hashCode());
 	}
 	
-	public String getColor(int hashcode) {
+	public static String getColor(int hashcode) {
 		int index = Math.abs(hashcode % COLORS.length);
 		return COLORS[index];
 	}
@@ -209,7 +209,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		this.isShowCompany = isShowCompany;
 		configure(principalId);
 	}
-	
+
 	public void loadBadge() {
 		if (profile == null) {
 			if (principalId != null) {

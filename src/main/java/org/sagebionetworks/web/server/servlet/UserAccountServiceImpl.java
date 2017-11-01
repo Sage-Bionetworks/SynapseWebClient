@@ -130,14 +130,12 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 	
 	@Override
-	public void createUserStep1(String email, String portalEndpoint) throws RestServiceException {
+	public void createUserStep1(NewUser newUser, String portalEndpoint) throws RestServiceException {
 		validateService();
 
 		SynapseClient client = createAnonymousSynapseClient();
-		NewUser user = new NewUser();
-		user.setEmail(email);
 		try {
-			client.newAccountEmailValidation(user, portalEndpoint);
+			client.newAccountEmailValidation(newUser, portalEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

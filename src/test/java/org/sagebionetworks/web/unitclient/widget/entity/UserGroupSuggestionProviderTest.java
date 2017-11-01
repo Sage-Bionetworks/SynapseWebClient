@@ -29,7 +29,7 @@ public class UserGroupSuggestionProviderTest {
 	UserGroupSuggestionProvider presenter;
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	AsyncCallback<SynapseSuggestionBundle> mockCallback;
-	
+
 	int offset = 0;
 	int pageSize = 10;
 	int width = 568;
@@ -44,7 +44,7 @@ public class UserGroupSuggestionProviderTest {
 	}
 	
 	@Test
-	public void testGetSuggestions() {	
+	public void testGetSuggestions() {
 		ArgumentCaptor<SynapseSuggestionBundle> captor = ArgumentCaptor.forClass(SynapseSuggestionBundle.class);
 		UserGroupHeaderResponsePage testPage = getResponsePage();
 		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseJavascriptClient).getUserGroupHeadersByPrefix(anyString(), any(TypeFilter.class), anyLong(), anyLong(), any(AsyncCallback.class));		

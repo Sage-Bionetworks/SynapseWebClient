@@ -4,11 +4,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.TextBox;
@@ -20,57 +16,27 @@ public class RegisterWidgetViewImpl implements RegisterWidgetView {
 	private Presenter presenter;
 	Widget widget;
 	@UiField
-	Button registerBtn;
-	@UiField
-	TextBox emailAddressField;
-	@UiField
 	Div synAlertContainer;
 	@UiField
 	Div blockUI;
+
 	@UiField
-	Div inlineUI;
-	
+	TextBox emailAddressField;
 	@UiField
-	TextBox emailAddressField2;
-	@UiField
-	Button registerBtn2;
+	Button registerBtn;
 	
 	@Inject
 	public RegisterWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
 		emailAddressField.getElement().setAttribute("placeholder", "Your email");
-		emailAddressField2.getElement().setAttribute("placeholder", "Your email");
 		initClickHandlers();
 	}
 
 	public void initClickHandlers() {
-		registerBtn.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.registerUser(emailAddressField.getValue());
-			}
-		});
-		registerBtn2.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.registerUser(emailAddressField2.getValue());
-			}
-		});
-		
-		emailAddressField.addKeyDownHandler(new KeyDownHandler() {
-		    @Override
-		    public void onKeyDown(KeyDownEvent event) {
-		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-		        	registerBtn.click();
-		        }
-		    }
-		});
-		emailAddressField2.addKeyDownHandler(new KeyDownHandler() {
-		    @Override
-		    public void onKeyDown(KeyDownEvent event) {
-		        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-		        	registerBtn2.click();
-		        }
+		registerBtn.addClickHandler(event -> presenter.registerUser(emailAddressField.getValue()));
+		emailAddressField.addKeyDownHandler(event -> {
+		    if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
+			    registerBtn.click();
 		    }
 		});
 	}
@@ -97,7 +63,6 @@ public class RegisterWidgetViewImpl implements RegisterWidgetView {
 	@Override
 	public void clear() {
 		emailAddressField.setText("");
-		emailAddressField2.setText("");
 	}
 
 	@Override
@@ -105,20 +70,18 @@ public class RegisterWidgetViewImpl implements RegisterWidgetView {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
-	
-	@Override
-	public void setInlineUI(boolean isInline) {
-		inlineUI.setVisible(isInline);
-		blockUI.setVisible(!isInline);
-	}
-	
+
 	@Override
 	public void setEmail(String email) {
 		emailAddressField.setText(email);
-		emailAddressField2.setText(email);
 	}
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message, "");
+	}
+
+	@Override
+	public void enableEmailAddressField(boolean enabled) {
+		emailAddressField.setEnabled(enabled);
 	}
 }

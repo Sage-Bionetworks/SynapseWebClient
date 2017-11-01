@@ -22,11 +22,12 @@ import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.ErrorPlace;
-import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Profile;
@@ -268,6 +269,10 @@ public class BulkPresenterProxy extends AbstractActivity {
 					} else if (place instanceof ACTAccessApprovalsPlace) {
 						ACTAccessApprovalsPresenter presenter = ginjector.getACTAccessApprovalsPresenter();
 						presenter.setPlace((ACTAccessApprovalsPlace) place);
+						presenter.start(panel, eventBus);
+					} else if (place instanceof EmailInvitation) {
+						EmailInvitationPresenter presenter = ginjector.getEmailInvitationPresenter();
+						presenter.setPlace((EmailInvitation) place);
 						presenter.start(panel, eventBus);
 					} else {
 						// Log that we have an unknown place but send the user to the default

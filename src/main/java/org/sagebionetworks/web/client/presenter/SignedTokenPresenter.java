@@ -4,21 +4,20 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
+import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
-import org.sagebionetworks.repo.model.principal.AccountCreationToken;
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.SignedTokenView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -72,7 +71,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 		configure(place.getTokenType(), place.getSignedEncodedToken());
 	}
 
-	public void configure(String tokenType, String signedEncodedToken) {
+	public void configure(String tokenType, final String signedEncodedToken) {
 		signedToken = null;
 		synapseAlert.clear();
 		view.clear();
@@ -88,6 +87,8 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 				} else if (result instanceof JoinTeamSignedToken) {
 					isFirstTry = true;
 					handleJoinTeamToken();
+				} else if (result instanceof MembershipInvtnSignedToken) {
+					handleEmailInvitationToken(signedEncodedToken);
 				} else {
 					handleSignedToken();
 				}
@@ -98,6 +99,13 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 				synapseAlert.handleException(caught);
 			}
 		});
+	}
+
+	public void handleEmailInvitationToken(final String signedEncodedToken) {
+		if (authController.isLoggedIn()) {
+			authController.logoutUser();
+		}
+		globalApplicationState.getPlaceChanger().goTo(new EmailInvitation(signedEncodedToken));
 	}
 
 	public void handleSettingsToken() {

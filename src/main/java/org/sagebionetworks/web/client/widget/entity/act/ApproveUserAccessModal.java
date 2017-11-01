@@ -29,8 +29,8 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 

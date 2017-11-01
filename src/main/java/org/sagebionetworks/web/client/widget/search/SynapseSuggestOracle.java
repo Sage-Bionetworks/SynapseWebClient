@@ -61,6 +61,13 @@ public class SynapseSuggestOracle extends SuggestOracle {
 			provider.getSuggestions(type, offset, pageSize, suggestBox.getWidth(), request.getQuery(), new AsyncCallback<SynapseSuggestionBundle>() {
 				@Override
 				public void onSuccess(SynapseSuggestionBundle suggestionBundle) {
+					suggestBox.setSelectedSuggestion(null);
+					for (UserGroupSuggestion suggestion : suggestionBundle.getSuggestionBundle()) {
+						if (suggestion.getHeader().getUserName().equals(suggestBox.getText())) {
+							suggestBox.setSelectedSuggestion(suggestion);
+							break;
+						}
+					}
 					suggestBox.hideLoading();
 					if (suggestBox != null) {
 						suggestBox.updateFieldStateForSuggestions((int)suggestionBundle.getTotalNumberOfResults(), offset);
@@ -74,7 +81,7 @@ public class SynapseSuggestOracle extends SuggestOracle {
 				public void onFailure(Throwable caught) {
 					suggestBox.hideLoading();
 					suggestBox.handleOracleException(caught);
-				}	
+				}
 			});
 		}
 	}

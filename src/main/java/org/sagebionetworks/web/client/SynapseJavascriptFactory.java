@@ -9,7 +9,9 @@ import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
@@ -80,6 +82,8 @@ public class SynapseJavascriptFactory {
 		UserProfile,
 		FileHandleResults,
 		JSON,
+		MembershipInvtnSubmission,
+		InviteeVerificationSignedToken,
 		None
 	}
 
@@ -199,6 +203,10 @@ public class SynapseJavascriptFactory {
 			}
 
 			return list;
+		case MembershipInvtnSubmission:
+			return new MembershipInvtnSubmission(json);
+		case InviteeVerificationSignedToken:
+			return new InviteeVerificationSignedToken(json);
 		default:
 			throw new IllegalArgumentException("No match found for : "+ type);
 		}

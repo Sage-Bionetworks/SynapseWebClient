@@ -1,11 +1,15 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertNull;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
-
-import static junit.framework.Assert.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -25,8 +29,8 @@ import org.sagebionetworks.web.client.view.ACTView;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionRowViewImpl;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;

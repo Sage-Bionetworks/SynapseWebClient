@@ -30,8 +30,6 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.repo.model.file.BatchFileRequest;
-import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
@@ -116,54 +114,54 @@ public interface SynapseClientAsync {
 	
 	void setNotificationEmail(String email, AsyncCallback<Void> callback);
 	void removeEmail(String email, AsyncCallback<Void> callback);
-	
-	public void getEntityBenefactorAcl(String id, AsyncCallback<AccessControlList> callback);
-	
-	public void createAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
-	
-	public void updateAcl(AccessControlList acl, boolean recursive, AsyncCallback<AccessControlList> callback);
-	
-	public void getTeamAcl(String teamId, AsyncCallback<AccessControlList> callback);
-	
-	public void deleteAcl(String ownerEntityId, AsyncCallback<AccessControlList> callback);
 
-	public void hasAccess(String ownerId, String ownerType, String accessType,AsyncCallback<Boolean> callback);
+	void getEntityBenefactorAcl(String id, AsyncCallback<AccessControlList> callback);
+
+	void createAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
+
+	void updateAcl(AccessControlList acl, boolean recursive, AsyncCallback<AccessControlList> callback);
+
+	void getTeamAcl(String teamId, AsyncCallback<AccessControlList> callback);
+
+	void deleteAcl(String ownerEntityId, AsyncCallback<AccessControlList> callback);
+
+	void hasAccess(String ownerId, String ownerType, String accessType, AsyncCallback<Boolean> callback);
 	
 	void createOrUpdateAccessRequirement(AccessRequirement arEW,
 			AsyncCallback<AccessRequirement> callback);
 
-	public void getTeamAccessRequirements(String teamId, AsyncCallback<List<AccessRequirement>> callback);
+	void getTeamAccessRequirements(String teamId, AsyncCallback<List<AccessRequirement>> callback);
 	
 	void createAccessApproval(AccessApproval aaEW,
 			AsyncCallback<AccessApproval> callback);
-	
-	public void updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
-	
-	public void createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
+
+	void updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
+
+	void createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
 	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback);
 
 	void getActivityForEntity(String entityId, AsyncCallback<Activity> callback);
 
 	void getActivity(String activityId, AsyncCallback<Activity> callback);
-		
-	public void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
-	public void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
+
+	void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
+	void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	
 	void restoreV2WikiPage(String ownerId, String ownerType, String wikiId,
 			Long versionToUpdate, AsyncCallback<V2WikiPage> callback);
-    public void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
-    void getV2WikiHeaderTree(String ownerId, String ownerType,
+	void deleteV2WikiPage(WikiPageKey key, AsyncCallback<Void> callback);
+	void getV2WikiHeaderTree(String ownerId, String ownerType,
 			AsyncCallback<List<V2WikiHeader>> callback);
-    public void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback);
-    public void updateV2WikiOrderHint(V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback);
-    void getV2WikiAttachmentHandles(WikiPageKey key,
+	void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback);
+	void updateV2WikiOrderHint(V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback);
+	void getV2WikiAttachmentHandles(WikiPageKey key,
 			AsyncCallback<FileHandleResults> callback);
-    void getV2WikiHistory(WikiPageKey key, Long limit, Long offset,
+	void getV2WikiHistory(WikiPageKey key, Long limit, Long offset,
 			AsyncCallback<PaginatedResults<V2WikiHistorySnapshot>> callback);
 
-	public void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
-	public void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
+	void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
+	void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	
 	void getEntitiesGeneratedBy(String activityId, Integer limit,
 			Integer offset, AsyncCallback<PaginatedResults<Reference>> callback);
@@ -194,9 +192,9 @@ public interface SynapseClientAsync {
 	void getTeamMembers(String teamId, String fragment, Integer limit, Integer offset, AsyncCallback<TeamMemberPagedResults> callback);	
 	void getTeamMemberCount(String teamId, AsyncCallback<Long> callback);
 	void requestMembership(String currentUserId, String teamId, String message, String hostPageBaseURL, Date expiresOn, AsyncCallback<TeamMembershipStatus> callback);
-	
 	void deleteOpenMembershipRequests(String currentUserId, String teamId, AsyncCallback<Void> callback);
 	void inviteMember(String userGroupId, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
+	void inviteNewMember(String email, String teamId, String message, String hostPageBaseURL, AsyncCallback<Void> callback);
 	/////////////////
 	
 	/**

@@ -16,12 +16,13 @@ import org.sagebionetworks.web.client.place.Challenges;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.ComingSoon;
 import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.ErrorPlace;
-import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.Governance;
 import org.sagebionetworks.web.client.place.Help;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Profile;
@@ -98,7 +99,8 @@ public class AppActivityMapper implements ActivityMapper {
 		openAccessPlaces.add(StandaloneWiki.class);
 		openAccessPlaces.add(SignedToken.class);
 		openAccessPlaces.add(SynapseForumPlace.class);
-		
+		openAccessPlaces.add(EmailInvitation.class);
+
 		excludeFromLastPlace = new ArrayList<Class>();
 		excludeFromLastPlace.add(Home.class);
 		excludeFromLastPlace.add(ErrorPlace.class);
@@ -118,8 +120,8 @@ public class AppActivityMapper implements ActivityMapper {
 	public Activity getActivity(Place place) {
 		synapseJSNIUtils.setPageTitle(DisplayConstants.DEFAULT_PAGE_TITLE);
 		synapseJSNIUtils.setPageDescription(DisplayConstants.DEFAULT_PAGE_DESCRIPTION);
-	    
-	    AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
+
+		AuthenticationController authenticationController = this.ginjector.getAuthenticationController();
 		GlobalApplicationState globalApplicationState = this.ginjector.getGlobalApplicationState();
 		
 		globalApplicationState.recordPlaceVisit(place);

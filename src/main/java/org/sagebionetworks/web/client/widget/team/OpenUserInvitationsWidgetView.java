@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import java.util.List;
-
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
-import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -15,16 +12,20 @@ public interface OpenUserInvitationsWidgetView extends IsWidget {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
+
+	void hideMoreButton();
+
+	void showMoreButton();
+
 	void setSynAlert(IsWidget w);
+
+	void addInvitation(EmailInvitationBadge badge, String misId, String message, String createdOn);
+
+	void addInvitation(UserBadge userBadge, String inviteeEmail, String misId, String message, String createdOn);
+
 	void clear();
-	/**
-	 * shows nothing if membershipRequests is empty.
-	 */
-	public void configure(List<UserProfile> profiles, List<MembershipInvtnSubmission> invitations, List<String> createdOnDates);
-	
-	public void setMoreResultsVisible(boolean isVisible);
-	
-	public interface Presenter {
+
+	interface Presenter {
 		//use to go to user profile page
 		void goTo(Place place);
 		void removeInvitation(String ownerId);

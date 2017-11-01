@@ -19,8 +19,8 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
 import org.sagebionetworks.web.client.widget.team.InviteWidgetView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -93,8 +93,21 @@ public class InviteWidgetTest {
 	@Test
 	public void testSendNoUserSelected() {
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
+		when(mockSuggestBox.getText()).thenReturn("notAnEmailAddress");
 		inviteWidget.validateAndSendInvite(invitationMessage);
-		verify(mockSynAlert).showError("Please select a user to send an invite to.");
+		verify(mockSynAlert).showError("Please select a user or an email address to send an invite to.");
+	}
+
+	@Test
+	public void testSendToEmailAddress() {
+		String email = "Test@eXample.coM";
+		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
+		when(mockSuggestBox.getText()).thenReturn(email);
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).inviteNewMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		inviteWidget.validateAndSendInvite(invitationMessage);
+		verify(mockSynapseClient).inviteNewMember(eq(email), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
+		verify(mockRefreshCallback).invoke();
+		verify(mockView).hide();
 	}
 	
 	@SuppressWarnings("unchecked")

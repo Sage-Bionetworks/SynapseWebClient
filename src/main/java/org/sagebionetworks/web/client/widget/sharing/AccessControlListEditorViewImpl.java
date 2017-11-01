@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.HelpWidget;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;

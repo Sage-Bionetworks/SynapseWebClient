@@ -185,14 +185,14 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	
 	private final Supplier<Set<String>> htmlTeamMembersCache = Suppliers.memoizeWithExpiration(teamMembersSupplier(), 1, TimeUnit.HOURS);
 
-    public Set<String> getHtmlTeamMembers() {
-        return htmlTeamMembersCache.get();
-    }
+	public Set<String> getHtmlTeamMembers() {
+		return htmlTeamMembersCache.get();
+	}
 
-    private Supplier<Set<String>> teamMembersSupplier() {
-        return new Supplier<Set<String>>() {
-            public Set<String> get() {
-            	Set<String> userIdSet = new HashSet<String>();
+	private Supplier<Set<String>> teamMembersSupplier() {
+		return new Supplier<Set<String>>() {
+			public Set<String> get() {
+				Set<String> userIdSet = new HashSet<String>();
 				try {
 					org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 					long currentOffset = 0;
@@ -210,9 +210,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					
 				}
 				return userIdSet;
-            }
-        };
-    }
+			}
+		};
+	}
 
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
@@ -538,7 +538,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
 	public String getUserIdFromUsername(String username) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1276,10 +1276,10 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					userId, MAX_LIMIT, ZERO_OFFSET);
 			List<Team> teamList = teams.getResults();
 			Collections.sort(teamList, new Comparator<Team>() {
-		        @Override
-		        public int compare(Team o1, Team o2) {
-		        	return o1.getName().compareToIgnoreCase(o2.getName());
-		        }
+				@Override
+				public int compare(Team o1, Team o2) {
+					return o1.getName().compareToIgnoreCase(o2.getName());
+				}
 			});
 			List<TeamRequestBundle> bundle = new ArrayList<TeamRequestBundle>(teamList.size());
 			for (Team team: teamList) {
@@ -1404,6 +1404,22 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				String joinTeamEndpoint = getNotificationEndpoint(NotificationTokenType.JoinTeam, hostPageBaseURL);
 				synapseClient.createMembershipInvitation(membershipInvite, joinTeamEndpoint, settingsEndpoint);
 			}
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+	}
+
+	@Override
+	public void inviteNewMember(String email, String teamId, String message, String hostPageBaseURL) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			MembershipInvtnSubmission mis = new MembershipInvtnSubmission();
+			mis.setInviteeEmail(email);
+			mis.setTeamId(teamId);
+			mis.setMessage(message);
+			String emailInvitationEndpoint = getNotificationEndpoint(NotificationTokenType.EmailInvitation, hostPageBaseURL);
+			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			synapseClient.createMembershipInvitation(mis, emailInvitationEndpoint, settingsEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -1610,16 +1626,34 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			// now go through and create a MembershipInvitationBundle for each
 			// pair
 
-			List<Long> userIds = new ArrayList<>();
+			List<MembershipInvtnSubmission> invitationsToUsers = new ArrayList<>();
+			List<MembershipInvtnSubmission> invitationsToEmails = new ArrayList<>();
+			// Sort the results into the two types
 			for (MembershipInvtnSubmission invite : invitations.getResults()) {
+				String inviteeId = invite.getInviteeId();
+				String inviteeEmail = invite.getInviteeEmail();
+				if (inviteeId != null) {
+					invitationsToUsers.add(invite);
+				} else if (inviteeEmail != null) {
+					invitationsToEmails.add(invite);
+				}
+			}
+
+			// Get profiles of existing user invitees
+			List<Long> userIds = new ArrayList<>();
+			for (MembershipInvtnSubmission invite : invitationsToUsers) {
 				userIds.add(Long.parseLong(invite.getInviteeId()));
 			}
 			Map<String, UserProfile> userId2UserProfile = getUserProfiles(userIds, synapseClient);
-			
-			for (MembershipInvtnSubmission invite : invitations.getResults()) {
+			// Add invitations to return list
+			for (MembershipInvtnSubmission invite : invitationsToUsers) {
 				UserProfile profile = userId2UserProfile.get(invite.getInviteeId());
 				OpenTeamInvitationBundle b = new OpenTeamInvitationBundle(invite, profile);
 				returnList.add(b);
+			}
+			for (MembershipInvtnSubmission invite : invitationsToEmails) {
+				// Invitations to new users have a null profile
+				returnList.add(new OpenTeamInvitationBundle(invite, null));
 			}
 
 			return returnList;
@@ -1627,7 +1661,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
 	}
-	
+
 	@Override
 	public void setIsTeamAdmin(String currentUserId, String targetUserId,
 			String teamId, boolean isTeamAdmin) throws RestServiceException {
@@ -1727,7 +1761,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				fileEntity = (FileEntity) synapseClient.getEntityById(entityId);
 				//update data file handle id
 				fileEntity.setDataFileHandleId(fileHandleId);
-				fileEntity = (FileEntity)synapseClient.putEntity(fileEntity);
+				fileEntity = synapseClient.putEntity(fileEntity);
 			}
 			return fileEntity.getId();
 		} catch (SynapseException e) {
@@ -2230,7 +2264,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 
 	@Override
 	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body)
-			throws RestServiceException, ResultNotReadyException {
+			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try{
 			return synapseClient.getAsyncResult(AsynchJobType.valueOf(type.name()), jobId, body);
@@ -2296,7 +2330,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			org.sagebionetworks.reflection.model.PaginatedResults<ProjectHeader> paginatedResults = synapseClient.getMyProjects(projectListType, sortBy, sortDir, limit, offset);
-			List<ProjectHeader> headers = (List<ProjectHeader>)paginatedResults.getResults();
+			List<ProjectHeader> headers = paginatedResults.getResults();
 			List<String> lastModifiedByList = new LinkedList<String>();
 			for (ProjectHeader header: headers) {
 				if (header.getModifiedBy() != null)
@@ -2314,8 +2348,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			Long teamIdLong = Long.parseLong(teamId);
 			org.sagebionetworks.reflection.model.PaginatedResults<ProjectHeader> paginatedResults = synapseClient.getProjectsForTeam(teamIdLong, sortBy, sortDir, limit, offset);
-			
-			List<ProjectHeader> headers = (List<ProjectHeader>)paginatedResults.getResults();
+
+			List<ProjectHeader> headers = paginatedResults.getResults();
 			List<String> lastModifiedByList = new LinkedList<String>();
 			for (ProjectHeader header: headers) {
 				if (header.getModifiedBy() != null)
@@ -2332,7 +2366,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			Long userIdLong = Long.parseLong(userId);
 			org.sagebionetworks.reflection.model.PaginatedResults<ProjectHeader> paginatedResults = synapseClient.getProjectsFromUser(userIdLong, sortBy, sortDir, limit, offset);
-			List<ProjectHeader> headers = (List<ProjectHeader>)paginatedResults.getResults();
+			List<ProjectHeader> headers = paginatedResults.getResults();
 			List<String> lastModifiedByList = new LinkedList<String>();
 			for (ProjectHeader header: headers) {
 				if (header.getModifiedBy() != null)
@@ -2345,11 +2379,11 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	public static int safeLongToInt(long l) {
-       if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
-           throw new IllegalArgumentException
-               ("Cannot safely cast "+l+" to int without changing the value.");
-       }
-       return (int) l;
+	   if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {
+		   throw new IllegalArgumentException
+			   ("Cannot safely cast "+l+" to int without changing the value.");
+	   }
+	   return (int) l;
    }
 
 	public String getHost(String urlString) throws RestServiceException {

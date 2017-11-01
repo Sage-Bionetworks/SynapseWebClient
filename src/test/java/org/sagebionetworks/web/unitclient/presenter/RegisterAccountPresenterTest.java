@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.event.shared.EventBus;
@@ -57,7 +56,6 @@ public class RegisterAccountPresenterTest {
 		registerAccountPresenter.setPlace(mockPlace);
 		
 		verify(mockRegisterWidget).setEmail(email);
-		verify(mockRegisterWidget).configure(false);
 		verify(mockView).setRegisterWidget(any(Widget.class));
 		verify(mockHeader).configure(false);
 		verify(mockHeader).refresh();

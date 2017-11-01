@@ -79,5 +79,5 @@ public class EntitySearchBoxOracle extends SuggestOracle {
 			return getDisplayString();
 		}
 		
-	} // end inner class UserGroupSuggestion	
+	} // end inner class UserGroupSuggestion
 }

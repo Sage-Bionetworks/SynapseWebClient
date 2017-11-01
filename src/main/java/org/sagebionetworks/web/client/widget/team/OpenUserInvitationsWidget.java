@@ -4,14 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
@@ -21,8 +22,8 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.Presenter {
-
 	public static final Integer INVITATION_BATCH_LIMIT = 10;
+
 	private OpenUserInvitationsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
@@ -30,12 +31,11 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	private String teamId;
 	private Callback teamRefreshCallback;
 	private Integer currentOffset;
-	private List<UserProfile> profiles;
-	private List<MembershipInvtnSubmission> invitations;
-	private List<String> createdOnDates;
 	private SynapseAlert synAlert;
 	private GWTWrapper gwt;
 	private DateTimeUtils dateTimeUtils;
+	private PortalGinInjector ginInjector;
+
 	@Inject
 	public OpenUserInvitationsWidget(OpenUserInvitationsWidgetView view, 
 			SynapseClientAsync synapseClient, 
@@ -43,7 +43,8 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 			SynapseAlert synAlert,
 			GWTWrapper gwt,
 			DateTimeUtils dateTimeUtils,
-			SynapseJavascriptClient jsClient) {
+			SynapseJavascriptClient jsClient,
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.gwt = gwt;
@@ -53,6 +54,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.jsClient = jsClient;
+		this.ginInjector = ginInjector;
 	}
 	
 	public void clear() {
@@ -79,47 +81,65 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	public void configure(String teamId, Callback teamRefreshCallback) {
 		this.teamId = teamId;
 		this.teamRefreshCallback = teamRefreshCallback;
-		profiles = new ArrayList<UserProfile>();
-		invitations = new ArrayList<MembershipInvtnSubmission>();
-		createdOnDates = new ArrayList<>();
 		currentOffset = 0;
 		getNextBatch();
-	};
+	}
 
 	@Override
 	public void getNextBatch() {
-		synAlert.clear();
-		//using the given team, try to show all pending membership requests (or nothing if empty)
+		view.hideMoreButton();
+		// Show up to INVITATION_BATCH_LIMIT invitations extended by teamId
 		synapseClient.getOpenTeamInvitations(teamId, INVITATION_BATCH_LIMIT, currentOffset, new AsyncCallback<ArrayList<OpenTeamInvitationBundle>>() {
 			@Override
 			public void onSuccess(ArrayList<OpenTeamInvitationBundle> result) {
 				currentOffset += result.size();
-				
-				//create the associated object list, and pass to the view to render
-				for (OpenTeamInvitationBundle b : result) {
-					invitations.add(b.getMembershipInvtnSubmission());
-					profiles.add(b.getUserProfile());
-					String createdOn = dateTimeUtils.convertDateToSmallString(b.getMembershipInvtnSubmission().getCreatedOn());
-					createdOnDates.add(createdOn);
-				}
-				view.configure(profiles, invitations, createdOnDates);
-				
-				//show the more button if we maxed out the return results
-				view.setMoreResultsVisible(result.size() == INVITATION_BATCH_LIMIT);
+				addInvitations(result);
+				updateMoreButton(result.size());
 				gwt.restoreWindowPosition();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof NotFoundException) {
-					view.setMoreResultsVisible(false);
+					view.hideMoreButton();
 				} else {
 					synAlert.handleException(caught);
 				} 
 			}
 		});
 	}
-	
+
+	private void addInvitations(List<OpenTeamInvitationBundle> bundles) {
+		// Add the invitations to the view
+		for (OpenTeamInvitationBundle b : bundles) {
+			MembershipInvtnSubmission mis = b.getMembershipInvtnSubmission();
+			String createdOn = dateTimeUtils.convertDateToSmallString(b.getMembershipInvtnSubmission().getCreatedOn());
+			if (b.getUserProfile() != null) {
+				// Invitee is an existing user
+				UserBadge userBadge = ginInjector.getUserBadgeWidget();
+				userBadge.configure(b.getUserProfile());
+				view.addInvitation(userBadge, mis.getInviteeEmail(), mis.getId(), mis.getMessage(), createdOn);
+			} else if (mis.getInviteeEmail() != null) {
+				// Invitee is an email address
+				EmailInvitationBadge emailInvitationBadge = ginInjector.getEmailInvitationBadgeWidget();
+				emailInvitationBadge.configure(mis.getInviteeEmail());
+				view.addInvitation(emailInvitationBadge, mis.getId(), mis.getMessage(), createdOn);
+			} else {
+				synAlert.showError("Membership invitation with ID " + mis.getId() + " is not in a valid state.");
+			}
+		}
+	}
+
+	private void updateMoreButton(int resultSize) {
+		if (resultSize == INVITATION_BATCH_LIMIT) {
+			view.showMoreButton();
+		} else if (resultSize < INVITATION_BATCH_LIMIT){
+			view.hideMoreButton();
+		} else {
+			synAlert.showError("Result size can't be greater than " + INVITATION_BATCH_LIMIT);
+		}
+	}
+
 	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
@@ -132,5 +152,4 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	public void setVisible(boolean visible) {
 		view.asWidget().setVisible(visible);
 	}
-
 }

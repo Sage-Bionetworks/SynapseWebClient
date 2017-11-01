@@ -115,8 +115,6 @@ public class HomeViewImpl extends Composite implements HomeView {
 				globalApplicationState.getPlaceChanger().goTo(new Profile(authController.getCurrentUserPrincipalId()));
 			}
 		});
-		boolean isInline = false;
-		registerWidget.configure(isInline);
 		registerWidgetContainer.add(registerWidget.asWidget());
 		
 		loginWidget.setUserListener(new UserListener() {

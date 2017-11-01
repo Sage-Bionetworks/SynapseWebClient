@@ -5,8 +5,8 @@ import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;

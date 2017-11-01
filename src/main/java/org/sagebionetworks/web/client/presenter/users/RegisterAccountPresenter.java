@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -36,8 +35,6 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	}
 	
 	public void init() {
-		boolean isInline = false;
-		registerWidget.configure(isInline);
 		view.setRegisterWidget(registerWidget.asWidget());
 		headerWidget.configure(false);
 		headerWidget.refresh();

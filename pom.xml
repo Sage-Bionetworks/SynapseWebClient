@@ -208,8 +208,7 @@
 
 					<!-- Does not work on GWT 2.8.1
 					<enableClosureCompiler>true</enableClosureCompiler> -->
-
-					<!--           <fragmentCount>12</fragmentCount> -->					
+					<!--           <fragmentCount>12</fragmentCount> -->
 				</configuration>
 			</plugin>
 

@@ -1,13 +1,8 @@
 package org.sagebionetworks.web.client.widget.search;
 
 import org.sagebionetworks.repo.model.principal.TypeFilter;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider.UserGroupSuggestion;
 
 import com.google.gwt.event.dom.client.HasKeyDownHandlers;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -30,11 +25,7 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 	
 	@Inject
 	public SynapseSuggestBox(SynapseSuggestBoxView view,
-			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState,
-			SynapseClientAsync synapseClient,
-			SageImageBundle sageImageBundle, 
-			SynapseSuggestOracle oracle) {
+							 SynapseSuggestOracle oracle) {
 		this.oracle = oracle;
 		this.view = view;
 		this.view.configure(oracle);
@@ -95,7 +86,9 @@ public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, Synap
 			if(callback != null) {
 				callback.invoke(selectedSuggestion);
 			}
-		}		
+		} else {
+			view.setSelectedText("");
+		}
 	}
 	
 	public String getText() {
