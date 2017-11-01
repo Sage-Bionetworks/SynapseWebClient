@@ -145,7 +145,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		return getColor(profile.getUserName().hashCode());
 	}
 	
-	public String getColor(int hashcode) {
+	public static String getColor(int hashcode) {
 		int index = Math.abs(hashcode % COLORS.length);
 		return COLORS[index];
 	}
@@ -210,15 +210,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		configure(principalId);
 	}
 
-	public void configureWithInviteeEmail(String inviteeEmail) {
-		lazyLoadHelper.setIsConfigured();
-		view.setDisplayName(inviteeEmail, inviteeEmail);
-		view.setDefaultPictureLetter(Character.toString(inviteeEmail.charAt(0)).toUpperCase());
-		view.setDefaultPictureColor(getColor(inviteeEmail.hashCode()));
-		view.showAnonymousUserPicture();
-		view.setHref("mailto:" + inviteeEmail);
-	}
-	
 	public void loadBadge() {
 		if (profile == null) {
 			if (principalId != null) {
