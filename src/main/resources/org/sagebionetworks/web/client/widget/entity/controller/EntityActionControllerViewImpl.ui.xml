@@ -31,30 +31,6 @@
 				<b:Button ui:field="deleteWikiButton" type="DANGER">Delete</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
-		<b:Modal ui:field="annotationsDialog" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
-			<b:ModalHeader closable="false">
-				<b:Heading size="H4" text="Annotations" addStyleNames="displayInline" />
-				<w:HelpWidget helpMarkdown="Projects, folder and files can be annotated with key-value terms describing the content.&#10;These terms enables data queries through the web or the Synapse analytical clients" 
-					href="http://docs.synapse.org/articles/annotation_and_query.html" addStyleNames="margin-left-5"/>
-			</b:ModalHeader>
-			<b:ModalBody>
-				<bh:Div ui:field="annotationsRendererContainer" />
-			</b:ModalBody>
-			<b:ModalFooter>
-				<b:Button ui:field="annotationsOkButton" type="PRIMARY"  dataDismiss="MODAL">OK</b:Button>
-			</b:ModalFooter>
-		</b:Modal>
-		<b:Modal ui:field="fileHistoryDialog" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
-			<b:ModalHeader closable="false">
-				<b:Heading size="H4" text="File History" addStyleNames="displayInline" />
-			</b:ModalHeader>
-			<b:ModalBody>
-				<bh:Div ui:field="fileHistoryContainer" />
-			</b:ModalBody>
-			<b:ModalFooter>
-				<b:Button ui:field="fileHistoryOkButton" type="PRIMARY"  dataDismiss="MODAL">OK</b:Button>
-			</b:ModalFooter>
-		</b:Modal>
 		<bh:Div ui:field="extraWidgetsContainer" />
 	</bh:Span>
 </ui:UiBinder>

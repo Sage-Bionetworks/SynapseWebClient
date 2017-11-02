@@ -54,12 +54,9 @@ import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
-import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
-import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
-import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
@@ -122,8 +119,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EvaluationSubmitter submitter;
 	EditFileMetadataModalWidget editFileMetadataModalWidget;
 	EditProjectMetadataModalWidget editProjectMetadataModalWidget;
-	AnnotationsRendererWidget annotationsRendererWidget;
-	EditAnnotationsDialog editAnnotationsDialog;
 	
 	EntityBundle entityBundle;
 	String wikiPageId, parentWikiPageId;
@@ -347,8 +342,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 		// hide all commands by default
 		actionMenu.hideAllActions();
-		view.hideAnnotations();
-		view.hideFileHistory();
 		
 		// Setup the actions
 		configureDeleteAction();
@@ -659,14 +652,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.SHOW_ANNOTATIONS, false);
 		} else {
 			actionMenu.setActionVisible(Action.SHOW_ANNOTATIONS, true);
-			actionMenu.setActionListener(Action.SHOW_ANNOTATIONS, this);
 		}
 	}
 	
 	private void configureFileHistory(){
 		if(entityBundle.getEntity() instanceof FileEntity){
 			actionMenu.setActionVisible(Action.SHOW_FILE_HISTORY, true);
-			actionMenu.setActionListener(Action.SHOW_FILE_HISTORY, this);
 		}else{
 			actionMenu.setActionVisible(Action.SHOW_FILE_HISTORY, false);
 		}
@@ -896,12 +887,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		case MANAGE_ACCESS_REQUIREMENTS:
 			onManageAccessRequirements();
 			break;
-		case SHOW_ANNOTATIONS :
-			onShowAnnotations();
-			break;
-		case SHOW_FILE_HISTORY : 
-			onShowFileHistory();
-			break;
 		case UPLOAD_FILE :
 			onUploadNewFileEntity();
 			break;
@@ -1044,47 +1029,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				postChangeStorageLocation();
 			}
 		});
-	}
-	
-	private AnnotationsRendererWidget getAnnotationsRendererWidget() {
-		if (annotationsRendererWidget == null) {
-			annotationsRendererWidget = ginInjector.getAnnotationsRendererWidget();
-			view.setAnnotationsRendererWidget(annotationsRendererWidget);
-		}
-		return annotationsRendererWidget;
-	}
-	
-	private EditAnnotationsDialog getEditAnnotationsDialog() {
-		if (editAnnotationsDialog == null) {
-			editAnnotationsDialog = ginInjector.getEditAnnotationsDialog();
-		}
-		return editAnnotationsDialog;
-	}
-	
-	private void onShowAnnotations() {
-		// configure and show annotations
-		if (entityBundle.getPermissions().getCanCertifiedUserEdit()) {
-			// show editor, if user passes preflight test
-			preflightController.checkUpdateEntity(entityBundle, new Callback() {
-				@Override
-				public void invoke() {
-					getEditAnnotationsDialog().configure(entityBundle, entityUpdateHandler);
-				}
-			});
-		} else {
-			// show renderer
-			getAnnotationsRendererWidget().configure(entityBundle);
-			view.showAnnotations();
-		}
-	}
-	
-	private void onShowFileHistory() {
-		FileHistoryWidget fileHistoryWidget = ginInjector.getFileHistoryWidget();
-		view.setFileHistoryWidget(fileHistoryWidget);
-		// configure and show file history
-		fileHistoryWidget.setEntityBundle(entityBundle, getVersion(), isCurrentVersion);
-		fileHistoryWidget.setEntityUpdatedHandler(entityUpdateHandler);
-		view.showFileHistory();
 	}
 	
 	private void postChangeStorageLocation() {

@@ -17,9 +17,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	@UiField
-	Div projectMetaContainer;
-	
-	@UiField
 	Div tabsUI;
 	@UiField
 	Span loadingUI;
@@ -27,8 +24,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	//project level info
 	@UiField
 	SimplePanel projectMetadataContainer;
-	@UiField
-	SimplePanel projectDescriptionContainer;
 	@UiField
 	Span projectActionMenuContainer;
 	@UiField
@@ -79,11 +74,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	public void setTabs(Widget w) {
 		tabsUI.clear();
 		tabsUI.add(w);
-	}
-	
-	@Override
-	public void setProjectInformationVisible(boolean isVisible) {
-		projectMetaContainer.setVisible(isVisible);
 	}
 	
 	@Override

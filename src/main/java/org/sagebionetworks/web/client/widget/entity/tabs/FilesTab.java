@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -57,7 +58,7 @@ public class FilesTab {
 	SynapseClientAsync synapseClient;
 	GlobalApplicationState globalApplicationState;
 	DiscussionThreadListWidget discussionThreadListWidget;
-	
+	ActionMenuWidget actionMenu;
 	ModifiedCreatedByWidget modifiedCreatedBy;
 	
 	public static int WIDGET_HEIGHT_PX = 270;
@@ -161,9 +162,10 @@ public class FilesTab {
 		this.projectBundleLoadError = projectBundleLoadError;
 	}
 	
-	public void configure(EntityBundle targetEntityBundle, EntityUpdatedHandler handler, Long versionNumber) {
+	public void configure(EntityBundle targetEntityBundle, EntityUpdatedHandler handler, Long versionNumber, ActionMenuWidget actionMenu) {
 		lazyInject();
 		this.handler = handler;
+		this.actionMenu = actionMenu;
 		fileTitleBar.setEntityUpdatedHandler(handler);
 		metadata.setEntityUpdatedHandler(handler);
 		
@@ -248,7 +250,7 @@ public class FilesTab {
 		boolean isMetadataVisible = isFile || isFolder;
 		view.setMetadataVisible(isMetadataVisible);
 		if (isMetadataVisible) {
-			metadata.setEntityBundle(bundle, versionNumber);
+			metadata.configure(bundle, versionNumber, actionMenu);
 		}
 		EntityArea area = isProject ? EntityArea.FILES : null;
 		tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(currentEntityId, versionNumber, area, null));

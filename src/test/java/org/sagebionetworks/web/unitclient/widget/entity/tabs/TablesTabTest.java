@@ -209,7 +209,7 @@ public class TablesTabTest {
 	private void verifyTableConfiguration() {
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.TABLES));
 		verify(mockBasicTitleBar).configure(mockTableEntityBundle);
-		verify(mockEntityMetadata).setEntityBundle(mockTableEntityBundle, null);
+		verify(mockEntityMetadata).configure(mockTableEntityBundle, null, mockActionMenuWidget);
 		verify(mockTableEntityWidget).configure(eq(mockTableEntityBundle), eq(true), eq(tab), eq(mockActionMenuWidget));
 		verify(mockView).setTableEntityWidget(any(Widget.class));
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());

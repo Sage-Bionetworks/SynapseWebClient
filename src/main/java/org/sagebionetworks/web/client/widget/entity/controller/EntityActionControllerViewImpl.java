@@ -45,14 +45,6 @@ public class EntityActionControllerViewImpl implements
 	Div wikiHeaderTreeContainer;
 	@UiField
 	Button deleteWikiButton;
-	@UiField
-	Div fileHistoryContainer;
-	@UiField
-	Modal fileHistoryDialog;
-	@UiField
-	Div annotationsRendererContainer;
-	@UiField
-	Modal annotationsDialog;
 	Widget widget;
 	Presenter presenter;
 	@Inject
@@ -130,32 +122,5 @@ public class EntityActionControllerViewImpl implements
 				addToDeleteListRecursive(child.getId(), id2HeaderMap, id2ChildrenMap, ul);
 			}
 		}
-	}
-	
-	@Override
-	public void setAnnotationsRendererWidget(IsWidget w) {
-		annotationsRendererContainer.clear();
-		annotationsRendererContainer.add(w);
-	}
-	@Override
-	public void setFileHistoryWidget(IsWidget w) {
-		fileHistoryContainer.clear();
-		fileHistoryContainer.add(w);
-	}
-	@Override
-	public void showAnnotations() {
-		annotationsDialog.show();
-	}
-	@Override
-	public void hideAnnotations() {
-		annotationsDialog.hide();
-	}
-	@Override
-	public void showFileHistory() {
-		fileHistoryDialog.show();
-	}
-	@Override
-	public void hideFileHistory() {
-		fileHistoryDialog.hide();
 	}
 }

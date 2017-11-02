@@ -56,7 +56,6 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 	Map<String,String> configMap;
 	ActionMenuWidget entityActionMenu;
 	CallbackP<String> entitySelectedCallback;
-	
 	public static final String TABLES_HELP = "Build structured queryable data that can be described by a schema using the Tables.";
 	public static final String TABLES_HELP_URL = WebConstants.DOCS_URL + "tables.html";
 	
@@ -190,7 +189,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 		
 		if (isTable) {
 			breadcrumb.configure(bundle.getPath(), EntityArea.TABLES);
-			metadata.setEntityBundle(bundle, null);
+			metadata.configure(bundle, null, entityActionMenu);
 			tableTitleBar.configure(bundle);
 			modifiedCreatedBy.configure(entity.getCreatedOn(), entity.getCreatedBy(), entity.getModifiedOn(), entity.getModifiedBy());
 			v2TableWidget = ginInjector.createNewTableEntityWidget();
