@@ -1,31 +1,26 @@
 package org.sagebionetworks.web.unitclient.widget.evaluation;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsListView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidget;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -102,14 +97,6 @@ public class AdministerEvaluationsListTest {
 		evalList.onShareClicked(e1);
 		verify(mockAclEditor).configure(eq(e1), any(Callback.class));
 		verify(mockAclEditor).show();
-	}
-	@Test
-	public void testOnNewEvaluationClicked() {
-		String entityId = "syn99999";
-		evalList.configure(entityId);
-		evalList.onNewEvaluationClicked();
-		verify(mockEvalEditor).configure(eq(entityId), any(Callback.class));
-		verify(mockEvalEditor).show();
 	}
 	
 	@Test

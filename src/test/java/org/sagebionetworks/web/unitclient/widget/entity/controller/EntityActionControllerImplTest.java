@@ -647,15 +647,16 @@ public class EntityActionControllerImplTest {
 
 
 	@Test
-	public void testConfigureAddEvaluationNotInAlpha(){
+	public void testConfigureAddEvaluationProjectSettings(){
+		currentEntityArea = null;
 		entityBundle.setEntity(new Project());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
 	}
 	
 	@Test
-	public void testConfigureAddEvaluationInAlpha(){
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+	public void testConfigureAddEvaluationOnChallengeTab(){
+		currentEntityArea = EntityArea.ADMIN;
 		entityBundle.setEntity(new Project());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, true);
@@ -1663,7 +1664,7 @@ public class EntityActionControllerImplTest {
 	
 
 	@Test
-	public void testConfigureChallengNotFound() throws Exception {
+	public void testConfigureChallengeNotFound() throws Exception {
 		// note that the currentArea is null (project settings)
 		currentEntityArea = null;
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
@@ -1674,6 +1675,26 @@ public class EntityActionControllerImplTest {
 		InOrder inOrder = inOrder(mockActionMenu);
 		inOrder.verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, false);
 		inOrder.verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, true);
+	}
+
+	@Test
+	public void testConfigureChallengeFoundProjectSettingsMenu() throws Exception {
+		// project settings menu
+		currentEntityArea = null;
+		entityBundle.setEntity(new Project());
+		AsyncMockStubber.callSuccessWith(new Challenge()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		verify(mockActionMenu, never()).setActionVisible(Action.DELETE_CHALLENGE, true);
+	}
+	
+	@Test
+	public void testConfigureChallengeFound() throws Exception {
+		// currentArea is on the challenge tab
+		currentEntityArea = EntityArea.ADMIN;
+		entityBundle.setEntity(new Project());
+		AsyncMockStubber.callSuccessWith(new Challenge()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionVisible(Action.DELETE_CHALLENGE, true);
 	}
 	
 	@Test
@@ -1855,5 +1876,47 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.CREATE_EXTERNAL_DOCKER_REPO);
 		verify(mockAddExternalRepoModal).configuration(eq(entityId), any(Callback.class));
 		verify(mockAddExternalRepoModal).show();
+	}
+	
+	@Test
+	public void testDeleteChallengeCancelConfirm(){
+		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		
+		controller.onAction(Action.DELETE_CHALLENGE);
+		
+		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		// should not make it to the pre-flight check
+		verify(mockPreflightController, never()).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+	}
+	
+	@Test
+	public void testDeleteChallengeConfirmed(){
+		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).deleteChallenge(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		
+		controller.onAction(Action.DELETE_CHALLENGE);
+		
+		verify(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		verify(mockChallengeClient).deleteChallenge(anyString(), any(AsyncCallback.class));
+		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+
+	@Test
+	public void testDeleteChallengeFailure(){
+		String error = "unable to delete challenge";
+		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockChallengeClient).deleteChallenge(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		
+		controller.onAction(Action.DELETE_CHALLENGE);
+		
+		verify(mockChallengeClient).deleteChallenge(anyString(), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(error);
+		verify(mockEntityUpdatedHandler, never()).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
 }

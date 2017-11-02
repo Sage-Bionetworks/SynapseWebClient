@@ -6,19 +6,8 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget.Eval
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface AdministerEvaluationsListView extends IsWidget {
-
-	/**
-	 * Set the presenter.
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
+	void setPresenter(EvaluationActionHandler presenter);
 	void addRow(Evaluation ev);
 	void clearRows();
 	void add(IsWidget w);
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter extends EvaluationActionHandler {
-		void onNewEvaluationClicked();
-	}
 }

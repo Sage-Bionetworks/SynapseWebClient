@@ -4,12 +4,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.Callback;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -24,15 +19,9 @@ public class ChallengeWidgetViewImpl implements ChallengeWidgetView {
 	@UiField
 	Div widgetsContainer;
 	@UiField
-	Button newChallengeButton;
-	@UiField
-	Button deleteChallengeButton;
-	@UiField
 	Panel challengeUI;
 	@UiField
 	Heading challengeIdHeading;
-	@UiField
-	Panel newChallengeUI;
 	
 	@UiField
 	Div selectTeamModalContainer;
@@ -44,29 +33,8 @@ public class ChallengeWidgetViewImpl implements ChallengeWidgetView {
 	@Inject
 	public ChallengeWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		newChallengeButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onCreateChallengeClicked();
-			}
-		});
-		deleteChallengeButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.showConfirmDialog("Delete Challenge?", DisplayConstants.CONFIRM_DELETE_CHALLENGE, 
-					new Callback() {
-						@Override
-						public void invoke() {
-							presenter.onDeleteChallengeClicked();
-						}
-					});
-			}
-		});
-		editTeamButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onEditTeamClicked();
-			}
+		editTeamButton.addClickHandler(event -> {
+			presenter.onEditTeamClicked();
 		});
 	}
 	
@@ -74,11 +42,6 @@ public class ChallengeWidgetViewImpl implements ChallengeWidgetView {
 	public void setChallengeTeamWidget(Widget w) {
 		teamWidgetContainer.clear();
 		teamWidgetContainer.add(w);
-	}
-	
-	@Override
-	public void setCreateChallengeVisible(boolean visible) {
-		newChallengeUI.setVisible(visible);
 	}
 	
 	@Override

@@ -4,16 +4,16 @@ import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget.EvaluationActionHandler;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidget;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class AdministerEvaluationsList implements SynapseWidgetPresenter, AdministerEvaluationsListView.Presenter {
+public class AdministerEvaluationsList implements SynapseWidgetPresenter, EvaluationActionHandler {
 	
 	private ChallengeClientAsync challengeClient;
 	private AdministerEvaluationsListView view;
@@ -71,11 +71,8 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 	@Override
 	public void onEditClicked(Evaluation evaluation) {
 		//configure and show modal for editing evaluation
-		evalEditor.configure(evaluation, new Callback() {
-			@Override
-			public void invoke() {
-				refresh();
-			}
+		evalEditor.configure(evaluation, () -> {
+			refresh();
 		});
 		evalEditor.show();
 	}
@@ -85,24 +82,12 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 		aclEditor.configure(evaluation, null);
 		aclEditor.show();
 	}
-	
-	@Override
-	public void onNewEvaluationClicked() {
-		evalEditor.configure(entityId, new Callback() {
-			@Override
-			public void invoke() {
-				refresh();
-			}
-		});
-		evalEditor.show();
-	}
-	
 	@Override
 	public void onDeleteClicked(Evaluation evaluation) {
 		challengeClient.deleteEvaluation(evaluation.getId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				refresh();	
+				refresh();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -110,10 +95,8 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Admini
 			}
 		});
 	}
-	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-	
 }
