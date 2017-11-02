@@ -34,6 +34,7 @@
 						<a:ActionMenuItem icon="ARROWS" iconFixedWidth="true" action="REORDER_WIKI_SUBPAGES">Edit Wiki Page Order</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_WIKI_PAGE">Delete Wiki Page</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TROPHY" iconFixedWidth="true" action="CREATE_CHALLENGE">Run Challenge</a:ActionMenuItem>
+						<a:ActionMenuItem icon="TROPHY" iconFixedWidth="true" action="DELETE_CHALLENGE">Delete Challenge</a:ActionMenuItem>
 						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="ADD_EVALUATION_QUEUE">Add Evaluation Queue</a:ActionMenuItem>
 						<a:ActionMenuItem icon="CODE_FORK" iconFixedWidth="true" action="EDIT_PROVENANCE">Edit Provenance</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TROPHY" iconFixedWidth="true" action="SUBMIT_TO_CHALLENGE">Submit to Challenge</a:ActionMenuItem>

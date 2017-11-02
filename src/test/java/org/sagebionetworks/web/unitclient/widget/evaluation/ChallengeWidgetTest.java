@@ -1,11 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.evaluation;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -17,7 +16,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
@@ -74,7 +72,6 @@ public class ChallengeWidgetTest {
 		verify(mockSynAlert).clear();
 		verify(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		verify(mockTeamBadge).configure(PARTICIPANT_TEAM_ID);
-		verify(mockView).setCreateChallengeVisible(false);
 		InOrder inOrder = inOrder(mockView);
 		inOrder.verify(mockView).setChallengeVisible(false);
 		inOrder.verify(mockView).setChallengeVisible(true);
@@ -89,10 +86,7 @@ public class ChallengeWidgetTest {
 		
 		verify(mockSynAlert).clear();
 		verify(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
-		verify(mockView).setChallengeVisible(false);
-		InOrder inOrder = inOrder(mockView);
-		inOrder.verify(mockView).setCreateChallengeVisible(false);
-		inOrder.verify(mockView).setCreateChallengeVisible(true);
+		verify(mockView, times(2)).setChallengeVisible(false);
 	}
 	
 	@Test
@@ -104,50 +98,10 @@ public class ChallengeWidgetTest {
 		verify(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
 		
 		verify(mockView).setChallengeVisible(false);
-		verify(mockView).setCreateChallengeVisible(false);
 		
 		InOrder inOrder = inOrder(mockSynAlert);
 		inOrder.verify(mockSynAlert).clear();
 		inOrder.verify(mockSynAlert).handleException(ex);
-	}
-	
-	@Test
-	public void testOnDeleteChallengeClicked() {
-		widget.setCurrentChallenge(mockChallenge);
-		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).deleteChallenge(anyString(), any(AsyncCallback.class));
-		widget.onDeleteChallengeClicked();
-		verify(mockChallengeClient).deleteChallenge(anyString(), any(AsyncCallback.class));
-		
-		verify(mockView).setChallengeVisible(false);
-		verify(mockView).setCreateChallengeVisible(true);
-	}
-
-	@Test
-	public void testOnDeleteChallengeClickedFailure() {
-		widget.setCurrentChallenge(mockChallenge);
-		Exception ex = new Exception("unknown error");
-		AsyncMockStubber.callFailureWith(ex).when(mockChallengeClient).deleteChallenge(anyString(), any(AsyncCallback.class));
-		widget.onDeleteChallengeClicked();
-		verify(mockChallengeClient).deleteChallenge(anyString(), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
-	}
-
-	@Test
-	public void testOnCreateChallengeClicked() {
-		widget.onCreateChallengeClicked();
-		verify(mockSelectTeamModal).show();
-		
-		//now simulate that a team was selected
-		ArgumentCaptor<CallbackP> teamSelectedCallback = ArgumentCaptor.forClass(CallbackP.class);
-		verify(mockSelectTeamModal).configure(teamSelectedCallback.capture());
-		teamSelectedCallback.getValue().invoke(SELECTED_TEAM_ID);
-		
-		ArgumentCaptor<Challenge> captor = ArgumentCaptor.forClass(Challenge.class);
-		verify(mockChallengeClient).createChallenge(captor.capture(), any(AsyncCallback.class));
-		verify(mockView).setCreateChallengeVisible(false);
-		Challenge c = captor.getValue();
-		assertNull(c.getId());
-		assertEquals(SELECTED_TEAM_ID, c.getParticipantTeamId());
 	}
 	
 	@Test

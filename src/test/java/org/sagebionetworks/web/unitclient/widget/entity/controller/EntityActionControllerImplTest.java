@@ -647,15 +647,16 @@ public class EntityActionControllerImplTest {
 
 
 	@Test
-	public void testConfigureAddEvaluationNotInAlpha(){
+	public void testConfigureAddEvaluationProjectSettings(){
+		currentEntityArea = null;
 		entityBundle.setEntity(new Project());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, false);
 	}
 	
 	@Test
-	public void testConfigureAddEvaluationInAlpha(){
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+	public void testConfigureAddEvaluationOnChallengeTab(){
+		currentEntityArea = EntityArea.ADMIN;
 		entityBundle.setEntity(new Project());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionVisible(Action.ADD_EVALUATION_QUEUE, true);
