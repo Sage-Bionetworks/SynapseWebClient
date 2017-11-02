@@ -61,6 +61,8 @@ public class DockerRepoWidgetTest {
 	DockerCommitListWidget mockDockerCommitListWidget;
 	@Mock
 	CookieProvider mockCookieProvider;
+	@Mock
+	ActionMenuWidget mockActionWidget;
 
 	DockerRepoWidget dockerRepoWidget;
 	String entityId = "syn123";
@@ -106,13 +108,13 @@ public class DockerRepoWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testConfigure() {
-		dockerRepoWidget.configure(mockEntityBundle, mockHandler);
+		dockerRepoWidget.configure(mockEntityBundle, mockHandler, mockActionWidget);
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockWikiPageWidget).setWikiReloadHandler(any(CallbackP.class));
 		verify(mockProvWidget).configure(any(Map.class));
 		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);
 		verify(mockMetadata).setEntityUpdatedHandler(mockHandler);
-		verify(mockMetadata).setEntityBundle(mockEntityBundle, null);
+		verify(mockMetadata).configure(mockEntityBundle, null, mockActionWidget);
 		verify(mockDockerTitleBar).configure(mockEntity);
 		verify(mockModifiedCreatedBy).configure(createdOn, createdBy, modifiedOn, modifiedBy);
 		verify(mockDockerCommitListWidget).configure(entityId, false);
@@ -124,13 +126,13 @@ public class DockerRepoWidgetTest {
 	public void testConfigureCannotEdit() {
 		canEdit = false;
 		when(mockPermissions.getCanCertifiedUserEdit()).thenReturn(canEdit);
-		dockerRepoWidget.configure(mockEntityBundle, mockHandler);
+		dockerRepoWidget.configure(mockEntityBundle, mockHandler, mockActionWidget);
 		verify(mockWikiPageWidget).configure(any(WikiPageKey.class), eq(canEdit), any(WikiPageWidget.Callback.class));
 		verify(mockWikiPageWidget).setWikiReloadHandler(any(CallbackP.class));
 		verify(mockProvWidget).configure(any(Map.class));
 		verify(mockView).setDockerPullCommand(DOCKER_PULL_COMMAND + repoName);
 		verify(mockMetadata).setEntityUpdatedHandler(mockHandler);
-		verify(mockMetadata).setEntityBundle(mockEntityBundle, null);
+		verify(mockMetadata).configure(mockEntityBundle, null, mockActionWidget);
 		verify(mockDockerTitleBar).configure(mockEntity);
 		verify(mockModifiedCreatedBy).configure(createdOn, createdBy, modifiedOn, modifiedBy);
 	}

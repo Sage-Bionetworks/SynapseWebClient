@@ -18,13 +18,16 @@ import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.place.shared.Place;
 import com.google.inject.Inject;
 
 public class DockerTab implements DockerTabView.Presenter{
-	private static final String DOCKER_TAB_TITLE = "Docker";
+	public static final String DOCKER = "Docker";
+
+	private static final String DOCKER_TAB_TITLE = DOCKER;
 
 	Tab tab;
 	DockerTabView view;
@@ -32,6 +35,7 @@ public class DockerTab implements DockerTabView.Presenter{
 	Breadcrumb breadcrumb;
 	PortalGinInjector ginInjector;
 	StuAlert synAlert;
+	ActionMenuWidget actionMenu;
 
 	EntityBundle projectBundle;
 	Throwable projectBundleLoadError;
@@ -84,8 +88,9 @@ public class DockerTab implements DockerTabView.Presenter{
 		tab.addTabClickedCallback(onClickCallback);
 	}
 
-	public void configure(EntityBundle entityBundle, EntityUpdatedHandler handler, String areaToken) {
+	public void configure(EntityBundle entityBundle, EntityUpdatedHandler handler, String areaToken, ActionMenuWidget actionMenu) {
 		lazyInject();
+		this.actionMenu = actionMenu;
 		this.areaToken = areaToken;
 		this.handler = handler;
 		synAlert.clear();
@@ -131,12 +136,11 @@ public class DockerTab implements DockerTabView.Presenter{
 				tab.setEntityNameAndPlace(bundle.getEntity().getName(), new Synapse(bundle.getEntity().getId(), null, null, null));
 				List<LinkData> links = new ArrayList<LinkData>();
 				Place projectPlace = new Synapse(projectEntityId, null, EntityArea.DOCKER, null);
-				String projectName = bundle.getPath().getPath().get(1).getName();
-				links.add(new LinkData(projectName, EntityTypeUtils.getIconTypeForEntityClassName(Project.class.getName()), projectPlace));
+				links.add(new LinkData(DOCKER, EntityTypeUtils.getIconTypeForEntityClassName(DockerRepository.class.getName()), projectPlace));
 				breadcrumb.configure(links, ((DockerRepository)entity).getRepositoryName());
 				DockerRepoWidget repoWidget = ginInjector.createNewDockerRepoWidget();
 				view.setDockerRepoWidget(repoWidget.asWidget());
-				repoWidget.configure(bundle, handler);
+				repoWidget.configure(bundle, handler, actionMenu);
 			} else if (isProject) {
 				areaToken = null;
 				showProjectLevelUI();

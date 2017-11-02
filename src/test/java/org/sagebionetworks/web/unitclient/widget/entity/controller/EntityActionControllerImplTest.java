@@ -34,7 +34,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.junit.Before;
@@ -121,6 +121,7 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidge
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -204,12 +205,6 @@ public class EntityActionControllerImplTest {
 	@Mock
 	AccessControlList mockACL;
 	@Mock
-	FileHistoryWidget mockFileHistoryWidget;
-	@Mock
-	EditAnnotationsDialog mockEditAnnotationsDialog;
-	@Mock
-	AnnotationsRendererWidget mockAnnotationsRendererWidget;
-	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	AddFolderDialogWidget mockAddFolderDialogWidget;
@@ -272,9 +267,6 @@ public class EntityActionControllerImplTest {
 		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClient);
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockSubmitter);
-		when(mockPortalGinInjector.getFileHistoryWidget()).thenReturn(mockFileHistoryWidget);
-		when(mockPortalGinInjector.getEditAnnotationsDialog()).thenReturn(mockEditAnnotationsDialog);
-		when(mockPortalGinInjector.getAnnotationsRendererWidget()).thenReturn(mockAnnotationsRendererWidget);
 		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		when(mockPortalGinInjector.getSynapseJavascriptClient()).thenReturn(mockSynapseJavascriptClient);
 		when(mockPortalGinInjector.getCreateTableViewWizard()).thenReturn(mockCreateTableViewWizard);
@@ -463,7 +455,6 @@ public class EntityActionControllerImplTest {
 		
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.GLOBE);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_ANNOTATIONS, true);
-		verify(mockActionMenu).setActionListener(eq(Action.SHOW_ANNOTATIONS), any(ActionListener.class));
 		// for a table entity, do not show file history
 		verify(mockActionMenu).setActionVisible(Action.SHOW_FILE_HISTORY, false);
 		
@@ -502,10 +493,8 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		verify(mockActionMenu).setActionIcon(Action.SHARE, IconType.GLOBE);
 		verify(mockActionMenu).setActionVisible(Action.SHOW_ANNOTATIONS, true);
-		verify(mockActionMenu).setActionListener(eq(Action.SHOW_ANNOTATIONS), any(ActionListener.class));
 		// for a table entity, do not show file history
 		verify(mockActionMenu).setActionVisible(Action.SHOW_FILE_HISTORY, true);
-		verify(mockActionMenu).setActionListener(eq(Action.SHOW_FILE_HISTORY), any(ActionListener.class));
 		
 		//table commands not shown for File
 		verify(mockActionMenu).setActionVisible(Action.UPLOAD_TABLE_DATA, false);
@@ -1635,58 +1624,6 @@ public class EntityActionControllerImplTest {
 		//initially hide, never show
 		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
 		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
-	}
-	
-	@Test
-	public void testOnFileHistoryToggled() {
-		boolean isCurrentVersion = true;
-		Long entityVersion = 42L;
-		FileEntity file = new FileEntity();
-		file.setId(entityId);
-		file.setParentId(parentId);
-		file.setVersionNumber(entityVersion);
-		entityBundle.setEntity(file);
-		
-		controller.configure(mockActionMenu, entityBundle, isCurrentVersion, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
-		controller.onAction(Action.SHOW_FILE_HISTORY);
-		
-		verify(mockView).setFileHistoryWidget(mockFileHistoryWidget);
-		verify(mockFileHistoryWidget).setEntityBundle(entityBundle, entityVersion, isCurrentVersion);
-		verify(mockFileHistoryWidget).setEntityUpdatedHandler(mockEntityUpdatedHandler);
-		verify(mockView).showFileHistory();
-	}
-	
-	@Test
-	public void testOnShowAnnotationsCanEditAndCertified() {
-		entityBundle.getPermissions().setCanCertifiedUserEdit(true);
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUpdateEntity(any(EntityBundle.class), any(Callback.class));
-		
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
-		controller.onAction(Action.SHOW_ANNOTATIONS);
-		
-		verify(mockEditAnnotationsDialog).configure(entityBundle, mockEntityUpdatedHandler);
-	}
-	
-	@Test
-	public void testOnShowAnnotationsCanEditNotCertified() {
-		entityBundle.getPermissions().setCanCertifiedUserEdit(true);
-		
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
-		controller.onAction(Action.SHOW_ANNOTATIONS);
-		
-		verify(mockEditAnnotationsDialog, never()).configure(entityBundle, mockEntityUpdatedHandler);
-	}
-
-	@Test
-	public void testOnShowAnnotationsCannotEditIsCertified() {
-		entityBundle.getPermissions().setCanCertifiedUserEdit(false);
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkUploadToEntity(any(EntityBundle.class), any(Callback.class));
-		
-		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
-		controller.onAction(Action.SHOW_ANNOTATIONS);
-		
-		verify(mockAnnotationsRendererWidget).configure(entityBundle);
-		verify(mockView).showAnnotations();
 	}
 	
 	@Test
