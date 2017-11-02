@@ -1664,6 +1664,8 @@ public class EntityActionControllerImplTest {
 
 	@Test
 	public void testConfigureChallengNotFound() throws Exception {
+		// note that the currentArea is null (project settings)
+		currentEntityArea = null;
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		entityBundle.setEntity(new Project());
 		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
@@ -1674,6 +1676,17 @@ public class EntityActionControllerImplTest {
 		inOrder.verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, true);
 	}
 	
+	@Test
+	public void testConfigureCreateChallengeActionWikiArea() throws Exception {
+		//SWC-3876:  if tools menu is set up for wiki commands, do not show the Run Challenge command (even in alpha mode)
+		currentEntityArea = EntityArea.WIKI;
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		entityBundle.setEntity(new Project());
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockChallengeClient).getChallengeForProject(anyString(), any(AsyncCallback.class));
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_CHALLENGE, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_CHALLENGE, true);
+	}
 	
 	@Test
 	public void testConfigureChallengeFoundNonEditable() throws Exception {
