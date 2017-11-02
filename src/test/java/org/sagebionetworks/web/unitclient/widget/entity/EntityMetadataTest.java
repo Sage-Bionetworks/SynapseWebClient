@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -53,9 +54,13 @@ public class EntityMetadataTest {
 	@Mock
 	AuthenticationController mockAuthenticationController;
 	@Mock
+	AnnotationsRendererWidget mockAnnotationsWidget;
+	@Mock
 	DoiWidget mockDoiWidget;
 	@Mock
 	RestrictionWidget mockRestrictionWidgetV2;
+	@Mock
+	FileHistoryWidget mockFileHistoryWidget;
 	@Mock
 	Doi mockDoi;
 	@Mock
@@ -64,6 +69,8 @@ public class EntityMetadataTest {
 	SynapseJSNIUtils mockJSNI;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	ActionMenuWidget mockActionMenuWidget;
 	String entityId = "syn123";
 	String entityName = "testEntity";
 	Entity en = new Folder();
@@ -72,13 +79,16 @@ public class EntityMetadataTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new EntityMetadata(mockView, mockDoiWidget, 
-				mockSynapseClient, mockJSNI, mockRestrictionWidgetV2, mockCookies);
+		widget = new EntityMetadata(mockView, mockDoiWidget, mockAnnotationsWidget, 
+				mockFileHistoryWidget, mockSynapseClient, mockJSNI, mockRestrictionWidgetV2, mockCookies);
+		when(mockInjector.getFileHistoryWidget()).thenReturn(mockFileHistoryWidget);
 	}
 	
 	@Test
 	public void testConstruction() {
 		verify(mockView).setDoiWidget(any(IsWidget.class));
+		verify(mockView).setAnnotationsRendererWidget(any(IsWidget.class));
+		verify(mockView).setFileHistoryWidget(any(IsWidget.class));
 		verify(mockView).setRestrictionWidgetV2(any(IsWidget.class));
 		verify(mockRestrictionWidgetV2).setShowChangeLink(true);
 		verify(mockRestrictionWidgetV2).setShowIfProject(false);
@@ -102,10 +112,10 @@ public class EntityMetadataTest {
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
 		en.setId(entityId);
-		widget.setEntityBundle(bundle, null);
-		verify(mockView).setDetailedMetadataVisible(true);
+		widget.configure(bundle, null, mockActionMenuWidget);
 		verify(mockView).setRestrictionPanelVisible(false);
 		verify(mockDoiWidget).configure(mockDoi, entityId);
+		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 		verify(mockRestrictionWidgetV2).configure(project, canChangePermissions);
 		verify(mockView, never()).setRestrictionWidgetV2Visible(false);
 	}
@@ -126,9 +136,11 @@ public class EntityMetadataTest {
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
 		Long versionNumber = null;
-		widget.setEntityBundle(bundle, versionNumber);
-		verify(mockView).setDetailedMetadataVisible(true);
+		widget.configure(bundle, versionNumber, mockActionMenuWidget);
+		verify(mockFileHistoryWidget, never()).setEntityBundle(bundle, versionNumber, isCurrentVersion);
+		verify(mockFileHistoryWidget, never()).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
+		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 	}
 	
 	@Test
@@ -147,9 +159,11 @@ public class EntityMetadataTest {
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
 		Long versionNumber = null;
-		widget.setEntityBundle(bundle, versionNumber);
-		verify(mockView).setDetailedMetadataVisible(true);
+		widget.configure(bundle, versionNumber, mockActionMenuWidget);
+		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber, isCurrentVersion);
+		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
+		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 	}
 	
 	@Test
@@ -169,9 +183,19 @@ public class EntityMetadataTest {
 		bundle.setEntity(fileEntity);
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
-		widget.setEntityBundle(bundle, versionNumber);
-		verify(mockView).setDetailedMetadataVisible(true);
+		widget.configure(bundle, versionNumber, mockActionMenuWidget);
+		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber, isCurrentVersion);
+		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
+		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
+	}
+	
+	@Test
+	public void testSetDetailedMetadataVisible() {
+		widget.setVisible(true);
+		verify(mockView).setDetailedMetadataVisible(true);
+		widget.setVisible(false);
+		verify(mockView).setDetailedMetadataVisible(false);
 	}
 	
 	@Test

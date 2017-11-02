@@ -5,14 +5,22 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface EntityMetadataView extends IsWidget {
 
 	public void setDetailedMetadataVisible(boolean visible);
-
+		
+	void setAnnotationsVisible(boolean visible);
+	
 	public interface Presenter {
 		
 		void fireEntityUpdatedEvent();
 		
 	}
 	
+	void setFileHistoryVisible(boolean visible);
+
+	void setFileHistoryWidget(IsWidget fileHistoryWidget);
+
 	public void setDoiWidget(IsWidget doiWidget);
+
+	public void setAnnotationsRendererWidget(IsWidget annotationsWidget);
 
 	void clear();
 
@@ -26,4 +34,5 @@ public interface EntityMetadataView extends IsWidget {
 
 	void setUploadDestinationText(String text);
 	void setRestrictionWidgetV2Visible(boolean visible);
+	void setAnnotationsTitleText(String text);
 }

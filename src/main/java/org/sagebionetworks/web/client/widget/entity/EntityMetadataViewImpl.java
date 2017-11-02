@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
@@ -12,6 +15,7 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -33,11 +37,21 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	Span doiPanel;
 	@UiField
+	Collapse annotationsContent;
+	@UiField
+	SimplePanel annotationsContainer;
+	@UiField
 	Span restrictionPanelV2;
+	@UiField
+	Collapse fileHistoryContent;
+	@UiField
+	SimplePanel fileHistoryContainer;
 	@UiField
 	Span uploadDestinationPanel;
 	@UiField
 	Span uploadDestinationField;
+	@UiField
+	Text annotationsTitleText;
 		
 	@UiField(provided = true)
 	final IconsImageBundle icons;
@@ -46,6 +60,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public EntityMetadataViewImpl(IconsImageBundle icons, final SynapseJSNIUtils jsniUtils) {
 		this.icons = icons;
 		initWidget(uiBinder.createAndBindUi(this));
+		fileHistoryContainer.getElement().setAttribute("highlight-box-title", "File History");
 		idField.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -59,6 +74,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 		doiPanel.clear();
 		doiPanel.add(doiWidget);
 	}
+
+	@Override
+	public void setAnnotationsRendererWidget(IsWidget annotationsWidget) {
+		annotationsContainer.setWidget(annotationsWidget);		
+	}
 	
 	@Override
 	public void setUploadDestinationPanelVisible(boolean isVisible) {
@@ -69,10 +89,35 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setUploadDestinationText(String text) {
 		uploadDestinationField.setText(text);
 	}
+
+	@Override
+	public void setAnnotationsVisible(boolean visible) {
+		if (visible) {
+			annotationsContent.show();
+		} else {
+			annotationsContent.hide();
+		}
+	}
+	
+	@Override
+	public void setFileHistoryWidget(IsWidget fileHistoryWidget) {
+		fileHistoryContainer.setWidget(fileHistoryWidget);
+	}
+	
+	@Override
+	public void setFileHistoryVisible(boolean visible) {
+		if (visible) {
+			fileHistoryContent.show();
+		} else {
+			fileHistoryContent.hide();
+		}
+	}
 	
 	@Override
 	public void clear() {
+		fileHistoryContent.hide();
 		dataUseContainer.setVisible(false);
+		annotationsContent.hide();
 		uploadDestinationField.setText("");
 		uploadDestinationPanel.setVisible(false);
 	}
@@ -100,5 +145,9 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setRestrictionWidgetV2Visible(boolean visible) {
 		restrictionPanelV2.setVisible(visible);
+	}
+	@Override
+	public void setAnnotationsTitleText(String text) {
+		annotationsTitleText.setText(text);
 	}
 }
