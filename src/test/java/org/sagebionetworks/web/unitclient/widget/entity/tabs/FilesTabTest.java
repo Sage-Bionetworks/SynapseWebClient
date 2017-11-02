@@ -49,6 +49,7 @@ import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.FilesTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -121,6 +122,8 @@ public class FilesTabTest {
 	DiscussionThreadBundle mockBundle;
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
+	@Mock
+	ActionMenuWidget mockActionMenuWidget;
 	
 	FilesTab tab;
 	String projectEntityId = "syn9";
@@ -224,7 +227,7 @@ public class FilesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockProjectEntityBundle, mockEntityUpdatedHandler, version);
+		tab.configure(mockProjectEntityBundle, mockEntityUpdatedHandler, version, mockActionMenuWidget);
 		
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
@@ -260,7 +263,7 @@ public class FilesTabTest {
 	public void testConfigureWithFileNoFileHandles() {
 		Long version = 4L;
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
-		tab.configure(mockEntityBundle, mockEntityUpdatedHandler, version);
+		tab.configure(mockEntityBundle, mockEntityUpdatedHandler, version, mockActionMenuWidget);
 		
 		verify(mockView, times(2)).setPreviewVisible(false);
 		verify(mockView, never()).setPreviewVisible(true);
@@ -278,7 +281,7 @@ public class FilesTabTest {
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockEntityBundle, mockEntityUpdatedHandler, version);
+		tab.configure(mockEntityBundle, mockEntityUpdatedHandler, version, mockActionMenuWidget);
 
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
@@ -296,7 +299,7 @@ public class FilesTabTest {
 		verify(mockFileTitleBar).configure(mockEntityBundle);
 		verify(mockPreviewWidget).configure(mockEntityBundle);
 		
-		verify(mockEntityMetadata).setEntityBundle(mockEntityBundle, version);
+		verify(mockEntityMetadata).configure(mockEntityBundle, version, mockActionMenuWidget);
 		
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));
 		
@@ -336,7 +339,7 @@ public class FilesTabTest {
 		when(mockPermissions.getIsCertifiedUser()).thenReturn(isCertifiedUser);
 		
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
-		tab.configure(mockEntityBundle, mockEntityUpdatedHandler, version);
+		tab.configure(mockEntityBundle, mockEntityUpdatedHandler, version, mockActionMenuWidget);
 		
 		verify(mockFileTitleBar).setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		verify(mockEntityMetadata).setEntityUpdatedHandler(mockEntityUpdatedHandler);
@@ -355,7 +358,7 @@ public class FilesTabTest {
 
 		verify(mockBasicTitleBar).configure(mockEntityBundle);
 		
-		verify(mockEntityMetadata).setEntityBundle(mockEntityBundle, version);
+		verify(mockEntityMetadata).configure(mockEntityBundle, version, mockActionMenuWidget);
 		
 		
 		verify(mockBreadcrumb).configure(any(EntityPath.class), eq(EntityArea.FILES));

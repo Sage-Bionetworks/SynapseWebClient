@@ -21,6 +21,9 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
+import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -31,25 +34,34 @@ public class EntityMetadata implements Presenter {
 
 	private EntityMetadataView view;
 	private EntityUpdatedHandler entityUpdatedHandler;
+	private AnnotationsRendererWidget annotationsWidget;
 	private DoiWidget doiWidget;
+	private FileHistoryWidget fileHistoryWidget;
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils jsni;
 	private org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2;
 	private CookieProvider cookies;
+	boolean isShowingAnnotations, isShowingFileHistory;
 	@Inject
 	public EntityMetadata(EntityMetadataView view, 
 			DoiWidget doiWidget,
+			AnnotationsRendererWidget annotationsWidget,
+			FileHistoryWidget fileHistoryWidget, 
 			SynapseClientAsync synapseClient, 
 			SynapseJSNIUtils jsni,
 			RestrictionWidget restrictionWidgetV2,
 			CookieProvider cookies) {
 		this.view = view;
 		this.doiWidget = doiWidget;
+		this.annotationsWidget = annotationsWidget;
+		this.fileHistoryWidget = fileHistoryWidget;
 		this.synapseClient = synapseClient;
 		this.jsni = jsni;
 		this.restrictionWidgetV2 = restrictionWidgetV2;
 		this.cookies = cookies;
 		this.view.setDoiWidget(doiWidget);
+		this.view.setAnnotationsRendererWidget(annotationsWidget);
+		this.view.setFileHistoryWidget(fileHistoryWidget);
 		this.view.setRestrictionWidgetV2(restrictionWidgetV2);
 		restrictionWidgetV2.setShowChangeLink(true);
 		restrictionWidgetV2.setShowIfProject(false);
@@ -61,12 +73,17 @@ public class EntityMetadata implements Presenter {
 		return view.asWidget();
 	}
 	
-	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
+	public void configure(EntityBundle bundle, Long versionNumber, ActionMenuWidget actionMenu) {
 		clear();
 		Entity en = bundle.getEntity();
 		view.setEntityId(en.getId());
-		boolean showDetailedMetadata = true;
+		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
+		
+		boolean isCurrentVersion = versionNumber == null;
 		if (bundle.getEntity() instanceof FileEntity) {
+			fileHistoryWidget.setEntityBundle(bundle, versionNumber, isCurrentVersion);
+			fileHistoryWidget.setEntityUpdatedHandler(entityUpdatedHandler);
+			view.setFileHistoryWidget(fileHistoryWidget);
 			view.setRestrictionPanelVisible(true);
 		} else {
 			view.setRestrictionPanelVisible(en instanceof TableEntity
@@ -74,11 +91,25 @@ public class EntityMetadata implements Presenter {
 		}
 		configureStorageLocation(en);
 		doiWidget.configure(bundle.getDoi(), en.getId());
-		
-		view.setDetailedMetadataVisible(showDetailedMetadata);
+		annotationsWidget.configure(bundle, canEdit, isCurrentVersion);
 		restrictionWidgetV2.configure(en, bundle.getPermissions().getCanChangePermissions());
-	}	
-
+		isShowingAnnotations = false;
+		setAnnotationsVisible(isShowingAnnotations);
+		isShowingFileHistory = false;
+		setFileHistoryVisible(isShowingFileHistory);
+		actionMenu.setActionListener(Action.SHOW_ANNOTATIONS, action -> {
+			isShowingAnnotations = !isShowingAnnotations;
+			setAnnotationsVisible(isShowingAnnotations);
+		});
+		
+		actionMenu.setActionListener(Action.SHOW_FILE_HISTORY, action -> {
+			isShowingFileHistory = !isShowingFileHistory;
+			setFileHistoryVisible(isShowingFileHistory);
+		});
+	}
+	public void setVisible(boolean visible) {
+		view.setDetailedMetadataVisible(visible);
+	}
 	@Override
 	public void fireEntityUpdatedEvent() {
 		if (entityUpdatedHandler != null)
@@ -87,6 +118,15 @@ public class EntityMetadata implements Presenter {
 	
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
 		this.entityUpdatedHandler = handler;
+		this.annotationsWidget.setEntityUpdatedHandler(entityUpdatedHandler);
+	}
+
+	public void setAnnotationsVisible(boolean visible) {
+		view.setAnnotationsVisible(visible);
+	}
+	
+	public void setFileHistoryVisible(boolean visible) {
+		view.setFileHistoryVisible(visible);
 	}
 	
 	public void clear() {
@@ -135,5 +175,9 @@ public class EntityMetadata implements Presenter {
 			});
 		 }
     }
+	 
+	 public void setAnnotationsTitleText(String text) {
+		 view.setAnnotationsTitleText(text);
+	 }
 	
 }
