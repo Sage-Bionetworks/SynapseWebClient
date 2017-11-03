@@ -5,12 +5,12 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -44,9 +44,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTopView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionController;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.tabs.ChallengeTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DockerTab;
@@ -83,7 +81,7 @@ public class EntityPageTopTest {
 	@Mock
 	Tabs mockTabs;
 	@Mock
-	EntityMetadata mockEntityMetadata;
+	EntityMetadata mockProjectMetadata;
 	@Mock
 	WikiTab mockWikiTab;
 	@Mock
@@ -148,7 +146,7 @@ public class EntityPageTopTest {
 		pageTop = new EntityPageTop(mockView, 
 				mockSynapseClientAsync, 
 				mockTabs,
-				mockEntityMetadata,
+				mockProjectMetadata,
 				mockWikiTab, 
 				mockFilesTab, 
 				mockTablesTab, 
@@ -225,7 +223,7 @@ public class EntityPageTopTest {
 		
 		//Once to show the active tab, and once after configuration so that the place is pushed into the history.
 		verify(mockTabs, times(2)).showTab(mockWikiInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
-		verify(mockEntityMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
+		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
 		verify(mockWikiInnerTab).setContentStale(true);
 		verify(mockWikiInnerTab).setContentStale(false);
 		
@@ -305,7 +303,7 @@ public class EntityPageTopTest {
 		verify(mockTablesTab).resetView();
 
 		verify(mockTabs).showTab(mockFilesInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
-		verify(mockEntityMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
+		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
 		
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockFilesTab).configure(mockEntityBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
@@ -316,6 +314,50 @@ public class EntityPageTopTest {
 		verify(mockChallengeTab, never()).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab, never()).configure(projectEntityId, projectName, null, canModerate, mockActionMenuWidget);
 		verify(mockDockerTab, never()).configure(mockEntityBundle, mockEntityUpdatedHandler, null, mockActionMenuWidget);
+		
+		clickAllTabsFile();
+	}
+	
+
+	private void clickAllTabsFile() {
+		//now go through and click on the tabs, verify project metadata visibility
+		ArgumentCaptor<CallbackP> tabCaptor = ArgumentCaptor.forClass(CallbackP.class);
+
+		//click on the wiki tab
+		reset(mockProjectMetadata);
+		verify(mockWikiTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata, times(2)).setVisible(true);
+		
+		//click on the files tab
+		reset(mockProjectMetadata);
+		verify(mockFilesTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(false);
+		
+		//click on the tables tab
+		reset(mockProjectMetadata);
+		verify(mockTablesTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(true);
+		
+		//click on the challenge tab
+		reset(mockProjectMetadata);
+		verify(mockChallengeTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(true);
+		
+		//click on the discussion tab
+		reset(mockProjectMetadata);
+		verify(mockDiscussionTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(true);
+		
+		//click on the docker tab
+		reset(mockProjectMetadata);
+		verify(mockDockerTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(true);
 	}
 	
 	@Test
@@ -329,7 +371,7 @@ public class EntityPageTopTest {
 		pageTop.configure(mockFileEntity, versionNumber, mockProjectHeader, area, areaToken);
 		verify(mockTabs).showTab(mockFilesInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
 		
-		verify(mockEntityMetadata, Mockito.never()).configure(mockProjectBundle, null, null);
+		verify(mockProjectMetadata, Mockito.never()).configure(mockProjectBundle, null, null);
 		EntityBundle expectedProjectEntityBundle = null;
 		verify(mockFilesTab).setProject(projectEntityId, expectedProjectEntityBundle, projectLoadError);
 		verify(mockFilesTab).configure(mockEntityBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
@@ -355,18 +397,59 @@ public class EntityPageTopTest {
 		pageTop.configure(mockTableEntity, versionNumber, mockProjectHeader, area, areaToken);
 		verify(mockTabs).showTab(mockTablesInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
 		
-		verify(mockEntityMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
+		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
 		
 		verify(mockTablesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockTablesTab).configure(mockEntityBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
 		
-		clickAllTabs();
+		clickAllTabsTable();
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class), eq(mockActionMenuWidget));
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockFilesTab).configure(mockProjectBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
 		verify(mockChallengeTab).configure(projectEntityId, projectName);
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate, mockActionMenuWidget);
 		verify(mockDockerTab).configure(mockProjectBundle, mockEntityUpdatedHandler, null, mockActionMenuWidget);
+	}
+	
+	private void clickAllTabsTable() {
+		//now go through and click on the tabs, verify project metadata visibility
+		ArgumentCaptor<CallbackP> tabCaptor = ArgumentCaptor.forClass(CallbackP.class);
+
+		//click on the wiki tab
+		reset(mockProjectMetadata);
+		verify(mockWikiTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata, times(2)).setVisible(true);
+		
+		//click on the files tab
+		reset(mockProjectMetadata);
+		verify(mockFilesTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(true);
+		
+		//click on the tables tab
+		reset(mockProjectMetadata);
+		verify(mockTablesTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(false);
+		
+		//click on the challenge tab
+		reset(mockProjectMetadata);
+		verify(mockChallengeTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(true);
+		
+		//click on the discussion tab
+		reset(mockProjectMetadata);
+		verify(mockDiscussionTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(true);
+		
+		//click on the docker tab
+		reset(mockProjectMetadata);
+		verify(mockDockerTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(true);
 	}
 
 	@Test
@@ -378,11 +461,11 @@ public class EntityPageTopTest {
 		pageTop.configure(mockDockerEntity, versionNumber, mockProjectHeader, area, areaToken);
 		verify(mockTabs).showTab(mockDockerInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
 		
-		verify(mockEntityMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
+		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
 		
 		verify(mockDockerTab).configure(mockEntityBundle, mockEntityUpdatedHandler, areaToken, mockActionMenuWidget);
 		
-		clickAllTabs();
+		clickAllTabsDocker();
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class), eq(mockActionMenuWidget));
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockFilesTab).configure(mockProjectBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);
@@ -392,6 +475,46 @@ public class EntityPageTopTest {
 		verify(mockDiscussionTab).configure(projectEntityId, projectName, null, canModerate, mockActionMenuWidget);
 	}
 
+	private void clickAllTabsDocker() {
+		//now go through and click on the tabs, verify project metadata visibility
+		ArgumentCaptor<CallbackP> tabCaptor = ArgumentCaptor.forClass(CallbackP.class);
+
+		//click on the wiki tab
+		reset(mockProjectMetadata);
+		verify(mockWikiTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata, times(2)).setVisible(true);
+		
+		//click on the files tab
+		reset(mockProjectMetadata);
+		verify(mockFilesTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(true);
+		
+		//click on the tables tab
+		reset(mockProjectMetadata);
+		verify(mockTablesTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(true);
+		
+		//click on the challenge tab
+		reset(mockProjectMetadata);
+		verify(mockChallengeTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(true);
+		
+		//click on the discussion tab
+		reset(mockProjectMetadata);
+		verify(mockDiscussionTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(true);
+		
+		//click on the docker tab
+		reset(mockProjectMetadata);
+		verify(mockDockerTab).setTabClickedCallback(tabCaptor.capture());
+		tabCaptor.getValue().invoke(null);
+		verify(mockProjectMetadata).setVisible(false);
+	}
 	@Test
 	public void testConfigureWithFileGoToChallengeAdminTab(){
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
@@ -400,7 +523,7 @@ public class EntityPageTopTest {
 		Long versionNumber = null;
 		pageTop.configure(mockFileEntity, versionNumber, mockProjectHeader, area, areaToken);
 		
-		verify(mockEntityMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
+		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
 		//ignore specified area, target entity is a File so configure and show the Files tab
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
 		verify(mockFilesTab).configure(mockEntityBundle, mockEntityUpdatedHandler, versionNumber, mockActionMenuWidget);

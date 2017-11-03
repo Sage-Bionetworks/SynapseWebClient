@@ -10,6 +10,5 @@
 		</bh:Div>
 		<bh:Div ui:field="rows" />
 		<bh:Div ui:field="widgetsContainer"/>
-		<b:Button ui:field="newEvaluationButton" type="PRIMARY" text="Add Evaluation Queue" icon="PLUS" addStyleNames="margin-10"/>
 	</b:Panel>
 </ui:UiBinder>

@@ -147,6 +147,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	WizardCallback entityUpdatedWizardCallback;
 	UploadTableModalWidget uploadTableModalWidget;
 	AddExternalRepoModal addExternalRepoModal;
+	String currentChallengeId;
 	
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
@@ -479,17 +480,23 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureCreateChallenge() {
+		currentChallengeId = null;
 		actionMenu.setActionVisible(Action.CREATE_CHALLENGE, false);
+		actionMenu.setActionVisible(Action.DELETE_CHALLENGE, false);
 		boolean canEdit = permissions.getCanEdit();
 		if(entityBundle.getEntity() instanceof Project && canEdit && 
 				((DisplayUtils.isInTestWebsite(cookies) && currentArea == null)|| 
 				EntityArea.ADMIN.equals(currentArea))) {
 			actionMenu.setActionListener(Action.CREATE_CHALLENGE, this);
+			actionMenu.setActionListener(Action.DELETE_CHALLENGE, this);
+			
 			//find out if this project has a challenge
 			getChallengeClient().getChallengeForProject(entity.getId(), new AsyncCallback<Challenge>() {
 				@Override
 				public void onSuccess(Challenge result) {
-					// challenge found, do nothing
+					// challenge found
+					currentChallengeId = result.getId();
+					actionMenu.setActionVisible(Action.DELETE_CHALLENGE, EntityArea.ADMIN.equals(currentArea));
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -527,11 +534,42 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		});
 	}
 
-	
 	private void onCreateChallenge() {
 		getSelectTeamModal().show();
 	}
 	
+	private void onDeleteChallenge() {
+		// Confirm the delete with the user.
+		view.showConfirmDialog(CONFIRM_DELETE_TITLE, DisplayConstants.CONFIRM_DELETE_CHALLENGE, () -> {
+			postConfirmedDeleteChallenge();
+		});
+	}
+
+	/**
+	 * Called after the user has confirmed the delete of the challenge.
+	 */
+	public void postConfirmedDeleteChallenge() {
+		// The user has confirmed the delete, the next step is the preflight check.
+		preflightController.checkDeleteEntity(this.entityBundle, () -> {
+			postCheckDeleteChallenge();
+		});
+	}
+	
+	public void postCheckDeleteChallenge() {
+		getChallengeClient().deleteChallenge(currentChallengeId, new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				view.showInfo(DELETED, THE + "challenge" + WAS_SUCCESSFULLY_DELETED); 
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
+		
 	private void configureTableCommands() {
 		if(entityBundle.getEntity() instanceof Table ) {
 			boolean canEditResults = entityBundle.getPermissions().getCanCertifiedUserEdit();
@@ -685,7 +723,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureAddEvaluationAction(){
-		if(entityBundle.getEntity() instanceof Project && currentArea == null && DisplayUtils.isInTestWebsite(cookies)){
+		if(entityBundle.getEntity() instanceof Project && currentArea == EntityArea.ADMIN){
 			actionMenu.setActionVisible(Action.ADD_EVALUATION_QUEUE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.ADD_EVALUATION_QUEUE, this);
 		}else{
@@ -882,6 +920,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case CREATE_CHALLENGE:
 			onCreateChallenge();
+			break;
+		case DELETE_CHALLENGE:
+			onDeleteChallenge();
 			break;
 		case APPROVE_USER_ACCESS:
 			onApproveUserAccess();
