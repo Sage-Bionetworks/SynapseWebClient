@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.pendo;
 import static org.sagebionetworks.web.client.ClientProperties.PENDO_SDK_JS;
 
 import org.sagebionetworks.web.client.resources.ResourceLoader;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
