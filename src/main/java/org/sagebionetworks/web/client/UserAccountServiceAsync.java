@@ -23,8 +23,6 @@ public interface UserAccountServiceAsync {
 
 	void createUserStep1(NewUser newUser, String portalEndpoint, AsyncCallback<Void> callback);
 
-	void createUserStep2(String userName, String fName, String lName, String password, String emailValidationToken, AsyncCallback<String> callback);
-
 	void createUserStep2(String userName, String fName, String lName, String password, EmailValidationSignedToken emailValidationSignedToken, AsyncCallback<String> callback);
 	
 	void terminateSession(String sessionToken, AsyncCallback<Void> callback);

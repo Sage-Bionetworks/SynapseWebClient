@@ -142,25 +142,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 
 	@Override
-	public String createUserStep2(String userName, String fName, String lName, String password, String emailValidationToken) throws RestServiceException {
-		validateService();
-
-		SynapseClient client = createAnonymousSynapseClient();
-		try {
-			AccountSetupInfo accountSetup = new AccountSetupInfo();
-			accountSetup.setFirstName(fName);
-			accountSetup.setLastName(lName);
-			accountSetup.setUsername(userName);
-			accountSetup.setPassword(password);
-			accountSetup.setEmailValidationToken(emailValidationToken);
-			Session s = client.createNewAccount(accountSetup);
-			return s.getSessionToken();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
 	public String createUserStep2(String userName, String fName, String lName, String password, EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException {
 		validateService();
 

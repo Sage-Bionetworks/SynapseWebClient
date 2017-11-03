@@ -119,7 +119,6 @@ import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.message.MessageToUser;
 import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.message.Settings;
-import org.sagebionetworks.repo.model.principal.AddEmailInfo;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
@@ -1654,7 +1653,7 @@ public class SynapseClientImplTest {
 	public void testAddEmail() throws Exception {
 		EmailValidationSignedToken emailValidationSignedToken = new EmailValidationSignedToken();
 		synapseClient.addEmail(emailValidationSignedToken);
-		verify(mockSynapse).addEmail(any(AddEmailInfo.class), anyBoolean());
+		verify(mockSynapse).addEmail(any(EmailValidationSignedToken.class), anyBoolean());
 	}
 
 	@Test
