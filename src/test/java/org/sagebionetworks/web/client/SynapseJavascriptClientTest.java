@@ -73,6 +73,8 @@ public class SynapseJavascriptClientTest {
 	GlobalApplicationState mockGlobalAppState;
 	@Mock
 	GWTWrapper mockGwt;
+	@Mock
+	SynapseJSNIUtils mockJsniUtils;
 	
 	@Captor
 	ArgumentCaptor<RequestCallback> requestCallbackCaptor;
@@ -101,7 +103,8 @@ public class SynapseJavascriptClientTest {
 				mockGlobalAppState, 
 				mockGwt,
 				synapseJsFactory,
-				mockGinInjector);
+				mockGinInjector,
+				mockJsniUtils);
 	}
 	
 	@Test
@@ -172,6 +175,32 @@ public class SynapseJavascriptClientTest {
 		Throwable t = throwableCaptor.getValue();
 		assertTrue(t instanceof ForbiddenException);
 		assertEquals(statusText, t.getMessage());
+	}
+	
+	@Test
+	public void testGetReasonFromFailure() throws RequestException, JSONObjectAdapterException {
+		String entityId = "syn291";
+		int partsMask = 22;
+		Long versionNumber = 5L;
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		client.getEntityBundleForVersion(entityId, versionNumber, partsMask, mockAsyncCallback);
+		
+		verify(mockRequestBuilder).sendRequest(eq((String)null), requestCallbackCaptor.capture());
+		RequestCallback requestCallback = requestCallbackCaptor.getValue();
+		
+		when(mockResponse.getStatusCode()).thenReturn(SC_BAD_REQUEST);
+		String statusText = "Bad Request";
+		String reason = "The results of this query exceeded the maximum number of allowable bytes: 512000.";
+		String responseText = "{\"reason\":" + "\""+reason+"\"}";
+		when(mockResponse.getStatusText()).thenReturn(statusText);
+		when(mockResponse.getText()).thenReturn(responseText);
+		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		
+		verify(mockAsyncCallback).onFailure(throwableCaptor.capture());
+		Throwable t = throwableCaptor.getValue();
+		assertTrue(t instanceof BadRequestException);
+		assertEquals(reason, t.getMessage());
 	}
 	
 	@Test

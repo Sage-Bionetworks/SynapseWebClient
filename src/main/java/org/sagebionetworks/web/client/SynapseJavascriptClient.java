@@ -130,6 +130,7 @@ public class SynapseJavascriptClient {
 	GWTWrapper gwt;
 	SynapseJavascriptFactory jsFactory;
 	PortalGinInjector ginInjector;
+	SynapseJSNIUtils jsniUtils;
 
 	public static final String ENTITY_URI_PATH = "/entity";
 	public static final String USER = "/user";
@@ -167,13 +168,15 @@ public class SynapseJavascriptClient {
 			GlobalApplicationState globalAppState,
 			GWTWrapper gwt,
 			SynapseJavascriptFactory jsFactory,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			SynapseJSNIUtils jsniUtils) {
 		this.authController = authController;
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.globalAppState = globalAppState;
 		this.gwt = gwt;
 		this.jsFactory = jsFactory;
 		this.ginInjector = ginInjector;
+		this.jsniUtils = jsniUtils;
 	}
 	private String getRepoServiceUrl() {
 		if (repoServiceUrl == null) {
@@ -271,7 +274,17 @@ public class SynapseJavascriptClient {
 						} else {
 							// getException() based on status code, 
 							// instead of using org.sagebionetworks.client.ClientUtils.throwException() and ExceptionUtil.convertSynapseException() (neither of which can be referenced here)
-							onError(request, getException(statusCode, response.getStatusText()));
+							String responseText = response.getStatusText();
+							try {
+								// try to get the reason
+								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
+								if (jsonObject.has("reason")) {
+									responseText = jsonObject.get("reason").toString();
+								}
+							} catch (Exception e) {
+								jsniUtils.consoleError("Unable to get reason for error: " + e.getMessage());
+							}
+							onError(request, getException(statusCode, responseText));
 						}
 					}
 				}
