@@ -28,9 +28,9 @@ public class MixPanelSdk {
 			String userId,
 			String synapseEmail) /*-{
 		$wnd.mixpanel.identify(userId);
-	    $wnd.mixpanel.register({
-	        "email": synapseEmail
-    	});
+		$wnd.mixpanel.register({
+			"email": synapseEmail
+		});
     }-*/;
 
 	private static native void _track(String eventType, String eventDescription) /*-{
