@@ -19,11 +19,11 @@ public class MixPanelSdk {
 			_changeUser(userId, email);	
 		}
 	}
-	
+
 	public void trackClick(String description) {
 		_track("click", description);
 	}
-	
+
 	private static native void _changeUser(
 			String userId,
 			String synapseEmail) /*-{
@@ -32,7 +32,7 @@ public class MixPanelSdk {
 	        "email": synapseEmail
     	});
     }-*/;
-	
+
 	private static native void _track(String eventType, String eventDescription) /*-{
 		$wnd.mixpanel.track(eventType, {"description" : eventDescription});
 	}-*/;
