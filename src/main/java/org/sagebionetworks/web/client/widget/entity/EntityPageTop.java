@@ -159,12 +159,14 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			public void invoke(Tab t) {
 				area = EntityArea.WIKI;
 				configureWikiTab();
+				projectMetadata.setVisible(true);
 			};
 		});
 		adminTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
 				area = EntityArea.ADMIN;
 				configureAdminTab();
+				projectMetadata.setVisible(true);
 			};
 		});
 
@@ -172,24 +174,28 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			public void invoke(Tab t) {
 				area = EntityArea.DISCUSSION;
 				configureDiscussionTab();
+				projectMetadata.setVisible(true);
 			};
 		});
 		filesTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
 				area = EntityArea.FILES;
 				configureFilesTab();
+				projectMetadata.setVisible(projectBundle != null && filesEntityBundle.getEntity() instanceof Project);
 			};
 		});
 		tablesTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
 				area = EntityArea.TABLES;
 				configureTablesTab();
+				projectMetadata.setVisible(projectBundle != null && tablesEntityBundle.getEntity() instanceof Project);
 			};
 		});
 		dockerTab.setTabClickedCallback(new CallbackP<Tab>() {
 			public void invoke(Tab t) {
 				area = EntityArea.DOCKER;
 				configureDockerTab();
+				projectMetadata.setVisible(projectBundle != null && dockerEntityBundle.getEntity() instanceof Project);
 			};
 		});
 	}
