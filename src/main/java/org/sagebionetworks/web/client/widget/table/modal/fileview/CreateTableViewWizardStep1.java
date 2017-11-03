@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,10 +9,10 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -19,13 +21,13 @@ import com.google.inject.Inject;
  * @author Jay
  *
  */
-public class CreateTableViewWizardStep1 implements ModalPage {
+public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWizardStep1View.Presenter {
 	private static final String NEXT = "Next";
 
 	public static final String NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "Name must include at least one character.";
 	
 	CreateTableViewWizardStep1View view;
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	String parentId;
 	ModalPresenter modalPresenter;
 	EntityContainerListWidget entityContainerList;
@@ -35,7 +37,7 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 	@Inject
 	public CreateTableViewWizardStep1(
 			CreateTableViewWizardStep1View view,
-			SynapseClientAsync synapseClient, 
+			SynapseJavascriptClient jsClient, 
 			EntityContainerListWidget entityContainerList,
 			CreateTableViewWizardStep2 step2) {
 		super();
@@ -43,9 +45,19 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 		this.step2 = step2;
 		this.entityContainerList = entityContainerList;
 		view.setScopeWidget(entityContainerList.asWidget());
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
+		view.setPresenter(this);
 	}
 	
+	@Override
+	public void onSelectFilesAndTablesView() {
+		tableType = TableType.file_and_table_view;
+	}
+	
+	@Override
+	public void onSelectFilesOnlyView() {
+		tableType = TableType.fileview;
+	}
 	/**
 	 * Configure this widget before use.
 	 * 
@@ -56,6 +68,12 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 		this.tableType = type;
 		boolean canEdit = true;
 		view.setScopeWidgetVisible(!TableType.table.equals(type));
+		if (TableType.table.equals(type) || TableType.projectview.equals(type)) {
+			view.setViewTypeSelectionVisible(false);	
+		} else {
+			view.setViewTypeSelectionVisible(true);
+		}
+		
 		entityContainerList.configure(new ArrayList<String>(), canEdit, type);
 		view.setName("");
 	}
@@ -74,21 +92,30 @@ public class CreateTableViewWizardStep1 implements ModalPage {
 			table = new EntityView();
 			List<String> scopeIds = entityContainerList.getEntityIds();
 			((EntityView)table).setScopeIds(scopeIds);
-			((EntityView)table).setType(tableType.getViewType());	
+			((EntityView)table).setType(tableType.getViewType());
 		} 
 		table.setName(name);
 		table.setParentId(parentId);
-		synapseClient.createEntity(table, new AsyncCallback<Entity>() {
-			@Override
-			public void onSuccess(Entity table) {
-				step2.configure((Table)table, tableType);
-				modalPresenter.setNextActivePage(step2);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				modalPresenter.setErrorMessage(caught.getMessage());
-			}
-		});
+		createEntity(table);
+	}
+	
+	private void createEntity(final Entity entity) {
+		jsClient.createEntity(entity)
+			.addCallback(
+					new FutureCallback<Entity>() {
+						@Override
+						public void onSuccess(Entity table) {
+							step2.configure((Table)table, tableType);
+							modalPresenter.setNextActivePage(step2);
+						}
+
+						@Override
+						public void onFailure(Throwable caught) {
+							modalPresenter.setErrorMessage(caught.getMessage());
+						}
+					},
+					directExecutor()
+			);
 	}
 
 	/**

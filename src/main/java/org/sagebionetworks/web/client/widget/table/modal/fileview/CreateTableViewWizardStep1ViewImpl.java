@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import org.gwtbootstrap3.client.ui.FormGroup;
+import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -21,11 +22,25 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	@UiField
 	FormGroup scopeUI;
 	
+	@UiField
+	FormGroup viewOptionsUI;
+	@UiField
+	Radio fileViewOption;
+	@UiField
+	Radio fileAndTablesViewOption;
+	
 	Widget widget;
+	Presenter p;
 	
 	@Inject
 	public CreateTableViewWizardStep1ViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
+		fileViewOption.addClickHandler(event -> {
+			p.onSelectFilesOnlyView();
+		});
+		fileAndTablesViewOption.addClickHandler(event -> {
+			p.onSelectFilesAndTablesView();
+		});
 	}
 	@Override
 	public Widget asWidget() {
@@ -51,5 +66,14 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	@Override
 	public void setScopeWidgetVisible(boolean visible) {
 		scopeUI.setVisible(visible);
+	}
+	
+	@Override
+	public void setViewTypeSelectionVisible(boolean visible) {
+		viewOptionsUI.setVisible(visible);
+	}
+	@Override
+	public void setPresenter(Presenter presenter) {
+		p = presenter;
 	}
 }

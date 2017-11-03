@@ -764,5 +764,10 @@ public class SynapseJavascriptClient {
 			key.getOwnerObjectId() + WIKI_ORDER_HINT;
 		doPut(url, toUpdate, OBJECT_TYPE.V2WikiOrderHint, callback);
 	}
+	
+	public FluentFuture<Entity> createEntity(Entity entity) {
+		String url = getRepoServiceUrl() + ENTITY;
+		return getFuture(cb -> doPost(url, entity, OBJECT_TYPE.Entity, cb));
+	}
 }
 

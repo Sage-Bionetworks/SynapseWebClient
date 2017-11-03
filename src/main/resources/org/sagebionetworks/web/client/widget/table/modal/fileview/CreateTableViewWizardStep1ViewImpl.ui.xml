@@ -16,11 +16,10 @@
 			<b:FormLabel>Scope</b:FormLabel>
 			<g:SimplePanel ui:field="scopeContainer" addStyleNames="light-border padding-10" />
 		</b:FormGroup>
-		<b:FormGroup>
+		<b:FormGroup ui:field="viewOptionsUI">
 			<b:FormLabel>View includes:</b:FormLabel>
-			<b:Radio ui:field="fileViewOption">Files only</b:Radio>
-			<b:Radio ui:field="fileAndTablesViewOption">Files and Tables</b:Radio>
-			<b:Radio ui:field="projectViewOption">Projects only</b:Radio>
+			<b:Radio name="viewOptions" ui:field="fileViewOption" value="true">Files only</b:Radio>
+			<b:Radio name="viewOptions" ui:field="fileAndTablesViewOption">Files and Tables</b:Radio>
 		</b:FormGroup>
 		
 	</bh:Div>
