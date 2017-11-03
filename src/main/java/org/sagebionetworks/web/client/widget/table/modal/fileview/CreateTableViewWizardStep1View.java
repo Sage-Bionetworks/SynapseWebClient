@@ -23,4 +23,8 @@ public interface CreateTableViewWizardStep1View extends IsWidget {
 	 */
 	void setScopeWidget(IsWidget scopeWidget);
 	void setScopeWidgetVisible(boolean visible);
+	void setViewTypeSelectionVisible(boolean visible);
+	void selectFilesAndTables();
+	boolean isFileViewSelected();
+	boolean isFileAndTableViewSelected();
 }
