@@ -40,11 +40,20 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	DropDownHeader noActionsAvailable;
 	@UiField
 	DropDownHeader actHeader;
+	Presenter presenter;
+	
 	@Inject
 	public ActionMenuWidgetViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
+		toolsMenu.addClickHandler(event -> {
+			presenter.onToolsMenuClicked();
+		});
 	}
 	
+	@Override
+	public void setPresenter(Presenter p) {
+		presenter = p;
+	}
 	@Override
 	public Widget asWidget() {
 		return widget;
