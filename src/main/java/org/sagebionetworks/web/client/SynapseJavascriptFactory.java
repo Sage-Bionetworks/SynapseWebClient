@@ -13,7 +13,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
+import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
@@ -84,7 +84,7 @@ public class SynapseJavascriptFactory {
 		UserProfile,
 		FileHandleResults,
 		JSON,
-		MembershipInvtnSubmission,
+		MembershipInvitation,
 		InviteeVerificationSignedToken,
 		None
 	}
@@ -189,8 +189,8 @@ public class SynapseJavascriptFactory {
 			}
 
 			return list;
-		case MembershipInvtnSubmission:
-			return new MembershipInvtnSubmission(json);
+		case MembershipInvitation:
+			return new MembershipInvitation(json);
 		case InviteeVerificationSignedToken:
 			return new InviteeVerificationSignedToken(json);
 		default:

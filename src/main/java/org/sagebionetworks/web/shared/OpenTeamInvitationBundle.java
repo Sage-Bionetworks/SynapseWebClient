@@ -1,30 +1,30 @@
 package org.sagebionetworks.web.shared;
 
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
+import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.UserProfile;
 
 import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class OpenTeamInvitationBundle implements IsSerializable {
 	
-	private MembershipInvtnSubmission membershipInvtnSubmission;
+	private MembershipInvitation MembershipInvitation;
 	private UserProfile userProfile;
 	
 	public OpenTeamInvitationBundle(
-			MembershipInvtnSubmission membershipInvtnSubmission,
+			MembershipInvitation MembershipInvitation,
 			UserProfile userProfile) {
 		super();
-		this.membershipInvtnSubmission = membershipInvtnSubmission;
+		this.MembershipInvitation = MembershipInvitation;
 		this.userProfile = userProfile;
 	}
 	public OpenTeamInvitationBundle() {
 	}
-	public MembershipInvtnSubmission getMembershipInvtnSubmission() {
-		return membershipInvtnSubmission;
+	public MembershipInvitation getMembershipInvitation() {
+		return MembershipInvitation;
 	}
-	public void setMembershipInvtnSubmission(
-			MembershipInvtnSubmission membershipInvtnSubmission) {
-		this.membershipInvtnSubmission = membershipInvtnSubmission;
+	public void setMembershipInvitation(
+			MembershipInvitation MembershipInvitation) {
+		this.MembershipInvitation = MembershipInvitation;
 	}
 	public UserProfile getUserProfile() {
 		return userProfile;
@@ -38,8 +38,8 @@ public class OpenTeamInvitationBundle implements IsSerializable {
 		int result = 1;
 		result = prime
 				* result
-				+ ((membershipInvtnSubmission == null) ? 0
-						: membershipInvtnSubmission.hashCode());
+				+ ((MembershipInvitation == null) ? 0
+						: MembershipInvitation.hashCode());
 		result = prime * result
 				+ ((userProfile == null) ? 0 : userProfile.hashCode());
 		return result;
@@ -53,11 +53,11 @@ public class OpenTeamInvitationBundle implements IsSerializable {
 		if (getClass() != obj.getClass())
 			return false;
 		OpenTeamInvitationBundle other = (OpenTeamInvitationBundle) obj;
-		if (membershipInvtnSubmission == null) {
-			if (other.membershipInvtnSubmission != null)
+		if (MembershipInvitation == null) {
+			if (other.MembershipInvitation != null)
 				return false;
-		} else if (!membershipInvtnSubmission
-				.equals(other.membershipInvtnSubmission))
+		} else if (!MembershipInvitation
+				.equals(other.MembershipInvitation))
 			return false;
 		if (userProfile == null) {
 			if (other.userProfile != null)
@@ -68,8 +68,8 @@ public class OpenTeamInvitationBundle implements IsSerializable {
 	}
 	@Override
 	public String toString() {
-		return "OpenTeamInvitationBundle [membershipInvtnSubmission="
-				+ membershipInvtnSubmission + ", userProfile=" + userProfile
+		return "OpenTeamInvitationBundle [MembershipInvitation="
+				+ MembershipInvitation + ", userProfile=" + userProfile
 				+ "]";
 	}
 

@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.team;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
+import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -112,8 +112,8 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	private void addInvitations(List<OpenTeamInvitationBundle> bundles) {
 		// Add the invitations to the view
 		for (OpenTeamInvitationBundle b : bundles) {
-			MembershipInvtnSubmission mis = b.getMembershipInvtnSubmission();
-			String createdOn = dateTimeUtils.convertDateToSmallString(b.getMembershipInvtnSubmission().getCreatedOn());
+			MembershipInvitation mis = b.getMembershipInvitation();
+			String createdOn = dateTimeUtils.convertDateToSmallString(b.getMembershipInvitation().getCreatedOn());
 			if (b.getUserProfile() != null) {
 				// Invitee is an existing user
 				UserBadge userBadge = ginInjector.getUserBadgeWidget();

@@ -48,7 +48,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
+import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -1390,7 +1390,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				synapseClient.addTeamMember(teamId, userGroupId, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
 			} else if (!membershipStatus.getHasOpenInvitation()) {
 				// check to see if there is already an open invite
-				MembershipInvtnSubmission membershipInvite = new MembershipInvtnSubmission();
+				MembershipInvitation membershipInvite = new MembershipInvitation();
 				membershipInvite.setMessage(message);
 				membershipInvite.setTeamId(teamId);
 				membershipInvite.setInviteeId(userGroupId);
@@ -1408,7 +1408,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public void inviteNewMember(String email, String teamId, String message, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			MembershipInvtnSubmission mis = new MembershipInvtnSubmission();
+			MembershipInvitation mis = new MembershipInvitation();
 			mis.setInviteeEmail(email);
 			mis.setTeamId(teamId);
 			mis.setMessage(message);
@@ -1611,7 +1611,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			org.sagebionetworks.reflection.model.PaginatedResults<MembershipInvtnSubmission> invitations = synapseClient
+			org.sagebionetworks.reflection.model.PaginatedResults<MembershipInvitation> invitations = synapseClient
 					.getOpenMembershipInvitationSubmissions(teamId, null,
 							limit, offset);
 			// and ask for the team info for each invite, and fill that in the
@@ -1621,10 +1621,10 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			// now go through and create a MembershipInvitationBundle for each
 			// pair
 
-			List<MembershipInvtnSubmission> invitationsToUsers = new ArrayList<>();
-			List<MembershipInvtnSubmission> invitationsToEmails = new ArrayList<>();
+			List<MembershipInvitation> invitationsToUsers = new ArrayList<>();
+			List<MembershipInvitation> invitationsToEmails = new ArrayList<>();
 			// Sort the results into the two types
-			for (MembershipInvtnSubmission invite : invitations.getResults()) {
+			for (MembershipInvitation invite : invitations.getResults()) {
 				String inviteeId = invite.getInviteeId();
 				String inviteeEmail = invite.getInviteeEmail();
 				if (inviteeId != null) {
@@ -1636,17 +1636,17 @@ public class SynapseClientImpl extends SynapseClientBase implements
 
 			// Get profiles of existing user invitees
 			List<Long> userIds = new ArrayList<>();
-			for (MembershipInvtnSubmission invite : invitationsToUsers) {
+			for (MembershipInvitation invite : invitationsToUsers) {
 				userIds.add(Long.parseLong(invite.getInviteeId()));
 			}
 			Map<String, UserProfile> userId2UserProfile = getUserProfiles(userIds, synapseClient);
 			// Add invitations to return list
-			for (MembershipInvtnSubmission invite : invitationsToUsers) {
+			for (MembershipInvitation invite : invitationsToUsers) {
 				UserProfile profile = userId2UserProfile.get(invite.getInviteeId());
 				OpenTeamInvitationBundle b = new OpenTeamInvitationBundle(invite, profile);
 				returnList.add(b);
 			}
-			for (MembershipInvtnSubmission invite : invitationsToEmails) {
+			for (MembershipInvitation invite : invitationsToEmails) {
 				// Invitations to new users have a null profile
 				returnList.add(new OpenTeamInvitationBundle(invite, null));
 			}

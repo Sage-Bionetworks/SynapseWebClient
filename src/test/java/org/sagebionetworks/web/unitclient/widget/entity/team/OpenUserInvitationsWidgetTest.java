@@ -17,7 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
+import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DateTimeUtils;
@@ -54,8 +54,8 @@ public class OpenUserInvitationsWidgetTest {
 	private String teamId = "123";
 	private OpenUserInvitationsWidget widget;
 	private UserProfile testProfile;
-	private MembershipInvtnSubmission testInvite;
-	private MembershipInvtnSubmission testEmailInvite;
+	private MembershipInvitation testInvite;
+	private MembershipInvitation testEmailInvite;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -72,11 +72,11 @@ public class OpenUserInvitationsWidgetTest {
 		testProfile = new UserProfile();
 		testProfile.setOwnerId("42");
 		testProfile.setFirstName("Bob");
-		testInvite = new MembershipInvtnSubmission();
+		testInvite = new MembershipInvitation();
 		testInvite.setTeamId(teamId);
 		testInvite.setInviteeId("42");
 		testInvite.setMessage("This is a test invite");
-		testEmailInvite = new MembershipInvtnSubmission();
+		testEmailInvite = new MembershipInvitation();
 		testEmailInvite.setTeamId(teamId);
 		testEmailInvite.setInviteeEmail("test@example.com");
 		testEmailInvite.setMessage("This is an email test invite");
@@ -84,7 +84,7 @@ public class OpenUserInvitationsWidgetTest {
 		List<OpenTeamInvitationBundle> testReturn = new ArrayList<>();
 		OpenTeamInvitationBundle mib = new OpenTeamInvitationBundle();
 		mib.setUserProfile(testProfile);
-		mib.setMembershipInvtnSubmission(testInvite);
+		mib.setMembershipInvitation(testInvite);
 		testReturn.add(mib);
 		
 		AsyncMockStubber.callSuccessWith(testReturn).when(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(),anyInt(),any(AsyncCallback.class));
@@ -99,13 +99,13 @@ public class OpenUserInvitationsWidgetTest {
 		for (int i = 0; i < userInvitationCount; i++) {
 			OpenTeamInvitationBundle mockBundle = mock(OpenTeamInvitationBundle.class);
 			when(mockBundle.getUserProfile()).thenReturn(testProfile);
-			when(mockBundle.getMembershipInvtnSubmission()).thenReturn(testInvite);
+			when(mockBundle.getMembershipInvitation()).thenReturn(testInvite);
 			testReturn.add(mockBundle);
 		}
 		for (int i = 0; i < emailInvitationCount; i++) {
 			OpenTeamInvitationBundle mockBundle = mock(OpenTeamInvitationBundle.class);
 			when(mockBundle.getUserProfile()).thenReturn(null);
-			when(mockBundle.getMembershipInvtnSubmission()).thenReturn(testEmailInvite);
+			when(mockBundle.getMembershipInvitation()).thenReturn(testEmailInvite);
 			testReturn.add(mockBundle);
 		}
 		AsyncMockStubber.callSuccessWith(testReturn).when(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(),anyInt(),any(AsyncCallback.class));

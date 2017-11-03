@@ -8,7 +8,7 @@ import static org.sagebionetworks.web.client.DisplayUtils.getDisplayName;
 import javax.inject.Inject;
 
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
+import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -80,9 +80,9 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 					token -> jsClient.getMembershipInvitation((MembershipInvtnSignedToken) token),
 					directExecutor()
 			).addCallback(
-					new FutureCallback<MembershipInvtnSubmission>() {
+					new FutureCallback<MembershipInvitation>() {
 						@Override
-						public void onSuccess(MembershipInvtnSubmission mis) {
+						public void onSuccess(MembershipInvitation mis) {
 							if (!authController.isLoggedIn()) {
 								initializeView(mis);
 							} else {
@@ -123,7 +123,7 @@ public class EmailInvitationPresenter extends AbstractActivity implements EmailI
 			);
 	}
 
-	private void initializeView(final MembershipInvtnSubmission mis) {
+	private void initializeView(final MembershipInvitation mis) {
 		view.showNotLoggedInUI();
 		registerWidget.setEncodedMembershipInvtnSignedToken(encodedMISignedToken);
 		registerWidget.setEmail(mis.getInviteeEmail());
