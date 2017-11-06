@@ -58,14 +58,16 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 		this.rowId = row.getRowId();
 		this.rowVersion = row.getVersionNumber();
 		this.cells = new ArrayList<Cell>(types.size());
-		boolean clearIds = false;
-		List<ColumnModel> defaultColumns = null;
-		defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.getViewType(), clearIds);
-		configureAfterInit(tableId, types, isEditor, tableType, row, defaultColumns);
+		configureAfterInit(tableId, types, isEditor, tableType, row);
 	}
 	
-	private void configureAfterInit(String tableId, List<ColumnModel> types, boolean isEditor, TableType tableType, Row row, List<ColumnModel> defaultColumns){
+	private void configureAfterInit(String tableId, List<ColumnModel> types, boolean isEditor, TableType tableType, Row row){
 		// Setup each cell
+		List<ColumnModel> defaultColumns = null;
+		if (isEditor) {
+			boolean clearIds = false;
+			defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.getViewType(), clearIds);
+		}
 		for(ColumnModel type: types){
 			// Create each cell
 			Cell cell = null;
