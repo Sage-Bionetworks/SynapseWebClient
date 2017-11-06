@@ -18,8 +18,10 @@
 		</b:FormGroup>
 		<b:FormGroup ui:field="viewOptionsUI">
 			<b:FormLabel>View includes:</b:FormLabel>
-			<b:Radio name="viewOptions" ui:field="fileViewOption" value="true">Files only</b:Radio>
-			<b:Radio name="viewOptions" ui:field="fileAndTablesViewOption">Files and Tables</b:Radio>
+			<bh:Div addStyleNames="margin-left-15">
+				<b:Radio name="viewOptions" ui:field="fileViewOption" value="true">Files only</b:Radio>
+				<b:Radio name="viewOptions" ui:field="fileAndTablesViewOption">Files and Tables</b:Radio>
+			</bh:Div>
 		</b:FormGroup>
 		
 	</bh:Div>
