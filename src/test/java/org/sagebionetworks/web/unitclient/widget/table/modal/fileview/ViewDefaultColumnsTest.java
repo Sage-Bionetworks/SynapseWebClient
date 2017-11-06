@@ -67,8 +67,8 @@ public class ViewDefaultColumnsTest {
 	public void testGetDefaultColumnNames() {
 		String colName = "default column name";
 		columnModel.setName(colName);
-		Set<String> columnNames = fileViewDefaultColumns.getDefaultFileViewColumnNames();
-		Set<String> projectColumnNames = fileViewDefaultColumns.getDefaultProjectViewColumnNames();
+		Set<String> columnNames = fileViewDefaultColumns.getDefaultViewColumnNames(ViewType.file);
+		Set<String> projectColumnNames = fileViewDefaultColumns.getDefaultViewColumnNames(ViewType.project);
 		assertTrue(columnNames.contains(colName));
 		assertTrue(projectColumnNames.contains(colName));
 	}

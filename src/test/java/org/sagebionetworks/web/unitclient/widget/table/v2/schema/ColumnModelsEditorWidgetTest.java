@@ -110,7 +110,7 @@ public class ColumnModelsEditorWidgetTest {
 		nonEditableColumnNames.add(colName1);
 		nonEditableColumnNames.add(ETAG_COLUMN_NAME);
 		
-		when(mockFileViewDefaultColumns.getDefaultFileViewColumnNames()).thenReturn(nonEditableColumnNames);
+		when(mockFileViewDefaultColumns.getDefaultViewColumnNames(any(org.sagebionetworks.repo.model.table.ViewType.class))).thenReturn(nonEditableColumnNames);
 		widget = new ColumnModelsEditorWidget(mockGinInjector, adapterFactory, mockFileViewDefaultColumns);
 		schema = TableModelTestUtils.createOneOfEachType(true);
 	}

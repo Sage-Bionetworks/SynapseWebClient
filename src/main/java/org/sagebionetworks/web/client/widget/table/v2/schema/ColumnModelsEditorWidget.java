@@ -139,16 +139,11 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	}
 	
 	private Set<String> getDefaultColumnNames() {
-		if (TableType.fileview.equals(tableType)) {
-			return fileViewDefaultColumns.getDefaultFileViewColumnNames();
-		} else if (TableType.projectview.equals(tableType)) {
-			return fileViewDefaultColumns.getDefaultProjectViewColumnNames();
-		} else {
-			return null;
-		}
+		return fileViewDefaultColumns.getDefaultViewColumnNames(tableType.getViewType());
 	}
 	
 	public void addColumns(List<ColumnModel> models) {
+		GWT.debugger();
 		List<ColumnModel> newColumns = new ArrayList<ColumnModel>(models.size());
 		newColumns.addAll(models);
 		List<ColumnModel> existingColumns = getEditedColumnModels();

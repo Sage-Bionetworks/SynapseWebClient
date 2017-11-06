@@ -69,9 +69,9 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		boolean canEdit = true;
 		view.setScopeWidgetVisible(!TableType.table.equals(type));
 		if (TableType.table.equals(type) || TableType.projectview.equals(type)) {
-			view.setViewTypeSelectionVisible(false);	
+			view.setFileViewTypeSelectionVisible(false);	
 		} else {
-			view.setViewTypeSelectionVisible(true);
+			view.setFileViewTypeSelectionVisible(true);
 		}
 		
 		entityContainerList.configure(new ArrayList<String>(), canEdit, type);
