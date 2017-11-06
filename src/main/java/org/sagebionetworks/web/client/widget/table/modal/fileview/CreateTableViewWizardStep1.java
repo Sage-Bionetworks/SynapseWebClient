@@ -22,8 +22,8 @@ import com.google.inject.Inject;
  *
  */
 public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWizardStep1View.Presenter {
+	public static final String EMPTY_SCOPE_MESSAGE = "Please define the scope for this view.";
 	private static final String NEXT = "Next";
-
 	public static final String NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER = "Name must include at least one character.";
 	
 	CreateTableViewWizardStep1View view;
@@ -92,7 +92,7 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 			table = new EntityView();
 			List<String> scopeIds = entityContainerList.getEntityIds();
 			if (scopeIds.isEmpty()) {
-				modalPresenter.setErrorMessage("Please define the scope for this view.");
+				modalPresenter.setErrorMessage(EMPTY_SCOPE_MESSAGE);
 				return;
 			}
 			((EntityView)table).setScopeIds(scopeIds);

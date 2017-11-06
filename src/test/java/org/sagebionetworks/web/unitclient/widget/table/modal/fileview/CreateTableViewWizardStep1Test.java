@@ -3,11 +3,12 @@ package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 import static junit.framework.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.utils.FutureUtils.*;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
+import static org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1.EMPTY_SCOPE_MESSAGE;
 
 import java.util.Collections;
 import java.util.List;
@@ -16,13 +17,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewType;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
@@ -30,9 +29,6 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableVie
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 
 
@@ -77,6 +73,7 @@ public class CreateTableViewWizardStep1Test {
 		widget.configure(parentId, TableType.fileview);
 		verify(mockView).setName("");
 		verify(mockView).setScopeWidgetVisible(true);
+		verify(mockView).setFileViewTypeSelectionVisible(true);
 		String tableName = "a name";
 		EntityView table = new EntityView();
 		table.setName(tableName);
@@ -94,10 +91,25 @@ public class CreateTableViewWizardStep1Test {
 	}
 	
 	@Test
+	public void testCreateFileViewEmptyScope(){
+		widget.configure(parentId, TableType.fileview);
+		String tableName = "a name";
+		EntityView table = new EntityView();
+		table.setName(tableName);
+		table.setId("syn57");
+		when(mockJsClient.createEntity(any(Entity.class))).thenReturn(getDoneFuture(table));
+		when(mockView.getName()).thenReturn(tableName);
+		when(mockEntityContainerListWidget.getEntityIds()).thenReturn(Collections.EMPTY_LIST);
+		widget.onPrimary();
+		verify(mockWizardPresenter).setErrorMessage(EMPTY_SCOPE_MESSAGE);
+	}
+	
+	@Test
 	public void testCreateProjectView(){
 		widget.configure(parentId, TableType.projectview);
 		verify(mockView).setName("");
 		verify(mockView).setScopeWidgetVisible(true);
+		verify(mockView).setFileViewTypeSelectionVisible(false);
 		String tableName = "a name";
 		EntityView table = new EntityView();
 		table.setName(tableName);
@@ -118,6 +130,7 @@ public class CreateTableViewWizardStep1Test {
 	public void testCreateTable(){
 		widget.configure(parentId, TableType.table);
 		verify(mockView).setScopeWidgetVisible(false);
+		verify(mockView).setFileViewTypeSelectionVisible(false);
 		String tableName = "a name";
 		TableEntity table = new TableEntity();
 		table.setName(tableName);
