@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.utils.FutureUtils.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,17 +22,13 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.PopupUtilsView;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseFutureClient;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ViewDefaultColumnsTest {
 	
 	@Mock
-	SynapseFutureClient mockFutureClient;
+	SynapseJavascriptClient mockJsClient;
 	ColumnModel columnModel;
 	List<ColumnModel> columns, projectColumns, fileAndTableColumns;
 	ViewDefaultColumns fileViewDefaultColumns;
@@ -50,10 +50,9 @@ public class ViewDefaultColumnsTest {
 		columns = Collections.singletonList(columnModel);
 		projectColumns = Collections.singletonList(columnModel);
 		fileAndTableColumns = Collections.singletonList(columnModel);
-		when(mockFutureClient.getDefaultColumnsForView(eq(ViewType.file))).thenReturn(getDoneFuture(columns));
-		when(mockFutureClient.getDefaultColumnsForView(eq(ViewType.project))).thenReturn(getDoneFuture(projectColumns));
-		when(mockFutureClient.getDefaultColumnsForView(eq(ViewType.file_and_table))).thenReturn(getDoneFuture(fileAndTableColumns));
-		fileViewDefaultColumns = new ViewDefaultColumns(mockFutureClient, adapterFactory, mockPopupUtils);
+		when(mockJsClient.getDefaultColumnsForView(eq(ViewType.file))).thenReturn(getDoneFuture(columns));
+		when(mockJsClient.getDefaultColumnsForView(eq(ViewType.project))).thenReturn(getDoneFuture(projectColumns));
+		fileViewDefaultColumns = new ViewDefaultColumns(mockJsClient, adapterFactory, mockPopupUtils);
 	}
 
 	@Test
@@ -75,19 +74,19 @@ public class ViewDefaultColumnsTest {
 	
 	@Test
 	public void testInitFailureFailure() {
-		when(mockFutureClient.getDefaultColumnsForView(eq(ViewType.file))).thenReturn(getFailedFuture(mockException));
-		fileViewDefaultColumns = new ViewDefaultColumns(mockFutureClient, adapterFactory, mockPopupUtils);
+		when(mockJsClient.getDefaultColumnsForView(eq(ViewType.file))).thenReturn(getFailedFuture(mockException));
+		fileViewDefaultColumns = new ViewDefaultColumns(mockJsClient, adapterFactory, mockPopupUtils);
 		
-		verify(mockFutureClient, times(2)).getDefaultColumnsForView(eq(ViewType.file));
+		verify(mockJsClient, times(2)).getDefaultColumnsForView(eq(ViewType.file));
 		verify(mockPopupUtils).showErrorMessage(errorMessage);
 	}
 	
 	@Test
 	public void testProjectInitFailure() {
-		when(mockFutureClient.getDefaultColumnsForView(eq(ViewType.project))).thenReturn(getFailedFuture(mockException));
-		fileViewDefaultColumns = new ViewDefaultColumns(mockFutureClient, adapterFactory, mockPopupUtils);
+		when(mockJsClient.getDefaultColumnsForView(eq(ViewType.project))).thenReturn(getFailedFuture(mockException));
+		fileViewDefaultColumns = new ViewDefaultColumns(mockJsClient, adapterFactory, mockPopupUtils);
 		
-		verify(mockFutureClient, times(2)).getDefaultColumnsForView(eq(ViewType.project));
+		verify(mockJsClient, times(2)).getDefaultColumnsForView(eq(ViewType.project));
 		verify(mockPopupUtils).showErrorMessage(errorMessage);
 	}
 

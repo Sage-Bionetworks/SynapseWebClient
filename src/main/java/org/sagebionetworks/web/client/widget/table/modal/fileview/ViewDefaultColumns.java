@@ -13,14 +13,13 @@ import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PopupUtilsView;
-import org.sagebionetworks.web.client.SynapseFutureClient;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
 import com.google.common.util.concurrent.FluentFuture;
-import com.google.common.util.concurrent.ListenableFuture;
 import com.google.inject.Inject;
 
 public class ViewDefaultColumns {
-	private SynapseFutureClient futureClient;
+	private SynapseJavascriptClient jsClient;
 	private List<ColumnModel> defaultFileViewColumns, 
 		defaultProjectViewColumns;
 		
@@ -29,17 +28,17 @@ public class ViewDefaultColumns {
 	PopupUtilsView popupUtils;
 
 	@Inject
-	public ViewDefaultColumns(SynapseFutureClient futureClient, AdapterFactory adapterFactory,
+	public ViewDefaultColumns(SynapseJavascriptClient jsClient, AdapterFactory adapterFactory,
 			PopupUtilsView popupUtils) {
-		this.futureClient = futureClient;
+		this.jsClient = jsClient;
 		this.adapterFactory = adapterFactory;
 		this.popupUtils = popupUtils;
 		init();
 	}
 
 	public void init() {
-		ListenableFuture<List<ColumnModel>> fileViewColumnsFuture = futureClient.getDefaultColumnsForView(ViewType.file);
-		ListenableFuture<List<ColumnModel>> projectViewColumnsFuture = futureClient.getDefaultColumnsForView(ViewType.project);
+		FluentFuture<List<ColumnModel>> fileViewColumnsFuture = jsClient.getDefaultColumnsForView(ViewType.file);
+		FluentFuture<List<ColumnModel>> projectViewColumnsFuture = jsClient.getDefaultColumnsForView(ViewType.project);
 		FluentFuture.from(whenAllComplete(fileViewColumnsFuture, projectViewColumnsFuture)
 				.call(() -> {
 						defaultFileViewColumns = fileViewColumnsFuture.get();
