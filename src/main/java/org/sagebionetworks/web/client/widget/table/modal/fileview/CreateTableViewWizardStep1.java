@@ -79,10 +79,10 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 	}
 	
 	/**
-	 * Create the file view.
+	 * Create the Table/View
 	 * @param name
 	 */
-	private void createFileViewEntity(final String name) {
+	private void createEntity(final String name) {
 		modalPresenter.setLoading(true);
 		Table table;
 		if (TableType.table.equals(tableType)) {
@@ -91,6 +91,10 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		else {
 			table = new EntityView();
 			List<String> scopeIds = entityContainerList.getEntityIds();
+			if (scopeIds.isEmpty()) {
+				modalPresenter.setErrorMessage("Please define the scope for this view.");
+				return;
+			}
 			((EntityView)table).setScopeIds(scopeIds);
 			((EntityView)table).setType(tableType.getViewType());
 		} 
@@ -127,8 +131,7 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		if(tableName == null || "".equals(tableName)){
 			modalPresenter.setErrorMessage(NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
 		}else{
-			// Create the table
-			createFileViewEntity(tableName);
+			createEntity(tableName);
 		}
 	}
 

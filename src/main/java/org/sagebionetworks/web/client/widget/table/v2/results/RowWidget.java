@@ -60,11 +60,7 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 		this.cells = new ArrayList<Cell>(types.size());
 		boolean clearIds = false;
 		List<ColumnModel> defaultColumns = null;
-		if (TableType.fileview.equals(tableType)) {
-			defaultColumns = fileViewDefaultColumns.getDefaultFileViewColumns(clearIds);
-		} else if (TableType.projectview.equals(tableType)) {
-			defaultColumns = fileViewDefaultColumns.getDefaultProjectViewColumns(clearIds);
-		}
+		defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.getViewType(), clearIds);
 		configureAfterInit(tableId, types, isEditor, tableType, row, defaultColumns);
 	}
 	
