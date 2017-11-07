@@ -1893,7 +1893,6 @@ var validateFileURL = void 0;
       return;
     }
     try {
-      debugger;
       var viewerOrigin = new URL(window.location.href).origin || 'null';
       if (HOSTED_VIEWER_ORIGINS.indexOf(viewerOrigin) >= 0) {
         return;

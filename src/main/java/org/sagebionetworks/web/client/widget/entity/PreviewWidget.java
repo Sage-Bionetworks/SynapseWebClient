@@ -47,7 +47,6 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	public static final int MAX_LENGTH = 100000;
 	public static final int VIDEO_WIDTH = 320;
 	public static final int VIDEO_HEIGHT = 180;
-	public static final int PDF_HEIGHT = 500;
 	public enum PreviewFileType {
 		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML
 	}
@@ -300,7 +299,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			} else if (originalFileHandle.getContentType() != null && "application/pdf".equals(originalFileHandle.getContentType().toLowerCase().trim())) {
 				// use pdf.js to view
 				PDFPreviewWidget w = ginInjector.getPDFPreviewWidget();
-				w.configure(bundle.getEntity().getId(), originalFileHandle.getId(), PDF_HEIGHT);
+				w.configure(bundle.getEntity().getId(), originalFileHandle.getId());
 				view.setPreviewWidget(w.asWidget());
 			}
 		}

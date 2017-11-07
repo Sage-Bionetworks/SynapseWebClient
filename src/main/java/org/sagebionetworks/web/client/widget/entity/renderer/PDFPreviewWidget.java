@@ -27,7 +27,7 @@ public class PDFPreviewWidget implements IsWidget {
 		this.gwt = gwt;
 	}
 	
-	public void configure(String synapseId, String fileHandleId, int height) {
+	public void configure(String synapseId, String fileHandleId) {
 		FileHandleAssociation fha = new FileHandleAssociation();
 		fha.setAssociateObjectId(synapseId);
 		fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
@@ -39,8 +39,7 @@ public class PDFPreviewWidget implements IsWidget {
 				StringBuilder siteUrl = new StringBuilder();
 				siteUrl.append("/pdf.js/web/viewer.html?file=");
 				siteUrl.append(gwt.encodeQueryString(presignedUrl));
-//				GWT.debugger();
-				view.configure(siteUrl.toString(), height);
+				view.configure(siteUrl.toString(), 3000);
 			}
 			
 			@Override

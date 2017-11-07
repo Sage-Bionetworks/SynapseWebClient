@@ -12,7 +12,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ShinySiteWidget implements IFrameView.Presenter, WidgetRendererPresenter {
+public class ShinySiteWidget implements WidgetRendererPresenter {
 	
 	//Note: *.synapse.org is also in the whitelist
 	private static final String[] VALID_URL_BASES = { 
@@ -36,7 +36,6 @@ public class ShinySiteWidget implements IFrameView.Presenter, WidgetRendererPres
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.jsniUtils = jsniUtils;
-		view.setPresenter(this);
 	}
 	
 	@Override
