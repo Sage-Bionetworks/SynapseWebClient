@@ -12,6 +12,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class PDFPreviewWidget implements IsWidget {
+	public static final String PDF_JS_VIEWER_PREFIX = "/pdf.js/web/viewer.html?file=";
 	private IFrameView view;
 	private PresignedURLAsyncHandler presignedURLAsyncHandler;
 	private GWTWrapper gwt;
@@ -51,7 +52,7 @@ public class PDFPreviewWidget implements IsWidget {
 				public void onSuccess(FileResult fileResult) {
 					String presignedUrl = fileResult.getPreSignedURL();
 					StringBuilder siteUrl = new StringBuilder();
-					siteUrl.append("/pdf.js/web/viewer.html?file=");
+					siteUrl.append(PDF_JS_VIEWER_PREFIX);
 					siteUrl.append(gwt.encodeQueryString(presignedUrl));
 					view.configure(siteUrl.toString(), view.getParentOffsetHeight());
 				}

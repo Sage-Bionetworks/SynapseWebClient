@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget.PreviewFileType;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.PDFPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -88,6 +89,9 @@ public class PreviewWidgetTest {
 	EntityBundle linkBundle;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	PDFPreviewWidget mockPDFPreviewWidget;
+	
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	FileHandle mainFileHandle;
@@ -109,6 +113,7 @@ public class PreviewWidgetTest {
 		testBundle.setEntity(testEntity);
 		testBundle.setFileHandles(testFileHandleList);
 		when(mockPortalGinInjector.getVideoWidget()).thenReturn(mockVideoWidget);
+		when(mockPortalGinInjector.getPDFPreviewWidget()).thenReturn(mockPDFPreviewWidget);
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://fakebaseurl/");
 		mockResponse = mock(Response.class);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
@@ -195,6 +200,27 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setImagePreview(anyString());
+	}
+	
+	@Test
+	public void testMainFilePdfContentType(){
+		// images that do not have a preview file handle will use the original
+		mainFileHandle.setContentType("application/pdf");
+		mainFileHandle.setFileName("original.pdf");
+		previewWidget.configure(testBundle);
+		verify(mockView).setPreviewWidget(mockPDFPreviewWidget);
+	}
+	
+	@Test
+	public void testPreviewFilePdfContentType(){
+		mainFileHandle.setContentType("doc");
+		PreviewFileHandle fh = new PreviewFileHandle();
+		fh.setId("previewFileId");
+		fh.setContentType("application/pdf");
+		testFileHandleList.add(fh);
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		verify(mockView).setPreviewWidget(mockPDFPreviewWidget);
 	}
 	
 	@Test

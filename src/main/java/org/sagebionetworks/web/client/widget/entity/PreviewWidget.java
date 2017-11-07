@@ -242,7 +242,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				String fileHandleId = handle != null ? handle.getId() : originalFileHandle.getId();
 				PDFPreviewWidget w = ginInjector.getPDFPreviewWidget();
 				w.configure(bundle.getEntity().getId(), fileHandleId);
-				view.setPreviewWidget(w.asWidget());
+				view.setPreviewWidget(w);
 			} else {
 				// if HTML, get the full file contents
 				view.showLoading();
@@ -303,7 +303,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			if (VideoConfigEditor.isRecognizedVideoFileName(originalFileHandle.getFileName())) {
 				VideoWidget videoWidget = ginInjector.getVideoWidget();
 				videoWidget.configure(bundle.getEntity().getId(), originalFileHandle.getFileName(), VIDEO_WIDTH, VIDEO_HEIGHT);
-				view.setPreviewWidget(videoWidget.asWidget());
+				view.setPreviewWidget(videoWidget);
 			}
 		}
 	}
@@ -316,7 +316,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	@Override
 	public void imagePreviewLoadFailed(ErrorEvent e) {
 		//show the load error
-		view.addSynapseAlertWidget(synapseAlert.asWidget());
+		view.addSynapseAlertWidget(synapseAlert);
 		synapseAlert.showError("Unable to load image preview");
 	}
 	

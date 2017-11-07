@@ -109,7 +109,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
 	}
 	@Override
-	public void setPreviewWidget(Widget w) {
+	public void setPreviewWidget(IsWidget w) {
 		clear();
 		add(w.asWidget());
 	}
@@ -243,7 +243,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 
   
 	@Override
-	public void addSynapseAlertWidget(Widget w) {
+	public void addSynapseAlertWidget(IsWidget w) {
 		clear();
 		add(w);
 	}
