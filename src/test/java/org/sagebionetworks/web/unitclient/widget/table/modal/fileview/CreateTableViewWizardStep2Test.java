@@ -100,8 +100,8 @@ public class CreateTableViewWizardStep2Test {
 		when(mockEditor.validate()).thenReturn(true);
 		when(mockTableSchemaChangeRequest.getChanges()).thenReturn(Collections.singletonList(mockTableUpdateRequest));
 		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), anyList(), any(AsyncCallback.class));
-		when(mockFileViewDefaultColumns.getDefaultFileViewColumns(anyBoolean())).thenReturn(mockDefaultColumnModels);
-		when(mockFileViewDefaultColumns.getDefaultProjectViewColumns(anyBoolean())).thenReturn(mockDefaultProjectColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(eq(ViewType.file), anyBoolean())).thenReturn(mockDefaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(eq(ViewType.project), anyBoolean())).thenReturn(mockDefaultProjectColumnModels);
 		when(viewEntity.getScopeIds()).thenReturn(mockViewScopeIds);
 		when(mockColumnModelPage1.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN);
 		when(mockColumnModelPage1.getResults()).thenReturn(mockAnnotationColumnsPage1);

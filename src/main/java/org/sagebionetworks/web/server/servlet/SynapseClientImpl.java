@@ -1963,16 +1963,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	@Override
-	public List<ColumnModel> getDefaultColumnsForView(ViewType type) throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			List<ColumnModel> defaultColumns = synapseClient.getDefaultColumnsForView(type);
-			return defaultColumns;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
 
 	@Override
 	public String sendMessage(

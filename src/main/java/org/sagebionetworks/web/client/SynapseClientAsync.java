@@ -352,8 +352,6 @@ public interface SynapseClientAsync {
 
 	void getEtag(String objectId, ObjectType objectType, AsyncCallback<Etag> callback);
 
-	void getDefaultColumnsForView(ViewType type, AsyncCallback<List<ColumnModel>> callback);
-
 	void deleteAccessRequirement(Long accessRequirementId, AsyncCallback<Void> callback);
 	
 	void deleteAccessApprovals(String accessRequirement, String accessorId, AsyncCallback<Void> asyncCallback);

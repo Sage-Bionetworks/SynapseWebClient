@@ -36,6 +36,7 @@ import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -86,6 +87,7 @@ public class SynapseJavascriptFactory {
 		JSON,
 		MembershipInvtnSubmission,
 		InviteeVerificationSignedToken,
+		ListWrapperColumnModel,
 		None
 	}
 
@@ -179,6 +181,14 @@ public class SynapseJavascriptFactory {
 				entityHeaderList.add(new EntityHeader(jsonObject));
 			}
 			return entityHeaderList;
+		case ListWrapperColumnModel :
+			List<ColumnModel> columnModelList = new ArrayList<>();
+			JSONArrayAdapter columnModelJsonList = json.getJSONArray("list");
+			for (int i = 0; i < columnModelJsonList.length(); i++) {
+				JSONObjectAdapter jsonObject = columnModelJsonList.getJSONObject(i);
+				columnModelList.add(new ColumnModel(jsonObject));
+			}
+			return columnModelList;
 		case ListWrapperUserProfile :
 			// json really represents a ListWrapper, but we can't reference ListWrapper here because it uses Class.forName() (breaks gwt compile)
 			List<UserProfile> list = new ArrayList<>();

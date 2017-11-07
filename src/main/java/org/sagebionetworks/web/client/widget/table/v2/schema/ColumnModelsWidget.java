@@ -127,12 +127,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	public void getDefaultColumnsForView() {
 		baseView.hideErrors();
 		boolean isClearIds = true;
-		List<ColumnModel> defaultColumns;
-		if (TableType.fileview.equals(tableType)) {
-			defaultColumns = fileViewDefaultColumns.getDefaultFileViewColumns(isClearIds); 
-		} else {
-			defaultColumns = fileViewDefaultColumns.getDefaultProjectViewColumns(isClearIds);
-		}
+		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.getViewType(), isClearIds);
 		editor.addColumns(defaultColumns); 
 	}
 	

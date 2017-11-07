@@ -183,7 +183,8 @@ public class ColumnModelsWidgetTest {
 	@Test
 	public void testGetDefaultColumnsForView() {
 		boolean isEditable = true;
-		when(mockFileViewDefaultColumns.getDefaultFileViewColumns(anyBoolean())).thenReturn(mockDefaultColumnModels);
+		
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(org.sagebionetworks.repo.model.table.ViewType.class), anyBoolean())).thenReturn(mockDefaultColumnModels);
 		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.file);
 		when(mockBundle.getEntity()).thenReturn(mockView);
 		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
@@ -195,7 +196,7 @@ public class ColumnModelsWidgetTest {
 	@Test
 	public void testGetDefaultColumnsForProjectView() {
 		boolean isEditable = true;
-		when(mockFileViewDefaultColumns.getDefaultProjectViewColumns(anyBoolean())).thenReturn(mockDefaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(org.sagebionetworks.repo.model.table.ViewType.class), anyBoolean())).thenReturn(mockDefaultColumnModels);
 		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.project);
 		when(mockBundle.getEntity()).thenReturn(mockView);
 		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
