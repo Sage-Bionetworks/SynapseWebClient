@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -55,7 +56,7 @@ public class ShinySiteWidget implements WidgetRendererPresenter {
 		}
 			
 		else 
-			view.showError(siteUrl);
+			view.showError(siteUrl + DisplayConstants.INVALID_SHINY_SITE);
 	}
 	
 	@SuppressWarnings("unchecked")

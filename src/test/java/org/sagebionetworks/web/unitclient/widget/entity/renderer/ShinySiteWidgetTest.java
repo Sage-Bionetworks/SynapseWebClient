@@ -17,6 +17,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
@@ -69,7 +70,7 @@ public class ShinySiteWidgetTest {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, invalidSiteUrl);
 		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).showError(invalidSiteUrl);
+		verify(mockView).showError(invalidSiteUrl + DisplayConstants.INVALID_SHINY_SITE);
 	}
 	
 	@Test
