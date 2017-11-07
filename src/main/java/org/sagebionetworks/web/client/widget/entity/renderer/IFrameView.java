@@ -8,4 +8,5 @@ public interface IFrameView extends IsWidget {
 	void configure(String siteUrl, int height);
 	void showInvalidSiteUrl(String siteUrl);
 	HandlerRegistration addAttachHandler(Handler handler);
+	int getParentOffsetHeight();
 }

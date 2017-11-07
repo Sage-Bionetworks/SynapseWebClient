@@ -53,7 +53,7 @@ public class PDFPreviewWidget implements IsWidget {
 					StringBuilder siteUrl = new StringBuilder();
 					siteUrl.append("/pdf.js/web/viewer.html?file=");
 					siteUrl.append(gwt.encodeQueryString(presignedUrl));
-					view.configure(siteUrl.toString(), 3000);
+					view.configure(siteUrl.toString(), view.getParentOffsetHeight());
 				}
 				
 				@Override

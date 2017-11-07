@@ -14,7 +14,13 @@ public class IFrameViewImpl extends FlowPanel implements IFrameView {
 	@Inject
 	public IFrameViewImpl() {
 	}
-	
+	@Override
+	public int getParentOffsetHeight() {
+		if (getParent() != null) {
+			return getParent().getOffsetHeight();
+		}
+		return 0;
+	}
 	@Override
 	public void configure(String siteUrl, int height) {
 		this.clear();
