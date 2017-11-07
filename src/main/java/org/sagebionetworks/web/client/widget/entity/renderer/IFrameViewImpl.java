@@ -1,13 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.web.client.widget.entity.PreviewWidgetViewImpl._autoAdjustFrameHeight;
-
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -24,7 +19,7 @@ public class IFrameViewImpl extends FlowPanel implements IFrameView {
 	public void configure(String siteUrl, int height) {
 		this.clear();
 		add(getFrame(siteUrl, height));
-	}	
+	}
 	
 	private Frame getFrame(String siteUrl, int height) {
 		final Frame frame = new Frame("about:blank");

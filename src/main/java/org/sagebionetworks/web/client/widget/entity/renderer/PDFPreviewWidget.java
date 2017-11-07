@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -16,7 +15,7 @@ public class PDFPreviewWidget implements IsWidget {
 	private IFrameView view;
 	private PresignedURLAsyncHandler presignedURLAsyncHandler;
 	private GWTWrapper gwt;
-	
+	FileHandleAssociation fha;
 	@Inject
 	public PDFPreviewWidget(
 			IFrameView view,
@@ -25,32 +24,43 @@ public class PDFPreviewWidget implements IsWidget {
 		this.view = view;
 		this.presignedURLAsyncHandler = presignedURLAsyncHandler;
 		this.gwt = gwt;
+		view.addAttachHandler(event -> {
+			if (event.isAttached()) {
+				refreshContent();
+			}
+		});
 	}
 	
 	public void configure(String synapseId, String fileHandleId) {
-		FileHandleAssociation fha = new FileHandleAssociation();
+		fha = new FileHandleAssociation();
 		fha.setAssociateObjectId(synapseId);
 		fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
 		fha.setFileHandleId(fileHandleId);
-		presignedURLAsyncHandler.getFileResult(fha, new AsyncCallback<FileResult>() {
-			@Override
-			public void onSuccess(FileResult fileResult) {
-				String presignedUrl = fileResult.getPreSignedURL();
-				StringBuilder siteUrl = new StringBuilder();
-				siteUrl.append("/pdf.js/web/viewer.html?file=");
-				siteUrl.append(gwt.encodeQueryString(presignedUrl));
-				view.configure(siteUrl.toString(), 3000);
-			}
-			
-			@Override
-			public void onFailure(Throwable ex) {
-				view.showInvalidSiteUrl(ex.getMessage());
-			}
-		});
+		refreshContent();
 	}
 	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	public void refreshContent() {
+		if (fha != null) {
+			presignedURLAsyncHandler.getFileResult(fha, new AsyncCallback<FileResult>() {
+				@Override
+				public void onSuccess(FileResult fileResult) {
+					String presignedUrl = fileResult.getPreSignedURL();
+					StringBuilder siteUrl = new StringBuilder();
+					siteUrl.append("/pdf.js/web/viewer.html?file=");
+					siteUrl.append(gwt.encodeQueryString(presignedUrl));
+					view.configure(siteUrl.toString(), 3000);
+				}
+				
+				@Override
+				public void onFailure(Throwable ex) {
+					view.showInvalidSiteUrl(ex.getMessage());
+				}
+			});
+		}
 	}
 }
