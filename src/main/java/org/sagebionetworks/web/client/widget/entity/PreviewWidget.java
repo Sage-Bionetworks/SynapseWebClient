@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -25,12 +26,12 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.renderer.PDFPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -46,6 +47,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	public static final int MAX_LENGTH = 100000;
 	public static final int VIDEO_WIDTH = 320;
 	public static final int VIDEO_HEIGHT = 180;
+	public static final int PDF_HEIGHT = 500;
 	public enum PreviewFileType {
 		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML
 	}
@@ -57,9 +59,10 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	SynapseAlert synapseAlert;
 	SynapseClientAsync synapseClient;
 	AuthenticationController authController;
-	VideoWidget videoWidget;
 	EntityBundle bundle;
 	SynapseJavascriptClient jsClient;
+	PortalGinInjector ginInjector;
+	
 	@Inject
 	public PreviewWidget(PreviewWidgetView view, 
 			RequestBuilderWrapper requestBuilder,
@@ -67,15 +70,15 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			SynapseAlert synapseAlert,
 			SynapseClientAsync synapseClient,
 			AuthenticationController authController,
-			VideoWidget videoWidget,
-			SynapseJavascriptClient jsClient) {
+			SynapseJavascriptClient jsClient,
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.requestBuilder = requestBuilder;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseAlert = synapseAlert;
 		this.synapseClient = synapseClient;
 		this.authController = authController;
-		this.videoWidget = videoWidget;
+		this.ginInjector = ginInjector;
 		this.jsClient = jsClient;
 	}
 	
@@ -232,7 +235,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				//add a html panel that contains the image src from the attachments server (to pull asynchronously)
 				//create img
 				String fullFileUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false);
-				view.setImagePreview(fullFileUrl);	
+				view.setImagePreview(fullFileUrl);
 			} else {
 				// if HTML, get the full file contents
 				view.showLoading();
@@ -289,14 +292,20 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 					synapseAlert.handleException(e);
 				}
 			}
-		} 
-		else if (originalFileHandle != null && VideoConfigEditor.isRecognizedVideoFileName(originalFileHandle.getFileName())) {
-			videoWidget.configure(bundle.getEntity().getId(), originalFileHandle.getFileName(), VIDEO_WIDTH, VIDEO_HEIGHT);
-			view.setPreviewWidget(videoWidget.asWidget());
+		} else if (originalFileHandle != null) {
+			if (VideoConfigEditor.isRecognizedVideoFileName(originalFileHandle.getFileName())) {
+				VideoWidget videoWidget = ginInjector.getVideoWidget();
+				videoWidget.configure(bundle.getEntity().getId(), originalFileHandle.getFileName(), VIDEO_WIDTH, VIDEO_HEIGHT);
+				view.setPreviewWidget(videoWidget.asWidget());
+			} else if (originalFileHandle.getContentType() != null && "application/pdf".equals(originalFileHandle.getContentType().toLowerCase().trim())) {
+				// use pdf.js to view
+				PDFPreviewWidget w = ginInjector.getPDFPreviewWidget();
+				w.configure(bundle.getEntity().getId(), originalFileHandle.getId(), PDF_HEIGHT);
+				view.setPreviewWidget(w.asWidget());
+			}
 		}
 	}
-	
-	
+		
 	
 	public Widget asWidget() {
 		return view.asWidget();

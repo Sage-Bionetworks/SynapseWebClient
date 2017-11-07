@@ -20,7 +20,7 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.ShinySiteWidgetView;
+import org.sagebionetworks.web.client.widget.entity.renderer.IFrameView;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -28,7 +28,7 @@ public class ShinySiteWidgetTest {
 		
 	ShinySiteWidget widget;
 	@Mock
-	ShinySiteWidgetView mockView;
+	IFrameView mockView;
 	@Mock
 	AuthenticationController mockAuthenticationController;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);

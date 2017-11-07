@@ -8,12 +8,12 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ShinySiteWidgetViewImpl extends FlowPanel implements ShinySiteWidgetView {
+public class IFrameViewImpl extends FlowPanel implements IFrameView {
 
 	private Presenter presenter;
 	
 	@Inject
-	public ShinySiteWidgetViewImpl() {
+	public IFrameViewImpl() {
 	}
 	
 	@Override

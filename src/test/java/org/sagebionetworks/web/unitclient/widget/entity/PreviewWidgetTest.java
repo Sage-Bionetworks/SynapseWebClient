@@ -34,6 +34,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -85,6 +86,8 @@ public class PreviewWidgetTest {
 	VideoWidget mockVideoWidget;
 	@Mock
 	EntityBundle linkBundle;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	FileHandle mainFileHandle;
@@ -94,7 +97,7 @@ public class PreviewWidgetTest {
 	@Before
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
-		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockSynapseClient, mockAuthController, mockVideoWidget, mockSynapseJavascriptClient);
+		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockSynapseClient, mockAuthController, mockSynapseJavascriptClient, mockPortalGinInjector);
 		testEntity = new FileEntity();
 		testFileHandleList = new ArrayList<FileHandle>();
 		mainFileHandle = new S3FileHandle();
@@ -105,6 +108,7 @@ public class PreviewWidgetTest {
 		testBundle = new EntityBundle();
 		testBundle.setEntity(testEntity);
 		testBundle.setFileHandles(testFileHandleList);
+		when(mockPortalGinInjector.getVideoWidget()).thenReturn(mockVideoWidget);
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://fakebaseurl/");
 		mockResponse = mock(Response.class);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
