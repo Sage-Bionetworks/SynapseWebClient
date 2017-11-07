@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-
+import static org.sagebionetworks.web.client.ContentTypeUtils.*;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -13,7 +13,6 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
@@ -48,7 +47,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	public static final int VIDEO_WIDTH = 320;
 	public static final int VIDEO_HEIGHT = 180;
 	public enum PreviewFileType {
-		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML
+		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML, PDF
 	}
 
 	
@@ -86,41 +85,44 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		if (previewHandle == null && originalFileHandle != null && originalFileHandle instanceof S3FileHandle) {
 			String contentType = originalFileHandle.getContentType();
 			if (contentType != null) {
-				if (org.sagebionetworks.web.client.ContentTypeUtils.isRecognizedImageContentType(contentType)) {
-					previewFileType = PreviewFileType.IMAGE;	
-				} else if (org.sagebionetworks.web.client.ContentTypeUtils.isHTML(contentType)) {
-					previewFileType = PreviewFileType.HTML;	
+				if (isRecognizedImageContentType(contentType)) {
+					previewFileType = PreviewFileType.IMAGE;
+				} else if (isHTML(contentType)) {
+					previewFileType = PreviewFileType.HTML;
+				} else if (isPDF(contentType)) {
+					previewFileType = PreviewFileType.PDF;
 				}
 			}
 		} else if (previewHandle != null && originalFileHandle != null) {
 			String contentType = previewHandle.getContentType();
 			if (contentType != null) {
-				if (org.sagebionetworks.web.client.ContentTypeUtils.isRecognizedImageContentType(contentType)) {
+				if (isRecognizedImageContentType(contentType)) {
 					previewFileType = PreviewFileType.IMAGE;
-				}
-				else if (org.sagebionetworks.web.client.ContentTypeUtils.isTextType(contentType)) {
+				} else if (isTextType(contentType)) {
 					//some kind of text
-					if (org.sagebionetworks.web.client.ContentTypeUtils.isHTML(originalFileHandle.getContentType())) {
+					if (isHTML(originalFileHandle.getContentType())) {
 						 previewFileType = PreviewFileType.HTML;
 					}
-					else if (ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){
+					else if (org.sagebionetworks.repo.model.util.ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){
 						previewFileType = PreviewFileType.CODE;
 					}
-					else if (org.sagebionetworks.web.client.ContentTypeUtils.isCSV(contentType)) {
+					else if (isCSV(contentType)) {
 						if (APPLICATION_ZIP.equals(originalFileHandle.getContentType()))
 							previewFileType = PreviewFileType.ZIP;
 						else
 							previewFileType = PreviewFileType.CSV;
 					}
-					else if (org.sagebionetworks.web.client.ContentTypeUtils.isCSV(originalFileHandle.getContentType())){
+					else if (isCSV(originalFileHandle.getContentType())){
 						previewFileType = PreviewFileType.CSV;
 					}
-					else if (org.sagebionetworks.web.client.ContentTypeUtils.isTAB(contentType) || org.sagebionetworks.web.client.ContentTypeUtils.isTAB(originalFileHandle.getContentType())) {
+					else if (isTAB(contentType) || isTAB(originalFileHandle.getContentType())) {
 						previewFileType = PreviewFileType.TAB;
 					}
 					else {
 						previewFileType = PreviewFileType.PLAINTEXT;
 					}
+				} else if (isPDF(contentType)) {
+					previewFileType = PreviewFileType.PDF;
 				}
 			}
 		}
@@ -235,6 +237,12 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				//create img
 				String fullFileUrl = DisplayUtils.createFileEntityUrl(synapseJSNIUtils.getBaseFileHandleUrl(), fileEntity.getId(), ((Versionable)fileEntity).getVersionNumber(), false);
 				view.setImagePreview(fullFileUrl);
+			} else if (previewType == PreviewFileType.PDF) {
+				// use pdf.js to view
+				String fileHandleId = handle != null ? handle.getId() : originalFileHandle.getId();
+				PDFPreviewWidget w = ginInjector.getPDFPreviewWidget();
+				w.configure(bundle.getEntity().getId(), fileHandleId);
+				view.setPreviewWidget(w.asWidget());
 			} else {
 				// if HTML, get the full file contents
 				view.showLoading();
@@ -296,11 +304,6 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				VideoWidget videoWidget = ginInjector.getVideoWidget();
 				videoWidget.configure(bundle.getEntity().getId(), originalFileHandle.getFileName(), VIDEO_WIDTH, VIDEO_HEIGHT);
 				view.setPreviewWidget(videoWidget.asWidget());
-			} else if (originalFileHandle.getContentType() != null && "application/pdf".equals(originalFileHandle.getContentType().toLowerCase().trim())) {
-				// use pdf.js to view
-				PDFPreviewWidget w = ginInjector.getPDFPreviewWidget();
-				w.configure(bundle.getEntity().getId(), originalFileHandle.getId());
-				view.setPreviewWidget(w.asWidget());
 			}
 		}
 	}
