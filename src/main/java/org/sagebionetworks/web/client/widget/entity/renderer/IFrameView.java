@@ -6,7 +6,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 public interface IFrameView extends IsWidget {
 	void configure(String siteUrl, int height);
-	void showInvalidSiteUrl(String siteUrl);
+	void showError(String siteUrl);
 	HandlerRegistration addAttachHandler(Handler handler);
 	int getParentOffsetHeight();
 }

@@ -69,7 +69,7 @@ public class ShinySiteWidgetTest {
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, invalidSiteUrl);
 		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).showInvalidSiteUrl(invalidSiteUrl);
+		verify(mockView).showError(invalidSiteUrl);
 	}
 	
 	@Test

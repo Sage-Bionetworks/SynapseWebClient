@@ -59,7 +59,7 @@ public class PDFPreviewWidget implements IsWidget {
 				
 				@Override
 				public void onFailure(Throwable ex) {
-					view.showInvalidSiteUrl(ex.getMessage());
+					view.showError(ex.getMessage());
 				}
 			});
 		}

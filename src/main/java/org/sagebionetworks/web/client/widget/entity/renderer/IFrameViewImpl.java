@@ -42,7 +42,7 @@ public class IFrameViewImpl extends FlowPanel implements IFrameView {
 	}	
 
 	@Override
-	public void showInvalidSiteUrl(String siteUrl) {
+	public void showError(String siteUrl) {
 		this.clear();
 		add(new HTMLPanel(DisplayUtils.getMarkdownWidgetWarningHtml(siteUrl + DisplayConstants.INVALID_SHINY_SITE)));
 	}		

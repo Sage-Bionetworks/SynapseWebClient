@@ -55,7 +55,7 @@ public class ShinySiteWidget implements WidgetRendererPresenter {
 		}
 			
 		else 
-			view.showInvalidSiteUrl(siteUrl);
+			view.showError(siteUrl);
 	}
 	
 	@SuppressWarnings("unchecked")
