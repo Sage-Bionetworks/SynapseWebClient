@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import static com.google.common.util.concurrent.Futures.whenAllComplete;
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,77 +13,47 @@ import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.PopupUtilsView;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.common.util.concurrent.FluentFuture;
 import com.google.inject.Inject;
 
 public class ViewDefaultColumns {
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private List<ColumnModel> defaultFileViewColumns, 
-		defaultFileViewColumnsWithoutIds, 
-		defaultProjectViewColumns,
-		defaultProjectViewColumnsWithoutIds;
+		defaultProjectViewColumns;
+		
 
 	private AdapterFactory adapterFactory;
 	PopupUtilsView popupUtils;
 
 	@Inject
-	public ViewDefaultColumns(SynapseClientAsync synapseClient, AdapterFactory adapterFactory,
+	public ViewDefaultColumns(SynapseJavascriptClient jsClient, AdapterFactory adapterFactory,
 			PopupUtilsView popupUtils) {
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.adapterFactory = adapterFactory;
 		this.popupUtils = popupUtils;
 		init();
 	}
 
 	public void init() {
-		synapseClient.getDefaultColumnsForView(ViewType.file, new AsyncCallback<List<ColumnModel>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				popupUtils.showErrorMessage(caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(List<ColumnModel> columns) {
-				defaultFileViewColumns = columns;
-				defaultFileViewColumnsWithoutIds = new ArrayList<ColumnModel>(defaultFileViewColumns.size());
-				try {
-					for (ColumnModel cm : defaultFileViewColumns) {
-						ColumnModel cmCopy = new ColumnModel(cm.writeToJSONObject(adapterFactory.createNew()));
-						cmCopy.setId(null);
-						defaultFileViewColumnsWithoutIds.add(cmCopy);
-					}
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
-			}
-		});
-		synapseClient.getDefaultColumnsForView(ViewType.project, new AsyncCallback<List<ColumnModel>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				popupUtils.showErrorMessage(caught.getMessage());
-			}
-
-			@Override
-			public void onSuccess(List<ColumnModel> columns) {
-				defaultProjectViewColumns = columns;
-				defaultProjectViewColumnsWithoutIds = new ArrayList<ColumnModel>(defaultProjectViewColumns.size());
-				try {
-					for (ColumnModel cm : defaultProjectViewColumns) {
-						ColumnModel cmCopy = new ColumnModel(cm.writeToJSONObject(adapterFactory.createNew()));
-						cmCopy.setId(null);
-						defaultProjectViewColumnsWithoutIds.add(cmCopy);
-					}
-				} catch (JSONObjectAdapterException e) {
-					onFailure(e);
-				}
-			}
-		});
-	}
-
-	public List<ColumnModel> getDefaultFileViewColumns(boolean isClearIds) {
-		return isClearIds ? defaultFileViewColumnsWithoutIds : defaultFileViewColumns;
+		FluentFuture<List<ColumnModel>> fileViewColumnsFuture = jsClient.getDefaultColumnsForView(ViewType.file);
+		FluentFuture<List<ColumnModel>> projectViewColumnsFuture = jsClient.getDefaultColumnsForView(ViewType.project);
+		FluentFuture.from(whenAllComplete(fileViewColumnsFuture, projectViewColumnsFuture)
+				.call(() -> {
+						defaultFileViewColumns = fileViewColumnsFuture.get();
+						defaultProjectViewColumns = projectViewColumnsFuture.get();
+						return null;
+					},
+					directExecutor())
+				).catching(
+					Throwable.class,
+					e -> {
+						popupUtils.showErrorMessage(e.getMessage());
+						return null;
+					},
+					directExecutor()
+				);
 	}
 
 	private Set<String> getColumnNames(List<ColumnModel> columns) {
@@ -91,16 +64,49 @@ public class ViewDefaultColumns {
 		return defaultColumnNames;
 	}
 
-	public Set<String> getDefaultFileViewColumnNames() {
-		return getColumnNames(defaultFileViewColumns);
+	public Set<String> getDefaultViewColumnNames(ViewType type) {
+		if (type == null) {
+			return null;
+		}
+		switch(type) {
+			case file:
+			case file_and_table:
+				return getColumnNames(defaultFileViewColumns);
+			case project:
+				return getColumnNames(defaultProjectViewColumns);
+			default :
+				popupUtils.showErrorMessage("Unrecognized view type when retrieving column names:" + type);
+				return null;
+		}
 	}
 
-	public List<ColumnModel> getDefaultProjectViewColumns(boolean isClearIds) {
-		return isClearIds ? defaultProjectViewColumnsWithoutIds : defaultProjectViewColumns;
+	public List<ColumnModel> getDefaultViewColumns(ViewType type, boolean isClearIds) {
+		if (type == null) {
+			return null;
+		}
+		switch(type) {
+			case file:
+			case file_and_table:
+				return isClearIds ? clearIds(defaultFileViewColumns) : defaultFileViewColumns;
+			case project:
+				return isClearIds ? clearIds(defaultProjectViewColumns) : defaultProjectViewColumns;
+			default :
+				popupUtils.showErrorMessage("Unrecognized view type:" + type);
+				return null;
+		}
 	}
-
-	public Set<String> getDefaultProjectViewColumnNames() {
-		return getColumnNames(defaultProjectViewColumns);
+	
+	private List<ColumnModel> clearIds(List<ColumnModel> columns) {
+		List<ColumnModel> newColumns = new ArrayList<ColumnModel>(columns.size());
+		try {
+			for (ColumnModel cm : columns) {
+				ColumnModel cmCopy = new ColumnModel(cm.writeToJSONObject(adapterFactory.createNew()));
+				cmCopy.setId(null);
+				newColumns.add(cmCopy);
+			}
+		} catch (JSONObjectAdapterException e) {
+			popupUtils.showErrorMessage(e.getMessage());
+		}
+		return newColumns;
 	}
-
 }

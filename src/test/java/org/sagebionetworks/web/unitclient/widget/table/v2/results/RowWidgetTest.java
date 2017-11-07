@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.RowWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.TakesAddressCell;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 import org.sagebionetworks.web.shared.table.CellAddress;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
@@ -74,7 +75,7 @@ public class RowWidgetTest {
 		when(mockCellFactory.createEditor(any(ColumnModel.class))).thenAnswer(answer);
 		when(mockCellFactory.createRenderer(any(ColumnModel.class))).thenAnswer(answer);
 		defaultColumnModels = new ArrayList<ColumnModel>();
-		when(mockFileViewDefaultColumns.getDefaultFileViewColumns(anyBoolean())).thenReturn(defaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(org.sagebionetworks.repo.model.table.ViewType.class), anyBoolean())).thenReturn(defaultColumnModels);
 		types = TableModelTestUtils.createOneOfEachType();
 		// Create a row that matches the type.
 		aRow = TableModelTestUtils.createRows(types, 1).get(0);

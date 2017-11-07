@@ -378,8 +378,6 @@ public interface SynapseClient extends RemoteService{
 
 	UserProfile getUserProfileFromUsername(String username) throws RestServiceException;
 
-	List<ColumnModel> getDefaultColumnsForView(ViewType type) throws RestServiceException;
-
 	Entity updateFileEntity(FileEntity toUpdate, FileHandleCopyRequest copyRequest) throws RestServiceException;
 	
 	void deleteAccessApprovals(String accessRequirement, String accessorId) throws RestServiceException;

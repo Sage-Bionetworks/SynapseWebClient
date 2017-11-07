@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
-import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.ETAG_COLUMN_NAME;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,7 +21,6 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -139,13 +136,7 @@ public class ColumnModelsEditorWidget implements ColumnModelsView.Presenter, Col
 	}
 	
 	private Set<String> getDefaultColumnNames() {
-		if (TableType.fileview.equals(tableType)) {
-			return fileViewDefaultColumns.getDefaultFileViewColumnNames();
-		} else if (TableType.projectview.equals(tableType)) {
-			return fileViewDefaultColumns.getDefaultProjectViewColumnNames();
-		} else {
-			return null;
-		}
+		return fileViewDefaultColumns.getDefaultViewColumnNames(tableType.getViewType());
 	}
 	
 	public void addColumns(List<ColumnModel> models) {

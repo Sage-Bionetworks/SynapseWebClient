@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -60,6 +61,8 @@ import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
+import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -69,6 +72,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.FutureUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -159,6 +163,9 @@ public class SynapseJavascriptClient {
 	public static final String LIMIT_PARAMETER = "limit=";
 	private static final String NEXT_PAGE_TOKEN_PARAM = "nextPageToken=";
 	public static final String SKIP_TRASH_CAN_PARAM = "skipTrashCan";
+	
+	public static final String COLUMN = "/column";
+	public static final String COLUMN_VIEW_DEFAULT = COLUMN + "/tableview/defaults/";
 	public String repoServiceUrl,fileServiceUrl; 
 	
 	@Inject
@@ -776,6 +783,16 @@ public class SynapseJavascriptClient {
 			key.getOwnerObjectType().toLowerCase() + "/" + 
 			key.getOwnerObjectId() + WIKI_ORDER_HINT;
 		doPut(url, toUpdate, OBJECT_TYPE.V2WikiOrderHint, callback);
+	}
+	
+	public FluentFuture<Entity> createEntity(Entity entity) {
+		String url = getRepoServiceUrl() + ENTITY;
+		return getFuture(cb -> doPost(url, entity, OBJECT_TYPE.Entity, cb));
+	}
+	
+	public FluentFuture<List<ColumnModel>> getDefaultColumnsForView(ViewType viewType) {
+		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + viewType.name();
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, cb));
 	}
 }
 

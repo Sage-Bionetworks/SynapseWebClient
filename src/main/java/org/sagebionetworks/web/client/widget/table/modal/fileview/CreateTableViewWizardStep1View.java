@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView.Presenter;
+
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -23,4 +25,13 @@ public interface CreateTableViewWizardStep1View extends IsWidget {
 	 */
 	void setScopeWidget(IsWidget scopeWidget);
 	void setScopeWidgetVisible(boolean visible);
+	void setFileViewTypeSelectionVisible(boolean visible);
+	
+	public interface Presenter {
+		void onSelectFilesOnlyView();
+		void onSelectFilesAndTablesView();
+	}
+
+	void setPresenter(Presenter presenter);
+
 }
