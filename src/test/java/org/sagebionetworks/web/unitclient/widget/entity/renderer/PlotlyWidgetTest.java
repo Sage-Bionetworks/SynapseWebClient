@@ -31,6 +31,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.plotly.PlotlyTrace;
+import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.WebResource;
@@ -83,7 +84,7 @@ public class PlotlyWidgetTest {
 	@Mock
 	SelectColumn mockY2Column;
 	@Captor
-	ArgumentCaptor<PlotlyTrace[]> plotlyTraceArrayCaptor;
+	ArgumentCaptor<List> plotlyTraceArrayCaptor;
 	@Mock
 	AsynchronousJobStatus mockAsynchronousJobStatus;
 	@Captor
@@ -181,7 +182,7 @@ public class PlotlyWidgetTest {
 		// complete first page load
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView, never()).showChart(eq(plotTitle), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
+		verify(mockView, never()).showChart(eq(plotTitle), anyString(), anyString(), anyList(), anyString());
 		
 		//test final page
 		rows.clear();
@@ -196,11 +197,10 @@ public class PlotlyWidgetTest {
 		
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		verify(mockView).showChart(eq(plotTitle), eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()));
-		PlotlyTrace[] traceArray = plotlyTraceArrayCaptor.getValue();
-		assertTrue(traceArray.length > 0);
-		assertEquals(type.toString().toLowerCase(), traceArray[0].getType());
+		List traces = plotlyTraceArrayCaptor.getValue();
+		assertTrue(traces.size() > 0);
+		assertEquals(type.toString().toLowerCase(), ((PlotlyTraceWrapper)traces.get(0)).getType());
 		verify(mockView).setSourceDataLinkVisible(true);
-		
 	}
 	
 	@Test
@@ -250,7 +250,7 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString());
 		
 		verify(mockResourceLoader).isLoaded(eq(PLOTLY_JS));
 		verify(mockResourceLoader).requires(eq(PLOTLY_JS), webResourceLoadedCallbackCaptor.capture());
@@ -259,11 +259,11 @@ public class PlotlyWidgetTest {
 		Exception ex = new Exception();
 		callback.onFailure(ex);
 		verify(mockSynAlert).handleException(ex);
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString());
 		
 		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(true);
 		callback.onSuccess(null);
-		verify(mockView).showChart(anyString(), anyString(), anyString(), any(PlotlyTrace[].class), anyString());
+		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString());
 	}	
 
 	@Test
@@ -289,9 +289,9 @@ public class PlotlyWidgetTest {
 		graphData.put(xAxisColumnName, Arrays.asList("1", "1", "2"));
 		graphData.put(fillColumnName, Arrays.asList("a", "b", "a"));
 		graphData.put(y1ColumnName, Arrays.asList("40", "50", "60"));
-		PlotlyTrace[] traces = PlotlyWidget.transform(xAxisColumnName, fillColumnName, graphType, graphData);
-		assertEquals(2, traces.length);
-		PlotlyTrace a = traces[0].getName().equals("a") ? traces[0] : traces[1];
+		List<PlotlyTraceWrapper> traces = PlotlyWidget.transform(xAxisColumnName, fillColumnName, graphType, graphData);
+		assertEquals(2, traces.size());
+		PlotlyTraceWrapper a = traces.get(0).getName().equals("a") ? traces.get(0) : traces.get(1);
 		assertEquals(2, a.getX().length);
 		assertEquals("40", a.getY()[0]);
 		assertEquals("60", a.getY()[1]);
@@ -307,9 +307,9 @@ public class PlotlyWidgetTest {
 		Map<String, List<String>> graphData = new HashMap<>();
 		graphData.put(xAxisColumnName, Arrays.asList("1", "1", "2"));
 		graphData.put(y1ColumnName, Arrays.asList("40", "50", "60"));
-		PlotlyTrace[] traces = PlotlyWidget.transform(xAxisColumnName, fillColumnName, graphType, graphData);
-		assertEquals(2, traces.length);
-		PlotlyTrace a = traces[0].getName().equals("1") ? traces[0] : traces[1];
+		List<PlotlyTraceWrapper> traces = PlotlyWidget.transform(xAxisColumnName, fillColumnName, graphType, graphData);
+		assertEquals(2, traces.size());
+		PlotlyTraceWrapper a = traces.get(0).getName().equals("1") ? traces.get(0) : traces.get(1);
 		assertEquals(2, a.getX().length);
 		assertEquals("40", a.getY()[0]);
 		assertEquals("50", a.getY()[1]);

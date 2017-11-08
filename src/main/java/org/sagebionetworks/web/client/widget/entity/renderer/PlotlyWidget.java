@@ -30,6 +30,7 @@ import org.sagebionetworks.web.client.ArrayUtils;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.plotly.PlotlyTrace;
+import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -43,6 +44,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -228,7 +230,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		}
 		
 		try {
-			PlotlyTrace[] plotlyGraphData;
+			List<PlotlyTraceWrapper> plotlyGraphData;
 			if (fillColumnName != null) {
 				plotlyGraphData = transform(xAxisColumnName, fillColumnName, graphType, graphData);
 			} else { 
@@ -250,23 +252,22 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	 * @param graphData
 	 * @return
 	 */
-	public static PlotlyTrace[] transform(String xAxisColumnName, GraphType graphType, Map<String, List<String>> graphData) {
+	public static List<PlotlyTraceWrapper> transform(String xAxisColumnName, GraphType graphType, Map<String, List<String>> graphData) {
 		String[] xData = ArrayUtils.getStringArray(graphData.remove(xAxisColumnName));
-		PlotlyTrace[] plotlyGraphData = new PlotlyTrace[graphData.size()];
-		int i = 0;
+		List<PlotlyTraceWrapper> plotlyGraphData = new ArrayList<PlotlyTraceWrapper>(graphData.size());
 		for (String columnName : graphData.keySet()) {
-			plotlyGraphData[i] = new PlotlyTrace();
-			plotlyGraphData[i].setX(xData);
+			PlotlyTraceWrapper trace =new PlotlyTraceWrapper();
+			trace.setX(xData);
 			String[] yData = ArrayUtils.getStringArray(graphData.get(columnName));
-			plotlyGraphData[i].setY(yData);
-			plotlyGraphData[i].setType(graphType);
-			plotlyGraphData[i].setName(columnName);
-			i++;
+			trace.setY(yData);
+			trace.setType(graphType);
+			trace.setName(columnName);
+			plotlyGraphData.add(trace);
 		}
 		return plotlyGraphData;
 	}
 	
-	public static PlotlyTrace[] transform(String xAxisColumnName, String fillColumnName, GraphType graphType, Map<String, List<String>> graphData) {
+	public static List<PlotlyTraceWrapper> transform(String xAxisColumnName, String fillColumnName, GraphType graphType, Map<String, List<String>> graphData) {
 		String[] xData = ArrayUtils.getStringArray(graphData.remove(xAxisColumnName));
 		String[] fillColumnData = ArrayUtils.getStringArray(graphData.remove(fillColumnName));
 		if (xAxisColumnName.equals(fillColumnName)) {
@@ -278,12 +279,12 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		for (String fillColValue : fillColumnData) {
 			uniqueFillColumnDataValues.add(fillColValue);
 		}
-		List<PlotlyTrace> plotlyTraceData = new ArrayList<>();
+		List<PlotlyTraceWrapper> plotlyTraceData = new ArrayList<>();
 		int yColumnCount = graphData.keySet().size();
 		for (String columnName : graphData.keySet()) {
 			for (String targetFillColumnValue : uniqueFillColumnDataValues) {
 				// create a new trace for each fill column value
-				PlotlyTrace newTrace = new PlotlyTrace();
+				PlotlyTraceWrapper newTrace = new PlotlyTraceWrapper();
 				List<String> traceX = new ArrayList<>();
 				List<String> traceY = new ArrayList<>();
 				
@@ -307,18 +308,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			}
 		}
 		
-		return getPlotlyTraceArray(plotlyTraceData);
-	}
-
-	public static PlotlyTrace[] getPlotlyTraceArray(List<PlotlyTrace> l) {
-		if (l == null) {
-			return null;
-		}
-		PlotlyTrace[] d = new PlotlyTrace[l.size()];
-		for (int i = 0; i < l.size(); i++) {
-			d[i] = l.get(i);
-		}
-		return d;
+		return plotlyTraceData;
 	}
 	
 	@Override
