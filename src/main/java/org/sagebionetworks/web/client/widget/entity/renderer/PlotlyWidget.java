@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_JS;
+import static org.sagebionetworks.web.client.place.Synapse.EntityArea.TABLES;
+import static org.sagebionetworks.web.client.widget.entity.tabs.TablesTab.TABLE_QUERY_PREFIX;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
 import static org.sagebionetworks.web.shared.WidgetConstants.FILL_COLUMN_NAME;
 import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
@@ -8,8 +10,7 @@ import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
-import static org.sagebionetworks.web.client.widget.entity.tabs.TablesTab.*;
-import static org.sagebionetworks.web.client.place.Synapse.EntityArea.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -26,10 +27,8 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.web.client.ArrayUtils;
-
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
-import org.sagebionetworks.web.client.plotly.PlotlyTrace;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -38,14 +37,11 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
