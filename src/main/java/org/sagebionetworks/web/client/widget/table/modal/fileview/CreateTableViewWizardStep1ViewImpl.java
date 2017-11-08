@@ -1,7 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
-import org.gwtbootstrap3.client.ui.Radio;
+import org.gwtbootstrap3.client.ui.InlineCheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -25,9 +26,7 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	@UiField
 	FormGroup viewOptionsUI;
 	@UiField
-	Radio fileViewOption;
-	@UiField
-	Radio fileAndTablesViewOption;
+	InlineCheckBox includeTablesCb;
 	
 	Widget widget;
 	Presenter p;
@@ -35,13 +34,16 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	@Inject
 	public CreateTableViewWizardStep1ViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
-		fileViewOption.addClickHandler(event -> {
-			p.onSelectFilesOnlyView();
-		});
-		fileAndTablesViewOption.addClickHandler(event -> {
-			p.onSelectFilesAndTablesView();
+		includeTablesCb.addClickHandler(event -> {
+			if (includeTablesCb.getValue()) {
+				p.onSelectFilesAndTablesView();
+			} else {
+				p.onSelectFilesOnlyView();
+			}
+			
 		});
 	}
+
 	@Override
 	public Widget asWidget() {
 		return widget;
