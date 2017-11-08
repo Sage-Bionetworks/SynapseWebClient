@@ -1,10 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import java.util.List;
+
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.web.client.plotly.PlotlyTrace;
+import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.ResizeEvent;
 import com.google.gwt.event.logical.shared.ResizeHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
@@ -74,13 +77,24 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	}-*/;
 	
 	@Override
-	public void showChart(String title, String xTitle, String yTitle, PlotlyTrace[] xyData, String barMode) {
+	public void showChart(String title, String xTitle, String yTitle, List<PlotlyTraceWrapper> xyData, String barMode) {
 		chartContainer.clear();
-		_showChart(chartContainer.getElement(), xyData, barMode, title, xTitle, yTitle);
+		_showChart(chartContainer.getElement(), getPlotlyTraceArray(xyData), barMode, title, xTitle, yTitle);
 		_resize(chartContainer.getElement());
 	}
 	
-	private static native void _showChart(Element el, PlotlyTrace[] xyData, String barMode, String title, String xTitle, String yTitle) /*-{
+	public static JavaScriptObject[] getPlotlyTraceArray(List<PlotlyTraceWrapper> l) {
+		if (l == null) {
+			return null;
+		}
+		JavaScriptObject[] d = new JavaScriptObject[l.size()];
+		for (int i = 0; i < l.size(); i++) {
+			d[i] = l.get(i).getTrace();
+		}
+		return d;
+	}
+	
+	private static native void _showChart(Element el, JavaScriptObject[] xyData, String barMode, String title, String xTitle, String yTitle) /*-{
 		var layout = {
 		  title: title,
 		  xaxis: { title: xTitle },
