@@ -1,47 +1,34 @@
 package org.sagebionetworks.web.client.plotly;
 
-import jsinterop.annotations.JsIgnore;
-import jsinterop.annotations.JsProperty;
-import jsinterop.annotations.JsType;
+import com.google.gwt.core.client.JavaScriptObject;
 
-@JsType
-public class PlotlyTrace {
+import jsinterop.annotations.JsIgnore;
+
+public class PlotlyTraceWrapper {
+	String[] x, y;
+	String name, type;
 	
-	@JsProperty
-	String x[];
-	
-	@JsProperty
-	String y[];
-	
-	@JsProperty
-	String type;
-	
-	@JsProperty
-	String name;
-	
-	@JsIgnore
-	public void setType(GraphType type) {
-		this.type = type.name().toLowerCase();
+	public PlotlyTraceWrapper() {
+	}
+	public void setType(GraphType newType) {
+		type = newType.name().toLowerCase();
 	}
 	
 	@JsIgnore
 	public void setX(String[] x) {
-		this.x = x;
 		removeNulls(x);
+		this.x = x;
 	}
 	
-	@JsIgnore
 	public void setY(String[] y) {
-		this.y = y;
 		removeNulls(y);
+		this.y = y;
 	}
 	
-	@JsIgnore
 	public void setName(String name) {
 		this.name = name;
 	}
 	
-	@JsIgnore
 	public String getType() {
 		return type;
 	}
@@ -62,4 +49,18 @@ public class PlotlyTrace {
 	public String[] getY() {
 		return y;
 	}
+	public JavaScriptObject getTrace() {
+		return _getTrace(name, type, x, y);
+	}
+
+
+	private static native JavaScriptObject _getTrace(String nameValue, String typeValue, String[] xValue, String[] yValue) /*-{
+		return {
+			type : typeValue,
+			name : nameValue,
+			x : xValue,
+			y : yValue
+		}
+	}-*/;
+
 }
