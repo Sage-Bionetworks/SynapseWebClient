@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -244,6 +245,32 @@ public class EntityFinderTest {
 		entityFinder.okClicked();
 		verify(mockSynAlert, never()).showError(anyString());
 		verify(mockSelectionHandler).onSelected(any(Reference.class));
+	}
+	
+	private void verifySelectedWithoutTypeCheck(PaginatedResults<EntityHeader> pr, SelectedHandler mockSelectionHandler) {
+		reset(mockSynAlert, mockSelectionHandler);
+		entityFinder.okClicked();
+		verify(mockSynapseClient, never()).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
+		verify(mockSynAlert, never()).showError(anyString());
+		verify(mockSelectionHandler).onSelected(any(Reference.class));
+	}
+	
+	@Test
+	public void testAllFilter() throws Exception {
+		SelectedHandler mockHandler = mock(SelectedHandler.class);
+		entityFinder.configure(EntityFilter.ALL, true, mockHandler);
+		Reference mockReference = mock(Reference.class);
+		when(mockReference.getTargetId()).thenReturn("syn99");
+		entityFinder.setSelectedEntity(mockReference);
+		
+		when(mockHeader.getType()).thenReturn(Folder.class.getName());
+		verifySelectedWithoutTypeCheck(pr, mockHandler);
+		when(mockHeader.getType()).thenReturn(FileEntity.class.getName());
+		verifySelectedWithoutTypeCheck(pr, mockHandler);
+		when(mockHeader.getType()).thenReturn(Project.class.getName());
+		verifySelectedWithoutTypeCheck(pr, mockHandler);
+		when(mockHeader.getType()).thenReturn(TableEntity.class.getName());
+		verifySelectedWithoutTypeCheck(pr, mockHandler);
 	}
 	
 	@Test

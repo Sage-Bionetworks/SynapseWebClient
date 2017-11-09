@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import static org.sagebionetworks.repo.model.EntityType.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,13 +11,13 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 
 public enum EntityFilter {
-	ALL(EntityType.project, EntityType.folder, EntityType.file, EntityType.link),
-	CONTAINER(EntityType.project, EntityType.folder),
-	PROJECT(EntityType.project),
-	FOLDER(EntityType.folder),
-	FILE(EntityType.file),
-	ALL_BUT_LINK(EntityType.project, EntityType.folder, EntityType.file),
-	PROJECT_OR_TABLE(EntityType.project, EntityType.table, EntityType.entityview);
+	ALL(project, folder, file, link),
+	CONTAINER(project, folder),
+	PROJECT(project),
+	FOLDER(folder),
+	FILE(file),
+	ALL_BUT_LINK(project, folder, file),
+	PROJECT_OR_TABLE(project, table, entityview);
 	
 	// when browsing (in the entity tree browser), only these types should be shown.
 	private Set<String> entityTypeClassNamesSet;

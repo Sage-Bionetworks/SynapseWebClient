@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,13 +54,12 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		view.setSynAlert(synAlert.asWidget());
 	}	
 
-	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
 	}
 
 	public void configure(boolean showVersions, SelectedHandler<Reference> handler) {
-		configure(EntityFilter.ALL, showVersions, handler);
+		configure(ALL, showVersions, handler);
 	}
 	
 
@@ -106,28 +106,38 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		if (selectedEntities == null || selectedEntities.isEmpty()) {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		} else {
-			// fetch the entity for a type check
-			ReferenceList rl = new ReferenceList();
-			rl.setReferences(selectedEntities);
-			lookupEntity(rl, new AsyncCallback<List<EntityHeader>>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-				}
-
-				@Override
-				public void onSuccess(List<EntityHeader> result) {
-					if (validateEntityTypeAgainstFilter(result)) {
-						if (selectedHandler != null) {
-							selectedHandler.onSelected(selectedEntities.get(0));
-						}
-						if (selectedMultiHandler != null) {
-							selectedMultiHandler.onSelected(selectedEntities);
+			if (!ALL.equals(filter)) {
+				// fetch the entity for a type check
+				ReferenceList rl = new ReferenceList();
+				rl.setReferences(selectedEntities);
+				lookupEntity(rl, new AsyncCallback<List<EntityHeader>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						synAlert.handleException(caught);
+					}
+	
+					@Override
+					public void onSuccess(List<EntityHeader> result) {
+						if (validateEntityTypeAgainstFilter(result)) {
+							fireEntitiesSelected();
 						}
 					}
-				}
-			});
+				});
+			} else {
+				// skip type check if ALL
+				fireEntitiesSelected();
+			}
 		}
+	}
+	
+	private void fireEntitiesSelected() {
+		if (selectedHandler != null) {
+			selectedHandler.onSelected(selectedEntities.get(0));
+		}
+		if (selectedMultiHandler != null) {
+			selectedMultiHandler.onSelected(selectedEntities);
+		}
+
 	}
 
 	public boolean validateEntityTypeAgainstFilter(List<EntityHeader> list) {
