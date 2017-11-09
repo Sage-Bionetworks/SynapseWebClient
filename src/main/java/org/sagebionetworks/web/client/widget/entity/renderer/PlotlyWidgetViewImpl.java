@@ -77,9 +77,9 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	}-*/;
 	
 	@Override
-	public void showChart(String title, String xTitle, String yTitle, List<PlotlyTraceWrapper> xyData, String barMode) {
+	public void showChart(String title, String xTitle, String yTitle, List<PlotlyTraceWrapper> xyData, String barMode, String xAxisType, String yAxisType) {
 		chartContainer.clear();
-		_showChart(chartContainer.getElement(), getPlotlyTraceArray(xyData), barMode, title, xTitle, yTitle);
+		_showChart(chartContainer.getElement(), getPlotlyTraceArray(xyData), barMode, title, xTitle, yTitle, xAxisType, yAxisType);
 		_resize(chartContainer.getElement());
 	}
 	
@@ -94,11 +94,16 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		return d;
 	}
 	
-	private static native void _showChart(Element el, JavaScriptObject[] xyData, String barMode, String title, String xTitle, String yTitle) /*-{
+	private static native void _showChart(Element el, JavaScriptObject[] xyData, String barMode, String plotTitle, String xTitle, String yTitle, String xAxisType, String yAxisType) /*-{
 		var layout = {
-		  title: title,
-		  xaxis: { title: xTitle },
-		  yaxis: { title: yTitle },
+		  xaxis: {
+		  	title: xTitle,
+		  	type: xAxisType
+		  },
+		  yaxis: { 
+		  	title: yTitle,
+		  	type: yAxisType
+		  },
 		  barmode: barMode
 		};
 		

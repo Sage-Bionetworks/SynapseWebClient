@@ -225,7 +225,9 @@ public class WidgetConstants {
 	
 	public static final String TITLE = "title";
 	public static final String X_AXIS_TITLE = "xtitle";
+	public static final String X_AXIS_TYPE = "xaxistype";
 	public static final String Y_AXIS_TITLE = "ytitle";
+	public static final String Y_AXIS_TYPE = "yaxistype";
 	public static final String TYPE = "type";
 	public static final String BAR_MODE = "barmode";
 }
