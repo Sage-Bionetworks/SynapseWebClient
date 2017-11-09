@@ -106,28 +106,38 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		if (selectedEntities == null || selectedEntities.isEmpty()) {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		} else {
-			// fetch the entity for a type check
-			ReferenceList rl = new ReferenceList();
-			rl.setReferences(selectedEntities);
-			lookupEntity(rl, new AsyncCallback<List<EntityHeader>>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-				}
-
-				@Override
-				public void onSuccess(List<EntityHeader> result) {
-					if (validateEntityTypeAgainstFilter(result)) {
-						if (selectedHandler != null) {
-							selectedHandler.onSelected(selectedEntities.get(0));
-						}
-						if (selectedMultiHandler != null) {
-							selectedMultiHandler.onSelected(selectedEntities);
+			if (!EntityFilter.ALL.equals(filter)) {
+				// fetch the entity for a type check
+				ReferenceList rl = new ReferenceList();
+				rl.setReferences(selectedEntities);
+				lookupEntity(rl, new AsyncCallback<List<EntityHeader>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						synAlert.handleException(caught);
+					}
+	
+					@Override
+					public void onSuccess(List<EntityHeader> result) {
+						if (validateEntityTypeAgainstFilter(result)) {
+							fireEntitiesSelected();
 						}
 					}
-				}
-			});
+				});
+			} else {
+				// all available
+				fireEntitiesSelected();
+			}
 		}
+	}
+	
+	private void fireEntitiesSelected() {
+		if (selectedHandler != null) {
+			selectedHandler.onSelected(selectedEntities.get(0));
+		}
+		if (selectedMultiHandler != null) {
+			selectedMultiHandler.onSelected(selectedEntities);
+		}
+
 	}
 
 	public boolean validateEntityTypeAgainstFilter(List<EntityHeader> list) {
