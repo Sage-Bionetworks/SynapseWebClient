@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.request.ReferenceList;
+import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -267,6 +268,8 @@ public class EntityFinderTest {
 		when(mockHeader.getType()).thenReturn(FileEntity.class.getName());
 		verifySelectedWithoutTypeCheck(pr, mockHandler);
 		when(mockHeader.getType()).thenReturn(Project.class.getName());
+		verifySelectedWithoutTypeCheck(pr, mockHandler);
+		when(mockHeader.getType()).thenReturn(TableEntity.class.getName());
 		verifySelectedWithoutTypeCheck(pr, mockHandler);
 	}
 	
