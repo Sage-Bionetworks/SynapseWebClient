@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,13 +54,12 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		view.setSynAlert(synAlert.asWidget());
 	}	
 
-	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
 	}
 
 	public void configure(boolean showVersions, SelectedHandler<Reference> handler) {
-		configure(EntityFilter.ALL, showVersions, handler);
+		configure(ALL, showVersions, handler);
 	}
 	
 
@@ -106,7 +106,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		if (selectedEntities == null || selectedEntities.isEmpty()) {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		} else {
-			if (!EntityFilter.ALL.equals(filter)) {
+			if (!ALL.equals(filter)) {
 				// fetch the entity for a type check
 				ReferenceList rl = new ReferenceList();
 				rl.setReferences(selectedEntities);
@@ -124,7 +124,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 					}
 				});
 			} else {
-				// all available
+				// skip type check if ALL
 				fireEntitiesSelected();
 			}
 		}
