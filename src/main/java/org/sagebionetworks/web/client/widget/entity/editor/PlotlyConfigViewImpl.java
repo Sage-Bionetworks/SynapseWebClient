@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.ListBox;
@@ -57,6 +58,9 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	ListBox xColumnNamesMenu;
 	@UiField
 	ListBox yColumnNamesMenu;
+	@UiField
+	CheckBox showLegendCb;
+	
 	public interface PlotlyConfigViewImplUiBinder extends UiBinder<Widget, PlotlyConfigViewImpl> {}
 	Widget widget;
 	
@@ -277,5 +281,13 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	public void setShowHideButton(IsWidget w) {
 		showHideAdvancedButtonContainer.clear();
 		showHideAdvancedButtonContainer.add(w);
+	}
+	@Override
+	public boolean isShowLegend() {
+		return showLegendCb.getValue();
+	}
+	@Override
+	public void setShowLegend(boolean value) {
+		showLegendCb.setValue(value);
 	}
 }

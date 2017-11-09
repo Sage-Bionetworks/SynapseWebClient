@@ -74,6 +74,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	private ResourceLoader resourceLoader;
 	QueryTokenProvider queryTokenProvider;
 	public static final String X_AXIS_CATEGORY_TYPE = "category";
+	boolean showLegend;
 	
 	@Inject
 	public PlotlyWidget(PlotlyWidgetView view,
@@ -108,18 +109,10 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		xTitle = descriptor.get(X_AXIS_TITLE);
 		yTitle = descriptor.get(Y_AXIS_TITLE);
 		graphType = GraphType.valueOf(descriptor.get(TYPE));
-		if (descriptor.containsKey(X_AXIS_TYPE)) {
-			xAxisType = descriptor.get(X_AXIS_TYPE);
-		} else {
-			xAxisType = "-";	
-		}
 		
-		if (descriptor.containsKey(Y_AXIS_TYPE)) {
-			yAxisType = descriptor.get(Y_AXIS_TYPE);
-		} else {
-			yAxisType = "-";	
-		}
-		
+		xAxisType = descriptor.containsKey(X_AXIS_TYPE) ? descriptor.get(X_AXIS_TYPE) : "-"; 
+		yAxisType = descriptor.containsKey(Y_AXIS_TYPE) ? descriptor.get(Y_AXIS_TYPE) : "-";
+		showLegend = descriptor.containsKey(SHOW_LEGEND) ? Boolean.valueOf(descriptor.get(SHOW_LEGEND)) : true;
 		
 		if (descriptor.containsKey(BAR_MODE)) {
 			barMode = BarMode.valueOf(descriptor.get(BAR_MODE));
@@ -249,7 +242,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 				plotlyGraphData = transform(xAxisColumnName, graphType, graphData); 
 			}
 			view.setLoadingVisible(false);
-			view.showChart(title, xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase(), xAxisType, yAxisType);
+			view.showChart(title, xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase(), xAxisType, yAxisType, showLegend);
 		} catch (Throwable ex) {
 			synAlert.showError("Error showing plot: " + ex.getMessage());
 		}

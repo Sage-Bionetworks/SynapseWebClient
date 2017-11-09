@@ -65,6 +65,10 @@
 					</bh:Div>
 				</b:InputGroup>
 			</b:FormGroup>
+			<b:FormGroup>
+				<b:FormLabel>Options</b:FormLabel>
+				<b:CheckBox ui:field="showLegendCb" text="Show legend"/>
+			</b:FormGroup>
 			<bh:Div ui:field="showHideAdvancedButtonContainer" />
 			<bh:Div ui:field="advancedUI" visible="false" addStyleNames="margin-top-10">
 				<b:FormGroup>

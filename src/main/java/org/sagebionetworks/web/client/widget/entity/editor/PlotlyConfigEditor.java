@@ -1,11 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
-import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
-import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
-import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
-import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -133,6 +128,11 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 			BarMode barMode = BarMode.valueOf(descriptor.get(BAR_MODE));
 			view.setBarMode(barMode);
 		}
+		if (descriptor.containsKey(SHOW_LEGEND)) {
+			view.setShowLegend(Boolean.valueOf(descriptor.get(SHOW_LEGEND)));
+		} else {
+			view.setShowLegend(true);
+		}
 	}
 	
 	/**
@@ -230,6 +230,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		if (GraphType.BAR.equals(view.getGraphType())) {
 			descriptor.put(BAR_MODE, view.getBarMode().toString());	
 		}
+		descriptor.put(SHOW_LEGEND, Boolean.toString(view.isShowLegend()));
 	}
 	
 	public String getSql() {
