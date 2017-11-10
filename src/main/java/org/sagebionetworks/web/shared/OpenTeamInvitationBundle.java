@@ -7,24 +7,24 @@ import com.google.gwt.user.client.rpc.IsSerializable;
 
 public class OpenTeamInvitationBundle implements IsSerializable {
 	
-	private MembershipInvitation MembershipInvitation;
+	private MembershipInvitation membershipInvitation;
 	private UserProfile userProfile;
 	
 	public OpenTeamInvitationBundle(
-			MembershipInvitation MembershipInvitation,
+			MembershipInvitation membershipInvitation,
 			UserProfile userProfile) {
 		super();
-		this.MembershipInvitation = MembershipInvitation;
+		this.membershipInvitation = membershipInvitation;
 		this.userProfile = userProfile;
 	}
 	public OpenTeamInvitationBundle() {
 	}
 	public MembershipInvitation getMembershipInvitation() {
-		return MembershipInvitation;
+		return membershipInvitation;
 	}
 	public void setMembershipInvitation(
-			MembershipInvitation MembershipInvitation) {
-		this.MembershipInvitation = MembershipInvitation;
+			MembershipInvitation membershipInvitation) {
+		this.membershipInvitation = membershipInvitation;
 	}
 	public UserProfile getUserProfile() {
 		return userProfile;
@@ -38,8 +38,8 @@ public class OpenTeamInvitationBundle implements IsSerializable {
 		int result = 1;
 		result = prime
 				* result
-				+ ((MembershipInvitation == null) ? 0
-						: MembershipInvitation.hashCode());
+				+ ((membershipInvitation == null) ? 0
+						: membershipInvitation.hashCode());
 		result = prime * result
 				+ ((userProfile == null) ? 0 : userProfile.hashCode());
 		return result;
@@ -53,11 +53,11 @@ public class OpenTeamInvitationBundle implements IsSerializable {
 		if (getClass() != obj.getClass())
 			return false;
 		OpenTeamInvitationBundle other = (OpenTeamInvitationBundle) obj;
-		if (MembershipInvitation == null) {
-			if (other.MembershipInvitation != null)
+		if (membershipInvitation == null) {
+			if (other.membershipInvitation != null)
 				return false;
-		} else if (!MembershipInvitation
-				.equals(other.MembershipInvitation))
+		} else if (!membershipInvitation
+				.equals(other.membershipInvitation))
 			return false;
 		if (userProfile == null) {
 			if (other.userProfile != null)
@@ -68,8 +68,8 @@ public class OpenTeamInvitationBundle implements IsSerializable {
 	}
 	@Override
 	public String toString() {
-		return "OpenTeamInvitationBundle [MembershipInvitation="
-				+ MembershipInvitation + ", userProfile=" + userProfile
+		return "OpenTeamInvitationBundle [membershipInvitation="
+				+ membershipInvitation + ", userProfile=" + userProfile
 				+ "]";
 	}
 
