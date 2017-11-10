@@ -34,7 +34,8 @@ public interface PlotlyConfigView extends IsWidget {
 	void resetSelectedYColumn();
 	void setShowHideButton(IsWidget w);
 	void setAdvancedUIVisible(boolean visible);
-	
+	void setShowLegend(boolean value);
+	boolean isShowLegend();
 	public interface Presenter {
 		void onFindTable();
 		void onXColumnChanged();

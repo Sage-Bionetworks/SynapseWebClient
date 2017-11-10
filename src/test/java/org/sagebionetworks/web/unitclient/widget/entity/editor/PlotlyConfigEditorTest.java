@@ -123,6 +123,7 @@ public class PlotlyConfigEditorTest {
 		BarMode barMode = BarMode.STACK;
 		String xAxisTitle = "X";
 		String yAxisTitle = "Y";
+		boolean showLegend = true;
 		
 		Map<String, String> params = new HashMap<>();
 		params.put(TABLE_QUERY_KEY, sql);
@@ -131,6 +132,7 @@ public class PlotlyConfigEditorTest {
 		params.put(Y_AXIS_TITLE, yAxisTitle);
 		params.put(TYPE, type.name());
 		params.put(BAR_MODE, barMode.name());
+		params.put(SHOW_LEGEND, Boolean.toString(showLegend));
 		
 		WikiPageKey wikiKey = null;
 		DialogCallback callback = null;
@@ -143,6 +145,7 @@ public class PlotlyConfigEditorTest {
 		verify(mockView).setBarMode(barMode);
 		verify(mockView).setAdvancedClause(advancedClause);
 		verify(mockView).setAdvancedUIVisible(true);
+		verify(mockView).setShowLegend(showLegend);
 	}
 	
 	@Test
@@ -190,7 +193,8 @@ public class PlotlyConfigEditorTest {
 		columnModels.add(mockXColumnModel);
 		columnModels.add(mockYColumnModel);
 		when(mockView.getXAxisColumnName()).thenReturn(newX);
-		
+		boolean showLegend = true;
+		when(mockView.isShowLegend()).thenReturn(showLegend);
 		editor.setTableId(newSynId);
 		editor.onXColumnChanged();
 		editor.onAddYColumn(newY1);
@@ -214,6 +218,7 @@ public class PlotlyConfigEditorTest {
 		assertEquals(xAxisLabel, params.get(X_AXIS_TITLE));
 		assertEquals(yAxisLabel, params.get(Y_AXIS_TITLE));
 		assertEquals(GraphType.SCATTER.toString(), params.get(TYPE));
+		assertEquals(Boolean.toString(showLegend), params.get(SHOW_LEGEND));
 	}
 	@Test (expected=IllegalArgumentException.class)
 	public void testUpdateDescriptorFromViewFailure() {

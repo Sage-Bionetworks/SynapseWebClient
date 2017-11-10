@@ -9,7 +9,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 public interface PlotlyWidgetView extends IsWidget {
 	void setSynAlertWidget(IsWidget w);
 	void setPresenter(Presenter p);
-	void showChart(String title, String xTitle, String yTitle, List<PlotlyTraceWrapper> xyData, String barMode);
+	void showChart(String title, String xTitle, String yTitle, List<PlotlyTraceWrapper> xyData, String barMode, String xAxisType, String yAxisType, boolean showLegend);
 	void clearChart();
 	void setLoadingVisible(boolean visible);
 	void setLoadingMessage(String message);

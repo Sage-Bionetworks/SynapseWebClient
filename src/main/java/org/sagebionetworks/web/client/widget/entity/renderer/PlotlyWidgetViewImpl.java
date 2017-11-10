@@ -77,9 +77,17 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	}-*/;
 	
 	@Override
-	public void showChart(String title, String xTitle, String yTitle, List<PlotlyTraceWrapper> xyData, String barMode) {
+	public void showChart(
+			String title, 
+			String xTitle, 
+			String yTitle, 
+			List<PlotlyTraceWrapper> xyData, 
+			String barMode, 
+			String xAxisType, 
+			String yAxisType, 
+			boolean showLegend) {
 		chartContainer.clear();
-		_showChart(chartContainer.getElement(), getPlotlyTraceArray(xyData), barMode, title, xTitle, yTitle);
+		_showChart(chartContainer.getElement(), getPlotlyTraceArray(xyData), barMode, title, xTitle, yTitle, xAxisType, yAxisType, showLegend);
 		_resize(chartContainer.getElement());
 	}
 	
@@ -94,18 +102,33 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		return d;
 	}
 	
-	private static native void _showChart(Element el, JavaScriptObject[] xyData, String barMode, String title, String xTitle, String yTitle) /*-{
+	private static native void _showChart(
+			Element el, 
+			JavaScriptObject[] xyData, 
+			String barMode, 
+			String plotTitle, 
+			String xTitle, 
+			String yTitle, 
+			String xAxisType, 
+			String yAxisType, 
+			boolean showLegend) /*-{
 		var layout = {
-		  title: title,
-		  xaxis: { title: xTitle },
-		  yaxis: { title: yTitle },
-		  barmode: barMode
+		  xaxis: {
+		  	title: xTitle,
+		  	type: xAxisType
+		  },
+		  yaxis: { 
+		  	title: yTitle,
+		  	type: yAxisType
+		  },
+		  barmode: barMode,
+		  showlegend: showLegend
 		};
 		
 		// note: we'd like to just hide the "save and edit plot in cloud" command, 
 		// but the parameter provided in the docs (showLink: false) has no effect.
 		// hide the entire bar by setting displayModeBar to false.
-		$wnd.Plotly.plot(el, xyData, layout, {displayModeBar: false});
+		$wnd.Plotly.newPlot(el, xyData, layout, {displayModeBar: false});
 	}-*/;
 
 	@Override

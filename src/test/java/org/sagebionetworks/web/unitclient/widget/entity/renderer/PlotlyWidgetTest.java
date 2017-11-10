@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -15,6 +16,7 @@ import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_JS;
 import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.ALL_PARTS_MASK;
 import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.LIMIT;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
+import static org.sagebionetworks.web.shared.WidgetConstants.SHOW_LEGEND;
 import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
 import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
@@ -155,6 +157,7 @@ public class PlotlyWidgetTest {
 		BarMode mode = BarMode.STACK;
 		String plotTitle = "Plot Title";
 		String tableId = "syn12345";
+		boolean showLegend = false;
 		String sql = "select x, y1, y2 from "+tableId+" where x>2";
 		params.put(TABLE_QUERY_KEY, sql);
 		params.put(TITLE, plotTitle);
@@ -162,6 +165,7 @@ public class PlotlyWidgetTest {
 		params.put(Y_AXIS_TITLE, yAxisLabel);
 		params.put(TYPE, type.toString());
 		params.put(BAR_MODE, mode.toString());
+		params.put(SHOW_LEGEND, Boolean.toString(showLegend));
 		
 		selectColumns.add(mockXColumn);
 		selectColumns.add(mockY1Column);
@@ -193,7 +197,7 @@ public class PlotlyWidgetTest {
 		// complete first page load
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView, never()).showChart(eq(plotTitle), anyString(), anyString(), anyList(), anyString());
+		verify(mockView, never()).showChart(eq(plotTitle), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
 		
 		//test final page
 		rows.clear();
@@ -207,7 +211,7 @@ public class PlotlyWidgetTest {
 		assertTrue(loadingMessage.contains(LIMIT.toString()));
 		
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
-		verify(mockView).showChart(eq(plotTitle), eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()));
+		verify(mockView).showChart(eq(plotTitle), eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()), anyString(), anyString(), eq(showLegend));
 		List traces = plotlyTraceArrayCaptor.getValue();
 		assertTrue(traces.size() > 0);
 		assertEquals(type.toString().toLowerCase(), ((PlotlyTraceWrapper)traces.get(0)).getType());
@@ -254,6 +258,8 @@ public class PlotlyWidgetTest {
 	public void testLazyLoadPlotlyJS() throws JSONObjectAdapterException {
 		GraphType type = GraphType.SCATTER;
 		params.put(TYPE, type.toString());
+		boolean showLegend = true;
+		params.put(SHOW_LEGEND, Boolean.toString(showLegend));
 		WikiPageKey pageKey = null;
 		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(false);
 		widget.configure(pageKey, params, null, null);
@@ -261,7 +267,7 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
 		
 		verify(mockResourceLoader).isLoaded(eq(PLOTLY_JS));
 		verify(mockResourceLoader).requires(eq(PLOTLY_JS), webResourceLoadedCallbackCaptor.capture());
@@ -270,11 +276,11 @@ public class PlotlyWidgetTest {
 		Exception ex = new Exception();
 		callback.onFailure(ex);
 		verify(mockSynAlert).handleException(ex);
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
 		
 		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(true);
 		callback.onSuccess(null);
-		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString());
+		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), eq(showLegend));
 	}	
 
 	@Test

@@ -8,7 +8,7 @@ import static org.sagebionetworks.web.shared.WidgetConstants.FILL_COLUMN_NAME;
 import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
 import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
 
 import java.util.ArrayList;
@@ -21,6 +21,7 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -59,6 +60,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	private SynapseAlert synAlert;
 	private String sql, title, xTitle, yTitle;
 	GraphType graphType;
+	String xAxisType, yAxisType;
 	BarMode barMode;
 	private AsynchronousJobTracker jobTracker;
 	// Mask to get all parts of a query.
@@ -71,6 +73,8 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	String xAxisColumnName, fillColumnName;
 	private ResourceLoader resourceLoader;
 	QueryTokenProvider queryTokenProvider;
+	public static final String X_AXIS_CATEGORY_TYPE = "category";
+	boolean showLegend;
 	
 	@Inject
 	public PlotlyWidget(PlotlyWidgetView view,
@@ -105,6 +109,10 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		xTitle = descriptor.get(X_AXIS_TITLE);
 		yTitle = descriptor.get(Y_AXIS_TITLE);
 		graphType = GraphType.valueOf(descriptor.get(TYPE));
+		
+		xAxisType = descriptor.containsKey(X_AXIS_TYPE) ? descriptor.get(X_AXIS_TYPE) : "-"; 
+		yAxisType = descriptor.containsKey(Y_AXIS_TYPE) ? descriptor.get(Y_AXIS_TYPE) : "-";
+		showLegend = descriptor.containsKey(SHOW_LEGEND) ? Boolean.valueOf(descriptor.get(SHOW_LEGEND)) : true;
 		
 		if (descriptor.containsKey(BAR_MODE)) {
 			barMode = BarMode.valueOf(descriptor.get(BAR_MODE));
@@ -192,7 +200,8 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			return;
 		}
 		
-		xAxisColumnName = result.getSelectColumns().get(0).getName();
+		SelectColumn xColumn = result.getSelectColumns().get(0);
+		xAxisColumnName = xColumn.getName();
 		for (SelectColumn column : result.getSelectColumns()) {
 			graphData.put(column.getName(), new ArrayList<String>());
 		}
@@ -233,7 +242,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 				plotlyGraphData = transform(xAxisColumnName, graphType, graphData); 
 			}
 			view.setLoadingVisible(false);
-			view.showChart(title, xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase());
+			view.showChart(title, xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase(), xAxisType, yAxisType, showLegend);
 		} catch (Throwable ex) {
 			synAlert.showError("Error showing plot: " + ex.getMessage());
 		}
