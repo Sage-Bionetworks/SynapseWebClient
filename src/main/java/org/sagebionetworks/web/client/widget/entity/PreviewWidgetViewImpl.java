@@ -195,7 +195,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 						// keep executing as long as frame is attached
 						return frame.isAttached();
 					}
-				}, 100);
+				}, 200);
 			}
 		});
 		
@@ -222,9 +222,10 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 				newHeightPx = 450;
 			}
 			var frameHeight = parseInt(iframe.height);
-			if (!frameHeight || (newHeightPx != frameHeight && newHeightPx > frameHeight)) {
+			if (!frameHeight || (Math.abs(newHeightPx - frameHeight) > 70)) {
 				iframe.height = "";
 				iframe.height = (newHeightPx + 50) + "px";
+				iframe.scrollIntoView();
 			}
 		}
 	}-*/;
