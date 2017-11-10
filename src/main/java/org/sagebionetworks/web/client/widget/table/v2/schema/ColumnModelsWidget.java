@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -96,10 +97,14 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			return TableType.table;
 		} else if (entity instanceof EntityView) {
 			EntityView view = (EntityView)entity;
-			if (org.sagebionetworks.repo.model.table.ViewType.file.equals(view.getType())) {
-				return TableType.fileview;
-			} else if (org.sagebionetworks.repo.model.table.ViewType.project.equals(view.getType())) {
-				return TableType.projectview;
+			org.sagebionetworks.repo.model.table.ViewType targetType = view.getType();
+			if (targetType == null) {
+				return TableType.table;
+			}
+			for (TableType tableType : TableType.values()) {
+				if (targetType.equals(tableType.getViewType())) {
+					return tableType;
+				}
 			}
 		}
 		return null;
