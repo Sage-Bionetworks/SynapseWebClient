@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import java.util.Map;
 
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -12,7 +13,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRendererPresenter {
+public class ShinySiteWidget implements WidgetRendererPresenter {
 	
 	//Note: *.synapse.org is also in the whitelist
 	private static final String[] VALID_URL_BASES = { 
@@ -25,18 +26,17 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 		"https://docs.google.com/a/sagebase.org/forms/",
 		"https://calendar.google.com/calendar/"
 		};
-	private ShinySiteWidgetView view;
+	private IFrameView view;
 	private Map<String, String> descriptor;
 	private AuthenticationController authenticationController;
 	private SynapseJSNIUtils jsniUtils;
 	@Inject
-	public ShinySiteWidget(ShinySiteWidgetView view, 
+	public ShinySiteWidget(IFrameView view, 
 			AuthenticationController authenticationController,
 			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.jsniUtils = jsniUtils;
-		view.setPresenter(this);
 	}
 	
 	@Override
@@ -56,7 +56,7 @@ public class ShinySiteWidget implements ShinySiteWidgetView.Presenter, WidgetRen
 		}
 			
 		else 
-			view.showInvalidSiteUrl(siteUrl);
+			view.showError(siteUrl + DisplayConstants.INVALID_SHINY_SITE);
 	}
 	
 	@SuppressWarnings("unchecked")

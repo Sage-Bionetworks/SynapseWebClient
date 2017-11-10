@@ -34,6 +34,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -43,6 +44,7 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget.PreviewFileType;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.PDFPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -85,6 +87,11 @@ public class PreviewWidgetTest {
 	VideoWidget mockVideoWidget;
 	@Mock
 	EntityBundle linkBundle;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	PDFPreviewWidget mockPDFPreviewWidget;
+	
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	FileHandle mainFileHandle;
@@ -94,7 +101,7 @@ public class PreviewWidgetTest {
 	@Before
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
-		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockSynapseClient, mockAuthController, mockVideoWidget, mockSynapseJavascriptClient);
+		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockSynapseClient, mockAuthController, mockSynapseJavascriptClient, mockPortalGinInjector);
 		testEntity = new FileEntity();
 		testFileHandleList = new ArrayList<FileHandle>();
 		mainFileHandle = new S3FileHandle();
@@ -105,6 +112,8 @@ public class PreviewWidgetTest {
 		testBundle = new EntityBundle();
 		testBundle.setEntity(testEntity);
 		testBundle.setFileHandles(testFileHandleList);
+		when(mockPortalGinInjector.getVideoWidget()).thenReturn(mockVideoWidget);
+		when(mockPortalGinInjector.getPDFPreviewWidget()).thenReturn(mockPDFPreviewWidget);
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://fakebaseurl/");
 		mockResponse = mock(Response.class);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
@@ -191,6 +200,27 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setImagePreview(anyString());
+	}
+	
+	@Test
+	public void testMainFilePdfContentType(){
+		// images that do not have a preview file handle will use the original
+		mainFileHandle.setContentType("application/pdf");
+		mainFileHandle.setFileName("original.pdf");
+		previewWidget.configure(testBundle);
+		verify(mockView).setPreviewWidget(mockPDFPreviewWidget);
+	}
+	
+	@Test
+	public void testPreviewFilePdfContentType(){
+		mainFileHandle.setContentType("doc");
+		PreviewFileHandle fh = new PreviewFileHandle();
+		fh.setId("previewFileId");
+		fh.setContentType("application/pdf");
+		testFileHandleList.add(fh);
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		verify(mockView).setPreviewWidget(mockPDFPreviewWidget);
 	}
 	
 	@Test

@@ -14,7 +14,7 @@ public interface PreviewWidgetView extends IsWidget{
 	public void setImagePreview(String fileUrl);
 	public void setCodePreview(String text);
 	public void setTextPreview(String text);
-	public void setPreviewWidget(Widget w);
+	public void setPreviewWidget(IsWidget w);
 	void addStyleName(String style);
 	public void setHTML(String html);
 	void showLoading();
@@ -26,7 +26,7 @@ public interface PreviewWidgetView extends IsWidget{
 	 */
 	public void setTablePreview(String text, String delimiter);
 	
-	void addSynapseAlertWidget(Widget w);
+	void addSynapseAlertWidget(IsWidget w);
 	public void clear();
 	
 	/**

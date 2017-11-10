@@ -1,14 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
-import org.sagebionetworks.web.client.utils.Callback;
-
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -19,7 +15,6 @@ import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Frame;
@@ -114,7 +109,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
 	}
 	@Override
-	public void setPreviewWidget(Widget w) {
+	public void setPreviewWidget(IsWidget w) {
 		clear();
 		add(w.asWidget());
 	}
@@ -220,7 +215,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		return frame;
 	}
 	
-	private static native void _autoAdjustFrameHeight(Element iframe) /*-{
+	public static native void _autoAdjustFrameHeight(Element iframe) /*-{
 		if(iframe && iframe.contentWindow && iframe.contentWindow.document.body) {
 			var newHeightPx = iframe.contentWindow.document.body.scrollHeight;
 			if (newHeightPx < 450) {
@@ -248,7 +243,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 
   
 	@Override
-	public void addSynapseAlertWidget(Widget w) {
+	public void addSynapseAlertWidget(IsWidget w) {
 		clear();
 		add(w);
 	}

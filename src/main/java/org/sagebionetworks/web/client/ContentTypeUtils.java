@@ -45,6 +45,11 @@ public class ContentTypeUtils {
 	public static boolean isHTML(String contentType) {
 		return contentType != null && contentType.toLowerCase().startsWith("text/html");
 	}
+	
+
+	public static boolean isPDF(String contentType) {
+		return contentType != null && contentType.toLowerCase().startsWith("application/pdf");
+	}
 
 	public static String fixDefaultContentType(String type, String fileName) {
 		String contentType = type;
