@@ -45,7 +45,7 @@ import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.ExampleEntity;
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
+import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
@@ -107,7 +107,7 @@ public class ChallengeClientImplTest {
 	Evaluation mockEvaluation;
 	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
-	MembershipInvtnSubmission testInvitation;
+	MembershipInvitation testInvitation;
 	MessageToUser sentMessage;
 	
 	private static final String testChallengeId = "1";

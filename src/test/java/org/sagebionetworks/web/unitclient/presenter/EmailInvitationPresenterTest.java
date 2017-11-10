@@ -20,7 +20,7 @@ import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
+import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -49,7 +49,7 @@ public class EmailInvitationPresenterTest {
 	@Mock private PlaceChanger placeChanger;
 	@Mock private EmailInvitation place;
 	@Mock private InviteeVerificationSignedToken inviteeVerificationSignedToken;
-	@Mock private MembershipInvtnSubmission mis;
+	@Mock private MembershipInvitation mis;
 	@Mock private Team team;
 	@Mock private UserProfile inviterProfile;
 

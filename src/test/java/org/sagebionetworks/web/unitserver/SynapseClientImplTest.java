@@ -79,9 +79,7 @@ import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.JoinTeamSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
 import org.sagebionetworks.repo.model.MembershipRequest;
-import org.sagebionetworks.repo.model.MembershipRqstSubmission;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
@@ -216,7 +214,7 @@ public class SynapseClientImplTest {
 	Evaluation mockEvaluation;
 	UserSessionData mockUserSessionData;
 	UserProfile mockUserProfile;
-	MembershipInvtnSubmission testInvitation;
+	MembershipInvitation testInvitation;
 	@Mock
 	MembershipRequest mockMembershipRequest;
 	PaginatedResults mockPaginatedMembershipRequest;
@@ -570,12 +568,12 @@ public class SynapseClientImplTest {
 	}
 
 	private void setupTeamInvitations() throws SynapseException {
-		ArrayList<MembershipInvtnSubmission> testInvitations = new ArrayList<MembershipInvtnSubmission>();
-		testInvitation = new MembershipInvtnSubmission();
+		ArrayList<MembershipInvitation> testInvitations = new ArrayList<MembershipInvitation>();
+		testInvitation = new MembershipInvitation();
 		testInvitation.setId("628319");
 		testInvitation.setInviteeId(USER_ID);
 		testInvitations.add(testInvitation);
-		PaginatedResults<MembershipInvtnSubmission> paginatedInvitations = new PaginatedResults<MembershipInvtnSubmission>();
+		PaginatedResults<MembershipInvitation> paginatedInvitations = new PaginatedResults<MembershipInvitation>();
 		paginatedInvitations.setResults(testInvitations);
 		when(
 				mockSynapse.getOpenMembershipInvitationSubmissions(anyString(),
@@ -1204,7 +1202,7 @@ public class SynapseClientImplTest {
 		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(),
 				anyString(), anyString(), anyString());
 		verify(mockSynapse, Mockito.times(0)).createMembershipInvitation(
-				any(MembershipInvtnSubmission.class), anyString(), anyString());
+				any(MembershipInvitation.class), anyString(), anyString());
 
 	}
 
@@ -1216,7 +1214,7 @@ public class SynapseClientImplTest {
 		synapseClient.requestMembership("123", "a team", "let me join", TEST_HOME_PAGE_BASE, null);
 		verify(mockSynapse, Mockito.times(0)).addTeamMember(anyString(),
 				anyString(), eq(TEST_HOME_PAGE_BASE+"#!Team:"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
-		ArgumentCaptor<MembershipRqstSubmission> captor = ArgumentCaptor.forClass(MembershipRqstSubmission.class);
+		ArgumentCaptor<MembershipRequest> captor = ArgumentCaptor.forClass(MembershipRequest.class);
 		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(
 				captor.capture(), anyString(), anyString());
 	}
@@ -1242,13 +1240,13 @@ public class SynapseClientImplTest {
 			RestServiceException, JSONObjectAdapterException {
 		synapseClient.inviteMember("123", "a team", "", TEST_HOME_PAGE_BASE);
 		verify(mockSynapse).createMembershipInvitation(
-				any(MembershipInvtnSubmission.class), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
+				any(MembershipInvitation.class), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
 	}
 
 	@Test
 	public void testRequestMembership() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
-		ArgumentCaptor<MembershipRqstSubmission> captor = ArgumentCaptor.forClass(MembershipRqstSubmission.class);
+		ArgumentCaptor<MembershipRequest> captor = ArgumentCaptor.forClass(MembershipRequest.class);
 		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(
 				captor.capture(), anyString(), anyString());
 		String teamId = "a team";
@@ -1257,7 +1255,7 @@ public class SynapseClientImplTest {
 		synapseClient.requestMembership("123", teamId, message, TEST_HOME_PAGE_BASE, expiresOn);
 		verify(mockSynapse).createMembershipRequest(
 				captor.capture(), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
-		MembershipRqstSubmission request = captor.getValue();
+		MembershipRequest request = captor.getValue();
 		assertEquals(expiresOn, request.getExpiresOn());
 		assertEquals(teamId, request.getTeamId());
 		assertEquals(message, request.getMessage());
@@ -1266,7 +1264,7 @@ public class SynapseClientImplTest {
 	@Test
 	public void testRequestMembershipWithExpiresOn() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
-		ArgumentCaptor<MembershipRqstSubmission> captor = ArgumentCaptor.forClass(MembershipRqstSubmission.class);
+		ArgumentCaptor<MembershipRequest> captor = ArgumentCaptor.forClass(MembershipRequest.class);
 		verify(mockSynapse, Mockito.times(0)).createMembershipRequest(
 				captor.capture(), anyString(), anyString());
 		String teamId = "a team";
@@ -1275,7 +1273,7 @@ public class SynapseClientImplTest {
 		synapseClient.requestMembership("123", teamId, message, TEST_HOME_PAGE_BASE, expiresOn);
 		verify(mockSynapse).createMembershipRequest(
 				captor.capture(), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:JoinTeam/"), eq(TEST_HOME_PAGE_BASE+"#!SignedToken:Settings/"));
-		MembershipRqstSubmission request = captor.getValue();
+		MembershipRequest request = captor.getValue();
 		assertEquals(expiresOn, request.getExpiresOn());
 		assertEquals(teamId, request.getTeamId());
 		assertEquals(message, request.getMessage());
@@ -1338,7 +1336,7 @@ public class SynapseClientImplTest {
 		assertEquals(1, invitationBundles.size());
 		OpenTeamInvitationBundle invitationBundle = invitationBundles.get(0);
 		assertEquals(inviteeUserProfile, invitationBundle.getUserProfile());
-		assertEquals(testInvitation, invitationBundle.getMembershipInvtnSubmission());
+		assertEquals(testInvitation, invitationBundle.getMembershipInvitation());
 	}
 	
 	@Test

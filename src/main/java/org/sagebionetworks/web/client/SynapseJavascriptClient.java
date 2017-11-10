@@ -34,7 +34,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
-import org.sagebionetworks.repo.model.MembershipInvtnSubmission;
+import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
@@ -729,9 +729,9 @@ public class SynapseJavascriptClient {
 		doPost(url, refList, OBJECT_TYPE.PaginatedResultsEntityHeader, callback);
 	}
 
-	public FluentFuture<MembershipInvtnSubmission> getMembershipInvitation(MembershipInvtnSignedToken token) {
+	public FluentFuture<MembershipInvitation> getMembershipInvitation(MembershipInvtnSignedToken token) {
 		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + token.getMembershipInvitationId();
-		return getFuture(cb -> doPost(url, token, OBJECT_TYPE.MembershipInvtnSubmission, cb));
+		return getFuture(cb -> doPost(url, token, OBJECT_TYPE.MembershipInvitation, cb));
 	}
 
 	public FluentFuture<InviteeVerificationSignedToken> getInviteeVerificationSignedToken(String membershipInvitationId) {

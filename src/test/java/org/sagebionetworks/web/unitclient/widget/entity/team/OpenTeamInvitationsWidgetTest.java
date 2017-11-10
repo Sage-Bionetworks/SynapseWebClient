@@ -85,7 +85,7 @@ public class OpenTeamInvitationsWidgetTest {
 		testTeam.setName("Bob's Team");
 		testInvite = new MembershipInvitation();
 		testInvite.setTeamId(teamId);
-		testInvite.setUserId("42");
+		testInvite.setInviteeId("42");
 		testInvite.setMessage("This is a test invite");
 		testInvite.setCreatedOn(new Date());
 		
