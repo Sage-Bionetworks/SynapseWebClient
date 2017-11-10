@@ -74,9 +74,7 @@ public class CreateTableViewWizardStep1Test {
 		verify(mockView).setName("");
 		verify(mockView).setScopeWidgetVisible(true);
 		
-		//TODO: show file view type when issues are resolved
-		verify(mockView).setFileViewTypeSelectionVisible(false);
-//		verify(mockView).setFileViewTypeSelectionVisible(true);
+		verify(mockView).setFileViewTypeSelectionVisible(true);
 		String tableName = "a name";
 		EntityView table = new EntityView();
 		table.setName(tableName);

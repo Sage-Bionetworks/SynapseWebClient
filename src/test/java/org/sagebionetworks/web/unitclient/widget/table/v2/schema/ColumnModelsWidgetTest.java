@@ -352,5 +352,18 @@ public class ColumnModelsWidgetTest {
 		verify(mockViewer, times(schema.size())).addColumn(any(ColumnModelTableRow.class));
 	}
 	
+	@Test
+	public void testGetTableType() {
+		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.file);
+		assertEquals(TableType.fileview, ColumnModelsWidget.getTableType(mockView));
+		
+		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.file_and_table);
+		assertEquals(TableType.file_and_table_view, ColumnModelsWidget.getTableType(mockView));
+		
+		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.project);
+		assertEquals(TableType.projectview, ColumnModelsWidget.getTableType(mockView));
+		
+		assertEquals(TableType.table, ColumnModelsWidget.getTableType(table));
+	}
 	
 }
