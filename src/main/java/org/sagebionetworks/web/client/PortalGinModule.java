@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.security.AuthenticationControllerImpl;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.transform.JsoProviderImpl;
+import org.sagebionetworks.web.client.utils.CajaHtmlSanitizer;
 import org.sagebionetworks.web.client.view.ACTAccessApprovalsView;
 import org.sagebionetworks.web.client.view.ACTAccessApprovalsViewImpl;
 import org.sagebionetworks.web.client.view.ACTDataAccessSubmissionsView;
@@ -402,6 +403,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.HtmlView;
+import org.sagebionetworks.web.client.widget.entity.renderer.HtmlViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetView;
@@ -749,6 +752,8 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(ResourceLoaderImpl.class).in(Singleton.class);
 		bind(ResourceLoader.class).to(ResourceLoaderImpl.class);
+		
+		bind(CajaHtmlSanitizer.class).in(Singleton.class);
 		
 		// Header & Footer
 		bind(Header.class).in(Singleton.class);
@@ -1442,5 +1447,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// Synapse js client
 		bind(SynapseJavascriptClient.class).in(Singleton.class);
 		bind(SynapseJavascriptFactory.class).in(Singleton.class);
+		
+		bind(HtmlView.class).to(HtmlViewImpl.class);
 	}
 }

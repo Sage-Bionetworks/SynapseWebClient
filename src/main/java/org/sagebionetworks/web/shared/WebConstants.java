@@ -294,6 +294,7 @@ public class WebConstants {
 	public static final String REPLY_TYPE = "reply";
 
 	public static final String TEXT_PLAIN_CHARSET_UTF8 = "text/plain; charset=utf-8";
+	public static final String TEXT_HTML_CHARSET_UTF8 = "text/html; charset=utf-8";
 
 	public static final String CONTENT_TYPE = "Content-Type";
 
