@@ -41,7 +41,6 @@ import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.CajaHtmlSanitizer;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.RadioWidget;
@@ -151,8 +150,9 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsWidge
 import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.NbviewerPreviewWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.PDFPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
@@ -580,6 +580,6 @@ public interface PortalGinInjector extends Ginjector {
 	UploadTableModalWidget getUploadTableModalWidget();
 	AddExternalRepoModal getAddExternalRepoModal();
 	PDFPreviewWidget getPDFPreviewWidget();
-	CajaHtmlSanitizer getCajaHtmlSanitizer();
-	NbviewerPreviewWidget getNbviewerPreviewWidget();
+	HtmlPreviewWidget getHtmlPreviewWidget();
+	NbConvertPreviewWidget getNbConvertPreviewWidget();
 }

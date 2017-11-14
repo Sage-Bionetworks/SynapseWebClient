@@ -177,10 +177,10 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	@Override
 	public void setHTML(final String htmlContent) {
 		clear();
-		add(getFrame(htmlContent));
+		add(getFrame(htmlContent, synapseJSNIUtils));
 	}
 	
-	private Frame getFrame(final String htmlContent) {
+	public static Frame getFrame(final String htmlContent, SynapseJSNIUtils jsniUtils) {
 		final Frame frame = new Frame("about:blank");
 		frame.getElement().setAttribute("frameborder", "0");
 		frame.setWidth("100%");
@@ -204,7 +204,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 			public void onAttachOrDetach(AttachEvent event) {
 				if (event.isAttached()) {
 					// use html5 srcdoc if available
-					if (synapseJSNIUtils.elementSupportsAttribute(frame.getElement(), "srcdoc")) {
+					if (jsniUtils.elementSupportsAttribute(frame.getElement(), "srcdoc")) {
 						frame.getElement().setAttribute("srcdoc", htmlContent);	
 					} else {
 						_setFrameContent(frame.getElement(), htmlContent);	
@@ -230,7 +230,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		}
 	}-*/;
 	
-	private static native void _setFrameContent(Element iframe, String htmlContent) /*-{
+	public static native void _setFrameContent(Element iframe, String htmlContent) /*-{
 		if(iframe) {
 			try {
 				iframe.contentWindow.document.open('text/html', 'replace'); 

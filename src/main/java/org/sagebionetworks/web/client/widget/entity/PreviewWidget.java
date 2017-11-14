@@ -25,6 +25,8 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.PDFPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -48,7 +50,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	public static final int VIDEO_WIDTH = 320;
 	public static final int VIDEO_HEIGHT = 180;
 	public enum PreviewFileType {
-		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML, PDF
+		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML, PDF, IPYNB
 	}
 
 	
@@ -83,7 +85,6 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	
 	public PreviewFileType getPreviewFileType(PreviewFileHandle previewHandle, FileHandle originalFileHandle) {
 		PreviewFileType previewFileType = PreviewFileType.NONE;
-		GWT.debugger();
 		if (previewHandle == null && originalFileHandle != null && originalFileHandle instanceof S3FileHandle) {
 			String contentType = originalFileHandle.getContentType();
 			if (contentType != null) {
@@ -94,6 +95,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				} else if (isPDF(contentType)) {
 					previewFileType = PreviewFileType.PDF;
 				}
+			}
+			if (originalFileHandle.getFileName().toLowerCase().endsWith("ipynb")) {
+				previewFileType = PreviewFileType.IPYNB;
 			}
 		} else if (previewHandle != null && originalFileHandle != null) {
 			String contentType = previewHandle.getContentType();
@@ -243,6 +247,11 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				// use pdf.js to view
 				String fileHandleId = handle != null ? handle.getId() : originalFileHandle.getId();
 				PDFPreviewWidget w = ginInjector.getPDFPreviewWidget();
+				w.configure(bundle.getEntity().getId(), fileHandleId);
+				view.setPreviewWidget(w);
+			} else if (previewType == PreviewFileType.IPYNB) {
+				String fileHandleId = handle != null ? handle.getId() : originalFileHandle.getId();
+				NbConvertPreviewWidget w = ginInjector.getNbConvertPreviewWidget();
 				w.configure(bundle.getEntity().getId(), fileHandleId);
 				view.setPreviewWidget(w);
 			} else {

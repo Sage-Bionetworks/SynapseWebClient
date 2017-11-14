@@ -4,7 +4,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
-import org.sagebionetworks.web.client.utils.CajaHtmlSanitizer;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -18,24 +18,30 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class NbviewerPreviewWidget implements IsWidget {
-	public static final String NBVIEWER = "http://nbviewer.jupyter.org/urls/";
-	private HtmlView view;
-	private PresignedURLAsyncHandler presignedURLAsyncHandler;
-	private FileHandleAssociation fha;
-	private CajaHtmlSanitizer cajaHtmlSanitizer;
-	private SynapseAlert synAlert;
-	private RequestBuilderWrapper requestBuilder;
+/**
+ * Widget used to show untrusted html preview content.  Has an option to open the untrusted html in a new window (after confirmation)
+ * @author jayhodgson
+ *
+ */
+public class HtmlPreviewWidget implements IsWidget {
+	protected HtmlPreviewView view;
+	protected PresignedURLAsyncHandler presignedURLAsyncHandler;
+	protected FileHandleAssociation fha;
+	protected SynapseAlert synAlert;
+	protected RequestBuilderWrapper requestBuilder;
+	protected SynapseJSNIUtils jsniUtils;
+	protected String rawHtml;
+	
 	@Inject
-	public NbviewerPreviewWidget(
-			HtmlView view,
+	public HtmlPreviewWidget(
+			HtmlPreviewView view,
 			PresignedURLAsyncHandler presignedURLAsyncHandler,
-			CajaHtmlSanitizer cajaHtmlSanitizer,
+			SynapseJSNIUtils jsniUtils,
 			RequestBuilderWrapper requestBuilder,
 			SynapseAlert synAlert) {
 		this.view = view;
 		this.presignedURLAsyncHandler = presignedURLAsyncHandler;
-		this.cajaHtmlSanitizer = cajaHtmlSanitizer;
+		this.jsniUtils = jsniUtils;
 		this.requestBuilder = requestBuilder;
 		this.synAlert = synAlert;
 		view.setSynAlert(synAlert);
@@ -72,13 +78,11 @@ public class NbviewerPreviewWidget implements IsWidget {
 			});
 		}
 	}
+	
 	public void setPresignedUrl(String url) {
-		StringBuilder siteUrl = new StringBuilder();
-		siteUrl.append(NBVIEWER);
-		siteUrl.append(url.substring(url.indexOf("://")));
-
-		// get html nbviewer html response
-		requestBuilder.configure(RequestBuilder.GET, siteUrl.toString());
+		// by default, get url.
+		// TODO: write a new class, NbconvertHtmlPreviewWidget that uses the lambda web service to convert the ipynb to html.
+		requestBuilder.configure(RequestBuilder.GET, url.toString());
 		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_HTML_CHARSET_UTF8);
 		try {
 			requestBuilder.sendRequest(null, new RequestCallback() {
@@ -109,8 +113,9 @@ public class NbviewerPreviewWidget implements IsWidget {
 	}
 	
 	public void setHtml(String html) {
+		this.rawHtml = html;
 		//sanitize before rendering
-		String sanitizedHtml = cajaHtmlSanitizer.sanitize(html);
+		String sanitizedHtml = jsniUtils.sanitizeHtml(html);
 		view.setHtml(sanitizedHtml);
 	}
 }
