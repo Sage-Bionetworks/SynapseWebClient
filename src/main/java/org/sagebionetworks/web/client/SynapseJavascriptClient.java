@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -33,8 +32,8 @@ import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
-import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
 import org.sagebionetworks.repo.model.MembershipInvitation;
+import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
@@ -72,7 +71,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.FutureUtils;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -139,7 +138,6 @@ public class SynapseJavascriptClient {
 	public static final String ENTITY_URI_PATH = "/entity";
 	public static final String USER = "/user";
 	public static final String BUNDLE_MASK_PATH = "/bundle?mask=";
-	public static final String CONTENT_TYPE = "Content-Type";
 	public static final String ACCEPT = "Accept";
 	public static final String SESSION_TOKEN_HEADER = "sessionToken";
 	public static final String USER_AGENT = "User-Agent";
@@ -231,7 +229,7 @@ public class SynapseJavascriptClient {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(method, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
-		requestBuilder.setHeader(CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
+		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}

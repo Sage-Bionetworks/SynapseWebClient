@@ -172,7 +172,7 @@ public class WebConstants {
 	public static final String ANONYMOUS_USER_PRINCIPAL_ID = "org.sagebionetworks.portal.anonymous_user_principal_id";
 	public static final String PROVENANCE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.provenance_synapse_id";
 	public static final String PROVENANCE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.provenance_wiki_id";
-	
+	public static final String NBCONVERT_ENDPOINT_PROPERTY ="org.sagebionetworks.portal.nbconvert_endpoint";
 	public static final String FORUM_SYNAPSE_ID_PROPERTY ="org.sagebionetworks.portal.forum_project_id";
 	
 	//Workshop

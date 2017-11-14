@@ -44,6 +44,8 @@ import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget.PreviewFileType;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.PDFPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -91,22 +93,28 @@ public class PreviewWidgetTest {
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
 	PDFPreviewWidget mockPDFPreviewWidget;
-	
+	@Mock
+	HtmlPreviewWidget mockHtmlPreviewWidget;
+	@Mock
+	NbConvertPreviewWidget mockNbConvertPreviewWidget;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	FileHandle mainFileHandle;
 	String zipTestString = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
 	Map<String, String> descriptor;
-	
+	public static final String TEST_ENTITY_ID = "syn20923";
+	public static final String TEST_ENTITY_MAIN_FILE_CREATED_BY = "8992983";
 	@Before
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
 		previewWidget = new PreviewWidget(mockView, mockRequestBuilder, mockSynapseJSNIUtils, mockSynapseAlert, mockSynapseClient, mockAuthController, mockSynapseJavascriptClient, mockPortalGinInjector);
 		testEntity = new FileEntity();
+		testEntity.setId(TEST_ENTITY_ID);
 		testFileHandleList = new ArrayList<FileHandle>();
 		mainFileHandle = new S3FileHandle();
 		String mainFileId = "MAIN_FILE";
 		mainFileHandle.setId(mainFileId);
+		mainFileHandle.setCreatedBy(TEST_ENTITY_MAIN_FILE_CREATED_BY);
 		testFileHandleList.add(mainFileHandle);
 		testEntity.setDataFileHandleId(mainFileId);
 		testBundle = new EntityBundle();
@@ -114,6 +122,8 @@ public class PreviewWidgetTest {
 		testBundle.setFileHandles(testFileHandleList);
 		when(mockPortalGinInjector.getVideoWidget()).thenReturn(mockVideoWidget);
 		when(mockPortalGinInjector.getPDFPreviewWidget()).thenReturn(mockPDFPreviewWidget);
+		when(mockPortalGinInjector.getHtmlPreviewWidget()).thenReturn(mockHtmlPreviewWidget);
+		when(mockPortalGinInjector.getNbConvertPreviewWidget()).thenReturn(mockNbConvertPreviewWidget);
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://fakebaseurl/");
 		mockResponse = mock(Response.class);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
@@ -177,7 +187,8 @@ public class PreviewWidgetTest {
 	@Test
 	public void testHtmlContentType(){
 		mainFileHandle.setContentType("text/html");
-		assertEquals(PreviewFileType.HTML, previewWidget.getPreviewFileType(null, mainFileHandle));
+		assertEquals(PreviewFileType.NONE, previewWidget.getPreviewFileType(null, mainFileHandle));
+		assertEquals(PreviewFileType.HTML, previewWidget.getOriginalFileType(mainFileHandle));
 	}
 	
 	@Test
@@ -188,8 +199,6 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView).setImagePreview(anyString());
-		
-		
 	}
 	
 	@Test
@@ -412,63 +421,6 @@ public class PreviewWidgetTest {
 		mainFileHandle.setFileName("test.html");
 		previewWidget.configure(testBundle);
 		
-		verify(mockRequestBuilder).configure(eq(RequestBuilder.GET), stringCaptor.capture());
-		assertTrue(stringCaptor.getValue().contains("preview=false"));
-		verify(mockView).showLoading();
-		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
+		verify(mockHtmlPreviewWidget).configure(TEST_ENTITY_ID, mainFileHandle.getId(), TEST_ENTITY_MAIN_FILE_CREATED_BY);
 	}
-	
-	
-	@Test
-	public void testRenderHTMLBlocked() {
-		boolean isUserAllowedToRenderHTML = false;
-		String userId = "56765";
-		String html = "<html><script></script></html>";
-		String sanitizedHtml = "<html></html>";
-		when(mockSynapseJSNIUtils.sanitizeHtml(anyString())).thenReturn(sanitizedHtml);
-		AsyncMockStubber.callSuccessWith(isUserAllowedToRenderHTML).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-		
-		previewWidget.renderHTML(userId, html);
-		
-		verify(mockSynapseClient).isUserAllowedToRenderHTML(eq(userId), any(AsyncCallback.class));
-		//attempts to sanitize the html and compare
-		verify(mockSynapseJSNIUtils).sanitizeHtml(html);
-		//html not set, showing text instead
-		verify(mockView).setTextPreview(anyString());
-	}
-	
-
-	@Test
-	public void testRenderSimpleHTMLAllowed() {
-		boolean isUserAllowedToRenderHTML = false;
-		String userId = "56765";
-		String html = "<html></html>";
-		String sanitizedHtml = "<html></html>";
-		when(mockSynapseJSNIUtils.sanitizeHtml(anyString())).thenReturn(sanitizedHtml);
-		AsyncMockStubber.callSuccessWith(isUserAllowedToRenderHTML).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-		
-		previewWidget.renderHTML(userId, html);
-		
-		verify(mockSynapseClient).isUserAllowedToRenderHTML(eq(userId), any(AsyncCallback.class));
-		verify(mockSynapseJSNIUtils).sanitizeHtml(html);
-		verify(mockView).setHTML(html);
-	}
-	
-
-	@Test
-	public void testRenderDangerousHTML() {
-		boolean isUserAllowedToRenderHTML = true;
-		String userId = "56765";
-		mainFileHandle.setCreatedBy(userId);
-		String html = "<html><script></script></html>";
-		AsyncMockStubber.callSuccessWith(isUserAllowedToRenderHTML).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-		when(mockResponse.getText()).thenReturn(html);
-		mainFileHandle.setContentType("text/html");
-		mainFileHandle.setFileName("index.html");
-		previewWidget.configure(testBundle);
-		verify(mockSynapseClient).isUserAllowedToRenderHTML(eq(userId), any(AsyncCallback.class));
-		verify(mockSynapseJSNIUtils, never()).sanitizeHtml(anyString());
-		verify(mockView).setHTML(html);
-	}
-
 }

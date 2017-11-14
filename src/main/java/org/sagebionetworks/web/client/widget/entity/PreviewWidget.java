@@ -130,7 +130,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			String contentType = originalFileHandle.getContentType();
 			if (VideoConfigEditor.isRecognizedVideoFileName(originalFileHandle.getFileName())) {
 				return PreviewFileType.VIDEO;
-			} else 	if (originalFileHandle.getFileName().toLowerCase().endsWith("ipynb")) {
+			} else 	if (originalFileHandle.getFileName() != null && originalFileHandle.getFileName().toLowerCase().endsWith("ipynb")) {
 				return PreviewFileType.IPYNB;
 			} else if (contentType != null) {
 				if (isRecognizedImageContentType(contentType)) {

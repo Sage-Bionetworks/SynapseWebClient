@@ -20,6 +20,7 @@ import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.RequestException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.junit.*;
 import org.mockito.ArgumentCaptor;
@@ -234,7 +235,7 @@ public class SynapseJavascriptClientTest {
 		String url = REPO_ENDPOINT + RESTRICTION_INFORMATION;
 		verify(mockRequestBuilder).configure(POST, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
-		verify(mockRequestBuilder).setHeader(SynapseJavascriptClient.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder).sendRequest(stringCaptor.capture(), requestCallbackCaptor.capture());
 		
 		//verify request data
@@ -256,7 +257,7 @@ public class SynapseJavascriptClientTest {
 		String url = REPO_ENDPOINT + ENTITY_URI_PATH + CHILDREN;
 		verify(mockRequestBuilder).configure(POST, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
-		verify(mockRequestBuilder).setHeader(SynapseJavascriptClient.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
 		
 		verify(mockRequestBuilder).sendRequest(stringCaptor.capture(), requestCallbackCaptor.capture());
@@ -502,7 +503,7 @@ public class SynapseJavascriptClientTest {
 		String url = REPO_ENDPOINT + "/" + pageKey.getOwnerObjectType().toLowerCase() + "/" + ownerObjectId + WIKI2 + wikiPageId;
 		verify(mockRequestBuilder).configure(PUT, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
-		verify(mockRequestBuilder).setHeader(SynapseJavascriptClient.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder).sendRequest(stringCaptor.capture(), requestCallbackCaptor.capture());
 		
 		//verify request data
