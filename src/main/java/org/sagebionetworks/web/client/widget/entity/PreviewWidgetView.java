@@ -16,7 +16,6 @@ public interface PreviewWidgetView extends IsWidget{
 	public void setTextPreview(String text);
 	public void setPreviewWidget(IsWidget w);
 	void addStyleName(String style);
-	public void setHTML(String html);
 	void showLoading();
 	
 	/**

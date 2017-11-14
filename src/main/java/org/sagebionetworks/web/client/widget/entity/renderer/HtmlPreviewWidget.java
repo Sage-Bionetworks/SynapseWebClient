@@ -4,6 +4,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -13,6 +14,7 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,7 +32,8 @@ public class HtmlPreviewWidget implements IsWidget {
 	protected SynapseAlert synAlert;
 	protected RequestBuilderWrapper requestBuilder;
 	protected SynapseJSNIUtils jsniUtils;
-	protected String rawHtml;
+	protected String createdBy, rawHtml;
+	protected SynapseClientAsync synapseClient;
 	
 	@Inject
 	public HtmlPreviewWidget(
@@ -38,16 +41,47 @@ public class HtmlPreviewWidget implements IsWidget {
 			PresignedURLAsyncHandler presignedURLAsyncHandler,
 			SynapseJSNIUtils jsniUtils,
 			RequestBuilderWrapper requestBuilder,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.presignedURLAsyncHandler = presignedURLAsyncHandler;
 		this.jsniUtils = jsniUtils;
 		this.requestBuilder = requestBuilder;
 		this.synAlert = synAlert;
+		this.synapseClient = synapseClient;
 		view.setSynAlert(synAlert);
 	}
 	
-	public void configure(String synapseId, String fileHandleId) {
+	public void renderHTML() {
+		synapseClient.isUserAllowedToRenderHTML(createdBy, new AsyncCallback<Boolean>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				String escapedContent = SafeHtmlUtils.htmlEscapeAllowEntities(rawHtml);
+				if (escapedContent.length() > 500000) {
+					escapedContent = escapedContent.substring(0, 500000) + "\n...";
+				}
+				view.setHtml(escapedContent);
+			}
+			
+			@Override
+			public void onSuccess(Boolean trustedUser) {
+				if (trustedUser) {
+					view.setHtml(rawHtml);
+				} else {
+					// is the sanitized version the same as the original??
+					String newHtml = jsniUtils.sanitizeHtml(rawHtml);
+					if (rawHtml.equals(newHtml)) {
+						view.setHtml(rawHtml);
+					} else {
+						onFailure(new Exception());	
+					}
+				}
+			}
+		});
+	}
+	
+	public void configure(String synapseId, String fileHandleId, String fileHandleCreatedBy) {
+		this.createdBy = fileHandleCreatedBy;
 		fha = new FileHandleAssociation();
 		fha.setAssociateObjectId(synapseId);
 		fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
@@ -81,7 +115,6 @@ public class HtmlPreviewWidget implements IsWidget {
 	
 	public void setPresignedUrl(String url) {
 		// by default, get url.
-		// TODO: write a new class, NbconvertHtmlPreviewWidget that uses the lambda web service to convert the ipynb to html.
 		requestBuilder.configure(RequestBuilder.GET, url.toString());
 		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_HTML_CHARSET_UTF8);
 		try {
@@ -92,9 +125,9 @@ public class HtmlPreviewWidget implements IsWidget {
 						Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
-						String html = response.getText();
+						rawHtml = response.getText();
 						view.setLoadingVisible(false);
-						setHtml(html);
+						renderHTML();
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve. Reason: " + response.getStatusText()));
 					}
@@ -110,12 +143,5 @@ public class HtmlPreviewWidget implements IsWidget {
 			view.setLoadingVisible(false);
 			synAlert.handleException(e);
 		}
-	}
-	
-	public void setHtml(String html) {
-		this.rawHtml = html;
-		//sanitize before rendering
-		String sanitizedHtml = jsniUtils.sanitizeHtml(html);
-		view.setHtml(sanitizedHtml);
 	}
 }
