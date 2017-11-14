@@ -25,7 +25,6 @@ import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
 import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
-import org.sagebionetworks.web.client.presenter.ProjectsHomePresenter;
 import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
 import org.sagebionetworks.web.client.presenter.SearchPresenter;
@@ -260,8 +259,6 @@ public interface PortalGinInjector extends Ginjector {
 	PresenterProxy<HomePresenter, Home> getHomePresenter();
 
 	EntityPresenter getEntityPresenter();
-
-	ProjectsHomePresenter getProjectsHomePresenter();
 
 	LoginPresenter getLoginPresenter();
 
