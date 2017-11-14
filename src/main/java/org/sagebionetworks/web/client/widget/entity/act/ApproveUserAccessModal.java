@@ -43,7 +43,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	
 	public static final String EMAIL_SUBJECT = "Data access approval";
 	public static final String SELECT_FROM = "SELECT \"Email Body\" FROM ";
-	public static final String WHERE = " WHERE \"Dataset Id\"= \"";	
+	public static final String WHERE = " WHERE \"Dataset Id\"=";	
 	public static final String QUERY_CANCELLED = "Query cancelled";
 	public static final String NO_EMAIL_MESSAGE = "You must enter an email to send to the user";
 	public static final String NO_USER_SELECTED = "You must select a user to approve";
@@ -201,7 +201,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		builder.append(SELECT_FROM);
 		builder.append(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.act.synapse_storage_id"));
 		builder.append(WHERE);
-		builder.append(datasetId + "\"");
+		builder.append(datasetId);
 		
 		Query query = new Query();
 		query.setSql(builder.toString());
