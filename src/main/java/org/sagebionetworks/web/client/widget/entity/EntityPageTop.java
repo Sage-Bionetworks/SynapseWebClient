@@ -316,9 +316,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		if(bundle.getEntity() instanceof Link) {
 			Reference ref = ((Link)bundle.getEntity()).getLinksTo();
 			if(ref != null){
-				// redefine where the page is and refresh
 				placeChanger.goTo(new Synapse(ref.getTargetId(), ref.getTargetVersionNumber(), null, null));
-				return;
 			} else {
 				// show error and then allow entity bundle to go to view
 				view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
