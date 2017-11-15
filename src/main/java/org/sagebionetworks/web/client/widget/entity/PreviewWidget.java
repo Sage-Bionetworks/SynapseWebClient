@@ -220,7 +220,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		PreviewFileType originalFileHandlePreviewType = getOriginalFileType(originalFileHandle);
 		if (originalFileHandlePreviewType != PreviewFileType.NONE) {
 			renderFilePreview(originalFileHandlePreviewType, originalFileHandle);	
-		} else {
+		} else if (previewFileHandle != null) {
 			PreviewFileType previewType = getPreviewFileType(previewFileHandle, originalFileHandle);
 			renderFilePreview(previewType, previewFileHandle);
 		}
