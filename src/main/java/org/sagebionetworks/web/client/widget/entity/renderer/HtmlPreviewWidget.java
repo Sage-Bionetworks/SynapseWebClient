@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -25,7 +26,7 @@ import com.google.inject.Inject;
  * @author jayhodgson
  *
  */
-public class HtmlPreviewWidget implements IsWidget {
+public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 	protected HtmlPreviewView view;
 	protected PresignedURLAsyncHandler presignedURLAsyncHandler;
 	protected FileHandleAssociation fha;
@@ -34,7 +35,7 @@ public class HtmlPreviewWidget implements IsWidget {
 	protected SynapseJSNIUtils jsniUtils;
 	protected String createdBy, rawHtml;
 	protected SynapseClientAsync synapseClient;
-	
+	protected PopupUtilsView popupUtils;
 	@Inject
 	public HtmlPreviewWidget(
 			HtmlPreviewView view,
@@ -42,39 +43,52 @@ public class HtmlPreviewWidget implements IsWidget {
 			SynapseJSNIUtils jsniUtils,
 			RequestBuilderWrapper requestBuilder,
 			SynapseAlert synAlert,
-			SynapseClientAsync synapseClient) {
+			SynapseClientAsync synapseClient,
+			PopupUtilsView popupUtils) {
 		this.view = view;
 		this.presignedURLAsyncHandler = presignedURLAsyncHandler;
 		this.jsniUtils = jsniUtils;
 		this.requestBuilder = requestBuilder;
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
+		this.popupUtils = popupUtils;
 		view.setSynAlert(synAlert);
+		view.setPresenter(this);
 	}
 	
-	public void renderHTML() {
+	public void renderHTML(final String rawHtml) {
+		this.rawHtml = rawHtml;
 		synapseClient.isUserAllowedToRenderHTML(createdBy, new AsyncCallback<Boolean>() {
 			@Override
 			public void onFailure(Throwable caught) {
+				view.setLoadingVisible(false);
 				String escapedContent = SafeHtmlUtils.htmlEscapeAllowEntities(rawHtml);
-				if (escapedContent.length() > 500000) {
-					escapedContent = escapedContent.substring(0, 500000) + "\n...";
-				}
-				view.setHtml(escapedContent);
+				view.setHtml(truncateLargeHtml(escapedContent));
+				view.setSanitizedWarningVisible(true);
 			}
 			
 			@Override
 			public void onSuccess(Boolean trustedUser) {
+				view.setLoadingVisible(false);
 				if (trustedUser) {
 					view.setHtml(rawHtml);
 				} else {
 					// is the sanitized version the same as the original??
-					String newHtml = jsniUtils.sanitizeHtml(rawHtml);
-					if (rawHtml.equals(newHtml)) {
+					String sanitizedHtml = jsniUtils.sanitizeHtml(rawHtml);
+					if (rawHtml.equals(sanitizedHtml)) {
 						view.setHtml(rawHtml);
 					} else {
-						onFailure(new Exception());	
+						view.setHtml(truncateLargeHtml(sanitizedHtml));
+						view.setSanitizedWarningVisible(true);
 					}
+				}
+			}
+			
+			public String truncateLargeHtml(String sanitizedHtml) {
+				if (sanitizedHtml.length() > 500000) {
+					return sanitizedHtml.substring(0, 500000) + "\n...";
+				} else {
+					return sanitizedHtml;
 				}
 			}
 		});
@@ -98,6 +112,7 @@ public class HtmlPreviewWidget implements IsWidget {
 		if (fha != null) {
 			synAlert.clear();
 			view.setLoadingVisible(true);
+			view.setSanitizedWarningVisible(false);
 			presignedURLAsyncHandler.getFileResult(fha, new AsyncCallback<FileResult>() {
 				@Override
 				public void onSuccess(FileResult fileResult) {
@@ -119,15 +134,12 @@ public class HtmlPreviewWidget implements IsWidget {
 		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_HTML_CHARSET_UTF8);
 		try {
 			requestBuilder.sendRequest(null, new RequestCallback() {
-
 				@Override
 				public void onResponseReceived(Request request,
 						Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
-						rawHtml = response.getText();
-						view.setLoadingVisible(false);
-						renderHTML();
+						renderHTML(response.getText());
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve. Reason: " + response.getStatusText()));
 					}
@@ -143,5 +155,13 @@ public class HtmlPreviewWidget implements IsWidget {
 			view.setLoadingVisible(false);
 			synAlert.handleException(e);
 		}
+	}
+	@Override
+	public void onShowFullContent() {
+		//confirm
+		popupUtils.showConfirmDialog("Render content?", "Are you sure you want to render the full content, including all scripts?", () -> {
+			//user clicked yes
+			view.openHtmlInNewWindow(rawHtml);
+		});
 	}
 }

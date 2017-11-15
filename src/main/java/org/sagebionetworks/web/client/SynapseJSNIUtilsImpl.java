@@ -585,7 +585,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    hr:     [],
 				    html:   [],
 				    i:      [],
-				    img:    ['src', 'alt', 'title', 'width', 'height'],
 				    ins:    ['datetime'],
 				    li:     [],
 				    mark:   [],

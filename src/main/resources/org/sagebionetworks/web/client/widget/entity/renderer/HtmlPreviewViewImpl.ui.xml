@@ -6,6 +6,10 @@
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	
 	<bh:Div addStyleNames="margin-5">
+		<b:Alert ui:field="htmlSanitizedWarning" type="WARNING" visible="false">
+			<bh:Text text="This content has been sanitized for your protection." />
+			<b:Button ui:field="showContentButton" size="EXTRA_SMALL" addStyleNames="margin-left-15" text="Show content"/>
+		</b:Alert>
 		<bh:Div ui:field="loadingUI" >
 			<g:Image styleName="displayInline margin-right-5" resource='{sageImageBundle.loading16}' />
 			<bh:Text ui:field="loadingMessage"></bh:Text>

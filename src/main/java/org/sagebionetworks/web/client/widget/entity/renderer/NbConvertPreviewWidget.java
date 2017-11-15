@@ -3,6 +3,7 @@ import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -20,6 +21,8 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 
 	JSONObjectAdapter jsonObjectAdapter;
 	String nbConvertEndpoint;
+	public static final String HTML_PREFIX = "<html><body>";
+	public static final String HTML_SUFFIX = "</body></html>";
 	@Inject
 	public NbConvertPreviewWidget(
 			HtmlPreviewView view,
@@ -29,8 +32,9 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 			SynapseAlert synAlert,
 			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter,
-			GlobalApplicationState globalAppState) {
-		super(view, presignedURLAsyncHandler, jsniUtils, requestBuilder, synAlert, synapseClient);
+			GlobalApplicationState globalAppState,
+			PopupUtilsView popupUtils) {
+		super(view, presignedURLAsyncHandler, jsniUtils, requestBuilder, synAlert, synapseClient, popupUtils);
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		nbConvertEndpoint = globalAppState.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY);
 	}
@@ -57,9 +61,7 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 						Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
-						rawHtml = response.getText();
-						view.setLoadingVisible(false);
-						renderHTML();
+						renderHTML(HTML_PREFIX + response.getText() + HTML_SUFFIX);
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve. Reason: " + response.getStatusText()));
 					}

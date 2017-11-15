@@ -112,6 +112,8 @@ public class GovernanceServiceHelper {
 			return ((ACTAccessRequirement)ar).getActContactInfo();
 		} else if (ar instanceof LockAccessRequirement) {
 			return LOCK_ACCESS_REQUIREMENT_TEXT;
+		} else if (ar instanceof PostMessageContentAccessRequirement) {
+			return ((PostMessageContentAccessRequirement)ar).getUrl();
 		} else {
 			throw new RuntimeException("Unexpected class "+ar.getClass().getName());
 		}

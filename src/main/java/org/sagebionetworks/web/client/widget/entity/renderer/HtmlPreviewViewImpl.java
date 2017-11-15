@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
@@ -25,6 +27,11 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
 	Div synAlertContainer;
 	@UiField
 	Div loadingUI;
+	@UiField
+	Alert htmlSanitizedWarning;
+	@UiField
+	Button showContentButton;
+	Presenter p;
 	SynapseJSNIUtils jsniUtils;
 	Widget w;
 	@Inject
@@ -32,6 +39,9 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
 			SynapseJSNIUtils jsniUtils) {
 		w = binder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
+		showContentButton.addClickHandler(event->{
+			p.onShowFullContent();
+		});
 	}
 	
 	@Override
@@ -60,7 +70,7 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
 	}
 	
 	private final static native void _openHtmlInNewWindow(String html) /*-{
-		var wnd = $wnd.open("about:blank", "");
+		var wnd = $wnd.open("", "");
         wnd.document.write(html);
         // close document, to run scripts inside html string 
         wnd.document.close();
@@ -128,4 +138,13 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
 			}
 		}
 	}-*/;
+	
+	@Override
+	public void setPresenter(Presenter p) {
+		this.p = p;
+	}
+	@Override
+	public void setSanitizedWarningVisible(boolean visible) {
+		htmlSanitizedWarning.setVisible(visible);
+	}
 }
