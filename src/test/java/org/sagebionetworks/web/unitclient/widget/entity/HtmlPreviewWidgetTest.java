@@ -34,6 +34,7 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -83,7 +84,8 @@ public class HtmlPreviewWidgetTest {
 	SynapseAlert mockSynapseAlert;
 	@Mock
 	AuthenticationController mockAuthController;
-	
+	@Mock
+	PopupUtilsView mockPopupUtils;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	
@@ -93,7 +95,7 @@ public class HtmlPreviewWidgetTest {
 	@Before
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
-		previewWidget = new HtmlPreviewWidget(mockView, mockPresignedURLAsyncHandler, mockSynapseJSNIUtils, mockRequestBuilder, mockSynapseAlert, mockSynapseClient);
+		previewWidget = new HtmlPreviewWidget(mockView, mockPresignedURLAsyncHandler, mockSynapseJSNIUtils, mockRequestBuilder, mockSynapseAlert, mockSynapseClient, mockPopupUtils);
 		String mainFileId = "MAIN_FILE";
 		mockResponse = mock(Response.class);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
