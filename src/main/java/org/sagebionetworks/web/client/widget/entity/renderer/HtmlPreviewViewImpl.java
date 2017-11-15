@@ -122,7 +122,9 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
 			if (!frameHeight || (Math.abs(newHeightPx - frameHeight) > 70)) {
 				iframe.height = "";
 				iframe.height = (newHeightPx + 50) + "px";
-				iframe.scrollIntoView();
+				if (frameHeight) {
+					iframe.scrollIntoView();
+				}
 			}
 		}
 	}-*/;

@@ -85,8 +85,8 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 			}
 			
 			public String truncateLargeHtml(String sanitizedHtml) {
-				if (sanitizedHtml.length() > 500000) {
-					return sanitizedHtml.substring(0, 500000) + "\n...";
+				if (sanitizedHtml.length() > 20000) {
+					return sanitizedHtml.substring(0, 20000) + "\n...";
 				} else {
 					return sanitizedHtml;
 				}
@@ -159,7 +159,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 	@Override
 	public void onShowFullContent() {
 		//confirm
-		popupUtils.showConfirmDialog("Render content?", "Are you sure you want to render the full content, including all scripts?", () -> {
+		popupUtils.showConfirmDialog("Continue?", "You are about to leave Synapse to render this content.\nWould you like to continue?", () -> {
 			//user clicked yes
 			view.openHtmlInNewWindow(rawHtml);
 		});
