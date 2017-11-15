@@ -313,7 +313,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	public void updateEntityBundle(EntityBundle bundle, Long version) {
 		entity = bundle.getEntity();
 		// Redirect if Entity is a Link
-		if(bundle.getEntity() instanceof Link) {
+		if(entity instanceof Link) {
 			Reference ref = ((Link)bundle.getEntity()).getLinksTo();
 			if(ref != null){
 				placeChanger.goTo(new Synapse(ref.getTargetId(), ref.getTargetVersionNumber(), null, null));
@@ -321,8 +321,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				// show error and then allow entity bundle to go to view
 				view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
 			}
-		}
-		if (entity instanceof Project) {
+		} else if (entity instanceof Project) {
 			switch (area) {
 			case FILES:
 				fileChanged(bundle, version);
