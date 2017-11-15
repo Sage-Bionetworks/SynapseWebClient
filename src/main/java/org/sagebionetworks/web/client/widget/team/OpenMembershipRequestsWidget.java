@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,17 +12,22 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidgetView.Presenter {
-	public static final String ACCEPTED_REQUEST_MESSAGE = "Accepted Request";
+	public static final String ACCEPTED_REQUEST_MESSAGE = "Accepted request";
+	public static final String DELETED_REQUEST_MESSAGE = "Request removed";
 	private OpenMembershipRequestsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private Callback teamUpdatedCallback;
@@ -30,6 +37,7 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 	private SynapseAlert synAlert;
 	private PopupUtilsView popupUtils;
 	private DateTimeUtils dateTimeUtils;
+	private SynapseJavascriptClient jsClient;
 	
 	@Inject
 	public OpenMembershipRequestsWidget(OpenMembershipRequestsWidgetView view, 
@@ -38,7 +46,8 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 			GWTWrapper gwt,
 			SynapseAlert synAlert,
 			PopupUtilsView popupUtils,
-			DateTimeUtils dateTimeUtils) {
+			DateTimeUtils dateTimeUtils,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.popupUtils = popupUtils;
 		this.synAlert = synAlert;
@@ -48,6 +57,7 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.gwt = gwt;
+		this.jsClient = jsClient;
 	}
 
 	public void configure(String teamId, Callback teamUpdatedCallback) {
@@ -60,6 +70,7 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 			public void onSuccess(List<MembershipRequestBundle> result) {
 				//create the associated object list, and pass to the view to render
 				List<UserProfile> profiles = new ArrayList<UserProfile>();
+				List<String> requestIds = new ArrayList<String>();
 				List<String> requestMessages = new ArrayList<String>();
 				List<String> createdOnDates = new ArrayList<String>();
 				for (MembershipRequestBundle b : result) {
@@ -68,10 +79,11 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 					if (request.getMessage() != null)
 						requestMessage = request.getMessage();
 					requestMessages.add(requestMessage);
+					requestIds.add(request.getId());
 					profiles.add(b.getUserProfile());
 					createdOnDates.add(dateTimeUtils.convertDateToSmallString(request.getCreatedOn()));
 				}
-				view.configure(profiles, requestMessages, createdOnDates);
+				view.configure(profiles, requestMessages, createdOnDates, requestIds);
 				gwt.restoreWindowPosition();
 			}
 			
@@ -107,6 +119,28 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 				synAlert.handleException(caught);
 			}
 		});
+	}
+	
+	@Override
+	public void deleteRequest(String requestId) {
+		gwt.saveWindowPosition();
+		synAlert.clear();
+		jsClient.deleteMembershipRequest(requestId)
+			.addCallback(
+				new FutureCallback<Void>() {
+					@Override
+					public void onSuccess(Void aVoid) {
+						popupUtils.showInfo(DELETED_REQUEST_MESSAGE,"");
+						teamUpdatedCallback.invoke();
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						synAlert.handleException(caught);
+					}
+				},
+				directExecutor()
+		);
 	}
 	
 	public Widget asWidget() {

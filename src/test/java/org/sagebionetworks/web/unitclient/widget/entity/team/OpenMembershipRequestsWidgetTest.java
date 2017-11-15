@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeList;
@@ -55,6 +56,8 @@ public class OpenMembershipRequestsWidgetTest {
 	Callback mockCallback;
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	
 	List<MembershipRequestBundle> membershipRequests;
 	public static final String TEAM_ID = "8765";
@@ -70,7 +73,8 @@ public class OpenMembershipRequestsWidgetTest {
 				mockGwt, 
 				mockSynAlert, 
 				mockPopupUtils,
-				mockDateTimeUtils);
+				mockDateTimeUtils,
+				mockJsClient);
 		membershipRequests = new ArrayList<>();
 		AsyncMockStubber.callSuccessWith(membershipRequests).when(mockSynapseClient).getOpenRequests(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).addTeamMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
@@ -88,7 +92,7 @@ public class OpenMembershipRequestsWidgetTest {
 		widget.configure(TEAM_ID, mockCallback);
 		verify(mockSynAlert).clear();
 		verify(mockSynapseClient).getOpenRequests(eq(TEAM_ID), any(AsyncCallback.class));
-		verify(mockView).configure(anyList(), anyList(), anyList());
+		verify(mockView).configure(anyList(), anyList(), anyList(), anyList());
 		verify(mockGwt).restoreWindowPosition();
 	}
 	
@@ -99,7 +103,7 @@ public class OpenMembershipRequestsWidgetTest {
 		widget.configure(TEAM_ID, mockCallback);
 		verify(mockSynAlert).clear();
 		verify(mockSynapseClient).getOpenRequests(eq(TEAM_ID), any(AsyncCallback.class));
-		verify(mockView, never()).configure(anyList(), anyList(), anyList());
+		verify(mockView, never()).configure(anyList(), anyList(), anyList(), anyList());
 		verify(mockSynAlert).handleException(ex);
 	}
 	
