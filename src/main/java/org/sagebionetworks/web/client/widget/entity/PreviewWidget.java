@@ -217,12 +217,12 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	private void renderFilePreview(EntityBundle bundle) {
 		PreviewFileHandle previewFileHandle = DisplayUtils.getPreviewFileHandle(bundle);
 		FileHandle originalFileHandle = DisplayUtils.getFileHandle(bundle);
-		PreviewFileType previewType = getPreviewFileType(previewFileHandle, originalFileHandle);
-		if (previewType != PreviewFileType.NONE) {
+		PreviewFileType originalFileHandlePreviewType = getOriginalFileType(originalFileHandle);
+		if (originalFileHandlePreviewType != PreviewFileType.NONE) {
+			renderFilePreview(originalFileHandlePreviewType, originalFileHandle);	
+		} else {
+			PreviewFileType previewType = getPreviewFileType(previewFileHandle, originalFileHandle);
 			renderFilePreview(previewType, previewFileHandle);
-		} else if (originalFileHandle != null) {
-			PreviewFileType originalFileHandlePreviewType = getOriginalFileType(originalFileHandle);
-			renderFilePreview(originalFileHandlePreviewType, originalFileHandle);
 		}
 	}
 	
