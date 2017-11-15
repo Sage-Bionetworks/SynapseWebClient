@@ -65,8 +65,6 @@ import org.sagebionetworks.web.client.view.PlaceView;
 import org.sagebionetworks.web.client.view.PlaceViewImpl;
 import org.sagebionetworks.web.client.view.ProfileView;
 import org.sagebionetworks.web.client.view.ProfileViewImpl;
-import org.sagebionetworks.web.client.view.ProjectsHomeView;
-import org.sagebionetworks.web.client.view.ProjectsHomeViewImpl;
 import org.sagebionetworks.web.client.view.QuestionContainerWidgetView;
 import org.sagebionetworks.web.client.view.QuestionContainerWidgetViewImpl;
 import org.sagebionetworks.web.client.view.QuizView;
@@ -402,14 +400,14 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.IFrameView;
+import org.sagebionetworks.web.client.widget.entity.renderer.IFrameViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.entity.renderer.IFrameView;
-import org.sagebionetworks.web.client.widget.entity.renderer.IFrameViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
 import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.SubmitToEvaluationWidgetView;
@@ -824,10 +822,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// EntityView
 		bind(EntityViewImpl.class).in(Singleton.class);
 		bind(EntityView.class).to(EntityViewImpl.class);
-		
-		// ProjectsHomeView
-		bind(ProjectsHomeViewImpl.class).in(Singleton.class);
-		bind(ProjectsHomeView.class).to(ProjectsHomeViewImpl.class);		
 		
 		// LoginView
 		bind(LoginViewImpl.class).in(Singleton.class);

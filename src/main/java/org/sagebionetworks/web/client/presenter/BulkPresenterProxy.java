@@ -31,7 +31,6 @@ import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.SignedToken;
@@ -148,12 +147,7 @@ public class BulkPresenterProxy extends AbstractActivity {
 			GWT.runAsync(new RunAsyncCallback() {
 				@Override
 				public void onSuccess() {
-					if (place instanceof ProjectsHome) {
-						// Projects Home
-						ProjectsHomePresenter presenter = ginjector.getProjectsHomePresenter();
-						presenter.setPlace((ProjectsHome) place);
-						presenter.start(panel, eventBus);
-					} else if (place instanceof PasswordReset) {
+					if (place instanceof PasswordReset) {
 						// reset passwords
 						PasswordResetPresenter presenter = ginjector.getPasswordResetPresenter();
 						presenter.setPlace((PasswordReset) place);

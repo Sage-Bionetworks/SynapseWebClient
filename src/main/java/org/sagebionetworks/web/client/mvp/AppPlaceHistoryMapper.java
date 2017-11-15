@@ -21,7 +21,6 @@ import org.sagebionetworks.web.client.place.MapPlace;
 import org.sagebionetworks.web.client.place.NewAccount;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.place.ProjectsHome;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.SignedToken;
@@ -47,7 +46,7 @@ import com.google.gwt.place.shared.WithTokenizers;
  */
 @WithTokenizers({ Home.Tokenizer.class, LoginPlace.Tokenizer.class,
 		PasswordReset.Tokenizer.class, RegisterAccount.Tokenizer.class,
-		ProjectsHome.Tokenizer.class, Profile.Tokenizer.class,
+		Profile.Tokenizer.class,
 		ComingSoon.Tokenizer.class, Synapse.Tokenizer.class, Wiki.Tokenizer.class,
 		Search.Tokenizer.class,
 		Challenges.Tokenizer.class, Help.Tokenizer.class, Governance.Tokenizer.class,
