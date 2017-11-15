@@ -86,13 +86,13 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 			Div createdOnDiv = new Div();
 			createdOnDiv.add(new Italic(createdOnDates.get(i)));
 			
-			Button ignoreButton = new Button("Remove");
-			ignoreButton.setSize(ButtonSize.LARGE);
-			ignoreButton.setType(ButtonType.DANGER);
-			ignoreButton.setPull(Pull.RIGHT);
-			ignoreButton.setMarginRight(5);
+			Button deleteButton = new Button("Remove");
+			deleteButton.setSize(ButtonSize.LARGE);
+			deleteButton.setType(ButtonType.DANGER);
+			deleteButton.setPull(Pull.RIGHT);
+			deleteButton.setMarginRight(5);
 			final String requestId = requestIds.get(i);
-			ignoreButton.addClickHandler(event -> {
+			deleteButton.addClickHandler(event -> {
 				presenter.deleteRequest(requestId);
 			});
 			Button joinButton = new Button(DisplayConstants.ACCEPT);
@@ -112,7 +112,7 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 			
 			td = new TableData();
 			td.add(joinButton);
-			td.add(ignoreButton);
+			td.add(deleteButton);
 			tr.add(td);
 			mainContainer.setVisible(true);
 		}
