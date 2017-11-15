@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.core.client.Scheduler;
@@ -31,6 +32,8 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
 	Alert htmlSanitizedWarning;
 	@UiField
 	Button showContentButton;
+	@UiField
+	Span storeRawHtmlSpan;
 	Presenter p;
 	SynapseJSNIUtils jsniUtils;
 	Widget w;
@@ -65,7 +68,8 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
 		synAlertContainer.add(w);
 	}
 	@Override
-	public void openHtmlInNewWindow(String html) {
+	public void openRawHtmlInNewWindow() {
+		String html = storeRawHtmlSpan.getText();
 		_openHtmlInNewWindow(html);
 	}
 	
@@ -148,5 +152,9 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
 	@Override
 	public void setSanitizedWarningVisible(boolean visible) {
 		htmlSanitizedWarning.setVisible(visible);
+	}
+	@Override
+	public void setRawHtml(String rawHtml) {
+		storeRawHtmlSpan.setText(rawHtml);
 	}
 }

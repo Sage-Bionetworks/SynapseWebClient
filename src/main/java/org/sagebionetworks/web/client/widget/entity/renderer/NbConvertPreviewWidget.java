@@ -1,5 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.APPLICATION_JSON_CHARSET_UTF8;
+import static org.sagebionetworks.web.shared.WebConstants.CONTENT_TYPE;
+import static org.sagebionetworks.web.shared.WebConstants.NBCONVERT_ENDPOINT_PROPERTY;
+import static org.sagebionetworks.web.shared.WebConstants.TEXT_HTML_CHARSET_UTF8;
+
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -9,7 +14,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import static org.sagebionetworks.web.shared.WebConstants.*;
 
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;

@@ -15,6 +15,7 @@
 			<bh:Text ui:field="loadingMessage"></bh:Text>
 		</bh:Div>
 		<bh:Div ui:field="htmlContainer" />
+		<bh:Span ui:field="storeRawHtmlSpan" visible="false" />
 		<bh:Div ui:field="synAlertContainer"/>
 	</bh:Div>
 </ui:UiBinder>

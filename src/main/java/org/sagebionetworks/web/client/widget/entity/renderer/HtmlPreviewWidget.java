@@ -33,7 +33,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 	protected SynapseAlert synAlert;
 	protected RequestBuilderWrapper requestBuilder;
 	protected SynapseJSNIUtils jsniUtils;
-	protected String createdBy, rawHtml;
+	protected String createdBy;
 	protected SynapseClientAsync synapseClient;
 	protected PopupUtilsView popupUtils;
 	@Inject
@@ -57,7 +57,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 	}
 	
 	public void renderHTML(final String rawHtml) {
-		this.rawHtml = rawHtml;
+		view.setRawHtml(rawHtml);
 		synapseClient.isUserAllowedToRenderHTML(createdBy, new AsyncCallback<Boolean>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -161,7 +161,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 		//confirm
 		popupUtils.showConfirmDialog("Continue?", "You are about to leave Synapse to render this content.\nWould you like to continue?", () -> {
 			//user clicked yes
-			view.openHtmlInNewWindow(rawHtml);
+			view.openRawHtmlInNewWindow();
 		});
 	}
 }
