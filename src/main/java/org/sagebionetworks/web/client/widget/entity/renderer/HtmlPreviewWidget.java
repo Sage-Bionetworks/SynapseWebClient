@@ -156,10 +156,11 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 			synAlert.handleException(e);
 		}
 	}
+	
 	@Override
 	public void onShowFullContent() {
 		//confirm
-		popupUtils.showConfirmDialog("", "You are leaving Synapse.org to open this in a new window; this enables additional content. Do you trust this content?", () -> {
+		popupUtils.showConfirmDialog("", "Click \"OK\" to leave this page and open this content in a new window; this enables additional functionality, but should only be done if you trust the contents.", () -> {
 			//user clicked yes
 			view.openRawHtmlInNewWindow();
 		});
