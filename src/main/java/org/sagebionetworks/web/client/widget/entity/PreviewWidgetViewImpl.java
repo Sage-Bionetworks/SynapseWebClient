@@ -218,14 +218,16 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	public static native void _autoAdjustFrameHeight(Element iframe) /*-{
 		if(iframe && iframe.contentWindow && iframe.contentWindow.document.body) {
 			var newHeightPx = iframe.contentWindow.document.body.scrollHeight;
-			if (newHeightPx < 450) {
-				newHeightPx = 450;
+			if (newHeightPx < 200) {
+				newHeightPx = 200;
 			}
 			var frameHeight = parseInt(iframe.height);
 			if (!frameHeight || (Math.abs(newHeightPx - frameHeight) > 70)) {
 				iframe.height = "";
 				iframe.height = (newHeightPx + 50) + "px";
-				iframe.scrollIntoView();
+				if (frameHeight) {
+					iframe.scrollIntoView();	
+				}
 			}
 		}
 	}-*/;
