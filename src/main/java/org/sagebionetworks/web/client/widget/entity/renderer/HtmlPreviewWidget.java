@@ -159,7 +159,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 	@Override
 	public void onShowFullContent() {
 		//confirm
-		popupUtils.showConfirmDialog("Continue?", "You are about to leave Synapse to render this content.\nWould you like to continue?", () -> {
+		popupUtils.showConfirmDialog("", "You are leaving Synapse.org to open this in a new window; this enables additional content. Do you trust this content?", () -> {
 			//user clicked yes
 			view.openRawHtmlInNewWindow();
 		});

@@ -1,65 +1,28 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.junit.Before;
-import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.FileEntity;
-import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
-import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
-import org.sagebionetworks.web.client.widget.entity.PreviewWidget.PreviewFileType;
-import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewView;
 import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.PDFPreviewWidget;
-import org.sagebionetworks.web.client.widget.entity.renderer.VideoWidget;
-import org.sagebionetworks.web.shared.WidgetConstants;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
 
-import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.Widget;
 
 /**
  * Unit test for the preview widget.
@@ -87,8 +50,6 @@ public class HtmlPreviewWidgetTest {
 	AuthenticationController mockAuthController;
 	@Mock
 	PopupUtilsView mockPopupUtils;
-	@Mock
-	SessionStorage mockSessionStorage;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	
@@ -98,7 +59,7 @@ public class HtmlPreviewWidgetTest {
 	@Before
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
-		previewWidget = new HtmlPreviewWidget(mockView, mockPresignedURLAsyncHandler, mockSynapseJSNIUtils, mockRequestBuilder, mockSynapseAlert, mockSynapseClient, mockPopupUtils, mockSessionStorage);
+		previewWidget = new HtmlPreviewWidget(mockView, mockPresignedURLAsyncHandler, mockSynapseJSNIUtils, mockRequestBuilder, mockSynapseAlert, mockSynapseClient, mockPopupUtils);
 		String mainFileId = "MAIN_FILE";
 		mockResponse = mock(Response.class);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);

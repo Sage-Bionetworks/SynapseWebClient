@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -29,9 +29,9 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
 	@UiField
 	Div loadingUI;
 	@UiField
-	Alert htmlSanitizedWarning;
+	Div htmlSanitizedWarning;
 	@UiField
-	Button showContentButton;
+	Anchor showContentLink;
 	@UiField
 	Span storeRawHtmlSpan;
 	Presenter p;
@@ -42,7 +42,7 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
 			SynapseJSNIUtils jsniUtils) {
 		w = binder.createAndBindUi(this);
 		this.jsniUtils = jsniUtils;
-		showContentButton.addClickHandler(event->{
+		showContentLink.addClickHandler(event->{
 			p.onShowFullContent();
 		});
 	}
