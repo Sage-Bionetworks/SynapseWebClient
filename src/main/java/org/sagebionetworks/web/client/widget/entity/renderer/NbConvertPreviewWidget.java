@@ -7,6 +7,7 @@ import static org.sagebionetworks.web.shared.WebConstants.TEXT_HTML_CHARSET_UTF8
 
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
@@ -19,13 +20,15 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.Window;
 import com.google.inject.Inject;
 
 public class NbConvertPreviewWidget extends HtmlPreviewWidget {
-
-	JSONObjectAdapter jsonObjectAdapter;
 	String nbConvertEndpoint;
-	public static final String HTML_PREFIX = "<html><body>";
+	GWTWrapper gwt;
+	public static final String HTML_PREFIX = "<html><head>" + 
+			"<link rel=\"stylesheet\" type=\"text/css\" href=\"css\notebook.css\">" + 
+			"</head><body>";
 	public static final String HTML_SUFFIX = "</body></html>";
 	@Inject
 	public NbConvertPreviewWidget(
@@ -35,11 +38,11 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 			RequestBuilderWrapper requestBuilder,
 			SynapseAlert synAlert,
 			SynapseClientAsync synapseClient,
-			JSONObjectAdapter jsonObjectAdapter,
 			GlobalApplicationState globalAppState,
-			PopupUtilsView popupUtils) {
+			PopupUtilsView popupUtils,
+			GWTWrapper gwt) {
 		super(view, presignedURLAsyncHandler, jsniUtils, requestBuilder, synAlert, synapseClient, popupUtils);
-		this.jsonObjectAdapter = jsonObjectAdapter;
+		this.gwt = gwt;
 		nbConvertEndpoint = globalAppState.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY);
 	}
 	
@@ -47,19 +50,13 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 	public void setPresignedUrl(String url) {
 		// use the lambda web service to convert the ipynb file to html.
 		//TODO: set up request
-		
-		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-		try {
-			adapter.put("file", url);
-		} catch (JSONObjectAdapterException exception) {
-			return;
-		}
+		String encodedUrl = gwt.encodeQueryString(url);
 		//TODO: use lambda endpoint to resolve ipynb file to html
-		requestBuilder.configure(RequestBuilder.POST, nbConvertEndpoint);
+//		Window.open(nbConvertEndpoint+encodedUrl, "", "");
+		requestBuilder.configure(RequestBuilder.GET, nbConvertEndpoint+encodedUrl);
 		requestBuilder.setHeader(ACCEPT, TEXT_HTML_CHARSET_UTF8);
-		requestBuilder.setHeader(CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		try {
-			requestBuilder.sendRequest(adapter.toJSONString(), new RequestCallback() {
+			requestBuilder.sendRequest(null, new RequestCallback() {
 				@Override
 				public void onResponseReceived(Request request,
 						Response response) {
