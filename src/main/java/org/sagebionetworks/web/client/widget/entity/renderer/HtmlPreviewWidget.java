@@ -160,7 +160,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 	@Override
 	public void onShowFullContent() {
 		//confirm
-		popupUtils.showConfirmDialog("", "Click \"OK\" to leave this page and open this content in a new window; this enables additional functionality, but should only be done if you trust the contents.", () -> {
+		popupUtils.showConfirmDialog("", "Click \"OK\" to leave this page and open this content in a new window; this enables additional functionality, but should only be done if you trust the content.", () -> {
 			//user clicked yes
 			view.openRawHtmlInNewWindow();
 		});
