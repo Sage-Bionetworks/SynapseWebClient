@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -79,5 +80,9 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public void setLoadingVisible(boolean visible) {
 		loadingUI.setVisible(visible);
+	}
+	@Override
+	public void scrollToTop() {
+		DisplayUtils.scrollToTop();
 	}
 }
