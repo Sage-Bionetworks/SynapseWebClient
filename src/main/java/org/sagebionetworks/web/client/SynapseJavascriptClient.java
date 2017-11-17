@@ -794,5 +794,15 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + COLUMN_VIEW_DEFAULT + viewType.name();
 		return getFuture(cb -> doGet(url, OBJECT_TYPE.ListWrapperColumnModel, cb));
 	}
+	
+	public FluentFuture<Void> deleteMembershipRequest(String requestId) {
+		String url = getRepoServiceUrl() + MEMBERSHIP_REQUEST + "/" + requestId;
+		return getFuture(cb -> doDelete(url, cb));
+	}
+	
+	public FluentFuture<Void> deleteMembershipInvitation(String inviteId) {
+		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + inviteId;
+		return getFuture(cb -> doDelete(url, cb));
+	}
 }
 

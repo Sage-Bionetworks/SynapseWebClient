@@ -22,10 +22,12 @@ public interface OpenMembershipRequestsWidgetView extends IsWidget {
 	 */
 	public void configure(List<UserProfile> profiles, 
 			List<String> requestMessages, 
-			List<String> createdOnDates);
+			List<String> createdOnDates,
+			List<String> requestIds);
 	public interface Presenter {
 		//use to go to user profile page
 		void goTo(Place place);
 		void acceptRequest(String userId);
+		void deleteRequest(String requestId);
 	}
 }
