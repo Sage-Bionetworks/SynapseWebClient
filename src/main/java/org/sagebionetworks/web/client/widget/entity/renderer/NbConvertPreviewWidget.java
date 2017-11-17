@@ -1,12 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.APPLICATION_JSON_CHARSET_UTF8;
-import static org.sagebionetworks.web.shared.WebConstants.CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WebConstants.NBCONVERT_ENDPOINT_PROPERTY;
 import static org.sagebionetworks.web.shared.WebConstants.TEXT_HTML_CHARSET_UTF8;
 
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -20,7 +16,6 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.user.client.Window;
 import com.google.inject.Inject;
 
 public class NbConvertPreviewWidget extends HtmlPreviewWidget {
