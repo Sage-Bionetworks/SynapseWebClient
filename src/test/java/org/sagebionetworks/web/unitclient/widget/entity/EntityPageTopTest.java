@@ -231,6 +231,29 @@ public class EntityPageTopTest {
 	}
 	
 	@Test
+	public void testSelectEntity(){
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		
+		ArgumentCaptor<CallbackP> selectEntityCallback = ArgumentCaptor.forClass(CallbackP.class);
+		
+		verify(mockFilesTab).setEntitySelectedCallback(selectEntityCallback.capture());
+		selectEntityCallback.getValue().invoke(null);
+		verify(mockTabs).showTab(mockFilesInnerTab, true);
+		
+		verify(mockTablesTab).setEntitySelectedCallback(selectEntityCallback.capture());
+		selectEntityCallback.getValue().invoke(null);
+		verify(mockTabs).showTab(mockTablesInnerTab, true);
+		
+		verify(mockDockerTab).setEntitySelectedCallback(selectEntityCallback.capture());
+		selectEntityCallback.getValue().invoke(null);
+		verify(mockTabs).showTab(mockDockerInnerTab, true);
+	}
+	
+	@Test
 	public void testConfigureWithProject(){
 		Synapse.EntityArea area = null;
 		String areaToken = null;
@@ -239,10 +262,11 @@ public class EntityPageTopTest {
 		//Area was not defined for this project, should try to go to wiki tab by default.
 		
 		//Once to show the active tab, and once after configuration so that the place is pushed into the history.
-		verify(mockTabs, times(2)).showTab(mockWikiInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
+		verify(mockTabs, times(2)).showTab(mockWikiInnerTab, false);
 		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
 		verify(mockWikiInnerTab).setContentStale(true);
 		verify(mockWikiInnerTab).setContentStale(false);
+		verify(mockView).scrollToTop();
 		
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class), eq(mockActionMenuWidget));
 		// entity area for the project settings doesn't apply (so it's set to null).
@@ -275,6 +299,8 @@ public class EntityPageTopTest {
 		//click on the wiki tab
 		verify(mockWikiTab).setTabClickedCallback(tabCaptor.capture());
 		tabCaptor.getValue().invoke(null);
+		verify(mockView).scrollToTop();
+		
 		//click on the files tab
 		verify(mockFilesTab).setTabClickedCallback(tabCaptor.capture());
 		tabCaptor.getValue().invoke(null);
@@ -319,7 +345,7 @@ public class EntityPageTopTest {
 		verify(mockFilesTab).resetView();
 		verify(mockTablesTab).resetView();
 
-		verify(mockTabs).showTab(mockFilesInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
+		verify(mockTabs).showTab(mockFilesInnerTab, false);
 		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
 		
 		verify(mockFilesTab).setProject(projectEntityId, mockProjectBundle, null);
@@ -386,7 +412,7 @@ public class EntityPageTopTest {
 		String areaToken = null;
 		Long versionNumber = 5L;
 		pageTop.configure(mockFileEntity, versionNumber, mockProjectHeader, area, areaToken);
-		verify(mockTabs).showTab(mockFilesInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
+		verify(mockTabs).showTab(mockFilesInnerTab, false);
 		
 		verify(mockProjectMetadata, Mockito.never()).configure(mockProjectBundle, null, null);
 		EntityBundle expectedProjectEntityBundle = null;
@@ -412,7 +438,7 @@ public class EntityPageTopTest {
 		String areaToken = "a table query area token";
 		Long versionNumber = null;
 		pageTop.configure(mockTableEntity, versionNumber, mockProjectHeader, area, areaToken);
-		verify(mockTabs).showTab(mockTablesInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
+		verify(mockTabs).showTab(mockTablesInnerTab, false);
 		
 		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
 		
@@ -476,7 +502,7 @@ public class EntityPageTopTest {
 		String areaToken = "docker area token";
 		Long versionNumber = null;
 		pageTop.configure(mockDockerEntity, versionNumber, mockProjectHeader, area, areaToken);
-		verify(mockTabs).showTab(mockDockerInnerTab, EntityPageTop.PUSH_TAB_URL_TO_BROWSER_HISTORY);
+		verify(mockTabs).showTab(mockDockerInnerTab, false);
 		
 		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
 		
