@@ -26,11 +26,15 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -55,6 +59,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -124,9 +129,18 @@ public class EntityPageTopTest {
 	CookieProvider mockCookies;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	PlaceChanger mockPlaceChanger;
+	@Mock
+	Link mockLinkEntity;
+	@Mock
+	Reference mockLinkReference;
 	@Captor
 	ArgumentCaptor<WikiPageWidget.Callback> wikiCallbackCaptor; 
-	
+	@Captor
+	ArgumentCaptor<Place> placeCaptor;
 	EntityPageTop pageTop;
 	String projectEntityId = "syn123";
 	String projectName = "fooooo";
@@ -143,6 +157,7 @@ public class EntityPageTopTest {
 		when(mockChallengeTab.asTab()).thenReturn(mockChallengeInnerTab);
 		when(mockDiscussionTab.asTab()).thenReturn(mockDiscussionInnerTab);
 		when(mockDockerTab.asTab()).thenReturn(mockDockerInnerTab);
+		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		pageTop = new EntityPageTop(mockView, 
 				mockSynapseClientAsync, 
 				mockTabs,
@@ -158,7 +173,8 @@ public class EntityPageTopTest {
 				mockEntityActionController,
 				mockActionMenuWidget,
 				mockCookies, 
-				mockSynapseJavascriptClient);
+				mockSynapseJavascriptClient,
+				mockGlobalApplicationState);
 		pageTop.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
@@ -194,6 +210,7 @@ public class EntityPageTopTest {
 		when(mockDockerInnerTab.isContentStale()).thenReturn(true);
 		when(mockChallengeInnerTab.isContentStale()).thenReturn(true);
 		when(mockTabs.getTabCount()).thenReturn(6);
+		when(mockLinkEntity.getLinksTo()).thenReturn(mockLinkReference);
 	}
 	
 	@Test
@@ -711,5 +728,21 @@ public class EntityPageTopTest {
 		verify(mockChallengeInnerTab, atLeastOnce()).setTabListItemVisible(false);
 		verify(mockDiscussionInnerTab, atLeastOnce()).setTabListItemVisible(false);
 		verify(mockDockerInnerTab, atLeastOnce()).setTabListItemVisible(false);
+	}
+	
+	@Test
+	public void testUpdateEntityBundleToLink() {
+		String targetEntityId = "syn2022";
+		Long targetVersion = 4L;
+		when(mockLinkReference.getTargetId()).thenReturn(targetEntityId);
+		when(mockLinkReference.getTargetVersionNumber()).thenReturn(targetVersion);
+		when(mockEntityBundle.getEntity()).thenReturn(mockLinkEntity);
+		
+		pageTop.updateEntityBundle(mockEntityBundle, null);
+		
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Synapse synPlace = (Synapse)placeCaptor.getValue();
+		assertEquals(targetEntityId, synPlace.getEntityId());
+		assertEquals(targetVersion, synPlace.getVersionNumber());
 	}
 }

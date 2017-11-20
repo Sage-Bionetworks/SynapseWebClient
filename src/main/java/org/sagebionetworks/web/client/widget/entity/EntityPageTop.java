@@ -19,10 +19,15 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -79,7 +84,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	private ActionMenuWidget projectActionMenu;
 	private EntityActionController entityActionController;
 	private ActionMenuWidget entityActionMenu;
-
+	private PlaceChanger placeChanger;
 	private CookieProvider cookies;
 	public boolean pushTabUrlToBrowserHistory = false;
 	
@@ -99,7 +104,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			EntityActionController entityActionController,
 			ActionMenuWidget entityActionMenu,
 			CookieProvider cookies,
-			SynapseJavascriptClient synapseJavascriptClient) {
+			SynapseJavascriptClient synapseJavascriptClient,
+			GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.tabs = tabs;
@@ -116,7 +122,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		this.entityActionMenu = entityActionMenu;
 		this.cookies = cookies;
 		this.synapseJavascriptClient = synapseJavascriptClient;
-
+		this.placeChanger = globalAppState.getPlaceChanger();
+		
 		initTabs();
 		view.setTabs(tabs.asWidget());
 		view.setProjectMetadata(projectMetadata.asWidget());
@@ -297,7 +304,16 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 
 	public void updateEntityBundle(EntityBundle bundle, Long version) {
 		entity = bundle.getEntity();
-		if (entity instanceof Project) {
+		// Redirect if Entity is a Link
+		if(entity instanceof Link) {
+			Reference ref = ((Link)bundle.getEntity()).getLinksTo();
+			if(ref != null){
+				placeChanger.goTo(new Synapse(ref.getTargetId(), ref.getTargetVersionNumber(), null, null));
+			} else {
+				// show error and then allow entity bundle to go to view
+				view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
+			}
+		} else if (entity instanceof Project) {
 			switch (area) {
 			case FILES:
 				fileChanged(bundle, version);
