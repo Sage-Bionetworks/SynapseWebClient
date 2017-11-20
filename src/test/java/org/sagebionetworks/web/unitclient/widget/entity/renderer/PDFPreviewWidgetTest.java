@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
@@ -34,12 +35,19 @@ public class PDFPreviewWidgetTest {
 	GWTWrapper mockGWT;
 	@Captor
 	ArgumentCaptor<FileHandleAssociation> fhaCaptor;
-	
+	@Captor
+	ArgumentCaptor<String> stringCaptor;
 	@Mock
 	FileResult mockFileResult;
+	@Mock
+	FileHandle mockFileHandle;
+	
+	public static final String FRIENDLY_FILE_SIZE = "a friendly file size";
+	
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
+		when(mockGWT.getFriendlySize(anyDouble(), anyBoolean())).thenReturn(FRIENDLY_FILE_SIZE);
 		widget = new PDFPreviewWidget(
 				mockView,
 				mockPresignedURLAsyncHandler,
@@ -68,8 +76,9 @@ public class PDFPreviewWidgetTest {
 		when(mockFileResult.getPreSignedURL()).thenReturn(presignedUrl);
 		when(mockView.getParentOffsetHeight()).thenReturn(parentOffsetHeight);
 		when(mockGWT.encodeQueryString(presignedUrl)).thenReturn(encodedPresignedUrl);
-		
-		widget.configure(synId, fileHandleId);
+		when(mockFileHandle.getId()).thenReturn(fileHandleId);
+		when(mockFileHandle.getContentSize()).thenReturn(1L);
+		widget.configure(synId, mockFileHandle);
 		
 		verify(mockPresignedURLAsyncHandler).getFileResult(fhaCaptor.capture(), any(AsyncCallback.class));
 		FileHandleAssociation fha = fhaCaptor.getValue();
@@ -84,10 +93,23 @@ public class PDFPreviewWidgetTest {
 	public void testConfigureFailure() {
 		String error = "an error";
 		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockPresignedURLAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
-		
-		widget.configure("syn23", "23");
+		when(mockFileHandle.getId()).thenReturn("23");
+		when(mockFileHandle.getContentSize()).thenReturn(1L);
+
+		widget.configure("syn23",mockFileHandle);
 		
 		verify(mockView).showError(error);
 	}
 	
+	@Test
+	public void testMaxFileSizeExceeded() {
+		when(mockFileHandle.getId()).thenReturn("23");
+		when(mockFileHandle.getContentSize()).thenReturn(new Double(PDFPreviewWidget.MAX_PDF_FILE_SIZE + 10).longValue());
+
+		widget.configure("syn23",mockFileHandle);
+		
+		//verify an error was shown, relating to the file size
+		verify(mockView).showError(stringCaptor.capture());
+		assertTrue(stringCaptor.getValue().contains(FRIENDLY_FILE_SIZE));
+	}
 }

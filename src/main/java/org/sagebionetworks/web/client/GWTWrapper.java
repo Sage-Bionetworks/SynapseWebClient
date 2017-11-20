@@ -61,5 +61,6 @@ public interface GWTWrapper {
 	void restoreWindowPosition();
 	int nextInt(int upperBound);
 
-	String getUniqueAliasName(String inputName);  
+	String getUniqueAliasName(String inputName);
+	String getFriendlySize(double size, boolean abbreviatedUnits);
 }

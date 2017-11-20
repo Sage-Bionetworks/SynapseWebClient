@@ -215,5 +215,8 @@ public class GWTWrapperImpl implements GWTWrapper {
 	public static String getRealGWTModuleBaseURL() {
 		return getHostpageUrl() + GWT.getModuleName() + "/";
 	}
-	
+	@Override
+	public String getFriendlySize(double size, boolean abbreviatedUnits) {
+		return DisplayUtils.getFriendlySize(size, abbreviatedUnits);
+	}
 }
