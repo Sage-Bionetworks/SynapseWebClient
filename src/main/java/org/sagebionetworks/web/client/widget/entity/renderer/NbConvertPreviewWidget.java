@@ -3,6 +3,7 @@ import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
 import static org.sagebionetworks.web.shared.WebConstants.NBCONVERT_ENDPOINT_PROPERTY;
 import static org.sagebionetworks.web.shared.WebConstants.TEXT_HTML_CHARSET_UTF8;
 
+import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -16,6 +17,7 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class NbConvertPreviewWidget extends HtmlPreviewWidget {
@@ -43,11 +45,8 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 	
 	@Override
 	public void setPresignedUrl(String url) {
-		// use the lambda web service to convert the ipynb file to html.
-		//TODO: set up request
 		String encodedUrl = gwt.encodeQueryString(url);
-		//TODO: use lambda endpoint to resolve ipynb file to html
-//		Window.open(nbConvertEndpoint+encodedUrl, "", "");
+		//use lambda endpoint to resolve ipynb file to html
 		requestBuilder.configure(RequestBuilder.GET, nbConvertEndpoint+encodedUrl);
 		requestBuilder.setHeader(ACCEPT, TEXT_HTML_CHARSET_UTF8);
 		try {
@@ -58,6 +57,7 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
 						renderHTML(HTML_PREFIX + response.getText() + HTML_SUFFIX);
+						view.setSanitizedWarningVisible(true);
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve. Reason: " + response.getStatusText()));
 					}
@@ -73,5 +73,22 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 			view.setLoadingVisible(false);
 			synAlert.handleException(e);
 		}
+	}
+	
+	@Override
+	public void onShowFullContent() {
+		//in this case (ipynb), to show the full content they need to download the ipynb file and view it locally
+		presignedURLAsyncHandler.getFileResult(fha, new AsyncCallback<FileResult>() {
+			@Override
+			public void onSuccess(FileResult fileResult) {
+				view.openInNewWindow(fileResult.getPreSignedURL());
+			}
+			
+			@Override
+			public void onFailure(Throwable ex) {
+				view.setLoadingVisible(false);
+				synAlert.handleException(ex);
+			}
+		});
 	}
 }

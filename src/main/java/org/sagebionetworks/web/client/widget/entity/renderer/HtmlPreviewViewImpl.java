@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -13,6 +12,7 @@ import com.google.gwt.event.dom.client.LoadHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -156,5 +156,13 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
 	@Override
 	public void setRawHtml(String rawHtml) {
 		storeRawHtmlSpan.setText(rawHtml);
+	}
+	@Override
+	public void openInNewWindow(String url) {
+		Window.open(url, "", "");
+	}
+	@Override
+	public void setShowContentLinkText(String text) {
+		showContentLink.setText(text);
 	}
 }
