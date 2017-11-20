@@ -22,7 +22,7 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 	String nbConvertEndpoint;
 	GWTWrapper gwt;
 	public static final String HTML_PREFIX = "<html><head>" + 
-			"<link rel=\"stylesheet\" type=\"text/css\" href=\"css\notebook.css\">" + 
+			"<link rel=\"stylesheet\" type=\"text/css\" href=\"css\\notebook.css\">" + 
 			"</head><body>";
 	public static final String HTML_SUFFIX = "</body></html>";
 	@Inject
