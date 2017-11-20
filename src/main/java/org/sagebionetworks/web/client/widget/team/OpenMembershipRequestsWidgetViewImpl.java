@@ -62,7 +62,7 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 	}
 	
 	@Override
-	public void configure(List<UserProfile> profiles, List<String> requestMessages, List<String> createdOnDates) {
+	public void configure(List<UserProfile> profiles, List<String> requestMessages, List<String> createdOnDates, List<String> requestIds) {
 		clear();
 		mainContainer.setVisible(false);
 		Table table = new Table();
@@ -85,15 +85,22 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 			
 			Div createdOnDiv = new Div();
 			createdOnDiv.add(new Italic(createdOnDates.get(i)));
+			
+			Button deleteButton = new Button("Remove");
+			deleteButton.setSize(ButtonSize.LARGE);
+			deleteButton.setType(ButtonType.DANGER);
+			deleteButton.setPull(Pull.RIGHT);
+			deleteButton.setMarginRight(5);
+			final String requestId = requestIds.get(i);
+			deleteButton.addClickHandler(event -> {
+				presenter.deleteRequest(requestId);
+			});
 			Button joinButton = new Button(DisplayConstants.ACCEPT);
 			joinButton.setSize(ButtonSize.LARGE);
 			joinButton.setType(ButtonType.PRIMARY);
 			joinButton.setPull(Pull.RIGHT);
-			joinButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.acceptRequest(profile.getOwnerId());
-				}
+			joinButton.addClickHandler(event -> {
+				presenter.acceptRequest(profile.getOwnerId());
 			});
 			
 			TableData td = new TableData();
@@ -105,6 +112,7 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 			
 			td = new TableData();
 			td.add(joinButton);
+			td.add(deleteButton);
 			tr.add(td);
 			mainContainer.setVisible(true);
 		}

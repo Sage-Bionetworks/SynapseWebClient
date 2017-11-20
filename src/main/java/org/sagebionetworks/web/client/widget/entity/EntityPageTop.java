@@ -19,10 +19,15 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -79,9 +84,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	private ActionMenuWidget projectActionMenu;
 	private EntityActionController entityActionController;
 	private ActionMenuWidget entityActionMenu;
-
+	private PlaceChanger placeChanger;
 	private CookieProvider cookies;
-	public static final boolean PUSH_TAB_URL_TO_BROWSER_HISTORY = false;
+	public boolean pushTabUrlToBrowserHistory = false;
+	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
 			SynapseClientAsync synapseClient,
@@ -98,7 +104,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			EntityActionController entityActionController,
 			ActionMenuWidget entityActionMenu,
 			CookieProvider cookies,
-			SynapseJavascriptClient synapseJavascriptClient) {
+			SynapseJavascriptClient synapseJavascriptClient,
+			GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.tabs = tabs;
@@ -115,7 +122,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		this.entityActionMenu = entityActionMenu;
 		this.cookies = cookies;
 		this.synapseJavascriptClient = synapseJavascriptClient;
-
+		this.placeChanger = globalAppState.getPlaceChanger();
+		
 		initTabs();
 		view.setTabs(tabs.asWidget());
 		view.setProjectMetadata(projectMetadata.asWidget());
@@ -131,14 +139,13 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	}
 
 	public CallbackP<String> getEntitySelectedCallback(final EntityArea newArea) {
-		return new CallbackP<String>() {
-			@Override
-			public void invoke(String newEntityId) {
-				area = newArea;
-				// always the current version from tab entity click
-				Long version = null;
-				configureEntity(newEntityId, version);
-			}
+		return newEntityId -> {
+			area = newArea;
+			// always the current version from tab entity click
+			Long version = null;
+			// SWC-3919: on tab entity click, push tab url to browser history
+			pushTabUrlToBrowserHistory = true;
+			configureEntity(newEntityId, version);
 		};
 	}
 
@@ -155,48 +162,36 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		dockerTab.setEntitySelectedCallback(getEntitySelectedCallback(EntityArea.DOCKER));
 
 		// lazy init tabs, and show project information (if set)
-		wikiTab.setTabClickedCallback(new CallbackP<Tab>() {
-			public void invoke(Tab t) {
-				area = EntityArea.WIKI;
-				configureWikiTab();
-				projectMetadata.setVisible(true);
-			};
+		wikiTab.setTabClickedCallback(tab -> {
+			area = EntityArea.WIKI;
+			configureWikiTab();
+			projectMetadata.setVisible(true);
 		});
-		adminTab.setTabClickedCallback(new CallbackP<Tab>() {
-			public void invoke(Tab t) {
-				area = EntityArea.ADMIN;
-				configureAdminTab();
-				projectMetadata.setVisible(true);
-			};
+		adminTab.setTabClickedCallback(tab -> {
+			area = EntityArea.ADMIN;
+			configureAdminTab();
+			projectMetadata.setVisible(true);
 		});
 
-		discussionTab.setTabClickedCallback(new CallbackP<Tab>() {
-			public void invoke(Tab t) {
-				area = EntityArea.DISCUSSION;
-				configureDiscussionTab();
-				projectMetadata.setVisible(true);
-			};
+		discussionTab.setTabClickedCallback(tab -> {
+			area = EntityArea.DISCUSSION;
+			configureDiscussionTab();
+			projectMetadata.setVisible(true);
 		});
-		filesTab.setTabClickedCallback(new CallbackP<Tab>() {
-			public void invoke(Tab t) {
-				area = EntityArea.FILES;
-				configureFilesTab();
-				projectMetadata.setVisible(projectBundle != null && filesEntityBundle.getEntity() instanceof Project);
-			};
+		filesTab.setTabClickedCallback(tab -> {
+			area = EntityArea.FILES;
+			configureFilesTab();
+			projectMetadata.setVisible(projectBundle != null && filesEntityBundle.getEntity() instanceof Project);
 		});
-		tablesTab.setTabClickedCallback(new CallbackP<Tab>() {
-			public void invoke(Tab t) {
-				area = EntityArea.TABLES;
-				configureTablesTab();
-				projectMetadata.setVisible(projectBundle != null && tablesEntityBundle.getEntity() instanceof Project);
-			};
+		tablesTab.setTabClickedCallback(tab -> {
+			area = EntityArea.TABLES;
+			configureTablesTab();
+			projectMetadata.setVisible(projectBundle != null && tablesEntityBundle.getEntity() instanceof Project);
 		});
-		dockerTab.setTabClickedCallback(new CallbackP<Tab>() {
-			public void invoke(Tab t) {
-				area = EntityArea.DOCKER;
-				configureDockerTab();
-				projectMetadata.setVisible(projectBundle != null && dockerEntityBundle.getEntity() instanceof Project);
-			};
+		dockerTab.setTabClickedCallback(tab -> {
+			area = EntityArea.DOCKER;
+			configureDockerTab();
+			projectMetadata.setVisible(projectBundle != null && dockerEntityBundle.getEntity() instanceof Project);
 		});
 	}
 
@@ -206,6 +201,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	 * @param bundle
 	 */
 	public void configure(Entity entity, Long versionNumber, EntityHeader projectHeader, Synapse.EntityArea initArea, String areaToken) {
+		pushTabUrlToBrowserHistory = false;
 		this.projectHeader = projectHeader;
 		this.area = initArea;
 		this.initialAreaToken = areaToken;
@@ -277,35 +273,47 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		switch (area) {
 		case FILES:
 			configureFilesTab();
-			tabs.showTab(filesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+			tabs.showTab(filesTab.asTab(), pushTabUrlToBrowserHistory);
 			break;
 		case WIKI:
 			configureWikiTab();
-			tabs.showTab(wikiTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+			tabs.showTab(wikiTab.asTab(), pushTabUrlToBrowserHistory);
 			break;
 		case TABLES:
 			configureTablesTab();
-			tabs.showTab(tablesTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+			tabs.showTab(tablesTab.asTab(), pushTabUrlToBrowserHistory);
 			break;
 		case ADMIN:
 			configureAdminTab();
-			tabs.showTab(adminTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+			tabs.showTab(adminTab.asTab(), pushTabUrlToBrowserHistory);
 			break;
 		case DISCUSSION:
 			configureDiscussionTab();
-			tabs.showTab(discussionTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+			tabs.showTab(discussionTab.asTab(), pushTabUrlToBrowserHistory);
 			break;
 		case DOCKER:
 			configureDockerTab();
-			tabs.showTab(dockerTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+			tabs.showTab(dockerTab.asTab(), pushTabUrlToBrowserHistory);
 			break;
 		default:
 		}
+		pushTabUrlToBrowserHistory = false;
+		//when tab reconfigured, scroll to the top
+		view.scrollToTop();
 	}
 
 	public void updateEntityBundle(EntityBundle bundle, Long version) {
 		entity = bundle.getEntity();
-		if (entity instanceof Project) {
+		// Redirect if Entity is a Link
+		if(entity instanceof Link) {
+			Reference ref = ((Link)bundle.getEntity()).getLinksTo();
+			if(ref != null){
+				placeChanger.goTo(new Synapse(ref.getTargetId(), ref.getTargetVersionNumber(), null, null));
+			} else {
+				// show error and then allow entity bundle to go to view
+				view.showErrorMessage(DisplayConstants.ERROR_NO_LINK_DEFINED);
+			}
+		} else if (entity instanceof Project) {
 			switch (area) {
 			case FILES:
 				fileChanged(bundle, version);
@@ -543,8 +551,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			wikiTab.configure(projectHeader.getId(), projectHeader.getName(), wikiId, 
 					canEdit, callback, entityActionMenu);
 			if (isWikiTabShown) {
-				//initially push the configured place into the browser history
-				tabs.showTab(wikiTab.asTab(), PUSH_TAB_URL_TO_BROWSER_HISTORY);
+				tabs.showTab(wikiTab.asTab(), false);
 				projectMetadata.setVisible(true);
 			}
 
