@@ -54,7 +54,6 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 		this.popupUtils = popupUtils;
 		view.setSynAlert(synAlert);
 		view.setPresenter(this);
-		view.setShowContentLinkText("Download this Juypter notebook and run in a local notebook server to see the fully interactive version.");
 	}
 	
 	public void renderHTML(final String rawHtml) {
@@ -79,7 +78,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 					if (rawHtml.equals(sanitizedHtml)) {
 						view.setHtml(rawHtml);
 					} else {
-						view.setHtml(truncateLargeHtml(sanitizedHtml));
+						view.setHtml(sanitizedHtml);
 						view.setSanitizedWarningVisible(true);
 					}
 				}

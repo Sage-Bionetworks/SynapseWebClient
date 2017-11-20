@@ -41,10 +41,12 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 		super(view, presignedURLAsyncHandler, jsniUtils, requestBuilder, synAlert, synapseClient, popupUtils);
 		this.gwt = gwt;
 		nbConvertEndpoint = globalAppState.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY);
+		view.setShowContentLinkText("Download this Juypter notebook and run in a local notebook server to see the fully interactive version.");
 	}
 	
 	@Override
 	public void setPresignedUrl(String url) {
+		view.setSanitizedWarningVisible(true);
 		String encodedUrl = gwt.encodeQueryString(url);
 		//use lambda endpoint to resolve ipynb file to html
 		requestBuilder.configure(RequestBuilder.GET, nbConvertEndpoint+encodedUrl);
@@ -57,7 +59,6 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
 						renderHTML(HTML_PREFIX + response.getText() + HTML_SUFFIX);
-						view.setSanitizedWarningVisible(true);
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve. Reason: " + response.getStatusText()));
 					}

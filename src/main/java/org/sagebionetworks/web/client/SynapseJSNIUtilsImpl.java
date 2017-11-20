@@ -581,6 +581,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    h4:     [],
 				    h5:     [],
 				    h6:     [],
+				    head:   [],
 				    header: [],
 				    hr:     [],
 				    html:   [],

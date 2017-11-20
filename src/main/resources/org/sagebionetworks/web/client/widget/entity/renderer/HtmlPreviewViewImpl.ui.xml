@@ -6,7 +6,7 @@
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	
 	<bh:Div addStyleNames="margin-5">
-		<bh:Div ui:field="htmlSanitizedWarning"  visible="false">
+		<bh:Div ui:field="htmlSanitizedWarning"  visible="false" addStyleNames="margin-top-20 margin-bottom-10">
 			<b:Alert type="INFO" addStyleNames="displayInline">
 				<bh:Text text="Limited rendering only." />
 				<b:Anchor ui:field="showContentLink" text="External view available." addStyleNames="margin-left-5"/>
