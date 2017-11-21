@@ -239,9 +239,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				view.setImagePreview(fullFileUrl);
 			} else if (previewType == PreviewFileType.PDF) {
 				// use pdf.js to view
-				String fileHandleId = handle != null ? handle.getId() : originalFileHandle.getId();
+				FileHandle fileHandle = handle != null ? handle : originalFileHandle;
 				PDFPreviewWidget w = ginInjector.getPDFPreviewWidget();
-				w.configure(bundle.getEntity().getId(), fileHandleId);
+				w.configure(bundle.getEntity().getId(), fileHandle);
 				view.setPreviewWidget(w);
 			} else {
 				// if HTML, get the full file contents

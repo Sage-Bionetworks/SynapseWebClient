@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.ClientProperties.MB;
+
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
@@ -17,6 +20,11 @@ public class PDFPreviewWidget implements IsWidget {
 	private PresignedURLAsyncHandler presignedURLAsyncHandler;
 	private GWTWrapper gwt;
 	FileHandleAssociation fha;
+	
+	public static final double MAX_PDF_FILE_SIZE = 30 * MB;
+	public static String friendlyMaxPdfFileSize = null;
+	
+	FileHandle fileHandle;
 	@Inject
 	public PDFPreviewWidget(
 			IFrameView view,
@@ -30,13 +38,17 @@ public class PDFPreviewWidget implements IsWidget {
 				refreshContent();
 			}
 		});
+		if (friendlyMaxPdfFileSize == null) {
+			friendlyMaxPdfFileSize = gwt.getFriendlySize(MAX_PDF_FILE_SIZE, true);
+		}
 	}
 	
-	public void configure(String synapseId, String fileHandleId) {
+	public void configure(String synapseId, FileHandle fileHandle) {
+		this.fileHandle = fileHandle;
 		fha = new FileHandleAssociation();
 		fha.setAssociateObjectId(synapseId);
 		fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
-		fha.setFileHandleId(fileHandleId);
+		fha.setFileHandleId(fileHandle.getId());
 		refreshContent();
 	}
 	
@@ -46,22 +58,26 @@ public class PDFPreviewWidget implements IsWidget {
 	}
 	
 	public void refreshContent() {
-		if (fha != null) {
-			presignedURLAsyncHandler.getFileResult(fha, new AsyncCallback<FileResult>() {
-				@Override
-				public void onSuccess(FileResult fileResult) {
-					String presignedUrl = fileResult.getPreSignedURL();
-					StringBuilder siteUrl = new StringBuilder();
-					siteUrl.append(PDF_JS_VIEWER_PREFIX);
-					siteUrl.append(gwt.encodeQueryString(presignedUrl));
-					view.configure(siteUrl.toString(), view.getParentOffsetHeight());
-				}
-				
-				@Override
-				public void onFailure(Throwable ex) {
-					view.showError(ex.getMessage());
-				}
-			});
+		if (fileHandle.getContentSize() != null && fileHandle.getContentSize() < MAX_PDF_FILE_SIZE) {
+			if (fha != null) {
+				presignedURLAsyncHandler.getFileResult(fha, new AsyncCallback<FileResult>() {
+					@Override
+					public void onSuccess(FileResult fileResult) {
+						String presignedUrl = fileResult.getPreSignedURL();
+						StringBuilder siteUrl = new StringBuilder();
+						siteUrl.append(PDF_JS_VIEWER_PREFIX);
+						siteUrl.append(gwt.encodeQueryString(presignedUrl));
+						view.configure(siteUrl.toString(), view.getParentOffsetHeight());
+					}
+					
+					@Override
+					public void onFailure(Throwable ex) {
+						view.showError(ex.getMessage());
+					}
+				});
+			}
+		} else {
+			view.showError("The PDF preview was not shown because the file size (" + gwt.getFriendlySize(fileHandle.getContentSize().doubleValue(), true) + ") exceeds the maximum preview size (" + friendlyMaxPdfFileSize + ")");
 		}
 	}
 }
