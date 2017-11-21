@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.accessrequirements.createaccessrequirement;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement.CreateAccessRequirementStep1.*;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -187,5 +187,51 @@ public class CreateAccessRequirementStep1Test {
 		assertEquals(VIEW_ENTITY_ID1, widget.getSubjectIds(testList));
 		testList.add(mockSubject2);
 		assertEquals(VIEW_ENTITY_ID1 + ", " + VIEW_ENTITY_ID2, widget.getSubjectIds(testList));
+	}
+	
+	@Test
+	public void testAddEntities() {
+		RestrictableObjectDescriptor rod = new RestrictableObjectDescriptor();
+		rod.setId(ROD_ENTITY_ID);
+		rod.setType(RestrictableObjectType.ENTITY);
+		widget.configure(rod);
+		verify(mockSubjectsWidget).configure(listCaptor.capture());
+		assertEquals(rod, listCaptor.getValue().get(0));
+		
+		//now add 1 new ID, 1 duplicate of the new ID, and 1 duplicate of the ID that the widget was configured with.
+		String newID = "syn9292929292";
+		String entityIds = ROD_ENTITY_ID +"," + newID + "," + newID;
+		when(mockView.getEntityIds()).thenReturn(entityIds);
+		
+		widget.onAddEntities();
+		
+		verify(mockSubjectsWidget, times(2)).configure(listCaptor.capture());
+		List<RestrictableObjectDescriptor> subjects = listCaptor.getValue();
+		assertEquals(2, subjects.size());
+		assertEquals(rod, subjects.get(0));
+		assertEquals(newID, subjects.get(1).getId());
+	}
+	
+	@Test
+	public void testAddTeams() {
+		RestrictableObjectDescriptor rod = new RestrictableObjectDescriptor();
+		rod.setId(ROD_TEAM_ID);
+		rod.setType(RestrictableObjectType.TEAM);
+		widget.configure(rod);
+		verify(mockSubjectsWidget).configure(listCaptor.capture());
+		assertEquals(rod, listCaptor.getValue().get(0));
+		
+		//now add 1 new ID, 1 duplicate of the new ID, and 1 duplicate of the ID that the widget was configured with.
+		String newID = "9938383";
+		String teamIds = ROD_TEAM_ID +"," + newID + "," + newID;
+		when(mockView.getTeamIds()).thenReturn(teamIds);
+		
+		widget.onAddTeams();
+		
+		verify(mockSubjectsWidget, times(2)).configure(listCaptor.capture());
+		List<RestrictableObjectDescriptor> subjects = listCaptor.getValue();
+		assertEquals(2, subjects.size());
+		assertEquals(rod, subjects.get(0));
+		assertEquals(newID, subjects.get(1).getId());
 	}
 }
