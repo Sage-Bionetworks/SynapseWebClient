@@ -53,6 +53,7 @@ public class EntityActionControllerViewImpl implements
 		deleteWikiButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				deleteWikiDialog.hide();
 				presenter.onConfirmDeleteWiki();	
 			}
 		});
