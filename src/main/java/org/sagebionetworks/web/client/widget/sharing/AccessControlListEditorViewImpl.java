@@ -28,7 +28,7 @@ import com.google.inject.Inject;
 
 public class AccessControlListEditorViewImpl extends FlowPanel implements AccessControlListEditorView {
 	
-	public static final String CREATE_ACL_HELP_TEXT = "By default the sharing settings are inhereted from the parent folder or project.  If you want to have different settings on a specific file folder or table you need to create local sharing settings then modify them.";
+	public static final String CREATE_ACL_HELP_TEXT = "By default the sharing settings are inherited from the parent folder or project. If you want to have different settings on a specific file, folder, or table you need to create local sharing settings and then modify them.";
 
 	public static final String DELETE_ACL_HELP_TEXT = "If a file or folder has sharing settings that are different from its parent folder or project you can delete the setting thereby inherting the sharing settings of the parent folder or project.";
 
