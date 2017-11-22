@@ -52,14 +52,14 @@ public class CreateAccessRequirementStep1ViewImpl implements CreateAccessRequire
 		synapseMultiIdButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onSetEntities();
+				presenter.onAddEntities();
 			}
 		});
 		
 		teamMultiIdButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onSetTeams();
+				presenter.onAddTeams();
 			}
 		});
 		

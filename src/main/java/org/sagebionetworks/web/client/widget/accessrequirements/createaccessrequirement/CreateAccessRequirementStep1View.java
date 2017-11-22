@@ -25,7 +25,7 @@ public interface CreateAccessRequirementStep1View extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		void onSetEntities();
-		void onSetTeams();
+		void onAddEntities();
+		void onAddTeams();
 	}
 }
