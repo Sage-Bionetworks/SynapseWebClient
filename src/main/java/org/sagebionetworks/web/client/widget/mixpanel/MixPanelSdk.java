@@ -27,10 +27,14 @@ public class MixPanelSdk {
 	private static native void _changeUser(
 			String userId,
 			String synapseEmail) /*-{
-		$wnd.mixpanel.identify(userId);
-		$wnd.mixpanel.register({
-			"email": synapseEmail
-		});
+		try {
+			$wnd.mixpanel.identify(userId);
+			$wnd.mixpanel.register({
+				"email": synapseEmail
+			});
+		} catch (err) {
+			console.error(err);
+		}
     }-*/;
 
 	private static native void _track(String eventType, String eventDescription) /*-{

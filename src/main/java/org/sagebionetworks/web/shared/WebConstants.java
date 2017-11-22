@@ -301,4 +301,5 @@ public class WebConstants {
 	public static final String REPO_SERVICE_URL_KEY = "repoServiceUrl";
 	public static final String FILE_SERVICE_URL_KEY = "fileServiceUrl";
 	public static final String AUTH_PUBLIC_SERVICE_URL_KEY = "authPublicServiceUrl";
+	public static final String SYNAPSE_VERSION_KEY = "synapseVersionInfo";
 }

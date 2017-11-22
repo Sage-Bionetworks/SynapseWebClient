@@ -21,7 +21,6 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.http.entity.ContentType;
@@ -111,7 +110,6 @@ import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
-import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -152,7 +150,6 @@ import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.core.server.StackTraceDeobfuscator;
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
 import com.google.gwt.thirdparty.guava.common.base.Suppliers;
 
@@ -166,7 +163,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public static final String HTML_TEAM_ID_PROPERTY_KEY = "org.sagebionetworks.portal.html_team_id";
 	
 	public static final String SYN_PREFIX = "syn";
-	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	public static final Charset MESSAGE_CHARSET = Charset.forName("UTF-8");
 	public static final ContentType HTML_MESSAGE_CONTENT_TYPE = ContentType
 			.create("text/html", MESSAGE_CHARSET);
@@ -175,8 +171,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 
 	public static final long LIMIT_50 = 50;
 	static private Log log = LogFactory.getLog(SynapseClientImpl.class);
-
-	private static StackTraceDeobfuscator deobfuscator = null;
 	
 	private final Supplier<Set<String>> htmlTeamMembersCache = Suppliers.memoizeWithExpiration(teamMembersSupplier(), 1, TimeUnit.HOURS);
 
@@ -201,7 +195,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 						currentOffset += LIMIT_50;
 					} while (teamMembers != null && !teamMembers.isEmpty());
 				} catch (SynapseException e) {
-					logError(e.getMessage());
+					log.error(e.getMessage());
 					
 				}
 				return userIdSet;
@@ -307,80 +301,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public <T extends JSONEntity> PaginatedResults<T> convertPaginated(org.sagebionetworks.reflection.model.PaginatedResults<T> in){
 		return  new PaginatedResults<T>(in.getResults(), in.getTotalNumberOfResults());
 	}
-
-	@Override
-	public void logDebug(String message) {
-		log.debug(message);
-	}
-
-	@Override
-	public void logError(String message) {
-		log.error(message);
-	}
-
-	
-	public StackTraceDeobfuscator getDeobfuscator() {
-		//lazy init deobfuscator
-		if (deobfuscator == null) {
-			String path = getServletContext().getRealPath("/WEB-INF/");
-			deobfuscator = StackTraceDeobfuscator.fromFileSystem(path);
-		}
-		return deobfuscator;
-	}
-	
-	/**
-	 * Deobfuscate a client stack trace
-	 * @param exceptionType
-	 * @param exceptionMessage
-	 * @param t 
-	 * @return
-	 */
-	public String deobfuscateException(String exceptionType, String exceptionMessage, StackTraceElement[] t, String permutationStrongName) {
-		StackTraceDeobfuscator deobfuscator = getDeobfuscator();
-		RuntimeException th = new RuntimeException(exceptionType + ":" + exceptionMessage);
-		th.setStackTrace(t);
-		deobfuscator.deobfuscateStackTrace(th, permutationStrongName);
-		return ExceptionUtils.getStackTrace(th).substring("java.lang.RuntimeException: ".length());
-	}
-	
-	@Override
-	public void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t) throws RestServiceException {
-			logErrorToRepositoryServices(message, exceptionType, exceptionMessage, t, getPermutationStrongName());
-	}
-	
-	//(tested)
-	public void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t, String strongName) throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			String exceptionString = "";
-			String outputLabel = "";
-			if (t != null) {
-				exceptionString = deobfuscateException(exceptionType, exceptionMessage, t, strongName);
-				outputLabel = exceptionString.substring(0, Math.min(exceptionString.length(), MAX_LOG_ENTRY_LABEL_SIZE));
-			}
-			
-			LogEntry entry = new LogEntry();
-			new PortalVersionHolder();
-			entry.setLabel("SWC/" + PortalVersionHolder.getVersionInfo() + "/" + outputLabel);
-			String userId = "";
-			UserProfile profile = synapseClient.getMyProfile();
-			if (profile != null) {
-				userId = "userId="+profile.getOwnerId()+" ";
-			}
-			String entryMessage = userId+message+"\n"+exceptionString;
-			entry.setMessage(entryMessage);
-			synapseClient.logError(entry);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	
-	@Override
-	public void logInfo(String message) {
-		log.info(message);
-	}
-
 	
 	/**
 	 * Update an entity.
@@ -1808,6 +1728,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		properties.put(WebConstants.REPO_SERVICE_URL_KEY, StackConfiguration.getRepositoryServiceEndpoint());
 		properties.put(WebConstants.FILE_SERVICE_URL_KEY, StackConfiguration.getFileServiceEndpoint());
 		properties.put(WebConstants.AUTH_PUBLIC_SERVICE_URL_KEY, StackConfiguration.getAuthenticationServicePublicEndpoint());
+		properties.put(WebConstants.SYNAPSE_VERSION_KEY, PortalVersionHolder.getVersionInfo());
 		return properties;
 	}
 
