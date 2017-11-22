@@ -5,7 +5,8 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
@@ -28,7 +29,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.GlobalApplicationStateView;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -64,7 +65,6 @@ public class GlobalApplicationStateImplTest {
 	JiraURLHelper mockJiraURLHelper;
 	AppPlaceHistoryMapper mockAppPlaceHistoryMapper;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	ClientLogger mockLogger;
 	GlobalApplicationStateView mockView;
 	HashMap<String, String> testProps;
 	@Mock
@@ -73,6 +73,8 @@ public class GlobalApplicationStateImplTest {
 	GWTWrapper mockGWT;
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -83,13 +85,12 @@ public class GlobalApplicationStateImplTest {
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAppPlaceHistoryMapper = mock(AppPlaceHistoryMapper.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockLogger = mock(ClientLogger.class);
 		mockView = mock(GlobalApplicationStateView.class);
 		AsyncMockStubber.callSuccessWith("v1").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
 		testProps = new HashMap<String, String>();
 		AsyncMockStubber.callSuccessWith(testProps).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 		
-		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLogger, mockLocalStorage, mockGWT, mockDateTimeUtils);
+		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLocalStorage, mockGWT, mockDateTimeUtils, mockJsClient);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
 	}
@@ -132,20 +133,7 @@ public class GlobalApplicationStateImplTest {
 		Throwable t = new RuntimeException("uncaught");
 		globalApplicationState.handleUncaughtException(t);
 		verify(mockSynapseJSNIUtils).consoleError(anyString());
-		verify(mockLogger).errorToRepositoryServices(anyString(), eq(t));
-	}
-	
-	@Test
-	public void testUncaughtJSExceptionsFailedServiceLog() {
-		Throwable t = new RuntimeException("uncaught");
-		//when we try to log the error to the repository services, 
-		//make sure we still send the error to the console, 
-		//and that calling does not throw any other uncaught exception.
-		doThrow(new NullPointerException()).when(mockLogger).errorToRepositoryServices(anyString(), any(Throwable.class));
-		globalApplicationState.handleUncaughtException(t);
-		verify(mockLogger).errorToRepositoryServices(anyString(), eq(t));
-		//called twice.  Once for the uncaught exception, and once to inform that the repo call method failed
-		verify(mockSynapseJSNIUtils, times(2)).consoleError(anyString());
+		verify(mockJsClient).logError(anyString(), eq(t));
 	}
 	
 	@Test

@@ -1,15 +1,17 @@
 package org.sagebionetworks.web.client;
 
+import static org.sagebionetworks.web.client.cookie.CookieKeys.CURRENT_PLACE;
+import static org.sagebionetworks.web.client.cookie.CookieKeys.LAST_PLACE;
+import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import static org.sagebionetworks.web.client.cookie.CookieKeys.*;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
@@ -45,7 +47,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private boolean isEditing;
 	Set<String> wikiBasedEntites;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private ClientLogger logger;
 	private GlobalApplicationStateView view;
 	private String synapseVersion;
 	private ClientCache localStorage;
@@ -53,6 +54,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private boolean isShowingVersionAlert;
 	private DateTimeUtils dateTimeUtils;
 	private PublicPrincipalIds publicPrincipalIds;
+	private SynapseJavascriptClient jsClient;
 	
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
@@ -61,20 +63,20 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			EventBus eventBus, 
 			SynapseClientAsync synapseClient, 
 			SynapseJSNIUtils synapseJSNIUtils, 
-			ClientLogger logger,
 			ClientCache localStorage, 
 			GWTWrapper gwt,
-			DateTimeUtils dateTimeUtils) {
+			DateTimeUtils dateTimeUtils,
+			SynapseJavascriptClient jsClient) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		this.synapseClient = synapseClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.logger = logger;
 		this.localStorage = localStorage;
 		this.dateTimeUtils = dateTimeUtils;
 		this.gwt = gwt;
 		this.view = view;
+		this.jsClient = jsClient;
 		isEditing = false;
 		isShowingVersionAlert = false;
 		initUncaughtExceptionHandler();
@@ -91,8 +93,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void handleUncaughtException(Throwable e) {
 		try {
 			GWT.debugger();
-			Throwable unwrapped = unwrap(e);
-			logger.errorToRepositoryServices(UNCAUGHT_JS_EXCEPTION, unwrapped);
+			jsClient.logError(UNCAUGHT_JS_EXCEPTION, unwrap(e));
 		} catch (Throwable t) {
 			synapseJSNIUtils.consoleError("Unable to log uncaught exception to server: " + t.getMessage());
 		} finally {

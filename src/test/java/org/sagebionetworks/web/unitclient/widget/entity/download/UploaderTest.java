@@ -48,7 +48,6 @@ import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -85,7 +84,6 @@ public class UploaderTest {
 	SynapseClientAsync synapseClient;
 	JiraURLHelper jiraURLHelper;
 	SynapseJSNIUtils synapseJsniUtils;
-	ClientLogger mockLogger;
 	GlobalApplicationState mockGlobalApplicationState;
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
 	
@@ -112,7 +110,6 @@ public class UploaderTest {
 		jiraURLHelper=mock(JiraURLHelper.class);
 		synapseJsniUtils=mock(SynapseJSNIUtils.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockLogger = mock(ClientLogger.class);
 		AsyncMockStubber.callSuccessWith("syn123").when(synapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 		testEntity = new FileEntity();
 		testEntity.setName("test file");
@@ -156,7 +153,6 @@ public class UploaderTest {
 				authenticationController, 
 				multipartUploader, 
 				mockGlobalApplicationState, 
-				mockLogger,
 				mockS3DirectUploader,
 				mockSynapseJavascriptClient);
 		uploader.addCancelHandler(cancelHandler);
@@ -690,7 +686,7 @@ public class UploaderTest {
 	public void testUploadFailed() {
 		String message = "meow there's an error.";
 		uploader.uploadFailed(message);
-		verify(mockLogger).errorToRepositoryServices(eq(message), any(Exception.class));
+		verify(mockSynapseJavascriptClient).logError(eq(message), any(Exception.class));
 	}
 	
 	@Test
