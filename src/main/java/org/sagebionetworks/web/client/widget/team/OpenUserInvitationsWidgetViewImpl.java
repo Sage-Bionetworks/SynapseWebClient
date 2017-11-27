@@ -100,7 +100,7 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	private Button createRemoveButton(String misId) {
 		Button button = new Button("Remove");
 		button.setType(ButtonType.DANGER);
-		button.setSize(ButtonSize.EXTRA_SMALL);
+		button.setSize(ButtonSize.LARGE);
 		button.setPull(Pull.RIGHT);
 		button.addClickHandler(event -> presenter.removeInvitation(misId));
 		return button;
