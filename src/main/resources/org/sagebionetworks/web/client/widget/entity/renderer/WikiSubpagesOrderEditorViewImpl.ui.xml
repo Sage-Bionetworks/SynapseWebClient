@@ -4,7 +4,6 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	<g:FlowPanel>
 		<bh:Div>
 		    <b:Heading size="H4" text="Edit Order">
@@ -31,7 +30,7 @@
 			</bh:Div>
 		</bh:Div>
 		<bh:Span ui:field="loadingUI" visible="false">
-			<g:Image resource='{sageImageBundle.loading31}' />
+			<w:LoadingSpinner size="31px"/>
 			<bh:Text> Processing...</bh:Text>
 		</bh:Span>
 		<g:SimplePanel ui:field="synAlertContainer" />
