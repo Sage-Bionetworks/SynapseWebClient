@@ -26,6 +26,8 @@ import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
@@ -55,6 +57,7 @@ import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FitImage;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -88,6 +91,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
 import com.google.gwt.user.client.ui.UIObject;
@@ -201,18 +205,23 @@ public class DisplayUtils {
 	 * @param sageImageBundle
 	 * @return
 	 */
-	public static Div getLoadingWidget(SageImageBundle sageImageBundle) {
-		Div cp = new Div();
-		cp.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()))));		
-		return cp;
+	public static IsWidget getLoadingWidget() {
+		LoadingSpinner spinner = new LoadingSpinner();
+		spinner.setSize(31);
+		return spinner;
 	}
 	
-	public static String getLoadingHtml(SageImageBundle sageImageBundle) {
-		return getLoadingHtml(sageImageBundle, DisplayConstants.LOADING);
+	public static IsWidget getSmallLoadingWidget() {
+		LoadingSpinner spinner = new LoadingSpinner();
+		spinner.setSize(16);
+		return spinner;
 	}
-
-	public static String getLoadingHtml(SageImageBundle sageImageBundle, String message) {
-		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + "&nbsp;" + message + "...";
+	
+	public static IsWidget getLoadingWidget(String message) {
+		Span span = new Span();
+		span.add(getSmallLoadingWidget());
+		span.add(new Text(" " + message + "..."));
+		return span;
 	}
 
 

@@ -15,7 +15,7 @@ public class FileHandleWidgetViewImpl implements FileHandleWidgetView {
 	public interface Binder extends UiBinder<Widget, FileHandleWidgetViewImpl> {}
 	
 	@UiField
-	Image loadingImage;
+	LoadingSpinner loadingImage;
 	@UiField
 	Text errorText;
 	@UiField

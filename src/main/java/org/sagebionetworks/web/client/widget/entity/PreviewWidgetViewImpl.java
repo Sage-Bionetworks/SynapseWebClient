@@ -106,7 +106,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	@Override
 	public void showLoading() {
 		clear();
-		add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		add(DisplayUtils.getSmallLoadingWidget());
 	}
 	@Override
 	public void setPreviewWidget(IsWidget w) {

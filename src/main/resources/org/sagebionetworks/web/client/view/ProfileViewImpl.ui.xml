@@ -38,7 +38,7 @@
 				        	<b:Container fluid="true">
 				        	    <b:Row ui:field="profilePictureLoadingUI" visible="false">
 						            <b:Column size="XS_12" offset="XS_5" addStyleNames="margin-top-100">
-						            	<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
+										<w:LoadingSpinner size="31px"/>
 						            	<bh:Text>&nbsp; Loading...</bh:Text>
 									</b:Column>
 								</b:Row>
@@ -226,7 +226,7 @@
 							    		<g:FlowPanel ui:field="challengesTabContent" styleName="margin-10" />
 							    	</div>
 							    	<div ui:field="challengesLoadingUI" >
-											<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+											<w:LoadingSpinner size="16px"/>
 											&nbsp;Loading...
 									</div>
 									<div class="clearfix">

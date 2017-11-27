@@ -6,12 +6,12 @@ import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -20,7 +20,7 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	Widget w;
 	public interface Binder extends UiBinder<Widget, EntityIdCellRendererViewImpl> {}
 	@UiField
-	Image loadingUI;
+	LoadingSpinner loadingUI;
 	@UiField
 	Tooltip errorField;
 	@UiField

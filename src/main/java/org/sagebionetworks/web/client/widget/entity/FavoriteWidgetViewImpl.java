@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -24,7 +25,7 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
 	@UiField
 	Anchor notFavoriteIcon;
 	@UiField
-	Image loadingUI;
+	LoadingSpinner loadingUI;
 	
 	private Widget widget;
 	

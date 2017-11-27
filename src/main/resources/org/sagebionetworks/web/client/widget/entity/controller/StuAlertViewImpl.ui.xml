@@ -4,10 +4,10 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-  xmlns:e="urn:import:org.sagebionetworks.web.client.widget.entity">
+  xmlns:e="urn:import:org.sagebionetworks.web.client.widget.entity"
+  xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
   
-  <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
- 	<bh:Div visible="false" addStyleNames="margin-top-10 margin-left-15 margin-right-15">
+  	<bh:Div visible="false" addStyleNames="margin-top-10 margin-left-15 margin-right-15">
  		<bh:Div ui:field="synAlertContainer" />
   		<g:HTMLPanel ui:field="httpCode404" visible="false">
   			<b:Row>
@@ -31,7 +31,7 @@
 			  			<b:Anchor addStyleNames="displayInline font-size-20 margin-5" ui:field="requestAccessLink" text="request access"/>
 			  			<b:Heading addStyleNames="displayInline" size="H4" text="from the owner." />
 			  			<bh:Div addStyleNames="center margin-top-10" ui:field="requestLoadingUI">
-							<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
+						  	<w:LoadingSpinner size="16px"/>
 							<bh:Text>&nbsp;Sending request...</bh:Text>
 						</bh:Div>
 			  		</bh:Div>
