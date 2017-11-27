@@ -4,12 +4,13 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle' />
+	
 	<bh:Div>
 		<bh:Div ui:field="container" />
-		<g:HTMLPanel ui:field="loadMore" addStyleNames="center-block center margin-top-20">
+		<bh:ClearFix />
+		<g:HTMLPanel ui:field="loadMore" addStyleNames="center center-block center-spinner margin-top-20">
 			<w:LoadingSpinner ui:field="loadMoreImage" size="31px"/>
-			&nbsp;Loading...
+			Loading...
 		</g:HTMLPanel>
 	</bh:Div>
 </ui:UiBinder>

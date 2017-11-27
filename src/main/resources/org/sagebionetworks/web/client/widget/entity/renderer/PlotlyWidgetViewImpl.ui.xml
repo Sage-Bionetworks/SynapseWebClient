@@ -6,7 +6,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Div addStyleNames="margin-5">
 		<bh:Div ui:field="loadingUI" >
-			<w:LoadingSpinner size="16px" addStyleNames="margin-right-5"/>
+			<w:LoadingSpinner size="16px"/>
 			<bh:Text ui:field="loadingMessage"></bh:Text>
 		</bh:Div>
 		<bh:Div>

@@ -39,7 +39,7 @@
 	    <g:Tree ui:field="entityTree">
 		</g:Tree>  
 		<bh:Span ui:field="loadingUI" addStyleNames="center-block center">
-			<w:LoadingSpinner size="31px"/>&nbsp;Loading...
+			<w:LoadingSpinner addStyleNames="center-spinner" size="31px"/>&nbsp;Loading...
 	    </bh:Span> 	    
 	</bh:Div>
 

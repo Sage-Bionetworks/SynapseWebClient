@@ -27,7 +27,7 @@
 				</g:HTMLPanel>
 				<b:Row ui:field="loadingUi" visible="false" addStyleNames="margin-150">
 					<b:Column size="XS_12" offset="XS_5">
-						<w:LoadingSpinner size="31px" addStyleNames="moveup-2"/>
+						<w:LoadingSpinner size="31px" addStyleNames="displayInline moveup-2"/>
 						<b:Heading size="H4" text="Logging you in..." addStyleNames="displayInline margin-left-5"/>
 					</b:Column>
 				</b:Row>

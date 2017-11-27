@@ -12,7 +12,7 @@
 		</bh:Div>
 		<bh:Div width="100%">
 			<g:HTMLPanel ui:field="loadingMessage" visible="false">
-				<w:LoadingSpinner size="16px"/>
+				<w:LoadingSpinner addStyleNames="displayInline" size="16px"/>
 				&nbsp;Loading...
 			</g:HTMLPanel>
 			<b:Container fluid="true">
