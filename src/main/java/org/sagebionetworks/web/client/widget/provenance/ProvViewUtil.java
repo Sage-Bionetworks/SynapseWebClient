@@ -5,8 +5,11 @@ import java.util.Map;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconSize;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
@@ -14,7 +17,6 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.HelpWidget;
-import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView.Presenter;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
@@ -184,7 +186,16 @@ public class ProvViewUtil {
 		}			
 		
 		// icon
-		Icon icon = EntityTypeUtils.getSynapseIconForEntityClassName(entityType, IconSize.TIMES2);
+		IconType iconType = EntityTypeUtils.getIconTypeForEntityClassName(entityType);
+		if (FileEntity.class.getName().equals(entityType)) {
+			if (ContentTypeUtils.isRecognizedCodeFileName(name)) {
+				iconType = IconType.FILE_CODE_O;
+			} else if (org.sagebionetworks.web.client.ContentTypeUtils.isRecognizedPlainTextFileName(name)) {
+				iconType = IconType.FILE_TEXT_O;
+			}
+		}
+		Icon icon = new Icon(iconType);
+		icon.setSize(IconSize.TIMES2);
 		container.add(new SimplePanel(icon));
 		
 		// name
@@ -209,7 +220,6 @@ public class ProvViewUtil {
 		versionHtml.setStyleName(PROV_VERSION_DISPLAY_STYLE);
 		builder.appendHtmlConstant(versionHtml.toString());		
 		link.add(new HTML(builder.toSafeHtml()));
-
 		ProvNodeContainer node = new ProvNodeContainer();
 		if(id != null) node.getElement().setId(id);
 		node.setStyleName(PROV_ENTTITY_NODE_STYLE);
