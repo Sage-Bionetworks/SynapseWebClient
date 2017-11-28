@@ -18,14 +18,21 @@ public class ContentTypeUtils {
 		return TABLE_CONTENT_TYPES_SET.contains(lowerContentType);
 	}
 
-	public static boolean isRecognizedPlainTextFileName(String fileName) {
-		boolean isPlainText = false;
+	public static String getExtension(String fileName) {
 		if (fileName != null) {
 			int lastDot = fileName.lastIndexOf(".");
 			if (lastDot > -1) {
-				String extension = fileName.substring(lastDot).toLowerCase();
-				isPlainText = PLAIN_TEXT_EXTENSIONS_SET.contains(extension);
+				return fileName.substring(lastDot + 1).toLowerCase();
 			}
+		}
+		return null;
+	}
+	
+	public static boolean isRecognizedPlainTextFileName(String fileName) {
+		boolean isPlainText = false;
+		String extension = getExtension(fileName);
+		if (extension != null) {
+			isPlainText = PLAIN_TEXT_EXTENSIONS_SET.contains("."+extension);
 		}
 		return isPlainText;
 	}
@@ -74,5 +81,4 @@ public class ContentTypeUtils {
 		}
 		return contentType;
 	}
-
 }

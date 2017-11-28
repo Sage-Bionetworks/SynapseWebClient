@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.web.client.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
@@ -276,7 +277,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 										
 										if (PreviewFileType.CODE == previewType) {
 											String codePreview = SafeHtmlUtils.htmlEscapeAllowEntities(responseText);
-											view.setCodePreview(codePreview);
+											String extension = ContentTypeUtils.getExtension(originalFileHandle.getFileName());
+											view.setCodePreview(codePreview, extension);
 										} 
 										else if (PreviewFileType.CSV == previewType) {
 											view.setTablePreview(responseText, ",");
