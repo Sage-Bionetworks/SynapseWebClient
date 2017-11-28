@@ -218,10 +218,11 @@ public class DisplayUtils {
 	}
 	
 	public static IsWidget getLoadingWidget(String message) {
-		Span span = new Span();
-		span.add(getSmallLoadingWidget());
-		span.add(new Text(" " + message + "..."));
-		return span;
+		Div div = new Div();
+		div.addStyleName("center center-block");
+		div.add(getSmallLoadingWidget());
+		div.add(new Text(" " + message + "..."));
+		return div;
 	}
 
 
