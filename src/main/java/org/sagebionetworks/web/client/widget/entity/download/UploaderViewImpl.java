@@ -24,6 +24,7 @@ import org.gwtbootstrap3.client.ui.constants.InputType;
 import org.gwtbootstrap3.client.ui.constants.ProgressBarType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -35,7 +36,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.JavaScriptCallback;
 import org.sagebionetworks.web.client.widget.entity.SharingAndDataUseConditionWidget;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.InputElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -53,6 +53,7 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -102,7 +103,7 @@ public class UploaderViewImpl extends FlowPanel implements
 
 	// external link panel
 	
-	private HTML spinningProgressContainer;
+	private Div spinningProgressContainer;
 	private Input fileUploadInput;
 	private Heading fileUploadLabel = new Heading(HeadingSize.H5);
 	private Italic uploadSpeedLabel = new Italic();
@@ -138,7 +139,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		this.formPanel = new FormPanel();
 		this.externalLinkFormPanel = new Form();
 		
-		spinningProgressContainer = new HTML();
+		spinningProgressContainer = new Div();
 		
 		chooseFileBtn = new Button("Choose File");
 		chooseFileBtn.setType(ButtonType.INFO);
@@ -292,7 +293,7 @@ public class UploaderViewImpl extends FlowPanel implements
 
 	@Override
 	public void showLoading() {
-		spinningProgressContainer = new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_INITIALIZING));
+		spinningProgressContainer.add(DisplayUtils.getLoadingWidget(DisplayConstants.LABEL_INITIALIZING));
 		spinningProgressContainer.addStyleName("margin-top-10");
 	}
 
@@ -359,7 +360,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		resetProgress();
 		progressContainer.setVisible(false);
 		uploadSpeedLabel.setHTML("");
-		spinningProgressContainer.setHTML("");
+		spinningProgressContainer.clear();
 		spinningProgressContainer.setVisible(false);
 	}
 	private void resetProgress() {
@@ -373,7 +374,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		initMessageHandler();
 		showSpinningProgress();
 		formPanel.setAction(actionUrl);
-		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_UPLOADING));
+		spinningProgressContainer.add(DisplayUtils.getLoadingWidget(DisplayConstants.LABEL_UPLOADING));
 		formPanel.submit();	
 	}
 	
@@ -478,7 +479,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	private void initializeProgress() {
 		showSpinningProgress();
-		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_INITIALIZING));
+		spinningProgressContainer.add(DisplayUtils.getLoadingWidget(DisplayConstants.LABEL_INITIALIZING));
 	}
 	
 	@Override

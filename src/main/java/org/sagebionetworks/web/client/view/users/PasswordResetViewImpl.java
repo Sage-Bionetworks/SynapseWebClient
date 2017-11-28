@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.view.users;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.dom.client.DivElement;
@@ -21,7 +20,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -76,17 +74,13 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	
 	private Presenter presenter;
 	private Header headerWidget;
-	private SageImageBundle sageImageBundle;
 	
 	private boolean isShowingResetUI;
 	
 	@Inject
 	public PasswordResetViewImpl(PasswordResetViewImplUiBinder binder,
-			Header headerWidget,
-			SageImageBundle sageImageBundle) {		
+			Header headerWidget) {		
 		initWidget(binder.createAndBindUi(this));
-
-		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		
 		headerWidget.configure(false);
@@ -268,7 +262,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 
 	@Override
 	public void showLoading() {
-		loadingPanel.setWidget(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		loadingPanel.setWidget(DisplayUtils.getSmallLoadingWidget());
 		loadingPanel.setVisible(true);		
 	}
 

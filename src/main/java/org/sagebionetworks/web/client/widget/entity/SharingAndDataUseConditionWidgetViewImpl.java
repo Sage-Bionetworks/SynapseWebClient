@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -32,7 +31,6 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	GlobalApplicationState globalApplicationState;
-	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
 	FlowPanel container;
 	PublicPrivateBadge publicPrivateBadge;
@@ -43,7 +41,6 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 	@Inject
 	public SharingAndDataUseConditionWidgetViewImpl(SynapseJSNIUtils synapseJSNIUtils,
 			GlobalApplicationState globalApplicationState,
-			SageImageBundle sageImageBundle, 
 			IconsImageBundle iconsImageBundle, 
 			PublicPrivateBadge publicPrivateBadge, 
 			AccessControlListModalWidget accessControlListModalWidget,
@@ -51,7 +48,6 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 			CookieProvider cookies) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.globalApplicationState = globalApplicationState;
-		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.publicPrivateBadge = publicPrivateBadge;
 		this.restrictionWidgetV2 = restrictionWidgetV2;
@@ -135,7 +131,7 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 	@Override
 	public void showLoading() {
 		container.clear();
-		container.add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		container.add(DisplayUtils.getSmallLoadingWidget());
 	}
 
 	@Override

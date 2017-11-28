@@ -4,8 +4,8 @@
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+  xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
   >
-  	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
   	<bh:Span addStyleNames="margin-left-2 displayInlineBlock" ui:field="favWidgetContainer">
 		<b:Tooltip trigger="HOVER" placement="RIGHT" title="Click the star to remove this from your favorites!">
 			<b:Anchor addStyleNames="favoriteIcon textDecorationNone" ui:field="favoriteIcon" icon="STAR" visible="false"/>
@@ -13,6 +13,6 @@
 		<b:Tooltip trigger="HOVER" placement="RIGHT" title="Click the star to add this to your favorites!">
 			<b:Anchor addStyleNames="greyText-imp textDecorationNone" ui:field="notFavoriteIcon" icon="STAR_O" visible="false"/>
 		</b:Tooltip>
-		<g:Image ui:field="loadingUI" styleName="displayInline" resource='{sageImageBundle.loading16}' />
+		<w:LoadingSpinner ui:field="loadingUI" size="16px" />
 	</bh:Span>
 </ui:UiBinder>

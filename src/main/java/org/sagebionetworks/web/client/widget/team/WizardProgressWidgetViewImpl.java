@@ -53,7 +53,7 @@ public class WizardProgressWidgetViewImpl extends FlowPanel implements WizardPro
 	@Override
 	public void showLoading() {
 		clear();
-		add(DisplayUtils.getLoadingWidget(sageImageBundle));
+		add(DisplayUtils.getLoadingWidget());
 	}
 
 	@Override

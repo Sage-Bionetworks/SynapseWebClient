@@ -212,7 +212,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField 
 	DivElement challengesLoadingUI;
 	@UiField 
-	Row profilePictureLoadingUI;
+	Div profilePictureLoadingUI;
 	
 	@UiField
 	FlowPanel favoritesHelpPanel;
@@ -266,7 +266,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Span teamNotifications;
 	private Presenter presenter;
 	private Header headerWidget;
-	private SageImageBundle sageImageBundle;
 	
 	//View profile widgets
 	private static HTML defaultProfilePicture = new HTML(DisplayUtils.getFontAwesomeIcon("user font-size-150 lightGreyText"));
@@ -275,11 +274,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
 			Header headerWidget,
-			SageImageBundle sageImageBundle,
 			SynapseJSNIUtils synapseJSNIUtils) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.sageImageBundle = sageImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		headerWidget.configure(false);
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
@@ -779,7 +776,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		picturePanel.clear();
 		DisplayUtils.hide(navtabContainer);
 		//init with loading widget
-		projectsTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		projectsTabContent.add(DisplayUtils.getSmallLoadingWidget());
 		
 		settingsTabContent.clear();
 		

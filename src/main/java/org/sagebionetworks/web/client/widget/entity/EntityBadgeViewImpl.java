@@ -8,9 +8,9 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -22,7 +22,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -31,7 +30,6 @@ import com.google.inject.Inject;
 
 public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	SynapseJSNIUtils synapseJSNIUtils;
-	SageImageBundle sageImageBundle;
 	Widget modifiedByWidget;
 	Presenter presenter;
 	public interface Binder extends UiBinder<Widget, EntityBadgeViewImpl> {	}
@@ -83,10 +81,8 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
 			final SynapseJSNIUtils synapseJSNIUtils,
-			SageImageBundle sageImageBundle, 
 			PortalGinInjector ginInjector) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.sageImageBundle = sageImageBundle;
 		initWidget(uiBinder.createAndBindUi(this));
 		idField.addClickHandler(new ClickHandler() {
 			@Override
@@ -160,21 +156,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		entityContainer.add(new HTML(DisplayConstants.ERROR_LOADING));		
 	}
 	
-	@Override
-	public void showLoading() {
-		clear();
-		entityContainer.add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-	}
-
-	@Override
 	public void clear() {
 		iconContainer.clear();
 		entityContainer.clear();
@@ -182,7 +163,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	
 	@Override
 	public void showLoadingIcon() {
-		iconContainer.setWidget(new Image(sageImageBundle.loading16()));
+		LoadingSpinner loadingSpinner = new LoadingSpinner();
+		loadingSpinner.setSize("15px");
+		iconContainer.setWidget(loadingSpinner);
 	}
 	
 	@Override

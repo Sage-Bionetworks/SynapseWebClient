@@ -80,7 +80,7 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 	@Override
 	public void showLoading() {
 		clear();
-		add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		add(DisplayUtils.getSmallLoadingWidget());
 	}
 
 	@Override

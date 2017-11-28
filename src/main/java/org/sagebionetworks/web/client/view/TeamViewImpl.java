@@ -79,19 +79,16 @@ public class TeamViewImpl extends Composite implements TeamView {
 	Anchor showMapLink;
 	
 	private Presenter presenter;
-	private SageImageBundle sageImageBundle;
 	private Header headerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private GWTWrapper gwt;
 	@Inject
 	public TeamViewImpl(TeamViewImplUiBinder binder, 
-			SageImageBundle sageImageBundle,
 			InviteWidget inviteWidget, 
 			Header headerWidget, 
 			SynapseJSNIUtils synapseJSNIUtils,
 			GWTWrapper gwt) {
 		initWidget(binder.createAndBindUi(this));
-		this.sageImageBundle = sageImageBundle;
 		this.headerWidget = headerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.gwt = gwt;
@@ -189,7 +186,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void showLoading() {
 		clear();
-		mainContainer.add(DisplayUtils.getLoadingWidget(sageImageBundle));
+		mainContainer.add(DisplayUtils.getLoadingWidget());
 	}
 
 	@Override

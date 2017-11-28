@@ -3,7 +3,8 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+  xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
   	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
   	<g:FlowPanel>
   		<b:Modal title="Submit to Challenge"
@@ -79,7 +80,7 @@
 								<g:SimplePanel ui:field="teamSelectSynAlertPanel"/>
 								<b:FormGroup>
 									<bh:Div ui:field="contributorsLoadingUI">
-										<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
+										<w:LoadingSpinner size="31px"/>
 								        <bh:Text>&nbsp; Loading...</bh:Text>
 									</bh:Div>
 									<b:FormLabel>Contributors</b:FormLabel>

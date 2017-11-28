@@ -120,7 +120,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	@Override
 	public void showLoading() {
 		clear();
-		add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		add(DisplayUtils.getSmallLoadingWidget());
 	}
 
 	@Override
