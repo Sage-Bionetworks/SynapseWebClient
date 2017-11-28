@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.HelpWidget;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -34,7 +35,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	private Presenter presenter;
 	private Map<PermissionLevel, String> permissionDisplay;
-	private SageImageBundle sageImageBundle;
 	private Long publicAclPrincipalId, authenticatedPrincipalId;
 	private Boolean isPubliclyVisible;
 	private boolean showEditColumns;
@@ -49,9 +49,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private HelpWidget deleteAclHelpWidget = new HelpWidget();
 	private IsWidget synAlertWidget;
 	@Inject
-	public AccessControlListEditorViewImpl(SageImageBundle sageImageBundle,
-					SharingPermissionsGrid permissionsGrid, AclAddPeoplePanel addPeoplePanel) {
-		this.sageImageBundle = sageImageBundle;
+	public AccessControlListEditorViewImpl(SharingPermissionsGrid permissionsGrid, AclAddPeoplePanel addPeoplePanel) {
 		this.permissionsGrid = permissionsGrid;
 		this.addPeoplePanel = addPeoplePanel;
 		
@@ -233,7 +231,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	@Override
 	public void showLoading() {
 		this.clear();
-		this.add(DisplayUtils.getLoadingWidget(" Loading..."));
+		this.add(new LoadingSpinner());
 	}
 
 	@Override

@@ -8,9 +8,8 @@
 	<bh:Div>
 		<bh:Div ui:field="container" />
 		<bh:ClearFix />
-		<g:HTMLPanel ui:field="loadMore" addStyleNames="center center-block center-spinner margin-top-20">
+		<g:HTMLPanel ui:field="loadMore" addStyleNames="center-spinner margin-top-20">
 			<w:LoadingSpinner ui:field="loadMoreImage" size="31px"/>
-			Loading...
 		</g:HTMLPanel>
 	</bh:Div>
 </ui:UiBinder>

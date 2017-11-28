@@ -212,7 +212,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField 
 	DivElement challengesLoadingUI;
 	@UiField 
-	Row profilePictureLoadingUI;
+	Div profilePictureLoadingUI;
 	
 	@UiField
 	FlowPanel favoritesHelpPanel;

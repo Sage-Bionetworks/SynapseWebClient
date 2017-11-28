@@ -38,8 +38,8 @@
 		<bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
 	    <g:Tree ui:field="entityTree">
 		</g:Tree>  
-		<bh:Span ui:field="loadingUI" addStyleNames="center-block center">
-			<w:LoadingSpinner addStyleNames="center-spinner" size="31px"/>&nbsp;Loading...
+		<bh:Span ui:field="loadingUI" addStyleNames="center-block center center-spinner">
+			<w:LoadingSpinner size="31px"/>&nbsp;Loading...
 	    </bh:Span> 	    
 	</bh:Div>
 
