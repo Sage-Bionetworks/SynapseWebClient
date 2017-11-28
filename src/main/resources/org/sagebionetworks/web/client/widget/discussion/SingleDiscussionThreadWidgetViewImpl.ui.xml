@@ -26,8 +26,8 @@
 							</b:Column>
 							<b:Column size="XS_12">
 								<g:HTMLPanel ui:field="loadingMessage" visible="false">
-									<w:LoadingSpinner addStyleNames="displayInline" size="16px"/>
-									&nbsp;Loading...
+									<bh:ClearFix />
+									<w:LoadingSpinner size="31px"/>
 								</g:HTMLPanel>
 								<bh:Div ui:field="threadMessage"></bh:Div>
 							</b:Column>

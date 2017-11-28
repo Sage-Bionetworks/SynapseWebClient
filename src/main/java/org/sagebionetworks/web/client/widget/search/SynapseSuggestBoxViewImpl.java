@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.SuggestBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -28,18 +27,16 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	SuggestBox suggestBox;
 	TextBox selectedItem;
 	Text selectedItemText;
-	SageImageBundle sageImageBundle;
 	SynapseAlert synAlert;
 	int originalScrollTop = -1;
 	@Inject
-	public SynapseSuggestBoxViewImpl(SageImageBundle sageImageBundle, SynapseAlert synAlert) {
-		this.sageImageBundle = sageImageBundle;
+	public SynapseSuggestBoxViewImpl(SynapseAlert synAlert) {
 		this.synAlert = synAlert;
 	}
 	
 	@Override
 	public void configure(SynapseSuggestOracle oracle) {
-		suggestBox = new SuggestBox(oracle, new TextBox(), new SynapseSuggestionDisplay(sageImageBundle));
+		suggestBox = new SuggestBox(oracle, new TextBox(), new SynapseSuggestionDisplay());
 		suggestBox.getValueBox().addStyleName("form-control");
 		suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
 			@Override
