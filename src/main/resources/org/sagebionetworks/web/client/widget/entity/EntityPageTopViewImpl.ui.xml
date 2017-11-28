@@ -16,8 +16,7 @@
 						<g:SimplePanel ui:field="projectMetadataContainer"/>
 					</bh:Span>
 					<bh:Span ui:field="loadingUI" addStyleNames="center-block center">
-						<w:LoadingSpinner size="31px"/>
-						<bh:Text>&nbsp;Loading...</bh:Text>
+						<w:LoadingSpinner size="40px"/>
 					</bh:Span>
 				</b:Column>
 			</b:Row>

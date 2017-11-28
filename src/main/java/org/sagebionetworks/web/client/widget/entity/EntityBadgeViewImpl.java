@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -155,21 +156,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		entityContainer.add(new HTML(DisplayConstants.ERROR_LOADING));		
 	}
 	
-	@Override
-	public void showLoading() {
-		clear();
-		entityContainer.add(DisplayUtils.getSmallLoadingWidget());
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-	}
-
-	@Override
 	public void clear() {
 		iconContainer.clear();
 		entityContainer.clear();
@@ -177,7 +163,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	
 	@Override
 	public void showLoadingIcon() {
-		iconContainer.setWidget(DisplayUtils.getSmallLoadingWidget());
+		LoadingSpinner loadingSpinner = new LoadingSpinner();
+		loadingSpinner.setSize("15px");
+		iconContainer.setWidget(loadingSpinner);
 	}
 	
 	@Override

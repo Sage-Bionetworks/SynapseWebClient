@@ -59,7 +59,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	Button takePledgeButton;
 	@UiField
-	Row loadingUi;
+	Div loadingUi;
 	@UiField
 	Modal termsOfUseDialog;
 	@UiField

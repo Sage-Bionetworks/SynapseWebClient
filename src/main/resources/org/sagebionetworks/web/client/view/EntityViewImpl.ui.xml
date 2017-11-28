@@ -8,9 +8,8 @@
     
 	<g:HTMLPanel>
 		<g:SimplePanel ui:field="synAlertContainer"/>
-		<g:HTMLPanel ui:field="loadingUI" addStyleNames="center-block center margin-top-100">
-			<w:LoadingSpinner size="31px"/>
-			&nbsp;Loading...
+		<g:HTMLPanel ui:field="loadingUI" addStyleNames="margin-top-100">
+			<w:LoadingSpinner size="40px"/>
 		</g:HTMLPanel>
 		
 		<g:SimplePanel ui:field="entityPageTopPanel"/>

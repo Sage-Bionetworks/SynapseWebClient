@@ -35,7 +35,7 @@
 				<div class="row margin-top-5">
 				    <div ui:field="profileUI" class="profileUI col-md-5 col-xs-12">
 				        <div class="padding-15 light-border">
-				        <bh:Div ui:field="profilePictureLoadingUI" visible="false" addStyleNames="center-spinner">
+				        <bh:Div ui:field="profilePictureLoadingUI" visible="false">
 			        			<w:LoadingSpinner size="50px"/>
 				        </bh:Div>
 						
@@ -221,9 +221,8 @@
 							    		<b:Heading ui:field="challengesHeading" size="H3"></b:Heading>
 							    		<g:FlowPanel ui:field="challengesTabContent" styleName="margin-10" />
 							    	</div>
-							    	<div ui:field="challengesLoadingUI" >
-											<w:LoadingSpinner size="16px"/>
-											&nbsp;Loading...
+							    		<div ui:field="challengesLoadingUI">
+										<w:LoadingSpinner size="31px"/>
 									</div>
 									<div class="clearfix">
 									    <b:Button ui:field="moreChallengesButton" styleName="btn btn-default btn-sm col-xs-12 margin-top-10">Show more results...</b:Button>

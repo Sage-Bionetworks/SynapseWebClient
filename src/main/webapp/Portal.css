@@ -3289,10 +3289,6 @@ div.colborder {
 /* ### Loading spinner ### */
 /*-------------------------------------------------------*/
 
-.center-spinner {
-	left: 48%;
-}
-
 .sk-circle {
   margin: auto;
   position: relative;

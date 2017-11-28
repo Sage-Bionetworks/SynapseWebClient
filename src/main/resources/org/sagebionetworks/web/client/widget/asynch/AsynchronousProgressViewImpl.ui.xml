@@ -20,7 +20,7 @@
 				</b:Progress>
 			</b:Column>
 			<b:Column size="XS_1" offset="XS_5" ui:field="spinnerColumn" visible="false">
-				<w:LoadingSpinner size="31px"/>
+				<w:LoadingSpinner size="40px"/>
 			</b:Column>			
 			<b:Column size="XS_1">
 				<b:Button ui:field="cancelButton" icon="BAN" type="DANGER"
