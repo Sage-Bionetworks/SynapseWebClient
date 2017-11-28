@@ -2,9 +2,9 @@ package org.sagebionetworks.web.client.widget.search;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
@@ -16,8 +16,6 @@ import com.google.gwt.user.client.ui.Widget;
  * SuggestionDisplay (for decorating the SuggestBox Popup)
  */
 public class SynapseSuggestionDisplay extends SuggestBox.DefaultSuggestionDisplay {
-	private SageImageBundle sageImageBundle;
-	
 	private Label resultsLabel;
 	private ButtonGroup buttonGroup;
 	private Button prevButton;
@@ -25,11 +23,10 @@ public class SynapseSuggestionDisplay extends SuggestBox.DefaultSuggestionDispla
 	
 	private Widget popupContents; // to save when loading.
 	
-	private LoadingSpinner loadingPanel;
+	private Div loadingPanel;
 	
-	public SynapseSuggestionDisplay(SageImageBundle sageImageBundle) {
+	public SynapseSuggestionDisplay() {
 		super();
-		this.sageImageBundle = sageImageBundle;
 		getPopupPanel().addStyleName("userGroupSuggestBoxPopup");
 	}
 	
@@ -59,8 +56,9 @@ public class SynapseSuggestionDisplay extends SuggestBox.DefaultSuggestionDispla
 	public void showLoading(UIObject suggestBox) {
 		popupContents = getPopupPanel().getWidget();
 		if (loadingPanel == null) {
-			loadingPanel = new LoadingSpinner();
-			loadingPanel.setSize(suggestBox.getOffsetWidth());
+			loadingPanel = new Div();
+			loadingPanel.setWidth(suggestBox.getOffsetWidth() + "px");
+			loadingPanel.add(new Text("Loading..."));
 		}
 		getPopupPanel().setWidget(loadingPanel);
 		//When in a bootstrap modal, the popup panel only has the correct top position when the window is scrolled up.
