@@ -5,10 +5,9 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
     
-	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/> 
-	
 	<bh:Div>
 	    <bh:Span ui:field="emptyUI" text="&#8212; Empty"/>
 	    
@@ -39,8 +38,8 @@
 		<bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
 	    <g:Tree ui:field="entityTree">
 		</g:Tree>  
-		<bh:Span ui:field="loadingUI" addStyleNames="center-block center">
-	        <g:Image resource='{sageImageBundle.loading31}' />&nbsp;Loading...
+		<bh:Span ui:field="loadingUI">
+			<w:LoadingSpinner size="40px"/>
 	    </bh:Span> 	    
 	</bh:Div>
 

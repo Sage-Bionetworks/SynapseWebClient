@@ -64,38 +64,38 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 	}
 	
 	@Override
-	public void onSetEntities() {
+	public void onAddEntities() {
 		currentAccessType = ACCESS_TYPE.DOWNLOAD;
 		String entityIds = view.getEntityIds();
 		String[] entities = entityIds.split("[,\\s]\\s*");
-		List<RestrictableObjectDescriptor> newSubjects = new ArrayList<RestrictableObjectDescriptor>();
 		for (int i = 0; i < entities.length; i++) {
 			if (entities[i].trim().length() > 0) {
 				RestrictableObjectDescriptor newSubject = new RestrictableObjectDescriptor();
 				newSubject.setId(entities[i]);
 				newSubject.setType(RestrictableObjectType.ENTITY);
-				newSubjects.add(newSubject);
+				if (!subjects.contains(newSubject)) {
+					subjects.add(newSubject);	
+				}
 			}
 		}
-		subjects.addAll(newSubjects);
 		refreshSubjects();
 	}
 	
 	@Override
-	public void onSetTeams() {
+	public void onAddTeams() {
 		currentAccessType = ACCESS_TYPE.PARTICIPATE;
 		String teamIds = view.getTeamIds();
 		String[] teams = teamIds.split("[,\\s]\\s*");
-		List<RestrictableObjectDescriptor> newSubjects = new ArrayList<RestrictableObjectDescriptor>();
 		for (int i = 0; i < teams.length; i++) {
 			if (teams[i].trim().length() > 0) {
 				RestrictableObjectDescriptor newSubject = new RestrictableObjectDescriptor();
 				newSubject.setId(teams[i]);
 				newSubject.setType(RestrictableObjectType.TEAM);
-				newSubjects.add(newSubject);
+				if (!subjects.contains(newSubject)) {
+					subjects.add(newSubject);
+				}
 			}
 		}
-		subjects.addAll(newSubjects);
 		refreshSubjects();
 	}
 	

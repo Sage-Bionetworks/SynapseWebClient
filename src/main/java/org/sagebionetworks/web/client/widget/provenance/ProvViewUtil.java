@@ -2,10 +2,14 @@ package org.sagebionetworks.web.client.widget.provenance;
 
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconSize;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
@@ -32,7 +36,6 @@ import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -114,11 +117,12 @@ public class ProvViewUtil {
 		builder.appendHtmlConstant(AbstractImagePrototype.create(sageImageBundle.expand()).getHTML());
 		
 		final Anchor link = new Anchor();
-		link.setHTML(builder.toSafeHtml());
+		link.add(new HTML(builder.toSafeHtml()));
 		link.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
-				link.setHTML(AbstractImagePrototype.create(sageImageBundle.loading16()).getHTML());
+				link.clear();
+				link.add(DisplayUtils.getSmallLoadingWidget());
 				presenter.expand(node);
 			}
 		});
@@ -152,8 +156,7 @@ public class ProvViewUtil {
 		String stubName = DisplayUtils.stubStrPartialWord(node.getName(), ENTITY_LINE_NUMBER_CHARS);
 		builder.appendEscaped(stubName);
 		builder.appendHtmlConstant("<br/>");
-				
-		link.setHTML(builder.toSafeHtml());
+		link.add(new HTML(builder.toSafeHtml()));
 
 		ProvNodeContainer container = new ProvNodeContainer();
 		if(node.getId() != null) container.getElement().setId(node.getId());
@@ -183,7 +186,16 @@ public class ProvViewUtil {
 		}			
 		
 		// icon
-		Icon icon = EntityTypeUtils.getSynapseIconForEntityClassName(entityType, IconSize.TIMES2);
+		IconType iconType = EntityTypeUtils.getIconTypeForEntityClassName(entityType);
+		if (FileEntity.class.getName().equals(entityType)) {
+			if (ContentTypeUtils.isRecognizedCodeFileName(name)) {
+				iconType = IconType.FILE_CODE_O;
+			} else if (org.sagebionetworks.web.client.ContentTypeUtils.isRecognizedPlainTextFileName(name)) {
+				iconType = IconType.FILE_TEXT_O;
+			}
+		}
+		Icon icon = new Icon(iconType);
+		icon.setSize(IconSize.TIMES2);
 		container.add(new SimplePanel(icon));
 		
 		// name
@@ -207,9 +219,7 @@ public class ProvViewUtil {
 		}
 		versionHtml.setStyleName(PROV_VERSION_DISPLAY_STYLE);
 		builder.appendHtmlConstant(versionHtml.toString());		
-		
-		link.setHTML(builder.toSafeHtml());
-
+		link.add(new HTML(builder.toSafeHtml()));
 		ProvNodeContainer node = new ProvNodeContainer();
 		if(id != null) node.getElement().setId(id);
 		node.setStyleName(PROV_ENTTITY_NODE_STYLE);

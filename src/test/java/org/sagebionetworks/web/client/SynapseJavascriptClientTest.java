@@ -52,6 +52,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -71,12 +72,11 @@ public class SynapseJavascriptClientTest {
 	@Mock
 	AuthenticationController mockAuthController;
 	@Mock
-	GlobalApplicationState mockGlobalAppState;
-	@Mock
 	GWTWrapper mockGwt;
 	@Mock
 	SynapseJSNIUtils mockJsniUtils;
-	
+	@Mock
+	ClientCache mockClientCache;
 	@Captor
 	ArgumentCaptor<RequestCallback> requestCallbackCaptor;
 	@Mock
@@ -95,13 +95,13 @@ public class SynapseJavascriptClientTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		when(mockGlobalAppState.getSynapseProperty(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT);
-		when(mockGlobalAppState.getSynapseProperty(FILE_SERVICE_URL_KEY)).thenReturn(FILE_ENDPOINT);
+		when(mockClientCache.get(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT);
+		when(mockClientCache.get(FILE_SERVICE_URL_KEY)).thenReturn(FILE_ENDPOINT);
 		when(mockGinInjector.getRequestBuilder()).thenReturn(mockRequestBuilder);
 		client = new SynapseJavascriptClient(
 				mockAuthController, 
 				jsonObjectAdapter, 
-				mockGlobalAppState, 
+				mockClientCache, 
 				mockGwt,
 				synapseJsFactory,
 				mockGinInjector,

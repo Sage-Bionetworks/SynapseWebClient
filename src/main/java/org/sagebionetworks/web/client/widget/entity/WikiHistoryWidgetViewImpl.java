@@ -6,13 +6,13 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.THead;
@@ -26,7 +26,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -46,12 +45,13 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 	private int offset;
 	private int resultSize;
 	DateTimeUtils dateTimeUtils;
-	HTML loadingUI;
+	Div loadingUI;
 	@Inject
-	public WikiHistoryWidgetViewImpl(DateTimeUtils dateTimeUtils, SageImageBundle sageImageBundle) {
+	public WikiHistoryWidgetViewImpl(DateTimeUtils dateTimeUtils) {
 		this.dateTimeUtils = dateTimeUtils;
 		addStyleName("min-height-200");
-		loadingUI = new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, "Loading"));
+		loadingUI = new Div();
+		loadingUI.add(DisplayUtils.getLoadingWidget("Loading"));
 	}
 	
 	private static class HistoryEntry {

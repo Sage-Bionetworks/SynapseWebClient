@@ -50,7 +50,6 @@ import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
-import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -78,22 +77,7 @@ public interface SynapseClientAsync {
 			AsyncCallback<PaginatedResults<VersionInfo>> callback);
 
 	void search(SearchQuery searchQuery, AsyncCallback<SearchResults> callback);
-	
-	void logDebug(String message, AsyncCallback<Void> callback);
-
-	void logError(String message, AsyncCallback<Void> callback);
-	
-	/**
-	 * 
-	 * @param message
-	 * @param exceptionType TODO
-	 * @param t
-	 * @param callback
-	 */
-	void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t, AsyncCallback<Void> callback);
-	
-	void logInfo(String message, AsyncCallback<Void> callback);
-
+ 	
 	void getRepositoryServiceUrl(AsyncCallback<String> callback);
 
 	void createOrUpdateEntity(Entity entity, Annotations annos,

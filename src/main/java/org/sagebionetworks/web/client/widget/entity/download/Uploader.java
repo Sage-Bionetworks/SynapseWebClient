@@ -13,7 +13,6 @@ import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
-import org.sagebionetworks.web.client.ClientLogger;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -79,7 +78,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private boolean fileHasBeenUploaded = false;
 	private UploadType currentUploadType;
 	private String currentExternalUploadUrl;
-	private ClientLogger logger;
 	private Long storageLocationId;
 	private S3DirectUploader s3DirectUploader;
 	private String bucketName, endpointUrl, keyPrefixUUID;
@@ -94,7 +92,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			AuthenticationController authenticationController,
 			MultipartUploader multiPartUploader,
 			GlobalApplicationState globalAppState,
-			ClientLogger logger,
 			S3DirectUploader s3DirectUploader,
 			SynapseJavascriptClient jsClient
 			) {
@@ -108,7 +105,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.globalAppState = globalAppState;
 		this.multiPartUploader = multiPartUploader;
 		this.s3DirectUploader = s3DirectUploader;
-		this.logger = logger;
 		this.jsClient = jsClient;
 		view.setPresenter(this);
 		clearHandlers();
@@ -765,7 +761,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	@Override
 	public void uploadFailed(String string) {
 		this.uploadError(string, new Exception(string));
-		logger.errorToRepositoryServices(string, new Exception(string));
+		jsClient.logError(string, new Exception(string));
 	}
 	
 	/**

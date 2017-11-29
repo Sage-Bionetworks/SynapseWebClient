@@ -12,7 +12,7 @@ public interface PreviewWidgetView extends IsWidget{
 	public void setPresenter(Presenter presenter);
 
 	public void setImagePreview(String fileUrl);
-	public void setCodePreview(String text);
+	public void setCodePreview(String text, String language);
 	public void setTextPreview(String text);
 	public void setPreviewWidget(IsWidget w);
 	void addStyleName(String style);

@@ -17,6 +17,7 @@ import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsExcept
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
+import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import org.sagebionetworks.repo.model.EntityIdList;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
+import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
 import org.sagebionetworks.repo.model.PaginatedIds;
@@ -69,6 +71,7 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -127,9 +130,11 @@ public class SynapseJavascriptClient {
 	public static final String STACK_STATUS = "/admin/synapse/status";
 	public static final String ATTACHMENT_HANDLES = "attachmenthandles";
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
+	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
+	private static final String LOG = "/log";
 	AuthenticationController authController;
 	JSONObjectAdapter jsonObjectAdapter;
-	GlobalApplicationState globalAppState;
+	ClientCache localStorage;
 	GWTWrapper gwt;
 	SynapseJavascriptFactory jsFactory;
 	PortalGinInjector ginInjector;
@@ -164,20 +169,20 @@ public class SynapseJavascriptClient {
 	
 	public static final String COLUMN = "/column";
 	public static final String COLUMN_VIEW_DEFAULT = COLUMN + "/tableview/defaults/";
-	public String repoServiceUrl,fileServiceUrl; 
+	public String repoServiceUrl,fileServiceUrl, synapseVersionInfo; 
 	
 	@Inject
 	public SynapseJavascriptClient(
 			AuthenticationController authController,
 			JSONObjectAdapter jsonObjectAdapter,
-			GlobalApplicationState globalAppState,
+			ClientCache localStorage,
 			GWTWrapper gwt,
 			SynapseJavascriptFactory jsFactory,
 			PortalGinInjector ginInjector,
 			SynapseJSNIUtils jsniUtils) {
 		this.authController = authController;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.globalAppState = globalAppState;
+		this.localStorage = localStorage;
 		this.gwt = gwt;
 		this.jsFactory = jsFactory;
 		this.ginInjector = ginInjector;
@@ -185,18 +190,25 @@ public class SynapseJavascriptClient {
 	}
 	private String getRepoServiceUrl() {
 		if (repoServiceUrl == null) {
-			repoServiceUrl = globalAppState.getSynapseProperty(REPO_SERVICE_URL_KEY);
+			repoServiceUrl = localStorage.get(REPO_SERVICE_URL_KEY);
 		}
 		return repoServiceUrl;
 	}
 	
 	private String getFileServiceUrl() {
 		if (fileServiceUrl == null) {
-			fileServiceUrl = globalAppState.getSynapseProperty(FILE_SERVICE_URL_KEY);
+			fileServiceUrl = localStorage.get(FILE_SERVICE_URL_KEY);
 		}
 		return fileServiceUrl;
 	}
-
+	
+	private String getSynapseVersionInfo() {
+		if (synapseVersionInfo == null) {
+			synapseVersionInfo = localStorage.get(SYNAPSE_VERSION_KEY);
+		}
+		return synapseVersionInfo;
+	}
+	
 	private void doDelete(String url, AsyncCallback callback) {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(DELETE, url);
@@ -801,6 +813,20 @@ public class SynapseJavascriptClient {
 	public FluentFuture<Void> deleteMembershipInvitation(String inviteId) {
 		String url = getRepoServiceUrl() + MEMBERSHIP_INVITATION + "/" + inviteId;
 		return getFuture(cb -> doDelete(url, cb));
+	}
+	
+	private FluentFuture<Void> logError(LogEntry entry) {
+		String url = getRepoServiceUrl() + LOG;
+		return getFuture(cb -> doPost(url, entry, OBJECT_TYPE.None, cb));
+	}
+	
+	public FluentFuture<Void> logError(String label, Throwable ex) {
+		LogEntry entry = new LogEntry();
+		String exceptionString = ex.getMessage();
+		String outputExceptionString = exceptionString.substring(0, Math.min(exceptionString.length(), MAX_LOG_ENTRY_LABEL_SIZE));
+		entry.setLabel(getSynapseVersionInfo() + ": " + label + ": " + outputExceptionString);
+		entry.setMessage(gwt.getCurrentURL() + " : \n" + ex.getMessage());
+		return logError(entry);
 	}
 }
 

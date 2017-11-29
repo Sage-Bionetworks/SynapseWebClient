@@ -51,7 +51,6 @@ import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
-import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
@@ -100,32 +99,6 @@ public interface SynapseClient extends RemoteService{
 	 * @throws RestServiceException
 	 */
 	Entity updateEntity(Entity toUpdate) throws RestServiceException;
-	
-	/**
-	 * Log a debug message in the server-side log.
-	 * @param message
-	 */
-	void logDebug(String message);
-	
-	/**
-	 * Log an error message in the server-side log.
-	 * @param message
-	 * @throws RestServiceException 
-	 */
-	void logError(String message) throws RestServiceException;
-	
-	/**
-	 * Log an error message to Synapse repository services.  
-	 * **NOTE** This should only be called if Synapse repository services was not involved, an error that could effect other clients.
-	 * @param message
-	 */
-	void logErrorToRepositoryServices(String message, String exceptionType, String exceptionMessage, StackTraceElement[] t) throws RestServiceException;
-
-	/**
-	 * Log an info message in the server-side log.
-	 * @param message
-	 */
-	void logInfo(String message);
 	
 	/**
 	 * Get the repository service URL

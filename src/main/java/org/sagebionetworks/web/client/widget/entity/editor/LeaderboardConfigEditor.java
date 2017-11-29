@@ -13,7 +13,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 public class LeaderboardConfigEditor implements WidgetEditorPresenter {
 	
-	public static final String LEADERBOARD_QUERY_PLACEHOLDER = "select * from evaluation_12345";
+	public static final String LEADERBOARD_QUERY_PLACEHOLDER = "select objectId, createdOn, entityId, team, annotation1 from evaluation_12345";
 	
 	QueryTableConfigEditor queryTableConfigEditor;
 	@Inject

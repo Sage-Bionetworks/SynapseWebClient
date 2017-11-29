@@ -242,7 +242,7 @@ public class PreviewWidgetTest {
 		testFileHandleList.add(fh);
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
-		verify(mockView).setCodePreview(anyString());
+		verify(mockView).setCodePreview(anyString(), eq("r"));
 	}
 
 	@Test
@@ -306,7 +306,7 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView, times(0)).setTextPreview(anyString());
-		verify(mockView, times(0)).setCodePreview(anyString());
+		verify(mockView, times(0)).setCodePreview(anyString(), anyString());
 		verify(mockView, times(0)).setTablePreview(anyString(), anyString());
 		verify(mockView, times(0)).setImagePreview(anyString());
 		verify(mockView, times(0)).setPreviewWidget(any(Widget.class));

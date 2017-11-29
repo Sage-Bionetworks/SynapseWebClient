@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
@@ -21,6 +22,7 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -39,7 +41,7 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 	private FlowPanel container;
 	private FlowPanel thisLayoutContainer;
 	private FlowPanel prov;
-	private HTML loadingContainer;
+	private IsWidget loadingContainer;
 	private Map<String,ProvNodeContainer> nodeToContainer;
 	
 	@Inject
@@ -53,7 +55,7 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 		container = new FlowPanel();
 		this.thisLayoutContainer = this;
 		this.add(container);
-		loadingContainer = new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, "Loading provenance"));
+		loadingContainer = DisplayUtils.getLoadingWidget("Loading provenance");
 	}
 
 	@Override

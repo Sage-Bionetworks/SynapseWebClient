@@ -19,7 +19,6 @@ import com.google.inject.Inject;
 
 public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetView {
 
-	private SageImageBundle sageImageBundle;
 	private Presenter presenter;
 	private PortalGinInjector ginInjector;
 	private Map<String, HasNotificationUI> team2Badge;
@@ -27,8 +26,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	Widget emptyHTML;
 	
 	@Inject
-	public TeamListWidgetViewImpl(SageImageBundle sageImageBundle, PortalGinInjector ginInjector) {
-		this.sageImageBundle = sageImageBundle;
+	public TeamListWidgetViewImpl(PortalGinInjector ginInjector) {
 		this.ginInjector = ginInjector;
 		this.emptyHTML = new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString());
 	}
@@ -41,7 +39,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	@Override
 	public void showLoading() {
 		clear();
-		add(DisplayUtils.getLoadingWidget(sageImageBundle));
+		add(DisplayUtils.getLoadingWidget());
 	}
 
 	@Override

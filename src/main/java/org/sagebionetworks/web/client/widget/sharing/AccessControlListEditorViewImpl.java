@@ -11,6 +11,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.HelpWidget;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -18,9 +19,7 @@ import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,7 +27,7 @@ import com.google.inject.Inject;
 
 public class AccessControlListEditorViewImpl extends FlowPanel implements AccessControlListEditorView {
 	
-	public static final String CREATE_ACL_HELP_TEXT = "By default the sharing settings are inhereted from the parent folder or project.  If you want to have different settings on a specific file folder or table you need to create local sharing settings then modify them.";
+	public static final String CREATE_ACL_HELP_TEXT = "By default the sharing settings are inherited from the parent folder or project. If you want to have different settings on a specific file, folder, or table you need to create local sharing settings and then modify them.";
 
 	public static final String DELETE_ACL_HELP_TEXT = "If a file or folder has sharing settings that are different from its parent folder or project you can delete the setting thereby inherting the sharing settings of the parent folder or project.";
 
@@ -36,7 +35,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	private Presenter presenter;
 	private Map<PermissionLevel, String> permissionDisplay;
-	private SageImageBundle sageImageBundle;
 	private Long publicAclPrincipalId, authenticatedPrincipalId;
 	private Boolean isPubliclyVisible;
 	private boolean showEditColumns;
@@ -51,9 +49,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	private HelpWidget deleteAclHelpWidget = new HelpWidget();
 	private IsWidget synAlertWidget;
 	@Inject
-	public AccessControlListEditorViewImpl(SageImageBundle sageImageBundle,
-					SharingPermissionsGrid permissionsGrid, AclAddPeoplePanel addPeoplePanel) {
-		this.sageImageBundle = sageImageBundle;
+	public AccessControlListEditorViewImpl(SharingPermissionsGrid permissionsGrid, AclAddPeoplePanel addPeoplePanel) {
 		this.permissionsGrid = permissionsGrid;
 		this.addPeoplePanel = addPeoplePanel;
 		
@@ -235,7 +231,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	@Override
 	public void showLoading() {
 		this.clear();
-		this.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " Loading...")));
+		this.add(new LoadingSpinner());
 	}
 
 	@Override

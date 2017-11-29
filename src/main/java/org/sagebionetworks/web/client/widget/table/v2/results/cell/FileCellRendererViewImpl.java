@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.base.HasTarget;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -15,7 +14,7 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 	public interface Binder extends UiBinder<Widget, FileCellRendererViewImpl> {}
 	
 	@UiField
-	Image loadingImage;
+	LoadingSpinner loadingUI;
 	@UiField
 	Text errorText;
 	@UiField
@@ -35,7 +34,7 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 
 	@Override
 	public void setLoadingVisible(boolean visible) {
-		loadingImage.setVisible(visible);
+		loadingUI.setVisible(visible);
 	}
 
 	@Override

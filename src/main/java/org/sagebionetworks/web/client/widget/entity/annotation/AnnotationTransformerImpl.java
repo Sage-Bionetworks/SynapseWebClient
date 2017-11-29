@@ -29,7 +29,8 @@ public class AnnotationTransformerImpl implements AnnotationTransformer {
 	public List<String> numbersToStrings(List<? extends Number> list) {
 		List<String> stringList = new ArrayList<String>(list.size());
 		for (Number v : list) {
-			stringList.add(v.toString());
+			String value = v == null ? null : v.toString();
+			stringList.add(value);
 		}
 		return stringList;
 	}
@@ -37,7 +38,8 @@ public class AnnotationTransformerImpl implements AnnotationTransformer {
 	public List<String> datesToStrings(List<Date> list) {
 		List<String> stringList = new ArrayList<String>(list.size());
 		for (Date v : list) {
-			stringList.add(Long.toString(v.getTime()));
+			String value = v == null ? null : Long.toString(v.getTime());
+			stringList.add(value);
 		}
 		return stringList;
 	}
@@ -122,7 +124,8 @@ public class AnnotationTransformerImpl implements AnnotationTransformer {
 	public List<Double> getDoubles(List<String> stringList) {
 		List<Double> newList = new ArrayList<Double>(stringList.size());
 		for (String s : stringList) {
-			newList.add(Double.parseDouble(s));
+			Double value = s == null ? null : Double.parseDouble(s);
+			newList.add(value);
 		}
 		return newList;
 	}
@@ -131,14 +134,16 @@ public class AnnotationTransformerImpl implements AnnotationTransformer {
 	public List<Long> getLongs(List<String> stringList) {
 		List<Long> newList = new ArrayList<Long>(stringList.size());
 		for (String s : stringList) {
-			newList.add(Long.parseLong(s));
+			Long value = s == null ? null : Long.parseLong(s);
+			newList.add(value);
 		}
 		return newList;
 	}
 	public List<Date> getDates(List<String> stringList) {
 		List<Date> newList = new ArrayList<Date>(stringList.size());
 		for (String s : stringList) {
-			newList.add(new Date(Long.parseLong(s)));
+			Date value = s == null ? null : new Date(Long.parseLong(s));
+			newList.add(value);
 		}
 		return newList;
 	}
@@ -162,6 +167,6 @@ public class AnnotationTransformerImpl implements AnnotationTransformer {
 	}
 
 	public String friendlyDate(String value) {
-		return standardFormatter.format(new Date(Long.parseLong(value)));
+		return value == null ? null : standardFormatter.format(new Date(Long.parseLong(value)));
 	}
 }

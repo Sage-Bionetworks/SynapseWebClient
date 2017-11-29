@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
+import org.sagebionetworks.web.client.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
@@ -128,9 +129,10 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	public PreviewFileType getOriginalFileType(FileHandle originalFileHandle) {
 		if (originalFileHandle != null && originalFileHandle instanceof S3FileHandle) {
 			String contentType = originalFileHandle.getContentType();
-			if (VideoConfigEditor.isRecognizedVideoFileName(originalFileHandle.getFileName())) {
+			String fileName = originalFileHandle.getFileName();
+			if (VideoConfigEditor.isRecognizedVideoFileName(fileName)) {
 				return PreviewFileType.VIDEO;
-			} else 	if (originalFileHandle.getFileName() != null && originalFileHandle.getFileName().toLowerCase().endsWith("ipynb")) {
+			} else 	if (fileName != null && fileName.toLowerCase().endsWith("ipynb")) {
 				return PreviewFileType.IPYNB;
 			} else if (contentType != null) {
 				if (isRecognizedImageContentType(contentType)) {
@@ -140,6 +142,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				} else if (isPDF(contentType)) {
 					return PreviewFileType.PDF;
 				}
+			} else if (org.sagebionetworks.repo.model.util.ContentTypeUtils.isRecognizedCodeFileName(fileName)) {
+				return PreviewFileType.CODE;
 			}
 		} 
 		return PreviewFileType.NONE;
@@ -241,7 +245,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			case PDF :
 				// use pdf.js to view
 				PDFPreviewWidget pdfPreviewWidget = ginInjector.getPDFPreviewWidget();
-				pdfPreviewWidget.configure(bundle.getEntity().getId(), fileHandleId);
+				pdfPreviewWidget.configure(bundle.getEntity().getId(), fileHandleToShow);
 				view.setPreviewWidget(pdfPreviewWidget);
 				break;
 			case IPYNB :
@@ -286,7 +290,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 									
 									if (PreviewFileType.CODE == previewType) {
 										String codePreview = SafeHtmlUtils.htmlEscapeAllowEntities(responseText);
-										view.setCodePreview(codePreview);
+										String extension = ContentTypeUtils.getExtension(fileHandleToShow.getFileName());
+										view.setCodePreview(codePreview, extension);
 									} 
 									else if (PreviewFileType.CSV == previewType) {
 										view.setTablePreview(responseText, ",");

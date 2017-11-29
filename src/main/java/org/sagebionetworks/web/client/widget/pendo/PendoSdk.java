@@ -48,26 +48,30 @@ public class PendoSdk {
 			String synapseEmail) /*-{
 		// Call this whenever information about your visitors becomes available
 	    // Please use Strings, Numbers, or Bools for value types.
-	    $wnd.pendo.initialize({
-	      visitor: {
-	        id: userId,   // Required if user is logged in
-	        email: synapseEmail// Optional
-	        // role:         // Optional
-	
-	        // You can add any additional visitor level key-values here,
-	        // as long as it's not one of the above reserved names.
-	      },
-	
-	      account: {
-	        // id:           'ACCOUNT-UNIQUE-ID' // Highly recommended
-	        // name:         // Optional
-	        // planLevel:    // Optional
-	        // planPrice:    // Optional
-	        // creationDate: // Optional
-	
-	        // You can add any additional account level key-values here,
-	        // as long as it's not one of the above reserved names.
-	      }
-	    });
+	    try {
+		    	$wnd.pendo.initialize({
+		      visitor: {
+		        id: userId,   // Required if user is logged in
+		        email: synapseEmail// Optional
+		        // role:         // Optional
+		
+		        // You can add any additional visitor level key-values here,
+		        // as long as it's not one of the above reserved names.
+		      },
+		
+		      account: {
+		        // id:           'ACCOUNT-UNIQUE-ID' // Highly recommended
+		        // name:         // Optional
+		        // planLevel:    // Optional
+		        // planPrice:    // Optional
+		        // creationDate: // Optional
+		
+		        // You can add any additional account level key-values here,
+		        // as long as it's not one of the above reserved names.
+		      }
+		    });
+	    } catch(err) {
+	    		console.error(err);
+	    }
 	}-*/;
 }

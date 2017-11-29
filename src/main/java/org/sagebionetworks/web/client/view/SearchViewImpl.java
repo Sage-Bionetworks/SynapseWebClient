@@ -27,6 +27,8 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.MarkdownIt;
+import org.sagebionetworks.web.client.MarkdownItImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -98,18 +100,21 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private PortalGinInjector ginInjector;
 	DateTimeUtils dateTimeUtils;
+	private MarkdownIt markdownIt;
 	@Inject
 	public SearchViewImpl(SearchViewImplUiBinder binder, 
 			Header headerWidget,
 			SynapseJSNIUtils synapseJSNIUtils, 
 			PortalGinInjector ginInjector,
-			DateTimeUtils dateTimeUtils) {
+			DateTimeUtils dateTimeUtils,
+			MarkdownIt markdownIt) {
 		initWidget(binder.createAndBindUi(this));
 		
 		this.headerWidget = headerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.ginInjector = ginInjector;
 		this.dateTimeUtils = dateTimeUtils;
+		this.markdownIt = markdownIt;
 		headerWidget.configure(false);
 		searchButton.addClickHandler(new ClickHandler() {				
 			@Override
@@ -386,8 +391,10 @@ public class SearchViewImpl extends Composite implements SearchView {
 			resultBuilder.append(getPathHtml(hit.getPath())).appendHtmlConstant("<br/>\n");
 		}
 		if(null != hit.getDescription()) {
+			String description = markdownIt.markdown2Html(hit.getDescription(), "");
+			description = new HTML(description).getText().replace("<Synapse widget>", "").replace("|", "").replace("#", "");
 			resultBuilder.appendHtmlConstant("<span class=\"hitdescription\">")
-			.appendEscaped(DisplayUtils.stubStr(hit.getDescription(), HIT_DESCRIPTION_LENGTH_CHAR))
+			.appendEscaped(DisplayUtils.stubStr(description, HIT_DESCRIPTION_LENGTH_CHAR))
 			.appendHtmlConstant("</span><br>\n");
 		}
 		hitPanel.add(new HTMLPanel(resultBuilder.toSafeHtml()));

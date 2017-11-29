@@ -31,21 +31,17 @@ public class UserGroupListWidgetViewImpl extends Composite implements UserGroupL
 	@UiField
 	Row mainRow;
 
-	private SageImageBundle sageImageBundle;
-	
 	private Presenter presenter;
 	
 	@Inject
-	public UserGroupListWidgetViewImpl(UserGroupListWidgetViewImplUiBinder uiBinder,
-										SageImageBundle sageImageBundle) {
+	public UserGroupListWidgetViewImpl(UserGroupListWidgetViewImplUiBinder uiBinder) {
 		initWidget(uiBinder.createAndBindUi(this));
-		this.sageImageBundle = sageImageBundle;
 	}
 	
 	@Override
 	public void showLoading() {
 		clear();
-		mainContainer.add(DisplayUtils.getLoadingWidget(sageImageBundle));
+		mainContainer.add(DisplayUtils.getLoadingWidget());
 	}
 	
 	@Override

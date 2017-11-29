@@ -106,7 +106,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	@Override
 	public void showLoading() {
 		clear();
-		add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		add(DisplayUtils.getSmallLoadingWidget());
 	}
 	@Override
 	public void setPreviewWidget(IsWidget w) {
@@ -115,16 +115,16 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
-	public void setCodePreview(String code) {
+	public void setCodePreview(String code, String language) {
 		clear();
-		add(new HTMLPanel(getCodeHtml(code)));
+		add(new HTMLPanel(getCodeHtml(code, language)));
 		synapseJSNIUtils.highlightCodeBlocks();
 		isCode = true;
 	}
 	
-	private String getCodeHtml(String code) {
+	private String getCodeHtml(String code, String language) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<pre style=\"overflow:auto;white-space:pre;\"><code style=\"background-color:white;\">");
+		sb.append("<pre style=\"overflow:auto;white-space:pre;\"><code style=\"background-color:white;\" class=\""+language+"\">");
 		sb.append(code);
 		sb.append("</code></pre>");
 		return sb.toString();

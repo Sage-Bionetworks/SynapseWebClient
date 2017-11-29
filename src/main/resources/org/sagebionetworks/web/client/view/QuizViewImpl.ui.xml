@@ -2,16 +2,15 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
-	
-	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	
 	<g:HTMLPanel>
         <div class="clear"></div>
         <div class="separator margin-top-10-imp"></div>
     	<g:SimplePanel ui:field="synAlertPanel" addStyleNames="margin-left-10 margin-right-10"/>
     	<div class="container margin-top-10"> 
-    	    <span ui:field="loadingUI" class="center-block center margin-150"><g:Image resource='{sageImageBundle.loading31}' />&nbsp;Loading...</span>
+    	    <span ui:field="loadingUI" class="center-block center margin-150"><w:LoadingSpinner size="60px"/></span>
     	    <g:SimplePanel ui:field="successContainer" visible="false">	</g:SimplePanel>
     	    <div ui:field="quizSuccessUI" style="display:none" class="row">
 				<div class="col-sm-offset-1 col-sm-10 margin-top-10">

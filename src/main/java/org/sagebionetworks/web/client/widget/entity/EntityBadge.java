@@ -218,14 +218,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		return sb.toString();
 	}
 	
-	public void hideLoadingIcon() {
-		view.hideLoadingIcon();
-	}
-
-	public void showLoadingIcon() {
-		view.showLoadingIcon();
-	}
-	
 	public EntityHeader getHeader() {
 		return entityHeader;
 	}
