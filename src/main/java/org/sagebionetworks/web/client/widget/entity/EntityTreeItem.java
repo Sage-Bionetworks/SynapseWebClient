@@ -46,14 +46,6 @@ public class EntityTreeItem implements IsTreeItem, SynapseWidgetPresenter {
 		return treeItem;
 	}
 	
-	public void showLoadingIcon() {
-		entityBadge.showLoadingIcon();
-	}
-	
-	public void showTypeIcon() {
-		entityBadge.hideLoadingIcon();
-	}
-	
 	public void setEntityClickedHandler(CallbackP<String> callback) {
 		entityBadge.setEntityClickedHandler(callback);
 	}

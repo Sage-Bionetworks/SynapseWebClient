@@ -13,10 +13,6 @@ public interface EntityBadgeView extends IsWidget, SupportsLazyLoadInterface {
 
 	void showLoadError(String entityId);
 	
-	void showLoadingIcon();
-	
-	void hideLoadingIcon();
-	
 	void addClickHandler(ClickHandler handler);
 	
 	void setModifiedOn(String modifiedOnString);
