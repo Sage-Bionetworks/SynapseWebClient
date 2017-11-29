@@ -213,7 +213,6 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		childToCreate.setClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				parent.showLoadingIcon();
 				presenter.getChildren(parent.getHeader().getId(), parent, nextPageToken);
 				childToCreate.setVisible(false);
 			}

@@ -157,8 +157,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 							} else {
 								view.hideEmptyUI();
 							}
-						} else {
-							parent.showTypeIcon();
 						}
 					}
 
@@ -229,7 +227,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			// We have not already fetched children for this entity.
 			alreadyFetchedEntityChildren.add(target);
 			target.asTreeItem().removeItems();
-			target.showLoadingIcon();
 			getChildren(target.getHeader().getId(), target, null);
 		}
 	}

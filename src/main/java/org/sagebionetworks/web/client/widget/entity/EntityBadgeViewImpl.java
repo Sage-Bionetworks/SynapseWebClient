@@ -162,18 +162,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}
 	
 	@Override
-	public void showLoadingIcon() {
-		LoadingSpinner loadingSpinner = new LoadingSpinner();
-		loadingSpinner.setSize("15px");
-		iconContainer.setWidget(loadingSpinner);
-	}
-	
-	@Override
-	public void hideLoadingIcon() {
-		iconContainer.setWidget(icon);
-	}
-	
-	@Override
 	public void addClickHandler(final ClickHandler handler) {
 		entityAnchor.addClickHandler(new ClickHandler() {
 			@Override

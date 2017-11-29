@@ -262,22 +262,6 @@ public class EntityBadgeTest {
 	}
 	
 	@Test
-	public void testShowTypeIcon() throws Exception {
-		EntityHeader header = new EntityHeader();
-		header.setId("syn93847");
-		widget.hideLoadingIcon();
-		verify(mockView).hideLoadingIcon();
-	}
-	
-	@Test
-	public void testShowLoadingIcon() throws Exception {
-		EntityHeader header = new EntityHeader();
-		header.setId("syn93847");
-		widget.showLoadingIcon();
-		verify(mockView).showLoadingIcon();
-	}
-	
-	@Test
 	public void testGetEntity() {
 		EntityHeader header = new EntityHeader();
 		header.setId("syn12345");
