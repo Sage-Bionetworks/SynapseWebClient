@@ -110,10 +110,12 @@ public class OpenMembershipRequestsWidgetViewImpl implements OpenMembershipReque
 			
 			td = new TableData();
 			td.add(deleteButton);
+			td.setWidth("100px");
 			tr.add(td);
 			
 			td = new TableData();
 			td.add(joinButton);
+			td.setWidth("100px");
 			tr.add(td);
 			
 			mainContainer.setVisible(true);
