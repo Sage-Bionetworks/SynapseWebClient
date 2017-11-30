@@ -132,16 +132,14 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 			String fileName = originalFileHandle.getFileName();
 			if (VideoConfigEditor.isRecognizedVideoFileName(fileName)) {
 				return PreviewFileType.VIDEO;
-			} else 	if (fileName != null && fileName.toLowerCase().endsWith("ipynb")) {
+			} else if (fileName != null && fileName.toLowerCase().endsWith("ipynb")) {
 				return PreviewFileType.IPYNB;
-			} else if (contentType != null) {
-				if (isRecognizedImageContentType(contentType)) {
+			} else if (isRecognizedImageContentType(contentType)) {
 					return PreviewFileType.IMAGE;
-				} else if (isHTML(contentType)) {
-					return PreviewFileType.HTML;
-				} else if (isPDF(contentType)) {
-					return PreviewFileType.PDF;
-				}
+			} else if (isHTML(contentType)) {
+				return PreviewFileType.HTML;
+			} else if (isPDF(contentType)) {
+				return PreviewFileType.PDF;
 			} else if (org.sagebionetworks.repo.model.util.ContentTypeUtils.isRecognizedCodeFileName(fileName)) {
 				return PreviewFileType.CODE;
 			}
