@@ -17,6 +17,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
@@ -61,7 +62,8 @@ public class NbConvertPreviewWidgetTest {
 	GlobalApplicationState mockGlobalAppState;
 	@Mock
 	GWTWrapper mockGwt;
-	
+	@Mock
+	FileHandle mockFileHandle;
 	@Mock
 	Response mockResponse;
 	@Mock
@@ -113,11 +115,14 @@ public class NbConvertPreviewWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockPresignedURLAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		when(mockFileResult.getPreSignedURL()).thenReturn(PRESIGNED_URL);
 		when(mockGwt.encodeQueryString(PRESIGNED_URL)).thenReturn(ENCODED_PRESIGNED_URL);
+		when(mockFileHandle.getContentSize()).thenReturn(2L);
+		when(mockFileHandle.getId()).thenReturn(FILE_HANDLE_ID);
+		when(mockFileHandle.getCreatedBy()).thenReturn(CREATED_BY);
 	}
 	
 	@Test
 	public void testFileHandleAssociation() {
-		previewWidget.configure(ENTITY_ID, FILE_HANDLE_ID, CREATED_BY);
+		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
 		verify(mockPresignedURLAsyncHandler).getFileResult(fhaCaptor.capture(), any(AsyncCallback.class));
 		FileHandleAssociation fha = fhaCaptor.getValue();
@@ -128,7 +133,7 @@ public class NbConvertPreviewWidgetTest {
 	
 	@Test
 	public void testRequestBuilderConfigure() {
-		previewWidget.configure(ENTITY_ID, FILE_HANDLE_ID, CREATED_BY);
+		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
 		verify(mockRequestBuilder).configure(GET, NBCONVERT_ENDPOINT + ENCODED_PRESIGNED_URL);
 		verify(mockRequestBuilder).setHeader(ACCEPT, TEXT_HTML_CHARSET_UTF8);
@@ -139,7 +144,7 @@ public class NbConvertPreviewWidgetTest {
 		Exception ex = new Exception("error");
 		AsyncMockStubber.callFailureWith(ex).when(mockPresignedURLAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		
-		previewWidget.configure(ENTITY_ID, FILE_HANDLE_ID, CREATED_BY);
+		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
 		verify(mockPresignedURLAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		verify(mockSynapseAlert).handleException(ex);
@@ -151,7 +156,7 @@ public class NbConvertPreviewWidgetTest {
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_GATEWAY_TIMEOUT);
 		when(mockResponse.getStatusText()).thenReturn(error);
 		
-		previewWidget.configure(ENTITY_ID, FILE_HANDLE_ID, CREATED_BY);
+		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
@@ -162,7 +167,7 @@ public class NbConvertPreviewWidgetTest {
 	
 	@Test
 	public void testRenderHtmlTrusted() {
-		previewWidget.configure(ENTITY_ID, FILE_HANDLE_ID, CREATED_BY);
+		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
 		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		// user is allowed to render html, so raw html is rendered
@@ -178,8 +183,7 @@ public class NbConvertPreviewWidgetTest {
 		
 		when(mockSynapseJSNIUtils.sanitizeHtml(WRAPPED_HTML)).thenReturn(WRAPPED_HTML);
 		
-		previewWidget.configure(ENTITY_ID, FILE_HANDLE_ID, CREATED_BY);
-		
+		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
 		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		// user is not allowed to render, but sanitized version is the same as raw
@@ -194,7 +198,7 @@ public class NbConvertPreviewWidgetTest {
 	public void testBlockRenderHtmlUntrusted() {
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		
-		previewWidget.configure(ENTITY_ID, FILE_HANDLE_ID, CREATED_BY);
+		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
 		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		// user is not allowed to render.  show sanitized version
@@ -214,7 +218,7 @@ public class NbConvertPreviewWidgetTest {
 		Exception ex = new Exception(errorMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		
-		previewWidget.configure(ENTITY_ID, FILE_HANDLE_ID, CREATED_BY);
+		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
 		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		// user is not allowed to render.  show sanitized version

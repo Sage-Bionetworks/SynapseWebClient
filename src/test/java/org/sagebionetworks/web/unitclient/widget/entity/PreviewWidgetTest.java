@@ -430,7 +430,7 @@ public class PreviewWidgetTest {
 		mainFileHandle.setFileName("test.html");
 		previewWidget.configure(testBundle);
 		
-		verify(mockHtmlPreviewWidget).configure(TEST_ENTITY_ID, mainFileHandle.getId(), TEST_ENTITY_MAIN_FILE_CREATED_BY);
+		verify(mockHtmlPreviewWidget).configure(TEST_ENTITY_ID, mainFileHandle);
 		verify(mockView).setPreviewWidget(mockHtmlPreviewWidget);
 	}
 	
@@ -440,7 +440,7 @@ public class PreviewWidgetTest {
 		mainFileHandle.setFileName("test.ipynb");
 		previewWidget.configure(testBundle);
 		
-		verify(mockNbConvertPreviewWidget).configure(TEST_ENTITY_ID, mainFileHandle.getId(), TEST_ENTITY_MAIN_FILE_CREATED_BY);
+		verify(mockNbConvertPreviewWidget).configure(TEST_ENTITY_ID, mainFileHandle);
 		verify(mockView).setPreviewWidget(mockNbConvertPreviewWidget);
 	}
 }

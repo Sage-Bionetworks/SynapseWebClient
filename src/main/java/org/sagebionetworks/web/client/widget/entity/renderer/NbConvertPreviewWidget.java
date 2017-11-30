@@ -20,7 +20,6 @@ import com.google.inject.Inject;
 public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 	public static final String DOWNLOAD_NOTEBOOK_MESSAGE = "Download this Juypter notebook and run in a local notebook server to see the fully interactive version.";
 	String nbConvertEndpoint;
-	GWTWrapper gwt;
 	public static final String HTML_PREFIX = "<html><head>" + 
 			"<link rel=\"stylesheet\" type=\"text/css\" href=\"css\\notebook.css\">" + 
 			"</head><body>";
@@ -36,8 +35,7 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 			PopupUtilsView popupUtils,
 			GlobalApplicationState globalAppState,
 			GWTWrapper gwt) {
-		super(view, presignedURLAsyncHandler, jsniUtils, requestBuilder, synAlert, synapseClient, popupUtils);
-		this.gwt = gwt;
+		super(view, presignedURLAsyncHandler, jsniUtils, requestBuilder, synAlert, synapseClient, popupUtils, gwt);
 		nbConvertEndpoint = globalAppState.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY);
 		view.setShowContentLinkText(DOWNLOAD_NOTEBOOK_MESSAGE);
 	}

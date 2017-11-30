@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.ClientProperties.MB;
+
+import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -36,6 +40,11 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 	protected String createdBy;
 	protected SynapseClientAsync synapseClient;
 	protected PopupUtilsView popupUtils;
+	protected GWTWrapper gwt;
+	
+	public static final double MAX_HTML_FILE_SIZE = 40 * MB;
+	public static String friendlyMaxFileSize = null;
+	
 	@Inject
 	public HtmlPreviewWidget(
 			HtmlPreviewView view,
@@ -44,7 +53,8 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 			RequestBuilderWrapper requestBuilder,
 			SynapseAlert synAlert,
 			SynapseClientAsync synapseClient,
-			PopupUtilsView popupUtils) {
+			PopupUtilsView popupUtils,
+			GWTWrapper gwt) {
 		this.view = view;
 		this.presignedURLAsyncHandler = presignedURLAsyncHandler;
 		this.jsniUtils = jsniUtils;
@@ -52,8 +62,12 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
 		this.popupUtils = popupUtils;
+		this.gwt = gwt;
 		view.setSynAlert(synAlert);
 		view.setPresenter(this);
+		if (friendlyMaxFileSize == null) {
+			friendlyMaxFileSize = gwt.getFriendlySize(MAX_HTML_FILE_SIZE, true);
+		}
 	}
 	
 	public void renderHTML(final String rawHtml) {
@@ -89,13 +103,18 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 		});
 	}
 	
-	public void configure(String synapseId, String fileHandleId, String fileHandleCreatedBy) {
-		this.createdBy = fileHandleCreatedBy;
+	public void configure(String synapseId, FileHandle fileHandle) {
+		this.createdBy = fileHandle.getCreatedBy();
 		fha = new FileHandleAssociation();
 		fha.setAssociateObjectId(synapseId);
 		fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
-		fha.setFileHandleId(fileHandleId);
-		refreshContent();
+		fha.setFileHandleId(fileHandle.getId());
+		if (fileHandle.getContentSize() != null && fileHandle.getContentSize() < MAX_HTML_FILE_SIZE) {
+			refreshContent();
+		} else {
+			view.setLoadingVisible(false);
+			synAlert.showError("The preview was not shown because the size (" + gwt.getFriendlySize(fileHandle.getContentSize().doubleValue(), true) + ") exceeds the maximum preview size (" + friendlyMaxFileSize + ")");
+		}
 	}
 	
 	@Override

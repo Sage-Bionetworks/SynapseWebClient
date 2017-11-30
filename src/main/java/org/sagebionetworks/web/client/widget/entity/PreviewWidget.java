@@ -221,9 +221,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	
 	private void renderFilePreview(PreviewFileType previewType, FileHandle fileHandleToShow) {
 		final FileEntity fileEntity = (FileEntity)bundle.getEntity();
-		String fileHandleId = fileHandleToShow.getId();
 		String contentType = fileHandleToShow.getContentType();
-		String fileCreatedBy = fileHandleToShow.getCreatedBy();
 		switch(previewType) {
 			case IMAGE :
 				//add a html panel that contains the image src from the attachments server (to pull asynchronously)
@@ -239,7 +237,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				break;
 			case IPYNB :
 				NbConvertPreviewWidget nbConvertPreviewWidget = ginInjector.getNbConvertPreviewWidget();
-				nbConvertPreviewWidget.configure(bundle.getEntity().getId(), fileHandleId, fileCreatedBy);
+				nbConvertPreviewWidget.configure(bundle.getEntity().getId(), fileHandleToShow);
 				view.setPreviewWidget(nbConvertPreviewWidget);
 				break;
 			case VIDEO :
@@ -249,7 +247,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				break;
 			case HTML :
 				HtmlPreviewWidget htmlPreviewWidget = ginInjector.getHtmlPreviewWidget();
-				htmlPreviewWidget.configure(bundle.getEntity().getId(), fileHandleId, fileCreatedBy);
+				htmlPreviewWidget.configure(bundle.getEntity().getId(), fileHandleToShow);
 				view.setPreviewWidget(htmlPreviewWidget);
 				break;
 			default :
