@@ -1310,6 +1310,7 @@ h1, h2, h3, h4, h5, h6 {
   -webkit-border-radius: 4px;
   -moz-border-radius: 4px;
   border-radius: 4px;
+  background-color: white;
 }
 
 .previewtable tbody td {
@@ -2718,9 +2719,12 @@ td.datePickerMonth {
 
 
 /* Code highlighting css */
-pre code {
+#rootPanel pre {
+	background-color: white;
+}
+#rootPanel pre code {
   display: block; padding: 0.5em;
-  background-color: #f4f4f4;
+  background-color: white;
   font-family:"Courier New", Courier, monospace;
 }
 

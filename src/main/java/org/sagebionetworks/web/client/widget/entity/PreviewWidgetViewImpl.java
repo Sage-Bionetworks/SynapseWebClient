@@ -124,7 +124,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	
 	private String getCodeHtml(String code, String language) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<pre style=\"overflow:auto;white-space:pre;\"><code style=\"background-color:white;\" class=\""+language+"\">");
+		sb.append("<pre style=\"overflow:auto;white-space:pre;\"><code class=\""+language+"\">");
 		sb.append(code);
 		sb.append("</code></pre>");
 		return sb.toString();
