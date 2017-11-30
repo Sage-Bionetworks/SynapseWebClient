@@ -69,6 +69,12 @@ public class GovernanceServiceHelperTest {
 		
 		PostMessageContentAccessRequirement ar = new PostMessageContentAccessRequirement();
 		ar.setId(accessRequirementId);
+		
+		//verify get access requirement text now just returns the url
+		String url = "http://postmessage/target";
+		ar.setUrl(url);
+		assertEquals(url, GovernanceServiceHelper.getAccessRequirementText(ar));
+		
 		GovernanceServiceHelper.signTermsOfUse(principalId,
 				ar,
 				mockSynapseClient,

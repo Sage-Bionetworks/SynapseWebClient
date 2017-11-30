@@ -15,7 +15,6 @@ import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
 import com.google.gwt.http.client.Response;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -27,6 +26,7 @@ import com.google.inject.Inject;
  *
  */
 public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
+	public static final String CONFIRM_OPEN_HTML_MESSAGE = "Click \"OK\" to leave this page and open this content in a new window; this enables additional functionality, but should only be done if you trust the content.";
 	protected HtmlPreviewView view;
 	protected PresignedURLAsyncHandler presignedURLAsyncHandler;
 	protected FileHandleAssociation fha;
@@ -57,38 +57,33 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 	}
 	
 	public void renderHTML(final String rawHtml) {
-		view.setRawHtml(rawHtml);
 		synapseClient.isUserAllowedToRenderHTML(createdBy, new AsyncCallback<Boolean>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setLoadingVisible(false);
-				String escapedContent = SafeHtmlUtils.htmlEscapeAllowEntities(rawHtml);
-				view.setHtml(truncateLargeHtml(escapedContent));
-				view.setSanitizedWarningVisible(true);
+				showSanitizedHtml();
+				jsniUtils.consoleError(caught.getMessage());
 			}
-			
+
 			@Override
 			public void onSuccess(Boolean trustedUser) {
 				view.setLoadingVisible(false);
 				if (trustedUser) {
 					view.setHtml(rawHtml);
 				} else {
-					// is the sanitized version the same as the original??
-					String sanitizedHtml = jsniUtils.sanitizeHtml(rawHtml);
-					if (rawHtml.equals(sanitizedHtml)) {
-						view.setHtml(rawHtml);
-					} else {
-						view.setHtml(sanitizedHtml);
-						view.setSanitizedWarningVisible(true);
-					}
+					showSanitizedHtml();
 				}
 			}
 			
-			public String truncateLargeHtml(String sanitizedHtml) {
-				if (sanitizedHtml.length() > 20000) {
-					return sanitizedHtml.substring(0, 20000) + "\n...";
+			private void showSanitizedHtml() {
+				// is the sanitized version the same as the original??
+				String sanitizedHtml = jsniUtils.sanitizeHtml(rawHtml);
+				if (rawHtml.equals(sanitizedHtml)) {
+					view.setHtml(rawHtml);
 				} else {
-					return sanitizedHtml;
+					view.setHtml(sanitizedHtml);
+					view.setRawHtml(rawHtml);
+					view.setSanitizedWarningVisible(true);
 				}
 			}
 		});
@@ -160,7 +155,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 	@Override
 	public void onShowFullContent() {
 		//confirm
-		popupUtils.showConfirmDialog("", "Click \"OK\" to leave this page and open this content in a new window; this enables additional functionality, but should only be done if you trust the content.", () -> {
+		popupUtils.showConfirmDialog("", CONFIRM_OPEN_HTML_MESSAGE, () -> {
 			//user clicked yes
 			view.openRawHtmlInNewWindow();
 		});

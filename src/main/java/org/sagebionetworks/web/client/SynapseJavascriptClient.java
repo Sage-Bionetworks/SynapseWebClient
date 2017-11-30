@@ -18,6 +18,7 @@ import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
+import static org.sagebionetworks.web.shared.WebConstants.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,7 +75,6 @@ import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -241,7 +241,7 @@ public class SynapseJavascriptClient {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(method, url);
 		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
-		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
+		requestBuilder.setHeader(CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}

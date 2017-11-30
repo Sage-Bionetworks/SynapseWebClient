@@ -12,7 +12,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.sagebionetworks.repo.model.util.ContentTypeUtils.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -270,6 +270,15 @@ public class PreviewWidgetTest {
 	}
 	
 	@Test
+	public void testVideoFilename(){
+		mainFileHandle.setContentType(APPLICATION_OCTET_STREAM);
+		mainFileHandle.setFileName("testvideo.mp4");
+		previewWidget.configure(testBundle);
+		previewWidget.asWidget();
+		verify(mockView).setPreviewWidget(mockVideoWidget);
+	}
+	
+	@Test
 	public void testLongContent(){
 		mainFileHandle.setContentType(PreviewWidget.APPLICATION_ZIP);
 		PreviewFileHandle fh = new PreviewFileHandle();
@@ -416,11 +425,22 @@ public class PreviewWidgetTest {
 	}
 	
 	@Test
-	public void testGetFullFileContents() {
+	public void testGetHtml() {
 		mainFileHandle.setContentType("text/html");
 		mainFileHandle.setFileName("test.html");
 		previewWidget.configure(testBundle);
 		
 		verify(mockHtmlPreviewWidget).configure(TEST_ENTITY_ID, mainFileHandle.getId(), TEST_ENTITY_MAIN_FILE_CREATED_BY);
+		verify(mockView).setPreviewWidget(mockHtmlPreviewWidget);
+	}
+	
+	@Test
+	public void testGetJupyterNotebook() {
+		mainFileHandle.setContentType(APPLICATION_OCTET_STREAM);
+		mainFileHandle.setFileName("test.ipynb");
+		previewWidget.configure(testBundle);
+		
+		verify(mockNbConvertPreviewWidget).configure(TEST_ENTITY_ID, mainFileHandle.getId(), TEST_ENTITY_MAIN_FILE_CREATED_BY);
+		verify(mockView).setPreviewWidget(mockNbConvertPreviewWidget);
 	}
 }
