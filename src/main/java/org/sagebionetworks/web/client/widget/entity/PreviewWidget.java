@@ -36,6 +36,7 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -252,7 +253,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				break;
 			default :
 				view.showLoading();
-				boolean isGetPreviewFile = true;
+				boolean isGetPreviewFile = !fileHandleToShow.getId().equals(fileEntity.getDataFileHandleId());
 				//must be a text type of some kind
 				//try to load the text of the preview, if available
 				requestBuilder.configure(RequestBuilder.GET, 

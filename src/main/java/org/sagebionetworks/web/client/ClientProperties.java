@@ -22,7 +22,7 @@ public class ClientProperties {
 	public static final String[] TABLE_CONTENT_TYPES = new String[] {"application/vnd.ms-excel", "text/csv","text/tab-separated-values","text/plain", "text/txt", "text", "text/", "text/tsv"};
 	public static final HashSet<String> TABLE_CONTENT_TYPES_SET = new HashSet<String>(Arrays.asList(TABLE_CONTENT_TYPES));
 	
-	public static final String[] CODE_EXTENSIONS = new String[] {".cwl", ".wdl"};
+	public static final String[] CODE_EXTENSIONS = new String[] {".cwl", ".wdl", ".json"};
 	public static final HashSet<String> CODE_EXTENSIONS_SET = new HashSet<String>(Arrays.asList(CODE_EXTENSIONS));
 	
 	
