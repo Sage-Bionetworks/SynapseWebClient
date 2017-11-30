@@ -127,9 +127,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				return PreviewFileType.IPYNB;
 			} else if (contentType != null && isRecognizedImageContentType(contentType)) {
 				return PreviewFileType.IMAGE;
-			} else if (contentType != null &&isHTML(contentType)) {
+			} else if (contentType != null && isHTML(contentType)) {
 				return PreviewFileType.HTML;
-			} else if (contentType != null &&isPDF(contentType)) {
+			} else if (contentType != null && isPDF(contentType)) {
 				return PreviewFileType.PDF;
 			} else if (isRecognizedCodeFileName(fileName) || isWebRecognizedCodeFileName(fileName)) {
 				return PreviewFileType.CODE;
