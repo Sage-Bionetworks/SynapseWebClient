@@ -13,14 +13,12 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
-import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.Response;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class NbConvertPreviewWidget extends HtmlPreviewWidget {
+	public static final String DOWNLOAD_NOTEBOOK_MESSAGE = "Download this Juypter notebook and run in a local notebook server to see the fully interactive version.";
 	String nbConvertEndpoint;
 	GWTWrapper gwt;
 	public static final String HTML_PREFIX = "<html><head>" + 
@@ -35,13 +33,18 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 			RequestBuilderWrapper requestBuilder,
 			SynapseAlert synAlert,
 			SynapseClientAsync synapseClient,
-			GlobalApplicationState globalAppState,
 			PopupUtilsView popupUtils,
+			GlobalApplicationState globalAppState,
 			GWTWrapper gwt) {
 		super(view, presignedURLAsyncHandler, jsniUtils, requestBuilder, synAlert, synapseClient, popupUtils);
 		this.gwt = gwt;
 		nbConvertEndpoint = globalAppState.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY);
-		view.setShowContentLinkText("Download this Juypter notebook and run in a local notebook server to see the fully interactive version.");
+		view.setShowContentLinkText(DOWNLOAD_NOTEBOOK_MESSAGE);
+	}
+	
+	@Override
+	public void renderHTML(String rawHtml) {
+		super.renderHTML(HTML_PREFIX + rawHtml + HTML_SUFFIX);
 	}
 	
 	@Override
@@ -52,24 +55,7 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 		requestBuilder.configure(RequestBuilder.GET, nbConvertEndpoint+encodedUrl);
 		requestBuilder.setHeader(ACCEPT, TEXT_HTML_CHARSET_UTF8);
 		try {
-			requestBuilder.sendRequest(null, new RequestCallback() {
-				@Override
-				public void onResponseReceived(Request request,
-						Response response) {
-					int statusCode = response.getStatusCode();
-					if (statusCode == Response.SC_OK) {
-						renderHTML(HTML_PREFIX + response.getText() + HTML_SUFFIX);
-					} else {
-						onError(null, new IllegalArgumentException("Unable to retrieve. Reason: " + response.getStatusText()));
-					}
-				}
-
-				@Override
-				public void onError(Request request, Throwable exception) {
-					view.setLoadingVisible(false);
-					synAlert.handleException(exception);
-				}
-			});
+			requestBuilder.sendRequest(null, getRequestCallback());
 		} catch (final Exception e) {
 			view.setLoadingVisible(false);
 			synAlert.handleException(e);

@@ -128,30 +128,34 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 		requestBuilder.configure(RequestBuilder.GET, url.toString());
 		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_HTML_CHARSET_UTF8);
 		try {
-			requestBuilder.sendRequest(null, new RequestCallback() {
-				@Override
-				public void onResponseReceived(Request request,
-						Response response) {
-					int statusCode = response.getStatusCode();
-					if (statusCode == Response.SC_OK) {
-						renderHTML(response.getText());
-					} else {
-						onError(null, new IllegalArgumentException("Unable to retrieve. Reason: " + response.getStatusText()));
-					}
-				}
-
-				@Override
-				public void onError(Request request, Throwable exception) {
-					view.setLoadingVisible(false);
-					synAlert.handleException(exception);
-				}
-			});
+			requestBuilder.sendRequest(null, getRequestCallback());
 		} catch (final Exception e) {
 			view.setLoadingVisible(false);
 			synAlert.handleException(e);
 		}
 	}
 	
+	protected RequestCallback getRequestCallback() {
+		return new RequestCallback() {
+			@Override
+			public void onResponseReceived(Request request,
+					Response response) {
+				int statusCode = response.getStatusCode();
+				if (statusCode == Response.SC_OK) {
+					renderHTML(response.getText());
+				} else {
+					onError(null, new IllegalArgumentException("Unable to retrieve. Reason: " + response.getStatusText()));
+				}
+			}
+
+			@Override
+			public void onError(Request request, Throwable exception) {
+				view.setLoadingVisible(false);
+				synAlert.handleException(exception);
+			}
+		};
+	}
+		
 	@Override
 	public void onShowFullContent() {
 		//confirm
