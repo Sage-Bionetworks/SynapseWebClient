@@ -181,7 +181,7 @@ public class PreviewWidgetTest {
 		fh.setId("previewFileId");
 		fh.setContentType("text/plain");
 		mainFileHandle.setContentType("text/html");
-		assertEquals(PreviewFileType.HTML, previewWidget.getPreviewFileType(fh, mainFileHandle));
+		assertEquals(PreviewFileType.HTML, previewWidget.getOriginalFileType(mainFileHandle));
 	}
 	
 	@Test

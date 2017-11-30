@@ -2,12 +2,8 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.web.client.ContentTypeUtils.isCSV;
-import static org.sagebionetworks.web.client.ContentTypeUtils.isHTML;
-import static org.sagebionetworks.web.client.ContentTypeUtils.isPDF;
-import static org.sagebionetworks.web.client.ContentTypeUtils.isRecognizedImageContentType;
-import static org.sagebionetworks.web.client.ContentTypeUtils.isTAB;
-import static org.sagebionetworks.web.client.ContentTypeUtils.isTextType;
+
+import static org.sagebionetworks.web.client.ContentTypeUtils.*;
 
 import java.util.Map;
 
@@ -49,6 +45,7 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import static org.sagebionetworks.repo.model.util.ContentTypeUtils.*;
 
 public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendererPresenter {
 	public static final String APPLICATION_ZIP = "application/zip";	
@@ -97,13 +94,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 					previewFileType = PreviewFileType.IMAGE;
 				} else if (isTextType(contentType)) {
 					//some kind of text
-					if (isHTML(originalFileHandle.getContentType())) {
-						 previewFileType = PreviewFileType.HTML;
-					}
-					else if (org.sagebionetworks.repo.model.util.ContentTypeUtils.isRecognizedCodeFileName(originalFileHandle.getFileName())){
-						previewFileType = PreviewFileType.CODE;
-					}
-					else if (isCSV(contentType)) {
+					if (isCSV(contentType)) {
 						if (APPLICATION_ZIP.equals(originalFileHandle.getContentType()))
 							previewFileType = PreviewFileType.ZIP;
 						else
@@ -134,13 +125,13 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				return PreviewFileType.VIDEO;
 			} else if (fileName != null && fileName.toLowerCase().endsWith("ipynb")) {
 				return PreviewFileType.IPYNB;
-			} else if (isRecognizedImageContentType(contentType)) {
-					return PreviewFileType.IMAGE;
-			} else if (isHTML(contentType)) {
+			} else if (contentType != null && isRecognizedImageContentType(contentType)) {
+				return PreviewFileType.IMAGE;
+			} else if (contentType != null &&isHTML(contentType)) {
 				return PreviewFileType.HTML;
-			} else if (isPDF(contentType)) {
+			} else if (contentType != null &&isPDF(contentType)) {
 				return PreviewFileType.PDF;
-			} else if (org.sagebionetworks.repo.model.util.ContentTypeUtils.isRecognizedCodeFileName(fileName)) {
+			} else if (isRecognizedCodeFileName(fileName) || isWebRecognizedCodeFileName(fileName)) {
 				return PreviewFileType.CODE;
 			}
 		} 
@@ -289,7 +280,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 									if (PreviewFileType.CODE == previewType) {
 										String codePreview = SafeHtmlUtils.htmlEscapeAllowEntities(responseText);
 										String extension = ContentTypeUtils.getExtension(fileHandleToShow.getFileName());
-										view.setCodePreview(codePreview, extension);
+										view.setCodePreview(codePreview, getLanguage(extension));
 									} 
 									else if (PreviewFileType.CSV == previewType) {
 										view.setTablePreview(responseText, ",");
@@ -312,7 +303,17 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				}
 		}
 	}
-	
+
+	public String getLanguage(String extension) {
+		if (extension.equals("cwl")) {
+			return "yaml";
+		} else if (extension.equals("wdl")) {
+			return "nohighlight";
+		} else {
+			return extension;
+		}
+	}
+
 	public Widget asWidget() {
 		return view.asWidget();
 	}
