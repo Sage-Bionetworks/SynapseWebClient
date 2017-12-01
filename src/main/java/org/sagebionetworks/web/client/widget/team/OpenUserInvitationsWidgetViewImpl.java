@@ -37,6 +37,11 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	}
 	
 	@Override
+	public void setVisible(boolean visible) {
+		widget.setVisible(visible);
+	}
+	
+	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
