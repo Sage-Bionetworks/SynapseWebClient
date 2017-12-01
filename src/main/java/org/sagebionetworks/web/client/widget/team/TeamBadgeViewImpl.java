@@ -43,7 +43,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		this.iconsImageBundle = iconsImageBundle;
 		addStyleName("teamBadge displayInline");
 		notificationsPanel = new SimplePanel();
-		notificationsPanel.addStyleName("displayInline");
+		notificationsPanel.addStyleName("margin-left-5 displayInline");
 		
 		publicAclPrincipalId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID));
 		authenticatedAclPrincipalId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));

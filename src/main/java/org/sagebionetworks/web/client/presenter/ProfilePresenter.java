@@ -663,10 +663,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					for (Team team: teams) {
 						// requests will always be 0 or greater
 						view.addTeamsFilterTeam(team);
+						myTeamsWidget.addTeam(team);
 						if (includeRequestCount) {
 							getTeamRequestCount(userId, team);
-						} else {
-							myTeamsWidget.addTeam(team, 0L);	
 						}
 					}
 					view.setTeamsFilterVisible(true);
@@ -688,11 +687,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		synapseClient.getOpenRequestCount(userId, team.getId(), new AsyncCallback<Long>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				myTeamsWidget.addTeam(team, 0L);
 			}
 			@Override
 			public void onSuccess(Long count) {
-				myTeamsWidget.addTeam(team, count);
+				myTeamsWidget.setNotificationValue(team.getId(), count);
 			}
 		});
 	}

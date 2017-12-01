@@ -46,8 +46,11 @@ public class TeamListWidget implements TeamListWidgetView.Presenter{
 		view.showEmpty();
 	}
 	
-	public void addTeam(Team team, Long notificationCount) {
-		view.addTeam(team, notificationCount);
+	public void addTeam(Team team) {
+		view.addTeam(team);
 	}
-
+	
+	public void setNotificationValue(String teamId, Long count) {
+		view.setNotificationValue(teamId, count);
+	}
 }

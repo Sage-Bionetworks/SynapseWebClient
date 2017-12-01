@@ -15,8 +15,9 @@ public interface TeamListWidgetView extends IsWidget, SynapseView {
 	public void setPresenter(Presenter presenter);
 	public void configure(boolean isBig);
 	public void showEmpty();
-	public void addTeam(Team team, Long notificationCount);
+	public void addTeam(Team team);
 	void showLoading();
+	void setNotificationValue(String teamId, Long notificationCount);
 	public interface Presenter {
 		void goTo(Place place);
 	}
