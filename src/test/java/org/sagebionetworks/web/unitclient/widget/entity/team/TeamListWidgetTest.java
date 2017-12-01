@@ -58,7 +58,7 @@ public class TeamListWidgetTest {
 		ArrayList<Team> teamList = new ArrayList<Team>();
 		teamList.add(testTeam1);
 		teamList.add(testTeam2);
-		AsyncMockStubber.callSuccessWith(teamList).when(mockSynapseClient).getTeamsForUser(anyString(), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(teamList).when(mockSynapseClient).getTeamsForUser(anyString(), any(AsyncCallback.class));
 		return teamList;
 	}
 	

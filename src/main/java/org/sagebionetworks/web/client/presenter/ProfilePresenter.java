@@ -39,7 +39,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
-import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
@@ -655,18 +654,20 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		teamSynAlert.clear();
 		myTeamsWidget.clear();
 		myTeamsWidget.showLoading();
-		synapseClient.getTeamsForUser(userId, includeRequestCount, new AsyncCallback<List<TeamRequestBundle>>() {
+		synapseClient.getTeamsForUser(userId, new AsyncCallback<List<Team>>() {
 			@Override
-			public void onSuccess(List<TeamRequestBundle> teamsRequestBundles) {
+			public void onSuccess(List<Team> teams) {
 				myTeamsWidget.clear();
-				if (teamsRequestBundles != null && teamsRequestBundles.size() > 0) {
+				if (teams != null && teams.size() > 0) {
 					view.addMyTeamProjectsFilter();
-					for (TeamRequestBundle teamAndRequest: teamsRequestBundles) {
+					for (Team team: teams) {
 						// requests will always be 0 or greater
-						Long requestCount = teamAndRequest.getRequestCount();
-						Team team = teamAndRequest.getTeam();
-						myTeamsWidget.addTeam(team, requestCount);
 						view.addTeamsFilterTeam(team);
+						if (includeRequestCount) {
+							getTeamRequestCount(userId, team);
+						} else {
+							myTeamsWidget.addTeam(team, 0L);	
+						}
 					}
 					view.setTeamsFilterVisible(true);
 				} else {
@@ -679,6 +680,19 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				myTeamsWidget.clear();
 				view.setTeamsFilterVisible(false);
 				teamSynAlert.handleException(caught);
+			}
+		});
+	}
+	
+	public void getTeamRequestCount(String userId, final Team team) {
+		synapseClient.getOpenRequestCount(userId, team.getId(), new AsyncCallback<Long>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				myTeamsWidget.addTeam(team, 0L);
+			}
+			@Override
+			public void onSuccess(Long count) {
+				myTeamsWidget.addTeam(team, count);
 			}
 		});
 	}
