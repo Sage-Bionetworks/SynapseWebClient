@@ -34,7 +34,7 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 		this.iconsImageBundle = iconsImageBundle;
 		addStyleName("bigTeamBadge");
 		notificationsPanel = new SimplePanel();
-		notificationsPanel.addStyleName("displayInline pull-left");
+		notificationsPanel.addStyleName("displayInline pull-left margin-left-5");
 	}
 	
 	@Override
