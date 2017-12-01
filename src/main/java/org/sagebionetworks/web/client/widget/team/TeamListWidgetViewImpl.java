@@ -58,15 +58,13 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	}
 	
 	@Override
-	public void addTeam(Team team, Long notificationCount) {
+	public void addTeam(Team team) {
 		emptyHTML.setVisible(false);
 		SimplePanel container = new SimplePanel();
 		container.addStyleName("margin-top-10");
 		if (isBig) {
 			BigTeamBadge teamRenderer = ginInjector.getBigTeamBadgeWidget();
 			teamRenderer.configure(team, team.getDescription());
-			if (notificationCount != null && notificationCount > 0)
-				teamRenderer.setNotificationValue(String.valueOf(notificationCount));
 			team2Badge.put(team.getId(), teamRenderer);
 			Widget teamRendererWidget = teamRenderer.asWidget();
 			teamRendererWidget.addStyleName("col-sm-12 col-md-6");
@@ -75,13 +73,18 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 		} else {
 			TeamBadge teamRenderer = ginInjector.getTeamBadgeWidget();
 			teamRenderer.configure(team);
-			if (notificationCount != null && notificationCount > 0)
-				teamRenderer.setNotificationValue(String.valueOf(notificationCount));
 			team2Badge.put(team.getId(), teamRenderer);
 			Widget teamRendererWidget = teamRenderer.asWidget();
 			container.add(teamRendererWidget);
 		}
 		add(container);
+	}
+	
+	@Override
+	public void setNotificationValue(String teamId, Long notificationCount) {
+		if (notificationCount != null && notificationCount > 0) {
+			team2Badge.get(teamId).setNotificationValue(String.valueOf(notificationCount));
+		}
 	}
 	
 	@Override

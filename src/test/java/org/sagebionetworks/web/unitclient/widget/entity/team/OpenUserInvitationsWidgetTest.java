@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -23,12 +24,14 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.team.EmailInvitationBadge;
+import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.OpenUserInvitationsWidgetView;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -50,7 +53,7 @@ public class OpenUserInvitationsWidgetTest {
 	@Mock private PortalGinInjector mockGinInjector;
 	@Mock private UserBadge mockUserBadge;
 	@Mock private EmailInvitationBadge mockEmailInvitationBadge;
-
+	@Mock private PopupUtilsView mockPopupUtils; 
 	private String teamId = "123";
 	private OpenUserInvitationsWidget widget;
 	private UserProfile testProfile;
@@ -67,6 +70,7 @@ public class OpenUserInvitationsWidgetTest {
 				mockGWT, 
 				mockDateTimeUtils,
 				mockJsClient,
+				mockPopupUtils,
 				mockGinInjector);
 		
 		testProfile = new UserProfile();
@@ -117,8 +121,16 @@ public class OpenUserInvitationsWidgetTest {
 		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView, times(1)).addInvitation(eq(mockUserBadge), eq(null), eq(testInvite.getId()), eq(testInvite.getMessage()), anyString());
 		verify(mockGWT).restoreWindowPosition();
+		verify(mockView).setVisible(true);
 	}
 
+	@Test
+	public void testEmptyResults() {
+		AsyncMockStubber.callSuccessWith(new ArrayList<>()).when(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(),anyInt(),any(AsyncCallback.class));
+		widget.configure(teamId, mockTeamUpdatedCallback);
+		verify(mockView).setVisible(false);
+	}
+	
 	@Test
 	public void testConfigureMultipleInvitations() {
 		int invitationCount = 5;
@@ -162,12 +174,19 @@ public class OpenUserInvitationsWidgetTest {
 	
 	@Test
 	public void testDeleteOpenInvite() throws Exception {
+		int expectedOffset = 0;
 		String invitationId = "123";
 		widget.configure(teamId, mockTeamUpdatedCallback);
+		verify(mockView).clear();
+		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(), eq(expectedOffset), any(AsyncCallback.class));
+		
 		widget.removeInvitation(invitationId);
+		
 		verify(mockGWT).saveWindowPosition();
 		verify(mockJsClient).deleteMembershipInvitation(eq(invitationId), any(AsyncCallback.class));
-		verify(mockTeamUpdatedCallback).invoke();
+		verify(mockPopupUtils).showInfo(OpenTeamInvitationsWidget.DELETED_INVITATION_MESSAGE, "");
+		verify(mockView, times(2)).clear();
+		verify(mockSynapseClient, times(2)).getOpenTeamInvitations(anyString(), anyInt(), eq(expectedOffset), any(AsyncCallback.class));
 	}
 
 	@Test

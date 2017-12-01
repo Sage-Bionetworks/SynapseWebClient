@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import static org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget.DELETED_INVITATION_MESSAGE;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +9,7 @@ import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -35,6 +38,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	private GWTWrapper gwt;
 	private DateTimeUtils dateTimeUtils;
 	private PortalGinInjector ginInjector;
+	private PopupUtilsView popupUtils;
 
 	@Inject
 	public OpenUserInvitationsWidget(OpenUserInvitationsWidgetView view, 
@@ -44,6 +48,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 			GWTWrapper gwt,
 			DateTimeUtils dateTimeUtils,
 			SynapseJavascriptClient jsClient,
+			PopupUtilsView popupUtils,
 			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.synAlert = synAlert;
@@ -54,6 +59,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.jsClient = jsClient;
+		this.popupUtils = popupUtils;
 		this.ginInjector = ginInjector;
 	}
 	
@@ -61,6 +67,10 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		view.clear();
 	}
 
+	public void refresh() {
+		configure(teamId, teamRefreshCallback);
+	}
+	
 	@Override
 	public void removeInvitation(String invitationId) {
 		gwt.saveWindowPosition();
@@ -68,7 +78,8 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		jsClient.deleteMembershipInvitation(invitationId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				teamRefreshCallback.invoke();
+				popupUtils.showInfo(DELETED_INVITATION_MESSAGE,"");
+				refresh();
 			}
 			
 			@Override
@@ -82,6 +93,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		this.teamId = teamId;
 		this.teamRefreshCallback = teamRefreshCallback;
 		currentOffset = 0;
+		view.clear();
 		getNextBatch();
 	}
 
@@ -92,6 +104,8 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		synapseClient.getOpenTeamInvitations(teamId, INVITATION_BATCH_LIMIT, currentOffset, new AsyncCallback<ArrayList<OpenTeamInvitationBundle>>() {
 			@Override
 			public void onSuccess(ArrayList<OpenTeamInvitationBundle> result) {
+				boolean isEmptyResultset = currentOffset == 0 && result.isEmpty();
+				view.setVisible(!isEmptyResultset);
 				currentOffset += result.size();
 				addInvitations(result);
 				updateMoreButton(result.size());

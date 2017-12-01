@@ -56,7 +56,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
@@ -182,8 +181,7 @@ public interface SynapseClient extends RemoteService{
 	String createTeam(String teamName) throws RestServiceException;
 	void deleteTeam(String teamId) throws RestServiceException;
 	PaginatedResults<Team> getTeams(String userId, Integer limit, Integer offset) throws RestServiceException;
-	List<TeamRequestBundle> getTeamsForUser(String userId,
-											boolean includeOpenRequests) throws RestServiceException;
+	List<Team> getTeamsForUser(String userId) throws RestServiceException;
 	PaginatedResults<Team> getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
 	TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;
 	Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException;

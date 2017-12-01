@@ -126,7 +126,6 @@ import org.sagebionetworks.table.query.TableQueryParser;
 import org.sagebionetworks.table.query.util.TableSqlProcessor;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.SynapseClient;
-import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
@@ -1181,8 +1180,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public List<TeamRequestBundle> getTeamsForUser(String userId, boolean includeOpenRequests)
-			throws RestServiceException {
+	public List<Team> getTeamsForUser(String userId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			org.sagebionetworks.reflection.model.PaginatedResults<Team> teams = synapseClient.getTeamsForUser(
@@ -1194,16 +1192,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					return o1.getName().compareToIgnoreCase(o2.getName());
 				}
 			});
-			List<TeamRequestBundle> bundle = new ArrayList<TeamRequestBundle>(teamList.size());
-			for (Team team: teamList) {
-				if (includeOpenRequests) {
-					Long openRequestCount = getOpenRequestCount(userId, team.getId());
-					bundle.add(new TeamRequestBundle(team, openRequestCount == null ? 0L : openRequestCount));
-				} else {
-					bundle.add(new TeamRequestBundle(team, 0L));
-				}
-			}
-			return bundle;
+			return teamList;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 

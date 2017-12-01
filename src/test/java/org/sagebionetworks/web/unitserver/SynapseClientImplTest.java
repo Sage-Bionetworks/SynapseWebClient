@@ -145,7 +145,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.util.SerializationUtils;
-import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -1770,35 +1769,13 @@ public class SynapseClientImplTest {
 	public void testGetTeamBundlesNotOwner() throws RestServiceException, SynapseException {
 		// the paginated results were set up to return {teamZ, teamA}, but
 		// servlet side we sort by name.
-		List<TeamRequestBundle> results = synapseClient.getTeamsForUser("abba", false);
+		List<Team> results = synapseClient.getTeamsForUser("abba");
 		verify(mockSynapse).getTeamsForUser(eq("abba"), anyInt(), anyInt());
 		assertEquals(2, results.size());
-		assertEquals(teamA, results.get(0).getTeam());
-		assertEquals(teamZ, results.get(1).getTeam());
-		verify(mockSynapse, Mockito.never()).getOpenMembershipRequests(anyString(), anyString(),
-				anyLong(), anyLong());
+		assertEquals(teamA, results.get(0));
+		assertEquals(teamZ, results.get(1));
 	}
-	
-	@Test
-	public void testGetTeamBundlesOwner() throws RestServiceException, SynapseException {
-		TeamMember testTeamMember = new TeamMember();
-		testTeamMember.setIsAdmin(true);
-		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(
-				testTeamMember);
-		when(mockSynapse.getOpenMembershipRequests(anyString(), anyString(), anyLong(), anyLong())).thenReturn(mockPaginatedMembershipRequest);
 		
-		List<TeamRequestBundle> results = synapseClient.getTeamsForUser("abba", true);
-		verify(mockSynapse).getTeamsForUser(eq("abba"), anyInt(), anyInt());
-		assertEquals(2, results.size());
-		assertEquals(teamA, results.get(0).getTeam());
-		assertEquals(teamZ, results.get(1).getTeam());
-		Long reqCount1 = results.get(0).getRequestCount();
-		Long reqCount2 = results.get(1).getRequestCount();
-		assertEquals(new Long(3L), results.get(0).getRequestCount());
-		assertEquals(new Long(3L), results.get(1).getRequestCount());
-
-	}
-	
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenNull() throws RestServiceException, SynapseException{
 		String tokenTypeName = null;

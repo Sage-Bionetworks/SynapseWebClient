@@ -180,8 +180,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				view.setTeamEmailAddress(getTeamEmail(team.getName(), canSendEmail));
 				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
 				openMembershipRequestsWidget.setVisible(isAdmin);
-				openUserInvitationsWidget.setVisible(isAdmin);
-
+				
 				if (teamMembershipStatus == null || !teamMembershipStatus.getIsMember()) {
 					//not a member, add Join widget
 					joinTeamWidget.configure(teamId, false, teamMembershipStatus,
