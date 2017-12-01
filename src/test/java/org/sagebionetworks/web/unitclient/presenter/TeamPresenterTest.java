@@ -168,7 +168,6 @@ public class TeamPresenterTest {
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
 		verify(mockOpenMembershipRequestsWidget).setVisible(true);
-		verify(mockOpenUserInvitationsWidget).setVisible(true);
 		verify(mockView).showAdminMenuItems();
 		verify(mockView).setTeamEmailAddress(anyString());
 		//never
@@ -206,7 +205,6 @@ public class TeamPresenterTest {
 		verify(mockJoinWidget).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
 		verify(mockOpenMembershipRequestsWidget).setVisible(false);
-		verify(mockOpenUserInvitationsWidget).setVisible(false);
 		//never
 		verify(mockView, never()).showMemberMenuItems();
 		verify(mockOpenMembershipRequestsWidget, never()).configure(eq(teamId), any(Callback.class));
@@ -244,7 +242,6 @@ public class TeamPresenterTest {
 		verify(mockGoogleMap).configure(teamId);
 		verify(mockView).showMapModal();
 		verify(mockOpenMembershipRequestsWidget).setVisible(false);
-		verify(mockOpenUserInvitationsWidget).setVisible(false);
 	}
 
 	@Test
