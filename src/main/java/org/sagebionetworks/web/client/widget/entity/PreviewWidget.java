@@ -2,8 +2,14 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-
-import static org.sagebionetworks.web.client.ContentTypeUtils.*;
+import static org.sagebionetworks.repo.model.util.ContentTypeUtils.isRecognizedCodeFileName;
+import static org.sagebionetworks.web.client.ContentTypeUtils.isCSV;
+import static org.sagebionetworks.web.client.ContentTypeUtils.isHTML;
+import static org.sagebionetworks.web.client.ContentTypeUtils.isPDF;
+import static org.sagebionetworks.web.client.ContentTypeUtils.isRecognizedImageContentType;
+import static org.sagebionetworks.web.client.ContentTypeUtils.isTAB;
+import static org.sagebionetworks.web.client.ContentTypeUtils.isTextType;
+import static org.sagebionetworks.web.client.ContentTypeUtils.isWebRecognizedCodeFileName;
 
 import java.util.Map;
 
@@ -36,7 +42,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -46,7 +51,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import static org.sagebionetworks.repo.model.util.ContentTypeUtils.*;
 
 public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendererPresenter {
 	public static final String APPLICATION_ZIP = "application/zip";	
