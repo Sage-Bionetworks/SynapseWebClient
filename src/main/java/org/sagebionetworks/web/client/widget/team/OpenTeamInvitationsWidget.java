@@ -19,7 +19,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -125,7 +124,7 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 					@Override
 					public void onSuccess(Void aVoid) {
 						popupUtils.showInfo(DELETED_INVITATION_MESSAGE,"");
-						teamUpdatedCallback.invoke();
+						refresh();
 					}
 
 					@Override

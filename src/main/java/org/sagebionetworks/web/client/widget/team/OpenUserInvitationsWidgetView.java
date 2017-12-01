@@ -24,7 +24,7 @@ public interface OpenUserInvitationsWidgetView extends IsWidget {
 	void addInvitation(UserBadge userBadge, String inviteeEmail, String misId, String message, String createdOn);
 
 	void clear();
-
+	void setVisible(boolean visible);
 	interface Presenter {
 		//use to go to user profile page
 		void goTo(Place place);
