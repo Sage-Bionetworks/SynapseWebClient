@@ -132,9 +132,11 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			String userName = userSessionData.getProfile().getUserName();
 			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
 			mixPanelSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
+			amplitudeSdk.initialize(authenticationController.getCurrentUserPrincipalId());
 		} else {
 			pendoSdk.initialize(ANONYMOUS, N_A);
 			mixPanelSdk.initialize(ANONYMOUS, N_A);
+			amplitudeSdk.initialize(ANONYMOUS);
 		}
 	}
 

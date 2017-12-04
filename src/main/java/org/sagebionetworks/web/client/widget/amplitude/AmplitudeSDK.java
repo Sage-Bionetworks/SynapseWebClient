@@ -18,6 +18,14 @@ public class AmplitudeSDK {
 
 	private static native void _track(String description) /*-{
 		$wnd.amplitude.getInstance().logEvent(description);
-		
 	}-*/;
+	
+	public void initialize(String userId) {
+		_initialize(userId);
+	}
+
+	private static native void _initialize(String userId) /*-{
+		$wnd.amplitude.getInstance().init("fb6f2a76ea88503e61e8de28b2c4c22c", userId, {includeReferrer: true, includeUtm: true});
+	}-*/;
+	
 }
