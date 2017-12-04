@@ -41,7 +41,7 @@ public interface SearchView extends IsWidget, SynapseView {
 		void setSearchTerm(String queryTerm);
 		
 		void addFacet(String facetName, String facetValue);
-		
+		void removeFacetAndRefresh(String facetName);
 		void addTimeFacet(String facetName, String facetValue,
 				String displayValue);
 
