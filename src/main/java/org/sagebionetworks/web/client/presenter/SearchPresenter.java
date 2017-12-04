@@ -153,7 +153,28 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	@Override
 	public void addTimeFacet(String facetName, String facetValue, String displayValue) {
 		timeValueToDisplay.put(createTimeValueKey(facetName, facetValue), displayValue);
+		// time facets allow a single facet value only.
+		removeFacet(facetName);
 		addFacet(facetName, facetValue);
+	}
+	
+	@Override
+	public void removeFacetAndRefresh(String facetName) {
+		removeFacet(facetName);
+		executeNewSearch();
+	}
+	
+	public void removeFacet(String facetName) {
+		List<KeyValue> bq = currentSearch.getBooleanQuery();
+		if(bq != null) {
+			List<KeyValue> newBq = new ArrayList<KeyValue>();
+			for(KeyValue kv : bq) {
+				if(!kv.getKey().equals(facetName)) {
+					newBq.add(kv);
+				}
+			}
+			currentSearch.setBooleanQuery(newBq);
+		}
 	}
 	
 	@Override

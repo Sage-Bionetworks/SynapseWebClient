@@ -28,7 +28,6 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.MarkdownIt;
-import org.sagebionetworks.web.client.MarkdownItImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -442,7 +441,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 		
 		// determine time diffs
 		long curTimeInSec = System.currentTimeMillis() / 1000;
-		long beginingOfTime = 0;
 		long anHourAgo = curTimeInSec - HOUR_IN_SEC;
 		long aDayAgo = curTimeInSec - DAY_IN_SEC;
 		long aWeekAgo = curTimeInSec - WEEK_IN_SEC;
@@ -450,7 +448,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		long aYearAgo = curTimeInSec - YEAR_IN_SEC;
 		
 		int row = -1;
-		table.setWidget(++row, 0, createTimeFacet(facet, beginingOfTime, "Any Time"));
+		table.setWidget(++row, 0, createRemoveFacet(facet, "Any Time"));
 		//if(anHourAgo <= max)
 			table.setWidget(++row, 0, createTimeFacet(facet, anHourAgo, "Past Hour"));
 		//if(aDayAgo <= max)
@@ -481,6 +479,16 @@ public class SearchViewImpl extends Composite implements SearchView {
 				Window.scrollTo(0, 0);
 				presenter.addTimeFacet(facet.getName(), facetValue, title);
 			}
+		});
+		return a;
+	}
+	
+	private Anchor createRemoveFacet(final Facet facet, final String title) {
+		Anchor a;
+		a = new Anchor(title);
+		a.addClickHandler( event -> {
+			Window.scrollTo(0, 0);
+			presenter.removeFacetAndRefresh(facet.getName());
 		});
 		return a;
 	}

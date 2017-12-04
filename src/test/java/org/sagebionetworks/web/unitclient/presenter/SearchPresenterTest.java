@@ -5,9 +5,11 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -141,6 +143,43 @@ public class SearchPresenterTest {
 		}
 		assertTrue(found);
 	}
+	
+	private List<KeyValue> getFacet(String facetName) {
+		List<KeyValue> facets = searchPresenter.getAppliedFacets();
+		List<KeyValue> foundFacets = new ArrayList<KeyValue>();
+		for(KeyValue facet : facets) {
+			if(facetName.equals(facet.getKey())) {
+				foundFacets.add(facet);
+			}
+		}
+		return foundFacets;
+	}
+	
+	@Test 
+	public void testTimeFacets() {
+		String facetName = "createdOn";
+		String facetValue = "1";
+		assertTrue(getFacet(facetName).isEmpty());
+		
+		searchPresenter.addTimeFacet(facetName, facetValue, "Yesterday");
+		verify(mockPlaceChanger).goTo(any(Search.class));
+		List<KeyValue> facetValues = getFacet(facetName);
+		assertEquals(1, facetValues.size());
+		assertEquals(facetValue, facetValues.get(0).getValue());
+		
+		//verify setting the time facet to another value clears the previous
+		facetValue = "2";
+		searchPresenter.addTimeFacet(facetName, facetValue, "Yesterday");
+		verify(mockPlaceChanger, times(2)).goTo(any(Search.class));
+		facetValues = getFacet(facetName);
+		assertEquals(1, facetValues.size());
+		assertEquals(facetValue, facetValues.get(0).getValue());
+		
+		searchPresenter.removeFacetAndRefresh(facetName);
+		verify(mockPlaceChanger, times(3)).goTo(any(Search.class));
+		assertTrue(getFacet(facetName).isEmpty());
+	}
+
 	
 }
 
