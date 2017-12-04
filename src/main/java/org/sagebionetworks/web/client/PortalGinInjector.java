@@ -150,7 +150,9 @@ import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsWidge
 import org.sagebionetworks.web.client.widget.entity.renderer.CytoscapeWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
+import org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.PDFPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ReferenceWidget;
@@ -576,4 +578,6 @@ public interface PortalGinInjector extends Ginjector {
 	UploadTableModalWidget getUploadTableModalWidget();
 	AddExternalRepoModal getAddExternalRepoModal();
 	PDFPreviewWidget getPDFPreviewWidget();
+	HtmlPreviewWidget getHtmlPreviewWidget();
+	NbConvertPreviewWidget getNbConvertPreviewWidget();
 }

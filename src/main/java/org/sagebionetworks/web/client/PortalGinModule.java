@@ -400,6 +400,8 @@ import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EmptyWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.EntityListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewView;
+import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.IFrameView;
 import org.sagebionetworks.web.client.widget.entity.renderer.IFrameViewImpl;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
@@ -1432,5 +1434,7 @@ public class PortalGinModule extends AbstractGinModule {
 		// Synapse js client
 		bind(SynapseJavascriptClient.class).in(Singleton.class);
 		bind(SynapseJavascriptFactory.class).in(Singleton.class);
+		
+		bind(HtmlPreviewView.class).to(HtmlPreviewViewImpl.class);
 	}
 }

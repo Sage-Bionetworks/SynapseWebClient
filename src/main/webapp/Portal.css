@@ -9,15 +9,15 @@ a {color:#1e7098;text-decoration:none;}
 a:visited{color:#1e7098; text-decoration:none;}
 a:hover{color:#1e7098; text-decoration:underline;}
 a:focus{color:#1e7098; text-decoration:underline;}
-.synapse-yellow, #rootPanel .synapse-yellow {color:#68b2bb;}
-.synapse-blue, #rootPanel .synapse-blue {color:#1e7098;}
-.synapse-purple, #rootPanel .synapse-purple {color:#7772b4;}
-.synapse-green, #rootPanel .synapse-green {color:#0ea862;}
+.synapse-yellow, #body .synapse-yellow {color:#68b2bb;}
+.synapse-blue, #body .synapse-blue {color:#1e7098;}
+.synapse-purple, #body .synapse-purple {color:#7772b4;}
+.synapse-green, #body .synapse-green {color:#0ea862;}
 
-.synapse-yellow-bg, #rootPanel .synapse-yellow-bg {background-color:#68b2bb;}
-.synapse-blue-bg, #rootPanel .synapse-blue-bg {background-color:#1e7098;}
-.synapse-purple-bg, #rootPanel .synapse-purple-bg {background-color:#7772b4;}
-.synapse-green-bg, #rootPanel .synapse-green-bg {background-color:#0ea862;}
+.synapse-yellow-bg, #body .synapse-yellow-bg {background-color:#68b2bb;}
+.synapse-blue-bg, #body .synapse-blue-bg {background-color:#1e7098;}
+.synapse-purple-bg, #body .synapse-purple-bg {background-color:#7772b4;}
+.synapse-green-bg, #body .synapse-green-bg {background-color:#0ea862;}
 
 .pagination>li>a, .pagination>li>span
 {
@@ -283,7 +283,7 @@ End Synapse color scheme
 }
 
 /* File browser input box needs more fine-tuned selector for override*/
-.border-none, input[type=text][readonly].border-none, #rootPanel .border-none {
+.border-none, input[type=text][readonly].border-none, #body .border-none {
 	border: none;
 }
 .userProfileImage {
@@ -589,7 +589,7 @@ a.shortBtn {
 	margin-right: auto;
 }
 
-.alert, #rootPanel .alert {
+.alert, #body .alert {
 	-moz-box-shadow:0px 1px 2px #aaa;
 	-webkit-box-shadow:0px 1px 2px #aaa;
 	box-shadow:0px 1px 2px #aaa;
@@ -656,7 +656,7 @@ a.shortBtn {
 	margin-right: 10px;
 }
 
-.margin-right-20, #rootPanel .margin-right-20 {
+.margin-right-20, #body .margin-right-20 {
 	margin-right: 20px;
 }
 
@@ -762,20 +762,20 @@ a.shortBtn {
 .margin-left-1 {
 	margin-left: 1px;
 }
-.margin-left-2, #rootPanel .margin-left-2 {
+.margin-left-2, #body .margin-left-2 {
 	margin-left: 2px;
 }
 .margin-left-3 {
 	margin-left: 3px;
 }
 
-.margin-left-5, #rootPanel .margin-left-5 {
+.margin-left-5, #body .margin-left-5 {
 	margin-left: 5px;
 }
 .margin-left-9 {
 	margin-left: 9px;
 }
-.margin-left-10, #rootPanel .margin-left-10{
+.margin-left-10, #body .margin-left-10{
 	margin-left: 10px;
 }
 .margin-left-12 {
@@ -824,7 +824,7 @@ a.shortBtn {
 	margin-top: 15px;
 }
 
-.margin-top-20, #rootPanel .margin-top-20 {
+.margin-top-20, #body .margin-top-20 {
 	margin-top: 20px;
 }
 
@@ -864,11 +864,11 @@ a.shortBtn {
 .margin-bottom-60 {
 	margin-bottom: 60px;
 }
-.margin-bottom-40, #rootPanel .margin-bottom-40 {
+.margin-bottom-40, #body .margin-bottom-40 {
 	margin-bottom: 40px;
 }
 
-.margin-bottom-20, #rootPanel .margin-bottom-20 {
+.margin-bottom-20, #body .margin-bottom-20 {
 	margin-bottom: 20px;
 }
 
@@ -876,7 +876,7 @@ a.shortBtn {
 	margin-bottom: 10px;
 }
 
-.margin-bottom-5, #rootPanel .margin-bottom-5{
+.margin-bottom-5, #body .margin-bottom-5{
 	margin-bottom: 5px;
 }
 
@@ -1056,7 +1056,6 @@ a.shortBtn {
 .markdown code {
 	background-clip: padding-box;
     border-radius: 3px 3px 3px 3px;
-    font-family: Courier,monospace;
     padding: 0 5px 2px;
     overflow:auto;
     white-space:pre;
@@ -1067,12 +1066,12 @@ a.shortBtn {
 	max-width: 100%;
 }
 
-.max-width-none, #rootPanel .max-width-none {
+.max-width-none, #body .max-width-none {
 	max-width: none;
 }
 
 .color-white, .color-white:hover, .color-white:visited, .color-white:focus, 
-#rootPanel .color-white, #rootPanel .color-white:hover, #rootPanel .color-white:visited, #rootPanel .color-white:focus {
+#body .color-white, #body .color-white:hover, #body .color-white:visited, #body .color-white:focus {
 	color: white;
 }
 
@@ -1188,8 +1187,8 @@ i.font-size-1x {
 	font-size:1em;
 }
 
-.font-size-0-9em, #rootPanel .font-size-0-9em,
-i.font-size-0-9em, #rootPanel i.font-size-0-9em {
+.font-size-0-9em, #body .font-size-0-9em,
+i.font-size-0-9em, #body i.font-size-0-9em {
 	font-size:0.9em;
 }
 
@@ -1620,7 +1619,7 @@ ol.lowerroman {
 	font-size: 13px;
 }
 
-.small-alert, #rootPanel .small-alert {
+.small-alert, #body .small-alert {
 	padding: 6px 10px;
 	margin-bottom: 5px;
 }
@@ -1648,11 +1647,11 @@ ol.lowerroman {
 	padding-bottom: 4px !important;
 }
 
-.padding-5, #rootPanel .padding-5 {
+.padding-5, #body .padding-5 {
 	padding: 5px;
 }
 
-.padding-10, #rootPanel .padding-10 {
+.padding-10, #body .padding-10 {
 	padding: 10px;
 }
 
@@ -1664,7 +1663,7 @@ ol.lowerroman {
 	padding: 30px;
 }
 
-.padding-2, #rootPanel .padding-2 {
+.padding-2, #body .padding-2 {
 	padding: 2px;
 }
 
@@ -1846,7 +1845,7 @@ ol.lowerroman {
 	position: relative;
 	top: -10px;
 }
-.moveup-8, #rootPanel .moveup-8 {
+.moveup-8, #body .moveup-8 {
 	position: relative;
 	top: -8px;
 }
@@ -2148,7 +2147,7 @@ a.projectTitle:hover {
     padding-bottom: 99999px;  
 }
 
-.padding-right-2, #rootPanel .padding-right-2 {
+.padding-right-2, #body .padding-right-2 {
 	padding-right: 2px;
 }
 
@@ -2163,7 +2162,7 @@ a.projectTitle:hover {
 	padding-left: 0px;
 }
 
-.padding-left-2, #rootPanel .padding-left-2 {
+.padding-left-2, #body .padding-left-2 {
 	padding-left: 2px;
 }
 
@@ -2344,7 +2343,7 @@ iframe[seamless] {
 	overflow-x: hidden;
 }
 
-.popover, #rootPanel .popover {
+.popover, #body .popover {
 	max-width: 400px;
 }
 
@@ -2418,7 +2417,7 @@ div.input-group > input.search-textbox {
 /* modified snippet from Bootstrap docs.css for Wiki Subpage style (minus the hidden sublists) */
 /* By default it's not affixed in mobile views, so undo that */
 
-#rootPanel .wiki-subpages-editor-tree .nav>li>a {
+#body .wiki-subpages-editor-tree .nav>li>a {
 	padding: 2px 5px;
 }
 
@@ -2718,10 +2717,12 @@ td.datePickerMonth {
 
 
 /* Code highlighting css */
-pre code {
+#body pre {
+	background-color: white;
+}
+#body pre code {
   display: block; padding: 0.5em;
-  background-color: #f4f4f4;
-  font-family:"Courier New", Courier, monospace;
+  background-color: white;
 }
 
 pre code,

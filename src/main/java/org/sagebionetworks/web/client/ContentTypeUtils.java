@@ -28,15 +28,15 @@ public class ContentTypeUtils {
 		return null;
 	}
 	
-	public static boolean isRecognizedPlainTextFileName(String fileName) {
+	public static boolean isWebRecognizedCodeFileName(String fileName) {
 		boolean isPlainText = false;
 		String extension = getExtension(fileName);
 		if (extension != null) {
-			isPlainText = PLAIN_TEXT_EXTENSIONS_SET.contains("."+extension);
+			isPlainText = CODE_EXTENSIONS_SET.contains("."+extension);
 		}
 		return isPlainText;
 	}
-
+	
 	public static boolean isTextType(String contentType) {
 		return contentType.toLowerCase().startsWith("text/");
 	}
@@ -53,7 +53,6 @@ public class ContentTypeUtils {
 		return contentType != null && contentType.toLowerCase().startsWith("text/html");
 	}
 	
-
 	public static boolean isPDF(String contentType) {
 		return contentType != null && contentType.toLowerCase().startsWith("application/pdf");
 	}
@@ -62,18 +61,12 @@ public class ContentTypeUtils {
 		String contentType = type;
 		String lowercaseFilename = fileName.toLowerCase();
 		if (type == null || type.trim().length() == 0) {
-			
-			if (isRecognizedCodeFileName(fileName)) {
+			if (isRecognizedCodeFileName(fileName) || isWebRecognizedCodeFileName(fileName) || lowercaseFilename.endsWith(".txt")) {
 				contentType = PLAIN_TEXT;
-			}
-			else if (lowercaseFilename.endsWith(".tsv") || lowercaseFilename.endsWith(".tab")) {
+			} else if (lowercaseFilename.endsWith(".tsv") || lowercaseFilename.endsWith(".tab")) {
 				contentType = WebConstants.TEXT_TAB_SEPARATED_VALUES;
-			}
-			else if (lowercaseFilename.endsWith(".csv")) {
+			} else if (lowercaseFilename.endsWith(".csv")) {
 				contentType = WebConstants.TEXT_COMMA_SEPARATED_VALUES;
-			}
-			else if (isRecognizedPlainTextFileName(fileName)) {
-				contentType = PLAIN_TEXT;
 			} else {
 				// fall back to the least specific official MIME type...
 				contentType = APPLICATION_OCTET_STREAM;

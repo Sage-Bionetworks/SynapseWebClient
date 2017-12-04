@@ -188,10 +188,8 @@ public class ProvViewUtil {
 		// icon
 		IconType iconType = EntityTypeUtils.getIconTypeForEntityClassName(entityType);
 		if (FileEntity.class.getName().equals(entityType)) {
-			if (ContentTypeUtils.isRecognizedCodeFileName(name)) {
+			if (ContentTypeUtils.isRecognizedCodeFileName(name) || org.sagebionetworks.web.client.ContentTypeUtils.isWebRecognizedCodeFileName(name)) {
 				iconType = IconType.FILE_CODE_O;
-			} else if (org.sagebionetworks.web.client.ContentTypeUtils.isRecognizedPlainTextFileName(name)) {
-				iconType = IconType.FILE_TEXT_O;
 			}
 		}
 		Icon icon = new Icon(iconType);

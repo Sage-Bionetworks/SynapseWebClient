@@ -18,6 +18,7 @@ import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
+import static org.sagebionetworks.web.shared.WebConstants.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -142,7 +143,6 @@ public class SynapseJavascriptClient {
 	public static final String ENTITY_URI_PATH = "/entity";
 	public static final String USER = "/user";
 	public static final String BUNDLE_MASK_PATH = "/bundle?mask=";
-	public static final String CONTENT_TYPE = "Content-Type";
 	public static final String ACCEPT = "Accept";
 	public static final String SESSION_TOKEN_HEADER = "sessionToken";
 	public static final String USER_AGENT = "User-Agent";

@@ -124,7 +124,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	
 	private String getCodeHtml(String code, String language) {
 		StringBuilder sb = new StringBuilder();
-		sb.append("<pre style=\"overflow:auto;white-space:pre;\"><code style=\"background-color:white;\" class=\""+language+"\">");
+		sb.append("<pre style=\"overflow:auto;white-space:pre;\"><code class=\""+language+"\">");
 		sb.append(code);
 		sb.append("</code></pre>");
 		return sb.toString();
@@ -173,78 +173,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		isCode = false;
 		super.clear();
 	}
-	
-	@Override
-	public void setHTML(final String htmlContent) {
-		clear();
-		add(getFrame(htmlContent));
-	}
-	
-	private Frame getFrame(final String htmlContent) {
-		final Frame frame = new Frame("about:blank");
-		frame.getElement().setAttribute("frameborder", "0");
-		frame.setWidth("100%");
-		frame.addLoadHandler(new LoadHandler() {
-			@Override
-			public void onLoad(LoadEvent event) {
-				_autoAdjustFrameHeight(frame.getElement());
-				Scheduler.get().scheduleFixedDelay(new Scheduler.RepeatingCommand() {
-					@Override
-					public boolean execute() {
-						_autoAdjustFrameHeight(frame.getElement());
-						// keep executing as long as frame is attached
-						return frame.isAttached();
-					}
-				}, 200);
-			}
-		});
-		
-		frame.addAttachHandler(new AttachEvent.Handler() {
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					// use html5 srcdoc if available
-					if (synapseJSNIUtils.elementSupportsAttribute(frame.getElement(), "srcdoc")) {
-						frame.getElement().setAttribute("srcdoc", htmlContent);	
-					} else {
-						_setFrameContent(frame.getElement(), htmlContent);	
-					}
-				}
-			}
-		});
-		return frame;
-	}
-	
-	public static native void _autoAdjustFrameHeight(Element iframe) /*-{
-		if(iframe && iframe.contentWindow && iframe.contentWindow.document.body) {
-			var newHeightPx = iframe.contentWindow.document.body.scrollHeight;
-			if (newHeightPx < 200) {
-				newHeightPx = 200;
-			}
-			var frameHeight = parseInt(iframe.height);
-			if (!frameHeight || (Math.abs(newHeightPx - frameHeight) > 70)) {
-				iframe.height = "";
-				iframe.height = (newHeightPx + 50) + "px";
-				if (frameHeight) {
-					iframe.scrollIntoView();	
-				}
-			}
-		}
-	}-*/;
-	
-	private static native void _setFrameContent(Element iframe, String htmlContent) /*-{
-		if(iframe) {
-			try {
-				iframe.contentWindow.document.open('text/html', 'replace'); 
-				iframe.contentWindow.document.write(htmlContent);
-				iframe.contentWindow.document.close();	
-			} catch (err) {
-				console.error(err);
-			}
-		}
-	}-*/;
-
-  
+	  
 	@Override
 	public void addSynapseAlertWidget(IsWidget w) {
 		clear();
