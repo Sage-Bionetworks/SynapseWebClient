@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.amplitude.AmplitudeSDK;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.mixpanel.MixPanelSdk;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
@@ -43,6 +44,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private StuAnnouncementWidget stuAnnouncementWidget;
 	private MixPanelSdk mixPanelSdk;
+	private AmplitudeSDK amplitudeSdk;
 	private PendoSdk pendoSdk;
 	
 	@Inject
@@ -54,7 +56,8 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			SynapseJSNIUtils synapseJSNIUtils, 
 			StuAnnouncementWidget stuAnnouncementWidget,
 			PendoSdk pendoSdk,
-			MixPanelSdk mixPanelSdk) {
+			MixPanelSdk mixPanelSdk,
+			AmplitudeSDK amplitudeSdk) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -64,6 +67,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.clear();
 		this.stuAnnouncementWidget = stuAnnouncementWidget;
 		this.mixPanelSdk = mixPanelSdk;
+		this.amplitudeSdk = amplitudeSdk;
 		this.pendoSdk = pendoSdk;
 		view.setPresenter(this);
 		stuAnnouncementWidget.init();
@@ -156,7 +160,9 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	public void onDashboardClick() {
 		if (authenticationController.isLoggedIn()) {
 			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
-			mixPanelSdk.trackClick("Header -> My Dashboard");
+			String event = "Header -> My Dashboard";
+			mixPanelSdk.trackClick(event);
+			amplitudeSdk.trackClick(event);
 		} else {
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}	
