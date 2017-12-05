@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.web.client.widget.amplitude.AmplitudeSDK;
+import org.sagebionetworks.web.client.widget.amplitude.HeapSDK;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.mixpanel.MixPanelSdk;
 
@@ -29,16 +29,14 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 	Map<Action, ActionView> actionViewMap;
 	Map<Action, List<ActionListener>> actionListenerMap;
 	MixPanelSdk mixPanelSdk;
-	AmplitudeSDK amplitudeSdk;
+	HeapSDK heapSdk;
 	
 	@Inject
 	public ActionMenuWidgetImpl(
 			ActionMenuWidgetView view,
-			MixPanelSdk mixPanelSdk,
-			AmplitudeSDK amplitudeSdk) {
+			MixPanelSdk mixPanelSdk) {
 		this.view = view;
 		this.mixPanelSdk = mixPanelSdk;
-		this.amplitudeSdk = amplitudeSdk;
 		this.actionViewMap = new HashMap<Action, ActionView>();
 		this.actionListenerMap = new HashMap<Action, List<ActionListener>>();
 		view.setPresenter(this);
@@ -65,7 +63,6 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 	public void onToolsMenuClicked() {
 		String event = "Tools menu";
 		mixPanelSdk.trackClick(event);
-		amplitudeSdk.trackClick(event);
 	}
 
 	@Override
@@ -151,7 +148,6 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 	public void onAction(Action action) {
 		String event = getActionView(action).getText();
 		mixPanelSdk.trackClick(event);
-		amplitudeSdk.trackClick(event);
 		// forward to the listeners
 		for (ActionListener listener : getActionListeners(action)) {
 			listener.onAction(action);
