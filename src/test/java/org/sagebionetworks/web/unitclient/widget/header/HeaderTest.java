@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.amplitude.AmplitudeSDK;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
@@ -74,6 +75,8 @@ public class HeaderTest {
 	UserProfile mockUserProfile;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	AmplitudeSDK mockAmplitudeSdk;
 	
 	@Before
 	public void setup(){
@@ -87,7 +90,7 @@ public class HeaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget, mockPendoSdk, mockMixPanelSdk);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget, mockPendoSdk, mockMixPanelSdk, mockAmplitudeSdk);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
