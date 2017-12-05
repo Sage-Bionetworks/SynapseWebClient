@@ -177,6 +177,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 			searchResultsPanel = new HTMLPanel(new SafeHtmlBuilder().appendHtmlConstant("<h4>" + DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART1)
 			.appendEscaped(searchTerm)
 			.appendHtmlConstant(DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART2 + "</h4>").toSafeHtml());
+			facetPanel.clear();
 		} else { 
 			searchResultsPanel = new SimplePanel();
 		}
