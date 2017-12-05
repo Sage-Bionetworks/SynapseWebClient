@@ -2,7 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.header;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -287,6 +287,6 @@ public class HeaderTest {
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
 		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);
-		verify(mockHeapSdk).initialize("");
+		verify(mockHeapSdk, never()).initialize(anyString());
 	}
 }

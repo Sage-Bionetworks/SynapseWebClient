@@ -130,7 +130,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			heapSdk.initialize(authenticationController.getCurrentUserPrincipalId());
 		} else {
 			pendoSdk.initialize(ANONYMOUS, N_A);
-			heapSdk.initialize("");
 		}
 	}
 
