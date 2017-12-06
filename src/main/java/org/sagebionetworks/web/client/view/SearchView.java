@@ -3,15 +3,12 @@ package org.sagebionetworks.web.client.view;
 import java.util.Date;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.web.client.SynapseView;
-import org.sagebionetworks.web.client.widget.search.PaginationEntry;
 
-import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
