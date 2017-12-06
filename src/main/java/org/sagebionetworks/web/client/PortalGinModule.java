@@ -149,6 +149,8 @@ import org.sagebionetworks.web.client.widget.asynch.NumberFormatProvider;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProviderImpl;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandlerImpl;
+import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandler;
+import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.TimerProvider;
 import org.sagebionetworks.web.client.widget.asynch.TimerProviderImpl;
 import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderAsyncHandler;
@@ -1376,6 +1378,9 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(UserProfileAsyncHandlerImpl.class).in(Singleton.class);
 		bind(UserProfileAsyncHandler.class).to(UserProfileAsyncHandlerImpl.class);
+		
+		bind(TeamAsyncHandlerImpl.class).in(Singleton.class);
+		bind(TeamAsyncHandler.class).to(TeamAsyncHandlerImpl.class);
 		
 		bind(UserGroupHeaderAsyncHandlerImpl.class).in(Singleton.class);
 		bind(UserGroupHeaderAsyncHandler.class).to(UserGroupHeaderAsyncHandlerImpl.class);
