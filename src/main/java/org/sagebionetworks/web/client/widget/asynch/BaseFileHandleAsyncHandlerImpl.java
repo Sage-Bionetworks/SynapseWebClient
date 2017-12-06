@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
@@ -96,7 +97,7 @@ public abstract class BaseFileHandleAsyncHandlerImpl {
 										ex = new NotFoundException();
 										break;
 									case UNAUTHORIZED:
-										ex = new UnauthorizedException();
+										ex = new ForbiddenException();
 										break;
 								}
 								for (AsyncCallback<FileResult> callback : callbacks) {
