@@ -27,6 +27,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandlerImpl;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -117,7 +118,7 @@ public class FileHandleAsyncHandlerImplTest {
 		verify(mockSynapseJavascriptClient).getFileHandleAndUrlBatch(any(BatchFileRequest.class), any(AsyncCallback.class));
 		verify(mockCallback).onFailure(throwableCaptor.capture());
 		Throwable th = throwableCaptor.getValue();
-		assertTrue(th instanceof UnauthorizedException);
+		assertTrue(th instanceof ForbiddenException);
 	}
 	
 	@Test
