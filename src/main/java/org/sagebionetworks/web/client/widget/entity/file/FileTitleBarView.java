@@ -12,14 +12,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public interface FileTitleBarView extends IsWidget, SynapseView {
-
-	/**
-	 * Set the presenter.
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
-	public void createTitlebar(Entity entity);
-
+	void createTitlebar(Entity entity);
 	void setFileLocation(String location);
 	void setFileDownloadButton(Widget w);
 	void setFilenameContainerVisible(boolean visible);
@@ -31,11 +24,4 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 	void setMd5(String md5);
 	void setExternalObjectStoreUIVisible(boolean visible);
 	void setExternalObjectStoreInfo(String endpoint, String bucket, String fileKey);
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void fireEntityUpdatedEvent(EntityUpdatedEvent event);
-		boolean isUserLoggedIn();
-	}
 }
