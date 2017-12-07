@@ -661,7 +661,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setTeamsContainer(loadMoreTeamsWidgetContainer.asWidget());
 		loadMoreTeamsWidgetContainer.setIsMore(false);
 		loadMoreTeamsWidgetContainer.configure(getMoreTeamsCallback);
-		myTeamsWidget.asWidget().removeFromParent();
+		if (myTeamsWidget.asWidget() != null) {
+			myTeamsWidget.asWidget().removeFromParent();	
+		}
 		loadMoreTeamsWidgetContainer.add(myTeamsWidget.asWidget());
 		getMoreTeams();
 	}
