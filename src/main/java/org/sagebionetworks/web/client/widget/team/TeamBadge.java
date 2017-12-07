@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandler;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -15,17 +14,15 @@ import com.google.inject.Inject;
 public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresenter, HasNotificationUI, IsWidget {
 	
 	private TeamBadgeView view;
-	private SynapseJavascriptClient jsClient;
+	TeamAsyncHandler teamAsyncHandler;
 	private Integer maxNameLength;
-	private AuthenticationController authController;
 	private String teamName;
 	private ClickHandler customClickHandler = null;
 	
 	@Inject
-	public TeamBadge(TeamBadgeView view, SynapseJavascriptClient synapseClient, AuthenticationController authController) {
+	public TeamBadge(TeamBadgeView view, TeamAsyncHandler teamAsyncHandler) {
 		this.view = view;
-		this.jsClient = synapseClient;
-		this.authController = authController;
+		this.teamAsyncHandler = teamAsyncHandler;
 		view.setPresenter(this);
 	}
 	
@@ -40,7 +37,7 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	public void configure(final String teamId) {
 		if (teamId != null && teamId.trim().length() > 0) {
 			view.showLoading();
-			jsClient.getTeam(teamId, new AsyncCallback<Team>() {
+			teamAsyncHandler.getTeam(teamId, new AsyncCallback<Team>() {
 				@Override
 				public void onSuccess(Team team) {
 					configure(team);

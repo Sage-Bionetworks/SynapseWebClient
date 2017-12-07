@@ -32,6 +32,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void refreshHeader();
 	void setProjectContainer(Widget widget);
 	void addChallengeWidget(Widget widget);
+	void setTeamsContainer(Widget widget);
 	void clearChallenges();
 	void showChallengesLoading(boolean isVisible);
 	void setIsMoreChallengesVisible(boolean isVisible);
@@ -99,8 +100,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void addMyTeamProjectsFilter();
 
 	void addTeamsFilterTeam(Team team);
-
-	void addMyTeamsWidget(TeamListWidget myTeamsWidget);
 
 	void addOpenInvitesWidget(OpenTeamInvitationsWidget openInvitesWidget);
 

@@ -470,9 +470,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void addMyTeamsWidget(TeamListWidget myTeamsWidget) {
+	public void setTeamsContainer(Widget toAdd) {
 		teamsTabContent.clear();
-		teamsTabContent.add(myTeamsWidget.asWidget());
+		teamsTabContent.add(toAdd);
 	}
 	
 	@Override
