@@ -107,7 +107,8 @@ public class TablesTabTest {
 	String projectName = "a test project";
 	String tableEntityId = "syn22";
 	String tableName = "test table";
-	QueryTokenProvider queryTokenProvider;
+	@Mock
+	QueryTokenProvider mockQueryTokenProvider;
 	
 	TablesTab tab;
 	Query query;
@@ -115,7 +116,6 @@ public class TablesTabTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		queryTokenProvider = new QueryTokenProvider(new AdapterFactoryImpl());
 		tab = new TablesTab(mockTab, mockPortalGinInjector);
 		
 		when(mockPortalGinInjector.getTablesTabView()).thenReturn(mockView);
@@ -123,7 +123,7 @@ public class TablesTabTest {
 		when(mockPortalGinInjector.getBasicTitleBar()).thenReturn(mockBasicTitleBar);
 		when(mockPortalGinInjector.getBreadcrumb()).thenReturn(mockBreadcrumb);
 		when(mockPortalGinInjector.getEntityMetadata()).thenReturn(mockEntityMetadata);
-		when(mockPortalGinInjector.getQueryTokenProvider()).thenReturn(queryTokenProvider);
+		when(mockPortalGinInjector.getQueryTokenProvider()).thenReturn(mockQueryTokenProvider);
 		when(mockPortalGinInjector.getStuAlert()).thenReturn(mockSynapseAlert);
 		when(mockPortalGinInjector.getModifiedCreatedByWidget()).thenReturn(mockModifiedCreatedBy);
 		when(mockPortalGinInjector.getProvenanceRenderer()).thenReturn(mockProvenanceWidget);
@@ -311,20 +311,20 @@ public class TablesTabTest {
 	public void testSetTableQueryWithToken() {
 		query.setOffset(1L);
 		when(mockTableEntityWidget.getDefaultQuery()).thenReturn(new Query());
-		String startToken = queryTokenProvider.queryToToken(query);
+		String startToken = "start token";
 		// Start with a token.
-		
+		String encodedToken = "encoded token";
+		when(mockQueryTokenProvider.queryToToken(any(Query.class))).thenReturn(encodedToken);
 		tab.setProject(projectEntityId, mockProjectEntityBundle, null);
 		tab.configure(mockTableEntityBundle, mockEntityUpdatedHandler, TablesTab.TABLE_QUERY_PREFIX + startToken, mockActionMenuWidget);
 		
 		reset(mockTab);
 		when(mockTab.isTabPaneVisible()).thenReturn(true);
-		String queryToken = queryTokenProvider.queryToToken(query);
 		tab.onQueryChange(query);
 		
 		Synapse place = getNewPlace(tableName);
 		assertEquals(EntityArea.TABLES, place.getArea());
-		assertTrue(place.getAreaToken().contains(queryToken));
+		assertTrue(place.getAreaToken().contains(encodedToken));
 	}
 	
 
@@ -343,13 +343,14 @@ public class TablesTabTest {
 		tab.configure(mockTableEntityBundle, mockEntityUpdatedHandler, queryAreaToken, mockActionMenuWidget);
 		query1 = tab.getQueryString();
 		assertNull(query1);
-		String token = queryTokenProvider.queryToToken(query);
+		String token = "encoded query token";
 		queryAreaToken = "query/"+token;
+		when(mockQueryTokenProvider.tokenToQuery(anyString())).thenReturn(query);
 		tab.configure(mockTableEntityBundle, mockEntityUpdatedHandler, queryAreaToken, mockActionMenuWidget);
 		query1 = tab.getQueryString();
 		assertEquals(query, query1);
 		query.setSql("SELECT 'query/' FROM syn123 LIMIT 1");
-		token = queryTokenProvider.queryToToken(query);
+		token = "encoded query token 2";
 		queryAreaToken = "query/"+token;
 		tab.configure(mockTableEntityBundle, mockEntityUpdatedHandler, queryAreaToken, mockActionMenuWidget);
 		query1 = tab.getQueryString();

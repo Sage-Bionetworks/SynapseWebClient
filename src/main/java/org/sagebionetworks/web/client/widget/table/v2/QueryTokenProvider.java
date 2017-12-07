@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
-import org.apache.commons.codec.binary.Base64;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 
@@ -8,13 +7,13 @@ import com.google.inject.Inject;
 
 /**
  * Utility for writing table Query objects to area tokens and back again.
+ * Encoding/decoding done via native js methods btoa and atob.
  *  
  * @author John
  *
  */
 public class QueryTokenProvider {
 	
-	private static final String UTF_8 = "UTF-8";
 	AdapterFactory factory;
 	
 	@Inject
@@ -33,13 +32,20 @@ public class QueryTokenProvider {
 			// First to json
 			String json = query.writeToJSONObject(factory.createNew()).toJSONString();
 			// the token is the json base64 encoded.
-			String base64 = new String(Base64.encodeBase64(json.getBytes(UTF_8)), UTF_8);
-			return base64;
+			return _encode(json);
 		} catch (Exception e) {
 			// we failed to create a token for the given query.
 			return null;
 		}
 	}
+	
+	public native String _encode(String s) /*-{
+		return btoa(s);
+	}-*/;
+	
+	public native String _decode(String s) /*-{
+		return atob(s);
+	}-*/;
 
 	/**
 	 * Parse a token into a query.
@@ -49,7 +55,7 @@ public class QueryTokenProvider {
 	public Query tokenToQuery(String token){
 		try {
 			// The token is base64 encoded json.
-			String json = new String(Base64.decodeBase64(token.getBytes(UTF_8)), UTF_8);
+			String json = _decode(token);
 			return new Query(factory.createNew(json));
 		} catch (Exception e) {
 			// If anything goes wrong reading the token null is returned.
