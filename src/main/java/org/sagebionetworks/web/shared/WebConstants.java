@@ -211,9 +211,7 @@ public class WebConstants {
 	
 	
 	public static final String GETTING_STARTED = "GettingStarted";
-	public static final String R_CLIENT = "RClient";
-	public static final String PYTHON_CLIENT = "PythonClient";
-	public static final String COMMAND_LINE_CLIENT = "CommandLineClient";
+	
 	public static final String FORMATTING_GUIDE = "FormattingGuide";
 	public static final String CHALLENGE_PARTICIPATION_INFO = "ChallengeParticipationInfo";
 	
