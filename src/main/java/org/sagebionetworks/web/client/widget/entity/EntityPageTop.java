@@ -160,7 +160,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		filesTab.setEntitySelectedCallback(getEntitySelectedCallback(EntityArea.FILES));
 		tablesTab.setEntitySelectedCallback(getEntitySelectedCallback(EntityArea.TABLES));
 		dockerTab.setEntitySelectedCallback(getEntitySelectedCallback(EntityArea.DOCKER));
-
+		
 		// lazy init tabs, and show project information (if set)
 		wikiTab.setTabClickedCallback(tab -> {
 			area = EntityArea.WIKI;
@@ -215,7 +215,24 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
 		configureProject();
 	}
-
+	
+	public void initDefaultTabPlaces() {
+		//initialize each tab place
+		if (projectBundle != null) {
+			String projectName = projectBundle.getEntity().getName();
+			String projectId = projectBundle.getEntity().getId();
+			Long versionNumber = null;
+			String areaToken = null;
+			
+			wikiTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.WIKI, areaToken));	
+			filesTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.FILES, areaToken));
+			tablesTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.TABLES, areaToken));
+			adminTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.ADMIN, areaToken));
+			discussionTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.DISCUSSION, areaToken));
+			dockerTab.asTab().setEntityNameAndPlace(projectName, new Synapse(projectId, versionNumber, EntityArea.DOCKER, areaToken));
+		}
+	}
+	
 	public void configureProject() {
 		view.setLoadingVisible(true);
 		hideTabs();
@@ -230,6 +247,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				// by default, all tab entity bundles point to the project entity bundle
 				projectBundle = filesEntityBundle = tablesEntityBundle = dockerEntityBundle = bundle;
 				projectMetadata.configure(projectBundle, null, projectActionMenu);
+				
+				initDefaultTabPlaces();
 				initAreaToken();
 				showSelectedTabs();
 				configureEntity(entity.getId(), filesVersionNumber);
