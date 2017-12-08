@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.file;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -21,7 +20,6 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
@@ -33,11 +31,13 @@ import junit.framework.Assert;
 public class FileTitleBarTest {
 		
 	FileTitleBar fileTitleBar;
+	@Mock
 	FileTitleBarView mockView;
-	AuthenticationController mockAuthController;
-	
+	@Mock
 	EntityBundle mockBundle;
+	@Mock
 	GlobalApplicationState mockGlobalAppState;
+	@Mock
 	org.sagebionetworks.repo.model.FileEntity mockFileEntity;
 	S3FileHandle handle;
 	Long synStorageLocationId = 1L;
@@ -51,12 +51,7 @@ public class FileTitleBarTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		mockView = mock(FileTitleBarView.class);
-		mockAuthController = mock(AuthenticationController.class);
-		mockGlobalAppState = mock(GlobalApplicationState.class);
-		fileTitleBar = new FileTitleBar(mockView, mockAuthController, mockGlobalAppState, mockFileDownloadButton);
-		mockBundle = mock(EntityBundle.class);
-		mockFileEntity = mock(org.sagebionetworks.repo.model.FileEntity.class);
+		fileTitleBar = new FileTitleBar(mockView, mockGlobalAppState, mockFileDownloadButton);
 		Mockito.when(mockFileEntity.getId()).thenReturn("syn123");
 		Mockito.when(mockFileEntity.getName()).thenReturn("syn123");
 		Mockito.when(mockFileEntity.getDataFileHandleId()).thenReturn(DATA_FILE_HANDLE_ID);
@@ -71,7 +66,6 @@ public class FileTitleBarTest {
 		handle.setStorageLocationId(synStorageLocationId);
 		fileHandles.add(handle);
 		Mockito.when(mockBundle.getFileHandles()).thenReturn(fileHandles);
-		verify(mockView).setPresenter(fileTitleBar);
 		verify(mockView).setFileDownloadButton(any(Widget.class));
 	}
 	

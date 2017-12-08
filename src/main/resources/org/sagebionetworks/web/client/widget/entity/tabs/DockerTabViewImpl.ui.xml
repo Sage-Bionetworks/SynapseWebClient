@@ -11,7 +11,7 @@
 		</bh:Div>
 		<b:Column size="XS_12">
 			<g:SimplePanel ui:field="dockerRepoListWidgetContainer"/>
-			<g:SimplePanel addStyleNames="margin-top-15" ui:field="dockerRepoWidgetContainer"/>
+			<g:SimplePanel ui:field="dockerRepoWidgetContainer"/>
 		</b:Column>
 	</b:Row>
 </ui:UiBinder>
