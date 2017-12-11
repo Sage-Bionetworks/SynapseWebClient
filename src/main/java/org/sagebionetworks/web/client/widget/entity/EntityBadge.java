@@ -7,6 +7,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
+import static org.sagebionetworks.repo.model.EntityBundle.RESTRICTION_INFORMATION;
 
 import java.util.List;
 
@@ -95,7 +96,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	}
 	
 	public void getEntityBundle() {
-		int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL | THREAD_COUNT;
+		int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL | THREAD_COUNT | RESTRICTION_INFORMATION;
 		jsClient.getEntityBundle(entityHeader.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
