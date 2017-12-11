@@ -132,6 +132,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
+import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererCancelControl;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
@@ -580,4 +581,5 @@ public interface PortalGinInjector extends Ginjector {
 	PDFPreviewWidget getPDFPreviewWidget();
 	HtmlPreviewWidget getHtmlPreviewWidget();
 	NbConvertPreviewWidget getNbConvertPreviewWidget();
+	S3DirectLoginDialog getS3DirectLoginDialog();
 }

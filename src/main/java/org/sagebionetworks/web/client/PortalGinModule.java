@@ -378,6 +378,8 @@ import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButtonView;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButtonViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
+import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialogImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
@@ -1436,5 +1438,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SynapseJavascriptFactory.class).in(Singleton.class);
 		
 		bind(HtmlPreviewView.class).to(HtmlPreviewViewImpl.class);
+		bind(S3DirectLoginDialog.class).to(S3DirectLoginDialogImpl.class);
 	}
 }
