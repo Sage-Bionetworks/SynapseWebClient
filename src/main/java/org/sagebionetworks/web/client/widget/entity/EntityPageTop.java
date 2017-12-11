@@ -214,13 +214,14 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 
 		//note: the files/tables/wiki/discussion/docker tabs rely on the project bundle, so they are configured later
 		configureProject();
+		initDefaultTabPlaces();
 	}
 	
 	public void initDefaultTabPlaces() {
 		//initialize each tab place
-		if (projectBundle != null) {
-			String projectName = projectBundle.getEntity().getName();
-			String projectId = projectBundle.getEntity().getId();
+		if (projectHeader != null) {
+			String projectName = projectHeader.getName();
+			String projectId = projectHeader.getId();
 			Long versionNumber = null;
 			String areaToken = null;
 			
@@ -248,7 +249,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				projectBundle = filesEntityBundle = tablesEntityBundle = dockerEntityBundle = bundle;
 				projectMetadata.configure(projectBundle, null, projectActionMenu);
 				
-				initDefaultTabPlaces();
 				initAreaToken();
 				showSelectedTabs();
 				configureEntity(entity.getId(), filesVersionNumber);
