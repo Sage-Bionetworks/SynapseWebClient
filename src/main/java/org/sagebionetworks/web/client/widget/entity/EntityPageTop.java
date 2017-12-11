@@ -577,6 +577,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			CallbackP<String> wikiReloadHandler = new CallbackP<String>(){
 				@Override
 				public void invoke(String wikiPageId) {
+					// a new wiki page has been loaded.
+					// update the tab link.  Note that WikiSubpageNavigationTree will push the link into the history.
+					Entity project = projectBundle.getEntity();
+					wikiTab.asTab().setEntityNameAndPlace(project.getName(), new Synapse(project.getId(), null, EntityArea.WIKI, wikiPageId));
+					// also update the action menu to target the correct wiki page.
 					entityActionController.configure(entityActionMenu, projectBundle, true, wikiPageId, area, entityUpdateHandler);
 				}
 			};
