@@ -78,6 +78,7 @@ public class Tab implements TabView.Presenter {
 		this.place = place;
 		this.entityName = entityName;
 		updatePageTitle();
+		view.updateHref(place);
 	}
 	
 	public void showTab() {
