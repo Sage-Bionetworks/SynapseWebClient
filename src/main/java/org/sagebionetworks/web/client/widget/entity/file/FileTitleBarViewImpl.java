@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
@@ -24,7 +25,6 @@ import com.google.inject.Inject;
 
 public class FileTitleBarViewImpl extends Composite implements FileTitleBarView {
 
-	private Presenter presenter;
 	private Md5Link md5Link;
 	private FavoriteWidget favoriteWidget;
 	
@@ -52,7 +52,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	SpanElement externalUrl;
 	@UiField
-	Heading entityName;
+	Text entityName;
 	@UiField
 	Span fileDownloadButtonContainer;
 	@UiField
@@ -126,11 +126,6 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	public Widget asWidget() {
 		return this;
 	}	
-
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
 		
 	@Override
 	public void showErrorMessage(String message) {

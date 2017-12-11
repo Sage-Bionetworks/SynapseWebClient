@@ -614,8 +614,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    ul:     [],
 				    video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width']
 				},
-				stripIgnoreTagBody: ['script'],  // the script tag is a special case, we need
-				allowCommentTag: true,
+				stripIgnoreTagBody: true,  // filter out all tags not in the whitelist
+				allowCommentTag: false,
+				css: false,
 				onIgnoreTag: function (tag, html, options) {
 					if (tag === '!doctype') {
 				      // do not filter doctype

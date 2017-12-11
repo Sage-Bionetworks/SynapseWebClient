@@ -32,7 +32,7 @@ public class TableEntityListGroupItem extends ListGroupItem {
 
 	static final DateTimeFormat DATE_FORMAT = DateTimeFormat.getFormat(PredefinedFormat.DATE_TIME_SHORT);
 	
-	TableEntityListGroupItem(HeadingSize size, EntityHeader header, ClickHandler clickHandler){
+	TableEntityListGroupItem(HeadingSize size, EntityHeader header, final ClickHandler clickHandler){
 		addStyleName("padding-10");
 		Heading iconHeading = new Heading(HeadingSize.H3);
 		iconHeading.setPull(Pull.LEFT);
@@ -42,8 +42,12 @@ public class TableEntityListGroupItem extends ListGroupItem {
 		
 		Heading heading = new Heading(size);
 		Anchor anchor = new Anchor();
+		anchor.setHref("#!Synapse:"+header.getId());
 		anchor.setText(header.getName());
-		anchor.addClickHandler(clickHandler);
+		anchor.addClickHandler(event -> {
+			event.preventDefault();
+			clickHandler.onClick(event);
+		});
 		heading.add(anchor);
 		heading.addStyleName("displayInline");
 		
@@ -72,16 +76,11 @@ public class TableEntityListGroupItem extends ListGroupItem {
 				synIdTextBox.selectAll();
 			}
 		});
-		anchor = new Anchor("#!Synapse:"+header.getId());
-		anchor.setTarget("_blank");
-		anchor.setIcon(IconType.EXTERNAL_LINK);
-		anchor.addStyleName("margin-left-10 moveup-2");
 		
 		Div div = new Div();
 		div.add(new ClearFix());
 		div.add(iconHeading);
 		div.add(heading);
-		div.add(anchor);
 		div.add(synIdTextBox);
 //		div.add(createdOnDiv);
 		this.add(div); 

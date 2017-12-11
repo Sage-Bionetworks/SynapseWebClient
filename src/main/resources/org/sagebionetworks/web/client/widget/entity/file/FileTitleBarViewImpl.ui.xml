@@ -10,12 +10,12 @@
 
 	<g:HTMLPanel ui:field="panel">
 		<g:HTMLPanel ui:field="fileFoundContainer">
-			<div>
-			 	<b:Heading size="H2" addStyleNames="displayInline"><b:Icon ui:field="entityIcon" addStyleNames="lightGreyText" type="FILE"/></b:Heading>
-			 	<b:Heading size="H2" ui:field="entityName" addStyleNames="displayInline"/>
-			 	<b:Heading size="H2" addStyleNames="displayInline margin-right-10"><g:SimplePanel ui:field="favoritePanel"/></b:Heading>
-			 	<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="moveup-5"/>
-			</div>
+			<b:Heading size="H2" addStyleNames="displayInlineBlock">
+			 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText margin-right-5" type="FILE"/>
+			 	<bh:Text ui:field="entityName" />
+			 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5 margin-right-10"/>
+			</b:Heading>
+			<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="moveup-5"/>
 			<g:HTMLPanel ui:field="fileNameContainer">
 				<span class="boldText">Download file as:</span>
 				<span ui:field="fileName"/>

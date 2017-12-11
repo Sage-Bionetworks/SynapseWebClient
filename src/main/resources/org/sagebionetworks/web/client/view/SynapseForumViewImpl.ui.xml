@@ -7,8 +7,6 @@
 
 	<bh:Div>
 		<bh:Div addStyleNames="min-height-200 margin-top-30 margin-10">
-			<bh:Div ui:field="synAlertContainer" />
-			<bh:Div ui:field="wikiContainer" />
 			<bh:Div ui:field="forumWidgetContainer" />
 		</bh:Div>
 	</bh:Div>
