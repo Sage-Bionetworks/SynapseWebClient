@@ -95,15 +95,19 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	
 	public void configure(final EntityBundle bundle) {
 		view.clear();
-		jsClient.getRestrictionInformation(bundle.getEntity().getId(), RestrictableObjectType.ENTITY, new AsyncCallback<RestrictionInformationResponse>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-			public void onSuccess(RestrictionInformationResponse restrictionInformation) {
-				configure(bundle, restrictionInformation);
-			};
-		});
+		if (bundle.getRestrictionInformation() != null) {
+			configure(bundle, bundle.getRestrictionInformation());
+		} else {
+			jsClient.getRestrictionInformation(bundle.getEntity().getId(), RestrictableObjectType.ENTITY, new AsyncCallback<RestrictionInformationResponse>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+				}
+				public void onSuccess(RestrictionInformationResponse restrictionInformation) {
+					configure(bundle, restrictionInformation);
+				};
+			});
+		}
 	}
 	
 	public void configure(EntityBundle bundle, RestrictionInformationResponse restrictionInformation) {

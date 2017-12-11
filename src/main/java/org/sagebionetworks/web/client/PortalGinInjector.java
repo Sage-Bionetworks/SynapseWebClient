@@ -42,7 +42,6 @@ import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.AccessRequirementWidget;
@@ -132,6 +131,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
+import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererCancelControl;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
@@ -576,4 +576,5 @@ public interface PortalGinInjector extends Ginjector {
 	UploadTableModalWidget getUploadTableModalWidget();
 	AddExternalRepoModal getAddExternalRepoModal();
 	PDFPreviewWidget getPDFPreviewWidget();
+	S3DirectLoginDialog getS3DirectLoginDialog();
 }
