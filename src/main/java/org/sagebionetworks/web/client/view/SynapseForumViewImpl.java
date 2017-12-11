@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -13,13 +12,8 @@ import com.google.inject.Inject;
 public class SynapseForumViewImpl implements SynapseForumView {
 
 	@UiField
-	Div synAlertContainer;
-	@UiField
-	Div wikiContainer;
-	@UiField
 	Div forumWidgetContainer;
-	private Presenter presenter;
-
+	
 	Widget widget;
 
 	public interface SynapseForumViewImplUiBinder extends UiBinder<Widget, SynapseForumViewImpl> {}
@@ -37,27 +31,6 @@ public class SynapseForumViewImpl implements SynapseForumView {
 	@Override
 	public Widget asWidget() {
 		return widget;
-	}
-
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
-
-	@Override
-	public void setAlert(Widget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
-	}
-
-	@Override
-	public void showErrorMessage(String errorMessage) {
-		DisplayUtils.showErrorMessage(errorMessage);
-	}
-	@Override
-	public void setWikiWidget(Widget w) {
-		wikiContainer.clear();
-		wikiContainer.add(w);
 	}
 
 	@Override
