@@ -834,7 +834,7 @@ public class SynapseJavascriptClient {
 	
 	public FluentFuture<PaginatedTeamIds> getUserTeams(String userId, boolean isAscendingOrder, String nextPageToken) {
 		String urlBuilder = getRepoServiceUrl() + USER + "/" + userId + TEAM + "/id?" + 
-				ASCENDING_PARAM + Boolean.toString(isAscendingOrder);
+				ASCENDING_PARAM + Boolean.toString(isAscendingOrder) + "&sort=TEAM_NAME";
 		if (nextPageToken != null) {
 			urlBuilder += "&" + NEXT_PAGE_TOKEN_PARAM + nextPageToken;
 		}

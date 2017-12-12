@@ -61,7 +61,6 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.Window;
@@ -677,7 +676,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						teamNextPageToken = paginatedTeamIds.getNextPageToken();
 						List<String> teamIds = paginatedTeamIds.getTeamIds();
 						boolean isTeams = teamIds.size() > 0;
-						loadMoreTeamsWidgetContainer.setIsMore(isTeams);
+						loadMoreTeamsWidgetContainer.setIsMore(teamNextPageToken != null);
 						view.setTeamsFilterVisible(isTeams);
 						if (isTeams) {
 							addTeams(teamIds);
