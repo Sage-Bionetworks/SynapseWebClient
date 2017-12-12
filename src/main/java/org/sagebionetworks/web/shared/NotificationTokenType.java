@@ -11,7 +11,8 @@ import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 public enum NotificationTokenType  {
 	EmailValidation(EmailValidationSignedToken.class),
 	NewUser(NewUserSignedToken.class),
-	// If any of the following values are renamed, please modify the corresponding constants in ServiceConstants in PLFM
+	// If any of the following values are renamed, please modify the corresponding constants in
+	// org.sagebionetworks.repo.model.ServiceConstants (PLFM)
 	JoinTeam(JoinTeamSignedToken.class),
 	Settings(NotificationSettingsSignedToken.class),
 	EmailInvitation(MembershipInvtnSignedToken.class);
