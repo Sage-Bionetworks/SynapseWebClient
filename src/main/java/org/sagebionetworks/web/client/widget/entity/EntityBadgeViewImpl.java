@@ -7,8 +7,11 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
@@ -77,13 +80,15 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Icon unLinkIcon;
 	Callback onAttachCallback;
 	Anchor entityAnchor;
-	
+	PlaceChanger placeChanger;
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
 			final SynapseJSNIUtils synapseJSNIUtils,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			GlobalApplicationState globalAppState) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		initWidget(uiBinder.createAndBindUi(this));
+		this.placeChanger = globalAppState.getPlaceChanger();
 		idField.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -132,6 +137,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			entityAnchor.setText(entityHeader.getName());
 			entityAnchor.addStyleName("link");
 			entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
+			entityAnchor.addClickHandler(event -> {
+				event.preventDefault();
+				placeChanger.goTo(new Synapse(entityHeader.getId()));
+			});
 			
 			ClickHandler clickHandler = new ClickHandler() {
 				@Override
