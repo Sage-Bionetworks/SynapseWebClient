@@ -9,10 +9,11 @@ import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 
 public enum NotificationTokenType  {
-	JoinTeam(JoinTeamSignedToken.class),
-	NewUser(NewUserSignedToken.class),
-	Settings(NotificationSettingsSignedToken.class),
 	EmailValidation(EmailValidationSignedToken.class),
+	NewUser(NewUserSignedToken.class),
+	// If any of the following values are renamed, please modify the corresponding constants in ServiceConstants in PLFM
+	JoinTeam(JoinTeamSignedToken.class),
+	Settings(NotificationSettingsSignedToken.class),
 	EmailInvitation(MembershipInvtnSignedToken.class);
 
 	public final Class<? extends SignedTokenInterface> classType;

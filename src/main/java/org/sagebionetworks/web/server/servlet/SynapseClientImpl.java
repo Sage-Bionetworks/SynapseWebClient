@@ -1821,11 +1821,13 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	public static String getTeamEndpoint(String hostPageBaseURL) {
 		return hostPageBaseURL + "#!Team:";
 	}
-	
+
+	// If this method is modified, please also modify ServiceConstants.SIGNED_TOKEN_ENDPOINT in PLFM
 	public static String getNotificationEndpoint(NotificationTokenType type, String hostPageBaseURL) {
 		return hostPageBaseURL + "#!SignedToken:"+ type.toString() + "/";
 	}
-	
+
+	// If this method is modified, please also modify ServiceConstants.CHALLENGE_ENDPOINT in PLFM
 	public static String getChallengeEndpoint(String hostPageBaseURL) {
 		return hostPageBaseURL + "#!Synapse:";
 	}
