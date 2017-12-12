@@ -6,12 +6,12 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
-	<g:HTMLPanel>
-		<h2 style="margin-bottom: 0px;" class="displayInlineBlock margin-right-5">
-		 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText" type="FOLDER"/>
+	<bh:Div>
+		<b:Heading size="H2" addStyleNames="displayInlineBlock margin-right-5 margin-bottom-0-imp">
+		 	<b:Icon ui:field="entityIcon" addStyleNames="margin-right-5 lightGreyText" type="FOLDER"/>
 		 	<bh:Span ui:field="fileName"/>
-		 	<g:SimplePanel ui:field="favoritePanel"/>
-		</h2>
+		 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5"/>
+		</b:Heading>
 		<bh:Span ui:field="containerHelpContainer"/>
-	</g:HTMLPanel>
+	</bh:Div>
 </ui:UiBinder>
