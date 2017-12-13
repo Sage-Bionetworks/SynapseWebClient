@@ -2,7 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.header;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -38,11 +38,11 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.amplitude.HeapSDK;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidget;
-import org.sagebionetworks.web.client.widget.mixpanel.MixPanelSdk;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -67,13 +67,13 @@ public class HeaderTest {
 	@Mock
 	PendoSdk mockPendoSdk;
 	@Mock
-	MixPanelSdk mockMixPanelSdk;
-	@Mock
 	UserSessionData mockUserSessionData;
 	@Mock
 	UserProfile mockUserProfile;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	HeapSDK mockHeapSdk;
 	
 	@Before
 	public void setup(){
@@ -87,7 +87,7 @@ public class HeaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget, mockPendoSdk, mockMixPanelSdk);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget, mockPendoSdk, mockHeapSdk);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
@@ -273,7 +273,7 @@ public class HeaderTest {
 		verify(mockView).setSearchVisible(true);
 		
 		verify(mockPendoSdk).initialize(userId, userName + SYNAPSE_ORG);
-		verify(mockMixPanelSdk).initialize(userId, userName + SYNAPSE_ORG);
+		verify(mockHeapSdk).initialize(userId);
 	}
 	
 
@@ -287,6 +287,6 @@ public class HeaderTest {
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
 		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);
-		verify(mockMixPanelSdk).initialize(ANONYMOUS, N_A);
+		verify(mockHeapSdk, never()).initialize(anyString());
 	}
 }
