@@ -2,22 +2,17 @@ package org.sagebionetworks.web.unitclient.widget.user;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.TeamBadgeView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -39,8 +34,6 @@ public class TeamBadgeTest {
 	String principalId = "id1";
 	int max = 10;
 	@Mock
-	AuthenticationController mockAuthController;
-	@Mock
 	ClickHandler mockClickHandler;
 	
 	@Before
@@ -50,7 +43,7 @@ public class TeamBadgeTest {
 		team.setName("name");
 		team.setId(principalId);
 		mockView = mock(TeamBadgeView.class);
-		badge = new TeamBadge(mockView, mockSynapseJavascriptClient, mockAuthController);
+		badge = new TeamBadge(mockView, mockSynapseJavascriptClient);
 	}
 	
 	@Test

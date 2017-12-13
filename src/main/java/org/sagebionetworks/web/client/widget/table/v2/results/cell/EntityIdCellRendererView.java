@@ -8,7 +8,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 public interface EntityIdCellRendererView extends IsWidget, SupportsLazyLoadInterface {
 	void setLinkText(String text);
-	void setLinkHref(String href);
+	void setEntityId(String entityId);
 	void setClickHandler(ClickHandler clickHandler);
 	void setIcon(IconType iconType);
 	void showLoadingIcon();

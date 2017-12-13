@@ -5,8 +5,11 @@ import java.util.Date;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Synapse;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -36,28 +39,28 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	
 	Widget widget;
 	DateTimeUtils dateTimeUtils;
+	String projectId;
 	@Inject
 	public ProjectBadgeViewImpl(final Binder uiBinder,
 			SynapseJSNIUtils synapseJSNIUtils,
 			SageImageBundle sageImageBundle,
-			DateTimeUtils dateTimeUtils
+			DateTimeUtils dateTimeUtils,
+			GlobalApplicationState globalAppState
 			) {
 		widget = uiBinder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
 		this.dateTimeUtils = dateTimeUtils;
+		anchor.addClickHandler(event -> {
+			event.preventDefault();
+			globalAppState.getPlaceChanger().goTo(new Synapse(projectId));
+		});
 	}
 	
 	@Override
-	public void setProject(String projectName, String href) {
-		isPopoverInitialized = false;
+	public void configure(String projectName, String projectId, String tooltip) {
 		anchor.setText(projectName);
-		anchor.setHref(href);
-	}
-	
-	@Override
-	public void configure(String projectName, String href, String tooltip) {
-		anchor.setText(projectName);
-		anchor.setHref(href);
+		this.projectId = projectId;
+		anchor.setHref(DisplayUtils.getSynapseHistoryToken(projectId));
 		this.tooltip.setTitle(tooltip);
 	}
 	

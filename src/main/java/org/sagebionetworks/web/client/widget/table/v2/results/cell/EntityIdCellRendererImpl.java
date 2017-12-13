@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
@@ -44,9 +43,8 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 		if (entityName == null && entityId != null) {
 			view.showLoadingIcon();
 			String requestEntityId = entityId.toLowerCase().startsWith("syn") ? entityId : "syn"+entityId;
-			if (customClickHandler == null) {
-				view.setLinkHref(Synapse.getHrefForDotVersion(requestEntityId));	
-			} else {
+			view.setEntityId(requestEntityId);
+			if (customClickHandler != null) {
 				view.setClickHandler(customClickHandler);
 			}
 			

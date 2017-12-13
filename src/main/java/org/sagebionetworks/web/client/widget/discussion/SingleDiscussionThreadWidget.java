@@ -270,7 +270,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			view.setUnpinIconVisible(isCurrentUserModerator && isPinned);
 			view.setPinIconVisible(isCurrentUserModerator && !isPinned);
 			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
-			view.setThreadLink(TopicUtils.buildThreadLink(projectId, threadId));
 		}
 		configureActionMenu();
 	}

@@ -76,7 +76,7 @@ public class EntityIdCellRendererImplTest {
 		verify(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		verify(mockView).setIcon(any(IconType.class));
 		verify(mockView).setLinkText(PROJECT_NAME);
-		verify(mockView).setLinkHref("#!Synapse:syn987654");
+		verify(mockView).setEntityId("syn"+entityId);
 		verify(mockView, never()).setClickHandler(any(ClickHandler.class));
 		
 		//verify that attempting to load data again is a no-op
@@ -94,7 +94,7 @@ public class EntityIdCellRendererImplTest {
 		
 		simulateInView();
 		verify(mockView).showLoadingIcon();
-		verify(mockView, never()).setLinkHref(anyString());
+		verify(mockView).setEntityId("syn"+entityId);
 		verify(mockView).setClickHandler(mockClickHandler);
 		
 		//verify that attempting to load data again is a no-op

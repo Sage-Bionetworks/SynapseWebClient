@@ -1,13 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -177,10 +172,9 @@ public class ProjectBadgeTest {
 		String projectName = "rosebud";
 		testProject.setName(projectName);
 		setupEntity(testProject, null);
-		ArgumentCaptor<String> hrefCaptor = ArgumentCaptor.forClass(String.class);
-		verify(mockView).configure(eq(projectName), hrefCaptor.capture(), anyString());
-		String href = hrefCaptor.getValue();
-		assertTrue(href.contains("#!Synapse:"));
-		assertTrue(href.contains(entityId));
+		ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
+		verify(mockView).configure(eq(projectName), stringCaptor.capture(), anyString());
+		String projectId = stringCaptor.getValue();
+		assertEquals(entityId, projectId);
 	}
 }
