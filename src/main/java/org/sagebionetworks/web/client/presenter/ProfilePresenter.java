@@ -664,6 +664,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			myTeamsWidget.asWidget().removeFromParent();	
 		}
 		loadMoreTeamsWidgetContainer.add(myTeamsWidget.asWidget());
+		view.addMyTeamProjectsFilter();
 		getMoreTeams();
 	}
 	
@@ -702,7 +703,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				new FutureCallback<List<Team>>() {
 					@Override
 					public void onSuccess(List<Team> teams) {
-						view.addMyTeamProjectsFilter();
 						for (Team team: teams) {
 							// requests will always be 0 or greater
 							view.addTeamsFilterTeam(team);
