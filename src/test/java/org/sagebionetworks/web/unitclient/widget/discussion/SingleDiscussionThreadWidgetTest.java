@@ -210,7 +210,6 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).setDeleteIconVisible(false);
 		verify(mockView).setEditIconVisible(false);
 		verify(mockView).setEditedLabelVisible(false);
-		verify(mockView).setThreadLink(anyString());
 		verify(mockView).setPinIconVisible(false);
 		verify(mockView).setUnpinIconVisible(false);
 		verify(mockView).setRefreshAlert(any(Widget.class));
@@ -307,7 +306,6 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView, never()).setDeleteIconVisible(false);
 		verify(mockView, never()).setEditIconVisible(false);
 		verify(mockView).setEditedLabelVisible(false);
-		verify(mockView, never()).setThreadLink(anyString());
 		verify(mockView, never()).setPinIconVisible(false);
 		verify(mockView, never()).setUnpinIconVisible(false);
 		verify(mockView).setRefreshAlert(any(Widget.class));

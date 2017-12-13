@@ -1,10 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -35,46 +33,38 @@ public class ChallengeBadgeTest {
 		testChallengeBundle.setProjectName(testProjectName);
 	}
 	
-	@Test
-	public void testSetPresenter() {
-		widget.configure(testChallengeBundle);
-		verify(mockView).setPresenter(widget);
-	}
-	
-	private void verifyNoHrefSet() {
-		verify(mockView, never()).setHref(anyString());
+	private void verifyNoProjectIdSet() {
+		verify(mockView, never()).setProjectId(anyString());
 	}
 	
 	/**
 	 * Verifies that setHref is called, and returns the value passed to the view
 	 * @return
 	 */
-	private String verifyHref() {
+	private String verifyProjectId() {
 		ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-		verify(mockView).setHref(stringCaptor.capture());
+		verify(mockView).setProjectId(stringCaptor.capture());
 		return stringCaptor.getValue();
 	}
 	
 	@Test
 	public void testConfigure() {
 		widget.configure(testChallengeBundle);
-		String href = verifyHref();
-		assertTrue(href.contains("#!Synapse:"));
-		assertTrue(href.contains(testProjectId));
-		verify(mockView).setPresenter(widget);
+		String projectId = verifyProjectId();
+		assertEquals(testProjectId, projectId);
 	}
 	
 	@Test
 	public void testConfigureNullChallenge() {
 		testChallengeBundle.setChallenge(null);
 		widget.configure(testChallengeBundle);
-		verifyNoHrefSet();
+		verifyNoProjectIdSet();
 	}
 	
 	@Test
 	public void testConfigureNullProjectId() {
 		testChallenge.setProjectId(null);
 		widget.configure(testChallengeBundle);
-		verifyNoHrefSet();
+		verifyNoProjectIdSet();
 	}
 }

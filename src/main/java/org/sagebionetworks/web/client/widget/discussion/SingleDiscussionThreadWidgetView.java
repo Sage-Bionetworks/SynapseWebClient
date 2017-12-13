@@ -54,8 +54,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setRepliesContainer(IsWidget container);
 	void showSuccess(String successTitle, String successMessage);
 
-	void setThreadLink(String link);
-
 	void setRefreshAlert(Widget w);
 
 	void removeRefreshAlert();
