@@ -5,6 +5,8 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
@@ -29,9 +31,10 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	Icon entityIcon;
 	@UiField
 	Anchor entityLink;
-	
+	String entityId;
+	ClickHandler customClickHandler;
 	@Inject
-	public EntityIdCellRendererViewImpl(Binder binder){
+	public EntityIdCellRendererViewImpl(Binder binder, GlobalApplicationState globalAppState){
 		w = binder.createAndBindUi(this);
 		w.addAttachHandler(new AttachEvent.Handler() {
 			@Override
@@ -39,6 +42,14 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 				if(event.isAttached()) {
 					onAttach();
 				}
+			}
+		});
+		entityLink.addClickHandler(event -> {
+			event.preventDefault();
+			if (customClickHandler != null) {
+				customClickHandler.onClick(event);
+			} else {
+				globalAppState.getPlaceChanger().goTo(new Synapse(entityId));
 			}
 		});
 	}
@@ -76,14 +87,16 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 		entityIcon.setType(iconType);
 		entityIcon.setVisible(true);
 	}
+	
 	@Override
-	public void setLinkHref(String href) {
-		entityLink.setHref(href);
+	public void setEntityId(String entityId) {
+		entityLink.setHref(Synapse.getHrefForDotVersion(entityId));
+		this.entityId = entityId;
 	}
 	
 	@Override
 	public void setClickHandler(ClickHandler clickHandler) {
-		entityLink.addClickHandler(clickHandler);
+		customClickHandler = clickHandler;
 	}
 	
 	@Override

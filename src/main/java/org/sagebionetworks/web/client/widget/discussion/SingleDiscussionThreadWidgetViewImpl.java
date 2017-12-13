@@ -72,7 +72,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@UiField
 	Span subscribersContainer;
 	
-	String threadLinkHref;
 	private Widget widget;
 	private SingleDiscussionThreadWidget presenter;
 
@@ -207,10 +206,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 		DisplayUtils.showInfo(title, message);
 	}
 
-	@Override
-	public void setThreadLink(String link){
-		threadLinkHref = link;
-	}
 	@Override
 	public void setSubscribeButtonWidget(Widget widget) {
 		subscribeButtonContainer.clear();

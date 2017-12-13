@@ -16,7 +16,6 @@ public interface ProjectBadgeView extends IsWidget {
 	 * @param presenter
 	 */
 	void setPresenter(Presenter presenter);
-	void setProject(String projectName, String href);
 	void setLastActivityText(String text);
 	void setLastActivityVisible(boolean isVisible);
 	String getSimpleDateString(Date date);
@@ -31,5 +30,5 @@ public interface ProjectBadgeView extends IsWidget {
 		String getProjectTooltip();
 	}
 
-	void configure(String projectName, String href, String tooltip);
+	void configure(String projectName, String projectId, String tooltip);
 }

@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandler;
@@ -11,7 +13,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresenter, HasNotificationUI, IsWidget {
+public class TeamBadge implements SynapseWidgetPresenter, HasNotificationUI, IsWidget {
 	
 	private TeamBadgeView view;
 	TeamAsyncHandler teamAsyncHandler;
@@ -23,7 +25,6 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 	public TeamBadge(TeamBadgeView view, TeamAsyncHandler teamAsyncHandler) {
 		this.view = view;
 		this.teamAsyncHandler = teamAsyncHandler;
-		view.setPresenter(this);
 	}
 	
 	public void setMaxNameLength(Integer maxLength) {

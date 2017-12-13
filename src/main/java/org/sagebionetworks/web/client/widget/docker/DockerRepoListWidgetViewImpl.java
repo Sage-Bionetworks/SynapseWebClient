@@ -4,6 +4,8 @@ import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -21,12 +23,13 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	Div membersContainer;
 
 	Widget widget;
-	
+	PlaceChanger placeChanger;
 	public interface Binder extends UiBinder<Widget, DockerRepoListWidgetViewImpl> {}
 
 	@Inject
-	public DockerRepoListWidgetViewImpl(Binder binder) {
+	public DockerRepoListWidgetViewImpl(Binder binder, GlobalApplicationState globalAppState) {
 		this.widget = binder.createAndBindUi(this);
+		placeChanger = globalAppState.getPlaceChanger();
 	}
 
 	@Override
@@ -36,7 +39,7 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 
 	@Override
 	public void addRepo(DockerRepository entity) {
-		dockerList.add(new DockerRepoListGroupItem(HeadingSize.H4, entity));
+		dockerList.add(new DockerRepoListGroupItem(HeadingSize.H4, entity, placeChanger));
 	}
 
 	@Override
