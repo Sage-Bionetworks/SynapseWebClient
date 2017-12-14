@@ -2,8 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -27,14 +25,6 @@ public class SynapseAlertViewImpl implements
 	Widget widget;
 	
 	@UiField
-	Modal jiraDialog;
-	@UiField
-	TextArea userReportField;
-	@UiField
-	Button okButton;
-	@UiField
-	Button cancelButton;
-	@UiField
 	Button reloadButton;
 	
 	@UiField
@@ -46,22 +36,18 @@ public class SynapseAlertViewImpl implements
 	Presenter presenter;
 	@UiField
 	Div loginWidgetContainer;
+	@UiField
+	Div jiraDialogContainer;
+	ClickHandler onCreateJiraIssue;
+	JiraDialog jiraDialog;
 	
 	@Inject
 	public SynapseAlertViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
-		okButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onCreateJiraIssue(userReportField.getText());
-			}
-		});
-		cancelButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				jiraDialog.hide();
-			}
-		});
+		onCreateJiraIssue = event -> {
+			presenter.onCreateJiraIssue(jiraDialog.getText());
+		};
+		
 		reloadButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -90,13 +76,20 @@ public class SynapseAlertViewImpl implements
 	
 	@Override
 	public void hideJiraDialog() {
-		jiraDialog.hide();
+		if (jiraDialog != null) {
+			jiraDialog.hideJiraDialog();	
+		}
 	}
 	
 	@Override
 	public void showJiraDialog(String errorMessage) {
+		if (jiraDialog == null) {
+			jiraDialog = new JiraDialog();
+			jiraDialog.addClickHandler(onCreateJiraIssue);
+			jiraDialogContainer.add(jiraDialog.asWidget());
+		}
 		widget.setVisible(true);
-		jiraDialog.show();
+		jiraDialog.showJiraDialog(errorMessage);
 	}
 	
 	@Override
