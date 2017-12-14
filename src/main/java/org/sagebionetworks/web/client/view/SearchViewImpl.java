@@ -10,12 +10,10 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -37,7 +35,6 @@ import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -104,6 +101,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private PortalGinInjector ginInjector;
 	DateTimeUtils dateTimeUtils;
 	private MarkdownIt markdownIt;
+	public static final String BUTTON_HEIGHT = "38px";
 	@Inject
 	public SearchViewImpl(SearchViewImplUiBinder binder, 
 			Header headerWidget,
@@ -196,8 +194,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		HTML totalFound = new HTML(searchResults.getFound() + " results found");
 		totalFound.setStyleName("small-italic margin-10");
 		currentFacets.add(totalFound);
-
-		currentFacets.setWidth("513px");
+		
 		for(final KeyValue facet : presenter.getAppliedFacets()) {
 			// Don't display the !link node_type facet
 			if("link".equals(facet.getValue()) && "node_type".equals(facet.getKey()))
@@ -217,7 +214,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 						presenter.removeFacet(facet.getKey(), facet.getValue());						
 					}
 				});
-				btn.addStyleName("margin-right-2");
+				btn.setHeight(BUTTON_HEIGHT);
+				btn.addStyleName("margin-right-5 margin-top-5");
 				btn.setPull(Pull.LEFT);
 				currentFacets.add(btn);
 				facetButtons.add(0, btn);				
@@ -266,8 +264,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 			} else {
 				btn.add(new Text(text));
 			}
-			btn.setHeight("38px");
-			btn.addStyleName("margin-right-2");
+			btn.setHeight(BUTTON_HEIGHT);
+			btn.addStyleName("margin-right-5 margin-top-5");
 			btn.setPull(Pull.LEFT);
 			currentFacets.add(btn);
 			facetButtons.add(btn);
