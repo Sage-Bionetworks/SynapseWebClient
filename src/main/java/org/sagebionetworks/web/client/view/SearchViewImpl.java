@@ -31,6 +31,7 @@ import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -100,6 +101,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	private PortalGinInjector ginInjector;
 	DateTimeUtils dateTimeUtils;
 	private MarkdownIt markdownIt;
+	public static final String BUTTON_HEIGHT = "38px";
 	@Inject
 	public SearchViewImpl(SearchViewImplUiBinder binder, 
 			Header headerWidget,
@@ -192,8 +194,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		HTML totalFound = new HTML(searchResults.getFound() + " results found");
 		totalFound.setStyleName("small-italic margin-10");
 		currentFacets.add(totalFound);
-
-		currentFacets.setWidth("513px");
+		
 		for(final KeyValue facet : presenter.getAppliedFacets()) {
 			// Don't display the !link node_type facet
 			if("link".equals(facet.getValue()) && "node_type".equals(facet.getKey()))
@@ -213,7 +214,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 						presenter.removeFacet(facet.getKey(), facet.getValue());						
 					}
 				});
-				btn.addStyleName("margin-right-2");
+				btn.setHeight(BUTTON_HEIGHT);
+				btn.addStyleName("margin-right-5 margin-top-5");
 				btn.setPull(Pull.LEFT);
 				currentFacets.add(btn);
 				facetButtons.add(0, btn);				
@@ -242,18 +244,28 @@ public class SearchViewImpl extends Composite implements SearchView {
 			}
 			facetNames.append(text);
 			facetNames.append(" ");
-			Button btn = new Button(text, IconType.TIMES, new ClickHandler() {				
-				@Override
-				public void onClick(ClickEvent event) {
-					// disable all buttons to allow only one click
-					for(Button btn : facetButtons) {
-						btn.setEnabled(false);
-					}
-					Window.scrollTo(0, 0);
-					presenter.removeFacet(facet.getKey(), facet.getValue());						
+			Button btn = new Button("", IconType.TIMES, event -> {				
+				// disable all buttons to allow only one click
+				for(Button facetButton : facetButtons) {
+					facetButton.setEnabled(false);
 				}
+				Window.scrollTo(0, 0);
+				presenter.removeFacet(facet.getKey(), facet.getValue());						
 			});
-			btn.addStyleName("margin-right-2");
+			if ("created_by".equalsIgnoreCase(facet.getKey())) {
+				UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
+				createdByBadge.configure(facet.getValue());
+				createdByBadge.setSize(BadgeSize.SMALLER);
+				createdByBadge.asWidget().addStyleName("movedown-6");
+				createdByBadge.setCustomClickHandler(event -> {
+					btn.click();
+				});
+				btn.add(createdByBadge);
+			} else {
+				btn.add(new Text(text));
+			}
+			btn.setHeight(BUTTON_HEIGHT);
+			btn.addStyleName("margin-right-5 margin-top-5");
 			btn.setPull(Pull.LEFT);
 			currentFacets.add(btn);
 			facetButtons.add(btn);
@@ -321,7 +333,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	@Override
 	public void clear() {
-		resultsPanel.clear();
 		narrowResultsPanel.setVisible(false);
 		currentFacetsPanel.setVisible(false);
 	}
