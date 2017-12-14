@@ -2,7 +2,6 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -29,10 +28,7 @@ import com.google.inject.Inject;
  *
  */
 public class FileHandleAssociationServlet extends HttpServlet {
-
-	private static Logger logger = Logger.getLogger(FileHandleAssociationServlet.class.getName());
 	private static final long serialVersionUID = 1L;
-
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	
 	/**
@@ -111,8 +107,8 @@ public class FileHandleAssociationServlet extends HttpServlet {
 			fha.setAssociateObjectId(objectId);
 			fha.setAssociateObjectType(FileHandleAssociateType.valueOf(objectType));
 			fha.setFileHandleId(fileHandleId);
-			URL resolvedUrl = client.getFileURL(fha);
-			response.sendRedirect(resolvedUrl.toString());
+			URL url = client.getFileURL(fha);
+			response.sendRedirect(response.encodeRedirectURL(url.toString()));
 		} catch (SynapseException e) {
 			//redirect to error place with an entry
 			LogEntry entry = new LogEntry();
