@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -162,21 +163,33 @@ public class SearchPresenterTest {
 		assertTrue(getFacet(facetName).isEmpty());
 		
 		searchPresenter.addTimeFacet(facetName, facetValue, "Yesterday");
-		verify(mockPlaceChanger).goTo(any(Search.class));
+
+		//When a new facet is added, we should:
+		// 1. Add the facet to the current search.
+		// 2. Clear existing search results.
+		// 3. Update the address bar to the new place. 
+		// 4. Execute the current search (that now has the new facet).
+
+		// 1
 		List<KeyValue> facetValues = getFacet(facetName);
 		assertEquals(1, facetValues.size());
 		assertEquals(facetValue, facetValues.get(0).getValue());
+		verify(mockView).clear(); // 2
+		verify(mockLoadMoreWidgetContainer).clear(); // 2
+		verify(mockGlobalApplicationState).pushCurrentPlace(any(Search.class)); // 3
+		verify(mockLoadMoreWidgetContainer).setIsProcessing(true); // 4
+		verify(mockSynapseClient).search(any(SearchQuery.class), any(AsyncCallback.class)); // 4
 		
 		//verify setting the time facet to another value clears the previous
 		facetValue = "2";
 		searchPresenter.addTimeFacet(facetName, facetValue, "Yesterday");
-		verify(mockPlaceChanger, times(2)).goTo(any(Search.class));
+		verify(mockSynapseClient, times(2)).search(any(SearchQuery.class), any(AsyncCallback.class)); // 4
 		facetValues = getFacet(facetName);
 		assertEquals(1, facetValues.size());
 		assertEquals(facetValue, facetValues.get(0).getValue());
 		
 		searchPresenter.removeFacetAndRefresh(facetName);
-		verify(mockPlaceChanger, times(3)).goTo(any(Search.class));
+		verify(mockSynapseClient, times(3)).search(any(SearchQuery.class), any(AsyncCallback.class)); // 4
 		assertTrue(getFacet(facetName).isEmpty());
 	}
 
