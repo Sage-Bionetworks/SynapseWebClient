@@ -107,8 +107,8 @@ public class FileHandleAssociationServlet extends HttpServlet {
 			fha.setAssociateObjectId(objectId);
 			fha.setAssociateObjectType(FileHandleAssociateType.valueOf(objectType));
 			fha.setFileHandleId(fileHandleId);
-			URL url = client.getFileURL(fha);
-			response.sendRedirect(response.encodeRedirectURL(url.toString()));
+			URL resolvedUrl = client.getFileURL(fha);
+			response.sendRedirect(resolvedUrl.toString());
 		} catch (SynapseException e) {
 			//redirect to error place with an entry
 			LogEntry entry = new LogEntry();
