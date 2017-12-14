@@ -10,10 +10,12 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -31,9 +33,11 @@ import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -242,17 +246,27 @@ public class SearchViewImpl extends Composite implements SearchView {
 			}
 			facetNames.append(text);
 			facetNames.append(" ");
-			Button btn = new Button(text, IconType.TIMES, new ClickHandler() {				
-				@Override
-				public void onClick(ClickEvent event) {
-					// disable all buttons to allow only one click
-					for(Button btn : facetButtons) {
-						btn.setEnabled(false);
-					}
-					Window.scrollTo(0, 0);
-					presenter.removeFacet(facet.getKey(), facet.getValue());						
+			Button btn = new Button("", IconType.TIMES, event -> {				
+				// disable all buttons to allow only one click
+				for(Button facetButton : facetButtons) {
+					facetButton.setEnabled(false);
 				}
+				Window.scrollTo(0, 0);
+				presenter.removeFacet(facet.getKey(), facet.getValue());						
 			});
+			if ("created_by".equalsIgnoreCase(facet.getKey())) {
+				UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
+				createdByBadge.configure(facet.getValue());
+				createdByBadge.setSize(BadgeSize.SMALLER);
+				createdByBadge.asWidget().addStyleName("movedown-6");
+				createdByBadge.setCustomClickHandler(event -> {
+					btn.click();
+				});
+				btn.add(createdByBadge);
+			} else {
+				btn.add(new Text(text));
+			}
+			btn.setHeight("38px");
 			btn.addStyleName("margin-right-2");
 			btn.setPull(Pull.LEFT);
 			currentFacets.add(btn);
@@ -321,7 +335,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	@Override
 	public void clear() {
-		resultsPanel.clear();
 		narrowResultsPanel.setVisible(false);
 		currentFacetsPanel.setVisible(false);
 	}
