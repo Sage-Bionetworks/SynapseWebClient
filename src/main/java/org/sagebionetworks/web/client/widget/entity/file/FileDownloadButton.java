@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -176,7 +177,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		
 		String directDownloadURL = null;
 		if (externalUrl == null)
-			directDownloadURL = DisplayUtils.createFileEntityUrl(jsniUtils.getBaseFileHandleUrl(), fileEntity.getId(), fileEntity.getVersionNumber(), false);
+			directDownloadURL = jsniUtils.getFileHandleAssociationUrl(fileEntity.getId(), FileHandleAssociateType.FileEntity, fileHandle.getId());
 		else {
 			if (externalUrl.toLowerCase().startsWith(WebConstants.SFTP_PREFIX)) {
 				//point to sftp proxy instead
