@@ -169,7 +169,11 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 	}
 	
 	private static native void connect(String parentId, String childId) /*-{
-		jsPlumbInstance.connect({source:parentId, target:childId, overlays:jsP_overlays	});
+		try {
+			jsPlumbInstance.connect({source:parentId, target:childId, overlays:jsP_overlays	});
+		} catch(err) {
+			console.log(err);
+		}
 	}-*/;
 	
 	/**
@@ -211,9 +215,13 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 			// chrome fix.
 			document.onselectstart = function () { return false; };
 			$wnd.jsPlumbDemo.init();
-			jsPlumbInstance.setRenderMode($wnd.jsPlumb.SVG);
-			jsPlumbInstance.setSuspendDrawing(true);
-			jsPlumbInstance.setContainer(containerId);
+			try {
+				jsPlumbInstance.setRenderMode($wnd.jsPlumb.SVG);
+				jsPlumbInstance.setSuspendDrawing(true);
+				jsPlumbInstance.setContainer(containerId);
+			} catch(err) {
+				console.log(err);
+			}
 		});
 		
 		
@@ -223,7 +231,11 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 	 * Call after connecting divs.
 	 */
 	private static native void afterJSPlumbLoad() /*-{
-		jsPlumbInstance.setSuspendDrawing(false, true);
+		try {
+			jsPlumbInstance.setSuspendDrawing(false, true);
+		} catch(err) {
+			console.log(err);
+		}
 	}-*/;
 	
 	@Override
