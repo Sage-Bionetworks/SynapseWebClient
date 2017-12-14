@@ -38,6 +38,7 @@ import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
 import org.sagebionetworks.repo.model.PaginatedIds;
+import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
@@ -129,6 +130,7 @@ public class SynapseJavascriptClient {
 	public static final String ENTITY_THREAD_COUNTS = ENTITY + THREAD_COUNTS;
 	public static final String STACK_STATUS = "/admin/synapse/status";
 	public static final String ATTACHMENT_HANDLES = "attachmenthandles";
+	
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	private static final String LOG = "/log";
@@ -166,6 +168,7 @@ public class SynapseJavascriptClient {
 	public static final String LIMIT_PARAMETER = "limit=";
 	private static final String NEXT_PAGE_TOKEN_PARAM = "nextPageToken=";
 	public static final String SKIP_TRASH_CAN_PARAM = "skipTrashCan";
+	private static final String ASCENDING_PARAM = "ascending=";
 	
 	public static final String COLUMN = "/column";
 	public static final String COLUMN_VIEW_DEFAULT = COLUMN + "/tableview/defaults/";
@@ -522,7 +525,7 @@ public class SynapseJavascriptClient {
 		return getFuture(cb -> doGet(finalUrl, OBJECT_TYPE.UserProfile, cb));
 	}
 	
-	public void listUserProfiles(List<String> userIds, final AsyncCallback<List<UserProfile>> callback) {
+	public void listUserProfiles(List<String> userIds, final AsyncCallback<List> callback) {
 		List<Long> userIdsLong = new ArrayList<>();
 		for (String userId : userIds) {
 			userIdsLong.add(Long.parseLong(userId));
@@ -530,7 +533,7 @@ public class SynapseJavascriptClient {
 		listUserProfilesFromUserIds(userIdsLong, callback);
 	}
 
-	private void listUserProfilesFromUserIds(List<Long> userIds, final AsyncCallback<List<UserProfile>> callback) {
+	private void listUserProfilesFromUserIds(List<Long> userIds, final AsyncCallback<List> callback) {
 		String url = getRepoServiceUrl() + USER_PROFILE_PATH;
 		IdList idList = new IdList();
 		idList.setList(userIds);
@@ -827,6 +830,27 @@ public class SynapseJavascriptClient {
 		entry.setLabel(getSynapseVersionInfo() + ": " + label + ": " + outputExceptionString);
 		entry.setMessage(gwt.getCurrentURL() + " : \n" + ex.getMessage());
 		return logError(entry);
+	}
+	
+	public FluentFuture<PaginatedTeamIds> getUserTeams(String userId, boolean isAscendingOrder, String nextPageToken) {
+		String urlBuilder = getRepoServiceUrl() + USER + "/" + userId + TEAM + "/id?" + 
+				ASCENDING_PARAM + Boolean.toString(isAscendingOrder) + "&sort=TEAM_NAME";
+		if (nextPageToken != null) {
+			urlBuilder += "&" + NEXT_PAGE_TOKEN_PARAM + nextPageToken;
+		}
+		final String url = urlBuilder;
+		return getFuture(cb -> doGet(url, OBJECT_TYPE.PaginatedTeamIds, cb));
+	}
+	
+	public FluentFuture<List<Team>> listTeams(List<String> teamIds) {
+		List<Long> teamIdsLong = new ArrayList<>();
+		for (String teamId : teamIds) {
+			teamIdsLong.add(Long.parseLong(teamId));
+		}
+		String url = getRepoServiceUrl() + TEAM + "List";
+		IdList idList = new IdList();
+		idList.setList(teamIdsLong);
+		return getFuture(cb -> doPost(url, idList, OBJECT_TYPE.ListWrapperTeam, cb));
 	}
 }
 

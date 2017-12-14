@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.PaginatedIds;
+import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
@@ -56,6 +57,7 @@ public class SynapseJavascriptFactory {
 		UserGroupHeaderResponsePage,
 		WikiPage,
 		ListWrapperUserProfile,
+		ListWrapperTeam,
 		UserGroupHeaderResponse,
 		UserBundle,
 		Count,
@@ -88,6 +90,7 @@ public class SynapseJavascriptFactory {
 		MembershipInvitation,
 		InviteeVerificationSignedToken,
 		ListWrapperColumnModel,
+		PaginatedTeamIds,
 		None
 	}
 
@@ -199,10 +202,20 @@ public class SynapseJavascriptFactory {
 			}
 
 			return list;
+		case ListWrapperTeam :
+			List<Team> teamList = new ArrayList<>();
+			JSONArrayAdapter jsonTeamArray = json.getJSONArray("list");
+			for (int i = 0; i < jsonTeamArray.length(); i++) {
+				JSONObjectAdapter jsonObject = jsonTeamArray.getJSONObject(i);
+				teamList.add(new Team(jsonObject));
+			}
+			return teamList;
 		case MembershipInvitation:
 			return new MembershipInvitation(json);
 		case InviteeVerificationSignedToken:
 			return new InviteeVerificationSignedToken(json);
+		case PaginatedTeamIds:
+			return new PaginatedTeamIds(json);
 		default:
 			throw new IllegalArgumentException("No match found for : "+ type);
 		}

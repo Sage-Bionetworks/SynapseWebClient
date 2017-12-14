@@ -39,7 +39,6 @@ import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -101,7 +100,6 @@ public class HomePresenterTest {
 				mockSynapseJSNIUtils
 				);
 		verify(mockView).setPresenter(homePresenter);
-		TeamListWidgetTest.setupUserTeams(mockSynapseClient);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		testSessionData = new UserSessionData();

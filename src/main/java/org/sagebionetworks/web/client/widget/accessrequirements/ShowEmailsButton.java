@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.PopupUtilsView;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.Button;
 
@@ -52,9 +51,9 @@ public class ShowEmailsButton implements IsWidget {
 	
 	public void onShowEmails() {
 		//get the profiles, to get the usernames
-		jsClient.listUserProfiles(userIds, new AsyncCallback<List<UserProfile>>() {
+		jsClient.listUserProfiles(userIds, new AsyncCallback<List>() {
 			@Override
-			public void onSuccess(List<UserProfile> userProfiles) {
+			public void onSuccess(List userProfiles) {
 				StringBuilder sb = new StringBuilder();
 				for (Iterator it = userProfiles.iterator(); it.hasNext();) {
 					UserProfile profile = (UserProfile) it.next();
