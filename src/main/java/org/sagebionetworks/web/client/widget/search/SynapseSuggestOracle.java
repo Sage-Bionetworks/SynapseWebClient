@@ -62,12 +62,6 @@ public class SynapseSuggestOracle extends SuggestOracle {
 				@Override
 				public void onSuccess(SynapseSuggestionBundle suggestionBundle) {
 					suggestBox.setSelectedSuggestion(null);
-					for (UserGroupSuggestion suggestion : suggestionBundle.getSuggestionBundle()) {
-						if (suggestion.getHeader().getUserName().equals(suggestBox.getText())) {
-							suggestBox.setSelectedSuggestion(suggestion);
-							break;
-						}
-					}
 					suggestBox.hideLoading();
 					if (suggestBox != null) {
 						suggestBox.updateFieldStateForSuggestions((int)suggestionBundle.getTotalNumberOfResults(), offset);

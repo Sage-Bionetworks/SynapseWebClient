@@ -33,7 +33,7 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	public SynapseSuggestBoxViewImpl(SynapseAlert synAlert) {
 		this.synAlert = synAlert;
 	}
-	
+
 	@Override
 	public void configure(SynapseSuggestOracle oracle) {
 		suggestBox = new SuggestBox(oracle, new TextBox(), new SynapseSuggestionDisplay());
