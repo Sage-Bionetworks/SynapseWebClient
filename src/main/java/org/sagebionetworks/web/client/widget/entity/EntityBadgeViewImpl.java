@@ -81,6 +81,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Callback onAttachCallback;
 	Anchor entityAnchor;
 	PlaceChanger placeChanger;
+	ClickHandler customClickHandler;
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
 			final SynapseJSNIUtils synapseJSNIUtils,
@@ -139,7 +140,11 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
 			entityAnchor.addClickHandler(event -> {
 				event.preventDefault();
-				placeChanger.goTo(new Synapse(entityHeader.getId()));
+				if (customClickHandler != null) {
+					customClickHandler.onClick(event);
+				} else {
+					placeChanger.goTo(new Synapse(entityHeader.getId()));	
+				}
 			});
 			
 			ClickHandler clickHandler = new ClickHandler() {
@@ -172,13 +177,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	
 	@Override
 	public void addClickHandler(final ClickHandler handler) {
-		entityAnchor.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				event.preventDefault();
-				handler.onClick(event);
-			}
-		});
+		customClickHandler = handler;
 	}
 	
 	@Override
