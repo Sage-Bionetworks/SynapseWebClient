@@ -99,7 +99,7 @@ public class WikiSubpageOrderEditorTree implements WikiSubpageOrderEditorTreeVie
 			}
 		}
 		
-		view.configure(overallRoot);
+		view.configure(overallRoot, wikiKey.getOwnerObjectId());
 		
 		SubpageOrderEditorTreeNode selectNode = id2node.get(selectWikiPageId);
 		if (selectNode != null) {
