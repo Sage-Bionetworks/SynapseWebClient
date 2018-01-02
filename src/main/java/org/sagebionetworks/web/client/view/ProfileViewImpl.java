@@ -10,15 +10,12 @@ import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
@@ -31,7 +28,6 @@ import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
-import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationIDCardViewImpl;
 
 import com.google.gwt.dom.client.DivElement;
@@ -213,6 +209,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement challengesLoadingUI;
 	@UiField 
 	Div profilePictureLoadingUI;
+	@UiField 
+	Div dashboardLoadingUI;
 	
 	@UiField
 	FlowPanel favoritesHelpPanel;
@@ -750,11 +748,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void showLoading() {
 		profilePictureLoadingUI.setVisible(true);
+		dashboardLoadingUI.setVisible(true);
 	}
 
 	@Override
 	public void hideLoading() {
 		profilePictureLoadingUI.setVisible(false);
+		dashboardLoadingUI.setVisible(false);
 	}
 	
 	@Override
@@ -1001,5 +1001,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setVerificationDetailsButtonVisible(boolean isVisible) {
 		verificationApprovedButton.setVisible(isVisible);
+	}
+	
+	@Override
+	public void open(String url) {
+		Window.open(url, "_self", "");	
 	}
 }

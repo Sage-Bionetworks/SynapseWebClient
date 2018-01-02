@@ -100,7 +100,7 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements
 		// Note: three-current-positions is used for position and company
 		OAuthRequest request = new OAuthRequest(
 				Verb.GET,
-				"http://api.linkedin.com/v1/people/~:(id,first-name,last-name,summary,industry,location:(name),three-current-positions)");
+				"http://api.linkedin.com/v1/people/~:(id,first-name,last-name,summary,industry,location:(name),positions)");
 		oAuthService.signRequest(accessToken, request);
 		Response response = request.send();
 		// parse the response
@@ -169,7 +169,6 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements
 		// sax parsing will work for this small xml string
 		UserProfile linkedInProfile = new UserProfile();
 		DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-
 		try {
 			DocumentBuilder db = dbf.newDocumentBuilder();
 			InputStream is = new ByteArrayInputStream(response.getBytes());
@@ -191,7 +190,7 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements
 						.item(0)).getElementsByTagName("name").item(0)
 						.getFirstChild().getNodeValue();
 				Element threeCurrentPositionsElement = (Element) doc
-						.getElementsByTagName("three-current-positions")
+						.getElementsByTagName("positions")
 						.item(0);
 				Element positionElement = (Element) threeCurrentPositionsElement
 						.getElementsByTagName("position").item(0);
