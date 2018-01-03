@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.user;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserProfile;
@@ -10,17 +12,18 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
-import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -44,11 +47,11 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	boolean useCachedImage;
 	private ClientCache clientCache;
 	public static final String[] COLORS = {"chocolate","black","firebrick","maroon","olive","limegreen","forestgreen","darkturquoise","teal","blue","navy","darkmagenta","purple", "stateblue","orangered","forestblue", "blueviolet"};
-	private LazyLoadHelper lazyLoadHelper;
 	private String principalId = null, username = null;
 	UserProfileAsyncHandler userProfileAsyncHandler;
 	private AdapterFactory adapterFactory;
-
+	private SynapseJavascriptClient jsClient;
+	
 	public static final ClickHandler DO_NOTHING_ON_CLICK = new ClickHandler() {
 		@Override
 		public void onClick(ClickEvent event) {
@@ -62,28 +65,21 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			GlobalApplicationState globalApplicationState,
 			SynapseJSNIUtils synapseJSNIUtils,
 			ClientCache clientCache,
-			LazyLoadHelper lazyLoadHelper,
 			UserProfileAsyncHandler userProfileAsyncHandler,
-			AdapterFactory adapterFactory) {
+			AdapterFactory adapterFactory,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.clientCache = clientCache;
-		this.lazyLoadHelper = lazyLoadHelper;
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		this.adapterFactory = adapterFactory;
+		this.jsClient = jsClient;
 		this.openNewWindow = false;
 		view.setPresenter(this);
 		view.setSize(BadgeSize.SMALL);
 		clearState();
-		Callback loadDataCallback = new Callback() {
-			@Override
-			public void invoke() {
-				loadBadge();
-			}
-		};
-		lazyLoadHelper.configure(loadDataCallback, view);
 	}
 	
 	public void setMaxNameLength(Integer maxLength) {
@@ -100,7 +96,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			return;
 		}
 		this.profile = profile;
-		lazyLoadHelper.setIsConfigured();
 		String displayName = DisplayUtils.getDisplayName(profile);
 		String shortDisplayName = maxNameLength == null ? displayName : DisplayUtils.stubStrPartialWord(displayName, maxNameLength); 
 		view.setDisplayName(displayName, shortDisplayName);
@@ -126,16 +121,34 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 
 	public void configurePicture() {
 		if (profile != null && profile.getProfilePicureFileHandleId() != null) {
-			String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getProfilePicureFileHandleId(), true);
-			if (!useCachedImage) {
-				url += DisplayUtils.getParamForNoCaching();
-			}
-			view.showCustomUserPicture(url);
+			jsClient.getProfilePicturePreviewUrl(profile.getOwnerId())
+			.addCallback(
+					new FutureCallback<String>() {
+						@Override
+						public void onSuccess(String url) {
+							if (!useCachedImage) {
+								url += DisplayUtils.getParamForNoCaching();
+							}
+							view.showCustomUserPicture(url);
+						}
+
+						@Override
+						public void onFailure(Throwable caught) {
+							synapseJSNIUtils.consoleError(caught.getMessage());
+							showDefaultPicture();
+						}
+					},
+					directExecutor()
+					);
 		} else {
-			view.setDefaultPictureLetter(getDefaultPictureLetter(profile));
-			view.setDefaultPictureColor(getDefaultPictureColor(profile));
-			view.showAnonymousUserPicture();
+			showDefaultPicture();
 		}
+	}
+	
+	public void showDefaultPicture() {
+		view.setDefaultPictureLetter(getDefaultPictureLetter(profile));
+		view.setDefaultPictureColor(getDefaultPictureColor(profile));
+		view.showAnonymousUserPicture();
 	}
 	
 	public String getDefaultPictureColor(UserProfile profile) {
@@ -182,7 +195,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		view.clear();
 		view.showLoading();
 		if (principalId != null && principalId.trim().length() > 0) {
-			lazyLoadHelper.setIsConfigured();			
+			loadBadge();			
 		} else {
 			view.showLoadError("Missing user ID");
 		}
@@ -200,7 +213,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			configure(principalId);	
 		} else {
 			this.username = username;
-			lazyLoadHelper.setIsConfigured();
+			loadBadge();
 		}
 	}
 	
