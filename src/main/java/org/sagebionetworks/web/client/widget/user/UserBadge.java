@@ -121,25 +121,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 
 	public void configurePicture() {
 		if (profile != null && profile.getProfilePicureFileHandleId() != null) {
-			jsClient.getProfilePicturePreviewUrl(profile.getOwnerId())
-				.addCallback(
-					new FutureCallback<String>() {
-						@Override
-						public void onSuccess(String url) {
-							if (!useCachedImage) {
-								url += DisplayUtils.getParamForNoCaching();
-							}
-							view.showCustomUserPicture(url);
-						}
-
-						@Override
-						public void onFailure(Throwable caught) {
-							synapseJSNIUtils.consoleError(caught.getMessage());
-							showDefaultPicture();
-						}
-					},
-					directExecutor()
-					);
+			view.showCustomUserPicture(jsClient.getProfilePicturePreviewUrl(profile.getOwnerId()));
 		} else {
 			showDefaultPicture();
 		}

@@ -870,9 +870,8 @@ public class SynapseJavascriptClient {
 		return getFuture(cb -> doPost(url, idList, OBJECT_TYPE.ListWrapperTeam, cb));
 	}
 	
-	public FluentFuture<String> getProfilePicturePreviewUrl(String ownerId) {
-		String url = getRepoServiceUrl() + USER_PROFILE_PATH+"/"+ownerId+PROFILE_IMAGE_PREVIEW+"?"+REDIRECT_PARAMETER+"false";
-		return getFuture(cb -> doGetString(url, cb));
+	public String getProfilePicturePreviewUrl(String ownerId) {
+		return getRepoServiceUrl() + USER_PROFILE_PATH+"/"+ownerId+PROFILE_IMAGE_PREVIEW+"?"+REDIRECT_PARAMETER+"true";
 	}
 }
 

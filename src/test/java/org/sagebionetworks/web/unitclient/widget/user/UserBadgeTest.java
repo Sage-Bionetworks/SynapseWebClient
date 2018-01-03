@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.user;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -11,7 +14,6 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -87,7 +89,7 @@ public class UserBadgeTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		when(mockSynapseJavascriptClient.getProfilePicturePreviewUrl(anyString())).thenReturn(getDoneFuture(PICTURE_URL));
+		when(mockSynapseJavascriptClient.getProfilePicturePreviewUrl(anyString())).thenReturn(PICTURE_URL);
 		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory, mockSynapseJavascriptClient);
 	}
 	
