@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -347,7 +347,9 @@ public class APITableWidgetTest {
 	
 	@Test
 	public void testCreateRenderersNull() throws JSONObjectAdapterException {
-		String[] columnNames = widget.getColumnNamesArray(getTestColumnNameSet());
+		Set<String> testSet = getTestColumnNameSet();
+		Map<String, List<String>> dataMap = widget.createColumnDataMap(testSet.iterator());
+		String[] columnNames = widget.getColumnNamesArray(dataMap);
 		APITableConfig newConfig = new APITableConfig(descriptor);
 		newConfig.setColumnConfigs(null);
 		widget.createRenderers(columnNames, newConfig, mockGinInjector);
@@ -357,7 +359,9 @@ public class APITableWidgetTest {
 
 	@Test
 	public void testCreateRenderersEmpty() throws JSONObjectAdapterException {
-		String[] columnNames = widget.getColumnNamesArray(getTestColumnNameSet());
+		Set<String> testSet = getTestColumnNameSet();
+		Map<String, List<String>> dataMap = widget.createColumnDataMap(testSet.iterator());
+		String[] columnNames = widget.getColumnNamesArray(dataMap);
 		APITableConfig newConfig = new APITableConfig(descriptor);
 		newConfig.setColumnConfigs(new ArrayList());
 		widget.createRenderers(columnNames, newConfig, mockGinInjector);
@@ -594,5 +598,11 @@ public class APITableWidgetTest {
 		
 		verify(mockCancelControlWidget, times(cancelRequestDivs.size())).configure(anyString());
 		verify(mockUserTeamBadge, times(userBadgeDivs.size())).configure(anyString());
+	}
+	
+	@Test
+	public void testGetSelectColumns() {
+		String selectColumns = widget.getSelectColumns(getTableConfig().getColumnConfigs());
+		assertEquals(col1Name+","+col2Name, selectColumns);
 	}
 }

@@ -133,12 +133,18 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			fullUri = getPagedURI(fullUri);
 		}
 		
-		
 		if (authenticationController.isLoggedIn()) {
 			String userId = authenticationController.getCurrentUserPrincipalId();
 			fullUri = fullUri.replace(CURRENT_USER_SQL_VARIABLE, userId).replace(ENCODED_CURRENT_USER_SQL_VARIABLE, userId);
 		}
-			
+		
+		if (isSubmissionQueryService(fullUri) && tableConfig.getColumnConfigs() != null && tableConfig.getColumnConfigs().size() > 0) {
+			// look for '*' in query.  if found, replace with columns defined in the table config
+			if (fullUri.contains("*")) {
+				fullUri = fullUri.replace("*", getSelectColumns(tableConfig.getColumnConfigs()));
+			}
+		}
+
 		jsClient.getJSON(fullUri, new AsyncCallback<JSONObjectAdapter>() {
 			@Override
 			public void onSuccess(JSONObjectAdapter adapter) {
@@ -195,7 +201,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 						fixColumnNames(columnData);
 					}
 					//define the column names
-					String[] columnNamesArray = getColumnNamesArray(columnData, tableConfig.getColumnConfigs());
+					String[] columnNamesArray = getColumnNamesArray(columnData);
 					//create renderers
 					APITableColumnRenderer[] renderers = createRenderers(columnNamesArray, tableConfig, ginInjector);
 					APITableInitializedColumnRenderer[] initializedRenderers = new APITableInitializedColumnRenderer[renderers.length];
@@ -215,6 +221,19 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 				}
 			}
 		});
+	}
+	
+	public String getSelectColumns(List<APITableColumnConfig> configs) {
+		StringBuilder columnNames = new StringBuilder();
+		for (Iterator<APITableColumnConfig> iterator = configs.iterator(); iterator.hasNext();) {
+			APITableColumnConfig config = iterator.next();
+			String inputColumnName = config.getInputColumnNames().iterator().next();
+			columnNames.append(inputColumnName);
+			if (iterator.hasNext()) {
+				columnNames.append(",");
+			}
+		}
+		return columnNames.toString();
 	}
 	
 	public static void fixColumnNames(Map<String, List<String>> columnData) {
@@ -265,7 +284,7 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		return renderers;
 	}
 	
-	public String[] getColumnNamesArray(Map<String, List<String>> columnData, List<APITableColumnConfig> columnConfigs){
+	public String[] getColumnNamesArray(Map<String, List<String>> columnData){
 		String[] columnNamesArray = new String[]{};
 		if (columnData != null && columnData.keySet() != null) {
 			// use response data to define target column names
