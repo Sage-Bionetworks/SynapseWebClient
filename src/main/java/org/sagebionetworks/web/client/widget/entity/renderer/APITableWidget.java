@@ -133,12 +133,18 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 			fullUri = getPagedURI(fullUri);
 		}
 		
-		
 		if (authenticationController.isLoggedIn()) {
 			String userId = authenticationController.getCurrentUserPrincipalId();
 			fullUri = fullUri.replace(CURRENT_USER_SQL_VARIABLE, userId).replace(ENCODED_CURRENT_USER_SQL_VARIABLE, userId);
 		}
-			
+		
+		if (isSubmissionQueryService(fullUri) && tableConfig.getColumnConfigs() != null && tableConfig.getColumnConfigs().size() > 0) {
+			// look for '*' in query.  if found, replace with columns defined in the table config
+			if (fullUri.contains("*")) {
+				fullUri = fullUri.replace("*", getSelectColumns(tableConfig.getColumnConfigs()));
+			}
+		}
+
 		jsClient.getJSON(fullUri, new AsyncCallback<JSONObjectAdapter>() {
 			@Override
 			public void onSuccess(JSONObjectAdapter adapter) {
@@ -190,19 +196,16 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 						}
 					}
 					
-					if (columnData != null) {
-						//if node query, remove the object type from the column names (ie remove "project." from "project.id")
-						if(isNodeQueryService(tableConfig.getUri())) {
-							fixColumnNames(columnData);
-						}
-						//define the column names
-						String[] columnNamesArray = getColumnNamesArray(columnData.keySet());
-						//create renderers
-						APITableColumnRenderer[] renderers = createRenderers(columnNamesArray, tableConfig, ginInjector);
-						APITableInitializedColumnRenderer[] initializedRenderers = new APITableInitializedColumnRenderer[renderers.length];
-						tableColumnRendererInit(columnData, columnNamesArray, renderers, initializedRenderers, 0);
+					//if node query, remove the object type from the column names (ie remove "project." from "project.id")
+					if(isNodeQueryService(tableConfig.getUri())) {
+						fixColumnNames(columnData);
 					}
-					
+					//define the column names
+					String[] columnNamesArray = getColumnNamesArray(columnData);
+					//create renderers
+					APITableColumnRenderer[] renderers = createRenderers(columnNamesArray, tableConfig, ginInjector);
+					APITableInitializedColumnRenderer[] initializedRenderers = new APITableInitializedColumnRenderer[renderers.length];
+					tableColumnRendererInit(columnData, columnNamesArray, renderers, initializedRenderers, 0);
 				} catch (Exception e1) {
 					onFailure(e1);
 				}
@@ -220,12 +223,27 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		});
 	}
 	
+	public String getSelectColumns(List<APITableColumnConfig> configs) {
+		StringBuilder columnNames = new StringBuilder();
+		for (Iterator<APITableColumnConfig> iterator = configs.iterator(); iterator.hasNext();) {
+			APITableColumnConfig config = iterator.next();
+			String inputColumnName = config.getInputColumnNames().iterator().next();
+			columnNames.append(inputColumnName);
+			if (iterator.hasNext()) {
+				columnNames.append(",");
+			}
+		}
+		return columnNames.toString();
+	}
+	
 	public static void fixColumnNames(Map<String, List<String>> columnData) {
-		Set<String> initialKeySet = new LinkedHashSet<String>();
-		initialKeySet.addAll(columnData.keySet());
-		for (String key : initialKeySet) {
-			List<String> columnValues = columnData.remove(key);
-			columnData.put(removeFirstToken(key), columnValues);
+		if (columnData != null) {
+			Set<String> initialKeySet = new LinkedHashSet<String>();
+			initialKeySet.addAll(columnData.keySet());
+			for (String key : initialKeySet) {
+				List<String> columnValues = columnData.remove(key);
+				columnData.put(removeFirstToken(key), columnValues);
+			}
 		}
 	}
 	
@@ -266,9 +284,11 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		return renderers;
 	}
 	
-	public String[] getColumnNamesArray(Set<String> columnNames){
+	public String[] getColumnNamesArray(Map<String, List<String>> columnData){
 		String[] columnNamesArray = new String[]{};
-		if (columnNames != null) {
+		if (columnData != null && columnData.keySet() != null) {
+			// use response data to define target column names
+			Set<String> columnNames = columnData.keySet();
 			columnNamesArray = new String[columnNames.size()];
 			int colNamesIndex = 0;
 			for (String colName : columnNames) {
@@ -553,18 +573,21 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	}
 	
 	public static List<String> getColumnValues(String inputColumnName, Map<String, List<String>> columnData) {
-		List<String> colValues = columnData.get(inputColumnName);
-		if (colValues == null) {
-			//try to find using the fixed column value
-			colValues = columnData.get(removeFirstToken(inputColumnName));
-		}
-		if (colValues == null) {
-			//column not found in the data.  return an empty column
-			if (!columnData.values().isEmpty()) {
-				colValues = new ArrayList<String>();
-				List<String> aColumn = columnData.values().iterator().next();
-				for (int i = 0; i < aColumn.size(); i++) {
-					colValues.add(null);
+		List<String> colValues = new ArrayList<>();
+		if (columnData != null) {
+			colValues = columnData.get(inputColumnName);
+			if (colValues == null) {
+				//try to find using the fixed column value
+				colValues = columnData.get(removeFirstToken(inputColumnName));
+			}
+			if (colValues == null) {
+				//column not found in the data.  return an empty column
+				if (!columnData.values().isEmpty()) {
+					colValues = new ArrayList<String>();
+					List<String> aColumn = columnData.values().iterator().next();
+					for (int i = 0; i < aColumn.size(); i++) {
+						colValues.add(null);
+					}
 				}
 			}
 		}
