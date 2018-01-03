@@ -91,7 +91,8 @@ public class SynapseJavascriptFactory {
 		InviteeVerificationSignedToken,
 		ListWrapperColumnModel,
 		PaginatedTeamIds,
-		None
+		None,
+		String
 	}
 
 	/**

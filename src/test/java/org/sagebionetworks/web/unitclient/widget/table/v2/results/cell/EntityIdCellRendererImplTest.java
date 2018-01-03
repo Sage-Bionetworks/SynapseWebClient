@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.table.v2.results.cell;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -12,14 +11,11 @@ import static org.mockito.Mockito.when;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
-import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -35,8 +31,6 @@ public class EntityIdCellRendererImplTest {
 	@Mock
 	EntityHeaderAsyncHandler mockEntityHeaderAsyncHandler;
 	@Mock
-	LazyLoadHelper mockLazyLoadHelper;
-	@Mock
 	EntityHeader mockProjectHeader;
 	@Mock
 	ClickHandler mockClickHandler;
@@ -47,15 +41,9 @@ public class EntityIdCellRendererImplTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		renderer = new EntityIdCellRendererImpl(mockView, mockLazyLoadHelper, mockEntityHeaderAsyncHandler, mockJSNIUtils);
+		renderer = new EntityIdCellRendererImpl(mockView, mockEntityHeaderAsyncHandler, mockJSNIUtils);
 		AsyncMockStubber.callSuccessWith(mockProjectHeader).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		when(mockProjectHeader.getName()).thenReturn(PROJECT_NAME);
-	}
-	
-	private void simulateInView() {
-		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
-		captor.getValue().invoke();
 	}
 	
 	@Test
@@ -68,10 +56,7 @@ public class EntityIdCellRendererImplTest {
 	public void testSetValue(){
 		String entityId = "987654";
 		renderer.setValue(entityId);
-		verify(mockLazyLoadHelper).setIsConfigured();
-		verifyZeroInteractions(mockEntityHeaderAsyncHandler);
 		
-		simulateInView();
 		verify(mockView).showLoadingIcon();
 		verify(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		verify(mockView).setIcon(any(IconType.class));
@@ -89,10 +74,6 @@ public class EntityIdCellRendererImplTest {
 	public void testSetValueAndCallback(){
 		String entityId = "987654";
 		renderer.setValue(entityId, mockClickHandler, true);
-		verify(mockLazyLoadHelper).setIsConfigured();
-		verifyZeroInteractions(mockEntityHeaderAsyncHandler);
-		
-		simulateInView();
 		verify(mockView).showLoadingIcon();
 		verify(mockView).setEntityId("syn"+entityId);
 		verify(mockView).setClickHandler(mockClickHandler);
@@ -109,8 +90,7 @@ public class EntityIdCellRendererImplTest {
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		String entityId = "syn987654";
 		renderer.setValue(entityId);
-		
-		simulateInView();
+
 		verify(mockView).showLoadingIcon();
 		verify(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		verify(mockView).showErrorIcon(errorMessage);
@@ -125,7 +105,6 @@ public class EntityIdCellRendererImplTest {
 		String entityId = "syn987654";
 		renderer.setValue(entityId, hideIfLoadError);
 		
-		simulateInView();
 		verify(mockView).showLoadingIcon();
 		verify(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 		verify(mockJSNIUtils).consoleError(errorMessage);

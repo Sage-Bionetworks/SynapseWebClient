@@ -20,11 +20,13 @@ import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -90,6 +92,7 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.common.util.concurrent.FluentFuture;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -130,6 +133,9 @@ public class SynapseJavascriptClient {
 	public static final String ENTITY_THREAD_COUNTS = ENTITY + THREAD_COUNTS;
 	public static final String STACK_STATUS = "/admin/synapse/status";
 	public static final String ATTACHMENT_HANDLES = "attachmenthandles";
+	private static final String PROFILE_IMAGE = "/image";
+	private static final String PROFILE_IMAGE_PREVIEW = PROFILE_IMAGE+"/preview";
+	private static final String REDIRECT_PARAMETER = "redirect=";
 	
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
@@ -222,11 +228,20 @@ public class SynapseJavascriptClient {
 		sendRequest(requestBuilder, null, OBJECT_TYPE.None, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 
-	
 	private void doGet(String url, OBJECT_TYPE responseType, AsyncCallback callback) {
+		doGet(url, responseType, APPLICATION_JSON_CHARSET_UTF8, callback);
+	}
+	
+	private void doGetString(String url, AsyncCallback callback) {
+		doGet(url, OBJECT_TYPE.String, null, callback);
+	}
+	
+	private void doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, AsyncCallback callback) {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(GET, url);
-		requestBuilder.setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		if (acceptedResponseType != null) {
+			requestBuilder.setHeader(ACCEPT, acceptedResponseType);	
+		}
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
@@ -273,6 +288,8 @@ public class SynapseJavascriptClient {
 							Object responseObject;
 							if (OBJECT_TYPE.None.equals(responseType)) {
 								responseObject = null;
+							} else if (OBJECT_TYPE.String.equals(responseType)) {
+								responseObject = response.getText();
 							} else {
 								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
 								responseObject = jsFactory.newInstance(responseType, jsonObject);
@@ -851,6 +868,10 @@ public class SynapseJavascriptClient {
 		IdList idList = new IdList();
 		idList.setList(teamIdsLong);
 		return getFuture(cb -> doPost(url, idList, OBJECT_TYPE.ListWrapperTeam, cb));
+	}
+	
+	public String getProfilePicturePreviewUrl(String ownerId) {
+		return getRepoServiceUrl() + USER_PROFILE_PATH+"/"+ownerId+PROFILE_IMAGE_PREVIEW+"?"+REDIRECT_PARAMETER+"true";
 	}
 }
 
