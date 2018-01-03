@@ -10,7 +10,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class BigTeamBadge implements BigTeamBadgeView.Presenter, SynapseWidgetPresenter, HasNotificationUI {
+public class BigTeamBadge implements SynapseWidgetPresenter, HasNotificationUI {
 	
 	private BigTeamBadgeView view;
 	SynapseJavascriptClient jsClient;
@@ -23,7 +23,6 @@ public class BigTeamBadge implements BigTeamBadgeView.Presenter, SynapseWidgetPr
 		this.view = view;
 		this.jsClient = jsClient;
 		this.authController = authController;
-		view.setPresenter(this);
 	}
 	
 	public void configure(Team team, String description) {
