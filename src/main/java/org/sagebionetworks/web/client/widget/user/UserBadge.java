@@ -122,7 +122,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	public void configurePicture() {
 		if (profile != null && profile.getProfilePicureFileHandleId() != null) {
 			jsClient.getProfilePicturePreviewUrl(profile.getOwnerId())
-			.addCallback(
+				.addCallback(
 					new FutureCallback<String>() {
 						@Override
 						public void onSuccess(String url) {

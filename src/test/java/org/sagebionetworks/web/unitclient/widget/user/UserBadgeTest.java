@@ -1,15 +1,17 @@
 package org.sagebionetworks.web.unitclient.widget.user;
 
-import static junit.framework.Assert.*;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -26,11 +28,10 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Profile;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
-import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadgeView;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -65,9 +66,10 @@ public class UserBadgeTest {
 	int max=10;
 	String displayName;
 	@Mock
-	LazyLoadHelper mockLazyLoadHelper;
-	@Mock
 	UserProfileAsyncHandler mockUserProfileAsyncHandler;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	public static final String PICTURE_URL = "http://url.to.profile.picture";
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -85,7 +87,8 @@ public class UserBadgeTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockLazyLoadHelper, mockUserProfileAsyncHandler, adapterFactory);
+		when(mockSynapseJavascriptClient.getProfilePicturePreviewUrl(anyString())).thenReturn(getDoneFuture(PICTURE_URL));
+		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory, mockSynapseJavascriptClient);
 	}
 	
 	@Test
@@ -95,6 +98,7 @@ public class UserBadgeTest {
 		ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
 		verify(mockView).showCustomUserPicture(urlCaptor.capture());
 		String url = urlCaptor.getValue();
+		assertEquals(PICTURE_URL, url);
 		assertFalse(url.contains(WebConstants.NOCACHE_PARAM));
 		
 		//simulate a load error
@@ -110,18 +114,12 @@ public class UserBadgeTest {
 		verify(mockView, never()).showCustomUserPicture(anyString());
 	}
 	
-	private void simulateInViewEvent() {
-		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
-		captor.getValue().invoke();
-	}
-	
 	@Test
 	public void testConfigureAsync() throws Exception {
 		AsyncMockStubber.callSuccessWith(profile).when(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		userBadge.setMaxNameLength(max);
 		userBadge.configure(principalId);
-		simulateInViewEvent();
+		
 		verify(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		verify(mockView).setDisplayName(eq(displayName), anyString());
 		verify(mockView).setHref("#!Profile:" + profile.getOwnerId());
@@ -132,7 +130,6 @@ public class UserBadgeTest {
 		AsyncMockStubber.callFailureWith(new Exception()).when(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));		
 		profile.setDisplayName("name");
 		userBadge.configure(principalId);
-		simulateInViewEvent();
 		verify(mockView).showLoadError(principalId);
 	}
 	
@@ -201,7 +198,6 @@ public class UserBadgeTest {
 		userBadge.setMaxNameLength(max);
 		when(mockCache.get(anyString())).thenReturn("invalid user profile json");
 		userBadge.configure(principalId);
-		simulateInViewEvent();
 		verify(mockCache).get(anyString());
 		verify(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		verify(mockView).setDisplayName(eq(displayName), anyString());
@@ -215,7 +211,6 @@ public class UserBadgeTest {
 		when(mockCache.get(anyString())).thenReturn(adapter.toJSONString());
 		
 		userBadge.configure(principalId);
-		simulateInViewEvent();
 		verify(mockCache).get(anyString());
 		verify(mockUserProfileAsyncHandler, never()).getUserProfile(eq(principalId), any(AsyncCallback.class));
 		verify(mockView).setDisplayName(eq(displayName), anyString());
@@ -250,7 +245,6 @@ public class UserBadgeTest {
 	public void testConfigureFromUsernameAsync() throws Exception {
 		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseClient).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
 		userBadge.configureWithUsername(DOEBOY);
-		simulateInViewEvent();
 		verify(mockSynapseClient).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
 		verify(mockView).setDisplayName(eq(displayName), anyString());
 	}
@@ -261,7 +255,6 @@ public class UserBadgeTest {
 		Exception ex = new Exception(errorMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
 		userBadge.configureWithUsername(DOEBOY);
-		simulateInViewEvent();
 		verify(mockSynapseClient).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
 		verify(mockView).showLoadError(errorMessage);
 	}
@@ -272,7 +265,6 @@ public class UserBadgeTest {
 		when(mockCache.get(anyString())).thenReturn(principalId, (String)null);
 		
 		userBadge.configureWithUsername(DOEBOY);
-		simulateInViewEvent();
 		verify(mockCache, times(2)).get(anyString());
 		verify(mockSynapseClient, never()).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
 		verify(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
