@@ -63,7 +63,6 @@ import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -992,8 +991,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		else {
 			//if this contains an oauth_token, it's from linkedin
-			if (token.contains("oauth_token"))
-			{
+			if (token.contains("oauth_token")) {
 				// User just logged in to LinkedIn. Get the request token and their info to update
 				// their profile with.
 
@@ -1014,10 +1012,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					}
 				}
 				
-				if(!requestToken.equals("") && !verifier.equals("")) {
+				globalApplicationState.replaceCurrentPlace(new Profile(authenticationController.getCurrentUserPrincipalId()));
+				
+				if(requestToken != null && !requestToken.equals("") && verifier != null && !verifier.equals("")) {
 					updateProfileWithLinkedIn(requestToken, verifier);
 				} else {
-					view.showErrorMessage("An error occurred. Please try reloading the page.");
+					view.showErrorMessage("Unable to import LinkedIn profile.");
+					globalApplicationState.refreshPage();
 				}
 			} else if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
 				editMyProfile();
@@ -1266,7 +1267,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				Date date = new Date(System.currentTimeMillis() + 300000);
 				cookies.setCookie(CookieKeys.LINKEDIN, result.getRequestSecret(), date);
 				// Open the LinkedIn authentication window in the same tab
-				Window.open(result.getAuthUrl(), "_self", "");
+				view.open(result.getAuthUrl());
 			}
 			
 			@Override
@@ -1283,6 +1284,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		// Grab the requestToken secret from the cookie. If it's expired, show an error message.
 		// If not, grab the user's info for an update.
 		profileSynAlert.clear();
+		view.showLoading();
 		String secret = cookies.getCookie(CookieKeys.LINKEDIN);
 		if(secret == null || secret.equals("")) {
 			view.showErrorMessage("Your request has timed out. Please reload the page and try again.");
@@ -1290,6 +1292,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, gwt.getHostPageBaseURL(), new AsyncCallback<UserProfile>() {
 				@Override
 				public void onSuccess(UserProfile linkedInProfile) {
+					view.hideLoading();
 					// Give the user a chance to edit the profile.
 					userProfileModalWidget.showEditProfile(linkedInProfile.getOwnerId(), linkedInProfile, new Callback(){
 						@Override

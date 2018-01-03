@@ -3,8 +3,8 @@ package org.sagebionetworks.web.client.widget.profile;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -21,6 +21,8 @@ public class UserProfileModalViewImpl implements UserProfileModalView {
 	@UiField
 	Button primaryButton;
 	@UiField
+	Button defaultButton;
+	@UiField
 	SimplePanel bodyPanel;
 	@UiField
 	SimplePanel loadingPanel;
@@ -28,10 +30,17 @@ public class UserProfileModalViewImpl implements UserProfileModalView {
 	Alert alert;
 	
 	Widget widget;
-	
+	Presenter presenter;
 	@Inject
-	public UserProfileModalViewImpl(Binder binder) {
+	public UserProfileModalViewImpl(Binder binder, GlobalApplicationState globalAppState) {
 		widget = binder.createAndBindUi(this);
+		defaultButton.addClickHandler( event -> {
+			modal.hide();
+			globalAppState.refreshPage();
+		});
+		primaryButton.addClickHandler(event -> {
+			presenter.onSave();
+		});
 	}
 
 	@Override
@@ -40,13 +49,8 @@ public class UserProfileModalViewImpl implements UserProfileModalView {
 	}
 
 	@Override
-	public void setPresenter(final Presenter presenter) {
-		primaryButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSave();
-			}
-		});
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
 	}
 
 	@Override
