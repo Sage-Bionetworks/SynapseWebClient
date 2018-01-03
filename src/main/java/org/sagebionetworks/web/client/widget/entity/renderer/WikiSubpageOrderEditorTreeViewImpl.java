@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageOrderEditorTree.SubpageOrderEditorTreeNode;
 
@@ -22,6 +24,8 @@ public class WikiSubpageOrderEditorTreeViewImpl extends FlowPanel implements Wik
 	private Map<String, Widget> headerId2listItem;
 	private Map<Widget, UnorderedListPanel> listItem2childrenList;
 	private IsWidget synAlert;
+	String ownerObjectId;
+	
 	@Inject
 	public WikiSubpageOrderEditorTreeViewImpl() {
 		addStyleName("notopmargin nav bs-sidenav well wiki-subpages-editor-tree");
@@ -92,7 +96,8 @@ public class WikiSubpageOrderEditorTreeViewImpl extends FlowPanel implements Wik
 	}
 	
 	@Override
-	public void configure(SubpageOrderEditorTreeNode overallRoot) {
+	public void configure(SubpageOrderEditorTreeNode overallRoot, String ownerObjectId) {
+		this.ownerObjectId = ownerObjectId;
 		UnorderedListPanel rootPanel = new UnorderedListPanel();
 		rootPanel.addStyleName("notopmargin nav bs-sidenav margin-bottom-10");
 		addTreeItemsRecursive(rootPanel, overallRoot);
@@ -131,9 +136,11 @@ public class WikiSubpageOrderEditorTreeViewImpl extends FlowPanel implements Wik
 	private Widget makeListItem(final SubpageOrderEditorTreeNode node) {
 		final Anchor l = new Anchor(node.getText());
 		l.addStyleName("link");
+		l.setHref("#!Synapse:" + new Synapse(ownerObjectId, null, EntityArea.WIKI, node.getHeader().getId()).toToken());
 		l.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				event.preventDefault();
 				presenter.selectTreeItem(node);
 			}
 		});
