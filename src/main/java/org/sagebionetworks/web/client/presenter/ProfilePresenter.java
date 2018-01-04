@@ -129,7 +129,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public PromptModalView promptForProjectNameDialog;
 	public PromptModalView promptForTeamNameDialog;
 	public SynapseJavascriptClient jsClient;
-	public List<Team> currentUserTeams;
 	@Inject
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
@@ -973,7 +972,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void showView(Profile place) {
-		currentUserTeams = new ArrayList<>();
 		view.clear();
 		profileSynAlert.clear();
 		projectSynAlert.clear();
