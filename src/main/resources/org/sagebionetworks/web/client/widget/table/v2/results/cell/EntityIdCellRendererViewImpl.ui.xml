@@ -6,7 +6,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<bh:Span>
-			<w:LoadingSpinner ui:field="loadingUI" visible="false" size="16px" />
+		<bh:Span ui:field="loadingUI" visible="false" > Loading...</bh:Span>
 		<b:Tooltip ui:field="errorField">
 		  <b:Icon  ui:field="errorIcon" visible="false" fixedWidth="true" type="EXCLAMATION_CIRCLE" addStyleNames="text-danger"/>
 		</b:Tooltip>
