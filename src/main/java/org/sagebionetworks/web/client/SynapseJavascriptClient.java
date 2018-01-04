@@ -876,7 +876,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	public String getTeamIconUrl(String teamId) {
-		return TEAM + "/" + teamId + ICON + "?" + REDIRECT_PARAMETER +"true";
+		return getRepoServiceUrl() + TEAM + "/" + teamId + ICON + "?" + REDIRECT_PARAMETER +"true";
 	}
 }
 
