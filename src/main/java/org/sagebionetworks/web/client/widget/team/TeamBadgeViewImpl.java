@@ -58,7 +58,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	}
 	
 	@Override
-	public void setTeam(final Team team, Integer maxNameLength, ClickHandler customClickHandler) {
+	public void setTeam(final Team team, Integer maxNameLength, String teamIconUrl, ClickHandler customClickHandler) {
 		clear();
 		teamId = team.getId();
 		this.customClickHandler = customClickHandler;
@@ -78,7 +78,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			};
 			if (team.getIcon() != null && team.getIcon().length() > 0) {
 				Image profilePicture = new Image();
-				profilePicture.setUrl(DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId()));
+				profilePicture.setUrl(teamIconUrl);
 				profilePicture.setHeight("24px");
 				profilePicture.addStyleName("imageButton userProfileImage displayInline margin-right-4");
 				profilePicture.addClickHandler(clickHandler);

@@ -9,7 +9,6 @@
 	<t:Table ui:field="userBadgeTable" addStyleNames="displayInlineBlock userBadgeTable">
 		<t:TableRow>
 			<t:TableData paddingRight="2" ui:field="loadingUI">
-				<w:LoadingSpinner size="16px"/>
 				<bh:Text> Loading...</bh:Text>
 			</t:TableData>
 			<t:TableData paddingRight="2" addStyleNames="min-width-25">

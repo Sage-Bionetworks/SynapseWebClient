@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -19,7 +18,7 @@ public abstract class AsyncHandlerImpl {
 	
 	public abstract void doCall(List<String> ids, AsyncCallback<List> callback);
 	public abstract String getId(Object singleItem);
-
+	
 	@Inject
 	public AsyncHandlerImpl(GWTWrapper gwt) {
 		Callback callback = new Callback() {
@@ -28,6 +27,7 @@ public abstract class AsyncHandlerImpl {
 				executeRequests();
 			}
 		};
+		
 		gwt.scheduleFixedDelay(callback, 200 + gwt.nextInt(150));
 	}
 	
@@ -41,9 +41,8 @@ public abstract class AsyncHandlerImpl {
 	}
 	public void executeRequests() {
 		if (!reference2Callback.isEmpty()) {
-			final Map<String, List<AsyncCallback>> reference2CallbackCopy = new HashMap<String, List<AsyncCallback>>();
-			reference2CallbackCopy.putAll(reference2Callback);
-			reference2Callback.clear();
+			final Map<String, List<AsyncCallback>> reference2CallbackCopy = reference2Callback;
+			reference2Callback = new HashMap<String, List<AsyncCallback>>();
 			List<String> ids = new ArrayList<String>();
 			ids.addAll(reference2CallbackCopy.keySet());
 			doCall(ids, new AsyncCallback<List>() {
