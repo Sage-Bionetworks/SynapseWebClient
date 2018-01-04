@@ -41,8 +41,9 @@ public abstract class AsyncHandlerImpl {
 	}
 	public void executeRequests() {
 		if (!reference2Callback.isEmpty()) {
-			final Map<String, List<AsyncCallback>> reference2CallbackCopy = reference2Callback;
-			reference2Callback = new HashMap<String, List<AsyncCallback>>();
+			final Map<String, List<AsyncCallback>> reference2CallbackCopy = new HashMap<String, List<AsyncCallback>>();
+			reference2CallbackCopy.putAll(reference2Callback);
+			reference2Callback.clear();
 			List<String> ids = new ArrayList<String>();
 			ids.addAll(reference2CallbackCopy.keySet());
 			doCall(ids, new AsyncCallback<List>() {
