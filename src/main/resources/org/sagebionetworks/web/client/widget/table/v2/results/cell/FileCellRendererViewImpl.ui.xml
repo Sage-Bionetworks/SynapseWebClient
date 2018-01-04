@@ -5,7 +5,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<g:HTMLPanel>
-		<w:LoadingSpinner ui:field="loadingUI" size="16px" />
+		<bh:Span ui:field="loadingUI"> Loading...</bh:Span> 
 		<bh:Text ui:field="errorText"></bh:Text>
 		<b:Anchor ui:field="anchor"></b:Anchor>
 	</g:HTMLPanel>

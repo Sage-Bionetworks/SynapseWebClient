@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -18,7 +19,7 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	Widget w;
 	public interface Binder extends UiBinder<Widget, EntityIdCellRendererViewImpl> {}
 	@UiField
-	LoadingSpinner loadingUI;
+	Span loadingUI;
 	@UiField
 	Tooltip errorField;
 	@UiField
