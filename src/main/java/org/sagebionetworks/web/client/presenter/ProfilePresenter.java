@@ -129,6 +129,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public PromptModalView promptForProjectNameDialog;
 	public PromptModalView promptForTeamNameDialog;
 	public SynapseJavascriptClient jsClient;
+	public List<Team> currentUserTeams;
 	@Inject
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
@@ -703,11 +704,23 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				new FutureCallback<List<Team>>() {
 					@Override
 					public void onSuccess(List<Team> teams) {
-						for (Team team: teams) {
-							// requests will always be 0 or greater
-							view.addTeamsFilterTeam(team);
-							myTeamsWidget.addTeam(team);
-							if (includeRequestCount) {
+						ProfileArea currentArea = place.getArea();
+						switch (currentArea) {
+							case PROJECTS:
+								for (Team team: teams) {
+									view.addTeamsFilterTeam(team);
+								}
+								break;
+							case TEAMS:
+								for (Team team: teams) {
+									myTeamsWidget.addTeam(team);
+								}
+								break;
+							default:
+								break;
+						}
+						if (includeRequestCount) {
+							for (Team team: teams) {
 								getTeamRequestCount(currentUserId, team);
 							}
 						}
@@ -960,6 +973,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void showView(Profile place) {
+		currentUserTeams = new ArrayList<>();
 		view.clear();
 		profileSynAlert.clear();
 		projectSynAlert.clear();
