@@ -1,16 +1,17 @@
 package org.sagebionetworks.web.unitclient.widget.user;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandler;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.TeamBadgeView;
@@ -35,20 +36,24 @@ public class TeamBadgeTest {
 	ClickHandler mockClickHandler;
 	@Mock
 	TeamAsyncHandler mockTeamAsyncHandler;
-	
+	@Mock
+	SynapseJavascriptClient mockJsClient;
+	public static final String TEAM_ICON_URL = "http://team.icon.png";
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		team = new Team();
 		team.setName("name");
 		team.setId(principalId);
-		badge = new TeamBadge(mockView, mockTeamAsyncHandler);
+		when(mockJsClient.getTeamIconUrl(anyString())).thenReturn(TEAM_ICON_URL);
+		badge = new TeamBadge(mockView, mockTeamAsyncHandler, mockJsClient);
+		
 	}
 	
 	@Test
 	public void testConfigure(){
 		badge.configure(team);		
-		verify(mockView).setTeam(team, null, null);
+		verify(mockView).setTeam(team, null, TEAM_ICON_URL, null);
 	}
 	
 
@@ -57,7 +62,7 @@ public class TeamBadgeTest {
 		AsyncMockStubber.callSuccessWith(team).when(mockTeamAsyncHandler).getTeam(eq(principalId), any(AsyncCallback.class));
 		badge.setMaxNameLength(max);
 		badge.configure(principalId, mockClickHandler);
-		verify(mockView).setTeam(team, max, mockClickHandler);
+		verify(mockView).setTeam(team, max,TEAM_ICON_URL, mockClickHandler);
 	}
 	
 	@Test
@@ -65,7 +70,7 @@ public class TeamBadgeTest {
 		AsyncMockStubber.callSuccessWith(team).when(mockTeamAsyncHandler).getTeam(eq(principalId), any(AsyncCallback.class));
 		badge.setMaxNameLength(max);
 		badge.configure(team);
-		verify(mockView).setTeam(team, max, null);
+		verify(mockView).setTeam(team, max, TEAM_ICON_URL, null);
 	}
 	
 	@Test
@@ -79,19 +84,19 @@ public class TeamBadgeTest {
 	public void testSetNameLength() {
 		badge.setMaxNameLength(max);
 		badge.configure(team);		
-		verify(mockView).setTeam(team, max, null);		
+		verify(mockView).setTeam(team, max, TEAM_ICON_URL, null);		
 	}
 	
 	@Test
 	public void testConfigureNullPrincipalId() throws Exception {
 		badge.configure((String)null);
-		verify(mockView, never()).setTeam(any(Team.class), anyInt(), any(ClickHandler.class));
+		verify(mockView, never()).setTeam(any(Team.class), anyInt(), anyString(), any(ClickHandler.class));
 	}
 	
 	@Test
 	public void testConfigureEmptyPrincipalId() throws Exception {
 		badge.configure("");
-		verify(mockView, never()).setTeam(any(Team.class), anyInt(), any(ClickHandler.class));
+		verify(mockView, never()).setTeam(any(Team.class), anyInt(), anyString(), any(ClickHandler.class));
 	}
 	
 	@Test

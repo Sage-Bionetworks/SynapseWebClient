@@ -20,11 +20,15 @@ public class TeamBadge implements SynapseWidgetPresenter, HasNotificationUI, IsW
 	private Integer maxNameLength;
 	private String teamName;
 	private ClickHandler customClickHandler = null;
+	private SynapseJavascriptClient jsClient;
 	
 	@Inject
-	public TeamBadge(TeamBadgeView view, TeamAsyncHandler teamAsyncHandler) {
+	public TeamBadge(TeamBadgeView view, 
+			TeamAsyncHandler teamAsyncHandler,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.teamAsyncHandler = teamAsyncHandler;
+		this.jsClient = jsClient;
 	}
 	
 	public void setMaxNameLength(Integer maxLength) {
@@ -57,7 +61,8 @@ public class TeamBadge implements SynapseWidgetPresenter, HasNotificationUI, IsW
 	}
 	
 	public void configure(Team team) {
-		view.setTeam(team, maxNameLength, customClickHandler);
+		String teamIconUrl = jsClient.getTeamIconUrl(team.getId());
+		view.setTeam(team, maxNameLength, teamIconUrl, customClickHandler);
 	}
 	
 	/**

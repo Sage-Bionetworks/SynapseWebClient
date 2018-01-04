@@ -7,7 +7,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface TeamBadgeView extends IsWidget, SynapseView {
-	public void setTeam(Team team, Integer maxNameLength, ClickHandler customClickHandler);
+	public void setTeam(Team team, Integer maxNameLength, String teamIconUrl, ClickHandler customClickHandler);
 
 	public void showLoadError(String principalId);
 	
