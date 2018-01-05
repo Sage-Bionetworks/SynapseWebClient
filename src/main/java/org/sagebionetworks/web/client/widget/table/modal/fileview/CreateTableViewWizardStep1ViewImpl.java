@@ -1,9 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
-import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
-import org.gwtbootstrap3.client.ui.InlineCheckBox;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -22,25 +21,21 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	SimplePanel scopeContainer;
 	@UiField
 	FormGroup scopeUI;
-	
 	@UiField
-	FormGroup viewOptionsUI;
-	@UiField
-	InlineCheckBox includeTablesCb;
-	
+	Div viewOptionsContainer;
 	Widget widget;
 	Presenter p;
-	
+	ViewOptions viewOptions;
 	@Inject
-	public CreateTableViewWizardStep1ViewImpl(Binder binder){
+	public CreateTableViewWizardStep1ViewImpl(Binder binder, ViewOptions viewOptions){
 		widget = binder.createAndBindUi(this);
-		includeTablesCb.addClickHandler(event -> {
-			if (includeTablesCb.getValue()) {
+		viewOptionsContainer.add(viewOptions);
+		viewOptions.addClickHandler(event -> {
+			if (viewOptions.isIncludeTables()) {
 				p.onSelectFilesAndTablesView();
 			} else {
 				p.onSelectFilesOnlyView();
 			}
-			
 		});
 	}
 
@@ -72,7 +67,7 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	
 	@Override
 	public void setFileViewTypeSelectionVisible(boolean visible) {
-		viewOptionsUI.setVisible(visible);
+		viewOptionsContainer.setVisible(visible);
 	}
 	@Override
 	public void setPresenter(Presenter presenter) {

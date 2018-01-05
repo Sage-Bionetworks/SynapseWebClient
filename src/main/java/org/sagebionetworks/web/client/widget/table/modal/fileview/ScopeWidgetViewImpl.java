@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -28,12 +29,17 @@ public class ScopeWidgetViewImpl implements ScopeWidgetView {
 	Button editButton;
 	@UiField
 	Modal editModal;
+	@UiField
+	Div viewOptionsContainer;
 	Widget widget;
 	Presenter presenter;
+	ViewOptions viewOptions;
 	
 	@Inject
-	public ScopeWidgetViewImpl(Binder binder){
+	public ScopeWidgetViewImpl(Binder binder, ViewOptions viewOptions){
 		widget = binder.createAndBindUi(this);
+		this.viewOptions = viewOptions;
+		viewOptionsContainer.add(viewOptions);
 		editButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -44,6 +50,13 @@ public class ScopeWidgetViewImpl implements ScopeWidgetView {
 			@Override
 			public void onClick(ClickEvent event) {
 				presenter.onSave();
+			}
+		});
+		viewOptions.addClickHandler(event -> {
+			if (viewOptions.isIncludeTables()) {
+				presenter.onSelectFilesAndTablesView();
+			} else {
+				presenter.onSelectFilesOnlyView();
 			}
 		});
 	}
@@ -97,5 +110,13 @@ public class ScopeWidgetViewImpl implements ScopeWidgetView {
 		}
 	}
 
+	@Override
+	public void setFileViewTypeSelectionVisible(boolean visible) {
+		viewOptionsContainer.setVisible(visible);
+	}
 	
+	@Override
+	public void setIsIncludeTables(boolean value) {
+		viewOptions.setIsIncludeTables(value);
+	}
 }
