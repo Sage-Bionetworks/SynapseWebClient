@@ -110,11 +110,6 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 		return view.asWidget();
 	}
 	
-	public boolean isShowIncludeTablesOption() {
-		ViewType currentType = currentView.getType();
-		return ViewType.file.equals(currentType) || ViewType.file_and_table.equals(currentType);
-	}
-	
 	@Override
 	public void onSave() {
 		// update scope
