@@ -20,6 +20,7 @@ public class FileViewOptions implements IsWidget {
 	public FileViewOptions(Binder binder){
 		widget = binder.createAndBindUi(this);
 	}
+	
 	@Override
 	public Widget asWidget() {
 		return widget;
