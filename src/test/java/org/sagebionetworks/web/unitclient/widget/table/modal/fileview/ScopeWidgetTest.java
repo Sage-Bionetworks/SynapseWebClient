@@ -51,10 +51,8 @@ public class ScopeWidgetTest {
 	EntityView mockEntityView;
 	@Mock
 	EntityView mockUpdatedEntityView;
-	
 	@Mock
 	Table mockTable;
-	
 	@Mock
 	EntityUpdatedHandler mockEntityUpdatedHandler;
 	
@@ -92,10 +90,16 @@ public class ScopeWidgetTest {
 		verify(mockEditScopeWidget).configure(mockScopeIds, true, TableType.fileview);
 		verify(mockView).showModal();
 		
+		//update file view to file+table view
+		widget.onSelectFilesAndTablesView();
+		
 		// save new scope
 		widget.onSave();
+		
 		verify(mockSynapseAlert).clear();
 		verify(mockView).setLoading(true);
+		//verify view type has been updated
+		verify(mockEntityView).setType(ViewType.file_and_table);
 		verify(mockSynapseClient).updateEntity(any(Table.class), any(AsyncCallback.class));
 		verify(mockView).setLoading(false);
 		verify(mockView).hideModal();
@@ -114,7 +118,41 @@ public class ScopeWidgetTest {
 		
 		// edit
 		widget.onEdit();
+		// Do not show File View options for project view
+		verify(mockView).setFileViewTypeSelectionVisible(false);
 		verify(mockEditScopeWidget).configure(mockScopeIds, true, TableType.projectview);
+	}
+	
+	@Test
+	public void testConfigureFileView() {
+		when(mockEntityView.getType()).thenReturn(ViewType.file);
+		boolean isEditable = true;
+		
+		widget.configure(mockBundle, isEditable, mockEntityUpdatedHandler);
+		widget.onEdit();
+		
+		// Show File View options for project view
+		verify(mockView).setFileViewTypeSelectionVisible(true);
+		verify(mockView).setIsIncludeTables(false);
+	}
+	
+	@Test
+	public void testConfigureFileAndTableView() {
+		when(mockEntityView.getType()).thenReturn(ViewType.file_and_table);
+		boolean isEditable = true;
+		
+		widget.configure(mockBundle, isEditable, mockEntityUpdatedHandler);
+		widget.onEdit();
+		
+		// Show File View options for project view
+		verify(mockView).setFileViewTypeSelectionVisible(true);
+		verify(mockView).setIsIncludeTables(true);
+		
+		//verify update view type from file+table to file
+		widget.onSelectFilesOnlyView();
+		widget.onSave();
+		
+		verify(mockEntityView).setType(ViewType.file);
 	}
 	
 	@Test

@@ -13,8 +13,9 @@
 			dataBackdrop="STATIC" dataKeyboard="false" b:id="editScopeModal"
 			size="LARGE">
 			<b:ModalBody>
-				<g:SimplePanel ui:field="editScopeContainer"/>
+				<g:SimplePanel ui:field="editScopeContainer" addStyleNames="light-border padding-10" />
 				<g:SimplePanel ui:field="editScopeAlertContainer" />
+				<bh:Div ui:field="viewOptionsContainer" />
 			</b:ModalBody>
 			<b:ModalFooter>
 				<b:Button ui:field="saveButton" type="PRIMARY"
