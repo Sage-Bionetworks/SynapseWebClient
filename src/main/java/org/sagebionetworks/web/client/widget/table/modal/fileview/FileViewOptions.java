@@ -10,14 +10,14 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ViewOptions implements IsWidget {
-	public interface Binder extends UiBinder<Widget, ViewOptions> {}
+public class FileViewOptions implements IsWidget {
+	public interface Binder extends UiBinder<Widget, FileViewOptions> {}
 	Widget widget;
 	@UiField
 	InlineCheckBox includeTablesCb;
 	
 	@Inject
-	public ViewOptions(Binder binder){
+	public FileViewOptions(Binder binder){
 		widget = binder.createAndBindUi(this);
 	}
 	@Override

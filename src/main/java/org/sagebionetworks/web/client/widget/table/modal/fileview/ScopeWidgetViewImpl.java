@@ -33,10 +33,10 @@ public class ScopeWidgetViewImpl implements ScopeWidgetView {
 	Div viewOptionsContainer;
 	Widget widget;
 	Presenter presenter;
-	ViewOptions viewOptions;
+	FileViewOptions viewOptions;
 	
 	@Inject
-	public ScopeWidgetViewImpl(Binder binder, ViewOptions viewOptions){
+	public ScopeWidgetViewImpl(Binder binder, FileViewOptions viewOptions){
 		widget = binder.createAndBindUi(this);
 		this.viewOptions = viewOptions;
 		viewOptionsContainer.add(viewOptions);
