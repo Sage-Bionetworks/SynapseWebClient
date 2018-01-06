@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -44,6 +45,7 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 	public void configure(DiscussionThreadBundle bundle) {
 		this.bundle = bundle;
 		view.setTitle(bundle.getTitle());
+		view.setThreadUrl(TopicUtils.buildThreadLink(bundle.getProjectId(), bundle.getId()));
 		authorWidget.configure(bundle.getCreatedBy());
 		authorWidget.setSize(BadgeSize.SMALL_PICTURE_ONLY);
 		view.clearActiveAuthors();
