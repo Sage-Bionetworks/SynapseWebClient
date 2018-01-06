@@ -4,7 +4,9 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div>
-		<b:Anchor ui:field="followersLink" />
+		<g:FocusPanel ui:field="followersFocusPanel">
+			<bh:Span ui:field="followersLink" addStyleNames="imageButton link" />	
+		</g:FocusPanel>
 		<b:Modal ui:field="modal" closable="true" dataBackdrop="STATIC" dataKeyboard="false" title="Followers">
 			<b:ModalBody>
 				<bh:Div ui:field="userListContainer" />
