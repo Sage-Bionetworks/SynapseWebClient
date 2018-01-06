@@ -504,7 +504,6 @@ public class ProfilePresenterTest {
 		verify(mockView, never()).setUnbindOrcIdVisible(true);
 		verify(mockView).setOrcIDLinkButtonVisible(true); 
 		verify(mockView, never()).setOrcIDLinkButtonVisible(false); 
-
 	}
 	
 	@Test
@@ -528,6 +527,7 @@ public class ProfilePresenterTest {
 		verify(mockView).setOrcIDLinkButtonVisible(true); 
 		verify(mockView).setOrcIDLinkButtonVisible(false); 
 	}
+	
 	@Test
 	public void testUnbindHiddenIfNotOwner() {
 		when(mockUserBundle.getIsCertified()).thenReturn(false);
@@ -553,7 +553,6 @@ public class ProfilePresenterTest {
 		verify(mockView, never()).addCertifiedBadge();
 	}
 	
-
 	@Test
 	public void testLinkOrcIdClicked() throws JSONObjectAdapterException {
 		when(place.toToken()).thenReturn(targetUserId);
@@ -564,7 +563,6 @@ public class ProfilePresenterTest {
 		profilePresenter.linkOrcIdClicked();
 		verify(mockView).showErrorMessage(anyString());
 	}
-	
 	
 	@Test
 	public void testRefreshProjects() {
@@ -625,8 +623,6 @@ public class ProfilePresenterTest {
 		verify(mockSynapseClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(any(Exception.class));
 	}
-
-
 	
 	@Test
 	public void testGetProjectsCreatedByMe() {
@@ -642,7 +638,6 @@ public class ProfilePresenterTest {
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 		verify(mockView).setProjectSortVisible(true);
 	}
-	
 
 	@Test
 	public void testGetFavorites() {
@@ -987,9 +982,10 @@ public class ProfilePresenterTest {
 	@Test
 	public void testGetTeamBundlesNoRequests() throws Exception {
 		setupUserTeams(3,1);
-		profilePresenter.setCurrentUserId("12345");
-		profilePresenter.getTeamBundles(false);
-		
+		when(place.getArea()).thenReturn(ProfileArea.TEAMS);
+
+		setPlaceMyProfile("12345");
+
 		verify(mockSynapseJavascriptClient).getUserTeams(eq("12345"), eq(true), eq(null));
 		verify(mockSynapseJavascriptClient).listTeams(teamIds);
 		verify(mockTeamListWidget).addTeam(any(Team.class));
@@ -998,8 +994,9 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetTeamBundlesWithRequests() throws Exception {
-		profilePresenter.setCurrentUserId(userProfile.getOwnerId());
-		profilePresenter.getTeamBundles(true);
+		when(place.getArea()).thenReturn(ProfileArea.TEAMS);
+		
+		setPlaceMyProfile(userProfile.getOwnerId());
 		
 		verify(mockSynapseJavascriptClient).getUserTeams(userProfile.getOwnerId(), true, null);
 		verify(mockSynapseJavascriptClient).listTeams(teamIds);
@@ -1039,7 +1036,10 @@ public class ProfilePresenterTest {
 	public void testGetQueryForRequestCount() throws Exception {
 		//when request count is 0, should do nothing
 		setupUserTeams(0,1);
-		profilePresenter.getTeamBundles(true);
+		when(place.getArea()).thenReturn(ProfileArea.TEAMS);
+		
+		setPlaceMyProfile(userProfile.getOwnerId());
+		
 		verify(mockTeamListWidget).setNotificationValue(anyString(), eq(0L));
 		verify(mockView, never()).showErrorMessage(anyString());
 
@@ -1055,18 +1055,21 @@ public class ProfilePresenterTest {
 	public void testTeamsTabNotOwner() {
 		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(false);
+		when(place.getArea()).thenReturn(ProfileArea.TEAMS);
 		profilePresenter.tabClicked(ProfileArea.TEAMS);
 		
 		verify(mockSynapseJavascriptClient).getUserTeams(anyString(), anyBoolean(), anyString());
 		verify(mockSynapseJavascriptClient).listTeams(anyList());
-		verify(mockView, Mockito.never()).setTeamNotificationCount(anyString());
+		verify(mockView, never()).setTeamNotificationCount(anyString());
 		verify(mockTeamListWidget, times(2)).addTeam(any(Team.class));
+		verify(mockView, never()).addTeamsFilterTeam(any(Team.class));
 	}
 	
 	@Test
 	public void testTeamsTabOwner() {
 		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
+		when(place.getArea()).thenReturn(ProfileArea.TEAMS);
 		profilePresenter.tabClicked(ProfileArea.TEAMS);	
 		verify(mockSynapseJavascriptClient).getUserTeams(anyString(), anyBoolean(), anyString());
 		verify(mockSynapseJavascriptClient).listTeams(anyList());
@@ -1096,13 +1099,16 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetTeamFilters() {
+		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
 		setPlaceMyProfile("456");
 		invokeGetMyTeamsCallback();
 		profilePresenter.tabClicked(ProfileArea.PROJECTS);
 		verify(mockSynapseJavascriptClient).getUserTeams(anyString(), anyBoolean(), anyString());
 		verify(mockSynapseJavascriptClient).listTeams(anyList());
 		verify(mockView).setTeamsFilterVisible(true);
-		verify(mockTeamListWidget, times(2)).addTeam(any(Team.class));
+		// filters are added, but teams not added to team list (in teams tab).
+		verify(mockTeamListWidget, never()).addTeam(any(Team.class));
+		verify(mockView, times(2)).addTeamsFilterTeam(any(Team.class));
 	}
 	
 	@Test
@@ -1231,13 +1237,14 @@ public class ProfilePresenterTest {
 			invites.add(new OpenUserInvitationBundle());	
 		}	
 		setupUserTeams(totalNotifications/2, 1);
-		profilePresenter.setIsOwner(true);
-		profilePresenter.refreshTeams();
+		when(place.getArea()).thenReturn(ProfileArea.TEAMS);
+		setPlaceMyProfile(targetUserId);
+		
 		ArgumentCaptor<Callback> refreshTeamsCallback = ArgumentCaptor.forClass(Callback.class);
 		verify(mockTeamInviteWidget).configure(refreshTeamsCallback.capture(), eq((CallbackP)null));
 		//updates total notifications when refreshing teams
 		verify(mockView).setTeamNotificationCount(String.valueOf(totalNotifications));
-		verify(mockView).addTeamsFilterTeam(any(Team.class));
+		verify(mockView, never()).addTeamsFilterTeam(any(Team.class));
 		verify(mockTeamListWidget).addTeam(any(Team.class));
 		//heretofore, have verified proper behavior without adding
 		
@@ -1252,8 +1259,8 @@ public class ProfilePresenterTest {
 		
 		//invites are still set
 		verify(mockView, atLeastOnce()).setTeamNotificationCount(String.valueOf(totalNotifications));
-		//called twice more, one for each added team
-		verify(mockView, times(3)).addTeamsFilterTeam(any(Team.class));
+		// on teams page, does not update project team filters
+		verify(mockView, never()).addTeamsFilterTeam(any(Team.class));
 		verify(mockTeamListWidget, times(3)).addTeam(any(Team.class));
 	}
 	
@@ -1280,13 +1287,15 @@ public class ProfilePresenterTest {
 			invites.add(new OpenUserInvitationBundle());	
 		}
 		setupUserTeams(totalNotifications, 1);
-		profilePresenter.setIsOwner(true);
-		profilePresenter.refreshTeams();
+		when(place.getArea()).thenReturn(ProfileArea.TEAMS);
+		
+		setPlaceMyProfile(targetUserId);
+		
 		ArgumentCaptor<Callback> refreshTeamsCallback = ArgumentCaptor.forClass(Callback.class);
 		verify(mockTeamInviteWidget).configure(refreshTeamsCallback.capture(), eq((CallbackP)null));
 		//called by updateTeamInvites due to second switch, even if invites doesn't change
 		verify(mockView).setTeamNotificationCount(String.valueOf(totalNotifications));
-		verify(mockView).addTeamsFilterTeam(any(Team.class));
+		verify(mockView, never()).addTeamsFilterTeam(any(Team.class));
 		verify(mockTeamListWidget).addTeam(any(Team.class));
 	}
 	
@@ -1300,23 +1309,30 @@ public class ProfilePresenterTest {
 			invites.add(new OpenUserInvitationBundle());	
 		}
 		setupUserTeams(0, 1);
-		profilePresenter.setIsOwner(true);
-		profilePresenter.refreshTeams();
+		when(place.getArea()).thenReturn(ProfileArea.TEAMS);
+		
+		setPlaceMyProfile(userProfile.getOwnerId());
+		
 		ArgumentCaptor<Callback> refreshTeamsCallback = ArgumentCaptor.forClass(Callback.class);
 		verify(mockTeamInviteWidget).configure(refreshTeamsCallback.capture(), eq((CallbackP)null));
 		verify(mockView).setTeamNotificationCount(String.valueOf(totalNotifications));
-		verify(mockView).addTeamsFilterTeam(any(Team.class));
+		verify(mockView, never()).addTeamsFilterTeam(any(Team.class));
 		verify(mockTeamListWidget).addTeam(any(Team.class));
 	}
 	
 	@Test
 	public void testRefreshTeamsNotOwner() {
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("39843");
+		when(place.getArea()).thenReturn(ProfileArea.TEAMS);
+		when(place.getUserId()).thenReturn("12345");
 		profilePresenter.setIsOwner(false);
 		setupUserTeams(3, 1);
-		profilePresenter.refreshTeams();
+		
+		profilePresenter.setPlace(place);
+		
 		verify(mockView, never()).setTeamNotificationCount(anyString());
 		verify(mockTeamInviteWidget, never()).configure(any(Callback.class), any(CallbackP.class));
-		verify(mockView).addTeamsFilterTeam(any(Team.class));
+		verify(mockView, never()).addTeamsFilterTeam(any(Team.class));
 		verify(mockTeamListWidget).addTeam(any(Team.class));
 	}
 

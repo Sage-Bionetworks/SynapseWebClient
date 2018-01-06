@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -15,8 +15,6 @@ public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadL
 
 	public interface Binder extends UiBinder<Widget, DiscussionThreadListItemWidgetViewImpl> {}
 
-	@UiField
-	Span threadTitle;
 	@UiField
 	Span threadAuthor;
 	@UiField
@@ -28,9 +26,7 @@ public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadL
 	@UiField
 	Span lastActivity;
 	@UiField
-	FocusPanel showThread;
-	@UiField
-	Icon pinnedIcon;
+	Anchor threadLink;
 
 	private Widget widget;
 	private DiscussionThreadListItemWidget presenter;
@@ -38,9 +34,10 @@ public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadL
 	@Inject
 	public DiscussionThreadListItemWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		showThread.addClickHandler(new ClickHandler() {
+		threadLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				event.preventDefault();
 				presenter.onClickThread();
 			}
 		});
@@ -58,7 +55,7 @@ public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadL
 
 	@Override
 	public void setTitle(String title) {
-		threadTitle.setText(title);
+		threadLink.setText(title);
 	}
 
 	@Override
@@ -93,6 +90,14 @@ public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadL
 
 	@Override
 	public void setPinnedIconVisible(boolean visible) {
-		pinnedIcon.setVisible(visible);
+		if (visible) {
+			threadLink.setIcon(IconType.THUMB_TACK);
+		} else {
+			threadLink.setIcon(null);
+		}
+	}
+	@Override
+	public void setThreadUrl(String url) {
+		threadLink.setHref(url);
 	}
 }
