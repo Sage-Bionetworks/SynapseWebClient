@@ -41,6 +41,7 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -74,6 +75,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	private String[] fileNames;
 	private int currIndex;
+	private JavaScriptObject fileList;
 	private NumberFormat percentFormat;
 	private boolean fileHasBeenUploaded = false;
 	private UploadType currentUploadType;
@@ -109,7 +111,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		view.setPresenter(this);
 		clearHandlers();
 	}		
-		
+
 	public Widget asWidget(Entity entity) {
 		return asWidget(entity, null, null, true);
 	}
@@ -126,8 +128,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.fileHandleIdCallback = fileHandleIdCallback;
 		this.view.createUploadForm(isEntity, parentEntityId);
 		view.resetToInitialState();
+		fileList = null;
 		resetUploadProgress();
 		view.showUploaderUI();
+		
+		globalAppState.setDropZoneHandler(fileList -> {
+			handleUploads(fileList);
+		});
 		
 		//async load upload destinations (and update view)
 		queryForUploadDestination();
@@ -158,10 +165,9 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public String[] getSelectedFileNames() {
-		return synapseJsniUtils.getMultipleUploadFileNames(UploaderViewImpl.FILE_FIELD_ID);
+		return synapseJsniUtils.getMultipleUploadFileNames(fileList);
 	}
 	
-	@Override
 	public String getSelectedFilesText() {
 		String[] selectedFiles = getSelectedFileNames();
 		if (selectedFiles == null)
@@ -176,11 +182,12 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	@Override
 	public void handleUploads() {
 		//field validation
-		if (fileNames == null) {
+		if (fileList == null) {
 			//setup upload process.
+			fileList = synapseJsniUtils.getFileList(UploaderViewImpl.FILE_FIELD_ID);
 			fileHasBeenUploaded = false;
 			currIndex = 0;
-			if ((fileNames = getSelectedFileNames()) == null) {
+			if (fileList == null) {
 				//no files selected.
 				view.hideLoading();
 				view.showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
@@ -188,7 +195,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				return;
 			}
 		}
-		
+		this.handleUploads(fileList);
+	}
+	
+	public void handleUploads(JavaScriptObject fileList) {
+		this.fileList = fileList;
+		view.setSelectedFilenames(getSelectedFilesText());
+		fileNames = synapseJsniUtils.getMultipleUploadFileNames(fileList);
 		if (currentUploadType == UploadType.SFTP) {
 			//must also have credentials
 			String username = view.getExternalUsername();
@@ -410,7 +423,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public void checkFileSize() throws IllegalArgumentException{
-		JavaScriptObject blob = synapseJsniUtils.getFileBlob(this.currIndex, UploaderViewImpl.FILE_FIELD_ID);
+		JavaScriptObject blob = synapseJsniUtils.getFileBlob(this.currIndex, fileList);
 		long fileSize = (long)synapseJsniUtils.getFileSize(blob);
 		//check
 		if (fileSize > OLD_BROWSER_MAX_SIZE) {
@@ -469,11 +482,14 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void directUploadStep2(String fileName) {
 		//use S3 direct uploader
+		JavaScriptObject currentFile = synapseJsniUtils.getFileBlob(currIndex, fileList);
+		String contentType = synapseJsniUtils.getContentType(fileList, currIndex);
+		contentType = ContentTypeUtils.fixDefaultContentType(contentType, fileName);
 		if (endpointUrl != null) {
 			s3DirectUploader.configure(view.getS3DirectAccessKey(), view.getS3DirectSecretKey(), bucketName, endpointUrl);
-			s3DirectUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, keyPrefixUUID, storageLocationId, view);
+			s3DirectUploader.uploadFile(fileName, contentType, currentFile, this, keyPrefixUUID, storageLocationId, view);
 		} else {
-			this.multiPartUploader.uploadFile(UploaderViewImpl.FILE_FIELD_ID, currIndex, this, storageLocationId, view);	
+			this.multiPartUploader.uploadFile(fileName, contentType, currentFile, this, storageLocationId, view);	
 		}
 	}
 
@@ -547,7 +563,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public void setSftpExternalFilePath(final String path, final Long storageLocationId) {
-		final JavaScriptObject blob = synapseJsniUtils.getFileBlob(currIndex, UploaderViewImpl.FILE_FIELD_ID);
+		final JavaScriptObject blob = synapseJsniUtils.getFileBlob(currIndex, fileList);
 		
 		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
 			@Override
@@ -555,7 +571,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				boolean isUpdating = entityId != null || entity != null;
 				long fileSize = (long)synapseJsniUtils.getFileSize(blob);
 				String fileName = fileNames[currIndex];
-				String contentType = synapseJsniUtils.getContentType(UploaderViewImpl.FILE_FIELD_ID, currIndex);
+				String contentType = synapseJsniUtils.getContentType(fileList, currIndex);
 				contentType = ContentTypeUtils.fixDefaultContentType(contentType, fileName);
 				if (isUpdating) {
 					//existing entity

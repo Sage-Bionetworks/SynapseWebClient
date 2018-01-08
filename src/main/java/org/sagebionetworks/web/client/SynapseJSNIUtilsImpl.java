@@ -174,8 +174,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 	}
 	
-	
-	
 	@Override
 	public void uploadFileChunk(String contentType, JavaScriptObject blob, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback) {
 		SynapseJSNIUtilsImpl.progressCallback = callback;
@@ -183,16 +181,25 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	@Override
-	public JavaScriptObject getFileBlob(int index, String fileFieldId) {
-		return _getFileBlob(index, fileFieldId);
+	public JavaScriptObject getFileList(String fileFieldId) {
+		return _getFileList(fileFieldId);
 	}
 	
-	private final static native JavaScriptObject _getFileBlob(int index, String fileFieldId) /*-{
+	private final static native JavaScriptObject _getFileList(String fileFieldId) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
 		if (fileToUploadElement && 'files' in fileToUploadElement) {
-			return fileToUploadElement.files[index];
+			return fileToUploadElement.files;
 		}
 		return null;
+	}-*/;
+	
+	@Override
+	public JavaScriptObject getFileBlob(int index, JavaScriptObject fileList) {
+		return _getFileBlob(index, fileList);
+	}
+	
+	private final static native JavaScriptObject _getFileBlob(int index, JavaScriptObject fileList) /*-{
+		return fileList[index];
 	}-*/;
 	
 	private final static native void _directUploadBlob(String contentType, JavaScriptObject fileToUpload, Long startByte, Long endByte, String url, XMLHttpRequest xhr) /*-{
@@ -238,12 +245,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public String getContentType(String fileFieldId, int index) {
-		return _getContentType(fileFieldId, index);
+	public String getContentType(JavaScriptObject fileList, int index) {
+		return _getContentType(fileList, index);
 	}
-	private final static native String _getContentType(String fileFieldId, int index) /*-{
-		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		return fileToUploadElement.files[index].type;
+	private final static native String _getContentType(JavaScriptObject fileList, int index) /*-{
+		return fileList[index].type;
 	}-*/;
 	
 	@Override
@@ -255,27 +261,29 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public String[] getMultipleUploadFileNames(String fileFieldId) {
-		String unSplitNames = _getFilesSelected(fileFieldId);
+	public String[] getMultipleUploadFileNames(JavaScriptObject fileList) {
+		String unSplitNames = _getFilesSelected(fileList);
 		if (unSplitNames.equals(""))
 			return null;
 		return unSplitNames.split(";");
 	}
 	
-	private static native String _getFilesSelected(String fileFieldId) /*-{
-		var fileToUploadElement = $doc.getElementById(fileFieldId);
-	    var out = "";
-		if (fileToUploadElement) {
-		    for (i = 0; i < fileToUploadElement.files.length; i++) {
-		        var file = fileToUploadElement.files[i];
-		        out += file.name + ';';
-		    }
-		}
+	private static native String _getFilesSelected(JavaScriptObject fileList) /*-{
+		var out = "";
+	    for (i = 0; i < fileList.length; i++) {
+	        var file =fileList[i];
+	        out += file.name + ';';
+	    }
 	    return out;
 	}-*/;
 	
 	public boolean isElementExists(String elementId) {
 		return Document.get().getElementById(elementId) != null;
+	};
+	
+	@Override
+	public Element getElementById(String elementId) {
+		return Document.get().getElementById(elementId);
 	};
 	
 	/**

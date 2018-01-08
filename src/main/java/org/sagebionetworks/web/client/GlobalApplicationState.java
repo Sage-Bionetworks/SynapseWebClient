@@ -5,10 +5,12 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -130,4 +132,6 @@ public interface GlobalApplicationState {
 	boolean isShowingUTCTime();
 	
 	PublicPrincipalIds getPublicPrincipalIds();
+	void initializeDropZone();
+	void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback);
 }

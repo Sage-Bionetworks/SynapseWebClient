@@ -53,7 +53,6 @@ import com.google.gwt.user.client.ui.FormPanel.SubmitCompleteHandler;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -509,7 +508,6 @@ public class UploaderViewImpl extends FlowPanel implements
 		fileUploadInput.addValueChangeHandler(new ValueChangeHandler<String>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<String> event) {
-				fileUploadLabel.setText(presenter.getSelectedFilesText());
 				uploadBtn.click();
 			}
 		});
@@ -656,5 +654,10 @@ public class UploaderViewImpl extends FlowPanel implements
 	@Override
 	public void setExternalUrl(String url) {
 		pathField.setValue(url);
+	}
+	
+	@Override
+	public void setSelectedFilenames(String fileNames) {
+		fileUploadLabel.setText(fileNames);
 	}
 }
