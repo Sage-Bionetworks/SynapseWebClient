@@ -99,6 +99,8 @@ public class UploaderTest {
 	ExternalObjectStoreUploadDestination mockExternalObjectStoreUploadDestination;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	JavaScriptObject mockFileList;
 	
 	@Before
 	public void before() throws Exception {
@@ -175,6 +177,8 @@ public class UploaderTest {
 				return null;
 			}
 		}).when(synapseJsniUtils).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
+		
+		when(synapseJsniUtils.getFileList(anyString())).thenReturn(mockFileList);
 	}
 	
 	@Test
