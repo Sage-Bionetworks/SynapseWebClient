@@ -47,7 +47,6 @@ public class EntityActionControllerViewImpl implements
 	Button deleteWikiButton;
 	Widget widget;
 	Presenter presenter;
-	boolean listenForDragEnter = false;
 	@Inject
 	public EntityActionControllerViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
@@ -58,19 +57,12 @@ public class EntityActionControllerViewImpl implements
 				presenter.onConfirmDeleteWiki();	
 			}
 		});
-		_initializeDragEnter(this);
 	}
 
 	@Override
 	public void setPresenter(Presenter p) {
 		presenter = p;
 	}
-	
-	@Override
-	public void setListenForDragEnter(boolean listen) {
-		this.listenForDragEnter = listen;
-	}
-	
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
@@ -132,16 +124,4 @@ public class EntityActionControllerViewImpl implements
 			}
 		}
 	}
-	
-	public void onDragEnter() {
-		if (listenForDragEnter) {
-			presenter.onDragEnter();
-		}
-	}
-	
-	private final static native void _initializeDragEnter(EntityActionControllerViewImpl view) /*-{
-		$wnd.addEventListener('dragenter', function(e) {
-			view.@org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerViewImpl::onDragEnter()();
-		});
-	}-*/;
 }

@@ -78,7 +78,6 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -594,7 +593,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(entityBundle.getEntity() instanceof FileEntity ){
 			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, permissions.getCanCertifiedUserEdit());
 			actionMenu.setActionListener(Action.UPLOAD_NEW_FILE, this);
-			view.setListenForDragEnter(false);
 		}else{
 			actionMenu.setActionVisible(Action.UPLOAD_NEW_FILE, false);
 		}
@@ -604,16 +602,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(isContainerOnFilesTab(entityBundle.getEntity(), currentArea)){
 			actionMenu.setActionVisible(Action.UPLOAD_FILE, permissions.getCanCertifiedUserEdit());
 			actionMenu.setActionListener(Action.UPLOAD_FILE, this);
-			view.setListenForDragEnter(permissions.getCanCertifiedUserEdit());
 		}else{
 			actionMenu.setActionVisible(Action.UPLOAD_FILE, false);
-			view.setListenForDragEnter(false);
 		}
-	}
-	
-	@Override
-	public void onDragEnter() {
-		onUploadNewFileEntity();
 	}
 	
 	private void configureAddFolder() {
