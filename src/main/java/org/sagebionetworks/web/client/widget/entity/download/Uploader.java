@@ -188,7 +188,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			fileList = synapseJsniUtils.getFileList(UploaderViewImpl.FILE_FIELD_ID);
 			fileHasBeenUploaded = false;
 			currIndex = 0;
-			if (fileList == null) {
+			if ((fileNames = getSelectedFileNames()) == null) {
 				//no files selected.
 				view.hideLoading();
 				view.showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);

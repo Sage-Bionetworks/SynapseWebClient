@@ -54,22 +54,10 @@ public class MultipartUploaderStub implements MultipartUploader {
 	}
 
 	@Override
-	public void uploadSelectedFile(String fileInputId, ProgressingFileUploadHandler handler, Long storageLocationId,
-			HasAttachHandlers view) {
-		respond(handler);
+	public void uploadFile(String fileName, String contentType, JavaScriptObject blob, ProgressingFileUploadHandler handler, Long storageLocationId, HasAttachHandlers view) {
+		respond(handler);	
 	}
-
-	@Override
-	public void uploadFile(String fileInputId, int fileIndex, ProgressingFileUploadHandler handler,
-			Long storageLocationId, HasAttachHandlers view) {
-		respond(handler);
-	}
-
-	@Override
-	public void uploadFile(String fileName, String contentType, JavaScriptObject blob,
-			ProgressingFileUploadHandler handler, Long storageLocationId, HasAttachHandlers view) {
-		respond(handler);
-	}
+	
 	@Override
 	public void cancelUpload() {
 		isCanceled = true;

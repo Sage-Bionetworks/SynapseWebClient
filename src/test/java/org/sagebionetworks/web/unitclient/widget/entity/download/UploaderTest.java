@@ -119,7 +119,7 @@ public class UploaderTest {
 		when(authenticationController.isLoggedIn()).thenReturn(true);
 		when(authenticationController.getCurrentUserSessionData()).thenReturn(sessionData);
 		
-		when(synapseJsniUtils.getContentType(anyString(), anyInt())).thenReturn("image/png");
+		when(synapseJsniUtils.getContentType(any(JavaScriptObject.class), anyInt())).thenReturn("image/png");
 		
 		S3UploadDestination d = new S3UploadDestination();
 		d.setUploadType(UploadType.S3);
@@ -138,7 +138,7 @@ public class UploaderTest {
 		cancelHandler = mock(CancelHandler.class);
 		
 		String[] fileNames = {"newFile.txt"};
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
+		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(fileNames);
 		
 		when(jiraURLHelper.createAccessRestrictionIssue(anyString(), anyString(), anyString())).thenReturn("http://fakeJiraRestrictionLink");
 		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).updateExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), anyString(), anyLong(), any(AsyncCallback.class));
@@ -263,7 +263,7 @@ public class UploaderTest {
 		verify(view).enableMultipleFileUploads(true);
 		final String file1 = "file1.txt";
 		String[] fileNames = {file1};
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
+		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(fileNames);
 		uploader.handleUploads();
 		verify(synapseClient).setFileEntityFileHandle(anyString(), anyString(),  anyString(),  any(AsyncCallback.class));
 		verify(view).hideLoading();
@@ -293,7 +293,7 @@ public class UploaderTest {
 	@Test
 	public void testDirectUploadNoFilesSelected() throws Exception {
 		uploader.setFileNames(null);
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
+		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(null);
 		uploader.handleUploads();
 		verify(view).hideLoading();
 		verify(view).showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
@@ -368,7 +368,7 @@ public class UploaderTest {
 		final String file2 = "file2.txt";
 		final String file3 = "file3.txt";
 		String[] fileNames = {file1, file2, file3};
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
+		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(fileNames);
 		
 		uploader.handleUploads();
 		
@@ -517,7 +517,7 @@ public class UploaderTest {
 		uploader.directUploadStep2(fileName);
 		
 		verify(mockS3DirectUploader).configure(accessKey, secretKey, bucket, endpoint);
-		verify(mockS3DirectUploader).uploadFile(UploaderViewImpl.FILE_FIELD_ID, 0, uploader, keyPrefixUUID, storageLocationId, view);
+		verify(mockS3DirectUploader).uploadFile(anyString(), anyString(), any(JavaScriptObject.class), eq(uploader), eq(keyPrefixUUID), eq(storageLocationId), eq(view));
 		
 	}
 
@@ -666,19 +666,19 @@ public class UploaderTest {
 	@Test
 	public void testGetSelectedFilesText() {
 		String fileName = "single file.txt";
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{fileName});
+		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(new String[]{fileName});
 		assertEquals(fileName, uploader.getSelectedFilesText());
 	}
 	
 	@Test
 	public void testGetSelectedFilesTextNoFiles() {
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
+		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(null);
 		assert(uploader.getSelectedFilesText().isEmpty());
 	}
 	
 	@Test
 	public void testGetSelectedFilesTextMultipleFiles() {
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"file1", "file2"});
+		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(new String[]{"file1", "file2"});
 		assertEquals("2 files", uploader.getSelectedFilesText());
 	}
 
