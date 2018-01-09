@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.NavTabs;
 import org.gwtbootstrap3.client.ui.Progress;
@@ -20,12 +21,15 @@ import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.ColumnSize;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.InputType;
 import org.gwtbootstrap3.client.ui.constants.ProgressBarType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EventHandlerUtils;
@@ -140,7 +144,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		
 		spinningProgressContainer = new Div();
 		
-		chooseFileBtn = new Button("Choose File");
+		chooseFileBtn = new Button("Browse...");
 		chooseFileBtn.setType(ButtonType.INFO);
 		chooseFileBtn.setSize(ButtonSize.LARGE);		
 		uploadBtn = new Button();
@@ -500,6 +504,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
 		FlowPanel fileInputPanel = new FlowPanel();
+		fileInputPanel.addStyleName("uploadContainer center");
 		fileUploadInput = new Input(InputType.FILE);
 		fileUploadInput.setId(FILE_FIELD_ID);
 		fileUploadInput.setName("uploads[]");
@@ -519,6 +524,13 @@ public class UploaderViewImpl extends FlowPanel implements
 			}
 		});
 		fileInputPanel.add(fileUploadInput);
+		Span icon = new Span();
+		icon.add(new Icon(IconType.CLOUD_UPLOAD));
+		icon.addStyleName("margin-right-5 font-size-30 lightGreyText movedown-6");
+		fileInputPanel.add(icon);
+		Span dropText = new Span("Drop files to upload, or");
+		dropText.addStyleName("margin-right-5 font-size-20 movedown-2");
+		fileInputPanel.add(dropText);
 		fileInputPanel.add(chooseFileBtn);
 		fileInputPanel.add(fileUploadLabel);
 		enableMultipleFileUploads(true);
