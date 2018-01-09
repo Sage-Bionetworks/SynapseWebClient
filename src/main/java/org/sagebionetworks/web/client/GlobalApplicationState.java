@@ -134,4 +134,5 @@ public interface GlobalApplicationState {
 	PublicPrincipalIds getPublicPrincipalIds();
 	void initializeDropZone();
 	void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback);
+	void clearDropZoneHandler();
 }

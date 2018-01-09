@@ -542,4 +542,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback) {
 		this.fileListCallback = fileListCallback;
 	}
+	
+	@Override
+	public void clearDropZoneHandler() {
+		fileListCallback = null;
+	}
 }
