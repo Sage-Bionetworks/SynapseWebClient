@@ -152,6 +152,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		bucketName = null;
 		keyPrefixUUID = null;
 		endpointUrl = null;
+		globalAppState.setDropZoneHandler(null);
 		resetUploadProgress();
 	}
 
@@ -742,6 +743,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private void uploadSuccess() {
 		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
 		view.clear();
+		globalAppState.setDropZoneHandler(null);
 		view.resetToInitialState();
 		resetUploadProgress();
 		handlerManager.fireEvent(new EntityUpdatedEvent());

@@ -474,8 +474,12 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		return publicPrincipalIds;
 	}
 	
+	public boolean isDragAndDropListenerSet() {
+		return fileListCallback != null;
+	}
+	
 	public void onDrop(JavaScriptObject fileList) {
-		if (fileListCallback != null) {
+		if (isDragAndDropListenerSet()) {
 			fileListCallback.invoke(fileList);
 		}
 	}
@@ -500,7 +504,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		}
 		
 		$wnd.addEventListener('dragenter', function(e) {
-			showDropZone();
+			if (globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::isDragAndDropListenerSet()()) {
+				showDropZone();
+			}
 		});
 		
 		function allowDrag(e) {

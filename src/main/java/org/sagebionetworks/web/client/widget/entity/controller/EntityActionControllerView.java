@@ -47,8 +47,9 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	void addWidget(IsWidget asWidget);
 	void showDeleteWikiModal(String wikiPageId, Map<String, V2WikiHeader> id2HeaderMap, Map<String, List<V2WikiHeader>> id2ChildrenMap);
 	void setPresenter(Presenter p);
-	
+	void setListenForDragEnter(boolean listen);
 	public interface Presenter {
 		void onConfirmDeleteWiki();
+		void onDragEnter();
 	}
 }
