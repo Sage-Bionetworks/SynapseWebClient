@@ -3294,8 +3294,8 @@ div.colborder {
 	left: 0;
 	top: 0;
 	z-index: 99999;
-	background: rgba(#1e7098, .8);
-	border: 9px dashed #1e7098;
+	background-color: rgba(0,0,0,0.8);
+	border: 5px dashed #F9F9F9;
 }
 
 /*-------------------------------------------------------*/
