@@ -47,17 +47,18 @@ public interface SynapseJSNIUtils {
 	
 	public void setPageDescription(String newDescription);
 
-	public JavaScriptObject getFileBlob(int index, String fileFieldId);
+	public JavaScriptObject getFileList(String fileFieldId);
+	public JavaScriptObject getFileBlob(int index, JavaScriptObject fileList);
 	public void uploadFileChunk(String contentType, JavaScriptObject blob, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback);
 	
-	public String getContentType(String fileFieldId, int index);
+	public String getContentType(JavaScriptObject fileList, int index);
 	public boolean isFileAPISupported();
 	public boolean isElementExists(String elementId);
 	public String getFileUrl(String fileFieldId);
 	public void getFileMd5(JavaScriptObject blob, MD5Callback callback);
 	public void getFilePartMd5(JavaScriptObject blob, int currentChunk, Long chunkSize, MD5Callback md5Callback);
 	public double getFileSize(JavaScriptObject blob);
-	String[] getMultipleUploadFileNames(String fileFieldId);
+	String[] getMultipleUploadFileNames(JavaScriptObject fileList);
 	public void consoleLog(String message);
 	public void consoleError(String message);
 	public void uploadUrlToGenomeSpace(String url);	
@@ -92,4 +93,6 @@ public interface SynapseJSNIUtils {
 	String sanitizeHtml(String html);
 
 	boolean elementSupportsAttribute(Element el, String attribute);
+
+	Element getElementById(String elementId);
 }

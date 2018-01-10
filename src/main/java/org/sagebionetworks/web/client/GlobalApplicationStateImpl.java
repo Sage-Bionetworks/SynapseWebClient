@@ -16,12 +16,14 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
@@ -55,7 +57,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private DateTimeUtils dateTimeUtils;
 	private PublicPrincipalIds publicPrincipalIds;
 	private SynapseJavascriptClient jsClient;
-	
+	private CallbackP<JavaScriptObject> fileListCallback;
+	boolean isDragDropInitialized = false;
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
@@ -469,5 +472,79 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			publicPrincipalIds.setAuthenticatedAclPrincipalId(Long.parseLong(getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)));	
 		}
 		return publicPrincipalIds;
+	}
+	
+	public boolean isDragAndDropListenerSet() {
+		return fileListCallback != null;
+	}
+	
+	public void onDrop(JavaScriptObject fileList) {
+		if (isDragAndDropListenerSet()) {
+			fileListCallback.invoke(fileList);
+		}
+	}
+	
+	@Override
+	public void initializeDropZone() {
+		if (!isDragDropInitialized) {
+			isDragDropInitialized = true;
+			_initializeDragDrop(this);
+		}
+	}
+	
+	private final static native void _initializeDragDrop(GlobalApplicationStateImpl globalAppState) /*-{
+		var dropZone = $doc.getElementById('dropzone');
+		
+		function showDropZone() {
+			dropZone.style.display = "block";
+		}
+		
+		function hideDropZone() {
+			dropZone.style.display = "none";
+		}
+		
+		$wnd.addEventListener('dragenter', function(e) {
+			if (globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::isDragAndDropListenerSet()()) {
+				showDropZone();
+			}
+		});
+		
+		function allowDrag(e) {
+			e.dataTransfer.dropEffect = 'copy';
+			e.preventDefault();
+		}
+
+		function handleDrop(e) {
+			e.preventDefault();
+			hideDropZone();
+			globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::onDrop(Lcom/google/gwt/core/client/JavaScriptObject;)(e.dataTransfer.files);
+		}
+
+		dropZone.addEventListener('dragenter', allowDrag);
+		dropZone.addEventListener('dragover', allowDrag);
+
+		dropZone.addEventListener('dragleave', function(e) {
+			hideDropZone();
+		});
+
+		dropZone.addEventListener('drop', handleDrop);
+		
+		//if files are dropped into the root panel, then ignore the event (do not open file contents if user does not have the upload dialog open).
+		var rootPanel = $doc.getElementById('rootPanel');
+		rootPanel.addEventListener('drop', function(e) {
+			e.preventDefault();
+		});
+		rootPanel.addEventListener('dragenter', allowDrag);
+		rootPanel.addEventListener('dragover', allowDrag);
+	}-*/;
+	
+	@Override
+	public void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback) {
+		this.fileListCallback = fileListCallback;
+	}
+	
+	@Override
+	public void clearDropZoneHandler() {
+		fileListCallback = null;
 	}
 }

@@ -106,8 +106,10 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 		this.endpoint = endpoint;
 	}
 	
-	public void uploadFile(final String fileInputId, 
-			final int fileIndex, 
+	public void uploadFile(
+			String fileName, 
+			String contentType,
+			JavaScriptObject blob,
 			final ProgressingFileUploadHandler handler, 
 			final String keyPrefixUUID, 
 			final Long storageLocationId, 
@@ -115,17 +117,9 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 		this.handler = handler;
 		this.storageLocationId = storageLocationId;
 		this.keyPrefixUUID = keyPrefixUUID;
+		this.fileName = fileName;
+		this.contentType = contentType;
 		this.view = view;
-		
-		final String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
-		if(names == null || names.length < 1){
-			handler.uploadFailed(PLEASE_SELECT_A_FILE);
-			return;
-		}
-		this.fileName = names[fileIndex];
-		this.blob = synapseJsniUtils.getFileBlob(fileIndex, fileInputId);
-		contentType = ContentTypeUtils.fixDefaultContentType(synapseJsniUtils.getContentType(fileInputId, fileIndex), fileName);
-		
 		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
 			@Override
 			public void setMD5(String hexValue) {

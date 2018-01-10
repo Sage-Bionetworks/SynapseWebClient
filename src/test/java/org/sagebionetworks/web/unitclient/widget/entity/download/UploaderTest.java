@@ -12,7 +12,9 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -26,6 +28,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -54,6 +57,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
@@ -64,7 +68,6 @@ import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.download.S3DirectUploader;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.download.UploaderView;
-import org.sagebionetworks.web.client.widget.entity.download.UploaderViewImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
@@ -99,6 +102,12 @@ public class UploaderTest {
 	ExternalObjectStoreUploadDestination mockExternalObjectStoreUploadDestination;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	JavaScriptObject mockFileList;
+	@Mock
+	JavaScriptObject mockDroppedFileList;
+	@Captor
+	ArgumentCaptor<CallbackP<JavaScriptObject>> dragAndDropHandlerCaptor;
 	
 	@Before
 	public void before() throws Exception {
@@ -119,7 +128,7 @@ public class UploaderTest {
 		when(authenticationController.isLoggedIn()).thenReturn(true);
 		when(authenticationController.getCurrentUserSessionData()).thenReturn(sessionData);
 		
-		when(synapseJsniUtils.getContentType(anyString(), anyInt())).thenReturn("image/png");
+		when(synapseJsniUtils.getContentType(any(JavaScriptObject.class), anyInt())).thenReturn("image/png");
 		
 		S3UploadDestination d = new S3UploadDestination();
 		d.setUploadType(UploadType.S3);
@@ -138,7 +147,7 @@ public class UploaderTest {
 		cancelHandler = mock(CancelHandler.class);
 		
 		String[] fileNames = {"newFile.txt"};
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
+		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(fileNames);
 		
 		when(jiraURLHelper.createAccessRestrictionIssue(anyString(), anyString(), anyString())).thenReturn("http://fakeJiraRestrictionLink");
 		AsyncMockStubber.callSuccessWith(testEntity).when(synapseClient).updateExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), anyString(), anyLong(), any(AsyncCallback.class));
@@ -175,6 +184,8 @@ public class UploaderTest {
 				return null;
 			}
 		}).when(synapseJsniUtils).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
+		
+		when(synapseJsniUtils.getFileList(anyString())).thenReturn(mockFileList);
 	}
 	
 	@Test
@@ -263,11 +274,17 @@ public class UploaderTest {
 		verify(view).enableMultipleFileUploads(true);
 		final String file1 = "file1.txt";
 		String[] fileNames = {file1};
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
+		when(synapseJsniUtils.getMultipleUploadFileNames(mockFileList)).thenReturn(fileNames);
+		AsyncMockStubber.callSuccessWith(testEntity).when(mockSynapseJavascriptClient).getEntity(anyString(), any(OBJECT_TYPE.class), any(AsyncCallback.class));
 		uploader.handleUploads();
 		verify(synapseClient).setFileEntityFileHandle(anyString(), anyString(),  anyString(),  any(AsyncCallback.class));
 		verify(view).hideLoading();
 		assertEquals(UploadType.S3, uploader.getCurrentUploadType());
+		//verify upload success
+		verify(view).showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
+		verify(view).clear();
+		verify(mockGlobalApplicationState).clearDropZoneHandler();
+		verify(view, times(2)).resetToInitialState();
 	}
 	
 	@Test
@@ -293,7 +310,7 @@ public class UploaderTest {
 	@Test
 	public void testDirectUploadNoFilesSelected() throws Exception {
 		uploader.setFileNames(null);
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
+		when(synapseJsniUtils.getMultipleUploadFileNames(mockFileList)).thenReturn(null);
 		uploader.handleUploads();
 		verify(view).hideLoading();
 		verify(view).showErrorMessage(DisplayConstants.NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE);
@@ -322,6 +339,7 @@ public class UploaderTest {
 		uploader.cancelClicked();
 		
 		verify(view).clear();
+		verify(mockGlobalApplicationState).clearDropZoneHandler();
 		verify(cancelHandler).onCancel(any(CancelEvent.class));
 		assertTrue(multipartUploader.isCanceled());
 	}
@@ -368,7 +386,7 @@ public class UploaderTest {
 		final String file2 = "file2.txt";
 		final String file3 = "file3.txt";
 		String[] fileNames = {file1, file2, file3};
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(fileNames);
+		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(fileNames);
 		
 		uploader.handleUploads();
 		
@@ -379,7 +397,6 @@ public class UploaderTest {
 		
 		// triggers file3 to upload
 		verify(synapseClient).getFileEntityIdWithSameName(eq(file3), eq(parentEntityId), any(AsyncCallback.class));
-		
 	}
 	
 	@Test
@@ -517,10 +534,23 @@ public class UploaderTest {
 		uploader.directUploadStep2(fileName);
 		
 		verify(mockS3DirectUploader).configure(accessKey, secretKey, bucket, endpoint);
-		verify(mockS3DirectUploader).uploadFile(UploaderViewImpl.FILE_FIELD_ID, 0, uploader, keyPrefixUUID, storageLocationId, view);
-		
+		verify(mockS3DirectUploader).uploadFile(anyString(), anyString(), any(JavaScriptObject.class), eq(uploader), eq(keyPrefixUUID), eq(storageLocationId), eq(view));
 	}
 
+	@Test
+	public void testDragAndDrop() throws RestServiceException{
+		//widget configured in @Before
+		verify(mockGlobalApplicationState).setDropZoneHandler(dragAndDropHandlerCaptor.capture());
+		verify(synapseClient, never()).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
+		
+		//simulate drop
+		String fileName = "single file.txt";
+		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(new String[]{fileName});
+		dragAndDropHandlerCaptor.getValue().invoke(mockDroppedFileList);
+		
+		verify(synapseClient).setFileEntityFileHandle(anyString(),  anyString(),  anyString(),  any(AsyncCallback.class));
+	}
+	
 	@Test
 	public void testQueryForUploadDestinationsWithoutParentEntityId() {
 		//Configure the uploader without a parent entity id, but with an existing file entity.
@@ -666,19 +696,19 @@ public class UploaderTest {
 	@Test
 	public void testGetSelectedFilesText() {
 		String fileName = "single file.txt";
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{fileName});
+		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(new String[]{fileName});
 		assertEquals(fileName, uploader.getSelectedFilesText());
 	}
 	
 	@Test
 	public void testGetSelectedFilesTextNoFiles() {
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(null);
+		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(null);
 		assert(uploader.getSelectedFilesText().isEmpty());
 	}
 	
 	@Test
 	public void testGetSelectedFilesTextMultipleFiles() {
-		when(synapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"file1", "file2"});
+		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(new String[]{"file1", "file2"});
 		assertEquals("2 files", uploader.getSelectedFilesText());
 	}
 

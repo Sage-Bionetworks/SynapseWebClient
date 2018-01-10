@@ -104,6 +104,7 @@ public class Portal implements EntryPoint {
 								// Goes to place represented on URL or default place
 								historyHandler.handleCurrentHistory();
 								delayLoadOfZxcvbn();
+								globalApplicationState.initializeDropZone();
 							}
 						});
 						

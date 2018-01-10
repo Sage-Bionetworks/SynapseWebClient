@@ -5,6 +5,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -50,11 +51,12 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 	
 	public FileMetadata getSelectedFileMetadata() {
 		String inputId = view.getInputId();
-		String[] fileNames = synapseJsniUtils.getMultipleUploadFileNames(inputId);
-		if(fileNames != null && fileNames.length > 0){
+		JavaScriptObject fileList = synapseJsniUtils.getFileList(inputId);
+		String[] fileNames = synapseJsniUtils.getMultipleUploadFileNames(fileList);
+		if(fileNames != null && fileNames.length > 0) {
 			String name = fileNames[0];
-			double fileSize = synapseJsniUtils.getFileSize(synapseJsniUtils.getFileBlob(0, inputId));
-			String contentType = synapseJsniUtils.getContentType(inputId, 0);
+			double fileSize = synapseJsniUtils.getFileSize(synapseJsniUtils.getFileBlob(0, fileList));
+			String contentType = synapseJsniUtils.getContentType(fileList, 0);
 			return new FileMetadata(name, contentType, fileSize);
 		}
 		return null;
