@@ -292,13 +292,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			gwt.scheduleDeferred(new Callback() {
 				@Override
 				public void invoke() {
-					initSynapsePropertiesFromServer(new Callback() {
-						public void invoke() {}
-					});
+					initSynapsePropertiesFromServer();
 				}
 			});
 		} else {
-			initSynapsePropertiesFromServer(c);
+			initSynapsePropertiesFromServer();
 		}
 		initWikiEntitiesAndVersions(c);
 		view.initGlobalViewProperties();
@@ -308,7 +306,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		}
 	}
 	
-	public void initSynapsePropertiesFromServer(final Callback c) {
+	public void initSynapsePropertiesFromServer() {
 		synapseClient.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
@@ -320,7 +318,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				c.invoke();
+				synapseJSNIUtils.consoleError(caught.getMessage());
 			}
 		});
 	}
