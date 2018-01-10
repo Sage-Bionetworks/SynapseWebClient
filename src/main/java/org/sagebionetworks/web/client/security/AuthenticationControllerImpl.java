@@ -199,7 +199,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public String getCurrentUserPrincipalId() {
-		if(currentUser != null) {		
+		if(currentUser != null) {
 			UserProfile profileObj = currentUser.getProfile();
 			if(profileObj != null && profileObj.getOwnerId() != null) {							
 				return profileObj.getOwnerId();						
