@@ -62,6 +62,9 @@ public class Portal implements EntryPoint {
 				@Override
 				public void onSuccess() {
 					try {
+						// load the previous session, if there is one
+						ginjector.getAuthenticationController().reloadUserSessionData();
+
 						EventBus eventBus = ginjector.getEventBus();
 						PlaceController placeController = new PlaceController(eventBus);
 
@@ -97,9 +100,6 @@ public class Portal implements EntryPoint {
 								
 								// start version timer
 								ginjector.getVersionTimer().start();
-								
-								// load the previous session, if there is one
-								ginjector.getAuthenticationController().reloadUserSessionData();
 								
 								// Goes to place represented on URL or default place
 								historyHandler.handleCurrentHistory();
