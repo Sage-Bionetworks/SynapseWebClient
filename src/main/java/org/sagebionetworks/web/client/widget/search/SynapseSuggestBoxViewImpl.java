@@ -36,7 +36,15 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 
 	@Override
 	public void configure(SynapseSuggestOracle oracle) {
-		suggestBox = new SuggestBox(oracle, new TextBox(), new SynapseSuggestionDisplay());
+		final TextBox suggestTextBox = new TextBox();
+		suggestTextBox.setAutoComplete(false);
+		suggestTextBox.setReadOnly(true);
+		suggestTextBox.addAttachHandler(event -> {
+			if (event.isAttached()) {
+				suggestTextBox.setReadOnly(false);
+			}
+		});
+		suggestBox = new SuggestBox(oracle, suggestTextBox, new SynapseSuggestionDisplay());
 		suggestBox.getValueBox().addStyleName("form-control");
 		suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
 			@Override
@@ -46,8 +54,15 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 			
 		});
 		selectedItem = new TextBox();
+		selectedItem.setAutoComplete(false);
+		selectedItem.setReadOnly(true);
 		selectedItem.setVisible(false);
 		
+		selectedItem.addAttachHandler(event -> {
+			if (event.isAttached()) {
+				selectedItem.setReadOnly(false);
+			}
+		});
 		selectedItem.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
