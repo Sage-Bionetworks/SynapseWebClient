@@ -21,7 +21,6 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 	void setDefaultPictureColor(String colorCss);
 	void setDefaultPictureLetter(String letter);
 	void setHref(String href);
-	void clearHref();
 	void openNewWindow(String url);
 	void setOpenNewWindow(String target);
 	void setStyleNames(String style);

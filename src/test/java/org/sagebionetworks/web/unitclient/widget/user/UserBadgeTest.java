@@ -175,7 +175,6 @@ public class UserBadgeTest {
 		userBadge.configure(profile);
 		ClickHandler mockClickHandler = mock(ClickHandler.class);
 		userBadge.setCustomClickHandler(mockClickHandler);
-		verify(mockView).clearHref();
 		userBadge.badgeClicked(null);
 		verify(mockClickHandler).onClick(any(ClickEvent.class));
 	}

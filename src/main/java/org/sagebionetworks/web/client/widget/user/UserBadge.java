@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.user;
 
-import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserProfile;
@@ -23,7 +21,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -103,9 +100,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			view.showDescription(profile.getCompany());
 		}
 		
-		if (customClickHandler == null) {
-			view.setHref("#!Profile:" + profile.getOwnerId());
-		}
+		view.setHref("#!Profile:" + profile.getOwnerId());
 		useCachedImage = true;
 		configurePicture();
 	}
@@ -253,7 +248,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	 */
 	public void setCustomClickHandler(ClickHandler clickHandler) {
 		customClickHandler = clickHandler;
-		view.clearHref();
 	}	
 	
 	@Override
@@ -264,8 +258,9 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			} else {
 				globalApplicationState.getPlaceChanger().goTo(new Profile(profile.getOwnerId()));				
 			}
-		else
+		else {
 			customClickHandler.onClick(event);
+		}			
 	}
 
 	public static UserProfile getUserProfileFromCache(String principalId, AdapterFactory adapterFactory, ClientCache clientCache) {
