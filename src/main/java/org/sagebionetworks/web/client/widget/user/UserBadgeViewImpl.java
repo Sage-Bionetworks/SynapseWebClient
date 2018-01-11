@@ -52,6 +52,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		badgeClicked = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				event.preventDefault();
 				presenter.badgeClicked(event);
 			}
 		};
@@ -153,12 +154,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@Override
 	public void setHref(String href) {
 		usernameLink.setHref(href);
-	}
-	
-	@Override
-	public void clearHref() {
-		usernameLink.setHref(HasHref.EMPTY_HREF);
-		usernameLink.addClickHandler(badgeClicked);
 	}
 	
 	@Override
