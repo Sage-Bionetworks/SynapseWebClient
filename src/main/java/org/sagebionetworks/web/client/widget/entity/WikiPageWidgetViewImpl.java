@@ -5,7 +5,9 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
@@ -86,8 +88,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	Collapse historyCollapse;
 	
 	@UiField
+	Div wikiHeadingContainer;
 	Heading wikiHeading;
-	
 	Widget widget;
 
 	@Override
@@ -131,12 +133,17 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@Override
 	public void setWikiHeadingText(String title) {
+		wikiHeadingContainer.clear();
+		wikiHeading = new Heading(HeadingSize.H2);
 		wikiHeading.setText(title);
+		wikiHeadingContainer.add(wikiHeading);
 	}
 	
 	@Override
 	public void scrollWikiHeadingIntoView() {
-		wikiHeading.getElement().scrollIntoView();
+		if (wikiHeading != null) {
+			wikiHeading.getElement().scrollIntoView();	
+		}
 	}
 	
 	@Override
