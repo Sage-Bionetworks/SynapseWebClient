@@ -54,47 +54,6 @@ end sticky footer
 	color: #1e7098;
 }
 
-a.button_readmore:hover {
-	background-color:#ffcc00;
-}
-.new-item { 
-	background-color:#FFCC00;
-}
-.featured { 
-	background-color:#FFCC00;
-}
-.more{
-	background-color:#FFCC00;
-}
-.ca-more{
-	background-color:#FFCC00;
-}
-.ca-close{
-	background-color:#FFCC00;
-}
-.ca-item .title { 
-	background-color:#FFCC00;
-}
-.mega-button {
-	background-color:#FFCC00;
-}
-.ca-content .live {
-	background-color:#FFCC00;
-}
-
-.ca-content .buy {
-	background-color:#FFCC00;
-}
-.va-slice h3:hover{
-	color:#FFCC00;
-}
-.va-slice ul li a{
-	background:#FFCC00;
-}
-.va-more{
-	background-color:#FFCC00;
-}
-
 /* Bootstrap overrides */
 .btn-primary {
 	color: #fff !important;
@@ -107,16 +66,6 @@ a.btn-primary {
 /***************
 End Synapse color scheme
 ****************/
-
-/** Add css rules here for your application. */
-/** Example rules used by the template application (remove for your app) */
-/* h1 {
-	font-size: 2em;
-	font-weight: bold;
-	color: #777777;
-	margin: 40px 0px 70px;
-	text-align: center;
-} */
 
 .overflow-y-auto {
 	overflow-y: auto;
@@ -361,84 +310,8 @@ End Synapse color scheme
 	-khtml-border-radius: 3px;
 }
 
-.portal {
-	width: 100%;
-	padding-top: 5px;
-	
-}
-
-/* Portal Section header */
-.portal h3 {
-	clear: both;
-	font-variant: small-caps;
-	margin-top: 20px;
-	margin-bottom: 15px;
-	margin-left: 0px;
-	margin-right: 0px;
-	padding-top: 5px;
-}
-
-.portal h3.top {
-	margin-top: 0px;	
-	margin-bottom: 15px;
-	margin-left: 0px;
-	margin-right: 0px;
-	
-}
-
-.portal h2.top {	
-	margin-top: 0px;
-	margin-bottom: 0px;
-	margin-left: 0px;
-	margin-right: 0px;
-	
-}
-
-/* Portal Section header */
-.portal h2 {
-	clear: both;
-	margin-top: 20px;
-	margin-bottom: 0px;
-	margin-left: 0px;
-	margin-right: 0px;
-}
-
 .btn.btn-v-align-top {
 	vertical-align: top;
-}
-
-/* Search boxes */
-.homesearchbox {
-	width: 645px;
-	margin: 4px 0 0 0;
-
-	height: 25px;
-	font-size: 1.6em;
-
-	-moz-box-shadow: black 0 0 0 0;
-	-webkit-box-shadow: black 0 0 0 0;
-	-o-box-shadow: black 0 0 0 0;
-	box-shadow: black 0 0 0 0;
-	font-family: "Ubuntu", sans-serif;
-
-	-webkit-border-radius: 4px;
-	-o-border-radius: 4px;
-	-khtml-border-radius: 4px;
-	border-radius: 4px;
-	display: inline-block;
-	-moz-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 0 rgba(255, 255, 255, 0.9);
-	-webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 0 rgba(255, 255, 255, 0.9);
-	-o-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 0 rgba(255, 255, 255, 0.9);
-	box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4) inset, 0 1px 0 rgba(255, 255, 255, 0.9);
-	border: medium none;
-	padding: 5px;
-	margin-bottom: 5px;
-	margin-left: 2px;
-	border: 1px solid #AAA;
-	border-image: initial;
-	
-	vertical-align: middle;
-	background: white;	
 }
 
 div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a.favoriteIcon:hover, a.favoriteIcon:focus {
