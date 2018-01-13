@@ -7,7 +7,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<g:HTMLPanel>
-	    <div class="separator separator-header-page"></div>
+	    <div class="separator margin-top-3"></div>
 	    <div class="margin-top-left-10 margin-right-15">
 	        <b:Row>
 	            <b:Column size="MD_9">

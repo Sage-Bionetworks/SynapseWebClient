@@ -8,7 +8,7 @@
 	<bh:Div>
 		<b:Icon ui:field="icon" type="LIST_ALT" addStyleNames="displayInline margin-right-5 lightGreyText"/>
 		<b:Tooltip isHtml="true" placement="RIGHT" ui:field="tooltip" trigger="HOVER">
-			<g:Anchor ui:field="anchor" addStyleNames="displayInline font-size-1.1em"/>
+			<g:Anchor ui:field="anchor" addStyleNames="displayInline font-size-1-1em"/>
 		</b:Tooltip>
 		<bh:Span ui:field="favoritesWidgetContainer"/>
 		<bh:Span ui:field="additionalTextUI" addStyleNames="margin-left-5">
