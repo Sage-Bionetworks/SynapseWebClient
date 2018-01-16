@@ -333,7 +333,6 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		
 		return plotlyTraceData;
 	}
-	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

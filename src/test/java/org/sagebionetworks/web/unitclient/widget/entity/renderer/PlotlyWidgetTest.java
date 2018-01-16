@@ -16,7 +16,7 @@ import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_JS;
 import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.ALL_PARTS_MASK;
 import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.LIMIT;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
-import static org.sagebionetworks.web.shared.WidgetConstants.SHOW_LEGEND;
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
 import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
 import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
@@ -158,6 +158,7 @@ public class PlotlyWidgetTest {
 		String plotTitle = "Plot Title";
 		String tableId = "syn12345";
 		boolean showLegend = false;
+		boolean isHorizontal = false;
 		String sql = "select x, y1, y2 from "+tableId+" where x>2";
 		params.put(TABLE_QUERY_KEY, sql);
 		params.put(TITLE, plotTitle);
@@ -166,6 +167,7 @@ public class PlotlyWidgetTest {
 		params.put(TYPE, type.toString());
 		params.put(BAR_MODE, mode.toString());
 		params.put(SHOW_LEGEND, Boolean.toString(showLegend));
+		params.put(IS_HORIZONTAL, Boolean.toString(isHorizontal));
 		
 		selectColumns.add(mockXColumn);
 		selectColumns.add(mockY1Column);
@@ -215,6 +217,7 @@ public class PlotlyWidgetTest {
 		List traces = plotlyTraceArrayCaptor.getValue();
 		assertTrue(traces.size() > 0);
 		assertEquals(type.toString().toLowerCase(), ((PlotlyTraceWrapper)traces.get(0)).getType());
+		assertEquals(isHorizontal, ((PlotlyTraceWrapper)traces.get(0)).isHorizontal());
 		verify(mockView).setSourceDataLinkVisible(true);
 	}
 	
@@ -330,5 +333,33 @@ public class PlotlyWidgetTest {
 		assertEquals(2, a.getX().length);
 		assertEquals("40", a.getY()[0]);
 		assertEquals("50", a.getY()[1]);
+	}
+	
+	@Test
+	public void testInitializeHorizontalOrientation() {
+		boolean isHorizontal = true;
+		String xAxisTitle = "x";
+		String yAxisTitle = "y";
+		params.put(X_AXIS_TITLE, xAxisTitle);
+		params.put(Y_AXIS_TITLE, yAxisTitle);
+		params.put(TYPE, GraphType.BAR.toString());
+		params.put(BAR_MODE, BarMode.STACK.toString());
+		params.put(IS_HORIZONTAL, Boolean.toString(isHorizontal));
+		selectColumns.add(mockXColumn);
+		selectColumns.add(mockY1Column);
+		rowValues.add("1.1");
+		rowValues.add("2.2");
+		rows.add(mockRow);
+		when(mockQueryResultBundle.getQueryCount()).thenReturn(1L);
+		
+		widget.configure(null, params, null, null);
+		
+		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
+		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
+		
+		verify(mockView).showChart(anyString(), eq(yAxisTitle), eq(xAxisTitle), plotlyTraceArrayCaptor.capture(), anyString(), anyString(), anyString(), anyBoolean());
+		List traces = plotlyTraceArrayCaptor.getValue();
+		assertTrue(traces.size() > 0);
+		assertEquals(isHorizontal, ((PlotlyTraceWrapper)traces.get(0)).isHorizontal());
 	}
 }

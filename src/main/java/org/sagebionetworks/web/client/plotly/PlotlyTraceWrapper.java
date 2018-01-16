@@ -55,6 +55,10 @@ public class PlotlyTraceWrapper {
 		this.isHorizontal = isHorizontal;
 	}
 	
+	public boolean isHorizontal() {
+		return isHorizontal;
+	}
+	
 	public JavaScriptObject getTrace() {
 		String orientationValue = isHorizontal ? "h" : "v";
 		String[] xAxis = isHorizontal ? y : x;
