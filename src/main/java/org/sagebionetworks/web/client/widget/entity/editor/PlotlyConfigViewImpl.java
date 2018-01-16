@@ -146,7 +146,7 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	}
 	
 	@Override
-	public boolean getIsBarOrientationHorizontal() {
+	public boolean isBarOrientationHorizontal() {
 		return isHorizontalBarCb.getValue();
 	}
 	

@@ -29,7 +29,7 @@ public interface PlotlyConfigView extends IsWidget {
 	String getXAxisColumnName();
 	void setBarModeVisible(boolean visible);
 	void setBarOrientationVisible(boolean visible);
-	boolean getIsBarOrientationHorizontal();
+	boolean isBarOrientationHorizontal();
 	void setBarOrientationHorizontal(boolean isHorizontal);
 	void setSynAlert(IsWidget w);
 	void add(IsWidget w);
