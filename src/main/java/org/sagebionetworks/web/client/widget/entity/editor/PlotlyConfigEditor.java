@@ -133,6 +133,10 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		} else {
 			view.setShowLegend(true);
 		}
+		
+		if (descriptor.containsKey(IS_HORIZONTAL)) {
+			view.setBarOrientationHorizontal(Boolean.valueOf(descriptor.get(IS_HORIZONTAL)));
+		}
 	}
 	
 	/**
@@ -228,7 +232,8 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		}
 		descriptor.put(TYPE, view.getGraphType().toString());
 		if (GraphType.BAR.equals(view.getGraphType())) {
-			descriptor.put(BAR_MODE, view.getBarMode().toString());	
+			descriptor.put(BAR_MODE, view.getBarMode().toString());
+			descriptor.put(IS_HORIZONTAL, Boolean.toString(view.getIsBarOrientationHorizontal()));
 		}
 		descriptor.put(SHOW_LEGEND, Boolean.toString(view.isShowLegend()));
 	}

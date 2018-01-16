@@ -60,6 +60,8 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	ListBox yColumnNamesMenu;
 	@UiField
 	CheckBox showLegendCb;
+	@UiField
+	CheckBox isHorizontalBarCb;
 	
 	public interface PlotlyConfigViewImplUiBinder extends UiBinder<Widget, PlotlyConfigViewImpl> {}
 	Widget widget;
@@ -102,7 +104,9 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 		});
 	}
 	private void updateBarModeVisibility() {
-		setBarModeVisible(GraphType.BAR.equals(getGraphType()));
+		boolean isBar = GraphType.BAR.equals(getGraphType());
+		setBarModeVisible(isBar);
+		setBarOrientationVisible(isBar);
 	}
 	
 	@Override
@@ -129,6 +133,21 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	@Override
 	public BarMode getBarMode() {
 		return BarMode.valueOf(barModeDropdownMenu.getSelectedValue());
+	}
+	
+	@Override
+	public void setBarOrientationVisible(boolean visible) {
+		isHorizontalBarCb.setVisible(visible);
+	}
+	
+	@Override
+	public void setBarOrientationHorizontal(boolean isHorizontal) {
+		isHorizontalBarCb.setValue(isHorizontal);
+	}
+	
+	@Override
+	public boolean getIsBarOrientationHorizontal() {
+		return isHorizontalBarCb.getValue();
 	}
 	
 	@Override
