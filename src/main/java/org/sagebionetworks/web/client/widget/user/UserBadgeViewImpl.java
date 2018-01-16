@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.base.HasHref;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 
@@ -14,7 +13,6 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -46,7 +44,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	
 	private Presenter presenter;
 	Widget widget;
-	Callback onAttachCallback;
 	ClickHandler badgeClicked;
 	
 	@Inject
@@ -55,6 +52,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		badgeClicked = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				event.preventDefault();
 				presenter.badgeClicked(event);
 			}
 		};
@@ -67,35 +65,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 				presenter.onImageLoadError();
 			}
 		});
-		widget.addAttachHandler(new AttachEvent.Handler() {
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					onAttach();
-				}
-			}
-		});
-	}
-	
-	@Override
-	public boolean isAttached() {
-		return widget.isAttached();
-	}
-	
-	@Override
-	public boolean isInViewport() {
-		return DisplayUtils.isInViewport(widget, 600);
-	}
-	
-	@Override
-	public void setOnAttachCallback(Callback onAttachCallback) {
-		this.onAttachCallback = onAttachCallback;
-	}
-	
-	private void onAttach() {
-		if (onAttachCallback != null) {
-			onAttachCallback.invoke();
-		}
 	}
 	
 	@Override
@@ -185,12 +154,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@Override
 	public void setHref(String href) {
 		usernameLink.setHref(href);
-	}
-	
-	@Override
-	public void clearHref() {
-		usernameLink.setHref(HasHref.EMPTY_HREF);
-		usernameLink.addClickHandler(badgeClicked);
 	}
 	
 	@Override

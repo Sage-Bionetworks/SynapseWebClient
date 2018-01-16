@@ -70,8 +70,8 @@ public class ImageUploadWidgetImplTest {
 
 		//The metadata returned should correspond to testFileName
 		when(mockView.getInputId()).thenReturn(inputId);
-		when(mockJSNIUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"testName.png"});
-		when(mockJSNIUtils.getContentType(anyString(), anyInt())).thenReturn("image/png");
+		when(mockJSNIUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(new String[]{"testName.png"});
+		when(mockJSNIUtils.getContentType(any(JavaScriptObject.class), anyInt())).thenReturn("image/png");
 		
 	}
 	
@@ -134,8 +134,8 @@ public class ImageUploadWidgetImplTest {
 	
 	@Test
 	public void testFileSelectedFailed(){
-		when(mockJSNIUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"testName.raw"});
-		when(mockJSNIUtils.getContentType(anyString(), anyInt())).thenReturn("notanimage/raw");
+		when(mockJSNIUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(new String[]{"testName.raw"});
+		when(mockJSNIUtils.getContentType(any(JavaScriptObject.class), anyInt())).thenReturn("notanimage/raw");
 		
 		// Configure before the test
 		widget.configure(mockCallback);

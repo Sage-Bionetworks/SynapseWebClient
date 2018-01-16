@@ -45,9 +45,6 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@Inject
 	public ActionMenuWidgetViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
-		toolsMenu.addClickHandler(event -> {
-			presenter.onToolsMenuClicked();
-		});
 	}
 	
 	@Override

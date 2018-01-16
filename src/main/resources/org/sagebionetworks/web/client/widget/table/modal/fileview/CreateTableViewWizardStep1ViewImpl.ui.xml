@@ -17,13 +17,6 @@
 			<b:FormLabel>Scope</b:FormLabel>
 			<g:SimplePanel ui:field="scopeContainer" addStyleNames="light-border padding-10" />
 		</b:FormGroup>
-		<b:FormGroup ui:field="viewOptionsUI">
-			<b:FormLabel>Options</b:FormLabel>
-			<bh:Div addStyleNames="margin-left-15">
-				<b:InlineCheckBox ui:field="includeTablesCb" value="false" text="Include Tables in File View" />
-				<w:HelpWidget helpMarkdown="Synapse Tables is a feature designed to provide users the ability to create web-accessible, sharable, and queryable data where columns can have a user-specified structured schema." 
-					href="http://docs.synapse.org/articles/tables.html" addStyleNames="margin-left-5"/>
-			</bh:Div>
-		</b:FormGroup>
+		<bh:Div ui:field="viewOptionsContainer" />
 	</bh:Div>
 </ui:UiBinder>

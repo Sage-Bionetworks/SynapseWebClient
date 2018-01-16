@@ -358,6 +358,22 @@ public class EntityPageTopTest {
 		verify(mockDiscussionTab, never()).configure(projectEntityId, projectName, null, canModerate, mockActionMenuWidget);
 		verify(mockDockerTab, never()).configure(mockEntityBundle, mockEntityUpdatedHandler, null, mockActionMenuWidget);
 		
+		//verify tab places have been set (allows for right-click of tab, before the tab has been initialized)
+		Long projectVersionNumber = null;
+		Synapse expectedPlace = new Synapse(projectEntityId, projectVersionNumber, EntityArea.FILES, areaToken);
+		
+		verify(mockFilesInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
+		expectedPlace.setArea(EntityArea.WIKI);
+		verify(mockWikiInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
+		expectedPlace.setArea(EntityArea.TABLES);
+		verify(mockTablesInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
+		expectedPlace.setArea(EntityArea.ADMIN);
+		verify(mockChallengeInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
+		expectedPlace.setArea(EntityArea.DISCUSSION);
+		verify(mockDiscussionInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
+		expectedPlace.setArea(EntityArea.DOCKER);
+		verify(mockDockerInnerTab).setEntityNameAndPlace(projectName, expectedPlace);
+		
 		clickAllTabsFile();
 	}
 	

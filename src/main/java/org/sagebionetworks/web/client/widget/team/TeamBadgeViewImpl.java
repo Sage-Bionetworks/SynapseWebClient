@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -25,14 +24,15 @@ import com.google.inject.Inject;
 
 public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	
-	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	GlobalApplicationState globalApplicationState;
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
 	SimplePanel notificationsPanel;
 	Long publicAclPrincipalId, authenticatedAclPrincipalId;
+	ClickHandler customClickHandler;
 	Anchor anchor = new Anchor();
+	String teamId;
 	@Inject
 	public TeamBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
 			GlobalApplicationState globalApplicationState,
@@ -47,22 +47,28 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		
 		publicAclPrincipalId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID));
 		authenticatedAclPrincipalId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));
+		anchor.addClickHandler(event -> {
+			event.preventDefault();
+			if (customClickHandler != null) {
+				customClickHandler.onClick(event);
+			} else {
+				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(teamId));
+			}
+		});
 	}
 	
 	@Override
-	public void setTeam(final Team team, Integer maxNameLength, ClickHandler customClickHandler) {
+	public void setTeam(final Team team, Integer maxNameLength, String teamIconUrl, ClickHandler customClickHandler) {
 		clear();
+		teamId = team.getId();
+		this.customClickHandler = customClickHandler;
 		notificationsPanel.clear();
 		if(team == null)  throw new IllegalArgumentException("Team is required");
 		
 		if(team != null) {
 			String name = maxNameLength == null ? team.getName() : DisplayUtils.stubStrPartialWord(team.getName(), maxNameLength);
 			anchor.setText(name);
-			if (customClickHandler == null) {
-				anchor.setHref(DisplayUtils.getTeamHistoryToken(team.getId()));
-			} else {
-				anchor.addClickHandler(customClickHandler);
-			}
+			anchor.setHref(DisplayUtils.getTeamHistoryToken(team.getId()));
 			
 			ClickHandler clickHandler = new ClickHandler() {
 				@Override
@@ -72,7 +78,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			};
 			if (team.getIcon() != null && team.getIcon().length() > 0) {
 				Image profilePicture = new Image();
-				profilePicture.setUrl(DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId()));
+				profilePicture.setUrl(teamIconUrl);
 				profilePicture.setHeight("24px");
 				profilePicture.addStyleName("imageButton userProfileImage displayInline margin-right-4");
 				profilePicture.addClickHandler(clickHandler);
@@ -129,11 +135,6 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 
 	@Override
 	public void showErrorMessage(String message) {
-	}
-
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;		
 	}
 
 	@Override

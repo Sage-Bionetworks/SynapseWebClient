@@ -50,7 +50,7 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 				} catch(Exception e) {};
 			}
 			favoritesWidget.configure(header.getId());
-			view.configure(header.getName(), DisplayUtils.getSynapseHistoryToken(header.getId()), getProjectTooltip());
+			view.configure(header.getName(), header.getId(), getProjectTooltip());
 		}
 	}
 	

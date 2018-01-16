@@ -14,8 +14,8 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.amplitude.HeapSDK;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
-import org.sagebionetworks.web.client.widget.mixpanel.MixPanelSdk;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -42,7 +42,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private FavoriteWidget favWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private StuAnnouncementWidget stuAnnouncementWidget;
-	private MixPanelSdk mixPanelSdk;
+	private HeapSDK heapSdk;
 	private PendoSdk pendoSdk;
 	
 	@Inject
@@ -54,7 +54,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			SynapseJSNIUtils synapseJSNIUtils, 
 			StuAnnouncementWidget stuAnnouncementWidget,
 			PendoSdk pendoSdk,
-			MixPanelSdk mixPanelSdk) {
+			HeapSDK heapSdk) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -63,7 +63,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		view.clear();
 		this.stuAnnouncementWidget = stuAnnouncementWidget;
-		this.mixPanelSdk = mixPanelSdk;
+		this.heapSdk = heapSdk;
 		this.pendoSdk = pendoSdk;
 		view.setPresenter(this);
 		stuAnnouncementWidget.init();
@@ -127,10 +127,9 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		if (authenticationController.isLoggedIn()) {
 			String userName = userSessionData.getProfile().getUserName();
 			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
-			mixPanelSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
+			heapSdk.initialize(authenticationController.getCurrentUserPrincipalId());
 		} else {
 			pendoSdk.initialize(ANONYMOUS, N_A);
-			mixPanelSdk.initialize(ANONYMOUS, N_A);
 		}
 	}
 
@@ -156,7 +155,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	public void onDashboardClick() {
 		if (authenticationController.isLoggedIn()) {
 			globalApplicationState.getPlaceChanger().goTo(new Profile(authenticationController.getCurrentUserPrincipalId()));
-			mixPanelSdk.trackClick("Header -> My Dashboard");
 		} else {
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		}	

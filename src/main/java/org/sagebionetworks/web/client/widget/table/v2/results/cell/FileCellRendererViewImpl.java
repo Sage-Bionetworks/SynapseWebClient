@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -14,7 +14,7 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 	public interface Binder extends UiBinder<Widget, FileCellRendererViewImpl> {}
 	
 	@UiField
-	LoadingSpinner loadingUI;
+	Span loadingUI;
 	@UiField
 	Text errorText;
 	@UiField

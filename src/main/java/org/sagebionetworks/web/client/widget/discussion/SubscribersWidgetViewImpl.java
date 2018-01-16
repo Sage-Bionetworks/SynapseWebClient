@@ -4,11 +4,11 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -25,7 +25,9 @@ public class SubscribersWidgetViewImpl implements SubscribersWidgetView {
 	@UiField
 	Button okButton;
 	@UiField
-	Anchor followersLink;
+	Span followersLink;
+	@UiField
+	FocusPanel followersFocusPanel;
 	
 	public static final String FOLLOWERS = "Followers";
 	
@@ -35,17 +37,11 @@ public class SubscribersWidgetViewImpl implements SubscribersWidgetView {
 	@Inject
 	public SubscribersWidgetViewImpl (Binder binder) {
 		widget = binder.createAndBindUi(this);
-		okButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				modal.hide();
-			}
+		okButton.addClickHandler(event -> {
+			modal.hide();
 		});
-		followersLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClickSubscribersLink();
-			}
+		followersFocusPanel.addClickHandler(event -> {
+			presenter.onClickSubscribersLink();
 		});
 	}
 

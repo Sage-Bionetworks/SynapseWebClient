@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
-import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView.Presenter;
-
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**

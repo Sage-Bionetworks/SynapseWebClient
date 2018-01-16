@@ -27,6 +27,7 @@ import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -116,7 +117,7 @@ public class FileDownloadButtonTest {
 	public static final String SFTP_ENDPOINT = "https://sftp.org/sftp";
 	public static final String SFTP_HOST = "my.sftp.server";
 	public static final String ENTITY_ID = "syn210";
-	public static final String baseFileHandleUrl="http://mytestbasefilehandleurl/filehandle";
+	public static final String fileHandleAssociationUrl="http://mytestfilehandleassociationurl/filehandleassociation";
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
@@ -129,7 +130,7 @@ public class FileDownloadButtonTest {
 		when(mockEntityBundle.getFileHandles()).thenReturn(fileHandles);
 		when(mockGinInjector.getFileClientsHelp()).thenReturn(mockFileClientsHelp);
 		AsyncMockStubber.callSuccessWith(SFTP_HOST).when(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
-		when(mockJsniUtils.getBaseFileHandleUrl()).thenReturn(baseFileHandleUrl);
+		when(mockJsniUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(fileHandleAssociationUrl);
 		when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockRestrictionInformation.getHasUnmetAccessRequirement()).thenReturn(false);
 	}
@@ -178,7 +179,7 @@ public class FileDownloadButtonTest {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		assertNotNull(widget.getFileHandle());
-		verify(mockView).setDirectDownloadLink("http://mytestbasefilehandleurl/filehandle?entityId=syn210&preview=false&proxy=false&version=0");
+		verify(mockView).setDirectDownloadLink(fileHandleAssociationUrl);
 		verify(mockView).setDirectDownloadLinkVisible(true);
 		
 		// First use in SWC of Mockito.InOrder. Supports multiple mocks. This verification correctly fails if you swap the lines below.

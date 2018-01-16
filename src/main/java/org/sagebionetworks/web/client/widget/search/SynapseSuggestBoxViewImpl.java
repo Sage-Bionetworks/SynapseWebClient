@@ -33,21 +33,22 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	public SynapseSuggestBoxViewImpl(SynapseAlert synAlert) {
 		this.synAlert = synAlert;
 	}
-	
+
 	@Override
 	public void configure(SynapseSuggestOracle oracle) {
-		suggestBox = new SuggestBox(oracle, new TextBox(), new SynapseSuggestionDisplay());
+		final TextBox suggestTextBox = new TextBox();
+		suggestTextBox.getElement().setAttribute("name", "address");
+		suggestBox = new SuggestBox(oracle, suggestTextBox, new SynapseSuggestionDisplay());
 		suggestBox.getValueBox().addStyleName("form-control");
 		suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
 			@Override
 			public void onSelection(SelectionEvent<Suggestion> event) {
 				selectSuggestion((UserGroupSuggestion)event.getSelectedItem());
 			}
-			
 		});
 		selectedItem = new TextBox();
 		selectedItem.setVisible(false);
-		
+		selectedItem.getElement().setAttribute("name", "code");
 		selectedItem.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageNavigationTree.SubpageNavTreeNode;
 
@@ -61,6 +62,10 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 		anchorContainer.addStyleName("imageButton");
 		Anchor l = new Anchor(root.getPageTitle());
 		l.addStyleName("subpage-link " + styleName);
+		l.setHref("#!Synapse:" + ((Synapse)root.getTargetPlace()).toToken());
+		l.addClickHandler(event -> {
+			event.preventDefault();
+		});
 		anchorContainer.add(l);
 		w.add(anchorContainer);
 		

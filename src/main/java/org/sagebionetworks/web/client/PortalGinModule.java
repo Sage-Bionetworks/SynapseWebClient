@@ -149,6 +149,8 @@ import org.sagebionetworks.web.client.widget.asynch.NumberFormatProvider;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProviderImpl;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandlerImpl;
+import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandler;
+import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.TimerProvider;
 import org.sagebionetworks.web.client.widget.asynch.TimerProviderImpl;
 import org.sagebionetworks.web.client.widget.asynch.UserGroupHeaderAsyncHandler;
@@ -378,6 +380,8 @@ import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButtonView;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButtonViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
+import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialogImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
@@ -1377,6 +1381,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UserProfileAsyncHandlerImpl.class).in(Singleton.class);
 		bind(UserProfileAsyncHandler.class).to(UserProfileAsyncHandlerImpl.class);
 		
+		bind(TeamAsyncHandlerImpl.class).in(Singleton.class);
+		bind(TeamAsyncHandler.class).to(TeamAsyncHandlerImpl.class);
+		
 		bind(UserGroupHeaderAsyncHandlerImpl.class).in(Singleton.class);
 		bind(UserGroupHeaderAsyncHandler.class).to(UserGroupHeaderAsyncHandlerImpl.class);
 		
@@ -1436,5 +1443,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SynapseJavascriptFactory.class).in(Singleton.class);
 		
 		bind(HtmlPreviewView.class).to(HtmlPreviewViewImpl.class);
+		bind(S3DirectLoginDialog.class).to(S3DirectLoginDialogImpl.class);
 	}
 }

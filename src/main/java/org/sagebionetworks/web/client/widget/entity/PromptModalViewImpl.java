@@ -123,6 +123,7 @@ public class PromptModalViewImpl implements PromptModalView {
 
 	@Override
 	public void configure(String title, String label, String buttonText, String name) {
+		clear();
 		this.modal.setTitle(title);
 		this.nameLabel.setText(label);
 		// TODO: SWC-3541: the primary button text is not being changed by this line.  We need to find out why.

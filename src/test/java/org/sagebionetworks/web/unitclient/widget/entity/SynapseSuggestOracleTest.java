@@ -72,23 +72,6 @@ public class SynapseSuggestOracleTest {
 	}
 	
 	@Test
-	public void testGetSuggestionsWithExactMatch() {
-		when(mockSuggestBox.getText()).thenReturn(USERNAME);
-		UserGroupHeader mockHeader = mock(UserGroupHeader.class);
-		when(mockHeader.getUserName()).thenReturn(USERNAME);
-		when(mockSuggestion.getHeader()).thenReturn(mockHeader);
-		AsyncMockStubber.callSuccessWith(suggBundle).when(mockSuggestionProvider).getSuggestions(any(TypeFilter.class), anyInt(), anyInt(), anyInt(), anyString(), any(AsyncCallback.class));
-		presenter.getSuggestions(offset);
-		verify(mockSuggestBox).showLoading();
-		verify(mockSuggestBox).setSelectedSuggestion(mockSuggestion);
-		verify(mockSuggestionProvider).getSuggestions(eq(TypeFilter.ALL), eq(offset), eq(pageSize),
-				anyInt(), eq(query), any(AsyncCallback.class));
-		verify(mockSuggestBox).hideLoading();
-		verify(mockSuggestBox).updateFieldStateForSuggestions((int)suggBundle.getTotalNumberOfResults(), offset);
-		verify(mockCallback).onSuggestionsReady(eq(mockRequest), any(Response.class));
-	}
-
-	@Test
 	public void testGetSuggestionsWithoutExactMatch() {
 		when(mockSuggestBox.getText()).thenReturn(USERNAME);
 		UserGroupHeader mockHeader = mock(UserGroupHeader.class);

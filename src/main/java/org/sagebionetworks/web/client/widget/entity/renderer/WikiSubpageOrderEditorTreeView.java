@@ -6,7 +6,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 
 public interface WikiSubpageOrderEditorTreeView extends IsWidget {
 
-	void configure(SubpageOrderEditorTreeNode overallRoot);
+	void configure(SubpageOrderEditorTreeNode overallRoot, String ownerObjectId);
 	void selectTreeItem(SubpageOrderEditorTreeNode toSelect);
 	void moveTreeItem(SubpageOrderEditorTreeNode node, boolean moveUp);
 	

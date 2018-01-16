@@ -15,7 +15,7 @@
 		    			<w:LoadingSpinner size="31px"/>
 				</g:HTMLPanel>
 			    
-		        <b:Heading size="H2" ui:field="wikiHeading" addStyleNames="margin-bottom-0-imp"/>
+		        <bh:Div ui:field="wikiHeadingContainer"></bh:Div>
 		        <b:Alert ui:field="diffVersionAlert" visible="false">
 		            <g:HTMLPanel>
 		                <bh:Span addStyleNames="margin-left-5" 

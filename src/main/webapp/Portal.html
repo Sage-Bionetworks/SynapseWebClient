@@ -45,6 +45,8 @@
 			ga('send', 'pageview');
 		</script>
 		
+		
+		
 		<script>
 			// determine cdn endpoint (staging, prod, or dev)
 			var cdnEndpoint = "//cdn-" + location.hostname + "/";
@@ -79,7 +81,7 @@
 				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css");
-				head.load(cdnEndpoint + "js/init-mixpanel.js");
+				head.load(cdnEndpoint + "js/heap-init.js");
 			};
 			script.src = cdnEndpoint + "js/head.load.min.js";
 			document.head.appendChild(script);
@@ -98,7 +100,12 @@
 		<div>
 			<!-- GWT history support -->
 			<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position: absolute; width: 0; height: 0; border: 0"></iframe>
-	
+			<div id="dropzone" class="dropzone">
+				<h2 class="center" style="color:white; padding-top: 180px">
+					<span class="fa fa-cloud-upload"></span>
+					Drop files to upload
+				</h2>
+			</div>
 			<noscript>
 				<div
 					style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">

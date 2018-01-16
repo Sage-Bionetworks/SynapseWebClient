@@ -49,6 +49,7 @@ public interface UploaderView extends IsWidget, SynapseView, HasAttachHandlers {
 	String getS3DirectSecretKey();
 	
 	void enableUpload();
+	void setSelectedFilenames(String fileNames);
 	/**
 	 * Presenter interface
 	 */
@@ -71,8 +72,6 @@ public interface UploaderView extends IsWidget, SynapseView, HasAttachHandlers {
 		void cancelClicked();
 		
 		void disableMultipleFileUploads();
-		String getSelectedFilesText();
-
 		Long getStorageLocationId();
 	}
 }

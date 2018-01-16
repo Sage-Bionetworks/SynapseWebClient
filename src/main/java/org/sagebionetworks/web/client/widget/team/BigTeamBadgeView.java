@@ -6,13 +6,6 @@ import org.sagebionetworks.web.client.SynapseView;
 import com.google.gwt.user.client.ui.IsWidget;
 
 public interface BigTeamBadgeView extends IsWidget, SynapseView {
-
-	/**
-	 * Set the presenter.
-	 * @param presenter
-	 */
-	public void setPresenter(Presenter presenter);
-	
 	public void setTeam(Team team, String description);
 
 	public void showLoadError(String principalId);
@@ -22,10 +15,4 @@ public interface BigTeamBadgeView extends IsWidget, SynapseView {
 	void setTeamWithoutLink(String name);
 	void addStyleName(String style);
 	void setHeight(String height);
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-	}
-
 }

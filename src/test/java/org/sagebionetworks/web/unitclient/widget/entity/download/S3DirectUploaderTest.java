@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.PLEASE_SELECT_A_FILE;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -50,7 +52,7 @@ public class S3DirectUploaderTest {
 	public static final String SECRET_KEY_ID = "2";
 	public static final String BUCKET_NAME = "abcd";
 	public static final String ENDPOINT = "https://testendpoint.test";
-	public static final String[] FILENAMES = new String[]{"selectedFile.txt"};
+	public static final String FILE_NAME = "file.txt";
 	public static final String CONTENT_TYPE = "plain/txt";
 	
 	public static final String FILE_INPUT_ID = "divId";
@@ -63,9 +65,8 @@ public class S3DirectUploaderTest {
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		when(mockView.isAttached()).thenReturn(true);
-		when(mockSynapseJsniUtils.getFileBlob(anyInt(), anyString())).thenReturn(mockBlob);
-		when(mockSynapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(FILENAMES);
-		when(mockSynapseJsniUtils.getContentType(anyString(), anyInt())).thenReturn(CONTENT_TYPE);
+		when(mockSynapseJsniUtils.getFileBlob(anyInt(), any(JavaScriptObject.class))).thenReturn(mockBlob);
+		when(mockSynapseJsniUtils.getContentType(any(JavaScriptObject.class), anyInt())).thenReturn(CONTENT_TYPE);
 		uploader = new S3DirectUploader(mockAwsSdk, mockSynapseJsniUtils, mockGwt, mockSynapseClient);
 		uploader.configure(ACCESS_KEY_ID, SECRET_KEY_ID, BUCKET_NAME, ENDPOINT);
 	}
@@ -73,27 +74,29 @@ public class S3DirectUploaderTest {
 	@Test
 	public void testUpload() {
 		uploader.uploadFile(
-				FILE_INPUT_ID, 
-				FILE_INDEX, 
+				FILE_NAME,
+				CONTENT_TYPE,
+				mockBlob, 
 				mockProgressHandler,
 				KEY_PREFIX_UUID,
 				STORAGE_LOCATION_ID,
 				mockView);
-		verify(mockSynapseJsniUtils).getFileMd5(eq(mockBlob), md5Captor.capture());
+		verify(mockSynapseJsniUtils).getFileMd5(any(JavaScriptObject.class), md5Captor.capture());
 		MD5Callback md5Callback = md5Captor.getValue();
 		String md5 = "8782672c";
 		md5Callback.setMD5(md5);
 		
 		verify(mockAwsSdk).getS3(eq(ACCESS_KEY_ID), eq(SECRET_KEY_ID), eq(BUCKET_NAME), eq(ENDPOINT), callbackPCaptor.capture());
 		callbackPCaptor.getValue().invoke(mockS3);
-		verify(mockAwsSdk).upload(KEY_PREFIX_UUID + "/" + FILENAMES[0], mockBlob, CONTENT_TYPE, mockS3, uploader);
+		verify(mockAwsSdk).upload(eq(KEY_PREFIX_UUID + "/" + FILE_NAME), any(JavaScriptObject.class), eq(CONTENT_TYPE), any(JavaScriptObject.class), eq(uploader));
 	}
 	
 	@Test
 	public void testUploadFailure() {
 		uploader.uploadFile(
-				FILE_INPUT_ID, 
-				FILE_INDEX, 
+				FILE_NAME,
+				CONTENT_TYPE,
+				mockBlob, 
 				mockProgressHandler,
 				KEY_PREFIX_UUID,
 				STORAGE_LOCATION_ID,
@@ -109,19 +112,4 @@ public class S3DirectUploaderTest {
 		uploader.uploadFailed(errorMessage);
 		verify(mockProgressHandler).uploadFailed(errorMessage);
 	}
-	
-
-	@Test
-	public void testUploadNoFilesSelected() {
-		when(mockSynapseJsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{});
-		uploader.uploadFile(
-				FILE_INPUT_ID, 
-				FILE_INDEX, 
-				mockProgressHandler,
-				KEY_PREFIX_UUID,
-				STORAGE_LOCATION_ID,
-				mockView);
-		verify(mockProgressHandler).uploadFailed(PLEASE_SELECT_A_FILE);
-	}
-
 }

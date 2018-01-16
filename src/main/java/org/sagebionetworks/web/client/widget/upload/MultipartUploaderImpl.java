@@ -85,28 +85,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	}
 	
 	@Override
-	public void uploadSelectedFile(String fileInputId,ProgressingFileUploadHandler handler, Long storageLocationId, HasAttachHandlers view) {
-		int index = 0;
-		uploadFile(fileInputId, index, handler, storageLocationId, view);
-	}
-	
-	@Override
-	public void uploadFile(String fileInputId, int fileIndex, ProgressingFileUploadHandler handler, Long storageLocationId, HasAttachHandlers view) {
-		// First get the name of the file
-		String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
-		if(names == null || names.length < 1){
-			handler.uploadFailed(PLEASE_SELECT_A_FILE);
-			return;
-		}
-		String fileName = names[fileIndex];
-
-		JavaScriptObject blob = synapseJsniUtils.getFileBlob(fileIndex, fileInputId);
-		String contentType = org.sagebionetworks.web.client.ContentTypeUtils.fixDefaultContentType(synapseJsniUtils.getContentType(fileInputId, fileIndex), fileName);
-		
-		uploadFile(fileName, contentType, blob, handler, storageLocationId, view);
-	}
-	
-	@Override
 	public void uploadFile(final String fileName, final String contentType, final JavaScriptObject blob, ProgressingFileUploadHandler handler, final Long storageLocationId, HasAttachHandlers view) {
 		//initialize attempt count. 
 		this.request = null;

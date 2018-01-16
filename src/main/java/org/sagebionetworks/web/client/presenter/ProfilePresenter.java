@@ -1,10 +1,13 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
@@ -56,10 +59,10 @@ import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -100,6 +103,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private String currentUserId;
 	private boolean isOwner;
 	private int currentProjectOffset, currentChallengeOffset;
+	private String teamNextPageToken;
+	private boolean includeRequestCount;
 	public final static int PROJECT_PAGE_SIZE=20;
 	public final static int CHALLENGE_PAGE_SIZE=20;
 	public ProfileArea currentArea;
@@ -107,6 +112,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public String filterTeamId;
 	public SortOptionEnum currentProjectSort;
 	public TeamListWidget myTeamsWidget;
+	public LoadMoreWidgetContainer loadMoreTeamsWidgetContainer;
 	public SynapseAlert profileSynAlert;
 	public SynapseAlert projectSynAlert;
 	public SynapseAlert teamSynAlert;
@@ -115,7 +121,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public UserBundle currentUserBundle;
 	public Callback resubmitVerificationCallback;
 	public LoadMoreWidgetContainer loadMoreProjectsWidgetContainer;
-	public Callback getMoreProjectsCallback;
+	public Callback getMoreProjectsCallback, getMoreTeamsCallback;
 	public Callback refreshTeamsCallback;
 	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	public DateTimeUtils dateTimeUtils;
@@ -172,29 +178,24 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		challengeSynAlert = ginInjector.getSynapseAlertWidget();
 		view.setPresenter(this);
 		view.addUserProfileModalWidget(userProfileModalWidget);
-		view.addMyTeamsWidget(myTeamsWidget);
 		view.addOpenInvitesWidget(openInvitesWidget);
 		view.setProfileSynAlertWidget(profileSynAlert.asWidget());
 		view.setProjectSynAlertWidget(projectSynAlert.asWidget());
 		view.setTeamSynAlertWidget(teamSynAlert.asWidget());
 		view.setChallengeSynAlertWidget(challengeSynAlert.asWidget());
-		resubmitVerificationCallback = new Callback() {
-			@Override
-			public void invoke() {
-				newVerificationSubmissionClicked();
-			}
+		resubmitVerificationCallback = () -> {
+			newVerificationSubmissionClicked();
 		};
-		getMoreProjectsCallback = new Callback() {
-			@Override
-			public void invoke() {
-				getMoreProjects();
-			}
+		getMoreProjectsCallback = () -> {
+			getMoreProjects();
 		};
-		refreshTeamsCallback = new Callback() {
-			@Override
-			public void invoke() {
-				refreshTeamsForFilter();
-			}
+		
+		getMoreTeamsCallback = () -> {
+			getMoreTeams();
+		};
+		
+		refreshTeamsCallback = () -> {
+			refreshTeamsForFilter();
 		};
 		promptForProjectNameDialog.setPresenter(new PromptModalView.Presenter() {
 			@Override
@@ -294,7 +295,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		myTeamsWidget.clear();
 		view.clearTeamNotificationCount();
-		myTeamsWidget.configure(false);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		if (isOwner) {
 			// make sure we have the user favorites before continuing
@@ -592,7 +592,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void refreshTeamsForFilter() {
 		updateMembershipInvitationCount();
 		updateMembershipRequestCount();
-		getTeamBundles(currentUserId, false);
+		getTeamBundles(false);
 	}
 	
 	@Override
@@ -600,7 +600,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		updateMembershipInvitationCount();
 		updateMembershipRequestCount();
 		refreshTeamInvites();
-		getTeamBundles(currentUserId, isOwner);
+		getTeamBundles(isOwner);
 	}
 	
 	public void refreshTeamInvites() {
@@ -649,38 +649,90 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	
-	public void getTeamBundles(String userId, final boolean includeRequestCount) {
+	public void getTeamBundles(boolean includeRequestCount) {
+		this.includeRequestCount = includeRequestCount;
 		teamSynAlert.clear();
 		myTeamsWidget.clear();
-		myTeamsWidget.showLoading();
-		synapseClient.getTeamsForUser(userId, new AsyncCallback<List<Team>>() {
-			@Override
-			public void onSuccess(List<Team> teams) {
-				myTeamsWidget.clear();
-				if (teams != null && teams.size() > 0) {
-					view.addMyTeamProjectsFilter();
-					for (Team team: teams) {
-						// requests will always be 0 or greater
-						view.addTeamsFilterTeam(team);
-						myTeamsWidget.addTeam(team);
-						if (includeRequestCount) {
-							getTeamRequestCount(userId, team);
+		teamNextPageToken = null;
+		
+		loadMoreTeamsWidgetContainer = ginInjector.getLoadMoreProjectsWidgetContainer();
+		view.setTeamsContainer(loadMoreTeamsWidgetContainer.asWidget());
+		loadMoreTeamsWidgetContainer.setIsMore(false);
+		loadMoreTeamsWidgetContainer.configure(getMoreTeamsCallback);
+		if (myTeamsWidget.asWidget() != null) {
+			myTeamsWidget.asWidget().removeFromParent();	
+		}
+		loadMoreTeamsWidgetContainer.add(myTeamsWidget.asWidget());
+		view.addMyTeamProjectsFilter();
+		getMoreTeams();
+	}
+	
+	public void getMoreTeams() {
+		jsClient.getUserTeams(currentUserId, true, teamNextPageToken)
+			.addCallback(
+				new FutureCallback<PaginatedTeamIds>() {
+					@Override
+					public void onSuccess(PaginatedTeamIds paginatedTeamIds) {
+						teamNextPageToken = paginatedTeamIds.getNextPageToken();
+						List<String> teamIds = paginatedTeamIds.getTeamIds();
+						boolean isTeams = teamIds.size() > 0;
+						loadMoreTeamsWidgetContainer.setIsMore(teamNextPageToken != null);
+						view.setTeamsFilterVisible(isTeams);
+						if (isTeams) {
+							addTeams(teamIds);
+						} else {
+							myTeamsWidget.showEmpty();
 						}
 					}
-					view.setTeamsFilterVisible(true);
-				} else {
-					myTeamsWidget.showEmpty();
-					view.setTeamsFilterVisible(false);
-				}
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				myTeamsWidget.clear();
-				view.setTeamsFilterVisible(false);
-				teamSynAlert.handleException(caught);
-			}
-		});
+	
+					@Override
+					public void onFailure(Throwable caught) {
+						view.setTeamsFilterVisible(false);
+						loadMoreTeamsWidgetContainer.setIsMore(false);
+						teamSynAlert.handleException(caught);
+					}
+				},
+				directExecutor()
+		);
+	}
+	
+	public void addTeams(List<String> teamIds) {
+		jsClient.listTeams(teamIds)
+			.addCallback(
+				new FutureCallback<List<Team>>() {
+					@Override
+					public void onSuccess(List<Team> teams) {
+						ProfileArea currentArea = place.getArea();
+						switch (currentArea) {
+							case PROJECTS:
+								for (Team team: teams) {
+									view.addTeamsFilterTeam(team);
+								}
+								break;
+							case TEAMS:
+								for (Team team: teams) {
+									myTeamsWidget.addTeam(team);
+								}
+								break;
+							default:
+								break;
+						}
+						if (includeRequestCount) {
+							for (Team team: teams) {
+								getTeamRequestCount(currentUserId, team);
+							}
+						}
+					}
+	
+					@Override
+					public void onFailure(Throwable caught) {
+						view.setTeamsFilterVisible(false);
+						loadMoreTeamsWidgetContainer.setIsMore(false);
+						teamSynAlert.handleException(caught);
+					}
+				},
+				directExecutor()
+		);
 	}
 	
 	public void getTeamRequestCount(String userId, final Team team) {
@@ -951,8 +1003,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		else {
 			//if this contains an oauth_token, it's from linkedin
-			if (token.contains("oauth_token"))
-			{
+			if (token.contains("oauth_token")) {
 				// User just logged in to LinkedIn. Get the request token and their info to update
 				// their profile with.
 
@@ -973,10 +1024,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					}
 				}
 				
-				if(!requestToken.equals("") && !verifier.equals("")) {
+				globalApplicationState.replaceCurrentPlace(new Profile(authenticationController.getCurrentUserPrincipalId()));
+				
+				if(requestToken != null && !requestToken.equals("") && verifier != null && !verifier.equals("")) {
 					updateProfileWithLinkedIn(requestToken, verifier);
 				} else {
-					view.showErrorMessage("An error occurred. Please try reloading the page.");
+					view.showErrorMessage("Unable to import LinkedIn profile.");
+					globalApplicationState.refreshPage();
 				}
 			} else if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
 				editMyProfile();
@@ -1225,7 +1279,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				Date date = new Date(System.currentTimeMillis() + 300000);
 				cookies.setCookie(CookieKeys.LINKEDIN, result.getRequestSecret(), date);
 				// Open the LinkedIn authentication window in the same tab
-				Window.open(result.getAuthUrl(), "_self", "");
+				view.open(result.getAuthUrl());
 			}
 			
 			@Override
@@ -1242,6 +1296,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		// Grab the requestToken secret from the cookie. If it's expired, show an error message.
 		// If not, grab the user's info for an update.
 		profileSynAlert.clear();
+		view.showLoading();
 		String secret = cookies.getCookie(CookieKeys.LINKEDIN);
 		if(secret == null || secret.equals("")) {
 			view.showErrorMessage("Your request has timed out. Please reload the page and try again.");
@@ -1249,6 +1304,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, gwt.getHostPageBaseURL(), new AsyncCallback<UserProfile>() {
 				@Override
 				public void onSuccess(UserProfile linkedInProfile) {
+					view.hideLoading();
 					// Give the user a chance to edit the profile.
 					userProfileModalWidget.showEditProfile(linkedInProfile.getOwnerId(), linkedInProfile, new Callback(){
 						@Override

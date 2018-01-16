@@ -4,23 +4,21 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.Synapse;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
-	Callback onAttachCallback;
 	Widget w;
 	public interface Binder extends UiBinder<Widget, EntityIdCellRendererViewImpl> {}
 	@UiField
-	LoadingSpinner loadingUI;
+	Span loadingUI;
 	@UiField
 	Tooltip errorField;
 	@UiField
@@ -29,16 +27,17 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	Icon entityIcon;
 	@UiField
 	Anchor entityLink;
-	
+	String entityId;
+	ClickHandler customClickHandler;
 	@Inject
-	public EntityIdCellRendererViewImpl(Binder binder){
+	public EntityIdCellRendererViewImpl(Binder binder, GlobalApplicationState globalAppState){
 		w = binder.createAndBindUi(this);
-		w.addAttachHandler(new AttachEvent.Handler() {
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if(event.isAttached()) {
-					onAttach();
-				}
+		entityLink.addClickHandler(event -> {
+			event.preventDefault();
+			if (customClickHandler != null) {
+				customClickHandler.onClick(event);
+			} else {
+				globalAppState.getPlaceChanger().goTo(new Synapse(entityId));
 			}
 		});
 	}
@@ -49,41 +48,22 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	}
 
 	@Override
-	public boolean isInViewport() {
-		return DisplayUtils.isInViewport(w);
-	}
-
-	@Override
-	public boolean isAttached() {
-		return w.isAttached();
-	}
-
-	@Override
-	public void setOnAttachCallback(Callback onAttachCallback) {
-		this.onAttachCallback = onAttachCallback;
-	}
-	
-	public void onAttach() {
-		if (onAttachCallback != null) {
-			onAttachCallback.invoke();
-		}
-	}
-	
-	@Override
 	public void setIcon(IconType iconType) {
 		errorIcon.setVisible(false);
 		loadingUI.setVisible(false);
 		entityIcon.setType(iconType);
 		entityIcon.setVisible(true);
 	}
+	
 	@Override
-	public void setLinkHref(String href) {
-		entityLink.setHref(href);
+	public void setEntityId(String entityId) {
+		entityLink.setHref(Synapse.getHrefForDotVersion(entityId));
+		this.entityId = entityId;
 	}
 	
 	@Override
 	public void setClickHandler(ClickHandler clickHandler) {
-		entityLink.addClickHandler(clickHandler);
+		customClickHandler = clickHandler;
 	}
 	
 	@Override
