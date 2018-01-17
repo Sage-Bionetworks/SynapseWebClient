@@ -32,7 +32,7 @@ public class SessionTokenDetector {
 		return cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN) != null;
 	}
 	public void start() {
-		timer  = new Timer() {			
+		timer  = new Timer() {	
 			@Override
 			public void run() {
 				boolean isNowSessionToken = isSessionTokenCookie();

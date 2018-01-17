@@ -22,6 +22,7 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SessionTokenDetector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -57,6 +58,8 @@ public class AuthenticationControllerImplTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
+	SessionTokenDetector mockSessionTokenDetector;
 	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	HashMap<String, String> serverProperties;
@@ -79,6 +82,7 @@ public class AuthenticationControllerImplTest {
 		AsyncMockStubber.callSuccessWith(serverProperties).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 		when(mockGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		when(mockGinInjector.getSessionTokenDetector()).thenReturn(mockSessionTokenDetector);
 	}
 	
 	@Test
@@ -104,7 +108,6 @@ public class AuthenticationControllerImplTest {
 		
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("");
 		assertFalse(authenticationController.isLoggedIn());
-		
 	}
 	
 	@Test
@@ -196,6 +199,7 @@ public class AuthenticationControllerImplTest {
 		verify(mockClientCache).clear();
 		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 		verify(mockClientCache).put(eq(propKey), eq(propValue), anyLong());
+		verify(mockSessionTokenDetector).initializeSessionTokenState();
 	}
 	
 	
@@ -251,6 +255,7 @@ public class AuthenticationControllerImplTest {
 		verify(mockClientCache).put(eq(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT), eq(newAuthReceipt), anyLong());
 		
 		verify(loginCallback).onSuccess(any(UserSessionData.class));
+		verify(mockSessionTokenDetector).initializeSessionTokenState();
 	}
 	
 	@Test
