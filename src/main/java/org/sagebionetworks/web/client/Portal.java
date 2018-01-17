@@ -99,8 +99,8 @@ public class Portal implements EntryPoint {
 								
 								// start version timer
 								ginjector.getVersionTimer().start();
-								// start timer to check for user change (session expiration)
-								ginjector.getUserChangeTimer().start();
+								// start timer to check for user logout (session expired, or user explicitly logged out)
+								ginjector.getSessionTokenDetector().start();
 								
 								// Goes to place represented on URL or default place
 								historyHandler.handleCurrentHistory();
