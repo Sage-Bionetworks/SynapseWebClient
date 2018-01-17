@@ -9,7 +9,6 @@ import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
 import com.google.gwt.user.client.rpc.HasRpcToken;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public interface GWTWrapper {

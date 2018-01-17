@@ -789,6 +789,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(GWTWrapper.class).to(GWTWrapperImpl.class);
 		bind(GWTTimer.class).to(GWTTimerImpl.class);
 		
+		bind(SessionTokenDetector.class).in(Singleton.class);
+		
 		//RequestBuilder
 		bind(RequestBuilderWrapper.class).to(RequestBuilderWrapperImpl.class);
 		

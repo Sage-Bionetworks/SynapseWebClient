@@ -18,7 +18,6 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 
@@ -100,6 +99,8 @@ public class Portal implements EntryPoint {
 								
 								// start version timer
 								ginjector.getVersionTimer().start();
+								// start timer to check for user logout (session expired, or user explicitly logged out)
+								ginjector.getSessionTokenDetector().start();
 								
 								// Goes to place represented on URL or default place
 								historyHandler.handleCurrentHistory();

@@ -111,6 +111,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		initSynapsePropertiesFromServer();
 		sessionStorage.clear();
 		currentUser = null;
+		ginInjector.getSessionTokenDetector().initializeSessionTokenState();
 	}
 
 	public void initSynapsePropertiesFromServer() {
@@ -144,6 +145,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
 				currentUser = userSessionData;
 				localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
+				ginInjector.getSessionTokenDetector().initializeSessionTokenState();
 				callback.onSuccess(currentUser);
 			}
 			@Override
