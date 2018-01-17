@@ -1,8 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import static org.sagebionetworks.web.client.cookie.CookieKeys.USER_LOGIN_TOKEN;
 import java.util.Objects;
-
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
@@ -10,7 +9,7 @@ import com.google.inject.Inject;
 
 public class SessionTokenDetector {
 
-	private static final int INTERVAL_MS = 1000*10; //check every 10 seconds
+	public static final int INTERVAL_MS = 1000*10; //check every 10 seconds
 	CookieProvider cookies;
 	AuthenticationController authController;
 	GlobalApplicationState globalAppState;
@@ -30,8 +29,9 @@ public class SessionTokenDetector {
 	}
 	
 	private boolean isSessionTokenCookie() {
-		return cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN) != null;
+		return cookies.getCookie(USER_LOGIN_TOKEN) != null;
 	}
+	
 	public void start() {
 		gwt.scheduleFixedDelay(() -> {
 			boolean isNowSessionToken = isSessionTokenCookie();
