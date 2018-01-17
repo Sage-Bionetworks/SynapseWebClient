@@ -68,6 +68,7 @@
 			<b:FormGroup>
 				<b:FormLabel>Options</b:FormLabel>
 				<b:CheckBox ui:field="showLegendCb" text="Show legend"/>
+				<b:CheckBox ui:field="isHorizontalBarCb" text="Horizontal bar chart"/>
 			</b:FormGroup>
 			<bh:Div ui:field="showHideAdvancedButtonContainer" />
 			<bh:Div ui:field="advancedUI" visible="false" addStyleNames="margin-top-10">

@@ -7,6 +7,7 @@ import jsinterop.annotations.JsIgnore;
 public class PlotlyTraceWrapper {
 	String[] x, y;
 	String name, type;
+	boolean isHorizontal = false;
 	
 	public PlotlyTraceWrapper() {
 	}
@@ -49,17 +50,29 @@ public class PlotlyTraceWrapper {
 	public String[] getY() {
 		return y;
 	}
+	
+	public void setIsHorizontal(boolean isHorizontal) {
+		this.isHorizontal = isHorizontal;
+	}
+	
+	public boolean isHorizontal() {
+		return isHorizontal;
+	}
+	
 	public JavaScriptObject getTrace() {
-		return _getTrace(name, type, x, y);
+		String orientationValue = isHorizontal ? "h" : "v";
+		String[] xAxis = isHorizontal ? y : x;
+		String[] yAxis = isHorizontal ? x : y;
+		return _getTrace(name, type, xAxis, yAxis, orientationValue);
 	}
 
-
-	private static native JavaScriptObject _getTrace(String nameValue, String typeValue, String[] xValue, String[] yValue) /*-{
+	private static native JavaScriptObject _getTrace(String nameValue, String typeValue, String[] xValue, String[] yValue, String orientationValue) /*-{
 		return {
 			type : typeValue,
 			name : nameValue,
 			x : xValue,
-			y : yValue
+			y : yValue,
+			orientation : orientationValue
 		}
 	}-*/;
 
