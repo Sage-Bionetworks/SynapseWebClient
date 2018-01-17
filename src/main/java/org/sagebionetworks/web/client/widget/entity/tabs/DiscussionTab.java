@@ -52,11 +52,8 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 		this.entityName = entityName;
 		this.params = new ParameterizedToken(areaToken);
 		checkForSynapseForum();
-		CallbackP<ParameterizedToken> updateParamsCallback = new CallbackP<ParameterizedToken>(){
-			@Override
-			public void invoke(ParameterizedToken token) {
-				updatePlace(new Synapse(entityId, PROJECT_VERSION_NUMBER, EntityArea.DISCUSSION, token.toString()));
-			}
+		CallbackP<ParameterizedToken> updateParamsCallback = token -> {
+			updatePlace(new Synapse(entityId, PROJECT_VERSION_NUMBER, EntityArea.DISCUSSION, token.toString()));
 		};
 		Callback updateURLCallback = new Callback() {
 			@Override
@@ -65,6 +62,8 @@ public class DiscussionTab implements DiscussionTabView.Presenter{
 			}
 		};
 		forumWidget.configure(entityId, params, isCurrentUserModerator, actionMenu, updateParamsCallback, updateURLCallback);
+		// SWC-3994: initialize tab Place to set the initial area token
+		updateParamsCallback.invoke(params);
 	}
 
 	public void updateActionMenuCommands() {

@@ -6,6 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -86,18 +87,25 @@ public class DiscussionTabTest {
 
 		ArgumentCaptor<CallbackP> paramCaptor = ArgumentCaptor.forClass(CallbackP.class);
 		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class), anyBoolean(), eq(mockActionMenuWidget), paramCaptor.capture(), any(Callback.class));
-		
-		//simulate the forum calling back to the tab with the parameter
-		paramCaptor.getValue().invoke(new ParameterizedToken(areaToken));
-		
+		//SWC-3994: verify place is initialized with area token.
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(entityName), captor.capture());
 		Synapse place = captor.getValue();
-		assertEquals(entityId, place.getEntityId());
-		assertNull(place.getVersionNumber());
 		assertEquals(EntityArea.DISCUSSION, place.getArea());
 		assertTrue(place.getAreaToken().contains("a=b"));
 		assertTrue(place.getAreaToken().contains("c=d"));
+		
+		//simulate the forum calling back to the tab with the parameter
+		areaToken = "e=f&g=h";
+		paramCaptor.getValue().invoke(new ParameterizedToken(areaToken));
+		
+		verify(mockTab, times(2)).setEntityNameAndPlace(eq(entityName), captor.capture());
+		place = captor.getValue();
+		assertEquals(entityId, place.getEntityId());
+		assertNull(place.getVersionNumber());
+		assertEquals(EntityArea.DISCUSSION, place.getArea());
+		assertTrue(place.getAreaToken().contains("e=f"));
+		assertTrue(place.getAreaToken().contains("g=h"));
 		verifyZeroInteractions(mockPlaceChanger);
 	}
 	@Test
