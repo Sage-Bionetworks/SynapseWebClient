@@ -278,8 +278,7 @@ public class DisplayConstants {
 	public static final String DOWNLOAD_CREDENTIALS_REQUIRED = "Sign in to download from ";
 	public static final String SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT = "Successfully linked the external account to your Synapse profile.";
 	public static final String INVALID_EMAIL = "Email address is not valid.";
-	
-	public static final String MD5_CALCULATION_ERROR = "Unable to upload. Please select a set of accessible Files to upload.";
+	public static final String MD5_CALCULATION_ERROR = "Unable to upload. Please select a set of accessible Files to upload.  Uploading a Folder is not supported.";
 
 	// Button styles
 	public static final String PRIMARY_BUTTON_STYLE = "btn-primary";
