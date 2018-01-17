@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitclient.widget.entity.download;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -13,6 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -89,6 +90,26 @@ public class S3DirectUploaderTest {
 		verify(mockAwsSdk).getS3(eq(ACCESS_KEY_ID), eq(SECRET_KEY_ID), eq(BUCKET_NAME), eq(ENDPOINT), callbackPCaptor.capture());
 		callbackPCaptor.getValue().invoke(mockS3);
 		verify(mockAwsSdk).upload(eq(KEY_PREFIX_UUID + "/" + FILE_NAME), any(JavaScriptObject.class), eq(CONTENT_TYPE), any(JavaScriptObject.class), eq(uploader));
+	}
+	
+	@Test
+	public void testUploadFolder() {
+		uploader.uploadFile(
+				FILE_NAME,
+				CONTENT_TYPE,
+				mockBlob, 
+				mockProgressHandler,
+				KEY_PREFIX_UUID,
+				STORAGE_LOCATION_ID,
+				mockView);
+		verify(mockSynapseJsniUtils).getFileMd5(any(JavaScriptObject.class), md5Captor.capture());
+		MD5Callback md5Callback = md5Captor.getValue();
+		// md5 calculation will fail if a directory is dropped into the uploader
+		String md5 = null;
+		md5Callback.setMD5(md5);
+		
+		verify(mockProgressHandler).uploadFailed(DisplayConstants.MD5_CALCULATION_ERROR);
+		verify(mockAwsSdk, never()).getS3(anyString(),anyString(), anyString(),anyString(), any(CallbackP.class));
 	}
 	
 	@Test

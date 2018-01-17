@@ -41,7 +41,6 @@ import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.shared.HandlerManager;
 import com.google.gwt.i18n.client.NumberFormat;
@@ -569,6 +568,10 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
 			@Override
 			public void setMD5(String hexValue) {
+				if (hexValue == null) {
+					view.showErrorMessage(DisplayConstants.MD5_CALCULATION_ERROR);
+					return;
+				}
 				boolean isUpdating = entityId != null || entity != null;
 				long fileSize = (long)synapseJsniUtils.getFileSize(blob);
 				String fileName = fileNames[currIndex];
