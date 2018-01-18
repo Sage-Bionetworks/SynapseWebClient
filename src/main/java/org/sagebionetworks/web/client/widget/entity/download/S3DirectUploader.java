@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl
 
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.web.client.ContentTypeUtils;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -124,6 +125,10 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 			@Override
 			public void setMD5(String hexValue) {
 				md5 = hexValue;
+				if (md5 == null) {
+					handler.uploadFailed(DisplayConstants.MD5_CALCULATION_ERROR);
+					return;
+				}
 				awsSdk.getS3(accessKeyId, secretAccessKey, bucketName, endpoint, new CallbackP<JavaScriptObject>() {
 					@Override
 					public void invoke(JavaScriptObject s3) {
