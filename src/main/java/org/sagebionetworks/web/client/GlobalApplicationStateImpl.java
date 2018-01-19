@@ -521,10 +521,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		dropZone.addEventListener('dragenter', allowDrag);
 		dropZone.addEventListener('dragover', allowDrag);
 
-		dropZone.addEventListener('dragleave', function(e) {
-			hideDropZone();
-		});
-
 		dropZone.addEventListener('drop', handleDrop);
 		
 		//if files are dropped into the root panel, then ignore the event (do not open file contents if user does not have the upload dialog open).
