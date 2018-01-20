@@ -229,8 +229,6 @@ public class UploaderTest {
 		verify(view).showInfo(anyString(), anyString());
 	}
 
-	
-
 	@Test
 	public void testSetNewSftpExternalPath() throws Exception {
 		//this is the full success test
@@ -240,7 +238,25 @@ public class UploaderTest {
 		verify(synapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
 	}
-	
+
+	@Test
+	public void testSetSftpExternalPathToFolder() throws Exception {
+		// attempt to uplaod a Folder to sftp external link
+		uploader.setFileNames(new String[] {"testfolder"});
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+                final Object[] args = invocation.getArguments();
+                ((MD5Callback) args[args.length - 1]).setMD5(null);
+				return null;
+			}
+		}).when(synapseJsniUtils).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
+		
+		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
+		verify(synapseClient, never()).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
+		verify(view).showErrorMessage(DisplayConstants.MD5_CALCULATION_ERROR);
+	}
+
 	@Test
 	public void testSetSftpExternalPathFailedCreate() throws Exception {
 		uploader.setFileNames(new String[] {"test.txt"});
