@@ -39,6 +39,7 @@ import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
+import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -583,4 +584,6 @@ public interface PortalGinInjector extends Ginjector {
 	HtmlPreviewWidget getHtmlPreviewWidget();
 	NbConvertPreviewWidget getNbConvertPreviewWidget();
 	S3DirectLoginDialog getS3DirectLoginDialog();
+	SynapseJSNIUtils getSynapseJSNIUtils();
+	GWTWrapper getGWT();
 }
