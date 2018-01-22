@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.footer.Footer;
+import org.sagebionetworks.web.client.widget.footer.VersionState;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.activity.shared.ActivityManager;
@@ -17,6 +18,7 @@ import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -61,6 +63,7 @@ public class Portal implements EntryPoint {
 				@Override
 				public void onSuccess() {
 					try {
+						loadPortalCss();
 						// load the previous session, if there is one
 						ginjector.getAuthenticationController().reloadUserSessionData();
 
@@ -84,7 +87,6 @@ public class Portal implements EntryPoint {
 						RootPanel.get("rootPanel").add(appWidget);
 						RootPanel.get("headerPanel").add(header);
 						RootPanel.get("footerPanel").add(footer);
-						
 						RootPanel.get("initialLoadingUI").setVisible(false);
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
@@ -117,6 +119,24 @@ public class Portal implements EntryPoint {
 			});
 			
 		}
+	}
+	
+	public void loadPortalCss() {
+		// get the current Synapse version
+		ginjector.getGlobalApplicationState().checkVersionCompatibility(new AsyncCallback<VersionState>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				_consoleError("Unable to load Portal.css" + caught.getMessage());
+			}
+			
+			public void onSuccess(VersionState versionState) {
+				SynapseJSNIUtils jsniUtils = ginjector.getSynapseJSNIUtils();
+				String cdnEndpoint = jsniUtils.getCdnEndpoint();
+				GWTWrapper gwt = ginjector.getGWT();
+				String encodedVersion = gwt.encodeQueryString(versionState.getVersion());
+				jsniUtils.loadCss(cdnEndpoint + "Portal.css?version=" + encodedVersion);
+			};
+		});
 	}
 	
 	public void fixGWTRpcServiceEntryPoints() {

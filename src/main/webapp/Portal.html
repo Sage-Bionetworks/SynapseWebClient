@@ -54,8 +54,10 @@
 			if (localhostRegex.test(location.hostname)) {
 				cdnEndpoint = "";
 			}
+			window.cdnEndpoint = cdnEndpoint;
+			
 			var link = document.createElement( "link" );
-			link.href = cdnEndpoint + "Portal.css";
+			link.href = cdnEndpoint + "loading.css";
 			link.type = "text/css";
 			link.rel = "stylesheet";
 			document.head.appendChild(link);
