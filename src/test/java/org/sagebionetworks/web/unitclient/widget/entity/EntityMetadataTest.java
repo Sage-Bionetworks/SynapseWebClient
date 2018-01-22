@@ -138,7 +138,6 @@ public class EntityMetadataTest {
 		Long versionNumber = null;
 		widget.configure(bundle, versionNumber, mockActionMenuWidget);
 		verify(mockFileHistoryWidget, never()).setEntityBundle(bundle, versionNumber, isCurrentVersion);
-		verify(mockFileHistoryWidget, never()).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 	}
@@ -161,7 +160,6 @@ public class EntityMetadataTest {
 		Long versionNumber = null;
 		widget.configure(bundle, versionNumber, mockActionMenuWidget);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber, isCurrentVersion);
-		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 	}
@@ -185,7 +183,6 @@ public class EntityMetadataTest {
 		bundle.setDoi(mockDoi);
 		widget.configure(bundle, versionNumber, mockActionMenuWidget);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber, isCurrentVersion);
-		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 	}
