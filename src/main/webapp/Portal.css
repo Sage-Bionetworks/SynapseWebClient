@@ -1903,6 +1903,28 @@ ul, ol {
 	color: #5bc0de;
 }
 
+/**
+SWC-3997: tidy up search bar in header
+**/
+#body .searchBox .input-group>input, #body .searchBox .input-group>input:focus {
+	border-radius: .2em 0em 0em .2em;
+	border: 0px;
+	background-color: #ffffff;
+	background-image: none;
+	box-shadow: none;
+}
+#body .searchBox .input-group-btn>.btn, #body .searchBox .input-group-btn>.btn:hover {
+	background-image: none;
+	border: 0px;
+	box-shadow: none;
+}
+#body .searchBox .input-group-btn>.btn-default, #body .searchBox .input-group-btn>.btn-default:hover  {
+	background-color: #ffffff;
+}
+/**
+end SWC-3997
+**/
+
 div.input-group > input.search-textbox {
 	border: 1px solid #eee;
 	padding-left: 10px;
