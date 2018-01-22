@@ -445,30 +445,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 
 	@Override
-	public void loadCss(final String url, final Callback<Void, Exception> callback) {
+	public void loadCss(final String url) {
 		final LinkElement link = Document.get().createLinkElement();
 		link.setRel("stylesheet");
 		link.setHref(url);
 		_nativeAttachToHead(link);
-		
-		// fall back timer
-		final Timer t = new Timer() {
-			@Override
-			public void run() {
-				callback.onSuccess(null);
-			}
-		};
-		
-		Command loadedCommand = new Command() {			
-			@Override
-			public void execute() {
-				callback.onSuccess(null);
-				t.cancel();
-			}
-		};
-		
-		_addCssLoadHandler(url, loadedCommand);		
-		t.schedule(5000); // failsafe: after 5 seconds assume loaded
 	}
 	
 	/**
@@ -476,21 +457,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	 */
 	protected static native void _nativeAttachToHead(JavaScriptObject scriptElement) /*-{
 	    $doc.getElementsByTagName("head")[0].appendChild(scriptElement);
-	}-*/;
-
-
-	/**
-	 * provides a callback mechanism for when CSS resources that have been added to the dom are fully loaded
-	 * @param cssUrl
-	 * @param finishedUploadingCallback
-	 */
-	private static native void _addCssLoadHandler(String cssUrl, Command command) /*-{
-		// Use Image load error callback to detect loading as no reliable/cross-browser callback exists for Link element
-		var img = $doc.createElement('img');		
-		img.onerror = function() {			
-			command.@com.google.gwt.user.client.Command::execute()();
-		}
-		img.src = cssUrl;
 	}-*/;
 	
 	@Override
@@ -731,5 +697,15 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
 	private final static native String _copyToClipboard() /*-{
 		$doc.execCommand('copy');
+	}-*/;
+	
+	@Override
+	public String getCdnEndpoint() {
+		return _getCdnEndpoint();
+	}
+
+	private final static native String _getCdnEndpoint() /*-{
+		// initialized in Portal.html
+		return $wnd.cdnEndpoint;
 	}-*/;
 }

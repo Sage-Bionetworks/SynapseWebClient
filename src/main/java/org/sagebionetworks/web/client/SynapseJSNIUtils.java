@@ -66,7 +66,7 @@ public interface SynapseJSNIUtils {
 	
 	public void processWithMathJax(Element element);	
 
-	public void loadCss(String url, Callback<Void, Exception> callback);
+	public void loadCss(String url);
 
 	/**
 	 * initialize the behavior for on pop state
@@ -95,4 +95,5 @@ public interface SynapseJSNIUtils {
 	boolean elementSupportsAttribute(Element el, String attribute);
 
 	Element getElementById(String elementId);
+	String getCdnEndpoint();
 }

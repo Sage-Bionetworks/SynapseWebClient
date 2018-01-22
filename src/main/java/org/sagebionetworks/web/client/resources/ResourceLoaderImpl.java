@@ -40,9 +40,6 @@ public class ResourceLoaderImpl implements ResourceLoader {
 				if(resource.getType() == ResourceType.JAVASCRIPT) {
 					// JavaScript
 					ScriptInjector.fromUrl(resource.getUrl()).setCallback(callback).setWindow(ScriptInjector.TOP_WINDOW).inject();
-				} else if(resource.getType() == ResourceType.CSS) {
-					// CSS
-					synapseJSNIUtils.loadCss(resource.getUrl(), callback);
 				}				
 			}
 		}
