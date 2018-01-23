@@ -11,17 +11,14 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -43,29 +40,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public String getCurrentHistoryToken() {
 		return History.getToken();
 	}
-
-	@Override
-	public void bindBootstrapTooltip(String id) {
-		_bindBootstrapTooltip(id);
-	}
-
-	private static native void _bindBootstrapTooltip(String id) /*-{
-		$wnd.jQuery('#'+id).tooltip().tooltip('fixTitle');	//update title from data-original-title, if necessary
-	}-*/;
-
-	@Override
-	public void hideBootstrapTooltip(String id) {
-		_hideBootstrapTooltip(id);
-	}
-
-	private static native void _hideBootstrapTooltip(String id) /*-{
-		$wnd.jQuery('#'+id).tooltip('hide');
-	}-*/;
-	
-	@Override
-	public void bindBootstrapPopover(String id) {
-		_bindBootstrapPopover(id);
-	}
 	
 	@Override
 	public void highlightCodeBlocks() {
@@ -73,7 +47,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	public static native void _highlightCodeBlocks() /*-{
-	  $wnd.jQuery('pre code').each(function(i, e) {$wnd.hljs.highlightBlock(e)});
+		try {
+			$wnd.jQuery('pre code').each(function(i, e) {$wnd.hljs.highlightBlock(e)});
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 	
 	@Override
@@ -82,13 +60,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	private static native void _tablesorter() /*-{
-		$wnd.jQuery('table.markdowntable').tablesorter();
+		try {
+			$wnd.jQuery('table.markdowntable').tablesorter();
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
-	
-	private static native void _bindBootstrapPopover(String id) /*-{
-		$wnd.jQuery('#'+id).popover();
-	}-*/;
-	
 	
 	@Override
 	public String getBaseFileHandleUrl() {
@@ -129,27 +106,31 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		return _nChartlayout(layers, characters);
 	}
 
-	private final static native LayoutResultJso _nChartlayout(NChartLayersArray layers, NChartCharacters characters) /*-{	        
-	    var debug = {'features': ['nodes'], 'wireframe': true};
-		var conf = {'group_styles': {'pov': {'stroke-width': 3}},
-	        'debug': debug};	        
-		var chart = new $wnd.NChart(characters, layers, conf).calc().plot();
-			
-		// convert graph into LayoutResult
-		var layoutResult = {}; 
-		var ncGraph = chart.graph;
-		for(var i=0; i<ncGraph.layers.length; i++) {		
-			var ncLayer = ncGraph.layers[i];
-			for(var j=0; j<ncLayer.nodes.length; j++) {
-				var ncNode = ncLayer.nodes[j];
-				var provGraphNodeId = ncNode.event;
-				var xypoint = { 'x':ncNode.x, 'y':ncNode.y };
-				if(!(provGraphNodeId in layoutResult)) { 
-					layoutResult[provGraphNodeId] = [];
+	private final static native LayoutResultJso _nChartlayout(NChartLayersArray layers, NChartCharacters characters) /*-{
+		var layoutResult = {};
+		try {
+		    var debug = {'features': ['nodes'], 'wireframe': true};
+			var conf = {'group_styles': {'pov': {'stroke-width': 3}},
+		        'debug': debug};	        
+			var chart = new $wnd.NChart(characters, layers, conf).calc().plot();
+				
+			// convert graph into LayoutResult
+			var ncGraph = chart.graph;
+			for(var i=0; i<ncGraph.layers.length; i++) {		
+				var ncLayer = ncGraph.layers[i];
+				for(var j=0; j<ncLayer.nodes.length; j++) {
+					var ncNode = ncLayer.nodes[j];
+					var provGraphNodeId = ncNode.event;
+					var xypoint = { 'x':ncNode.x, 'y':ncNode.y };
+					if(!(provGraphNodeId in layoutResult)) { 
+						layoutResult[provGraphNodeId] = [];
+					}
+					layoutResult[provGraphNodeId].push(xypoint);				
 				}
-				layoutResult[provGraphNodeId].push(xypoint);				
 			}
-		}		
+		} catch (err) {
+			console.error(err);
+		}
 		return layoutResult;
 	}-*/;
 
@@ -391,33 +372,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 
 	@Override
-	public void uploadUrlToGenomeSpace(String url) {
-		_uploadUrlToGenomeSpace(url, null);
-	}
-
-	@Override
-	public void uploadUrlToGenomeSpace(String url, String filename) {
-		_uploadUrlToGenomeSpace(url, filename);		
-	}
-
-	private final static native void _uploadUrlToGenomeSpace(String url, String fileName) /*-{
-		var gsUploadUrl = "https://gsui.genomespace.org/jsui/upload/loadUrlToGenomespace.html?uploadUrl=";
-		var dest = $wnd.encodeURIComponent(url);
-		gsUploadUrl += dest;
-		if(fileName != null) {
-			gsUploadUrl += "&fileName=" + fileName;
-		}
-		var newWin = $wnd.open(gsUploadUrl, "GenomeSpace Upload", "height=340px,width=550px");
-		newWin.focus();
-		newWin.setCallbackOnGSUploadComplete = function(savePath) {
-			alert('outer Saved to GenomeSpace as ' + savePath);
-		}
-		newWin.setCallbackOnGSUploadError = function(savePath) {
-			alert('outer ERROR saving to GenomeSpace as ' + savePath);
-		}
-	}-*/;
-
-	@Override
 	public void consoleLog(String message) {
 		_consoleLog(message);
 	}
@@ -441,7 +395,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	private final static native void _processWithMathJax(Element element) /*-{
-		$wnd.layoutMath(element);
+		try {
+			$wnd.layoutMath(element);
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 
 	@Override
@@ -484,16 +442,19 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private final static native void _showTwitterFeed(String dataWidgetId,
 			String elementId, String linkColorHex, String borderColorHex,
 			int tweetCount) /*-{
-		if (typeof $wnd.twttr !== 'undefined') {
-			var element = $doc.getElementById(elementId);
-			$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
-				chrome : "nofooter noheader",
-				linkColor : linkColorHex,
-				borderColor : borderColorHex,
-				tweetLimit : tweetCount
-			});
+		try {
+			if (typeof $wnd.twttr !== 'undefined') {
+				var element = $doc.getElementById(elementId);
+				$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
+					chrome : "nofooter noheader",
+					linkColor : linkColorHex,
+					borderColor : borderColorHex,
+					tweetLimit : tweetCount
+				});
+			}
+		} catch (err) {
+			console.error(err);
 		}
-		
 	}-*/;
 	
 	@Override

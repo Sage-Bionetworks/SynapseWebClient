@@ -4,7 +4,7 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >	
-	<bh:Div ui:field="loadingSpinnerDiv" addStyleNames="sk-circle margin-right-10" width="40px" height="40px">
+	<bh:Div ui:field="loadingSpinnerDiv" addStyleNames="sk-circle margin-right-10 center-in-div" width="40px" height="40px">
 		<bh:Div addStyleNames="sk-circle1 sk-child"/>
 		<bh:Div addStyleNames="sk-circle2 sk-child"/>
 		<bh:Div addStyleNames="sk-circle3 sk-child"/>
