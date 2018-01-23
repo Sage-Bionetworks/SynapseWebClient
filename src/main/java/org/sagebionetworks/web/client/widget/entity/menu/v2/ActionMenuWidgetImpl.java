@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
-import org.sagebionetworks.web.client.widget.amplitude.HeapSDK;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -27,7 +26,6 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 
 	Map<Action, ActionView> actionViewMap;
 	Map<Action, List<ActionListener>> actionListenerMap;
-	HeapSDK heapSdk;
 	
 	@Inject
 	public ActionMenuWidgetImpl(
