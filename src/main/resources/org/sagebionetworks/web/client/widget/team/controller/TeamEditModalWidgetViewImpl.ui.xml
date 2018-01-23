@@ -39,9 +39,14 @@
 		            <b:Row b:id="uploadWidget">
 		                <b:Column size="MD_4">
 		                    <bh:Div ui:field="iconContainer">
-		                        <b:Icon ui:field="defaultIcon" type="USER"
+		                        <b:Icon ui:field="defaultIcon" type="USERS"
 								addStyleNames="font-size-150 lightGreyText" visible="true"/>
-								<b:Image ui:field="previewImage" type="ROUNDED" width="150px" visible="false"/>
+								<g:HTMLPanel width="150px" addStyleNames="position-relative">
+								    <bh:Div addStyleNames="position-absolute topLevelZIndex">
+						    				<b:Button ui:field="removePicture" icon="TIMES" size="EXTRA_SMALL" type="DANGER" visible="false"/>
+						       		</bh:Div>
+						       		<b:Image ui:field="previewImage" type="ROUNDED" width="150px" visible="false"/>
+								</g:HTMLPanel>
 		                    </bh:Div>
 							<bh:Div ui:field="teamImageLoading" visible="false">
 								<w:LoadingSpinner size="16px"/>

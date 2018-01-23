@@ -64,7 +64,9 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	
 	@UiField
 	Div iconContainer;
-
+	@UiField
+	Button removePicture;
+	
 	public interface Binder extends UiBinder<Widget, TeamEditModalWidgetViewImpl> {}
 	
 	Widget widget;
@@ -74,26 +76,20 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	@Inject
 	public TeamEditModalWidgetViewImpl(Binder uiBinder) {
 		this.widget = uiBinder.createAndBindUi(this);
-		primaryButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onConfirm();
-			}
+		primaryButton.addClickHandler(event -> {
+			presenter.onConfirm();
 		});
-		secondaryButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				modal.hide();
-			}
+		secondaryButton.addClickHandler(event -> {
+			modal.hide();
 		});
-		KeyDownHandler saveInfo = new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					primaryButton.click();
-				}
+		KeyDownHandler saveInfo = event -> {
+			if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+				primaryButton.click();
 			}
 		};
+		removePicture.addClickHandler(event -> {
+			presenter.onRemovePicture();
+		});
 		editNameField.addKeyDownHandler(saveInfo);
 	}
 	
@@ -131,6 +127,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		primaryButton.setEnabled(false);
 		iconContainer.setVisible(false);
 		teamImageLoading.setVisible(true);
+		removePicture.setVisible(false);
 	}
 	
 	@Override
@@ -181,6 +178,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		previewImage.setVisible(true);
 		teamImageLoading.setVisible(false);
 		previewImage.setUrl(url);
+		removePicture.setVisible(true);
 	}	
 	
 	@Override
@@ -188,6 +186,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		defaultIcon.setVisible(true);
 		previewImage.setVisible(false);
 		teamImageLoading.setVisible(false);
+		removePicture.setVisible(false);
 	}
 	
 	@Override

@@ -98,8 +98,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 			team.setName(newName);
 			team.setDescription(newDescription);
 			team.setCanPublicJoin(canPublicJoin);
-			if (uploadedFileHandleId != null)
-				team.setIcon(uploadedFileHandleId);
+			team.setIcon(uploadedFileHandleId);
 			updateACLFromView();
 			synapseClient.updateTeam(team, teamACL, new AsyncCallback<Team>() {
 				@Override
@@ -117,6 +116,12 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 				}
 			});
 		}
+	}
+	
+	@Override
+	public void onRemovePicture() {
+		uploadedFileHandleId = null;
+		view.setDefaultIconVisible();
 	}
 	
 	@Override
@@ -146,7 +151,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	}
 	
 	public void configureAndShow(Team team) {
-		uploadedFileHandleId = null;
+		uploadedFileHandleId = team.getIcon();
 		this.team = team;
 		//get the messaging parameter, and show
 		synapseClient.getTeamAcl(team.getId(), new AsyncCallback<AccessControlList>() {

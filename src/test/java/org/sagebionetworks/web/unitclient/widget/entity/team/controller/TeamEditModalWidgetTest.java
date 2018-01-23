@@ -116,7 +116,6 @@ public class TeamEditModalWidgetTest {
 	public static AccessControlList createACL(Long teamId) {
 		// create the set of permissions
 		Set<ResourceAccess> resourceAccesses = new HashSet<ResourceAccess>();
-		
 		// create the ACL
 		AccessControlList acl = new AccessControlList();
 		acl.setId(teamId.toString());
@@ -128,7 +127,6 @@ public class TeamEditModalWidgetTest {
 		ResourceAccess ra = new ResourceAccess();
 		ra.setPrincipalId(principalId);
 		ra.setAccessType(AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_MESSAGE_TEAM));
-		
 		acl.getResourceAccess().add(ra);
 	}
 	@Test
@@ -157,15 +155,10 @@ public class TeamEditModalWidgetTest {
 	}
 	
 	@Test
-	public void testImageLoading() {
-	}
-	
-	@Test
 	public void testConfirmSuccessfulChanges() {
 		presenter.configureAndShow(mockTeam);
 		String fileHandleId = "newIcon";
 		when(mockFileUpload.getFileHandleId()).thenReturn(fileHandleId);
-		
 		finishedUploadingCallback.invoke(mockFileUpload);
 		verify(mockView, times(2)).hideLoading();
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
@@ -174,6 +167,7 @@ public class TeamEditModalWidgetTest {
 		verify(mockFileUpload).getFileHandleId();
 		
 		presenter.onConfirm();
+		
 		verify(mockView).getName();
 		verify(mockView).getDescription();
 		verify(mockView).getPublicJoin();
@@ -181,12 +175,31 @@ public class TeamEditModalWidgetTest {
 		verify(mockTeam).setDescription(newDesc);
 		verify(mockTeam).setCanPublicJoin(newPublicJoin);
 		verify(mockTeam).setIcon(newIcon);
-		
 		verify(mockSynapseClient).updateTeam(eq(mockTeam), eq(acl), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
 	}
+	
+	@Test
+	public void testRemovePicture() {
+		String fileHandleId = "321";
+		when(mockTeam.getIcon()).thenReturn(fileHandleId);
+		presenter.configureAndShow(mockTeam);
+		verify(mockView).setImageURL(anyString());
+		
+		presenter.onRemovePicture();
+		verify(mockView).setDefaultIconVisible();
+		
+		presenter.onConfirm();
+		
+		verify(mockTeam).setIcon(null);
+		verify(mockSynapseClient).updateTeam(eq(mockTeam), eq(acl), any(AsyncCallback.class));
+		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockRefreshCallback).invoke();
+		verify(mockView).hide();
+	}
+	
 	@Test
 	public void testErrorOnTeamACLLoad() {
 		String error = "error on team acl load";
@@ -205,14 +218,14 @@ public class TeamEditModalWidgetTest {
 		verify(mockFileUpload).getFileHandleId();
 		
 		presenter.onConfirm();
+		
 		verify(mockView).getName();
 		verify(mockView).getDescription();
 		verify(mockView).getPublicJoin();
 		verify(mockTeam).setName(newName);
 		verify(mockTeam).setDescription(newDesc);
 		verify(mockTeam).setCanPublicJoin(newPublicJoin);
-		verify(mockTeam, never()).setIcon(newIcon);
-		
+		verify(mockTeam).setIcon(null);
 		verify(mockSynapseClient).updateTeam(eq(mockTeam), eq(acl), any(AsyncCallback.class));
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockRefreshCallback).invoke();
@@ -231,11 +244,11 @@ public class TeamEditModalWidgetTest {
 		verify(mockFileUpload).getFileHandleId();
 		
 		presenter.onConfirm();
+		
 		verify(mockTeam).setName(newName);
 		verify(mockTeam).setDescription(newDesc);
 		verify(mockTeam).setCanPublicJoin(newPublicJoin);
 		verify(mockTeam).setIcon(newIcon);
-		
 		verify(mockSynapseClient).updateTeam(eq(mockTeam), eq(acl), any(AsyncCallback.class));
 		verify(mockUploader, times(2)).reset();
 		verify(mockView, Mockito.atLeast(1)).hideLoading();
@@ -246,6 +259,7 @@ public class TeamEditModalWidgetTest {
 	@Test
 	public void testShowIconExists() {
 		presenter.configureAndShow(mockTeam);
+		
 		verify(mockUploader).reset();
 		verify(mockSynAlert).clear();
 		verify(mockView).hideLoading();
@@ -257,7 +271,9 @@ public class TeamEditModalWidgetTest {
 	@Test
 	public void testShowIconDoesNotExist() {
 		when(mockTeam.getIcon()).thenReturn(null);
+		
 		presenter.configureAndShow(mockTeam);
+		
 		verify(mockUploader).reset();
 		verify(mockSynAlert).clear();
 		verify(mockView).hideLoading();
@@ -269,6 +285,7 @@ public class TeamEditModalWidgetTest {
 	@Test
 	public void testHide() {
 		presenter.hide();
+		
 		verify(mockView).hide();
 		verify(mockView, never()).setDefaultIconVisible();
 		verify(mockView, never()).setImageURL(anyString());
@@ -280,6 +297,7 @@ public class TeamEditModalWidgetTest {
 		//set up team can message, should not be touched in the acl.  Authenticated users should be added.
 		addCanMessageTeam(TEAM_ID, acl);
 		when(mockView.canAuthenticatedUsersSendMessageToTeam()).thenReturn(true);
+		
 		presenter.updateACLFromView();
 		
 		//verify that stubbed acl has been modified in the way that we expect
@@ -303,6 +321,7 @@ public class TeamEditModalWidgetTest {
 		addCanMessageTeam(AUTHENTICATED_USERS_GROUP_ID, acl);
 		addCanMessageTeam(TEAM_ID, acl);
 		when(mockView.canAuthenticatedUsersSendMessageToTeam()).thenReturn(false);
+		
 		presenter.updateACLFromView();
 		
 		//verify that stubbed acl has been modified in the way that we expect
@@ -311,5 +330,4 @@ public class TeamEditModalWidgetTest {
 		assertEquals(TEAM_ID, ra.getPrincipalId());
 		assertEquals(ModelConstants.TEAM_MESSENGER_PERMISSIONS, ra.getAccessType());
 	}
-	
 }
