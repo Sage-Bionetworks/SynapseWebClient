@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.presenter.SignedTokenPresenter;
@@ -209,6 +210,6 @@ public class SignedTokenPresenterTest {
 	@Test
 	public void testSetOkClicked() {
 		presenter.okClicked();
-		verify(mockGlobalApplicationState).gotoLastPlace();
+		verify(mockPlaceChanger).goTo(AppActivityMapper.getDefaultPlace());
 	}
 }
