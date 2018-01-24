@@ -15,7 +15,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.web.client.widget.amplitude.HeapSDK;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
@@ -32,8 +31,6 @@ public class ActionMenuWidgetImplTest {
 	ActionMenuWidgetView mockView;
 	@Mock
 	ActionListener mockActionListener;
-	@Mock
-	HeapSDK mockHeapSdk;
 	
 	@Before
 	public void before(){
