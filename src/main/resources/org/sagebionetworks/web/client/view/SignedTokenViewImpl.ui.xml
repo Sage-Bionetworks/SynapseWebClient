@@ -9,10 +9,7 @@
 	<bh:Div>
 		<bh:Div addStyleNames="color-line" />
 		<b:Container addStyleNames="min-height-200 margin-top-60">
-			<bh:Span ui:field="loadingUI" addStyleNames="center-block center">
-				<w:LoadingSpinner ui:field="loadMoreImage" size="31px"/>
-				<bh:Text>&nbsp;Loading...</bh:Text>
-			</bh:Span>
+			<w:LoadingSpinner ui:field="loadingUI" addStyleNames="center-block center" size="31px"/>
 			<!-- Confirm unsubscribe UI -->
 			<b:Modal ui:field="confirmUnsubscribeUI" title="Are you sure you want to stop receiving messages from Synapse?" closable="true"
 				dataBackdrop="STATIC" dataKeyboard="false" b:id="confirmUnsubscribeUI">

@@ -11,10 +11,8 @@
 		</b:Form>
 		<b:Button addStyleNames="margin-right-5" ui:field="uploadbutton" icon="UPLOAD">Upload</b:Button>
 		<bh:Span ui:field="uploadedFileNameField"/>
-		 <g:HTMLPanel ui:field="loadingUI" addStyleNames="displayInline" visible="false">
-		 	<w:LoadingSpinner size="16px" addStyleNames="margin-right-5"/>
-			Loading...
-		</g:HTMLPanel>
+		 
+		<w:LoadingSpinner ui:field="loadingUI" size="16px" addStyleNames="margin-right-5" visible="false"/>
 		
 		<g:HTMLPanel visible="false" >
 			<canvas ui:field="originalCanvas" />

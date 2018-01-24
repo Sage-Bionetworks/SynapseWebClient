@@ -29,10 +29,7 @@
 				</b:VerticalButtonGroup>
 			</bh:Div>
 		</bh:Div>
-		<bh:Span ui:field="loadingUI" visible="false">
-			<w:LoadingSpinner size="31px"/>
-			<bh:Text> Processing...</bh:Text>
-		</bh:Span>
+		<w:LoadingSpinner ui:field="loadingUI" size="31px" visible="false"/>
 		<g:SimplePanel ui:field="synAlertContainer" />
 		<g:SimplePanel ui:field="treePanel" />
 		

@@ -14,11 +14,9 @@
 				</g:FocusPanel>
 			</t:TableData>
 			<t:TableData addStyleNames="overflow-x-hidden ">
-				<bh:Div addStyleNames="margin-right-5"> 
+				<bh:Div addStyleNames="margin-right-5" ui:field="nameData"> 
 					<g:FlowPanel ui:field="entityContainer" styleName="displayInline pull-left"/>
-					<b:Tooltip title="Download">
-						<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="right"/>
-					</b:Tooltip>
+					<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="right"/>
 					<b:Tooltip title="Remove this link">
 						<b:Icon ui:field="unLinkIcon" fixedWidth="true" type="CHAIN_BROKEN" visible="false" pull="RIGHT" emphasis="DANGER" addStyleNames="imageButton"/>
 					</b:Tooltip>

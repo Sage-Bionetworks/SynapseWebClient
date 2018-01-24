@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -28,7 +29,7 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 	@UiField
 	Div paginationWidgetContainer;
 	@UiField
-	Span loadingUI;
+	LoadingSpinner loadingUI;
 	@UiField
 	Table subscriptionsContainer;
 	public interface Binder extends UiBinder<Widget, SubscriptionListWidgetViewImpl> {

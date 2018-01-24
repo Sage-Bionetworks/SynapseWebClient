@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -25,8 +26,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	public interface Binder extends UiBinder<Widget, RestrictionWidgetViewImpl> {}
 	
 	@UiField
-	Div loadingUI;
-	
+	LoadingSpinner loadingUI;
 	@UiField
 	Span controlledUseUI;
 	@UiField

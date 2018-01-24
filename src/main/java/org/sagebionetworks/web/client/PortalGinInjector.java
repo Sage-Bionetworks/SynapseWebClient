@@ -180,6 +180,7 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
@@ -586,4 +587,5 @@ public interface PortalGinInjector extends Ginjector {
 	S3DirectLoginDialog getS3DirectLoginDialog();
 	SynapseJSNIUtils getSynapseJSNIUtils();
 	GWTWrapper getGWT();
+	LazyLoadHelper getLazyLoadHelper();
 }

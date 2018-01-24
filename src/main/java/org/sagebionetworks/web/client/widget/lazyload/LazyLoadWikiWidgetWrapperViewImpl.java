@@ -3,11 +3,11 @@ package org.sagebionetworks.web.client.widget.lazyload;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -19,7 +19,7 @@ public class LazyLoadWikiWidgetWrapperViewImpl implements LazyLoadWikiWidgetWrap
 	@UiField
 	Span widgetContainer;
 	@UiField
-	HTMLPanel loadingUI;
+	LoadingSpinner loadingUI;
 	
 	@Inject
 	public LazyLoadWikiWidgetWrapperViewImpl(Binder binder) {

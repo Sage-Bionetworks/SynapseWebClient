@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -30,7 +31,7 @@ public class EmailAddressesWidgetViewImpl implements EmailAddressesWidgetView {
 	@UiField
 	TextBox newEmailTextBox;
 	@UiField
-	Div loadingUI;
+	LoadingSpinner loadingUI;
 	@UiField
 	Div synapseAlertContainer;
 	@UiField

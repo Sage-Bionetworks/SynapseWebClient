@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -19,7 +20,7 @@ import com.google.inject.Inject;
 
 public class EmailInvitationViewImpl extends Composite implements EmailInvitationView {
 	@UiField
-	Div loading;
+	LoadingSpinner loading;
 	@UiField
 	Div notLoggedInContainer;
 	@UiField

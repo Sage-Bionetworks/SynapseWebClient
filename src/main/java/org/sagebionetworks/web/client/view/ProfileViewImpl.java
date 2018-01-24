@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FitImage;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
@@ -206,11 +207,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement teamsHighlightBox;
 
 	@UiField 
-	DivElement challengesLoadingUI;
+	LoadingSpinner challengesLoadingUI;
 	@UiField 
-	Div profilePictureLoadingUI;
+	LoadingSpinner profilePictureLoadingUI;
 	@UiField 
-	Div dashboardLoadingUI;
+	LoadingSpinner dashboardLoadingUI;
 	
 	@UiField
 	FlowPanel favoritesHelpPanel;
@@ -663,7 +664,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void showChallengesLoading(boolean isVisible) {
-		UIObject.setVisible(challengesLoadingUI, isVisible);
+		challengesLoadingUI.setVisible(isVisible);
 	}
 	
 	@Override

@@ -79,10 +79,7 @@
 								</b:FormGroup>
 								<g:SimplePanel ui:field="teamSelectSynAlertPanel"/>
 								<b:FormGroup>
-									<bh:Div ui:field="contributorsLoadingUI">
-										<w:LoadingSpinner size="31px"/>
-								        <bh:Text>&nbsp; Loading...</bh:Text>
-									</bh:Div>
+									<w:LoadingSpinner size="31px" ui:field="contributorsLoadingUI"/>
 									<b:FormLabel>Contributors</b:FormLabel>
 									<b:Panel ui:field="contributorsPanel"  addStyleNames="padding-5" />
 								</b:FormGroup> 

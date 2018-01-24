@@ -11,10 +11,8 @@
         <g:FlowPanel ui:field="mainPanel">
 		    <g:FlowPanel ui:field="wikiSubpagesPanel"/>
 		    <g:FlowPanel ui:field="wikiPagePanel">
-		    		<g:HTMLPanel ui:field="loadingPanel">
-		    			<w:LoadingSpinner size="31px"/>
-				</g:HTMLPanel>
-			    
+		    		<w:LoadingSpinner ui:field="loadingPanel" size="31px"/>
+				
 		        <bh:Div ui:field="wikiHeadingContainer"></bh:Div>
 		        <b:Alert ui:field="diffVersionAlert" visible="false">
 		            <g:HTMLPanel>

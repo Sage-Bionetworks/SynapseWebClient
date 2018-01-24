@@ -48,10 +48,7 @@
 						       		<b:Image ui:field="previewImage" type="ROUNDED" width="150px" visible="false"/>
 								</g:HTMLPanel>
 		                    </bh:Div>
-							<bh:Div ui:field="teamImageLoading" visible="false">
-								<w:LoadingSpinner size="16px"/>
-								<bh:Text>&nbsp;Loading...</bh:Text>
-							</bh:Div>		                
+							<w:LoadingSpinner ui:field="teamImageLoading" size="16px" visible="false"/>
 						</b:Column>
 		                <b:Column size="MD_8" >
 		                    <g:SimplePanel ui:field="uploadWidgetPanel"/>

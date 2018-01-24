@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Heading;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -23,7 +24,7 @@ public class EntityViewImpl implements EntityView {
 	@UiField
 	SimplePanel synAlertContainer;
 	@UiField
-	HTMLPanel loadingUI;
+	LoadingSpinner loadingUI;
 	@UiField
 	Heading accessDependentMessage;
 	

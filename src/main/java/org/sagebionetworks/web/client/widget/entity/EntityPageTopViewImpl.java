@@ -3,10 +3,10 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -20,7 +20,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@UiField
 	Div tabsUI;
 	@UiField
-	Span loadingUI;
+	LoadingSpinner loadingUI;
 	
 	//project level info
 	@UiField

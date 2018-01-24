@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -25,7 +26,7 @@ public class UserProfileModalViewImpl implements UserProfileModalView {
 	@UiField
 	SimplePanel bodyPanel;
 	@UiField
-	SimplePanel loadingPanel;
+	LoadingSpinner loadingPanel;
 	@UiField
 	Alert alert;
 	

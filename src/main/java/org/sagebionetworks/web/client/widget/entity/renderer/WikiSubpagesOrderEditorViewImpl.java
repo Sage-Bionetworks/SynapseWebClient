@@ -4,6 +4,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -42,7 +43,7 @@ public class WikiSubpagesOrderEditorViewImpl extends Composite implements WikiSu
 	Button rightButton2;
 
 	@UiField
-	Span loadingUI;
+	LoadingSpinner loadingUI;
 	
 	private WikiSubpageOrderEditorTree tree;
 	

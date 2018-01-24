@@ -8,9 +8,7 @@
     
 	<g:HTMLPanel>
 		<g:SimplePanel ui:field="synAlertContainer"/>
-		<g:HTMLPanel ui:field="loadingUI" addStyleNames="margin-top-100">
-			<w:LoadingSpinner size="40px"/>
-		</g:HTMLPanel>
+		<w:LoadingSpinner ui:field="loadingUI" addStyleNames="margin-top-100" size="40px"/>
 		
 		<g:SimplePanel ui:field="entityPageTopPanel"/>
 		<b:Heading ui:field="accessDependentMessage"  size="H4" text="Access could be dependent upon membership in one of the following Teams"

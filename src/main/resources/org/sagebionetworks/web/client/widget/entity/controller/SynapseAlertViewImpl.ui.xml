@@ -6,7 +6,7 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:e="urn:import:org.sagebionetworks.web.client.widget.entity">
   
-  	<bh:Div visible="false" addStyleNames="margin-top-10 margin-left-15 margin-right-15">
+  	<bh:Div addStyleNames="margin-top-10 margin-left-15 margin-right-15">
   		<bh:Div ui:field="loginAlert">
   			<b:Alert type="INFO">
 	  			<bh:Strong text="Please login to access this resource." />

@@ -6,10 +6,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	
 	<b:Row addStyleNames="filesTabContent">
-		<bh:Span ui:field="loading" addStyleNames="center-block center min-height-400">
-			<w:LoadingSpinner size="31px"/>
-			<bh:Text> Loading...</bh:Text>
-		</bh:Span>
+		<w:LoadingSpinner ui:field="loading" size="31px" addStyleNames="center-block center min-height-400"/>
 		<g:SimplePanel ui:field="refreshAlertContainer"/>
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
 		<bh:Div addStyleNames="margin-left-15 margin-right-15">

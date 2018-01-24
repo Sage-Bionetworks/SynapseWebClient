@@ -10,6 +10,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -35,7 +36,7 @@ public class UserListViewImpl implements UserListView {
 	Div participantsContainer;
 	
 	@UiField
-	Div loadingUI;
+	LoadingSpinner loadingUI;
 	
 	@UiField
 	Alert errorUI;

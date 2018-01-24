@@ -50,7 +50,6 @@ public class SynapseAlertImpl implements SynapseAlert, SynapseAlertView.Presente
 		this.authController = authController;
 		this.ginInjector = ginInjector;
 		view.setPresenter(this);
-		view.clearState();
 		
 		reloadOnLoginListener = new UserListener() {
 			@Override
