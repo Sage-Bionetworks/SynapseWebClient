@@ -39,7 +39,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 		this.usgFromIdAsyncHandler = usgFromIdAsyncHandler;
 		this.usgFromAliasAsyncHandler = usgFromAliasAsyncHandler;
 		this.div = div;
-		div.addStyleName("displayInline");
+		div.addStyleName("displayInlineBlock");
 	}
 	
 	@Override
