@@ -64,6 +64,7 @@
 
 			var script = document.createElement('script');
 			script.onload = function () {
+				head.load(cdnEndpoint + "Portal1.css");
 				head.load("//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js");
 				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
 				head.load(cdnEndpoint + "js/spark-md5.min.js");
@@ -83,7 +84,6 @@
 				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css");
-				head.load(cdnEndpoint + "js/heap-init.js");
 			};
 			script.src = cdnEndpoint + "js/head.load.min.js";
 			document.head.appendChild(script);
@@ -102,7 +102,7 @@
 		<div>
 			<!-- GWT history support -->
 			<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position: absolute; width: 0; height: 0; border: 0"></iframe>
-			<div id="dropzone" class="dropzone">
+			<div id="dropzone" class="dropzone" style="display: none;">
 				<h2 class="center" style="color:white; padding-top: 180px">
 					<span class="fa fa-cloud-upload"></span>
 					Drop files to upload
