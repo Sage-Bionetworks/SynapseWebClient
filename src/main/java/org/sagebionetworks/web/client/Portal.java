@@ -63,7 +63,6 @@ public class Portal implements EntryPoint {
 				@Override
 				public void onSuccess() {
 					try {
-						loadPortalCss();
 						// load the previous session, if there is one
 						ginjector.getAuthenticationController().reloadUserSessionData();
 
@@ -119,24 +118,6 @@ public class Portal implements EntryPoint {
 			});
 			
 		}
-	}
-	
-	public void loadPortalCss() {
-		// get the current Synapse version
-		ginjector.getGlobalApplicationState().checkVersionCompatibility(new AsyncCallback<VersionState>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				_consoleError("Unable to load Portal.css" + caught.getMessage());
-			}
-			
-			public void onSuccess(VersionState versionState) {
-				SynapseJSNIUtils jsniUtils = ginjector.getSynapseJSNIUtils();
-				String cdnEndpoint = jsniUtils.getCdnEndpoint();
-				GWTWrapper gwt = ginjector.getGWT();
-				String encodedVersion = gwt.encodeQueryString(versionState.getVersion());
-				jsniUtils.loadCss(cdnEndpoint + "Portal.css?version=" + encodedVersion);
-			};
-		});
 	}
 	
 	public void fixGWTRpcServiceEntryPoints() {
