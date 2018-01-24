@@ -59,6 +59,7 @@ public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
 		if (widget == null) {
 			widget = uiBinder.createAndBindUi(this);
 		}
+		spinnerContainer.clear();
 		spinnerContainer.add(widget); 
 	}
 	

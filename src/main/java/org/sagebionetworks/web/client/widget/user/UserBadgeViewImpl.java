@@ -24,7 +24,9 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public interface Binder extends UiBinder<Widget, UserBadgeViewImpl> {	}
 	
 	@UiField
-	FocusPanel defaultUserPicture;
+	FocusPanel pictureFocusPanel;
+	@UiField
+	Span defaultUserPicture;
 	@UiField
 	Image userPicture;
 	@UiField
@@ -52,8 +54,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 			}
 		};
 		pictureSpan.setHeight(BadgeSize.DEFAULT.pictureHeight());
-		userPicture.addClickHandler(badgeClicked);
-		defaultUserPicture.addClickHandler(badgeClicked);
+		pictureFocusPanel.addClickHandler(badgeClicked);
 		
 		userPicture.addErrorHandler(new ErrorHandler() {
 			@Override

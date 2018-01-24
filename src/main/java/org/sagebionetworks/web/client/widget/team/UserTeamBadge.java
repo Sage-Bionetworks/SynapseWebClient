@@ -108,7 +108,6 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			}
 			
 			theWidget = badge.asWidget();
-			theWidget.addStyleName("movedown-6");
 		} else {
 			//team
 			ClickHandler customClickHandler = null;

@@ -57,7 +57,7 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 	@Override
 	public void clear() {
 		downloadLink.setVisible(false);
-		downloadLink.setVisible(false);
+		downloadLink2.setVisible(false);
 	}
 	
 	@Override

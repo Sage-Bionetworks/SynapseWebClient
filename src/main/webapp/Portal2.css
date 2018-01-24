@@ -1355,11 +1355,6 @@ ol.lowerroman {
    flex-direction: column;
 }
 
-.flexcontainer-align-center {
-	-webkit-align-items: center;
-   align-items: center;
-}
-
 .flexcontainer-justify-center {
    -webkit-justify-content: center;
    justify-content: center;
