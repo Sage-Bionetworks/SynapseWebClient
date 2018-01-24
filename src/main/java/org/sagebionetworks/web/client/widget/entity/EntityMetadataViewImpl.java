@@ -3,8 +3,6 @@ package org.sagebionetworks.web.client.widget.entity;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -53,12 +51,8 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	Text annotationsTitleText;
 		
-	@UiField(provided = true)
-	final IconsImageBundle icons;
-	
 	@Inject
-	public EntityMetadataViewImpl(IconsImageBundle icons, final SynapseJSNIUtils jsniUtils) {
-		this.icons = icons;
+	public EntityMetadataViewImpl(final SynapseJSNIUtils jsniUtils) {
 		initWidget(uiBinder.createAndBindUi(this));
 		fileHistoryContainer.getElement().setAttribute("highlight-box-title", "File History");
 		idField.addClickHandler(new ClickHandler() {
