@@ -100,7 +100,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		jsClient.getEntityBundle(entityHeader.getId(), partsMask, new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorIcon();
 				view.setError(caught.getMessage());
 			}
 			public void onSuccess(EntityBundle eb) {
@@ -128,9 +127,13 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		Annotations annotations = eb.getAnnotations();
 		String rootWikiId = eb.getRootWikiId();
 		List<FileHandle> handles = eb.getFileHandles();
+		if (PublicPrivateBadge.isPublic(eb.getBenefactorAcl(), globalAppState.getPublicPrincipalIds())) {
+			view.showPublicIcon();
+		} else {
+			view.showPrivateIcon();
+		}
 		List<Annotation> annotationList = transformer.annotationsToList(annotations);
 		if (!annotationList.isEmpty()) {
-			view.showAnnotationsIcon();
 			view.setAnnotations(getAnnotationsHTML(annotationList));
 		}
 		if (eb.getEntity() instanceof Link && eb.getPermissions().getCanDelete()) {
@@ -138,11 +141,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		}
 		view.setSize(getContentSize(handles));
 		view.setMd5(getContentMd5(handles));
-		if (PublicPrivateBadge.isPublic(eb.getBenefactorAcl(), globalAppState.getPublicPrincipalIds())) {
-			view.showPublicIcon();
-		} else {
-			view.showPrivateIcon();
-		}
+		
 		boolean hasLocalSharingSettings = eb.getBenefactorAcl().getId().equals(entityHeader.getId());
 		if (hasLocalSharingSettings) {
 			view.showSharingSetIcon();
@@ -158,7 +157,9 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			view.setFileDownloadButton(fileDownloadButton.asWidget());
 		}
 		
-		view.setDiscussionThreadIconVisible(eb.getThreadCount() > 0);
+		if (eb.getThreadCount() > 0) {
+			view.showDiscussionThreadIcon();
+		}
 		
 		if (eb.getEntity().getModifiedBy() != null) {
 			modifiedByUserBadge.configure(eb.getEntity().getModifiedBy());
