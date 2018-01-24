@@ -19,7 +19,7 @@ public class LazyLoadWikiWidgetWrapperViewImpl implements LazyLoadWikiWidgetWrap
 	@UiField
 	Span widgetContainer;
 	@UiField
-	LoadingSpinner loadingUI;
+	Span loadingUI;
 	
 	@Inject
 	public LazyLoadWikiWidgetWrapperViewImpl(Binder binder) {

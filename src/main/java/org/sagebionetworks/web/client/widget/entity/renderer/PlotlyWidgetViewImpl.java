@@ -4,8 +4,10 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.event.logical.shared.ResizeEvent;
@@ -28,14 +30,14 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	@UiField
 	Div synAlertContainer;
 	@UiField
-	Div loadingUI;
-	@UiField
-	Text loadingMessage;
+	LoadingSpinner loadingUI;
 	Widget w;
 	Presenter presenter;
 	HandlerRegistration resizeHandler;
 	@UiField
 	Anchor sourceDataAnchor;
+	@UiField
+	Span loadingMessage;
 	
 	@Inject
 	public PlotlyWidgetViewImpl(Binder binder) {
@@ -134,6 +136,7 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	@Override
 	public void setLoadingVisible(boolean visible) {
 		loadingUI.setVisible(visible);
+		loadingMessage.setVisible(visible);
 	}
 	@Override
 	public void setLoadingMessage(String message) {

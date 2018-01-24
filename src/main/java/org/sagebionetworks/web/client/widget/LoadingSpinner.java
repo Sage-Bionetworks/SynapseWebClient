@@ -18,6 +18,7 @@ public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
 	public interface Binder extends UiBinder<Widget, LoadingSpinner> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
 	Widget widget = null;
+	String size;
 	
 	@UiField
 	Div loadingSpinnerDiv;
@@ -58,6 +59,9 @@ public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
 	private void lazyConstruct() {
 		if (widget == null) {
 			widget = uiBinder.createAndBindUi(this);
+			if (size != null) {
+				widget.setSize(size, size);	
+			}
 		}
 		spinnerContainer.clear();
 		spinnerContainer.add(widget); 
@@ -86,6 +90,7 @@ public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
 	}
 	
 	public void setSize(String size) {
+		this.size = size;
 		spinnerContainer.setHeight(size);
 		spinnerContainer.setWidth(size);
 	}

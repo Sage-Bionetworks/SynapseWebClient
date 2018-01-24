@@ -6,7 +6,7 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
   	<bh:Span>
-		<w:LoadingSpinner size="16px" ui:field="loadingUI"/>
+		<bh:Span ui:field="loadingUI" text="Loading..." />
 		<bh:Span ui:field="widgetContainer"/>
   	</bh:Span>
 </ui:UiBinder>
