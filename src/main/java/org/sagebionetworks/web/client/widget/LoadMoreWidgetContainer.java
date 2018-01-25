@@ -5,7 +5,8 @@ import java.util.Iterator;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueue;
-import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueue;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueueImpl;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueueImpl;
 
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -26,9 +27,9 @@ public class LoadMoreWidgetContainer implements IsWidget, HasWidgets {
 	LazyLoadCallbackQueue lazyLoadCallbackQueue;
 	
 	@Inject
-	public LoadMoreWidgetContainer(LoadMoreWidgetContainerView view, GWTWrapper gwt) {
+	public LoadMoreWidgetContainer(LoadMoreWidgetContainerView view, LazyLoadCallbackQueue lazyLoadCallbackQueue) {
 		this.view = view;
-		this.lazyLoadCallbackQueue = LazyLoadCallbackQueue.getInstance(gwt);
+		this.lazyLoadCallbackQueue = lazyLoadCallbackQueue;
 		this.isProcessing = false;
 		invokeCheckForInViewAndLoadData = new Callback() {
 			@Override
@@ -36,10 +37,6 @@ public class LoadMoreWidgetContainer implements IsWidget, HasWidgets {
 				checkForInViewAndLoadData();
 			}
 		};
-	}
-	
-	public void setLazyLoadCallbackQueue(LazyLoadCallbackQueue lazyLoadCallbackQueue) {
-		this.lazyLoadCallbackQueue = lazyLoadCallbackQueue;
 	}
 	
 	public void configure(Callback loadMoreCallback) {

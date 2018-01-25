@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.Portal;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
@@ -24,6 +24,7 @@ public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
 	Div loadingSpinnerDiv;
 	Div spinnerContainer = new Div();
 	Callback onAttachCallback;
+	
 	/**
 	 * ## Usage
 	 * 
@@ -42,8 +43,8 @@ public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
 				onAttachCallback.invoke();
 			}
 		});
-		PortalGinInjector ginjector = GWT.create(PortalGinInjector.class);
-		LazyLoadHelper lazyLoadHelper = ginjector.getLazyLoadHelper();
+		
+		LazyLoadHelper lazyLoadHelper = Portal.getInjector().getLazyLoadHelper(); 
 		lazyLoadHelper.configure(isInViewportCallback, this);
 		lazyLoadHelper.setIsConfigured();
 	}

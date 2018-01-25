@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueue;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueueImpl;
 
 public class LoadMoreWidgetContainerTest {
 	@Mock
@@ -29,8 +30,7 @@ public class LoadMoreWidgetContainerTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new LoadMoreWidgetContainer(mockView, mockGWT);
-		widget.setLazyLoadCallbackQueue(mockLazyLoadCallbackQueue);
+		widget = new LoadMoreWidgetContainer(mockView, mockLazyLoadCallbackQueue);
 		
 		widget.configure(mockLoadMoreCallback);
 	}

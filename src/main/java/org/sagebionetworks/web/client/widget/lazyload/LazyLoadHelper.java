@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.lazyload;
 
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.inject.Inject;
@@ -13,8 +12,8 @@ public class LazyLoadHelper {
 	public LazyLoadCallbackQueue lazyLoadCallbackQueue;
 	
 	@Inject
-	public LazyLoadHelper(GWTWrapper gwt) {
-		this.lazyLoadCallbackQueue = LazyLoadCallbackQueue.getInstance(gwt);
+	public LazyLoadHelper(LazyLoadCallbackQueue lazyLoadCallbackQueue) {
+		this.lazyLoadCallbackQueue = lazyLoadCallbackQueue;
 		isConfigured = false;
 		isAttached = false;
 		invokeCheckForInViewAndLoadData = new Callback() {
@@ -25,7 +24,7 @@ public class LazyLoadHelper {
 		};
 	}
 	
-	public void setLazyLoadCallbackQueue(LazyLoadCallbackQueue lazyLoadCallbackQueue) {
+	public void setLazyLoadCallbackQueue(LazyLoadCallbackQueueImpl lazyLoadCallbackQueue) {
 		this.lazyLoadCallbackQueue = lazyLoadCallbackQueue;
 	}
 	

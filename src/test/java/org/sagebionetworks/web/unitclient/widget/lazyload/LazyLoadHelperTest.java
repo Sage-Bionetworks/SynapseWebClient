@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueue;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueueImpl;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
@@ -30,8 +31,7 @@ public class LazyLoadHelperTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		lazyLoadHelper = new LazyLoadHelper(mockGWT);
-		lazyLoadHelper.setLazyLoadCallbackQueue(mockLazyLoadCallbackQueue);
+		lazyLoadHelper = new LazyLoadHelper(mockLazyLoadCallbackQueue);
 		when(mockView.isAttached()).thenReturn(false);
 		when(mockView.isInViewport()).thenReturn(false);
 		lazyLoadHelper.configure(mockInViewportCallback, mockView);
