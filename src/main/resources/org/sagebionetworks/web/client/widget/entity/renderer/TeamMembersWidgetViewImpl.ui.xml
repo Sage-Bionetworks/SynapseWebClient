@@ -13,11 +13,7 @@
 				<t:TableHeader text="Email" />
 			</t:TableRow>
 		</t:Table>
-		<bh:Div ui:field="loadingUI" addStyleNames="center-block center"
-			visible="false">
-			<w:LoadingSpinner size="31px"/>
-			<bh:Text>&nbsp;Loading...</bh:Text>
-		</bh:Div>
+		<w:LoadingSpinner ui:field="loadingUI" size="31px" addStyleNames="center-block center"/>
 		<bh:Div ui:field="paginationWidgetContainer" />
 	</bh:Div>
 </ui:UiBinder>

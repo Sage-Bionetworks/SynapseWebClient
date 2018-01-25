@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -18,7 +18,7 @@ public class TeamMembersWidgetViewImpl implements TeamMembersWidgetView {
 	@UiField
 	Div synAlertContainer;
 	@UiField
-	Div loadingUI;
+	LoadingSpinner loadingUI;
 	
 	private Widget widget;
 	public interface Binder extends UiBinder<Widget, TeamMembersWidgetViewImpl> {}
