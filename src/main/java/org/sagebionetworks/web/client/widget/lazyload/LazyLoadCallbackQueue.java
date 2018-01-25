@@ -5,23 +5,26 @@ import java.util.ArrayList;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 
-import com.google.inject.Inject;
-
 public class LazyLoadCallbackQueue {
-	GWTWrapper gwt;
 	public final static int DELAY = 400;
 	Callback checkForMoreWorkCallback;
 	ArrayList<Callback> callbacks = new ArrayList<Callback>();
+	GWTWrapper gwt;
 	
-	@Inject
-	public LazyLoadCallbackQueue(
-			GWTWrapper gwt
-			) {
+	private static LazyLoadCallbackQueue instance = null;
+	public static LazyLoadCallbackQueue getInstance(GWTWrapper gwt) {
+		if (instance == null) {
+			instance = new LazyLoadCallbackQueue(gwt);
+			instance.fire();
+		}
+		return instance;
+	}
+	
+	private LazyLoadCallbackQueue(GWTWrapper gwt) {
 		this.gwt = gwt;
 		checkForMoreWorkCallback = () -> {
 			fire();
 		};
-		fire();
 	}
 	
 	public void subscribe(Callback callback) {
@@ -41,6 +44,4 @@ public class LazyLoadCallbackQueue {
 		}
 		gwt.scheduleExecution(checkForMoreWorkCallback, DELAY);
 	}
-	
-
 }

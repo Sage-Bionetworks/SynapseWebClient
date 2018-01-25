@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,11 +22,16 @@ public class LoadMoreWidgetContainerTest {
 	LazyLoadCallbackQueue mockLazyLoadCallbackQueue;
 	@Mock
 	Callback mockLoadMoreCallback;
+	@Mock
+	GWTWrapper mockGWT;
+	
 	LoadMoreWidgetContainer widget;
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new LoadMoreWidgetContainer(mockView, mockLazyLoadCallbackQueue);
+		widget = new LoadMoreWidgetContainer(mockView, mockGWT);
+		widget.setLazyLoadCallbackQueue(mockLazyLoadCallbackQueue);
+		
 		widget.configure(mockLoadMoreCallback);
 	}
 

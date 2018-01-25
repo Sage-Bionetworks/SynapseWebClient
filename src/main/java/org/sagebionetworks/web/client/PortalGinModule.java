@@ -478,7 +478,6 @@ import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.HeaderViewImpl;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetView;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetViewImpl;
-import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueue;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapperView;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapperViewImpl;
 import org.sagebionetworks.web.client.widget.login.LoginModalView;
@@ -751,7 +750,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(GlobalApplicationStateImpl.class).in(Singleton.class);
 		bind(GlobalApplicationState.class).to(GlobalApplicationStateImpl.class);
 		bind(GlobalApplicationStateView.class).to(GlobalApplicationStateViewImpl.class);
-		bind(LazyLoadCallbackQueue.class).in(Singleton.class);
 		
 		bind(ResourceLoaderImpl.class).in(Singleton.class);
 		bind(ResourceLoader.class).to(ResourceLoaderImpl.class);

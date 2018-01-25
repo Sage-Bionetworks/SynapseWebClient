@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.lazyload;
 
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -11,13 +10,11 @@ public class LazyLoadHelper {
 	private SupportsLazyLoadInterface view;
 	private Callback invokeCheckForInViewAndLoadData;
 	boolean isAttached, isConfigured;
-	LazyLoadCallbackQueue lazyLoadCallbackQueue;
+	public LazyLoadCallbackQueue lazyLoadCallbackQueue;
 	
 	@Inject
-	public LazyLoadHelper(
-			LazyLoadCallbackQueue lazyLoadCallbackQueue
-			) {
-		this.lazyLoadCallbackQueue = lazyLoadCallbackQueue;
+	public LazyLoadHelper(GWTWrapper gwt) {
+		this.lazyLoadCallbackQueue = LazyLoadCallbackQueue.getInstance(gwt);
 		isConfigured = false;
 		isAttached = false;
 		invokeCheckForInViewAndLoadData = new Callback() {
@@ -26,7 +23,10 @@ public class LazyLoadHelper {
 				checkForInViewAndLoadData();
 			}
 		};
-		
+	}
+	
+	public void setLazyLoadCallbackQueue(LazyLoadCallbackQueue lazyLoadCallbackQueue) {
+		this.lazyLoadCallbackQueue = lazyLoadCallbackQueue;
 	}
 	
 	public void startCheckingIfAttachedAndConfigured() {

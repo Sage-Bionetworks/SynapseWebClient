@@ -1,17 +1,15 @@
 package org.sagebionetworks.web.unitclient.widget.lazyload;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueue;
@@ -26,11 +24,14 @@ public class LazyLoadHelperTest {
 	SupportsLazyLoadInterface mockView;
 	@Mock
 	LazyLoadCallbackQueue mockLazyLoadCallbackQueue;
+	@Mock
+	GWTWrapper mockGWT;
 		
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		lazyLoadHelper = new LazyLoadHelper(mockLazyLoadCallbackQueue);
+		lazyLoadHelper = new LazyLoadHelper(mockGWT);
+		lazyLoadHelper.setLazyLoadCallbackQueue(mockLazyLoadCallbackQueue);
 		when(mockView.isAttached()).thenReturn(false);
 		when(mockView.isInViewport()).thenReturn(false);
 		lazyLoadHelper.configure(mockInViewportCallback, mockView);
