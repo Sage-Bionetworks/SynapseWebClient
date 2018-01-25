@@ -18,8 +18,6 @@ public class LoadMoreWidgetContainerViewImpl implements LoadMoreWidgetContainerV
 	@UiField
 	Div container;
 	@UiField
-	HTMLPanel loadMore;
-	@UiField
 	LoadingSpinner loadMoreImage;
 
 	Widget widget;
@@ -55,12 +53,12 @@ public class LoadMoreWidgetContainerViewImpl implements LoadMoreWidgetContainerV
 
 	@Override
 	public void setLoadMoreVisibility(boolean visible) {
-		loadMore.setVisible(visible);
+		loadMoreImage.setVisible(visible);
 	}
 
 	@Override
 	public boolean isLoadMoreAttached() {
-		return loadMore.isAttached();
+		return loadMoreImage.isAttached();
 	}
 
 	@Override
@@ -70,6 +68,6 @@ public class LoadMoreWidgetContainerViewImpl implements LoadMoreWidgetContainerV
 
 	@Override
 	public boolean getLoadMoreVisibility() {
-		return loadMore.isVisible();
+		return loadMoreImage.isVisible();
 	}
 }

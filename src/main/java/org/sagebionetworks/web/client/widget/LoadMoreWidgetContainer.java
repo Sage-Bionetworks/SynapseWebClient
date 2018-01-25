@@ -2,9 +2,8 @@ package org.sagebionetworks.web.client.widget;
 
 import java.util.Iterator;
 
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueue;
 
 import com.google.gwt.user.client.ui.HasWidgets;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -21,13 +20,13 @@ import com.google.inject.Inject;
 public class LoadMoreWidgetContainer implements IsWidget, HasWidgets {
 	LoadMoreWidgetContainerView view;
 	Callback callback, invokeCheckForInViewAndLoadData;
-	GWTWrapper gwt;
 	boolean isProcessing;
+	LazyLoadCallbackQueue lazyLoadCallbackQueue;
 	
 	@Inject
-	public LoadMoreWidgetContainer(LoadMoreWidgetContainerView view, GWTWrapper gwt) {
+	public LoadMoreWidgetContainer(LoadMoreWidgetContainerView view, LazyLoadCallbackQueue lazyLoadCallbackQueue) {
 		this.view = view;
-		this.gwt = gwt;
+		this.lazyLoadCallbackQueue = lazyLoadCallbackQueue;
 		this.isProcessing = false;
 		invokeCheckForInViewAndLoadData = new Callback() {
 			@Override
@@ -44,14 +43,13 @@ public class LoadMoreWidgetContainer implements IsWidget, HasWidgets {
 	public void checkForInViewAndLoadData() {
 		if (!view.isLoadMoreAttached()) {
 			//Done, view has been detached and widget was never in the viewport
+			setIsMore(false);
 			return;
 		} else if (view.isLoadMoreInViewport() && view.getLoadMoreVisibility() && !isProcessing) {
 			//try to load data!
 			isProcessing = true;
+			setIsMore(false);
 			callback.invoke();
-		} else {
-			//wait for a few seconds and see if we should load data
-			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
 		}
 	}
 	
@@ -59,7 +57,9 @@ public class LoadMoreWidgetContainer implements IsWidget, HasWidgets {
 		isProcessing = false;
 		view.setLoadMoreVisibility(isMore);
 		if (isMore) {
-			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
+			lazyLoadCallbackQueue.subscribe(invokeCheckForInViewAndLoadData);
+		} else {
+			lazyLoadCallbackQueue.unsubscribe(invokeCheckForInViewAndLoadData);
 		}
 	}
 	

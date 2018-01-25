@@ -99,4 +99,7 @@ public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
 		spinnerContainer.addStyleName(styleNames);
 	}
 	
+	public boolean isVisible() {
+		return spinnerContainer.isVisible();
+	}
 }

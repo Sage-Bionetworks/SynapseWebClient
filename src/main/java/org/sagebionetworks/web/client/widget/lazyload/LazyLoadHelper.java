@@ -9,15 +9,15 @@ import com.google.inject.Inject;
 public class LazyLoadHelper {
 	private Callback inViewportCallback;
 	private SupportsLazyLoadInterface view;
-	private GWTWrapper gwt;
 	private Callback invokeCheckForInViewAndLoadData;
 	boolean isAttached, isConfigured;
+	LazyLoadCallbackQueue lazyLoadCallbackQueue;
 	
 	@Inject
 	public LazyLoadHelper(
-			GWTWrapper gwt
+			LazyLoadCallbackQueue lazyLoadCallbackQueue
 			) {
-		this.gwt = gwt;
+		this.lazyLoadCallbackQueue = lazyLoadCallbackQueue;
 		isConfigured = false;
 		isAttached = false;
 		invokeCheckForInViewAndLoadData = new Callback() {
@@ -26,11 +26,12 @@ public class LazyLoadHelper {
 				checkForInViewAndLoadData();
 			}
 		};
+		
 	}
 	
 	public void startCheckingIfAttachedAndConfigured() {
 		if (isAttached && isConfigured) {
-			checkForInViewAndLoadData();
+			lazyLoadCallbackQueue.subscribe(invokeCheckForInViewAndLoadData);
 		}
 	}
 	
@@ -50,13 +51,12 @@ public class LazyLoadHelper {
 	public void checkForInViewAndLoadData() {
 		if (!view.isAttached()) {
 			//Done, view has been detached and widget was never in the viewport
+			lazyLoadCallbackQueue.unsubscribe(invokeCheckForInViewAndLoadData);
 			return;
 		} else if (view.isInViewport()) {
 			//try to load data!
+			lazyLoadCallbackQueue.unsubscribe(invokeCheckForInViewAndLoadData);
 			inViewportCallback.invoke();
-		} else {
-			//wait for a few seconds and see if we should load data
-			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
 		}
 	}
 	

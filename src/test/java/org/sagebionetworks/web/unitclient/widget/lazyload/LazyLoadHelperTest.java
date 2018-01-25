@@ -14,22 +14,23 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueue;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.lazyload.SupportsLazyLoadInterface;
 
 public class LazyLoadHelperTest {
 	LazyLoadHelper lazyLoadHelper;
 	@Mock
-	GWTWrapper mockGWT;
-	@Mock
 	Callback mockInViewportCallback;
 	@Mock 
 	SupportsLazyLoadInterface mockView;
+	@Mock
+	LazyLoadCallbackQueue mockLazyLoadCallbackQueue;
 		
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		lazyLoadHelper = new LazyLoadHelper(mockGWT);
+		lazyLoadHelper = new LazyLoadHelper(mockLazyLoadCallbackQueue);
 		when(mockView.isAttached()).thenReturn(false);
 		when(mockView.isInViewport()).thenReturn(false);
 		lazyLoadHelper.configure(mockInViewportCallback, mockView);
@@ -45,13 +46,13 @@ public class LazyLoadHelperTest {
 	public void testHappyCase() {
 		// in before, simulated the view is not yet attached, or in viewport, and underlying widget is not yet configured
 		lazyLoadHelper.startCheckingIfAttachedAndConfigured();
-		verifyZeroInteractions(mockGWT);
+		verifyZeroInteractions(mockLazyLoadCallbackQueue);
 		
 		//configure
 		lazyLoadHelper.setIsConfigured();
 		
 		//has not yet started looking loading data, because it's been configured but not attached (view tells presenter when it's attached).
-		verifyZeroInteractions(mockGWT);
+		verifyZeroInteractions(mockLazyLoadCallbackQueue);
 		verify(mockInViewportCallback, never()).invoke();
 		
 		
@@ -61,7 +62,7 @@ public class LazyLoadHelperTest {
 		
 		// should start the process of asking if this is in the viewport
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockGWT).scheduleExecution(captor.capture(), eq(DisplayConstants.DELAY_UNTIL_IN_VIEW));
+		verify(mockLazyLoadCallbackQueue).subscribe(captor.capture());
 		Callback callback = captor.getValue();
 		
 		//simulate the view is now attached and in the viewport, and widget is configure, so it's time to load data
@@ -85,14 +86,13 @@ public class LazyLoadHelperTest {
 		
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		
-		verify(mockGWT).scheduleExecution(captor.capture(), eq(DisplayConstants.DELAY_UNTIL_IN_VIEW));
+		verify(mockLazyLoadCallbackQueue).subscribe(captor.capture());
 		Callback callback = captor.getValue();
 		
-		Mockito.reset(mockGWT);
 		//simulate the view detached before it's ever scrolled into view
 		when(mockView.isAttached()).thenReturn(false);
 		callback.invoke();
 		//verify that this cycle is dead
-		verify(mockGWT, never()).scheduleExecution(any(Callback.class), anyInt());
+		verify(mockLazyLoadCallbackQueue).unsubscribe(callback);
 	}
 }
