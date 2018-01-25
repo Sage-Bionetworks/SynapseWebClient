@@ -1,17 +1,16 @@
 package org.sagebionetworks.web.client.widget.lazyload;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 
-import com.google.gwt.core.client.GWT;
 import com.google.inject.Inject;
 
 public class LazyLoadCallbackQueueImpl implements LazyLoadCallbackQueue {
 	public final static int DELAY = 300;
 	Callback checkForMoreWorkCallback;
-	ArrayList<Callback> callbacks = new ArrayList<Callback>();
+	HashSet<Callback> callbacks = new HashSet<Callback>();
 	GWTWrapper gwt;
 	
 	@Inject
@@ -35,7 +34,8 @@ public class LazyLoadCallbackQueueImpl implements LazyLoadCallbackQueue {
 	
 	public void fire() {
 		//execute callbacks, and schedule the next execution
-		for (Callback callback : callbacks) {
+		HashSet<Callback> callbackCopy = new HashSet<Callback>(callbacks);
+		for (Callback callback : callbackCopy) {
 			callback.invoke();
 		}
 		gwt.scheduleExecution(checkForMoreWorkCallback, DELAY);
