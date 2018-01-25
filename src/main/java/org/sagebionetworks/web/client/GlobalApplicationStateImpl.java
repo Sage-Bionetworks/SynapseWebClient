@@ -24,12 +24,14 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
@@ -486,50 +488,57 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void initializeDropZone() {
 		if (!isDragDropInitialized) {
 			isDragDropInitialized = true;
-			_initializeDragDrop(this);
+			Element dropZoneElement = RootPanel.get("dropzone").getElement();
+			Element rootPanelElement = RootPanel.get("rootPanel").getElement();
+			_initializeDragDrop(this, dropZoneElement, rootPanelElement);
 		}
 	}
 	
-	private final static native void _initializeDragDrop(GlobalApplicationStateImpl globalAppState) /*-{
-		var dropZone = $doc.getElementById('dropzone');
-		
-		function showDropZone() {
-			dropZone.style.display = "block";
-		}
-		
-		function hideDropZone() {
-			dropZone.style.display = "none";
-		}
-		
-		$wnd.addEventListener('dragenter', function(e) {
-			if (globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::isDragAndDropListenerSet()()) {
-				showDropZone();
+	private final static native void _initializeDragDrop(
+			GlobalApplicationStateImpl globalAppState,
+			Element dropZone,
+			Element rootPanel
+			) /*-{
+		try {
+			function showDropZone() {
+				dropZone.style.display = "block";
 			}
-		});
-		
-		function allowDrag(e) {
-			e.dataTransfer.dropEffect = 'copy';
-			e.preventDefault();
+			
+			function hideDropZone() {
+				dropZone.style.display = "none";
+			}
+			
+			$wnd.addEventListener('dragenter', function(e) {
+				if (globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::isDragAndDropListenerSet()()) {
+					showDropZone();
+				}
+			});
+			
+			function allowDrag(e) {
+				e.dataTransfer.dropEffect = 'copy';
+				e.preventDefault();
+			}
+	
+			function handleDrop(e) {
+				e.preventDefault();
+				hideDropZone();
+				globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::onDrop(Lcom/google/gwt/core/client/JavaScriptObject;)(e.dataTransfer.files);
+			}
+	
+			dropZone.addEventListener('dragenter', allowDrag);
+			dropZone.addEventListener('dragover', allowDrag);
+	
+			dropZone.addEventListener('drop', handleDrop);
+			
+			//if files are dropped into the root panel, then ignore the event (do not open file contents if user does not have the upload dialog open).
+			rootPanel.addEventListener('drop', function(e) {
+				e.preventDefault();
+			});
+			rootPanel.addEventListener('dragenter', allowDrag);
+			rootPanel.addEventListener('dragover', allowDrag);
+		} catch (err) {
+			console.error(err);
 		}
-
-		function handleDrop(e) {
-			e.preventDefault();
-			hideDropZone();
-			globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::onDrop(Lcom/google/gwt/core/client/JavaScriptObject;)(e.dataTransfer.files);
-		}
-
-		dropZone.addEventListener('dragenter', allowDrag);
-		dropZone.addEventListener('dragover', allowDrag);
-
-		dropZone.addEventListener('drop', handleDrop);
-		
-		//if files are dropped into the root panel, then ignore the event (do not open file contents if user does not have the upload dialog open).
-		var rootPanel = $doc.getElementById('rootPanel');
-		rootPanel.addEventListener('drop', function(e) {
-			e.preventDefault();
-		});
-		rootPanel.addEventListener('dragenter', allowDrag);
-		rootPanel.addEventListener('dragover', allowDrag);
 	}-*/;
 	
 	@Override
