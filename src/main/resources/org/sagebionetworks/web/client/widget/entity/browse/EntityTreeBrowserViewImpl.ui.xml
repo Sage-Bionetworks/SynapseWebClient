@@ -36,9 +36,7 @@
 			</t:TableRow>
 		</t:Table>
 		<bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
-	    <g:Tree ui:field="entityTree">
-		</g:Tree>  
-		<w:LoadingSpinner ui:field="loadingUI" size="40px"/>
+		<bh:Div ui:field="mainContainer" />
 	</bh:Div>
 
 </ui:UiBinder>

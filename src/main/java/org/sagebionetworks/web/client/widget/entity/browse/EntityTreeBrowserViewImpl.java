@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -13,12 +14,6 @@ import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.OpenEvent;
-import com.google.gwt.event.logical.shared.OpenHandler;
-import com.google.gwt.event.logical.shared.SelectionEvent;
-import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ClientBundleWithLookup;
 import com.google.gwt.resources.client.ImageResource;
@@ -43,38 +38,23 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	private Map<TreeItem, EntityTreeItem> treeItem2entityTreeItem;
 	private EntityTreeItem selectedItem;
 	public interface Binder extends UiBinder<Widget, EntityTreeBrowserViewImpl> {}
-
 	
 	@UiField
 	Span emptyUI;
-	
 	@UiField
-	LoadingSpinner loadingUI;
-	
-	@UiField(provided=true)
+	Div mainContainer;
+	LoadingSpinner loadingSpinner;
 	Tree entityTree;
 	@UiField
 	Table entityTreeHeader;
-	
+	Div entityTreeContainer = new Div();
 	private Widget widget;
 
 	@Inject
 	public EntityTreeBrowserViewImpl(IconsImageBundle iconsImageBundle,
 			Binder uiBinder) {
 		this.iconsImageBundle = iconsImageBundle;
-		treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();
-		entityTree = new Tree(new EntityTreeResources());
 		this.widget = uiBinder.createAndBindUi(this);
-		// On open, it will call expandTreeItemOnOpen, which starts a loading message.
-		entityTree.addOpenHandler(new OpenHandler<TreeItem>() {
-			@Override
-			public void onOpen(OpenEvent<TreeItem> event) {
-				final EntityTreeItem target = treeItem2entityTreeItem.get(event
-						.getTarget());
-				presenter.expandTreeItemOnOpen(target);
-			}
-
-		});
 		// Make sure to show this and hide the tree on empty.
 		hideEmptyUI();
 	}
@@ -118,23 +98,30 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	@Override
 	public void clear() {
-		entityTree.clear();
-		treeItem2entityTreeItem.clear();
+		// On open, it will call expandTreeItemOnOpen, which starts a loading message.
+		entityTree = new Tree(new EntityTreeResources());
+		entityTree.addOpenHandler(event -> {
+			final EntityTreeItem target = treeItem2entityTreeItem.get(event
+					.getTarget());
+			presenter.expandTreeItemOnOpen(target);
+		});
+		treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();
 		presenter.clearRecordsFetchedChildren();
+		
+		if (isSelectable) {
+			entityTree.addSelectionHandler(event -> {
+				final EntityTreeItem targetItem = treeItem2entityTreeItem
+						.get(event.getSelectedItem());
+				selectEntity(targetItem);
+			});
+		}
+		entityTreeContainer.clear();
+		entityTreeContainer.add(entityTree);
 	}
 
 	@Override
 	public void makeSelectable() {
 		this.isSelectable = true;
-		entityTree.addSelectionHandler(new SelectionHandler<TreeItem>() {
-			@Override
-			public void onSelection(SelectionEvent<TreeItem> event) {
-				final EntityTreeItem targetItem = treeItem2entityTreeItem
-						.get(event.getSelectedItem());
-				selectEntity(targetItem);
-			}
-
-		});
 	}
 
 	// When empty...
@@ -151,11 +138,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		childToAdd.asTreeItem().addItem(createDummyItem());
 		if (isSelectable) {
 			// Add select functionality.
-			childToAdd.setClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					selectEntity(childToAdd);
-				}
+			childToAdd.setClickHandler(event -> {
+				selectEntity(childToAdd);
 			});
 		}
 		// Update fields.
@@ -189,13 +173,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	@Override
 	public void placeRootMoreTreeItem(final MoreTreeItem childToCreate,
 			final String parentId, final String nextPageToken) {
-		childToCreate.setClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setLoadingVisible(true);
-				presenter.getChildren(parentId, null, nextPageToken);
-				childToCreate.setVisible(false);
-			}
+		childToCreate.setClickHandler(event -> {
+			setLoadingVisible(true);
+			presenter.getChildren(parentId, null, nextPageToken);
+			childToCreate.setVisible(false);
 		});
 		entityTree.addItem(childToCreate.asTreeItem());
 	}
@@ -211,12 +192,9 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	@Override
 	public void placeChildMoreTreeItem(final MoreTreeItem childToCreate,
 			final EntityTreeItem parent, final String nextPageToken) {
-		childToCreate.setClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.getChildren(parent.getHeader().getId(), parent, nextPageToken);
-				childToCreate.setVisible(false);
-			}
+		childToCreate.setClickHandler(event -> {
+			presenter.getChildren(parent.getHeader().getId(), parent, nextPageToken);
+			childToCreate.setVisible(false);
 		});
 		parent.asTreeItem().addItem(childToCreate.asTreeItem());
 	}
@@ -278,7 +256,17 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	@Override
 	public void setLoadingVisible(boolean isShown) {
-		loadingUI.setVisible(isShown);
+		mainContainer.clear();
+		if (isShown && loadingSpinner == null) {
+			loadingSpinner = new LoadingSpinner();
+			loadingSpinner.setSize(40);
+			loadingSpinner.setAddStyleNames("center-block center");
+		}
+		if (isShown) {
+			mainContainer.add(loadingSpinner);
+		} else {
+			mainContainer.add(entityTreeContainer);
+		}
 	}
 
 	@Override
