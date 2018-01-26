@@ -143,6 +143,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			area = newArea;
 			// always the current version from tab entity click
 			Long version = null;
+			// SWC-4023: clear out the initial area tokens when a new entity is selected
+			tablesAreaToken = null;
+			dockerAreaToken = null;
+			discussionAreaToken = null;
+			wikiAreaToken = null;
 			// SWC-3919: on tab entity click, push tab url to browser history
 			pushTabUrlToBrowserHistory = true;
 			configureEntity(newEntityId, version);
@@ -644,5 +649,10 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		if (DisplayUtils.isDefined(areaToken))
 			wikiPageId = areaToken;
 		return wikiPageId;
+	}
+	
+	//for testing
+	public String getTablesAreaToken() {
+		return tablesAreaToken;
 	}
 }
