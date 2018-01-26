@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
@@ -251,6 +251,25 @@ public class EntityPageTopTest {
 		verify(mockDockerTab).setEntitySelectedCallback(selectEntityCallback.capture());
 		selectEntityCallback.getValue().invoke(null);
 		verify(mockTabs).showTab(mockDockerInnerTab, true);
+	}
+	
+	@Test
+	public void testSelectTableListingClearsQueryToken(){
+		EntityArea area = EntityArea.TABLES;
+		String initialAreaToken = "query/eyJzcWwiOiJzZWxlY3Qg";
+		Long versionNumber = null;
+		
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, initialAreaToken);
+		
+		assertEquals(initialAreaToken, pageTop.getTablesAreaToken());
+		
+		ArgumentCaptor<CallbackP> selectEntityCallback = ArgumentCaptor.forClass(CallbackP.class);
+		
+		verify(mockTablesTab).setEntitySelectedCallback(selectEntityCallback.capture());
+		//select the project
+		selectEntityCallback.getValue().invoke("syn123");
+		verify(mockTabs).showTab(mockTablesInnerTab, true);
+		assertNull(pageTop.getTablesAreaToken());
 	}
 	
 	@Test
