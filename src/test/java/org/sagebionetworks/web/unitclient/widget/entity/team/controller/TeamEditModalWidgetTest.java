@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
 import org.sagebionetworks.web.client.widget.upload.FileValidator;
 import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
@@ -50,7 +51,7 @@ public class TeamEditModalWidgetTest {
 	TeamEditModalWidgetView mockView;
 	SynapseJSNIUtils mockJSNIUtils;
 	SynapseClientAsync mockSynapseClient;
-	FileHandleUploadWidget mockUploader;
+	ImageUploadWidget mockUploader;
 	AuthenticationController mockAuthenticationController;
 	Team mockTeam;
 	Callback mockRefreshCallback;
@@ -79,7 +80,7 @@ public class TeamEditModalWidgetTest {
 		mockView = mock(TeamEditModalWidgetView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockUploader = mock(FileHandleUploadWidget.class);
+		mockUploader = mock(ImageUploadWidget.class);
 		mockJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockTeam = mock(Team.class);
 		when(mockTeam.getId()).thenReturn(TEAM_ID.toString());
@@ -100,7 +101,7 @@ public class TeamEditModalWidgetTest {
 		startedUploadingCallback = startedUploadingCaptor.getValue();
 		
 		ArgumentCaptor<CallbackP> finishedUploadingCaptor = ArgumentCaptor.forClass(CallbackP.class);
-		verify(mockUploader).configure(anyString(), finishedUploadingCaptor.capture());
+		verify(mockUploader).configure(finishedUploadingCaptor.capture());
 		// can invoke to check when loading finishes
 		finishedUploadingCallback = finishedUploadingCaptor.getValue();
 		
@@ -132,19 +133,11 @@ public class TeamEditModalWidgetTest {
 	@Test
 	public void testConstruction() {
 		verify(mockJSNIUtils).getBaseFileHandleUrl();
-		verify(mockUploader).configure(anyString(), any(CallbackP.class));
+		verify(mockUploader).configure(any(CallbackP.class));
 		verify(mockUploader).setUploadingCallback(any(Callback.class));
 		verify(mockView).setUploadWidget(mockUploader.asWidget());
 		verify(mockView).setAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setPresenter(presenter);
-		
-		//also verify that max image size is set
-		ArgumentCaptor<FileValidator> captor = ArgumentCaptor.forClass(FileValidator.class);
-		verify(mockUploader).setValidation(captor.capture());
-		FileValidator validator = captor.getValue();
-		assertTrue(validator instanceof ImageFileValidator);
-		ImageFileValidator v = (ImageFileValidator)validator;
-		assertEquals(UserProfileEditorWidgetImpl.MAX_IMAGE_SIZE, v.getMaxFileSize(), .1);
 	}
 	
 	@Test

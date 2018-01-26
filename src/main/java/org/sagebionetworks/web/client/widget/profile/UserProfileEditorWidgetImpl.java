@@ -1,20 +1,17 @@
 package org.sagebionetworks.web.client.widget.profile;
 
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
-import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, UserProfileEditorWidgetView.Presenter {
-	public static final double MAX_IMAGE_SIZE = ClientProperties.MB * 5; //5MB
 	public static final String PLEASE_ENTER_A_VALID_URL = "Please enter a valid URL";
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file";
 	public static final String CAN_ONLY_INCLUDE = "Can only include letters, numbers, dot (.), dash (-), and underscore (_)";
@@ -22,12 +19,12 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	
 	UserProfileEditorWidgetView view;
 	ProfileImageWidget imageWidget;
-	FileHandleUploadWidget fileHandleUploadWidget;
+	ImageUploadWidget fileHandleUploadWidget;
 	String fileHandleId;
 	
 	@Inject
 	public UserProfileEditorWidgetImpl(UserProfileEditorWidgetView view,
-			ProfileImageWidget imageWidget, FileHandleUploadWidget fileHandleUploadWidget) {
+			ProfileImageWidget imageWidget, ImageUploadWidget fileHandleUploadWidget) {
 		super();
 		this.view = view;
 		this.imageWidget = imageWidget;
@@ -64,15 +61,12 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 				setNewFileHandle(null);
 			}
 		});
-		fileHandleUploadWidget.configure("Upload Image", new CallbackP<FileUpload>() {
+		fileHandleUploadWidget.configure(new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUploaded) {
 				setNewFileHandle(fileUploaded.getFileHandleId());
 			}
 		});
-		ImageFileValidator imageValidator = new ImageFileValidator();
-		imageValidator.setMaxSize(MAX_IMAGE_SIZE);
-		fileHandleUploadWidget.setValidation(imageValidator);
 	}
 
 	@Override

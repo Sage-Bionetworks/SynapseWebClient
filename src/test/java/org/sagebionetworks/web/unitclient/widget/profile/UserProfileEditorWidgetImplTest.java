@@ -18,12 +18,13 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetView
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileValidator;
 import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 
 public class UserProfileEditorWidgetImplTest {
 	
 	UserProfileEditorWidgetView mockView;
 	ProfileImageWidget mockImageWidget;
-	FileHandleUploadWidget mockfileHandleUploadWidget;
+	ImageUploadWidget mockfileHandleUploadWidget;
 	UserProfileEditorWidgetImpl widget;
 	
 	UserProfile profile;
@@ -32,7 +33,7 @@ public class UserProfileEditorWidgetImplTest {
 	public void before(){
 		mockView = Mockito.mock(UserProfileEditorWidgetView.class);
 		mockImageWidget = Mockito.mock(ProfileImageWidget.class);
-		mockfileHandleUploadWidget = Mockito.mock(FileHandleUploadWidget.class);
+		mockfileHandleUploadWidget = Mockito.mock(ImageUploadWidget.class);
 		widget = new UserProfileEditorWidgetImpl(mockView, mockImageWidget, mockfileHandleUploadWidget);
 		
 		profile = new UserProfile();
@@ -65,14 +66,6 @@ public class UserProfileEditorWidgetImplTest {
 		verify(mockView).setLink(profile.getUrl());
 		verify(mockView).setBio(profile.getSummary());
 		verify(mockImageWidget).configure(profile.getProfilePicureFileHandleId());
-		
-		//also verify that max image size is set
-		ArgumentCaptor<FileValidator> captor = ArgumentCaptor.forClass(FileValidator.class);
-		verify(mockfileHandleUploadWidget).setValidation(captor.capture());
-		FileValidator validator = captor.getValue();
-		assertTrue(validator instanceof ImageFileValidator);
-		ImageFileValidator v = (ImageFileValidator)validator;
-		assertEquals(UserProfileEditorWidgetImpl.MAX_IMAGE_SIZE, v.getMaxFileSize(), .1);
 	}
 	
 	@Test

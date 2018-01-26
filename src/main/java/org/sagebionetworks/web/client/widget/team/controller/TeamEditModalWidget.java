@@ -15,10 +15,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
-import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
-import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -35,7 +33,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	Team team;
 	AccessControlList teamACL;
 	SynapseClientAsync synapseClient;
-	FileHandleUploadWidget uploader;
+	ImageUploadWidget uploader;
 	String uploadedFileHandleId;
 	String baseImageURL;
 	Long authenticatedUserGroupId;
@@ -46,7 +44,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 			SynapseAlert synAlert,
 			final TeamEditModalWidgetView view, 
 			SynapseClientAsync synapseClient,
-			final FileHandleUploadWidget uploader, 
+			final ImageUploadWidget uploader, 
 			SynapseJSNIUtils jsniUtils,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState) {
@@ -57,7 +55,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		this.baseImageURL = jsniUtils.getBaseFileHandleUrl();
 		this.authController = authenticationController;
 		authenticatedUserGroupId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));
-		uploader.configure("Browse...", new CallbackP<FileUpload>() {
+		uploader.configure(new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
 				uploader.setUploadedFileText(fileUpload.getFileMeta().getFileName());
@@ -66,9 +64,6 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 				view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, uploadedFileHandleId));
 			}
 		});
-		ImageFileValidator imageValidator = new ImageFileValidator();
-		imageValidator.setMaxSize(UserProfileEditorWidgetImpl.MAX_IMAGE_SIZE);
-		uploader.setValidation(imageValidator);
 		uploader.setUploadingCallback(new Callback() {
 			@Override
 			public void invoke() {
