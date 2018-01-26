@@ -28,12 +28,12 @@ public interface APITableWidgetView extends IsWidget, SynapseView {
 	 */
 	public void configurePager(int start, int end, int total);
 	
-	public void showError(Widget synAlert);
+	public void showError(IsWidget synAlert);
 	
 	void showTableUnavailable();
 	List<ElementWrapper> findCancelRequestDivs();
 	List<ElementWrapper> findUserBadgeDivs();
-	void addWidget(Widget widget, String divID);
+	void addWidget(IsWidget widget, String divID);
 	/**
 	 * Presenter interface
 	 */
