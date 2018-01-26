@@ -1341,6 +1341,25 @@ ol.lowerroman {
 	display: block;
 }
 
+.flexcontainer-row {
+   display: -webkit-flex;
+   display: flex;
+   -webkit-flex-direction: row;
+   flex-direction: row;
+}
+
+.flexcontainer-column {
+   display: -webkit-flex;
+   display: flex;
+   -webkit-flex-direction: column;
+   flex-direction: column;
+}
+
+.flexcontainer-justify-center {
+   -webkit-justify-content: center;
+   justify-content: center;
+}
+
 .smallerText {
 	font-size: 0.8em;
 }

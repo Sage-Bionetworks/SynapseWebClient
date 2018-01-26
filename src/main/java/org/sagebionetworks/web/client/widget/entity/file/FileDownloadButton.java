@@ -61,7 +61,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	PopupUtilsView popupUtilsView;
 	FileHandle dataFileHandle;
 	JavaScriptObject s3;
-	
+	boolean isSynAlertAddedToView = false;
 	@Inject
 	public FileDownloadButton(FileDownloadButtonView view, 
 			SynapseClientAsync synapseClient, 
@@ -90,7 +90,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 		this.awsSdk = awsSdk;
 		this.popupUtilsView = popupUtilsView;
 		view.setPresenter(this);
-		view.setSynAlert(synAlert.asWidget());
 		loginModalWidget.setPrimaryButtonText(DisplayConstants.BUTTON_DOWNLOAD);
 	}
 	
@@ -102,7 +101,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 			jsClient.getRestrictionInformation(bundle.getEntity().getId(), RestrictableObjectType.ENTITY, new AsyncCallback<RestrictionInformationResponse>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
+					handleException(caught);
 				}
 				public void onSuccess(RestrictionInformationResponse restrictionInformation) {
 					configure(bundle, restrictionInformation);
@@ -114,22 +113,19 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	public void configure(EntityBundle bundle, RestrictionInformationResponse restrictionInformation) {
 		view.clear();
 		this.entityBundle = bundle;
-		view.setClientsHelpVisible(false);
 		dataFileHandle = null;
 		s3 = null;
 		
 		if (!authController.isLoggedIn()) {
-			view.setDirectDownloadLink(LOGIN_PLACE_LINK);
-			view.setDirectDownloadLinkVisible(true);
+			view.setIsDirectDownloadLink(LOGIN_PLACE_LINK);
 		} else if (restrictionInformation.getHasUnmetAccessRequirement()) {
 			// if in alpha, send to access requirements
-			view.setDirectDownloadLink(ACCESS_REQUIREMENTS_LINK+bundle.getEntity().getId() + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
-			view.setDirectDownloadLinkVisible(true);
+			view.setIsDirectDownloadLink(ACCESS_REQUIREMENTS_LINK+bundle.getEntity().getId() + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
 		} else {
 			dataFileHandle = getFileHandle();
 			if (dataFileHandle != null) {
 				if (dataFileHandle instanceof ExternalObjectStoreFileHandle) {
-					view.setUnauthenticatedS3DirectDownloadLinkVisible(true);
+					view.setIsUnauthenticatedS3DirectDownload();
 				} else {
 					String fileNameOverride = entityBundle.getFileName();
 					String directDownloadUrl = getDirectDownloadURL((FileEntity)entityBundle.getEntity(), dataFileHandle, fileNameOverride);
@@ -137,25 +133,30 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 					//special case, if this starts with sftp proxy, then handle
 					String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
 					if (directDownloadUrl.startsWith(sftpProxy)) {
-						view.setAuthorizedDirectDownloadLinkVisible(true);
+						view.setIsAuthorizedDirectDownloadLink();
 						loginModalWidget.configure(directDownloadUrl, FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
 						FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
 						String url = ((ExternalFileHandle) fileHandle).getExternalURL();
 						queryForSftpLoginInstructions(url);
 					} else {
-						view.setDirectDownloadLink(directDownloadUrl);
-						view.setDirectDownloadLinkVisible(true);
+						view.setIsDirectDownloadLink(directDownloadUrl);
 						if (!isHidingClientHelp) {
-							view.setClientsHelpVisible(true);	
+							FileClientsHelp clientsHelp = ginInjector.getFileClientsHelp();
+							view.addWidget(clientsHelp);
+							clientsHelp.configure(entityBundle.getEntity().getId());
 						}
 					}
 				}
 			}
 		}
-		
-		FileClientsHelp clientsHelp = ginInjector.getFileClientsHelp();
-		view.setFileClientsHelp(clientsHelp.asWidget());
-		clientsHelp.configure(entityBundle.getEntity().getId());
+	}
+	
+	private void handleException(Throwable t) {
+		if (!isSynAlertAddedToView) {
+			view.addWidget(synAlert);
+			isSynAlertAddedToView = true;
+		}
+		synAlert.handleException(t);
 	}
 	
 	public FileHandle getFileHandle() {
@@ -191,8 +192,8 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	
 	public void hideClientHelp() {
 		isHidingClientHelp = true;
-		view.setClientsHelpVisible(false);
 	}
+	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
@@ -216,7 +217,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				handleException(caught);
 			}
 		});
 	}

@@ -136,8 +136,8 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		view.setDescription(eb.getEntity().getDescription());
 		
 		if (eb.getEntity() instanceof FileEntity) {
-			fileDownloadButton.configure(eb);
 			fileDownloadButton.hideClientHelp();
+			fileDownloadButton.configure(eb);
 			view.setFileDownloadButton(fileDownloadButton.asWidget());
 		}
 		

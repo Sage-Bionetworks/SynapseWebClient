@@ -39,7 +39,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 		this.usgFromIdAsyncHandler = usgFromIdAsyncHandler;
 		this.usgFromAliasAsyncHandler = usgFromAliasAsyncHandler;
 		this.div = div;
-		div.addStyleName("displayInline");
+		div.addStyleName("displayInlineBlock");
 	}
 	
 	@Override
@@ -108,7 +108,6 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			}
 			
 			theWidget = badge.asWidget();
-			theWidget.addStyleName("movedown-6");
 		} else {
 			//team
 			ClickHandler customClickHandler = null;

@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -32,7 +32,7 @@ public class StuAlertViewImpl implements
 	@UiField
 	Anchor requestAccessLink;
 	@UiField
-	Div requestLoadingUI;
+	LoadingSpinner requestLoadingUI;
 	@UiField
 	Div synAlertContainer;
 	Presenter presenter;

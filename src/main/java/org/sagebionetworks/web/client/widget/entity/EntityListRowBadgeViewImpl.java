@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -16,7 +17,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -47,7 +47,7 @@ public class EntityListRowBadgeViewImpl extends Composite implements EntityListR
 	@UiField
 	Label versionField;
 	@UiField
-	HTMLPanel loadingUI;
+	LoadingSpinner loadingUI;
 	@UiField
 	CheckBox select;
 	@UiField

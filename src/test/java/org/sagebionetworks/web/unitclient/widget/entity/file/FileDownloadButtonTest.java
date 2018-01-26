@@ -138,7 +138,6 @@ public class FileDownloadButtonTest {
 	@Test
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
-		verify(mockView).setSynAlert(any(IsWidget.class));
 		verify(mockLoginModalWidget).setPrimaryButtonText(DisplayConstants.BUTTON_DOWNLOAD);
 	}
 
@@ -158,8 +157,7 @@ public class FileDownloadButtonTest {
 		// Not Logged in Test: Download
 		when(mockAuthController.isLoggedIn()).thenReturn(false);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		verify(mockView).setDirectDownloadLink(FileDownloadButton.LOGIN_PLACE_LINK);
-		verify(mockView).setDirectDownloadLinkVisible(true);
+		verify(mockView).setIsDirectDownloadLink(FileDownloadButton.LOGIN_PLACE_LINK);
 		assertNull(widget.getFileHandle());
 	}
 	
@@ -179,21 +177,15 @@ public class FileDownloadButtonTest {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		assertNotNull(widget.getFileHandle());
-		verify(mockView).setDirectDownloadLink(fileHandleAssociationUrl);
-		verify(mockView).setDirectDownloadLinkVisible(true);
+		verify(mockView).setIsDirectDownloadLink(fileHandleAssociationUrl);
 		
-		// First use in SWC of Mockito.InOrder. Supports multiple mocks. This verification correctly fails if you swap the lines below.
-		InOrder inOrder = inOrder(mockView);
-		inOrder.verify(mockView).setClientsHelpVisible(false);
-		inOrder.verify(mockView).setClientsHelpVisible(true);
-		
+		verify(mockView).addWidget(mockFileClientsHelp);
 		verify(mockFileClientsHelp).configure(ENTITY_ID);
 	}
 	
 	@Test
 	public void testHideClientHelp() throws RestServiceException {
 		widget.hideClientHelp();
-		verify(mockView).setClientsHelpVisible(false);
 		
 		//verify that once we tell the widget to hide client help, it is not shown after getting the restriction information
 		String fileHandleId = "22";
@@ -206,7 +198,7 @@ public class FileDownloadButtonTest {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		verify(mockView, never()).setClientsHelpVisible(true);
+		verify(mockView, never()).addWidget(mockFileClientsHelp);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -227,8 +219,7 @@ public class FileDownloadButtonTest {
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		assertNotNull(widget.getFileHandle());
-		verify(mockView).setDirectDownloadLink(url);
-		verify(mockView).setDirectDownloadLinkVisible(true);
+		verify(mockView).setIsDirectDownloadLink(url);
 	}
 	
 	@Test
@@ -241,9 +232,8 @@ public class FileDownloadButtonTest {
 		String fileUrl = SFTP_ENDPOINT + "/path=mysftpfile.txt";
 		when(mockFileHandle.getExternalURL()).thenReturn(fileUrl);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		verify(mockView).setClientsHelpVisible(false);
-		verify(mockView).setAuthorizedDirectDownloadLinkVisible(true);
-		verify(mockFileClientsHelp).configure(ENTITY_ID);
+		verify(mockView).setIsAuthorizedDirectDownloadLink();
+		verify(mockFileClientsHelp, never()).configure(anyString()); //no client help for sftp download
 		verify(mockLoginModalWidget).configure(fileUrl,  FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
 		verify(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
 		verify(mockLoginModalWidget).setInstructionMessage(DisplayConstants.DOWNLOAD_CREDENTIALS_REQUIRED + SFTP_HOST);
@@ -266,7 +256,7 @@ public class FileDownloadButtonTest {
 		fileHandles.add(mockObjectStoreFileHandle);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
-		verify(mockView).setUnauthenticatedS3DirectDownloadLinkVisible(true);
+		verify(mockView).setIsUnauthenticatedS3DirectDownload();
 		
 		//under this configuration, try clicking the download button (verify login dialog shown)
 		widget.onUnauthenticatedS3DirectDownloadClicked();
@@ -296,8 +286,7 @@ public class FileDownloadButtonTest {
 		when(mockRestrictionInformation.getHasUnmetAccessRequirement()).thenReturn(true);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		
-		verify(mockView).setDirectDownloadLink(FileDownloadButton.ACCESS_REQUIREMENTS_LINK + ENTITY_ID + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
-		verify(mockView).setDirectDownloadLinkVisible(true);
+		verify(mockView).setIsDirectDownloadLink(FileDownloadButton.ACCESS_REQUIREMENTS_LINK + ENTITY_ID + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.ENTITY.toString());
 		assertNull(widget.getFileHandle());
 	}
 

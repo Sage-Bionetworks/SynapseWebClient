@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.Progress;
 import org.gwtbootstrap3.client.ui.ProgressBar;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.CanvasElement;
@@ -61,7 +62,7 @@ public class ImageUploadViewImpl implements ImageUploadView {
 	@UiField
 	CanvasElement resizedCanvas;
 	@UiField
-	HTMLPanel loadingUI;
+	LoadingSpinner loadingUI;
 
 	@Inject
 	public ImageUploadViewImpl(Binder binder) {

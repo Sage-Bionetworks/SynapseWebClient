@@ -4,7 +4,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -40,7 +40,7 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	SimplePanel unsubscribeUserBadgeContainer;
 	
 	@UiField
-	Span loadingUI;
+	LoadingSpinner loadingUI;
 	private Presenter presenter;
 	private Header headerWidget;
 	

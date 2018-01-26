@@ -3,26 +3,30 @@ package org.sagebionetworks.web.client.widget.footer;
 import java.util.Date;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.ToggleACTActionsButton;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FooterViewImpl extends Composite implements FooterView {
+public class FooterViewImpl implements FooterView {
 	
 	public interface Binder extends UiBinder<Widget, FooterViewImpl> {
 	}
@@ -45,22 +49,35 @@ public class FooterViewImpl extends Composite implements FooterView {
 	private CookieProvider cookies;
 	private GlobalApplicationState globalAppState;
 	private ToggleACTActionsButton hideACTActionsButton;
+	Div container = new Div();
+	
 	@Inject
-	public FooterViewImpl(Binder binder, CookieProvider cookies, GlobalApplicationState globalAppState, ToggleACTActionsButton hideACTActionsButton) {
-		this.initWidget(binder.createAndBindUi(this));
+	public FooterViewImpl(Binder binder, CookieProvider cookies, GlobalApplicationState globalAppState, ToggleACTActionsButton hideACTActionsButton, GWTWrapper gwt) {
+		//defer constructing this view (to give a chance for other page components to load first)
+		Callback constructViewCallback = () -> {
+			IsWidget widget = binder.createAndBindUi(this);
+			container.add(widget);
+			
+			initDebugModeLink();
+			hideACTActionsContainer.add(hideACTActionsButton);
+			copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " Sage Bionetworks");
+			reportAbuseLink.addClickHandler(new ClickHandler() {
+				
+				@Override
+				public void onClick(ClickEvent event) {
+					presenter.onReportAbuseClicked();
+				}
+			});
+		};
+		gwt.scheduleDeferred(constructViewCallback);
 		this.cookies = cookies;
 		this.globalAppState = globalAppState;
 		this.hideACTActionsButton = hideACTActionsButton;
-		initDebugModeLink();
-		hideACTActionsContainer.add(hideACTActionsButton);
-		copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " Sage Bionetworks");
-		reportAbuseLink.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onReportAbuseClicked();
-			}
-		});
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return container;
 	}
 	
 	private void initDebugModeLink() {

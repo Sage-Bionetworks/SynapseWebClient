@@ -256,7 +256,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 				UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
 				createdByBadge.configure(facet.getValue());
 				createdByBadge.setSize(BadgeSize.SMALLER);
-				createdByBadge.asWidget().addStyleName("movedown-6");
 				createdByBadge.setCustomClickHandler(event -> {
 					btn.click();
 				});
@@ -369,7 +368,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 		inlineHtml.addStyleName("hitattribution");
 		attributionPanel.add(inlineHtml);
 		Widget createdByBadgeWidget = createdByBadge.asWidget();
-		createdByBadgeWidget.addStyleName("movedown-7");
 		attributionPanel.add(createdByBadgeWidget);
 		
 		inlineHtml = new InlineHTML(" on " + dateTimeUtils.convertDateToSimpleString(new Date(hit.getCreated_on()*1000)) + ", Updated by ");
@@ -377,7 +375,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 		
 		attributionPanel.add(inlineHtml);
 		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
-		modifiedByBadgeWidget.addStyleName("movedown-7");
 		attributionPanel.add(modifiedByBadgeWidget);
 		inlineHtml = new InlineHTML(" on " + dateTimeUtils.convertDateToSimpleString(new Date(hit.getModified_on()*1000)));
 		inlineHtml.addStyleName("hitattribution");
@@ -543,7 +540,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 					badge.configure(getSearchUserId(constraint.getValue()));
 					badge.setCustomClickHandler(clickHandler);
 					Widget widget = badge.asWidget();
-					widget.addStyleName("movedown-7");
 					valueContainer.add(widget);
 				}
 				Anchor a = new Anchor(stub + " (" + constraint.getCount() + ")");

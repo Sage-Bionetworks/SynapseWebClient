@@ -10,7 +10,7 @@
         <div class="separator margin-top-10-imp"></div>
     	<g:SimplePanel ui:field="synAlertPanel" addStyleNames="margin-left-10 margin-right-10"/>
     	<div class="container margin-top-10"> 
-    	    <span ui:field="loadingUI" class="center-block center margin-150"><w:LoadingSpinner size="60px"/></span>
+    	    <w:LoadingSpinner ui:field="loadingUI" addStyleNames="center-block center margin-150" size="60px"/>
     	    <g:SimplePanel ui:field="successContainer" visible="false">	</g:SimplePanel>
     	    <div ui:field="quizSuccessUI" style="display:none" class="row">
 				<div class="col-sm-offset-1 col-sm-10 margin-top-10">

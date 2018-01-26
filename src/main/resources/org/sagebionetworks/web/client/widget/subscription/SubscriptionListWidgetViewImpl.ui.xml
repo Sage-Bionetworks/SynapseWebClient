@@ -12,10 +12,7 @@
 				<b:RadioButton name="filters" ui:field="threadFilter">Threads</b:RadioButton>
 			</b:ButtonGroup>
 		</bh:Div>
-		<bh:Span ui:field="loadingUI" visible="false">
-			<w:LoadingSpinner size="16px"/>
-			<bh:Text>&nbsp;Loading...</bh:Text>
-		</bh:Span>
+		<w:LoadingSpinner ui:field="loadingUI" visible="false" size="16px"/>
 		<bh:Div ui:field="synAlertContainer"/>
 		<g:SimplePanel ui:field="emptyUI" addStyleNames="smallGreyText padding-15" visible="false">
 			<bh:Text>- No items found</bh:Text>

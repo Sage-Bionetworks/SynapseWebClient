@@ -5,6 +5,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -58,7 +59,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	Anchor tryAgainLink;
 	
 	@UiField
-	SpanElement loadingUI;
+	LoadingSpinner loadingUI;
 	
 	@UiField
 	SimplePanel synAlertPanel;
@@ -113,7 +114,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 
 	@Override
 	public void showLoading() {
-		DisplayUtils.show(loadingUI);
+		loadingUI.setVisible(true);
 	}
 
 	@Override
@@ -199,6 +200,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 
 	@Override
 	public void hideLoading() {
-		DisplayUtils.hide(loadingUI);
+		loadingUI.setVisible(false);
 	}
 }
