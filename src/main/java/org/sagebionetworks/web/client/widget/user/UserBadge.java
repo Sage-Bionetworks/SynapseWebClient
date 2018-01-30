@@ -75,7 +75,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		this.jsClient = jsClient;
 		this.openNewWindow = false;
 		view.setPresenter(this);
-		view.setSize(BadgeSize.SMALL);
+		view.setSize(BadgeSize.DEFAULT);
 		clearState();
 	}
 	
