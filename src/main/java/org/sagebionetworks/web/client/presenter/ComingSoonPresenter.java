@@ -48,7 +48,7 @@ public class ComingSoonPresenter extends AbstractActivity implements ComingSoonV
 		
 		// test react-based view
 		// get the data
-		jsClient.getUserGroupHeadersByPrefix("Jay", TypeFilter.USERS_ONLY, 20, 0, new AsyncCallback<UserGroupHeaderResponsePage>() {
+		jsClient.getUserGroupHeadersByPrefix("Bob", TypeFilter.USERS_ONLY, 20, 0, new AsyncCallback<UserGroupHeaderResponsePage>() {
 			@Override
 			public void onSuccess(UserGroupHeaderResponsePage result) {
 				view.setUserList(result);
