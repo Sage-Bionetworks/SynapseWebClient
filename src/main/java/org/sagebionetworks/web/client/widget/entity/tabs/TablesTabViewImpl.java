@@ -64,7 +64,7 @@ public class TablesTabViewImpl implements TablesTabView {
 		viewLearnMoreButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(WebConstants.DOCS_URL + "fileviews.html", "", "");
+				DisplayUtils.newWindow(WebConstants.DOCS_URL + "views.html", "", "");
 			}
 		});
 	
