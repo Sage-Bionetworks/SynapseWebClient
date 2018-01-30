@@ -63,7 +63,8 @@ public class LazyLoadWikiWidgetWrapperTest {
 		
 		simulateLazyLoadEvent();
 		verify(mockWikiWidget).configure(mockWikiKey, mockWidgetDescriptor, mockWidgetRefreshRequired, wikiVersionInView);
-		verify(mockView).showWidget(any(Widget.class));
+		String expectedCssSelector = mockWikiWidget.getClass().getSimpleName();
+		verify(mockView).showWidget(any(Widget.class), eq(expectedCssSelector));
 	}
 
 

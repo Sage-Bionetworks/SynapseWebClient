@@ -45,7 +45,9 @@ public class LazyLoadWikiWidgetWrapper implements IsWidget {
 	
 	public void lazyLoad() {
 		wikiWidget.configure(wikiKey, widgetDescriptor, widgetRefreshRequired, wikiVersionInView);
-		view.showWidget(wikiWidget.asWidget());
+		// use the renderer class name as a css selector (for widget usage statistics, and possibly automated UI testing)
+		String cssSelector = wikiWidget.getClass().getSimpleName();
+		view.showWidget(wikiWidget.asWidget(), cssSelector);
 	}
 	
 	@Override
