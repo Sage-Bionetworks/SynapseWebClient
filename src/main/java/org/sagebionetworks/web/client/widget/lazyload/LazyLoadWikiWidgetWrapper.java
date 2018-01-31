@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.lazyload;
 
 import java.util.Map;
 
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -19,11 +20,14 @@ public class LazyLoadWikiWidgetWrapper implements IsWidget {
 	private Callback widgetRefreshRequired; 
 	private Long wikiVersionInView;
 	private LazyLoadWikiWidgetWrapperView view;
+	private SynapseJSNIUtils jsniUtils;
+	public final static String LOADED_EVENT_NAME = "WikiWidgetLoaded";
 	
 	@Inject
-	public LazyLoadWikiWidgetWrapper(LazyLoadWikiWidgetWrapperView view, LazyLoadHelper lazyLoadHelper) {
+	public LazyLoadWikiWidgetWrapper(LazyLoadWikiWidgetWrapperView view, LazyLoadHelper lazyLoadHelper, SynapseJSNIUtils jsniUtils) {
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.view = view;
+		this.jsniUtils = jsniUtils;
 		Callback loadDataCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -45,7 +49,10 @@ public class LazyLoadWikiWidgetWrapper implements IsWidget {
 	
 	public void lazyLoad() {
 		wikiWidget.configure(wikiKey, widgetDescriptor, widgetRefreshRequired, wikiVersionInView);
-		view.showWidget(wikiWidget.asWidget());
+		// use the renderer class name as a css selector (for widget usage statistics, and possibly automated UI testing)
+		String widgetClassName = wikiWidget.getClass().getSimpleName();
+		view.showWidget(wikiWidget.asWidget(), widgetClassName);
+		jsniUtils.sendAnalyticsEvent(widgetClassName, LOADED_EVENT_NAME);
 	}
 	
 	@Override

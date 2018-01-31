@@ -37,6 +37,23 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
+	public void sendAnalyticsEvent(String eventCategory, String eventAction) {
+		_sendAnalyticsEvent(eventCategory, eventAction, getCurrentURL());
+	}
+
+	private static native void _sendAnalyticsEvent(String eventCategoryValue, String eventActionValue, String eventLabelValue) /*-{
+		$wnd.ga('send', 
+			{
+			  hitType: 'event',
+			  eventCategory: eventCategoryValue,
+			  eventAction: eventActionValue,
+			  eventLabel: eventLabelValue,
+			  fieldsObject: { nonInteraction: true}
+			});
+	}-*/;
+
+	
+	@Override
 	public String getCurrentHistoryToken() {
 		return History.getToken();
 	}
