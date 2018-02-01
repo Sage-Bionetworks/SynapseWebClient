@@ -420,7 +420,7 @@ public class SynapseJavascriptClientTest {
 	}
 
 	@Test
-	public void testGetNewEntityInstance() throws RequestException, JSONObjectAdapterException {
+	public void testGetNewEntityInstance() throws RequestException, JSONObjectAdapterException, ResultNotReadyException {
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		new FileEntity().writeToJSONObject(adapter);
 		assertTrue(synapseJsFactory.newInstance(OBJECT_TYPE.Entity, adapter) instanceof FileEntity);
@@ -456,7 +456,7 @@ public class SynapseJavascriptClientTest {
 	}
 
 	@Test (expected=IllegalArgumentException.class)
-	public void testGetInvalidEntityInstance() throws RequestException, JSONObjectAdapterException {
+	public void testGetInvalidEntityInstance() throws RequestException, JSONObjectAdapterException, ResultNotReadyException {
 		// if using OBJECT_TYPE Entity, then json must represent a recognized subclass of Entity.
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		new Team().writeToJSONObject(adapter);

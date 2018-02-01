@@ -9,7 +9,9 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
@@ -20,6 +22,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTrackerImpl;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -34,8 +37,10 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  *
  */
 public class AsynchronousJobTrackerTest {
-
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	TimerProviderStub mockTimerProvider;
 	AdapterFactory adapterFactory;
 	int waitTimeMS;
@@ -55,12 +60,12 @@ public class AsynchronousJobTrackerTest {
 	
 	@Before
 	public void before() throws JSONObjectAdapterException{
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
+		MockitoAnnotations.initMocks(this);
 		mockTimerProvider = new TimerProviderStub();
 		adapterFactory = new AdapterFactoryImpl();
 		waitTimeMS = 1000;
 		mockHandler = Mockito.mock(UpdatingAsynchProgressHandler.class);
-		tracker = new AsynchronousJobTrackerImpl(mockSynapseClient, mockTimerProvider);
+		tracker = new AsynchronousJobTrackerImpl(mockSynapseClient, mockTimerProvider, mockJsClient);
 		
 		// Setup three phases for a job.
 		jobId = "99999";
