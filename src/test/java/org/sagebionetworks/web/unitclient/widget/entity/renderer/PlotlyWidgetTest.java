@@ -12,7 +12,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_JS;
+import static org.sagebionetworks.web.client.ClientProperties.*;
 import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.ALL_PARTS_MASK;
 import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.LIMIT;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
@@ -132,6 +132,7 @@ public class PlotlyWidgetTest {
 		when(mockY2Column.getName()).thenReturn(Y1_COLUMN_NAME);
 		when(mockRow.getValues()).thenReturn(rowValues);
 		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(true);
+		when(mockResourceLoader.isLoaded(eq(PLOTLY_REACT_JS))).thenReturn(true);
 	}
 	
 	@Test
@@ -282,6 +283,35 @@ public class PlotlyWidgetTest {
 		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
 		
 		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(true);
+		callback.onSuccess(null);
+		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), eq(showLegend));
+	}
+	
+	@Test
+	public void testLazyLoadPlotlyReactJS() throws JSONObjectAdapterException {
+		GraphType type = GraphType.SCATTER;
+		params.put(TYPE, type.toString());
+		boolean showLegend = true;
+		params.put(SHOW_LEGEND, Boolean.toString(showLegend));
+		WikiPageKey pageKey = null;
+		when(mockResourceLoader.isLoaded(eq(PLOTLY_REACT_JS))).thenReturn(false);
+		widget.configure(pageKey, params, null, null);
+		
+		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
+		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
+		
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
+		
+		verify(mockResourceLoader).isLoaded(eq(PLOTLY_REACT_JS));
+		verify(mockResourceLoader).requires(eq(PLOTLY_REACT_JS), webResourceLoadedCallbackCaptor.capture());
+		
+		AsyncCallback callback = webResourceLoadedCallbackCaptor.getValue();
+		Exception ex = new Exception();
+		callback.onFailure(ex);
+		verify(mockSynAlert).handleException(ex);
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
+		
+		when(mockResourceLoader.isLoaded(eq(PLOTLY_REACT_JS))).thenReturn(true);
 		callback.onSuccess(null);
 		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), eq(showLegend));
 	}	
