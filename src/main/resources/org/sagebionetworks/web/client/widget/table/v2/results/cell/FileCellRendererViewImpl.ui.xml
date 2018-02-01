@@ -7,7 +7,7 @@
 	<g:HTMLPanel>
 		<bh:Span ui:field="loadingUI"> Loading...</bh:Span> 
 		<bh:Text ui:field="errorText"></bh:Text>
-		<b:Anchor ui:field="anchor"></b:Anchor>
+		<b:Anchor ui:field="anchor" icon="DOWNLOAD" iconFixedWidth="true"/>
 	</g:HTMLPanel>
 
 </ui:UiBinder>
