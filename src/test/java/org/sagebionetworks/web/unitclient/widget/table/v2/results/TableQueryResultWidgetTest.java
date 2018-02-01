@@ -242,6 +242,12 @@ public class TableQueryResultWidgetTest {
 		partsMask = qbrCaptor.getValue().getPartMask();
 		expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE;
 		assertEquals(expectedPartsMask, partsMask);
+		AsynchronousProgressHandler progressHandler2 = asyncProgressHandlerCaptor.getValue();
+		progressHandler2.onComplete(mockNewPageQueryResultBundle);
+		//verify cached results are set on the new result
+		verify(mockNewPageQueryResultBundle).setColumnModels(bundle.getColumnModels());
+		verify(mockNewPageQueryResultBundle).setFacets(bundle.getFacets());
+		verify(mockNewPageQueryResultBundle).setSelectColumns(bundle.getSelectColumns());
 	}
 	
 	@Test
