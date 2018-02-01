@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
+import org.sagebionetworks.repo.model.table.FacetColumnResult;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -70,6 +71,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	ClientCache clientCache;
 	GWTWrapper gwt;
 	int currentJobIndex = 0;
+	QueryResultBundle cachedFullQueryResultBundle = null;
+	boolean facetsVisible = true;
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, 
 			SynapseClientAsync synapseClient, 
@@ -91,6 +94,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			@Override
 			public void invoke() {
 				startingQuery.setSelectedFacets(null);
+				cachedFullQueryResultBundle = null;
+				startingQuery.setOffset(0L);
 				runQuery();
 			}
 		};
@@ -109,6 +114,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 					}
 				}
 				selectedFacets.add(request);
+				cachedFullQueryResultBundle = null;
+				startingQuery.setOffset(0L);
 				runQuery();
 			}
 		};
@@ -126,12 +133,15 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.tableType = tableType;
 		this.startingQuery = query;
 		this.queryListener = listener;
+		cachedFullQueryResultBundle = null;
 		runQuery();
 	}
+	
 	private void runQuery() {
 		currentJobIndex++;
 		runQuery(currentJobIndex);
 	}
+	
 	private void runQuery(final int jobIndex) {
 		this.view.setErrorVisible(false);
 		fireStartEvent();
@@ -142,8 +152,18 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		if (viewEtag == null) {
 			// run the job
 			QueryBundleRequest qbr = new QueryBundleRequest();
+			long partMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE;
 			// do not ask for query count
-			qbr.setPartMask(BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_FACETS);
+			if (cachedFullQueryResultBundle == null) {
+				partMask = partMask | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS;
+				if (facetsVisible) {
+					partMask = partMask | BUNDLE_MASK_QUERY_FACETS;
+				}
+			} else {
+				// we can release the old query result
+				cachedFullQueryResultBundle.setQueryResult(null);
+			}
+			qbr.setPartMask(partMask);
 			qbr.setQuery(this.startingQuery);
 			qbr.setEntityId(entityId);
 			AsynchronousProgressWidget progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
@@ -229,6 +249,14 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param bundle
 	 */
 	private void setQueryResults(final QueryResultBundle bundle){
+		if (cachedFullQueryResultBundle != null) {
+			bundle.setColumnModels(cachedFullQueryResultBundle.getColumnModels());
+			bundle.setFacets(cachedFullQueryResultBundle.getFacets());
+			bundle.setSelectColumns(cachedFullQueryResultBundle.getSelectColumns());
+		} else {
+			cachedFullQueryResultBundle = bundle;
+		}
+		
 		// Get the sort info
 		this.synapseClient.getSortFromTableQuery(this.startingQuery.getSql(), new AsyncCallback<List<SortItem>>() {
 			
@@ -331,6 +359,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.queryResultEditor.showEditor(bundle, tableType, new Callback() {
 			@Override
 			public void invoke() {
+				cachedFullQueryResultBundle = null;
 				runQuery();
 			}
 		});
@@ -340,6 +369,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public void onPageChange(Long newOffset) {
 		this.startingQuery.setOffset(newOffset);
 		queryChanging();
+		view.scrollTableIntoView();
 	}
 	
 	private void runSql(String sql){
@@ -375,6 +405,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	}
 	
 	public void setFacetsVisible(boolean visible) {
+		facetsVisible = visible;
 		pageViewerWidget.setFacetsVisible(visible);
 	}
 	

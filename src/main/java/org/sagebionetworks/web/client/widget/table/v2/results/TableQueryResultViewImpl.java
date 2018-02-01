@@ -4,6 +4,7 @@ import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -27,7 +28,8 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	SimplePanel rowEditorModalPanel;
 	@UiField
 	SimplePanel synapseAlertContainer;
-
+	@UiField
+	Panel tableContainer;
 	Widget widget;
 
 	Presenter presenter;
@@ -75,5 +77,9 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@Override
 	public void setSynapseAlertWidget(Widget w) {
 		synapseAlertContainer.setWidget(w);
+	}
+	@Override
+	public void scrollTableIntoView() {
+		tableContainer.getElement().scrollIntoView();
 	}
 }
