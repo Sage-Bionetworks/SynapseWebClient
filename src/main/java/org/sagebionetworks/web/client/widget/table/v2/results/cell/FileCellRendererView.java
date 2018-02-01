@@ -28,5 +28,6 @@ public interface FileCellRendererView extends IsWidget {
 	 * @param createAnchorHref
 	 */
 	void setAnchor(String fileName, String createAnchorHref);
-
+	
+	void setTooltip(Long contentSize);
 }
