@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_JS;
+import static org.sagebionetworks.web.client.ClientProperties.*;
 import static org.sagebionetworks.web.client.place.Synapse.EntityArea.TABLES;
 import static org.sagebionetworks.web.client.widget.entity.tabs.TablesTab.TABLE_QUERY_PREFIX;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
@@ -234,6 +234,10 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		
 		if (!resourceLoader.isLoaded(PLOTLY_JS)) {
 			resourceLoader.requires(PLOTLY_JS, initializedCallback);
+			return;
+		}
+		if (!resourceLoader.isLoaded(PLOTLY_REACT_JS)) {
+			resourceLoader.requires(PLOTLY_REACT_JS, initializedCallback);
 			return;
 		}
 		
