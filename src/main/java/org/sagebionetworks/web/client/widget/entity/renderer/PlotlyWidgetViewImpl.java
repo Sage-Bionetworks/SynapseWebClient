@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.SynapseJSNIUtilsImpl._unmountComponentAtNode;
+
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Anchor;
@@ -37,6 +39,12 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	public PlotlyWidgetViewImpl(Binder binder) {
 		w=binder.createAndBindUi(this);
 		chartContainer.setWidth("100%");
+		w.addAttachHandler(event -> {
+			if (!event.isAttached()) {
+				//detach event, clean up react component
+				_unmountComponentAtNode(chartContainer.getElement());
+			}
+		});
 	}
 	
 	@Override
