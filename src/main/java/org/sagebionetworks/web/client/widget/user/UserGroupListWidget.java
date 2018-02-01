@@ -73,7 +73,7 @@ public class UserGroupListWidget implements UserGroupListWidgetView.Presenter {
 			if (isIndividual) {
 				UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
 				userBadge.configure(ownerId, true);
-				userBadge.setSize(BadgeSize.LARGE);
+				userBadge.setSize(BadgeSize.LARGER);
 				return userBadge.asWidget();
 			} else {
 				BigTeamBadge teamBadge = portalGinInjector.getBigTeamBadgeWidget();
