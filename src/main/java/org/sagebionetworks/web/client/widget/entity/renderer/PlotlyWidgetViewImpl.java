@@ -5,18 +5,13 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.event.logical.shared.ResizeEvent;
-import com.google.gwt.event.logical.shared.ResizeHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Element;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -33,7 +28,6 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	LoadingSpinner loadingUI;
 	Widget w;
 	Presenter presenter;
-	HandlerRegistration resizeHandler;
 	@UiField
 	Anchor sourceDataAnchor;
 	@UiField
@@ -42,16 +36,7 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	@Inject
 	public PlotlyWidgetViewImpl(Binder binder) {
 		w=binder.createAndBindUi(this);
-		resizeHandler = Window.addResizeHandler(new ResizeHandler() {
-			@Override
-			public void onResize(ResizeEvent event) {
-				if (chartContainer.isAttached()) {
-					_resize(chartContainer.getElement());
-				} else {
-					resizeHandler.removeHandler();
-				}
-			}
-		});
+		chartContainer.setWidth("100%");
 	}
 	
 	@Override
@@ -74,10 +59,6 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		chartContainer.clear();
 	}
 	
-	private static native void _resize(Element el) /*-{
-		$wnd.Plotly.Plots.resize(el);
-	}-*/;
-	
 	@Override
 	public void showChart(
 			String title, 
@@ -90,7 +71,6 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 			boolean showLegend) {
 		chartContainer.clear();
 		_showChart(chartContainer.getElement(), getPlotlyTraceArray(xyData), barMode, title, xTitle, yTitle, xAxisType, yAxisType, showLegend);
-		_resize(chartContainer.getElement());
 	}
 	
 	public static JavaScriptObject[] getPlotlyTraceArray(List<PlotlyTraceWrapper> l) {
@@ -114,23 +94,32 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 			String xAxisType, 
 			String yAxisType, 
 			boolean showLegend) /*-{
-		var layout = {
-		  xaxis: {
-		  	title: xTitle,
-		  	type: xAxisType
-		  },
-		  yaxis: { 
-		  	title: yTitle,
-		  	type: yAxisType
-		  },
-		  barmode: barMode,
-		  showlegend: showLegend
+		var plot =  $wnd.createPlotlyComponent($wnd.Plotly);
+		var props = {
+			data: xyData,
+			fit: true,
+			layout: {
+				  xaxis: {
+				  	title: xTitle,
+				  	type: xAxisType
+				  },
+				  yaxis: { 
+				  	title: yTitle,
+				  	type: yAxisType
+				  },
+				  barmode: barMode,
+				  showlegend: showLegend
+				},
+
+			// note: we'd like to just hide the "save and edit plot in cloud" command, 
+			// but the parameter provided in the docs (showLink: false) has no effect.
+			// hide the entire bar by setting displayModeBar to false.
+			config: {displayModeBar: false}
 		};
-		
-		// note: we'd like to just hide the "save and edit plot in cloud" command, 
-		// but the parameter provided in the docs (showLink: false) has no effect.
-		// hide the entire bar by setting displayModeBar to false.
-		$wnd.Plotly.newPlot(el, xyData, layout, {displayModeBar: false});
+		$wnd.ReactDOM.render(
+				$wnd.React.createElement(plot, props), 
+				el
+			);
 	}-*/;
 
 	@Override
