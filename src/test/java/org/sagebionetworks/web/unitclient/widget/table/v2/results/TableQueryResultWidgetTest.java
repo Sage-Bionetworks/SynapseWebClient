@@ -251,6 +251,19 @@ public class TableQueryResultWidgetTest {
 	}
 	
 	@Test
+	public void testFacetsNotVisible(){
+		boolean isEditable = true;
+		widget.setFacetsVisible(false);
+		widget.configure(query, isEditable, tableType, mockListner);
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
+
+		//verify all parts are initially asked for
+		Long partsMask = qbrCaptor.getValue().getPartMask();
+		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS;
+		assertEquals(expectedPartsMask, partsMask);
+	}
+	
+	@Test
 	public void testConfigureSuccessNotEditable(){
 		boolean isEditable = false;
 		tableType = TableType.fileview;

@@ -557,13 +557,18 @@ public class SynapseJavascriptClientTest {
 		
 		assertEquals(resultBundle, newResultBundleInstance);
 	}
-	@Test (expected=ResultNotReadyException.class)
+	@Test
 	public void testGetTableQueryJobResultsNotReady() throws RequestException, JSONObjectAdapterException, ResultNotReadyException {
 		// response status code is OK, but if we request a query result but it responds with a job status, then a ResultNotReadyException should be thrown
 		AsynchronousJobStatus jobStatus = new AsynchronousJobStatus();
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		jobStatus.writeToJSONObject(adapter);
 		
-		synapseJsFactory.newInstance(OBJECT_TYPE.QueryResultBundle, adapter);
+		try {
+			synapseJsFactory.newInstance(OBJECT_TYPE.QueryResultBundle, adapter);
+			fail("expected result not ready exception");
+		} catch (ResultNotReadyException ex) {
+			assertEquals(jobStatus, ex.getStatus());
+		}
 	}
 }
