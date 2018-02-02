@@ -230,6 +230,10 @@ End Synapse color scheme
 	max-width: none;
 }
 
+.TableQueryResultWikiWidget, #rootPanel TableQueryResultWikiWidget {
+	text-align: start;
+}
+
 /* Search loading image */
 .ui-autocomplete-loading { background: white url('http://jqueryui.com/demos/autocomplete/images/ui-anim_basic_16x16.gif') right center no-repeat; }
 

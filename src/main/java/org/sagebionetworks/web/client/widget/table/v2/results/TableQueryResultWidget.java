@@ -366,7 +366,6 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public void onPageChange(Long newOffset) {
 		this.startingQuery.setOffset(newOffset);
 		queryChanging();
-		view.scrollTableIntoView();
 	}
 	
 	private void runSql(String sql){
@@ -379,6 +378,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		if(this.queryListener != null){
 			this.queryListener.onStartingNewQuery(this.startingQuery);
 		}
+		view.scrollTableIntoView();
 		runQuery();
 	}
 	
