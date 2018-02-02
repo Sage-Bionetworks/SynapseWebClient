@@ -9,9 +9,10 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Before;
@@ -22,7 +23,9 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UnauthorizedException;
+import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
+import org.sagebionetworks.repo.model.table.FacetColumnResult;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
@@ -94,6 +97,16 @@ public class TableQueryResultWidgetTest {
 	ArgumentCaptor<AsynchronousProgressHandler> asyncProgressHandlerCaptor;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
+	@Captor
+	ArgumentCaptor<QueryBundleRequest> qbrCaptor;
+	@Mock
+	FacetColumnResult mockFacetColumnResult;
+	@Mock
+	ColumnModel mockColumnModel;
+	@Mock
+	SelectColumn mockSelectColumn;
+	@Mock
+	QueryResultBundle mockNewPageQueryResultBundle;
 	
 	public static final String ENTITY_ID = "syn123";
 	@Before
@@ -125,6 +138,9 @@ public class TableQueryResultWidgetTest {
 		bundle.setMaxRowsPerPage(123L);
 		bundle.setQueryCount(88L);
 		bundle.setQueryResult(results);
+		bundle.setFacets(Collections.singletonList(mockFacetColumnResult));
+		bundle.setColumnModels(Collections.singletonList(mockColumnModel));
+		bundle.setSelectColumns(Collections.singletonList(mockSelectColumn));
 		
 		sortList = new ArrayList<SortItem>();
 		SortItem sort = new SortItem();
@@ -147,7 +163,8 @@ public class TableQueryResultWidgetTest {
 		
 		// Make the call that changes it all.
 		widget.configure(query, isEditable, tableType, mockListner);
-		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
+		
 		AsynchronousProgressHandler progressHandler1 = asyncProgressHandlerCaptor.getValue();
 		// reconfigure before previous job is done (verify previous job is no longer tracked, it uses a new tracking widget).
 		widget.configure(query, isEditable, tableType, mockListner);
@@ -198,6 +215,52 @@ public class TableQueryResultWidgetTest {
 		Callback resetFacetsHandler = callbackCaptor.getValue();
 		resetFacetsHandler.invoke();
 		assertNull(query.getSelectedFacets());
+	}
+	
+	@Test
+	public void testOnPageChange(){
+		boolean isEditable = true;
+		widget.configure(query, isEditable, tableType, mockListner);
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
+
+		//verify all parts are initially asked for
+		Long partsMask = qbrCaptor.getValue().getPartMask();
+		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_FACETS;
+		assertEquals(expectedPartsMask, partsMask);
+		
+		//simulate complete table query async job
+		AsynchronousProgressHandler progressHandler1 = asyncProgressHandlerCaptor.getValue();
+		progressHandler1.onComplete(bundle);
+		
+		// go to the next page
+		Long newOffset = 25L;
+		widget.onPageChange(newOffset);
+		
+		verify(mockView).scrollTableIntoView();
+		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
+		// verify we are not asking for the cached result values (column models, select columns, facets)
+		partsMask = qbrCaptor.getValue().getPartMask();
+		expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS;
+		assertEquals(expectedPartsMask, partsMask);
+		AsynchronousProgressHandler progressHandler2 = asyncProgressHandlerCaptor.getValue();
+		progressHandler2.onComplete(mockNewPageQueryResultBundle);
+		//verify cached results are set on the new result
+		verify(mockNewPageQueryResultBundle).setColumnModels(bundle.getColumnModels());
+		verify(mockNewPageQueryResultBundle).setFacets(bundle.getFacets());
+		verify(mockNewPageQueryResultBundle).setSelectColumns(bundle.getSelectColumns());
+	}
+	
+	@Test
+	public void testFacetsNotVisible(){
+		boolean isEditable = true;
+		widget.setFacetsVisible(false);
+		widget.configure(query, isEditable, tableType, mockListner);
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
+
+		//verify all parts are initially asked for
+		Long partsMask = qbrCaptor.getValue().getPartMask();
+		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS;
+		assertEquals(expectedPartsMask, partsMask);
 	}
 	
 	@Test

@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
-import static org.sagebionetworks.web.client.ClientProperties.*;
+import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_JS;
+import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_REACT_JS;
 import static org.sagebionetworks.web.client.place.Synapse.EntityArea.TABLES;
 import static org.sagebionetworks.web.client.widget.entity.tabs.TablesTab.TABLE_QUERY_PREFIX;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_COUNT;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_RESULTS;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_SELECT_COLUMNS;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
 import static org.sagebionetworks.web.shared.WidgetConstants.FILL_COLUMN_NAME;
 import static org.sagebionetworks.web.shared.WidgetConstants.IS_HORIZONTAL;
@@ -66,8 +70,6 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	String xAxisType, yAxisType;
 	BarMode barMode;
 	private AsynchronousJobTracker jobTracker;
-	// Mask to get all parts of a query.
-	public static final Long ALL_PARTS_MASK = new Long(255);
 	Query query;
 	Long currentOffset;
 	QueryBundleRequest qbr;
@@ -133,7 +135,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		query.setLimit(LIMIT);
 		
 		qbr = new QueryBundleRequest();
-		qbr.setPartMask(ALL_PARTS_MASK);
+		qbr.setPartMask(BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_COUNT);
 		qbr.setQuery(query);
 		qbr.setEntityId(QueryBundleUtils.getTableId(query));
 		
