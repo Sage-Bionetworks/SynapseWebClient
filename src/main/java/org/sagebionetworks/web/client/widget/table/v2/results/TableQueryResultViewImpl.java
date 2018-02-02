@@ -30,8 +30,6 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@UiField
 	SimplePanel synapseAlertContainer;
 	@UiField
-	Panel tableContainer;
-	@UiField
 	Div scrollTarget;
 	Widget widget;
 

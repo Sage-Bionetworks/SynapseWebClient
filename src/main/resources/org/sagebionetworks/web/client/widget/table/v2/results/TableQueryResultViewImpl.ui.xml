@@ -6,7 +6,7 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
-		<b:Panel ui:field="tableContainer">
+		<b:Panel>
 			<b:PanelBody>
 				<bh:Div ui:field="scrollTarget"/>
 				<g:SimplePanel ui:field="synapseAlertContainer"/>
