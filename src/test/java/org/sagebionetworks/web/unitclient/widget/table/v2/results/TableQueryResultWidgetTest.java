@@ -225,7 +225,7 @@ public class TableQueryResultWidgetTest {
 
 		//verify all parts are initially asked for
 		Long partsMask = qbrCaptor.getValue().getPartMask();
-		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_FACETS;
+		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_FACETS;
 		assertEquals(expectedPartsMask, partsMask);
 		
 		//simulate complete table query async job
@@ -240,7 +240,7 @@ public class TableQueryResultWidgetTest {
 		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
 		// verify we are not asking for the cached result values (column models, select columns, facets)
 		partsMask = qbrCaptor.getValue().getPartMask();
-		expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE;
+		expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS;
 		assertEquals(expectedPartsMask, partsMask);
 		AsynchronousProgressHandler progressHandler2 = asyncProgressHandlerCaptor.getValue();
 		progressHandler2.onComplete(mockNewPageQueryResultBundle);

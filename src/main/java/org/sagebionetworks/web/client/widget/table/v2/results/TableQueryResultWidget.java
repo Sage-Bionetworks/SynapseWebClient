@@ -149,7 +149,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		if (viewEtag == null) {
 			// run the job
 			QueryBundleRequest qbr = new QueryBundleRequest();
-			long partMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE;
+			long partMask = BUNDLE_MASK_QUERY_RESULTS;
 			// do not ask for query count
 			if (cachedFullQueryResultBundle == null) {
 				partMask = partMask | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS;
