@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -30,6 +31,8 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	SimplePanel synapseAlertContainer;
 	@UiField
 	Panel tableContainer;
+	@UiField
+	Div scrollTarget;
 	Widget widget;
 
 	Presenter presenter;
@@ -80,6 +83,6 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	}
 	@Override
 	public void scrollTableIntoView() {
-		tableContainer.getElement().scrollIntoView();
+		scrollTarget.getElement().scrollIntoView();
 	}
 }
