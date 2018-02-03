@@ -8,6 +8,7 @@
 	<g:HTMLPanel>
 		<b:Panel>
 			<b:PanelBody>
+				<bh:Div ui:field="scrollTarget"/>
 				<g:SimplePanel ui:field="synapseAlertContainer"/>
 				<g:SimplePanel ui:field="progressPanel" />
 				<g:SimplePanel ui:field="tablePanel" />

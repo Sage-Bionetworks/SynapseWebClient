@@ -30,11 +30,11 @@ public enum AsynchType implements IsSerializable{
 	
 	TableAppendRowSet(AppendableRowSetRequest.class, RowReferenceSetResults.class),
 	TableQuery(QueryBundleRequest.class, QueryResultBundle.class),
-	TableQueryNextPage(QueryNextPageToken.class, QueryResult.class),
-	TableCSVUpload(UploadToTableRequest.class, UploadToTableResult.class),
+	TableQueryNextPage(QueryNextPageToken.class, QueryResult.class), // no references
+	TableCSVUpload(UploadToTableRequest.class, UploadToTableResult.class), // no references
 	TableCSVUploadPreview(UploadToTablePreviewRequest.class, UploadToTablePreviewResult.class),
 	TableCSVDownload(DownloadFromTableRequest.class, DownloadFromTableResult.class),
-	BulkFileDownload(BulkFileDownloadRequest.class,BulkFileDownloadResponse.class),
+	BulkFileDownload(BulkFileDownloadRequest.class,BulkFileDownloadResponse.class), // no references
 	TableTransaction(TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class);
 	
 	Class<? extends AsynchronousRequestBody> requestClass;

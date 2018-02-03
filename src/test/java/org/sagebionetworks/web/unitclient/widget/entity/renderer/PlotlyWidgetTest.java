@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -13,7 +14,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.ClientProperties.*;
-import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.ALL_PARTS_MASK;
 import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.LIMIT;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
 import static org.sagebionetworks.web.shared.WidgetConstants.*;
@@ -193,7 +193,7 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		//check query
 		QueryBundleRequest request = queryBundleRequestCaptor.getValue();
-		assertEquals(ALL_PARTS_MASK, request.getPartMask());
+		assertEquals(new Long(BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_COUNT), request.getPartMask());
 		assertEquals("syn12345", request.getEntityId());
 		assertEquals((Long)0L, request.getQuery().getOffset());
 		assertEquals(sql, request.getQuery().getSql());

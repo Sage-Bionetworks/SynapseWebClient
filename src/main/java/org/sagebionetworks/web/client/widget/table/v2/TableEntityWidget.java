@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.TableBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -84,32 +85,51 @@ public class TableEntityWidget implements IsWidget,
 	public static final String SCOPE = "Scope of ";
 	public static final String SCHEMA = " Schema";
 	String entityTypeDisplay;
+	PortalGinInjector ginInjector;
+	
 	@Inject
 	public TableEntityWidget(TableEntityWidgetView view,
 			TableQueryResultWidget queryResultsWidget,
 			QueryInputWidget queryInputWidget,
-			DownloadTableQueryModalWidget downloadTableQueryModalWidget,
-			UploadTableModalWidget uploadTableModalWidget,
 			PreflightController preflightController,
-			CopyTextModal copyTextModal, 
 			SynapseClientAsync synapseClient,
-			FileViewClientsHelp fileViewClientsHelp) {
+			FileViewClientsHelp fileViewClientsHelp,
+			PortalGinInjector ginInjector) {
 		this.view = view;
-		this.downloadTableQueryModalWidget = downloadTableQueryModalWidget;
-		this.uploadTableModalWidget = uploadTableModalWidget;
 		this.queryResultsWidget = queryResultsWidget;
 		this.queryInputWidget = queryInputWidget;
 		this.preflightController = preflightController;
-		this.copyTextModal = copyTextModal;
 		this.synapseClient = synapseClient;
 		this.fileViewClientsHelp = fileViewClientsHelp;
-		copyTextModal.setTitle("Query:");
+		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
-		this.view.addModalWidget(this.downloadTableQueryModalWidget);
-		this.view.addModalWidget(this.uploadTableModalWidget);
-		view.addModalWidget(copyTextModal);
+	}
+	
+	public DownloadTableQueryModalWidget getDownloadTableQueryModalWidget() {
+		if (downloadTableQueryModalWidget == null) {
+			downloadTableQueryModalWidget = ginInjector.getDownloadTableQueryModalWidget();
+			view.addModalWidget(downloadTableQueryModalWidget);
+		}
+		return downloadTableQueryModalWidget;
+	}
+	
+	public UploadTableModalWidget getUploadTableModalWidget() {
+		if (uploadTableModalWidget == null) {
+			uploadTableModalWidget = ginInjector.getUploadTableModalWidget();
+			view.addModalWidget(uploadTableModalWidget);
+		}
+		return uploadTableModalWidget;
+	}
+	
+	public CopyTextModal getCopyTextModal() {
+		if (copyTextModal == null) {
+			copyTextModal = ginInjector.getCopyTextModal();
+			copyTextModal.setTitle("Query:");
+			view.addModalWidget(copyTextModal);
+		}
+		return copyTextModal;
 	}
 
 	@Override
@@ -138,7 +158,6 @@ public class TableEntityWidget implements IsWidget,
 		this.canEditResults = canEdit;
 		this.queryChangeHandler = qch;
 		this.view.configure(bundle, this.canEdit);
-		this.uploadTableModalWidget.configure(table.getParentId(), tableId);
 		this.actionMenu = actionMenu;
 		this.entityTypeDisplay = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass()));
 		configureActions();
@@ -451,8 +470,8 @@ public class TableEntityWidget implements IsWidget,
 
 	@Override
 	public void onDownloadResults() {
-		this.downloadTableQueryModalWidget.configure(this.queryInputWidget.getInputSQL(), this.tableId, currentQuery.getSelectedFacets());
-		downloadTableQueryModalWidget.showModal();
+		getDownloadTableQueryModalWidget().configure(this.queryInputWidget.getInputSQL(), this.tableId, currentQuery.getSelectedFacets());
+		getDownloadTableQueryModalWidget().showModal();
 	}
 	
 	public void onUploadTableData(){
@@ -468,7 +487,9 @@ public class TableEntityWidget implements IsWidget,
 	 * Called after all pre-flight checks for upload has passed.
 	 */
 	private void postCheckonUploadTableData(){
-		this.uploadTableModalWidget.showModal(new WizardCallback() {
+		Entity table = entityBundle.getEntity();
+		getUploadTableModalWidget().configure(table.getParentId(), tableId);
+		getUploadTableModalWidget().showModal(new WizardCallback() {
 			@Override
 			public void onFinished() {
 				// SWC-3488: successfully uploaded data to table/view.  The current query may be invalid, so rerun with default query.
@@ -491,8 +512,8 @@ public class TableEntityWidget implements IsWidget,
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String sql) {
-				copyTextModal.setText(sql);
-				copyTextModal.show();
+				getCopyTextModal().setText(sql);
+				getCopyTextModal().show();
 			}
 			
 			@Override
@@ -518,8 +539,5 @@ public class TableEntityWidget implements IsWidget,
 			}
 		};
 		generateSqlWithFacets(callback);
-			
 	}
-	
-	
 }

@@ -5,7 +5,7 @@ public enum BadgeSize {
     LARGER("fa-2x", "font-size-20", "64px", true),
     LARGE("fa-lg", "font-size-17", "32px", true),
     DEFAULT("", "", "27px", true),
-    SMALLER("font-size-0-9em", "font-size-14", "20px", true),
+    SMALLER("font-size-0-9em", "font-size-13", "20px", true),
     LARGER_PICTURE_ONLY("font-size-12x", "", "128px", false),
     LARGE_PICTURE_ONLY("fa-lg", "", "32px", false),
     SMALL_PICTURE_ONLY("", "", "27px", false),

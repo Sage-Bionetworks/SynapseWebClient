@@ -6,11 +6,11 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<g:HTMLPanel>
-		<bh:Div b:id="editScopeCollapse" ui:field="scopeCollapse" addStyleNames="padding-bottom-15">
+		<bh:Div b:id="editScopeCollapse" ui:field="scopeCollapse" addStyleNames="padding-bottom-15" visible="false">
 			<bh:Div ui:field="scopePanel" addStyleNames="highlight-box" />
 		</bh:Div>
 		
-		<bh:Div b:id="editSchemaCollapse" ui:field="schemaCollapse">
+		<bh:Div b:id="editSchemaCollapse" ui:field="schemaCollapse" visible="false">
 			<g:FlowPanel addStyleNames="light-border padding-10 margin-bottom-15">
 	    		<bh:Div addStyleNames="highlight-title">
 	    			<bh:Text>Schema</bh:Text>
@@ -21,7 +21,7 @@
 	    	</g:FlowPanel>
 		</bh:Div>
 		
-		<b:Alert ui:field="tableMessage" type="INFO" />
+		<b:Alert ui:field="tableMessage" type="INFO" visible="false"/>
 
 		<bh:Div>
 			<b:Anchor ui:field="showSimpleSearch" text="Show simple search"/>

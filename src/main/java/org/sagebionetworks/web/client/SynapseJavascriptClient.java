@@ -15,18 +15,16 @@ import static org.apache.http.HttpStatus.SC_SERVICE_UNAVAILABLE;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
+import static org.sagebionetworks.web.shared.WebConstants.CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
-import static org.sagebionetworks.web.shared.WebConstants.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -50,6 +48,7 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -67,6 +66,7 @@ import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
+import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -86,13 +86,13 @@ import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.LockedException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
+import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.common.util.concurrent.FluentFuture;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
 import com.google.gwt.http.client.RequestCallback;
@@ -179,6 +179,10 @@ public class SynapseJavascriptClient {
 	
 	public static final String COLUMN = "/column";
 	public static final String COLUMN_VIEW_DEFAULT = COLUMN + "/tableview/defaults/";
+	public static final String ASYNC_START = "/async/start";
+	public static final String ASYNC_GET = "/async/get/";
+	public static final String TABLE_QUERY = "/table/query";
+	
 	public String repoServiceUrl,fileServiceUrl, synapseVersionInfo; 
 	
 	@Inject
@@ -298,6 +302,8 @@ public class SynapseJavascriptClient {
 							callback.onSuccess(responseObject);
 						} catch (JSONObjectAdapterException e) {
 							onError(null, e);
+						} catch (ResultNotReadyException e) {
+							onError(request, e);
 						}
 					} else {
 						// Status code could be 0 if the preflight request failed, or if the network connection is down.
@@ -877,6 +883,17 @@ public class SynapseJavascriptClient {
 	
 	public String getTeamIconUrl(String teamId) {
 		return getRepoServiceUrl() + TEAM + "/" + teamId + ICON + "?" + REDIRECT_PARAMETER +"true";
+	}
+	
+	public void startTableQueryJob(QueryBundleRequest request, AsyncCallback<String> callback) {
+		String entityId = request.getEntityId();
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + TABLE_QUERY + ASYNC_START;
+		doPost(url, request, OBJECT_TYPE.AsyncJobId, callback);
+	}
+	
+	public void getTableQueryJobResults(String entityId, String jobId, AsyncCallback<AsynchronousResponseBody> callback) {
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + TABLE_QUERY + ASYNC_GET + jobId;
+		doGet(url, OBJECT_TYPE.QueryResultBundle, callback);
 	}
 }
 

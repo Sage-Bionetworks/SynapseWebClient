@@ -40,6 +40,7 @@ import org.sagebionetworks.web.client.presenter.TrashPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.RadioWidget;
@@ -191,6 +192,7 @@ import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidge
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
+import org.sagebionetworks.web.client.widget.table.modal.download.DownloadTableQueryModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
 import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
@@ -583,6 +585,9 @@ public interface PortalGinInjector extends Ginjector {
 	HtmlPreviewWidget getHtmlPreviewWidget();
 	NbConvertPreviewWidget getNbConvertPreviewWidget();
 	S3DirectLoginDialog getS3DirectLoginDialog();
+	DownloadTableQueryModalWidget getDownloadTableQueryModalWidget();
+	CopyTextModal getCopyTextModal();
+	
 	SynapseJSNIUtils getSynapseJSNIUtils();
 	GWTWrapper getGWT();
 	LazyLoadHelper getLazyLoadHelper();
