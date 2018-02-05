@@ -148,7 +148,8 @@ public class FileHandleListTest {
 		when(mockFileHandleLink.isSelected()).thenReturn(true);
 		widget.configure()
 			.setCanDelete(true);
-	
+		
+		verify(mockUploadWidget).reset();
 		//add a single file
 		widget.addFileLink("f1", "123");
 		reset(mockView);
@@ -156,6 +157,8 @@ public class FileHandleListTest {
 		//no files left.  do not add a file widget to the view, and hide the toolbar
 		verify(mockView, never()).addFileLink(any(Widget.class));
 		verify(mockView).setToolbarVisible(false);
+		//SWC-2789: reset upload widget when a file is deleted from the list (user may want to re-upload the same file)
+		verify(mockUploadWidget, times(2)).reset();
 	}
 
 	@Test
