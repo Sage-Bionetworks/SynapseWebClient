@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.verification;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.UserProfile;
@@ -15,15 +14,11 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
-import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -33,11 +28,8 @@ import com.google.inject.Inject;
 public class VerificationSubmissionWidget implements VerificationSubmissionWidgetView.Presenter, IsWidget {
 	public static final String FILL_IN_PROFILE_FIELDS_MESSAGE = "Please edit your profile to fill in your first name, last name, affiliation, and city/country before requesting profile validation.";
 	private UserProfileClientAsync userProfileClient;
-	private SynapseClientAsync synapseClient;
-	private MarkdownWidget helpWikiPage;
 	private SynapseAlert synAlert;
 	private FileHandleList fileHandleList;
-	private static WikiPageKey validationPageKey;
 	private UserProfile profile;
 	private VerificationSubmission submission;
 	private String orcId;
@@ -57,8 +49,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	public VerificationSubmissionWidget(
 			PortalGinInjector ginInjector,
 			UserProfileClientAsync userProfileClient,
-			MarkdownWidget helpWikiPage,
-			SynapseClientAsync synapseClient,
 			SynapseAlert synAlert,
 			FileHandleList fileHandleList,
 			PromptModalView promptModalView,
@@ -67,8 +57,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			) {
 		this.ginInjector = ginInjector;
 		this.userProfileClient = userProfileClient;
-		this.helpWikiPage = helpWikiPage;
-		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
 		this.fileHandleList = fileHandleList;
 		this.promptModal = promptModalView;
@@ -90,7 +78,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view = ginInjector.getVerificationSubmissionRowViewImpl();
 		}
 		view.setFileHandleList(fileHandleList.asWidget());
-		view.setWikiPage(helpWikiPage.asWidget());
 		view.setPromptModal(promptModal.asWidget());
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
@@ -151,7 +138,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	public void showNewVerificationSubmission() {
 		if (isPreconditionsForNewSubmissionMet(profile, orcId)) {
 			//show wiki on validation process
-			loadWikiHelpContent();
 			view.setCancelButtonVisible(true);
 			view.setSubmitButtonVisible(true);
 			fileHandleList.configure()
@@ -173,7 +159,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	
 	public void showExistingVerificationSubmission() {
 		//view an existing verification submission
-		view.setWikiPageVisible(false);
 		view.setFirstName(submission.getFirstName());
 		view.setLastName(submission.getLastName());
 		view.setLocation(submission.getLocation());
@@ -250,30 +235,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			return false;
 		}
 		return true;
-	}
-	
-	public void loadWikiHelpContent() {
-		if (validationPageKey == null) {
-			//get the wiki page key, then load the content
-			synapseClient.getPageNameToWikiKeyMap(new AsyncCallback<HashMap<String,WikiPageKey>>() {
-				@Override
-				public void onSuccess(HashMap<String,WikiPageKey> result) {
-					validationPageKey = result.get(WebConstants.VALIDATION);
-					loadWikiHelpContent(validationPageKey);
-				};
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-				}
-			});
-		} else {
-			loadWikiHelpContent(validationPageKey);
-		}
-	}
-	
-	public void loadWikiHelpContent(WikiPageKey key) {
-		helpWikiPage.loadMarkdownFromWikiPage(key, false);
-		view.setWikiPageVisible(true);
 	}
 	
 	@Override

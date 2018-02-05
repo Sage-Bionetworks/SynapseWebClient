@@ -84,6 +84,7 @@ import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
+import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
@@ -183,6 +184,7 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.profile.ProfileCertifiedValidatedWidget;
+import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.refresh.DiscussionThreadCountAlert;
 import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
@@ -587,6 +589,8 @@ public interface PortalGinInjector extends Ginjector {
 	S3DirectLoginDialog getS3DirectLoginDialog();
 	DownloadTableQueryModalWidget getDownloadTableQueryModalWidget();
 	CopyTextModal getCopyTextModal();
+	UserProfileModalWidget getUserProfileModalWidget();
+	PromptModalView getPromptModal();
 	
 	SynapseJSNIUtils getSynapseJSNIUtils();
 	GWTWrapper getGWT();
