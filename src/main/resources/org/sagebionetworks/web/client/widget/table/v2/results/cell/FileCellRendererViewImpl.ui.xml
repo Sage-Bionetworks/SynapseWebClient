@@ -8,7 +8,7 @@
 		<bh:Span ui:field="loadingUI"> Loading...</bh:Span> 
 		<bh:Text ui:field="errorText"></bh:Text>
 		<b:Tooltip ui:field="tooltip" trigger="HOVER" isHtml="true" placement="BOTTOM">
-			<b:Anchor ui:field="anchor" icon="DOWNLOAD" iconFixedWidth="true"/>
+			<b:Anchor ui:field="anchor" icon="DOWNLOAD" iconFixedWidth="true" visible="false"/>
 		</b:Tooltip>
 	</g:HTMLPanel>
 </ui:UiBinder>

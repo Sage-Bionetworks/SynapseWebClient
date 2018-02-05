@@ -43,6 +43,7 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 	@Override
 	public void setErrorText(String fileName) {
 		this.errorText.setText(fileName);
+		anchor.setVisible(false);
 	}
 
 	@Override
@@ -52,6 +53,7 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 
 	@Override
 	public void setAnchor(String fileName, String createAnchorHref) {
+		anchor.setVisible(true);
 		this.anchor.setText(fileName);
 		this.anchor.setHref(createAnchorHref);
 		this.anchor.setTarget("_self");
@@ -61,6 +63,5 @@ public class FileCellRendererViewImpl implements FileCellRendererView {
 	public void setTooltip(Long contentSize) {
 		String friendlySize = DisplayUtils.getFriendlySize(contentSize, true).replace(" ", "&nbsp;");
 		tooltip.setTitle("<strong>Size:</strong>&nbsp;" + friendlySize);
-		tooltip.recreate();
 	}
 }
