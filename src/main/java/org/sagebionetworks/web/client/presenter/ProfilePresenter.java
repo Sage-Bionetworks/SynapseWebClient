@@ -135,18 +135,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			SynapseClientAsync synapseClient,
 			ChallengeClientAsync challengeClient,
 			CookieProvider cookies,
-			UserProfileModalWidget userProfileModalWidget,
 			LinkedInServiceAsync linkedInServic,
 			GWTWrapper gwt,
 			TeamListWidget myTeamsWidget,
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
 			UserProfileClientAsync userProfileClient,
-			VerificationSubmissionWidget verificationModal,
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
 			DateTimeUtils dateTimeUtils,
-			PromptModalView promptForProjectNameDialog,
-			PromptModalView promptForTeamNameDialog,
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
@@ -155,18 +151,14 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.synapseClient = synapseClient;
 		this.challengeClient = challengeClient;
 		this.cookies = cookies;
-		this.userProfileModalWidget = userProfileModalWidget;
 		this.linkedInService = linkedInServic;
 		this.gwt = gwt;
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.userProfileClient = userProfileClient;
-		this.verificationModal = verificationModal;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.dateTimeUtils = dateTimeUtils;
-		this.promptForProjectNameDialog = promptForProjectNameDialog;
-		this.promptForTeamNameDialog = promptForTeamNameDialog;
 		this.jsClient = jsClient;
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
@@ -177,7 +169,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		teamSynAlert = ginInjector.getSynapseAlertWidget();
 		challengeSynAlert = ginInjector.getSynapseAlertWidget();
 		view.setPresenter(this);
-		view.addUserProfileModalWidget(userProfileModalWidget);
 		view.addOpenInvitesWidget(openInvitesWidget);
 		view.setProfileSynAlertWidget(profileSynAlert.asWidget());
 		view.setProjectSynAlertWidget(projectSynAlert.asWidget());
@@ -197,18 +188,47 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		refreshTeamsCallback = () -> {
 			refreshTeamsForFilter();
 		};
-		promptForProjectNameDialog.setPresenter(new PromptModalView.Presenter() {
-			@Override
-			public void onPrimary() {
-				createProjectAfterPrompt();
-			}
-		});
-		promptForTeamNameDialog.setPresenter(new PromptModalView.Presenter() {
-			@Override
-			public void onPrimary() {
-				createTeamAfterPrompt();
-			}
-		});
+	}
+	
+	public VerificationSubmissionWidget getVerificationSubmissionWidget() {
+		if (verificationModal == null) {
+			verificationModal = ginInjector.getVerificationSubmissionWidget();
+		}
+		return verificationModal;
+	}
+	public PromptModalView getPromptForTeamNameDialog() {
+		if (promptForTeamNameDialog == null) {
+			promptForTeamNameDialog = ginInjector.getPromptModal();
+			promptForTeamNameDialog.setPresenter(new PromptModalView.Presenter() {
+				@Override
+				public void onPrimary() {
+					createTeamAfterPrompt();
+				}
+			});
+		}
+		return promptForTeamNameDialog;
+	}
+	
+	public PromptModalView getPromptForProjectNameDialog() {
+		if (promptForProjectNameDialog == null) {
+			promptForProjectNameDialog = ginInjector.getPromptModal();
+			promptForProjectNameDialog.setPresenter(new PromptModalView.Presenter() {
+				@Override
+				public void onPrimary() {
+					createProjectAfterPrompt();
+				}
+			});
+		}
+		return promptForProjectNameDialog;
+	}
+
+	
+	public UserProfileModalWidget getUserProfileModalWidget() {
+		if (userProfileModalWidget == null) {
+			userProfileModalWidget = ginInjector.getUserProfileModalWidget();
+			view.addUserProfileModalWidget(userProfileModalWidget);
+		}
+		return userProfileModalWidget;
 	}
 
 	public SettingsPresenter getSettingsPresenter() {
@@ -883,22 +903,22 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void createProject() {
 		//prompt for project name
-		promptForProjectNameDialog.configure("Create a New Project", "Project Name", "OK", "");
-		promptForProjectNameDialog.show();
+		getPromptForProjectNameDialog().configure("Create a New Project", "Project Name", "OK", "");
+		getPromptForProjectNameDialog().show();
 	}
 	
 	public void createProjectAfterPrompt() {
-		final String name = promptForProjectNameDialog.getValue();
+		final String name = getPromptForProjectNameDialog().getValue();
 		//validate project name
 		if (!DisplayUtils.isDefined(name)) {
-			promptForProjectNameDialog.showError(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
+			getPromptForProjectNameDialog().showError(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
 			return;
 		}
 		
 		CreateEntityUtil.createProject(name, synapseClient, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newProjectId) {
-				promptForProjectNameDialog.hide();
+				getPromptForProjectNameDialog().hide();
 				view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
 				globalApplicationState.getPlaceChanger().goTo(new Synapse(newProjectId));						
 			}
@@ -906,9 +926,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof ConflictException) {
-					promptForProjectNameDialog.showError(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
+					getPromptForProjectNameDialog().showError(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
 				} else {
-					promptForProjectNameDialog.showError(caught.getMessage());
+					getPromptForProjectNameDialog().showError(caught.getMessage());
 				}
 			}
 		});
@@ -917,22 +937,22 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void createTeam() {
 		// prompt for team name
-		promptForTeamNameDialog.configure("Create a New Team", "Team Name", "OK", "");
-		promptForTeamNameDialog.show();
+		getPromptForTeamNameDialog().configure("Create a New Team", "Team Name", "OK", "");
+		getPromptForTeamNameDialog().show();
 	}
 	
 	public void createTeamAfterPrompt() {
-		final String teamName = promptForTeamNameDialog.getValue();
+		final String teamName = getPromptForTeamNameDialog().getValue();
 		//validate team name
 		if (!DisplayUtils.isDefined(teamName)) {
-			promptForTeamNameDialog.showError(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
+			getPromptForTeamNameDialog().showError(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
 			return;
 		}
 
 		synapseClient.createTeam(teamName, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newTeamId) {
-				promptForTeamNameDialog.hide();
+				getPromptForTeamNameDialog().hide();
 				view.showInfo(DisplayConstants.LABEL_TEAM_CREATED, teamName);
 				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(newTeamId));						
 			}
@@ -940,9 +960,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof ConflictException) {
-					promptForTeamNameDialog.showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
+					getPromptForTeamNameDialog().showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 				} else {
-					promptForTeamNameDialog.showError(caught.getMessage());
+					getPromptForTeamNameDialog().showError(caught.getMessage());
 				}
 			}
 		});		
@@ -1256,7 +1276,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	@Override
 	public void onEditProfile() {
-		this.userProfileModalWidget.showEditProfile(this.currentUserId, new Callback() {
+		getUserProfileModalWidget().showEditProfile(this.currentUserId, new Callback() {
 			@Override
 			public void invoke() {
 				profileUpdated();
@@ -1306,7 +1326,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				public void onSuccess(UserProfile linkedInProfile) {
 					view.hideLoading();
 					// Give the user a chance to edit the profile.
-					userProfileModalWidget.showEditProfile(linkedInProfile.getOwnerId(), linkedInProfile, new Callback(){
+					getUserProfileModalWidget().showEditProfile(linkedInProfile.getOwnerId(), linkedInProfile, new Callback(){
 						@Override
 						public void invoke() {
 							profileUpdated();
@@ -1327,7 +1347,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
 			@Override
 			public void invoke(Boolean isACTMember) {
-				verificationModal.configure(
+				getVerificationSubmissionWidget().configure(
 						currentUserBundle.getVerificationSubmission(), 
 						isACTMember, 
 						true) //isModal
@@ -1345,7 +1365,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		
 		//create a new submission
-		verificationModal.configure(
+		getVerificationSubmissionWidget().configure(
 				currentUserBundle.getUserProfile(), 
 				currentUserBundle.getORCID(), 
 				true, //isModal
