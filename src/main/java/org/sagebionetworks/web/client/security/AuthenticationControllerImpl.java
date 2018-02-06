@@ -78,10 +78,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			@Override
 			public void onSuccess(LoginResponse session) {
 				storeAuthenticationReceipt(username, session.getAuthenticationReceipt());
-				Session newSession = new Session();
-				newSession.setAcceptsTermsOfUse(session.getAcceptsTermsOfUse());
-				newSession.setSessionToken(session.getSessionToken());
-				setSession(newSession, callback);
+				revalidateSession(session.getSessionToken(), callback);
 			}
 			
 			@Override
@@ -142,8 +139,19 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
 		}
-		
-		ginInjector.getSynapseJavascriptClient().revalidate(token, new AsyncCallback<Session>() {
+
+		userAccountService.getUserSessionData(token, new AsyncCallback<UserSessionData>() {
+			@Override
+			public void onSuccess(UserSessionData userSessionData) {
+				Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
+				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
+				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
+				currentUser = userSessionData;
+				localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
+				ginInjector.getSessionTokenDetector().initializeSessionTokenState();
+				callback.onSuccess(currentUser);
+			}
+			
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof SynapseDownException || caught instanceof ReadOnlyModeException) {
@@ -153,46 +161,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					callback.onFailure(caught);
 				}
 			}
-			@Override
-			public void onSuccess(final Session session) {
-				// session token is valid
-				Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
-				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
-				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, token, tomorrow);
-				if (currentUser == null) {
-					setSession(session, callback);
-				} else {
-					setUserSessionData(currentUser, callback);
-				}
-			}
 		});
 	}
 	
-	private void setSession(Session session, final AsyncCallback<UserSessionData> callback) {
-		// get user profile and then set user session data
-		ginInjector.getSynapseJavascriptClient().getMyUserProfile(new AsyncCallback<UserProfile>() {
-			@Override
-			public void onSuccess(UserProfile userProfile) {
-				// session token is valid, and now we have a user profile
-				UserSessionData usd = new UserSessionData();
-				usd.setProfile(userProfile);
-				usd.setSession(session);
-				setUserSessionData(usd, callback);
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
-	}
-	private void setUserSessionData(UserSessionData userSessionData, AsyncCallback<UserSessionData> callback) {
-		Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
-		currentUser = userSessionData;
-		localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
-		ginInjector.getSessionTokenDetector().initializeSessionTokenState();
-		callback.onSuccess(currentUser);
-	}
-
 	public String getUserSessionDataString(UserSessionData session) {
 		JSONObjectAdapter adapter = adapterFactory.createNew();
 		try {
