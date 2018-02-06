@@ -94,17 +94,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
-	@Override
-	public LoginResponse initiateSession(LoginRequest loginRequest) throws RestServiceException {
-		validateService();
-		SynapseClient synapseClient = createAnonymousSynapseClient();
-		try {
-			return synapseClient.login(loginRequest);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
 	
 	@Override 
 	public UserSessionData getUserSessionData(String sessionToken) throws RestServiceException {

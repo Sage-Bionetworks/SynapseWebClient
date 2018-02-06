@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -25,6 +26,7 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -49,6 +51,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private AdapterFactory adapterFactory;
 	private SynapseClientAsync synapseClient;
 	private PortalGinInjector ginInjector;
+	
 	@Inject
 	public AuthenticationControllerImpl(
 			CookieProvider cookies, 
@@ -71,11 +74,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public void loginUser(final String username, String password, final AsyncCallback<UserSessionData> callback) {
 		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 		LoginRequest loginRequest = getLoginRequest(username, password);
-		userAccountService.initiateSession(loginRequest, new AsyncCallback<LoginResponse>() {		
+		ginInjector.getSynapseJavascriptClient().login(loginRequest, new AsyncCallback<LoginResponse>() {		
 			@Override
 			public void onSuccess(LoginResponse session) {
 				storeAuthenticationReceipt(username, session.getAuthenticationReceipt());
-				revalidateSession(session.getSessionToken(), callback);
+				Session newSession = new Session();
+				newSession.setAcceptsTermsOfUse(session.getAcceptsTermsOfUse());
+				newSession.setSessionToken(session.getSessionToken());
+				setSession(newSession, callback);
 			}
 			
 			@Override
@@ -130,24 +136,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		});
 	}
 	
-	private void setUser(String token, final AsyncCallback<UserSessionData> callback) {
+	private void setUser(final String token, final AsyncCallback<UserSessionData> callback) {
 		if(token == null) {
 			sessionStorage.clear();
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
 		}
 		
-		userAccountService.getUserSessionData(token, new AsyncCallback<UserSessionData>() {
-			@Override
-			public void onSuccess(UserSessionData userSessionData) {
-				Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
-				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
-				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, userSessionData.getSession().getSessionToken(), tomorrow);
-				currentUser = userSessionData;
-				localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
-				ginInjector.getSessionTokenDetector().initializeSessionTokenState();
-				callback.onSuccess(currentUser);
-			}
+		ginInjector.getSynapseJavascriptClient().revalidate(token, new AsyncCallback<Session>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof SynapseDownException || caught instanceof ReadOnlyModeException) {
@@ -157,7 +153,44 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 					callback.onFailure(caught);
 				}
 			}
+			@Override
+			public void onSuccess(final Session session) {
+				// session token is valid
+				Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
+				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
+				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, token, tomorrow);
+				if (currentUser == null) {
+					setSession(session, callback);
+				} else {
+					setUserSessionData(currentUser, callback);
+				}
+			}
 		});
+	}
+	
+	private void setSession(Session session, final AsyncCallback<UserSessionData> callback) {
+		// get user profile and then set user session data
+		ginInjector.getSynapseJavascriptClient().getMyUserProfile(new AsyncCallback<UserProfile>() {
+			@Override
+			public void onSuccess(UserProfile userProfile) {
+				// session token is valid, and now we have a user profile
+				UserSessionData usd = new UserSessionData();
+				usd.setProfile(userProfile);
+				usd.setSession(session);
+				setUserSessionData(usd, callback);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+		});
+	}
+	private void setUserSessionData(UserSessionData userSessionData, AsyncCallback<UserSessionData> callback) {
+		Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
+		currentUser = userSessionData;
+		localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
+		ginInjector.getSessionTokenDetector().initializeSessionTokenState();
+		callback.onSuccess(currentUser);
 	}
 
 	public String getUserSessionDataString(UserSessionData session) {

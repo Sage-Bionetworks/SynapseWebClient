@@ -101,8 +101,8 @@ public class SynapseJavascriptClientTest {
 		when(mockClientCache.get(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT);
 		when(mockClientCache.get(FILE_SERVICE_URL_KEY)).thenReturn(FILE_ENDPOINT);
 		when(mockGinInjector.getRequestBuilder()).thenReturn(mockRequestBuilder);
+		when(mockGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
 		client = new SynapseJavascriptClient(
-				mockAuthController, 
 				jsonObjectAdapter, 
 				mockClientCache, 
 				mockGwt,

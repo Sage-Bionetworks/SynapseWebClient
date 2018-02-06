@@ -18,8 +18,6 @@ public interface UserAccountService extends RemoteService {
 
 	void changePassword(String sessionToken, String newPassword) throws RestServiceException;
 
-	LoginResponse initiateSession(LoginRequest loginRequest) throws RestServiceException;
-
 	UserSessionData getUserSessionData(String sessionToken) throws RestServiceException;
 
 	void signTermsOfUse(String sessionToken, boolean acceptsTerms) throws RestServiceException;

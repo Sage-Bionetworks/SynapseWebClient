@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsyncJobId;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -97,6 +98,7 @@ public class SynapseJavascriptFactory {
 		PaginatedTeamIds,
 		QueryResultBundle,
 		AsyncJobId,
+		LoginResponse,
 		None,
 		String
 	}
@@ -233,6 +235,8 @@ public class SynapseJavascriptFactory {
 			}
 		case AsyncJobId:
 			return new AsyncJobId(json).getToken();
+		case LoginResponse:
+			return new LoginResponse(json);
 		default:
 			throw new IllegalArgumentException("No match found for : "+ type);
 		}

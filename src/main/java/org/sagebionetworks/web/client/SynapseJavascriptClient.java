@@ -15,6 +15,7 @@ import static org.apache.http.HttpStatus.SC_SERVICE_UNAVAILABLE;
 import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFuture;
+import static org.sagebionetworks.web.shared.WebConstants.AUTH_PUBLIC_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.CONTENT_TYPE;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
@@ -25,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.sagebionetworks.client.exceptions.SynapseTermsOfUseException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -48,7 +50,11 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.auth.LoginRequest;
+import org.sagebionetworks.repo.model.auth.LoginResponse;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -183,18 +189,17 @@ public class SynapseJavascriptClient {
 	public static final String ASYNC_GET = "/async/get/";
 	public static final String TABLE_QUERY = "/table/query";
 	
-	public String repoServiceUrl,fileServiceUrl, synapseVersionInfo; 
+	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	
 	@Inject
 	public SynapseJavascriptClient(
-			AuthenticationController authController,
 			JSONObjectAdapter jsonObjectAdapter,
 			ClientCache localStorage,
 			GWTWrapper gwt,
 			SynapseJavascriptFactory jsFactory,
 			PortalGinInjector ginInjector,
 			SynapseJSNIUtils jsniUtils) {
-		this.authController = authController;
+		this.authController = ginInjector.getAuthenticationController();
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.localStorage = localStorage;
 		this.gwt = gwt;
@@ -208,6 +213,14 @@ public class SynapseJavascriptClient {
 		}
 		return repoServiceUrl;
 	}
+	
+	private String getAuthServiceUrl() {
+		if (authServiceUrl == null) {
+			authServiceUrl = localStorage.get(AUTH_PUBLIC_SERVICE_URL_KEY);
+		}
+		return authServiceUrl;
+	}
+
 	
 	private String getFileServiceUrl() {
 		if (fileServiceUrl == null) {
@@ -526,6 +539,10 @@ public class SynapseJavascriptClient {
 		doGet(builder.toString(), OBJECT_TYPE.UserGroupHeaderResponsePage, callback);
 	}
 
+	public void getMyUserProfile(AsyncCallback<UserProfile> callback) {
+		getUserProfile(null, callback);
+	}
+	
 	public void getUserProfile(String userId, AsyncCallback<UserProfile> callback) {
 		String url = getRepoServiceUrl() + USER_PROFILE_PATH;
 		if (userId == null) {
@@ -894,6 +911,33 @@ public class SynapseJavascriptClient {
 	public void getTableQueryJobResults(String entityId, String jobId, AsyncCallback<AsynchronousResponseBody> callback) {
 		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + TABLE_QUERY + ASYNC_GET + jobId;
 		doGet(url, OBJECT_TYPE.QueryResultBundle, callback);
+	}
+	
+	public void login(LoginRequest loginRequest, AsyncCallback<LoginResponse> callback) {
+		String url = getAuthServiceUrl() + "/login";
+		doPost(url, loginRequest, OBJECT_TYPE.LoginResponse, callback);
+	}
+	
+	public void revalidate(String sessionToken, final AsyncCallback<Session> callback) {
+		String url = getAuthServiceUrl() + "/session";
+		final Session session = new Session();
+		session.setSessionToken(sessionToken);
+		session.setAcceptsTermsOfUse(true);
+		doPut(url, session, OBJECT_TYPE.None, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				if (caught instanceof ForbiddenException) {
+					session.setAcceptsTermsOfUse(false);
+					onSuccess(null);
+				} else {
+					callback.onFailure(caught);
+				}
+			}
+			@Override
+			public void onSuccess(Void result) {
+				callback.onSuccess(session);
+			}
+		});
 	}
 }
 
