@@ -343,9 +343,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testStart() {
-		verify(mockInjector, times(4)).getSynapseAlertWidget();
 		profilePresenter.setPlace(place);
-		verify(mockInjector, times(4)).getSynapseAlertWidget();
 		AcceptsOneWidget panel = mock(AcceptsOneWidget.class);
 		EventBus eventBus = mock(EventBus.class);		
 		
