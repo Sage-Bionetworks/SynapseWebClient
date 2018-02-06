@@ -108,6 +108,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			}
 			
 			theWidget = badge.asWidget();
+			theWidget.addStyleName("moveup-3");
 		} else {
 			//team
 			ClickHandler customClickHandler = null;
@@ -116,7 +117,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			}
 			TeamBadge badge = ginInjector.getTeamBadgeWidget();
 			badge.configure(id, customClickHandler);
-			badge.addStyleName("font-size-14");
+			badge.addStyleName("font-size-13");
 			theWidget = badge.asWidget();
 		}
 		theWidget.addStyleName("margin-left-2");

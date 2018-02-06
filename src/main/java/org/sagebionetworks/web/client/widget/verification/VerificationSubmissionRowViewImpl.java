@@ -150,16 +150,6 @@ public class VerificationSubmissionRowViewImpl implements VerificationSubmission
 	}
 
 	@Override
-	public void setWikiPage(Widget w) {
-		//Not used in this view implementation
-	}
-
-	@Override
-	public void setWikiPageVisible(boolean visible) {
-		//Not used in this view implementation
-	}
-
-	@Override
 	public void setTitle(String title) {
 		//Not used in this view implementation
 	}

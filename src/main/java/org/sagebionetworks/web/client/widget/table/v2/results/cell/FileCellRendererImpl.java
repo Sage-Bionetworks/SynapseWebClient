@@ -66,7 +66,11 @@ public class FileCellRendererImpl implements FileCellRenderer {
 					if(view.isAttached() && result != null){
 						view.setLoadingVisible(false);
 						if (result.getFileHandle() != null) {
-							view.setAnchor(result.getFileHandle().getFileName(), createAnchorHref());	
+							view.setAnchor(result.getFileHandle().getFileName(), createAnchorHref());
+							Long contentSize = result.getFileHandle().getContentSize();
+							if (contentSize != null) {
+								view.setTooltip(contentSize);	
+							}
 						} else if (result.getFailureCode() != null) {
 							//failed
 							view.setErrorText(UNABLE_TO_LOAD_FILE_DATA + ": " + result.getFailureCode().toString());

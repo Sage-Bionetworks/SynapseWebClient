@@ -11,7 +11,6 @@ import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -75,9 +74,9 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	Div synAlertContainer;
 	@UiField
 	Div promptModalContainer;
-	@UiField
-	Div wikiPageContainer;
 	
+	@UiField
+	Heading modalTitle;
 	@UiField
 	Alert reasonAlert;
 	@UiField
@@ -169,7 +168,7 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 		closeButton.setVisible(false);
 		reasonAlert.setVisible(false);
 		recreateSubmissionButton.setVisible(false);
-		dialog.setTitle("");
+		modalTitle.setText("");
 	}
 
 	@Override
@@ -195,19 +194,8 @@ public class VerificationSubmissionModalViewImpl implements VerificationSubmissi
 	}
 
 	@Override
-	public void setWikiPage(Widget w) {
-		wikiPageContainer.clear();
-		wikiPageContainer.add(w);
-	}
-
-	@Override
-	public void setWikiPageVisible(boolean visible) {
-		wikiPageContainer.setVisible(visible);
-	}
-
-	@Override
 	public void setTitle(String title) {
-		dialog.setTitle(title);
+		modalTitle.setText(title);
 	}
 
 	@Override

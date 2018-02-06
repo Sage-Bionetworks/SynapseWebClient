@@ -173,9 +173,7 @@ public class ProfilePresenterTest {
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
 	@Mock
-	PromptModalView mockPromptForProjectNameDialog;
-	@Mock
-	PromptModalView mockPromptForTeamNameDialog;
+	PromptModalView mockPromptModalView;
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
 	@Mock
@@ -195,22 +193,21 @@ public class ProfilePresenterTest {
 				mockSynapseClient, 
 				mockChallengeClient, 
 				mockCookies, 
-				mockUserProfileModalWidget, 
 				mockLinkedInServic, 
 				mockGwt, 
 				mockTeamListWidget, 
 				mockTeamInviteWidget, 
 				mockInjector, 
 				mockUserProfileClient,
-				mockVerificationSubmissionModal,
 				mockIsACTMemberAsyncHandler,
 				mockDateTimeUtils,
-				mockPromptForProjectNameDialog,
-				mockPromptForTeamNameDialog,
 				mockSynapseJavascriptClient
 				);
 		verify(mockView).setPresenter(profilePresenter);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		when(mockInjector.getPromptModal()).thenReturn(mockPromptModalView);
+		when(mockInjector.getUserProfileModalWidget()).thenReturn(mockUserProfileModalWidget);
+		when(mockInjector.getVerificationSubmissionWidget()).thenReturn(mockVerificationSubmissionModal);
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
 		when(mockInjector.getChallengeBadgeWidget()).thenReturn(mockChallengeBadge);
 		when(mockInjector.getSettingsPresenter()).thenReturn(mockSettingsPresenter);
@@ -816,7 +813,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testCreateProject() {
-		when(mockPromptForProjectNameDialog.getValue()).thenReturn("valid name");
+		when(mockPromptModalView.getValue()).thenReturn("valid name");
 		profilePresenter.createProjectAfterPrompt();
 		verify(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 		//inform user of success, and go to new project page
@@ -826,34 +823,34 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testCreateProjectEmptyName() {
-		when(mockPromptForProjectNameDialog.getValue()).thenReturn("");
+		when(mockPromptModalView.getValue()).thenReturn("");
 		profilePresenter.createProjectAfterPrompt();
 		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
-		verify(mockPromptForProjectNameDialog).showError(anyString());
-		Mockito.reset(mockPromptForProjectNameDialog);
+		verify(mockPromptModalView).showError(anyString());
+		Mockito.reset(mockPromptModalView);
 		
-		when(mockPromptForProjectNameDialog.getValue()).thenReturn(null);
+		when(mockPromptModalView.getValue()).thenReturn(null);
 		profilePresenter.createProjectAfterPrompt();
 		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
-		verify(mockPromptForProjectNameDialog).showError(anyString());
+		verify(mockPromptModalView).showError(anyString());
 	}
 
 	@Test
 	public void testCreateProjectError() {
-		when(mockPromptForProjectNameDialog.getValue()).thenReturn("valid name");
+		when(mockPromptModalView.getValue()).thenReturn("valid name");
 		profilePresenter.createProjectAfterPrompt();
 		String errorMessage = "unhandled";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 		profilePresenter.createProjectAfterPrompt();
-		verify(mockPromptForProjectNameDialog).showError(errorMessage);
+		verify(mockPromptModalView).showError(errorMessage);
 	}
 	
 	@Test
 	public void testCreateProjectNameConflictError() {
 		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
-		when(mockPromptForProjectNameDialog.getValue()).thenReturn("valid name");
+		when(mockPromptModalView.getValue()).thenReturn("valid name");
 		profilePresenter.createProjectAfterPrompt();
-		verify(mockPromptForProjectNameDialog).showError(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));
+		verify(mockPromptModalView).showError(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));
 	}
 	
 	// Project Sorting tests
@@ -903,7 +900,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testCreateTeam() {
-		when(mockPromptForTeamNameDialog.getValue()).thenReturn("valid name");
+		when(mockPromptModalView.getValue()).thenReturn("valid name");
 		profilePresenter.createTeamAfterPrompt();
 		verify(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
 		//inform user of success, and go to new team page
@@ -913,32 +910,32 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testCreateTeamEmptyName() {
-		when(mockPromptForTeamNameDialog.getValue()).thenReturn("");
+		when(mockPromptModalView.getValue()).thenReturn("");
 		profilePresenter.createTeamAfterPrompt();
 		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
-		verify(mockPromptForTeamNameDialog).showError(anyString());
-		Mockito.reset(mockPromptForTeamNameDialog);
-		when(mockPromptForTeamNameDialog.getValue()).thenReturn(null);
+		verify(mockPromptModalView).showError(anyString());
+		Mockito.reset(mockPromptModalView);
+		when(mockPromptModalView.getValue()).thenReturn(null);
 		profilePresenter.createTeamAfterPrompt();
 		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
-		verify(mockPromptForTeamNameDialog).showError(anyString());
+		verify(mockPromptModalView).showError(anyString());
 	}
 
 	@Test
 	public void testCreateTeamError() {
 		String errorMessage = "unhandled";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
-		when(mockPromptForTeamNameDialog.getValue()).thenReturn("valid name");
+		when(mockPromptModalView.getValue()).thenReturn("valid name");
 		profilePresenter.createTeamAfterPrompt();
-		verify(mockPromptForTeamNameDialog).showError(errorMessage);
+		verify(mockPromptModalView).showError(errorMessage);
 	}
 	
 	@Test
 	public void testCreateTeamNameConflictError() {
 		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
-		when(mockPromptForTeamNameDialog.getValue()).thenReturn("valid name");
+		when(mockPromptModalView.getValue()).thenReturn("valid name");
 		profilePresenter.createTeamAfterPrompt();
-		verify(mockPromptForTeamNameDialog).showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
+		verify(mockPromptModalView).showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 	}
 	
 	
