@@ -165,11 +165,11 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	@Override
 	public void loadMoreUserUpdateable() {
 		if (authenticationController.isLoggedIn()) {
-			synapseClient.getMyProjects(ProjectListType.MY_CREATED_PROJECTS, PROJECT_LIMIT, userUpdatableOffset, ProjectListSortColumn.PROJECT_NAME, SortDirection.ASC, new AsyncCallback<ProjectPagedResults>() {
+			jsClient.getMyProjects(ProjectListType.MY_CREATED_PROJECTS, PROJECT_LIMIT, userUpdatableOffset, ProjectListSortColumn.PROJECT_NAME, SortDirection.ASC, new AsyncCallback<List<ProjectHeader>>() {
 				@Override
-				public void onSuccess(ProjectPagedResults projectHeaders) {
+				public void onSuccess(List<ProjectHeader> projectHeaders) {
 					List<EntityHeader> headers = new ArrayList<EntityHeader>();
-					for (ProjectHeader result : projectHeaders.getResults()) {
+					for (ProjectHeader result : projectHeaders) {
 						EntityHeader h = new EntityHeader();
 						h.setType(Project.class.getName());
 						h.setId(result.getId());
@@ -178,7 +178,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 					};
 					view.addUpdatableEntities(headers);
 					userUpdatableOffset += PROJECT_LIMIT;
-					view.setIsMoreUpdatableEntities(userUpdatableOffset < projectHeaders.getTotalNumberOfResults());
+					view.setIsMoreUpdatableEntities(!projectHeaders.isEmpty());
 				}
 				@Override
 				public void onFailure(Throwable caught) {

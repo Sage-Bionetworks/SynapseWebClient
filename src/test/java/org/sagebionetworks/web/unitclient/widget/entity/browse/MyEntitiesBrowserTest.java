@@ -58,9 +58,8 @@ public class MyEntitiesBrowserTest {
 	EntityTreeBrowser mockCurrentContextTreeBrowser;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
-
+	List<ProjectHeader> entities;
 	String currentUserId = "100042";
-	ProjectPagedResults projects;
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
@@ -79,21 +78,18 @@ public class MyEntitiesBrowserTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
 		
-		List<ProjectHeader> entities = new ArrayList<ProjectHeader>();
-		projects = new ProjectPagedResults();
+		entities = new ArrayList<ProjectHeader>();
 		ProjectHeader projectHeader1 = new ProjectHeader();
 		projectHeader1.setId("syn1");
 		ProjectHeader projectHeader2 = new ProjectHeader();
 		projectHeader2.setId("syn2");
-		projects.setResults(entities);
-		projects.setTotalNumberOfResults(entities.size());
-		AsyncMockStubber.callSuccessWith(projects).when(mockSynapseClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entities).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testLoadUserUpdateable() {
 		widget.loadMoreUserUpdateable();
-		verify(mockSynapseClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		verify(mockView).addUpdatableEntities(anyList());
 		verify(mockView).setIsMoreUpdatableEntities(false);
 	}
@@ -102,7 +98,7 @@ public class MyEntitiesBrowserTest {
 	public void testLoadUserUpdateableWithMore() {
 		projects.setTotalNumberOfResults(MyEntitiesBrowser.PROJECT_LIMIT*2);
 		widget.loadMoreUserUpdateable();
-		verify(mockSynapseClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		verify(mockView).addUpdatableEntities(anyList());
 		verify(mockView).setIsMoreUpdatableEntities(true);
 	}
@@ -117,7 +113,7 @@ public class MyEntitiesBrowserTest {
 	@Test
 	public void testLoadUserUpdateableFailure() {
 		String errorMessage = "An error occurred.";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		widget.loadMoreUserUpdateable();
 		verify(mockView, never()).addUpdatableEntities(anyList());
 		verify(mockView).showErrorMessage(errorMessage);
@@ -164,7 +160,7 @@ public class MyEntitiesBrowserTest {
 		verify(mockEntityTreeBrowser).clear();
 		verify(mockView).setIsMoreUpdatableEntities(true);
 		assertEquals(MyEntitiesBrowser.ZERO_OFFSET, widget.getUserUpdatableOffset());
-		verify(mockSynapseClient, never()).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		
 		//test clearState() when context has changed
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("yet another different place"));

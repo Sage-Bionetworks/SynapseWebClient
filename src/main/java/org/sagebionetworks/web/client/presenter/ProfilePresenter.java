@@ -786,12 +786,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getMyProjects(ProjectListType projectListType, final ProjectFilterEnum filter, int offset) {
 		projectSynAlert.clear();
-		synapseClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
+		jsClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>() {
 			@Override
-			public void onSuccess(ProjectPagedResults projectHeaders) {
+			public void onSuccess(List<ProjectHeader> results) {
 				if (filterType == filter) {
-					addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
-					projectPageAdded(projectHeaders.getTotalNumberOfResults());
+					addProjectResults(results);
+					projectPageAdded(results.size());
 				}
 			}
 			@Override
@@ -807,7 +807,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
 				if (filterType == ProjectFilterEnum.TEAM) {
-					addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
+					addProjectResults(projectHeaders.getResults());
 					projectPageAdded(projectHeaders.getTotalNumberOfResults());
 				}
 			}
@@ -823,7 +823,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
 			@Override
 			public void onSuccess(ProjectPagedResults projectHeaders) {
-				addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
+				addProjectResults(projectHeaders.getResults());
 				projectPageAdded(projectHeaders.getTotalNumberOfResults());
 			}
 			@Override
@@ -833,11 +833,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void addProjectResults(List<ProjectHeader> projectHeaders, List<UserProfile> lastModifiedByList) {
+	public void addProjectResults(List<ProjectHeader> projectHeaders) {
 		for (int i = 0; i < projectHeaders.size(); i++) {
 			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
 			badge.addStyleName("margin-bottom-10 col-xs-12");
-			badge.configure(projectHeaders.get(i), lastModifiedByList == null ? null :lastModifiedByList.get(i));
+			badge.configure(projectHeaders.get(i));
 			Widget widget = badge.asWidget();
 			loadMoreProjectsWidgetContainer.add(widget);
 		}
@@ -858,9 +858,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	public void projectPageAdded(int totalNumberOfResults) {
+	public void projectPageAdded(int projectsAdded) {
 		currentProjectOffset += PROJECT_PAGE_SIZE;
-		loadMoreProjectsWidgetContainer.setIsMore(currentProjectOffset < totalNumberOfResults);
+		loadMoreProjectsWidgetContainer.setIsMore(projectsAdded > 0);
 	}
 	
 	public void challengePageAdded(Long totalNumberOfResults) {
@@ -887,7 +887,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							projectHeader.setName(header.getName());
 							headers.add(projectHeader);
 						}
-						addProjectResults(headers, null);
+						addProjectResults(headers);
 						loadMoreProjectsWidgetContainer.setIsMore(false);
 					}
 				}

@@ -26,7 +26,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import org.sagebionetworks.client.exceptions.SynapseTermsOfUseException;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -41,6 +40,9 @@ import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
+import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
+import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
@@ -50,7 +52,6 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
@@ -62,6 +63,7 @@ import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
+import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -84,6 +86,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -176,7 +179,8 @@ public class SynapseJavascriptClient {
 	public static final String INVITEE_VERIFICATION_SIGNED_TOKEN = "/inviteeVerificationSignedToken";
 	public static final String INVITEE_ID = "/inviteeId";
 	public static final String ICON = "/icon";
-
+	public static final String PROJECTS_URI_PATH = "/projects";
+	
 	public static final String OFFSET_PARAMETER = "offset=";
 	public static final String LIMIT_PARAMETER = "limit=";
 	private static final String NEXT_PAGE_TOKEN_PARAM = "nextPageToken=";
@@ -918,26 +922,29 @@ public class SynapseJavascriptClient {
 		doPost(url, loginRequest, OBJECT_TYPE.LoginResponse, callback);
 	}
 	
-	public void revalidate(String sessionToken, final AsyncCallback<Session> callback) {
-		String url = getAuthServiceUrl() + "/session";
-		final Session session = new Session();
-		session.setSessionToken(sessionToken);
-		session.setAcceptsTermsOfUse(true);
-		doPut(url, session, OBJECT_TYPE.None, new AsyncCallback<Void>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				if (caught instanceof ForbiddenException) {
-					session.setAcceptsTermsOfUse(false);
-					onSuccess(null);
-				} else {
-					callback.onFailure(caught);
-				}
-			}
-			@Override
-			public void onSuccess(Void result) {
-				callback.onSuccess(session);
-			}
-		});
+	public void getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
+		getProjects(projectListType, null, null, limit, offset, sortBy, sortDir, projectHeadersCallback);
+	}
+	
+	private void getProjects(ProjectListType projectListType, Long userId, Long teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
+		String url = getRepoServiceUrl() + PROJECTS_URI_PATH + '/' + projectListType.name();
+		if (userId != null) {
+			url += USER + '/' + userId;
+		}
+		if (teamId != null) {
+			url += TEAM + '/' + teamId;
+		}
+
+		if (sortBy == null) {
+			sortBy = ProjectListSortColumn.LAST_ACTIVITY;
+		}
+		if (sortDir == null) {
+			sortDir = SortDirection.DESC;
+		}
+
+		url += '?' + OFFSET_PARAMETER + offset + '&' + LIMIT_PARAMETER + limit + "&sort=" + sortBy.name() + "&sortDirection="
+				+ sortDir.name();
+		doGet(url, OBJECT_TYPE.PaginatedResultProjectHeader, projectHeadersCallback);
 	}
 }
 

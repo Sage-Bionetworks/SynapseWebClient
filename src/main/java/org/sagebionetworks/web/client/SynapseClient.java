@@ -307,7 +307,6 @@ public interface SynapseClient extends RemoteService{
 	 * @throws RestServiceException
 	 */
 	List<UploadDestination> getUploadDestinations(String parentEntityId) throws RestServiceException;
-	ProjectPagedResults getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException;
 	ProjectPagedResults getProjectsForTeam(String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException;
 	ProjectPagedResults getUserProjects(String userId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException;
 	
