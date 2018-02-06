@@ -860,7 +860,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void projectPageAdded(int projectsAdded) {
 		currentProjectOffset += PROJECT_PAGE_SIZE;
-		loadMoreProjectsWidgetContainer.setIsMore(projectsAdded > 0);
+		loadMoreProjectsWidgetContainer.setIsMore(projectsAdded >= PROJECT_PAGE_SIZE);
 	}
 	
 	public void challengePageAdded(Long totalNumberOfResults) {
