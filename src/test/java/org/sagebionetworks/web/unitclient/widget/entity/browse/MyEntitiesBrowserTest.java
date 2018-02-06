@@ -9,6 +9,7 @@ import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -38,7 +39,6 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
-import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -60,6 +60,7 @@ public class MyEntitiesBrowserTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	List<ProjectHeader> entities;
 	String currentUserId = "100042";
+	
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
@@ -83,6 +84,8 @@ public class MyEntitiesBrowserTest {
 		projectHeader1.setId("syn1");
 		ProjectHeader projectHeader2 = new ProjectHeader();
 		projectHeader2.setId("syn2");
+		entities.add(projectHeader1);
+		entities.add(projectHeader2);
 		AsyncMockStubber.callSuccessWith(entities).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 	}
 
@@ -91,18 +94,14 @@ public class MyEntitiesBrowserTest {
 		widget.loadMoreUserUpdateable();
 		verify(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		verify(mockView).addUpdatableEntities(anyList());
+		verify(mockView).setIsMoreUpdatableEntities(true);
+		
+		entities.clear();
+		widget.loadMoreUserUpdateable();
+		verify(mockSynapseJavascriptClient, times(2)).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		verify(mockView).setIsMoreUpdatableEntities(false);
 	}
-	
-	@Test
-	public void testLoadUserUpdateableWithMore() {
-		projects.setTotalNumberOfResults(MyEntitiesBrowser.PROJECT_LIMIT*2);
-		widget.loadMoreUserUpdateable();
-		verify(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
-		verify(mockView).addUpdatableEntities(anyList());
-		verify(mockView).setIsMoreUpdatableEntities(true);
-	}
-	
+		
 	@Test
 	public void testLoadUserUpdateableAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
