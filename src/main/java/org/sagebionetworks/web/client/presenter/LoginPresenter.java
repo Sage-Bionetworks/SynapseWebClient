@@ -123,7 +123,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		} else if (LoginPlace.CHANGE_USERNAME.equals(token) && authenticationController.isLoggedIn()) {
 			//go to the change username page
 			gotoChangeUsernamePlace();
-		} else if (LoginPlace.SHOW_TOU.equals(token) && authenticationController.getCurrentUserSessionData() != null) {
+		} else if (LoginPlace.SHOW_TOU.equals(token) && authenticationController.isLoggedIn()) {
 			if (!authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
 				showTermsOfUse(getAcceptTermsOfUseCallback());	
 			} else {

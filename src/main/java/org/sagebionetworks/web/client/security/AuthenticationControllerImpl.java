@@ -23,11 +23,10 @@ import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Down;
-import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -44,9 +43,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public static final String USER_SESSION_DATA_CACHE_KEY = "org.sagebionetworks.UserSessionData";
 	public static final String USER_AUTHENTICATION_RECEIPT = "_authentication_receipt";
 	private static final String AUTHENTICATION_MESSAGE = "Invalid usename or password.";
-	
-	private static Session currentSession;
-	private static UserProfile currentUserProfile;
+	private static UserSessionData currentUser;
 	private CookieProvider cookies;
 	private UserAccountServiceAsync userAccountService;	
 	private SessionStorage sessionStorage;
@@ -119,8 +116,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		localStorage.clear();
 		initSynapsePropertiesFromServer();
 		sessionStorage.clear();
-		currentSession = null;
-		currentUserProfile = null;
+		currentUser = null;
 		ginInjector.getSessionTokenDetector().initializeSessionTokenState();
 	}
 
@@ -160,11 +156,13 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			@Override
 			public void onSuccess(final Session session) {
 				// session token is valid
-				if (currentSession == null) {
+				Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
+				cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
+				cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, token, tomorrow);
+				if (currentUser == null) {
 					setSession(session, callback);
 				} else {
-					updateUserSessionData(currentSession, currentUserProfile);
-					callback.onSuccess(getCurrentUserSessionData());
+					setUserSessionData(currentUser, callback);
 				}
 			}
 		});
@@ -172,37 +170,29 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	
 	private void setSession(Session session, final AsyncCallback<UserSessionData> callback) {
 		// get user profile and then set user session data
-		updateUserSessionData(session, null);
-		if (!currentSession.getAcceptsTermsOfUse()) {
-			callback.onSuccess(getCurrentUserSessionData());
-		} else {
-			ginInjector.getSynapseJavascriptClient().getMyUserProfile(new AsyncCallback<UserProfile>() {
-				@Override
-				public void onSuccess(UserProfile userProfile) {
-					// session token is valid, and now we have a user profile
-					updateUserSessionData(session, userProfile);
-					callback.onSuccess(getCurrentUserSessionData());
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					callback.onFailure(caught);
-				}
-			});	
-		}
+		ginInjector.getSynapseJavascriptClient().getMyUserProfile(new AsyncCallback<UserProfile>() {
+			@Override
+			public void onSuccess(UserProfile userProfile) {
+				// session token is valid, and now we have a user profile
+				UserSessionData usd = new UserSessionData();
+				usd.setProfile(userProfile);
+				usd.setSession(session);
+				setUserSessionData(usd, callback);
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				callback.onFailure(caught);
+			}
+		});
 	}
-	
-	private void updateUserSessionData(Session session, UserProfile profile) {
+	private void setUserSessionData(UserSessionData userSessionData, AsyncCallback<UserSessionData> callback) {
 		Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
-		currentSession = session;
-		currentUserProfile = profile;
-		
-		UserSessionData usd = getCurrentUserSessionData();
-		cookies.setCookie(CookieKeys.USER_LOGGED_IN_RECENTLY, "true", DateTimeUtilsImpl.getWeekFromNow());
-		cookies.setCookie(CookieKeys.USER_LOGIN_TOKEN, session.getSessionToken(), tomorrow);
-		localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(usd), tomorrow.getTime());
+		currentUser = userSessionData;
+		localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
 		ginInjector.getSessionTokenDetector().initializeSessionTokenState();
+		callback.onSuccess(currentUser);
 	}
-	
+
 	public String getUserSessionDataString(UserSessionData session) {
 		JSONObjectAdapter adapter = adapterFactory.createNew();
 		try {
@@ -224,8 +214,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	
 	@Override
 	public void updateCachedProfile(UserProfile updatedProfile){
-		if(isLoggedIn()) {
-			updateUserSessionData(currentSession, updatedProfile);
+		if(currentUser != null) {
+			currentUser.setProfile(updatedProfile);
+			Date tomorrow = DateTimeUtilsImpl.getDayFromNow();
+			localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
 		}
 	}
 	
@@ -237,13 +229,16 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	@Override
 	public boolean isLoggedIn() {
 		String token = cookies.getCookie(CookieKeys.USER_LOGIN_TOKEN);
-		return token != null && !token.isEmpty() && currentSession != null;
+		return token != null && !token.isEmpty() && currentUser != null;
 	}
 
 	@Override
 	public String getCurrentUserPrincipalId() {
-		if(currentUserProfile != null) {
-			return currentUserProfile.getOwnerId();						
+		if(currentUser != null) {
+			UserProfile profileObj = currentUser.getProfile();
+			if(profileObj != null && profileObj.getOwnerId() != null) {							
+				return profileObj.getOwnerId();						
+			}
 		} 
 		return null;
 	}
@@ -256,9 +251,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			// load user session data from session storage
 			String sessionStorageString = localStorage.get(USER_SESSION_DATA_CACHE_KEY);
 			if (sessionStorageString != null) {
-				UserSessionData usd = getUserSessionData(sessionStorageString);
-				currentSession = usd.getSession();
-				currentUserProfile = usd.getProfile();
+				currentUser = getUserSessionData(sessionStorageString);
 			} else {
 				logoutUser();
 			}
@@ -267,18 +260,15 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public UserSessionData getCurrentUserSessionData() {
-		if (currentSession != null) {
-			UserSessionData usd = new UserSessionData();
-			usd.setProfile(currentUserProfile);
-			usd.setSession(currentSession);
-			return usd;
+		if (isLoggedIn()) {
+			return currentUser;
 		} else
 			return null;
 	}
 
 	@Override
 	public String getCurrentUserSessionToken() {
-		if(currentSession != null) return currentSession.getSessionToken();
+		if(currentUser != null) return currentUser.getSession().getSessionToken();
 		else return null;
 	}
 	
