@@ -163,10 +163,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
 			view.addSortOption(sort);
 		}
-		
+		profileSynAlert = ginInjector.getSynapseAlertWidget();
+		projectSynAlert = ginInjector.getSynapseAlertWidget();
+		teamSynAlert = ginInjector.getSynapseAlertWidget();
+		challengeSynAlert = ginInjector.getSynapseAlertWidget();
 		view.setPresenter(this);
 		view.addOpenInvitesWidget(openInvitesWidget);
-		
+		view.setProfileSynAlertWidget(profileSynAlert.asWidget());
+		view.setProjectSynAlertWidget(projectSynAlert.asWidget());
+		view.setTeamSynAlertWidget(teamSynAlert.asWidget());
+		view.setChallengeSynAlertWidget(challengeSynAlert.asWidget());
 		resubmitVerificationCallback = () -> {
 			newVerificationSubmissionClicked();
 		};
@@ -181,38 +187,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		refreshTeamsCallback = () -> {
 			refreshTeamsForFilter();
 		};
-	}
-	
-	private SynapseAlert getProfileSynAlert() {
-		if (profileSynAlert == null) {
-			profileSynAlert = ginInjector.getSynapseAlertWidget();
-			view.setProfileSynAlertWidget(profileSynAlert.asWidget());
-		}
-		return profileSynAlert;
-	}
-	
-	private SynapseAlert getProjectSynAlert() {
-		if (projectSynAlert == null) {
-			projectSynAlert = ginInjector.getSynapseAlertWidget();
-			view.setProjectSynAlertWidget(projectSynAlert.asWidget());
-		}
-		return projectSynAlert;
-	}
-	
-	private SynapseAlert getTeamSynAlert() {
-		if (teamSynAlert == null) {
-			teamSynAlert = ginInjector.getSynapseAlertWidget();
-			view.setTeamSynAlertWidget(teamSynAlert.asWidget());
-		}
-		return teamSynAlert;
-	}
-	
-	private SynapseAlert getChallengeSynAlert() {
-		if (challengeSynAlert == null) {
-			challengeSynAlert = ginInjector.getSynapseAlertWidget();
-			view.setTeamSynAlertWidget(challengeSynAlert.asWidget());
-		}
-		return challengeSynAlert;
 	}
 	
 	public VerificationSubmissionWidget getVerificationSubmissionWidget() {
@@ -289,9 +263,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		if (teamSynAlert != null) {
 			teamSynAlert.clear();	
-		}
-		if (challengeSynAlert != null) {
-			challengeSynAlert.clear();
 		}
 	}
 	
@@ -400,7 +371,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				view.hideLoading();
-				getProfileSynAlert().handleException(caught);
+				profileSynAlert.handleException(caught);
 			}
 		});
 	}
@@ -425,7 +396,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				getProfileSynAlert().handleException(caught);
+				profileSynAlert.handleException(caught);
 			}
 		});	
 	}
@@ -675,7 +646,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			jsClient.getOpenMembershipRequestCount(new AsyncCallback<Long>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					getTeamSynAlert().handleException(caught);
+					teamSynAlert.handleException(caught);
 				}
 				
 				@Override
@@ -692,7 +663,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			jsClient.getOpenMembershipInvitationCount(new AsyncCallback<Long>() {
 				@Override
 				public void onFailure(Throwable caught) {
-					getTeamSynAlert().handleException(caught);
+					teamSynAlert.handleException(caught);
 				}
 				
 				@Override
@@ -705,7 +676,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getTeamBundles(boolean includeRequestCount) {
 		this.includeRequestCount = includeRequestCount;
-		resetSynAlertWidgets();
+		teamSynAlert.clear();
 		myTeamsWidget.clear();
 		teamNextPageToken = null;
 		
@@ -743,7 +714,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					public void onFailure(Throwable caught) {
 						view.setTeamsFilterVisible(false);
 						loadMoreTeamsWidgetContainer.setIsMore(false);
-						getTeamSynAlert().handleException(caught);
+						teamSynAlert.handleException(caught);
 					}
 				},
 				directExecutor()
@@ -782,7 +753,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					public void onFailure(Throwable caught) {
 						view.setTeamsFilterVisible(false);
 						loadMoreTeamsWidgetContainer.setIsMore(false);
-						getTeamSynAlert().handleException(caught);
+						teamSynAlert.handleException(caught);
 					}
 				},
 				directExecutor()
@@ -802,7 +773,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getMoreChallenges() {
-		resetSynAlertWidgets();
+		challengeSynAlert.clear();
 		view.showChallengesLoading(true);
 		challengeClient.getChallenges(currentUserId, CHALLENGE_PAGE_SIZE, currentChallengeOffset, new AsyncCallback<ChallengePagedResults>() {
 			@Override
@@ -813,13 +784,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	            @Override
 			public void onFailure(Throwable caught) {
 				view.showChallengesLoading(false);
-				getChallengeSynAlert().handleException(caught);
+				challengeSynAlert.handleException(caught);
 			}
 		});
 	}
 	
 	public void getMyProjects(ProjectListType projectListType, final ProjectFilterEnum filter, int offset) {
-		resetSynAlertWidgets();
+		projectSynAlert.clear();
 		jsClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>() {
 			@Override
 			public void onSuccess(List<ProjectHeader> results) {
@@ -830,13 +801,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				getProjectSynAlert().handleException(caught);
+				projectSynAlert.handleException(caught);
 			}
 		});
 	}
 	
 	public void getTeamProjects(int offset) {
-		resetSynAlertWidgets();
+		projectSynAlert.clear();
 		jsClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>(){
 			@Override
 			public void onSuccess(List<ProjectHeader> results) {
@@ -847,13 +818,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				getProjectSynAlert().handleException(caught);
+				projectSynAlert.handleException(caught);
 			}
 		});
 	}
 
 	public void getUserProjects(int offset) {
-		resetSynAlertWidgets();
+		projectSynAlert.clear();
 		jsClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>() {
 			@Override
 			public void onSuccess(List<ProjectHeader> results) {
@@ -862,7 +833,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				getProjectSynAlert().handleException(caught);
+				projectSynAlert.handleException(caught);
 			}
 		});
 	}
@@ -903,7 +874,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getFavorites() {
-		resetSynAlertWidgets();
+		projectSynAlert.clear();
 		EntityBrowserUtils.loadFavorites(jsClient, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
@@ -928,7 +899,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				getProjectSynAlert().handleException(caught);
+				projectSynAlert.handleException(caught);
 			}
 		});
 	}
@@ -1026,7 +997,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void showView(Profile place) {
 		view.clear();
-		resetSynAlertWidgets();
+		profileSynAlert.clear();
+		projectSynAlert.clear();
+		teamSynAlert.clear();
 		String token = place.toToken();
 		currentArea = place.getArea();
 		filterType = place.getProjectFilter();
@@ -1108,7 +1081,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				getProfileSynAlert().handleException(caught);
+				profileSynAlert.handleException(caught);
 			}
 		});
 	}
@@ -1323,7 +1296,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void redirectToLinkedIn() {
-		resetSynAlertWidgets();
+		profileSynAlert.clear();
 		linkedInService.returnAuthUrl(gwt.getHostPageBaseURL(), new AsyncCallback<LinkedInInfo>() {
 			@Override
 			public void onSuccess(LinkedInInfo result) {
@@ -1336,7 +1309,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				getProfileSynAlert().handleException(caught);
+				profileSynAlert.handleException(caught);
 			}
 		});
 	}
@@ -1347,7 +1320,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void updateProfileWithLinkedIn(String requestToken, String verifier) {
 		// Grab the requestToken secret from the cookie. If it's expired, show an error message.
 		// If not, grab the user's info for an update.
-		resetSynAlertWidgets();
+		profileSynAlert.clear();
 		view.showLoading();
 		String secret = cookies.getCookie(CookieKeys.LINKEDIN);
 		if(secret == null || secret.equals("")) {
@@ -1367,7 +1340,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				
 				@Override
 				public void onFailure(Throwable caught) {
-					getProfileSynAlert().handleException(caught);								
+					profileSynAlert.handleException(caught);								
 				}
 			});
 		}
