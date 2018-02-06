@@ -926,7 +926,15 @@ public class SynapseJavascriptClient {
 		getProjects(projectListType, null, null, limit, offset, sortBy, sortDir, projectHeadersCallback);
 	}
 	
-	private void getProjects(ProjectListType projectListType, Long userId, Long teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
+	public void getProjectsForTeam(String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
+		getProjects(ProjectListType.TEAM_PROJECTS, null, teamId, limit, offset, sortBy, sortDir, projectHeadersCallback);
+	}
+	
+	public void getUserProjects(String userId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
+		getProjects(ProjectListType.OTHER_USER_PROJECTS, userId, null, limit, offset, sortBy, sortDir, projectHeadersCallback);
+	}
+	
+	private void getProjects(ProjectListType projectListType, String userId, String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
 		String url = getRepoServiceUrl() + PROJECTS_URI_PATH + '/' + projectListType.name();
 		if (userId != null) {
 			url += USER + '/' + userId;

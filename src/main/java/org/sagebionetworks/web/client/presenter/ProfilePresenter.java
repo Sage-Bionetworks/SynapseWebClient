@@ -56,7 +56,6 @@ import org.sagebionetworks.web.client.widget.verification.VerificationSubmission
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.LinkedInInfo;
-import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -803,12 +802,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getTeamProjects(int offset) {
 		projectSynAlert.clear();
-		synapseClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir,  new AsyncCallback<ProjectPagedResults>() {
+		jsClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>(){
 			@Override
-			public void onSuccess(ProjectPagedResults projectHeaders) {
+			public void onSuccess(List<ProjectHeader> results) {
 				if (filterType == ProjectFilterEnum.TEAM) {
-					addProjectResults(projectHeaders.getResults());
-					projectPageAdded(projectHeaders.getTotalNumberOfResults());
+					addProjectResults(results);
+					projectPageAdded(results.size());
 				}
 			}
 			@Override
@@ -820,11 +819,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	public void getUserProjects(int offset) {
 		projectSynAlert.clear();
-		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
+		jsClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>() {
 			@Override
-			public void onSuccess(ProjectPagedResults projectHeaders) {
-				addProjectResults(projectHeaders.getResults());
-				projectPageAdded(projectHeaders.getTotalNumberOfResults());
+			public void onSuccess(List<ProjectHeader> results) {
+				addProjectResults(results);
+				projectPageAdded(results.size());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
