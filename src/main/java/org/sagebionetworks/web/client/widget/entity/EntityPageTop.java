@@ -48,7 +48,6 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -81,14 +80,13 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	// how many tabs have been marked as visible
 	private int visibleTabCount;
 
+	private EntityActionController projectActionController;
 	private ActionMenuWidget projectActionMenu;
 	private EntityActionController entityActionController;
 	private ActionMenuWidget entityActionMenu;
 	private PlaceChanger placeChanger;
 	private CookieProvider cookies;
 	public boolean pushTabUrlToBrowserHistory = false;
-	// delay configuration of tools menu until it's clicked
-	ClickHandler entityBundleDropDownClickHandler, tablesTabDropDownClickHandler, discussionTabDropDownClickHandler, wikiTabDropDownClickHandler;
 	
 	@Inject
 	public EntityPageTop(EntityPageTopView view, 
@@ -118,6 +116,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		this.discussionTab = discussionTab;
 		this.dockerTab = dockerTab;
 		this.projectMetadata = projectMetadata;
+		this.projectActionController = projectActionController;
 		this.projectActionMenu = projectActionMenu;
 		this.entityActionController = entityActionController;
 		this.entityActionMenu = entityActionMenu;
@@ -137,13 +136,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		view.setEntityActionMenu(entityActionMenu.asWidget());
 		
 		projectMetadata.setAnnotationsTitleText("Project Annotations");
-		
-		projectActionMenu.setDropdownClickHandler(event -> {
-			if (projectBundle != null) {
-				String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
-				projectActionController.configure(projectActionMenu, projectBundle, true, wikiId, null, entityUpdateHandler);
-			}
-		});
 	}
 
 	public CallbackP<String> getEntitySelectedCallback(final EntityArea newArea) {
@@ -503,6 +495,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			}
 			break;
 		default:
+		}
+
+		if (projectBundle != null) {
+			String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
+			projectActionController.configure(projectActionMenu, projectBundle, true, wikiId, null, entityUpdateHandler);
 		}
 
 		// set all content stale

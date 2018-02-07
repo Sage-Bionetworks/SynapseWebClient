@@ -11,7 +11,6 @@ import org.gwtbootstrap3.client.ui.DropDownHeader;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.ComplexPanel;
@@ -42,15 +41,10 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@UiField
 	DropDownHeader actHeader;
 	Presenter presenter;
-	ClickHandler dropdownClickHandler;
+	
 	@Inject
 	public ActionMenuWidgetViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
-		toolsMenu.addClickHandler(event -> {
-			if (dropdownClickHandler != null) {
-				dropdownClickHandler.onClick(event);
-			}
-		});
 	}
 	
 	@Override
@@ -108,10 +102,5 @@ public class ActionMenuWidgetViewImpl implements ActionMenuWidgetView {
 	@Override
 	public void setNoActionsAvailableVisible(boolean visible) {
 		noActionsAvailable.setVisible(visible);
-	}
-	
-	@Override
-	public void setDropdownClickHandler(ClickHandler handler) {
-		dropdownClickHandler = handler;
 	}
 }

@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.menu.v2;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 /**
  * Abstraction for an ActionMenu widget that knows nothing about the actions it maintains.
@@ -79,5 +78,5 @@ public interface ActionMenuWidget extends IsWidget {
 	public void addControllerWidget(IsWidget controllerWidget);
 
 	void setACTDividerVisible(boolean visible);
-	void setDropdownClickHandler(ClickHandler handler);
+
 }

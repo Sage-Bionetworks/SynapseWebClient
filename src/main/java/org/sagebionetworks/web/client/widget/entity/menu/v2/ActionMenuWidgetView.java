@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.menu.v2;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 
 /**
@@ -33,7 +32,6 @@ public interface ActionMenuWidgetView extends IsWidget {
 
 	void setACTDividerVisible(boolean visible);
 	void setNoActionsAvailableVisible(boolean visible);
-	void setDropdownClickHandler(ClickHandler handler);
 	void setPresenter(Presenter p);
 	public interface Presenter {
 	}
