@@ -68,14 +68,14 @@ public class NewDiscussionThreadModalTest {
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setModalTitle(anyString());
 		verify(mockView).setMarkdownEditor(any(Widget.class));
-		verify(mockMarkdownEditor).hideUploadRelatedCommands();
-		verify(mockMarkdownEditor).showExternalImageButton();
 	}
 
 	@Test
 	public void testShowDialog() {
 		modal.show();
 		verify(mockView).clear();
+		verify(mockMarkdownEditor).hideUploadRelatedCommands();
+		verify(mockMarkdownEditor).showExternalImageButton();
 		verify(mockMarkdownEditor).configure(DEFAULT_MARKDOWN);
 		verify(mockView).showDialog();
 	}
