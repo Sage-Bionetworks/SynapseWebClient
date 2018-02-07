@@ -56,7 +56,6 @@ import org.sagebionetworks.web.client.widget.verification.VerificationSubmission
 import org.sagebionetworks.web.shared.ChallengeBundle;
 import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.LinkedInInfo;
-import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.common.util.concurrent.FutureCallback;
@@ -257,8 +256,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private void resetSynAlertWidgets() {
 		profileSynAlert.clear();
-		projectSynAlert.clear();
-		teamSynAlert.clear();
+		projectSynAlert.clear();	
+		teamSynAlert.clear();	
 	}
 	
 	@Override
@@ -786,12 +785,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getMyProjects(ProjectListType projectListType, final ProjectFilterEnum filter, int offset) {
 		projectSynAlert.clear();
-		synapseClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
+		jsClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>() {
 			@Override
-			public void onSuccess(ProjectPagedResults projectHeaders) {
+			public void onSuccess(List<ProjectHeader> results) {
 				if (filterType == filter) {
-					addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
-					projectPageAdded(projectHeaders.getTotalNumberOfResults());
+					addProjectResults(results);
+					projectPageAdded(results.size());
 				}
 			}
 			@Override
@@ -803,12 +802,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getTeamProjects(int offset) {
 		projectSynAlert.clear();
-		synapseClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir,  new AsyncCallback<ProjectPagedResults>() {
+		jsClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>(){
 			@Override
-			public void onSuccess(ProjectPagedResults projectHeaders) {
+			public void onSuccess(List<ProjectHeader> results) {
 				if (filterType == ProjectFilterEnum.TEAM) {
-					addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
-					projectPageAdded(projectHeaders.getTotalNumberOfResults());
+					addProjectResults(results);
+					projectPageAdded(results.size());
 				}
 			}
 			@Override
@@ -820,11 +819,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	public void getUserProjects(int offset) {
 		projectSynAlert.clear();
-		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
+		jsClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>() {
 			@Override
-			public void onSuccess(ProjectPagedResults projectHeaders) {
-				addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
-				projectPageAdded(projectHeaders.getTotalNumberOfResults());
+			public void onSuccess(List<ProjectHeader> results) {
+				addProjectResults(results);
+				projectPageAdded(results.size());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -833,11 +832,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void addProjectResults(List<ProjectHeader> projectHeaders, List<UserProfile> lastModifiedByList) {
+	public void addProjectResults(List<ProjectHeader> projectHeaders) {
 		for (int i = 0; i < projectHeaders.size(); i++) {
 			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
 			badge.addStyleName("margin-bottom-10 col-xs-12");
-			badge.configure(projectHeaders.get(i), lastModifiedByList == null ? null :lastModifiedByList.get(i));
+			badge.configure(projectHeaders.get(i));
 			Widget widget = badge.asWidget();
 			loadMoreProjectsWidgetContainer.add(widget);
 		}
@@ -858,9 +857,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	public void projectPageAdded(int totalNumberOfResults) {
+	public void projectPageAdded(int projectsAdded) {
 		currentProjectOffset += PROJECT_PAGE_SIZE;
-		loadMoreProjectsWidgetContainer.setIsMore(currentProjectOffset < totalNumberOfResults);
+		loadMoreProjectsWidgetContainer.setIsMore(projectsAdded >= PROJECT_PAGE_SIZE);
 	}
 	
 	public void challengePageAdded(Long totalNumberOfResults) {
@@ -887,7 +886,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							projectHeader.setName(header.getName());
 							headers.add(projectHeader);
 						}
-						addProjectResults(headers, null);
+						addProjectResults(headers);
 						loadMoreProjectsWidgetContainer.setIsMore(false);
 					}
 				}

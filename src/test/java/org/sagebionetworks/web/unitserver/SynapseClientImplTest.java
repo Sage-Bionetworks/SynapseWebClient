@@ -1662,46 +1662,6 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testGetMyProjects() throws Exception {
-		int limit = 11;
-		int offset = 20;
-		ProjectPagedResults results = synapseClient.getMyProjects(ProjectListType.MY_PROJECTS, limit, offset,
-				ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC);
-		verify(mockSynapse).getMyProjects(eq(ProjectListType.MY_PROJECTS),
-				eq(ProjectListSortColumn.LAST_ACTIVITY),
-				eq(SortDirection.DESC), eq(limit), eq(offset));
-		verify(mockSynapse).listUserProfiles(anyList());
-	}
-
-	@Test
-	public void testGetUserProjects() throws Exception {
-		int limit = 11;
-		int offset = 20;
-		Long userId = 133l;
-		String userIdString = userId.toString();
-		synapseClient.getUserProjects(userIdString, limit, offset,
-				ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC);
-		verify(mockSynapse).getProjectsFromUser(eq(userId),
-				eq(ProjectListSortColumn.LAST_ACTIVITY),
-				eq(SortDirection.DESC), eq(limit), eq(offset));
-		verify(mockSynapse).listUserProfiles(anyList());
-	}
-
-	@Test
-	public void testGetProjectsForTeam() throws Exception {
-		int limit = 13;
-		int offset = 40;
-		Long teamId = 144l;
-		String teamIdString = teamId.toString();
-		synapseClient.getProjectsForTeam(teamIdString, limit, offset,
-				ProjectListSortColumn.LAST_ACTIVITY, SortDirection.DESC);
-		verify(mockSynapse).getProjectsForTeam(eq(teamId),
-				eq(ProjectListSortColumn.LAST_ACTIVITY),
-				eq(SortDirection.DESC), eq(limit), eq(offset));
-		verify(mockSynapse).listUserProfiles(anyList());
-	}
-
-	@Test
 	public void testSafeLongToInt() {
 		int inRangeInt = 500;
 		int after = SynapseClientImpl.safeLongToInt(inRangeInt);

@@ -30,7 +30,7 @@ public class EntityActionControllerViewImpl implements
 	public interface Binder extends
 			UiBinder<Widget, EntityActionControllerViewImpl> {
 	}
-
+	Binder binder;
 	@UiField
 	Modal infoDialog;
 	@UiField
@@ -45,20 +45,28 @@ public class EntityActionControllerViewImpl implements
 	Div wikiHeaderTreeContainer;
 	@UiField
 	Button deleteWikiButton;
-	Widget widget;
+	Span widget = new Span();
 	Presenter presenter;
+	Widget viewWidget = null;
 	@Inject
 	public EntityActionControllerViewImpl(Binder binder){
-		widget = binder.createAndBindUi(this);
-		deleteWikiButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				deleteWikiDialog.hide();
-				presenter.onConfirmDeleteWiki();	
-			}
-		});
+		this.binder = binder;
 	}
 
+	private void lazyConstruct() {
+		if (viewWidget == null) {
+			viewWidget = binder.createAndBindUi(this);
+			widget.add(viewWidget);
+			deleteWikiButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					deleteWikiDialog.hide();
+					presenter.onConfirmDeleteWiki();	
+				}
+			});
+		}
+	}
+	
 	@Override
 	public void setPresenter(Presenter p) {
 		presenter = p;
@@ -90,6 +98,7 @@ public class EntityActionControllerViewImpl implements
 	
 	@Override
 	public void showInfoDialog(String header, String message) {
+		lazyConstruct();
 		infoDialog.setTitle(header);
 		infoDialogText.setText(message);
 		infoDialog.show();
@@ -97,10 +106,12 @@ public class EntityActionControllerViewImpl implements
 
 	@Override
 	public void addWidget(IsWidget w) {
+		lazyConstruct();
 		extraWidgetsContainer.add(w);
 	}
 	@Override
 	public void showDeleteWikiModal(String wikiPageId, Map<String, V2WikiHeader> id2HeaderMap, Map<String, List<V2WikiHeader>> id2ChildrenMap) {
+		lazyConstruct();
 		//create wiki header tree (using unordered lists)
 		wikiHeaderTreeContainer.clear();
 		wikiPageTitle.setText(id2HeaderMap.get(wikiPageId).getTitle());

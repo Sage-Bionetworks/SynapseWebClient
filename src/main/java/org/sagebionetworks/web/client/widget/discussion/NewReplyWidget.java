@@ -55,8 +55,6 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
 		this.storage = sessionStorage;
-		markdownEditor.hideUploadRelatedCommands();
-		markdownEditor.showExternalImageButton();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setMarkdownEditor(markdownEditor.asWidget());
@@ -87,6 +85,8 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	}
 	
 	private void checkForSavedReply() {
+		markdownEditor.hideUploadRelatedCommands();
+		markdownEditor.showExternalImageButton();
 		if (storage.getItem(key) == null) {
 			markdownEditor.configure(DEFAULT_MARKDOWN);			
 		} else {

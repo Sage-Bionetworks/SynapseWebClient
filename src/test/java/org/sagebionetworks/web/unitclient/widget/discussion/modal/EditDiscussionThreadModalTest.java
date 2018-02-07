@@ -56,8 +56,6 @@ public class EditDiscussionThreadModalTest {
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setModalTitle(anyString());
 		verify(mockView).setMarkdownEditor(any(Widget.class));
-		verify(mockMarkdownEditor).hideUploadRelatedCommands();
-		verify(mockMarkdownEditor).showExternalImageButton();
 	}
 
 	@Test
@@ -66,6 +64,8 @@ public class EditDiscussionThreadModalTest {
 		verify(mockView).clear();
 		verify(mockView).setThreadTitle(title);
 		verify(mockMarkdownEditor).configure(message);
+		verify(mockMarkdownEditor).hideUploadRelatedCommands();
+		verify(mockMarkdownEditor).showExternalImageButton();
 		verify(mockView).showDialog();
 	}
 

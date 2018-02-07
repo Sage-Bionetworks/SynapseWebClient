@@ -78,11 +78,6 @@ public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
 	}
 	
 	public void setVisible(boolean visible) {
-		spinnerContainer.clear();
-		if (visible) {
-			lazyConstruct();
-		} 
-		
 		spinnerContainer.setVisible(visible);
 	}
 	
