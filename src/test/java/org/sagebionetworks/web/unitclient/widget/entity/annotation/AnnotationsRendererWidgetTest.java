@@ -9,12 +9,15 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
@@ -31,20 +34,25 @@ import com.google.gwt.user.client.ui.Widget;
 public class AnnotationsRendererWidgetTest {
 	
 	AnnotationsRendererWidget widget;
-	
+	@Mock
 	AnnotationsRendererWidgetView mockView;
+	@Mock
 	AnnotationTransformer mockAnnotationTransformer;
+	@Mock
 	EditAnnotationsDialog mockEditAnnotationsDialog;
+	@Mock
 	EntityBundle mockBundle;
 	List<Annotation> annotationList;
+	@Mock
 	PreflightController mockPreflightController;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
+	
 	@Before
 	public void setUp() throws Exception {
-		mockEditAnnotationsDialog = mock(EditAnnotationsDialog.class);
-		mockView = mock(AnnotationsRendererWidgetView.class);
-		mockAnnotationTransformer = mock(AnnotationTransformer.class);
-		mockPreflightController = mock(PreflightController.class);
-		widget = new AnnotationsRendererWidget(mockView, mockAnnotationTransformer, mockEditAnnotationsDialog, mockPreflightController);
+		MockitoAnnotations.initMocks(this);
+		when(mockPortalGinInjector.getEditAnnotationsDialog()).thenReturn(mockEditAnnotationsDialog);
+		widget = new AnnotationsRendererWidget(mockView, mockAnnotationTransformer, mockPreflightController, mockPortalGinInjector);
 		mockBundle = mock(EntityBundle.class);
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, "key", Collections.EMPTY_LIST));
@@ -55,7 +63,6 @@ public class AnnotationsRendererWidgetTest {
 	public void testConfigureEmptyAnnotations() {
 		//also verify construction
 		verify(mockView).setPresenter(widget);
-		verify(mockView).addEditorToPage(any(Widget.class));
 		
 		annotationList.clear();
 		boolean canEdit = true;
@@ -111,6 +118,7 @@ public class AnnotationsRendererWidgetTest {
 		ArgumentCaptor<EntityUpdatedHandler> updateCaptor = ArgumentCaptor.forClass(EntityUpdatedHandler.class);
 		ArgumentCaptor<EntityBundle> bundleCaptor = ArgumentCaptor.forClass(EntityBundle.class);
 		
+		verify(mockView).addEditorToPage(any(Widget.class));
 		verify(mockEditAnnotationsDialog).configure(bundleCaptor.capture(), updateCaptor.capture());
 		
 		assertEquals(updateCaptor.getValue(), updateHandler);
