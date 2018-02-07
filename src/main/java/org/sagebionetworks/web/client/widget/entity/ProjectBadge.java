@@ -10,10 +10,12 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.client.widget.provenance.ProvViewUtil;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
 
 import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -22,24 +24,24 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 	private ProjectBadgeView view;
 	private ProjectHeader header;
 	private FavoriteWidget favoritesWidget;
-	private UserProfile modifiedBy;
 	private GWTWrapper gwt;
-	
+	private UserProfileAsyncHandler userProfileAsyncHandler;
 	@Inject
 	public ProjectBadge(ProjectBadgeView view, 
 			FavoriteWidget favoritesWidget,
-			GWTWrapper gwt
+			GWTWrapper gwt,
+			UserProfileAsyncHandler userProfileAsyncHandler
 			) {
 		this.view = view;
 		this.favoritesWidget = favoritesWidget;
 		this.gwt = gwt;
+		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		view.setPresenter(this);
 		view.setFavoritesWidget(favoritesWidget.asWidget());
 	}
 	
-	public void configure(ProjectHeader header, UserProfile modifiedBy) {
+	public void configure(ProjectHeader header) {
 		this.header = header;
-		this.modifiedBy = modifiedBy;
 		view.setLastActivityVisible(false);
 		if (header != null) {
 			if (header.getLastActivity() != null) {
@@ -50,7 +52,8 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 				} catch(Exception e) {};
 			}
 			favoritesWidget.configure(header.getId());
-			view.configure(header.getName(), header.getId(), getProjectTooltip());
+			view.configure(header.getName(), header.getId());
+			updateTooltip();
 		}
 	}
 	
@@ -59,25 +62,38 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 		return view.asWidget();
 	}	
 	
-	@Override
-	public String getProjectTooltip() {
+	public void updateTooltip() {
+		if (header.getModifiedBy() != null) {
+			userProfileAsyncHandler.getUserProfile(header.getModifiedBy().toString(), new AsyncCallback<UserProfile>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					updateTooltip(null);
+				}
+				public void onSuccess(UserProfile profile) {
+					updateTooltip(profile);
+				};
+			});
+		} else {
+			updateTooltip(null);
+		}
+	}
+	
+	public void updateTooltip(UserProfile modifiedBy) {
 		Map<String,String> map = new HashMap<String, String>();
 		List<String> order = new ArrayList<String>();
 		
 		order.add("ID");
 		map.put("ID", header.getId());
-
 		if (modifiedBy != null) {
 			order.add("Modified By");
 			map.put("Modified By", DisplayUtils.getDisplayName(modifiedBy));
 		}
-
 		if (header.getModifiedOn() != null) {
 			order.add("Modified On");
 			map.put("Modified On", gwt.getDateTimeFormat(PredefinedFormat.DATE_TIME_MEDIUM).format(header.getModifiedOn()));		
 		}
 		
-		return ProvViewUtil.createEntityPopoverHtml(new KeyValueDisplay<String>(map, order)).asString();
+		view.setTooltip(ProvViewUtil.createEntityPopoverHtml(new KeyValueDisplay<String>(map, order)).asString());
 	}
 	
 	public void addStyleName(String style) {

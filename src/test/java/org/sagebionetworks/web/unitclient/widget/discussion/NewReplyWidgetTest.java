@@ -154,8 +154,6 @@ public class NewReplyWidgetTest {
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setMarkdownEditor(any(Widget.class));
 		verify(mockView).setPresenter(newReplyWidget);
-		verify(mockMarkdownEditor).showExternalImageButton();
-		verify(mockMarkdownEditor).hideUploadRelatedCommands();
 	}
 	
 	@Test
@@ -174,6 +172,8 @@ public class NewReplyWidgetTest {
 		callbackCaptor.getValue().invoke();
 		
 		verify(mockMarkdownEditor).configure("message");
+		verify(mockMarkdownEditor).showExternalImageButton();
+		verify(mockMarkdownEditor).hideUploadRelatedCommands();
 		verify(mockStorage).removeItem(anyString());
 	}
 	

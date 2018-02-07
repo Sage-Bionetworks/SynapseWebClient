@@ -26,9 +26,8 @@ public interface ProjectBadgeView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-
-		String getProjectTooltip();
 	}
 
-	void configure(String projectName, String projectId, String tooltip);
+	void configure(String projectName, String projectId);
+	void setTooltip(String tooltip);
 }

@@ -6,10 +6,10 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2">
-	<g:FlowPanel addStyleNames="markdownWidget">
+	<g:FlowPanel addStyleNames="markdownWidget min-height-48">
 	    <g:FlowPanel ui:field="wikiSubpagesPanel"/>
-	    <g:HTMLPanel ui:field="contentPanel" addStyleNames="margin-right-10 margin-left-10 markdown min-height-48"/>
+	    <g:HTMLPanel ui:field="contentPanel" addStyleNames="margin-right-10 margin-left-10 markdown"/>
 	    <g:SimplePanel ui:field="synAlertPanel"/>
-	    <bh:Italic ui:field="emptyPanel">There is no content. Please click Edit Wiki from the Tools menu.</bh:Italic>
+	    <bh:Italic ui:field="emptyPanel" visible="false">There is no content. Please click Edit Wiki from the Tools menu.</bh:Italic>
 	</g:FlowPanel>
 </ui:UiBinder>

@@ -50,9 +50,6 @@ import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.ProjectHeader;
-import org.sagebionetworks.repo.model.ProjectListSortColumn;
-import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -71,7 +68,6 @@ import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
 import org.sagebionetworks.repo.model.doi.Doi;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.BatchFileHandleCopyResult;
 import org.sagebionetworks.repo.model.file.ExternalFileHandle;
@@ -133,7 +129,6 @@ import org.sagebionetworks.web.shared.NotificationTokenType;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
@@ -2219,58 +2214,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try{
 			return synapseClient.getUploadDestinations(parentEntityId);
 		}catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	public ProjectPagedResults getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			org.sagebionetworks.reflection.model.PaginatedResults<ProjectHeader> paginatedResults = synapseClient.getMyProjects(projectListType, sortBy, sortDir, limit, offset);
-			List<ProjectHeader> headers = paginatedResults.getResults();
-			List<String> lastModifiedByList = new LinkedList<String>();
-			for (ProjectHeader header: headers) {
-				if (header.getModifiedBy() != null)
-					lastModifiedByList.add(header.getModifiedBy().toString());
-			}			
-			return new ProjectPagedResults(headers, safeLongToInt(paginatedResults.getTotalNumberOfResults()), listUserProfiles(lastModifiedByList, synapseClient));
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	
-	public ProjectPagedResults getProjectsForTeam(String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			Long teamIdLong = Long.parseLong(teamId);
-			org.sagebionetworks.reflection.model.PaginatedResults<ProjectHeader> paginatedResults = synapseClient.getProjectsForTeam(teamIdLong, sortBy, sortDir, limit, offset);
-
-			List<ProjectHeader> headers = paginatedResults.getResults();
-			List<String> lastModifiedByList = new LinkedList<String>();
-			for (ProjectHeader header: headers) {
-				if (header.getModifiedBy() != null)
-					lastModifiedByList.add(header.getModifiedBy().toString());
-			}
-			return new ProjectPagedResults(headers, safeLongToInt(paginatedResults.getTotalNumberOfResults()), listUserProfiles(lastModifiedByList, synapseClient));
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}	
-	
-	public ProjectPagedResults getUserProjects(String userId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			Long userIdLong = Long.parseLong(userId);
-			org.sagebionetworks.reflection.model.PaginatedResults<ProjectHeader> paginatedResults = synapseClient.getProjectsFromUser(userIdLong, sortBy, sortDir, limit, offset);
-			List<ProjectHeader> headers = paginatedResults.getResults();
-			List<String> lastModifiedByList = new LinkedList<String>();
-			for (ProjectHeader header: headers) {
-				if (header.getModifiedBy() != null)
-					lastModifiedByList.add(header.getModifiedBy().toString());
-			}
-			return new ProjectPagedResults(headers, safeLongToInt(paginatedResults.getTotalNumberOfResults()), listUserProfiles(lastModifiedByList, synapseClient));
-		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}

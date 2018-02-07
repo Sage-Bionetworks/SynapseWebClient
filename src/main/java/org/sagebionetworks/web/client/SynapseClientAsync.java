@@ -283,23 +283,6 @@ public interface SynapseClientAsync {
 	 * @throws RestServiceException
 	 */
 	void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback);
-
-	/**
-	 * Return all projects that the current user can access, sorted by access time
-	 * @param limit
-	 * @param offset
-	 * @param projectHeaders
-	 */
-	void getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectPagedResults> projectHeaders);
-	/**
-	 * Return projects that the current user can access due to being on a particular team. 
-	 * @param teamId
-	 * @param limit
-	 * @param offset
-	 * @param projectHeaders
-	 */
-	void getProjectsForTeam(String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectPagedResults> projectHeaders);
-	void getUserProjects(String userId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectPagedResults> projectHeaders);
 	
 	void getHost(String urlString, AsyncCallback<String> callback);
 

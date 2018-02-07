@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.annotation;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
@@ -23,6 +24,7 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 	EntityUpdatedHandler entityUpdatedHandler;
 	List<Annotation> annotationsList;
 	private PreflightController preflightController;
+	private PortalGinInjector ginInjector;
 	
 	/**
 	 * 
@@ -33,15 +35,22 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 	@Inject
 	public AnnotationsRendererWidget(AnnotationsRendererWidgetView propertyView, 
 			AnnotationTransformer annotationTransformer, 
-			EditAnnotationsDialog editorDialog, 
-			PreflightController preflightController) {
+			PreflightController preflightController,
+			PortalGinInjector ginInjector) {
 		super();
 		this.view = propertyView;
 		this.annotationTransformer = annotationTransformer;
-		this.editorDialog = editorDialog;
+		this.ginInjector = ginInjector;
 		this.preflightController = preflightController;
 		this.view.setPresenter(this);
-		this.view.addEditorToPage(editorDialog.asWidget());
+	}
+	
+	public EditAnnotationsDialog getEditAnnotationsDialog() {
+		if (editorDialog == null) {
+			editorDialog = ginInjector.getEditAnnotationsDialog();
+			view.addEditorToPage(editorDialog.asWidget());			
+		}
+		return editorDialog;
 	}
 
 	public void configure(EntityBundle bundle, boolean canEdit, boolean isCurrentVersion) {
@@ -74,7 +83,7 @@ public class AnnotationsRendererWidget implements AnnotationsRendererWidgetView.
 		preflightController.checkUploadToEntity(bundle, new Callback() {
 			@Override
 			public void invoke() {
-				editorDialog.configure(bundle, entityUpdatedHandler);
+				getEditAnnotationsDialog().configure(bundle, entityUpdatedHandler);
 			}
 		});
 	}

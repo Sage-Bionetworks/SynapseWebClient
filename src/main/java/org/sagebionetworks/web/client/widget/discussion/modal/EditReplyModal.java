@@ -39,8 +39,6 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 		this.discussionForumClient = discussionForumClient;
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
-		markdownEditor.hideUploadRelatedCommands();
-		markdownEditor.showExternalImageButton();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(EDIT_REPLY_MODAL_TITLE);
@@ -56,6 +54,8 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 	@Override
 	public void show() {
 		view.clear();
+		markdownEditor.hideUploadRelatedCommands();
+		markdownEditor.showExternalImageButton();
 		markdownEditor.configure(message);
 		view.showDialog();
 	}

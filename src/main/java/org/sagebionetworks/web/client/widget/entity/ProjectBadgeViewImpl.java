@@ -57,11 +57,15 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	}
 	
 	@Override
-	public void configure(String projectName, String projectId, String tooltip) {
+	public void configure(String projectName, String projectId) {
 		anchor.setText(projectName);
 		this.projectId = projectId;
 		anchor.setHref(DisplayUtils.getSynapseHistoryToken(projectId));
-		this.tooltip.setTitle(tooltip);
+	}
+	
+	@Override
+	public void setTooltip(String tooltipText) {
+		tooltip.setTitle(tooltipText);
 	}
 	
 	@Override

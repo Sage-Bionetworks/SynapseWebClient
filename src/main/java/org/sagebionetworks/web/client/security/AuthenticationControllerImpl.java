@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
+import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -25,6 +26,7 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -49,6 +51,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private AdapterFactory adapterFactory;
 	private SynapseClientAsync synapseClient;
 	private PortalGinInjector ginInjector;
+	
 	@Inject
 	public AuthenticationControllerImpl(
 			CookieProvider cookies, 
@@ -71,7 +74,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public void loginUser(final String username, String password, final AsyncCallback<UserSessionData> callback) {
 		if(username == null || password == null) callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 		LoginRequest loginRequest = getLoginRequest(username, password);
-		userAccountService.initiateSession(loginRequest, new AsyncCallback<LoginResponse>() {		
+		ginInjector.getSynapseJavascriptClient().login(loginRequest, new AsyncCallback<LoginResponse>() {		
 			@Override
 			public void onSuccess(LoginResponse session) {
 				storeAuthenticationReceipt(username, session.getAuthenticationReceipt());
@@ -130,13 +133,13 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		});
 	}
 	
-	private void setUser(String token, final AsyncCallback<UserSessionData> callback) {
+	private void setUser(final String token, final AsyncCallback<UserSessionData> callback) {
 		if(token == null) {
 			sessionStorage.clear();
 			callback.onFailure(new AuthenticationException(AUTHENTICATION_MESSAGE));
 			return;
 		}
-		
+
 		userAccountService.getUserSessionData(token, new AsyncCallback<UserSessionData>() {
 			@Override
 			public void onSuccess(UserSessionData userSessionData) {
@@ -148,6 +151,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				ginInjector.getSessionTokenDetector().initializeSessionTokenState();
 				callback.onSuccess(currentUser);
 			}
+			
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught instanceof SynapseDownException || caught instanceof ReadOnlyModeException) {
@@ -159,7 +163,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			}
 		});
 	}
-
+	
 	public String getUserSessionDataString(UserSessionData session) {
 		JSONObjectAdapter adapter = adapterFactory.createNew();
 		try {

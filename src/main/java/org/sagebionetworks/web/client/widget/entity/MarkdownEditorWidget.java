@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.shared.event.ModalShownEvent;
 import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.WidgetDescriptorUpdatedEvent;
@@ -62,6 +63,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	private MarkdownWidget markdownPreview;
 	private SelectTeamModal selectTeamModal;
 	MarkdownEditorAction currentAction;
+	private PortalGinInjector ginInjector;
 	
 	@Inject
 	public MarkdownEditorWidget(MarkdownEditorWidgetView view, 
@@ -70,10 +72,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			GWTWrapper gwt,
 			BaseEditWidgetDescriptorPresenter widgetDescriptorEditor,
 			WidgetRegistrar widgetRegistrar,
-			MarkdownWidget formattingGuide,
 			UserTeamSelector userTeamSelector,
-			MarkdownWidget markdownPreview,
-			SelectTeamModal selectTeamModal
+			PortalGinInjector ginInjector
 			) {
 		super();
 		this.view = view;
@@ -82,17 +82,13 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		this.cookies = cookies;
 		this.widgetDescriptorEditor = widgetDescriptorEditor;
 		this.widgetRegistrar = widgetRegistrar;
-		this.formattingGuide = formattingGuide;
+		this.ginInjector = ginInjector;
+		
 		this.userTeamSelector = userTeamSelector;
-		this.markdownPreview = markdownPreview;
-		this.selectTeamModal = selectTeamModal;
+		
 		widgetSelectionState = new WidgetSelectionState();
 		view.setPresenter(this);
-		view.setFormattingGuideWidget(formattingGuide.asWidget());
-		view.setMarkdownPreviewWidget(markdownPreview.asWidget());
 		view.setAttachmentCommandsVisible(true);
-		view.setSelectTeamModal(selectTeamModal.asWidget());
-		
 		userTeamSelector.configure(new CallbackP<String>() {
 			@Override
 			public void invoke(String username) {
@@ -105,12 +101,33 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 				MarkdownEditorWidget.this.view.setEditorEnabled(true);
 			}
 		});
-		selectTeamModal.configure(new CallbackP<String>() {
-			@Override
-			public void invoke(String selectedTeamId) {
+	}
+	
+	public MarkdownWidget getFormattingGuide() {
+		if (formattingGuide == null) {
+			formattingGuide = ginInjector.getMarkdownWidget();
+			view.setFormattingGuideWidget(formattingGuide.asWidget());
+		}
+		return formattingGuide;
+	}
+	
+	public MarkdownWidget getMarkdownPreview() {
+		if (markdownPreview == null) {
+			markdownPreview = ginInjector.getMarkdownWidget();
+			view.setMarkdownPreviewWidget(markdownPreview.asWidget());
+		}
+		return markdownPreview;
+	}
+	
+	public SelectTeamModal getSelectTeamModal() {
+		if (selectTeamModal == null) {
+			selectTeamModal = ginInjector.getSelectTeamModal();
+			view.setSelectTeamModal(selectTeamModal.asWidget());
+			selectTeamModal.configure(selectedTeamId -> {
 				onSelectTeam(selectedTeamId);
-			}
-		});
+			});
+		}
+		return selectTeamModal;
 	}
 	
 	public void configure(String markdown) {
@@ -134,7 +151,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	}
 	
 	public void configureStep2() {
-		formattingGuide.loadMarkdownFromWikiPage(formattingGuideWikiPageKey, true);
+		getFormattingGuide().loadMarkdownFromWikiPage(formattingGuideWikiPageKey, true);
 		setMarkdownTextAreaHandlers();
   	  	resizeMarkdownTextArea();
 		gwt.scheduleExecution(new Callback() {
@@ -369,7 +386,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 			break;
 		case INSERT_TEAM_MEMBERS:
 		case INSERT_TEAM_MEMBER_COUNT:	
-			selectTeamModal.show();
+			getSelectTeamModal().show();
 			break;
 		case MARKDOWN_PREVIEW:
 			previewClicked();
@@ -396,7 +413,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	
 	public void previewClicked() {
 	    //get the html for the markdown
-		markdownPreview.configure(getMarkdown(), wikiKey, null);
+		getMarkdownPreview().configure(getMarkdown(), wikiKey, null);
 		view.showPreview();
 	}
 
