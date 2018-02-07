@@ -652,6 +652,7 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	border-right: 1px solid #ddd;
 	border-bottom: 1px solid #ddd;
 	border-radius: 0px 0px 4px 4px;
+	min-height: 200px;
 }
 
 .file-preview {
