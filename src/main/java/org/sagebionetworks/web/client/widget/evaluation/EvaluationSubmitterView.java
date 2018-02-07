@@ -42,12 +42,12 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 		void onNextClicked(Reference selectedEntity, String submissionName, Evaluation evaluation);
 		void onDoneClicked();
 		void onTeamSelected(int index);
-		void teamAdded();
 		void onRegisterTeamClicked();
 		void onNewTeamClicked();
 		void onIndividualSubmissionOptionClicked();
 		void onTeamSubmissionOptionClicked();
 		void onDockerCommitNextButton();
+		void refreshRegisteredTeams(); 
 	}
 	void setChallengesSynAlertWidget(Widget synAlert);
 	void setTeamSelectSynAlertWidget(Widget synAlert);

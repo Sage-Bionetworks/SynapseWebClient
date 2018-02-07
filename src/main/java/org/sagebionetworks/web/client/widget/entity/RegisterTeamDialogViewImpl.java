@@ -47,6 +47,8 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	Paragraph noTeamsFoundUI;
 	@UiField
 	Div teamSelectComboUI;
+	@UiField
+	Button refreshTeamsButton;
 	
 	Modal modal;
 	@Inject
@@ -77,6 +79,9 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 			public void onChange(ChangeEvent event) {
 				presenter.teamSelected(teamComboBox.getSelectedIndex());
 			}
+		});
+		refreshTeamsButton.addClickHandler(event -> {
+			presenter.refreshRegistratableTeams();
 		});
 	}
 	

@@ -23,7 +23,6 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -224,7 +223,7 @@ public class EvaluationSubmitter implements Presenter {
 			@Override
 			public void onSuccess(Challenge result) {
 				challenge = result;
-				getAvailableTeams();
+				refreshRegisteredTeams();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -240,14 +239,9 @@ public class EvaluationSubmitter implements Presenter {
 		});
 	}
 	
-	public void getAvailableTeams() {
-		challengeClient.getSubmissionTeams(authenticationController.getCurrentUserPrincipalId(), challenge.getId(), getTeamsCallback());
-	}
-	
 	@Override
-	public void teamAdded() {
-		//when a team is registered, refresh the teams list.
-		getAvailableTeams();
+	public void refreshRegisteredTeams() {
+		challengeClient.getSubmissionTeams(authenticationController.getCurrentUserPrincipalId(), challenge.getId(), getTeamsCallback());
 	}
 	
 	@Override

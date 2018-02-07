@@ -248,7 +248,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		dialog.configure(challengeId, new Callback() {
 			@Override
 			public void invoke() {
-				presenter.teamAdded();
+				presenter.refreshRegisteredTeams();
 			}
 		});
 	}
