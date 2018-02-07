@@ -255,15 +255,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void resetSynAlertWidgets() {
-		if (profileSynAlert != null) {
-			profileSynAlert.clear();
-		}
-		if (projectSynAlert != null) {
-			projectSynAlert.clear();	
-		}
-		if (teamSynAlert != null) {
-			teamSynAlert.clear();	
-		}
+		profileSynAlert.clear();
+		projectSynAlert.clear();	
+		teamSynAlert.clear();	
 	}
 	
 	@Override
