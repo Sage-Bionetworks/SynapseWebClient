@@ -314,13 +314,17 @@ public class EvaluationSubmitterTest {
 		verify(mockView).hideModal1();
 		verify(mockView).showModal2();
 		
-		//individual submission is selected by default
-		assertTrue(submitter.getIsIndividualSubmission());
-		verify(mockView).setIsIndividualSubmissionActive(true);
-		verify(mockView, never()).showTeamsUI(anyList());
-		submitter.onTeamSubmissionOptionClicked();
-		verify(mockView).showTeamsUI(eq(submissionTeams));
+		//team submission is selected by default if there's a registered team
 		assertFalse(submitter.getIsIndividualSubmission());
+		verify(mockView).setTeamSubmissionActive();
+		verify(mockView).showTeamsUI(anyList());
+		
+		submitter.onIndividualSubmissionOptionClicked();
+		verify(mockView).showTeamsUI(eq(submissionTeams));
+		assertTrue(submitter.getIsIndividualSubmission());
+		
+		submitter.onTeamSubmissionOptionClicked();
+		verify(mockView, times(2)).showTeamsUI(eq(submissionTeams));
 		
 		//try selecting invalid indexes
 		submitter.onTeamSelected(-1);
