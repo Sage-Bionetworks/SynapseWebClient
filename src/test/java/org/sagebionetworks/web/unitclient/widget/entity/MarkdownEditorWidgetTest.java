@@ -29,6 +29,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -55,21 +56,28 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 public class MarkdownEditorWidgetTest {
-	SynapseClientAsync mockSynapseClient; 
+	@Mock
+	SynapseClientAsync mockSynapseClient;
+	@Mock
 	MarkdownEditorWidgetView mockView;
-	SynapseJSNIUtils mockSynapseJSNIUtils; 
+	@Mock
+	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
 	WidgetRegistrar mockWidgetRegistrar;
 	MarkdownEditorWidget presenter;
+	@Mock
 	IconsImageBundle mockIcons;
+	@Mock
 	CookieProvider mockCookies;
 	BaseEditWidgetDescriptorPresenter mockBaseEditWidgetPresenter;
+	@Mock
 	ResourceLoader mockResourceLoader;
+	@Mock
 	GWTWrapper mockGwt;
+	@Mock
 	BaseEditWidgetDescriptorPresenter mockEditDescriptor;
 	@Mock
-	MarkdownWidget mockFormattingGuideMarkdownWidget;
-	@Mock
-	MarkdownWidget mockMarkdownPreview;
+	MarkdownWidget mockMarkdownWidget;
 	WikiPageKey wikiPageKey;
 	String initialMarkdown;
 	WikiPage testPage;
@@ -81,19 +89,14 @@ public class MarkdownEditorWidgetTest {
 	KeyPressEvent mockKeyEvent;
 	@Mock
 	SelectTeamModal mockSelectTeamModal;
+	@Mock
+	PortalGinInjector mockGinInjector;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockIcons = mock(IconsImageBundle.class);
-		mockWidgetRegistrar = mock(WidgetRegistrar.class);
-		mockBaseEditWidgetPresenter = mock(BaseEditWidgetDescriptorPresenter.class);
-		mockResourceLoader = mock(ResourceLoader.class);
-		mockCookies = mock(CookieProvider.class);
-		mockGwt = mock(GWTWrapper.class);
-		mockView = mock(MarkdownEditorWidgetView.class);
-		mockEditDescriptor = mock(BaseEditWidgetDescriptorPresenter.class);
-		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockFormattingGuideMarkdownWidget, mockUserSelector, mockMarkdownPreview, mockSelectTeamModal);
+		when(mockGinInjector.getSelectTeamModal()).thenReturn(mockSelectTeamModal);
+		when(mockGinInjector.getMarkdownWidget()).thenReturn(mockMarkdownWidget);
+		presenter = new MarkdownEditorWidget(mockView, mockSynapseClient, mockCookies, mockGwt, mockEditDescriptor, mockWidgetRegistrar, mockUserSelector, mockGinInjector);
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		initialMarkdown = "Hello Markdown";
 		presenter.configure(initialMarkdown);
@@ -118,8 +121,6 @@ public class MarkdownEditorWidgetTest {
 		verify(mockView).clear();
 		verify(mockView).setAttachmentCommandsVisible(true);
 		verify(mockView).setAlphaCommandsVisible(false);
-		verify(mockView).setMarkdownPreviewWidget(any(Widget.class));
-		verify(mockView).setSelectTeamModal(any(Widget.class));
 		verify(mockView).showEditMode();
 	}
 	
@@ -632,7 +633,7 @@ public class MarkdownEditorWidgetTest {
 	@Test
 	public void testPreview() throws Exception {
 		presenter.previewClicked();
-		verify(mockMarkdownPreview).configure(anyString(), any(WikiPageKey.class), any(Long.class));
+		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), any(Long.class));
 		verify(mockView).showPreview();
 	}
 	

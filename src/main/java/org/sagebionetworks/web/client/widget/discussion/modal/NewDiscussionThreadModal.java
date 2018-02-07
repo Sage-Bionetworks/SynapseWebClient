@@ -50,8 +50,6 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 		this.markdownEditor = markdownEditor;
 		this.authController = authController;
 		this.storage = sessionStorage;
-		markdownEditor.hideUploadRelatedCommands();
-		markdownEditor.showExternalImageButton();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(NEW_THREAD_MODAL_TITLE);
@@ -73,6 +71,8 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	}
 	
 	private void checkForSavedThread() {
+		markdownEditor.hideUploadRelatedCommands();
+		markdownEditor.showExternalImageButton();
 		if (storage.getItem(titleKey) == null || storage.getItem(messageKey) == null) {
 			markdownEditor.configure(DEFAULT_MARKDOWN);			
 		} else {
