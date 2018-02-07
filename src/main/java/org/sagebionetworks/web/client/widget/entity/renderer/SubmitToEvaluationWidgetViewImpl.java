@@ -35,6 +35,7 @@ public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements Submi
 		
 		String primaryButtonText = buttonText == null ? WidgetConstants.SUBMIT_TO_CHALLENGE : buttonText;
 		Button button = DisplayUtils.createButton(primaryButtonText, ButtonType.PRIMARY);
+		button.addStyleName("margin-5");
 		button.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
