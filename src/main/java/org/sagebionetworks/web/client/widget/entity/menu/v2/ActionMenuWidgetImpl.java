@@ -8,6 +8,7 @@ import java.util.Map;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -154,5 +155,9 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 	@Override
 	public void setToolsButtonIcon(String text, IconType icon) {
 		view.setToolsButtonIcon(text, icon);
+	}
+	@Override
+	public void setDropdownClickHandler(ClickHandler handler) {
+		view.setDropdownClickHandler(handler);
 	}
 }

@@ -9,8 +9,7 @@
 			<b:ButtonGroup>
 				<b:DropDown>
 					<b:Button icon="GEARS" ui:field="toolsMenu" dataToggle="DROPDOWN">Tools</b:Button>
-					<b:DropDownMenu ui:field="toolsDropDown"
-						addStyleNames="dropdown-menu-right">
+					<b:DropDownMenu ui:field="toolsDropDown" addStyleNames="dropdown-menu-right">
 						<b:DropDownHeader ui:field="noActionsAvailable" addStyleNames="font-italic">No actions available</b:DropDownHeader>
 						<a:ActionMenuItem icon="LOCK" iconFixedWidth="true" action="SHARE">Share</a:ActionMenuItem>
 						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_PROJECT_METADATA">Edit Project Metadata</a:ActionMenuItem>
