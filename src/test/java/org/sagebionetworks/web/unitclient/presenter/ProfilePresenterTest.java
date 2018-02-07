@@ -378,7 +378,7 @@ public class ProfilePresenterTest {
 		profilePresenter.setPlace(place);
 		verify(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
-		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).getUserTeams(anyString(), anyBoolean(), anyString());
 		verifyProfileShown(false);
 		
 		//not logged in, should not ask for this user favs
@@ -427,7 +427,7 @@ public class ProfilePresenterTest {
 		setPlaceMyProfile("456");
 		verify(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		
-		verify(mockSynapseClient, never()).getTeamsForUser(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).getUserTeams(anyString(), anyBoolean(), anyString());
 		//should attempt to get my teams, but delayed.
 		invokeGetMyTeamsCallback();
 		//also verify that it is asking for the correct teams

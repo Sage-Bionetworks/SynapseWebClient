@@ -176,8 +176,6 @@ public interface SynapseClient extends RemoteService{
 
 	String createTeam(String teamName) throws RestServiceException;
 	void deleteTeam(String teamId) throws RestServiceException;
-	PaginatedResults<Team> getTeams(String userId, Integer limit, Integer offset) throws RestServiceException;
-	List<Team> getTeamsForUser(String userId) throws RestServiceException;
 	PaginatedResults<Team> getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
 	TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;
 	Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException;
@@ -218,8 +216,6 @@ public interface SynapseClient extends RemoteService{
 	AccountCreationToken hexDecodeAndDeserializeAccountCreationToken(String tokenString) throws RestServiceException;
 
 	List<ColumnModel> getColumnModelsForTableEntity(String tableEntityId) throws RestServiceException;
-
-	String createColumnModel(String columnModelJson) throws RestServiceException;
 
 	String sendMessage(Set<String> recipients, String subject, String message, String hostPageBaseURL) throws RestServiceException;
 
@@ -330,10 +326,7 @@ public interface SynapseClient extends RemoteService{
 
 	Boolean isTeamMember(String userId, Long groupPrincipalId)
 			throws RestServiceException;
-
-	EntityBundlePlus getEntityBundlePlusForVersion(String entityId, Long versionNumber, int partsMask)
-			throws RestServiceException;
-
+	
 	Entity moveEntity(String entityId, String newParentEntityId) throws RestServiceException;
 
 	String getUserIdFromUsername(String username) throws RestServiceException;

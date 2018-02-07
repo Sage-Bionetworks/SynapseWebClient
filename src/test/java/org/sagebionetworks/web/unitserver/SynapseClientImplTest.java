@@ -150,11 +150,9 @@ import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
-import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.NotificationTokenType;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
-import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
@@ -1724,17 +1722,6 @@ public class SynapseClientImplTest {
 				ObjectType.ENTITY.toString());
 		assertEquals(expectedId, actualId);
 	}
-
-	@Test
-	public void testGetTeamBundlesNotOwner() throws RestServiceException, SynapseException {
-		// the paginated results were set up to return {teamZ, teamA}, but
-		// servlet side we sort by name.
-		List<Team> results = synapseClient.getTeamsForUser("abba");
-		verify(mockSynapse).getTeamsForUser(eq("abba"), anyInt(), anyInt());
-		assertEquals(2, results.size());
-		assertEquals(teamA, results.get(0));
-		assertEquals(teamZ, results.get(1));
-	}
 		
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenNull() throws RestServiceException, SynapseException{
@@ -1994,52 +1981,6 @@ public class SynapseClientImplTest {
 		versionInfoPaginatedResults.setResults(versionInfoList);
 		when(mockSynapse.getEntityVersions(anyString(), anyInt(), anyInt())).thenReturn(versionInfoPaginatedResults);
 		when(mockSynapse.getEntityById(anyString())).thenReturn(file);
-	}
-	@Test
-	public void testGetEntityBundlePlusForVersionVersionable() throws RestServiceException, SynapseException {
-		String entityId = "syn123";
-		Long targetVersionNumber = 1L;
-		Long latestVersionNumber = 2L;
-		setupVersionedEntityBundle(entityId, latestVersionNumber);
-		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion(entityId, targetVersionNumber, 1);
-		assertEquals(returnedEntityBundle.getLatestVersionNumber(), latestVersionNumber);
-		verify(mockSynapse).getEntityBundle(anyString(), eq(targetVersionNumber), anyInt());
-		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), entityId);
-	}
-	
-	@Test
-	public void testGetEntityBundlePlusForNullVersionVersionable() throws RestServiceException, SynapseException {
-		String entityId = "syn123";
-		Long targetVersionNumber = null;
-		Long latestVersionNumber = 2L;
-		setupVersionedEntityBundle(entityId, latestVersionNumber);
-		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion(entityId, targetVersionNumber, 1);
-		assertEquals(returnedEntityBundle.getLatestVersionNumber(), latestVersionNumber);
-		verify(mockSynapse).getEntityBundle(anyString(), anyInt());
-		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), entityId);
-	}
-	
-	@Test
-	public void testGetEntityBundlePlusForVersionLatestVersion() throws RestServiceException, SynapseException {
-		String entityId = "syn123";
-		Long targetVersionNumber = 2L;
-		Long latestVersionNumber = 2L;
-		setupVersionedEntityBundle(entityId, latestVersionNumber);
-		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion(entityId, targetVersionNumber, 1);
-		assertEquals(returnedEntityBundle.getLatestVersionNumber(), latestVersionNumber);
-		verify(mockSynapse).getEntityBundle(anyString(), anyInt());
-		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), entityId);
-	}
-	
-	@Test
-	public void testGetEntityBundlePlusForVersionNonVersionable() throws RestServiceException, SynapseException {
-		EntityBundle eb = new EntityBundle();
-		eb.setEntity(new Folder());
-		eb.getEntity().setId("syn123");
-		when(mockSynapse.getEntityBundle(anyString(), anyInt())).thenReturn(eb);
-		EntityBundlePlus returnedEntityBundle = synapseClient.getEntityBundlePlusForVersion("syn123", 123L, 1);
-		assertNull(returnedEntityBundle.getLatestVersionNumber());
-		assertEquals(returnedEntityBundle.getEntityBundle().getEntity().getId(), "syn123");
 	}
 	
 	@Test

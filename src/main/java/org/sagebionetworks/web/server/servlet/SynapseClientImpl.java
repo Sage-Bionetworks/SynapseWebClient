@@ -8,7 +8,6 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -61,7 +60,6 @@ import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
@@ -123,7 +121,6 @@ import org.sagebionetworks.table.query.util.TableSqlProcessor;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.client.SynapseClient;
 import org.sagebionetworks.web.shared.AccessRequirementUtils;
-import org.sagebionetworks.web.shared.EntityBundlePlus;
 import org.sagebionetworks.web.shared.MembershipRequestBundle;
 import org.sagebionetworks.web.shared.NotificationTokenType;
 import org.sagebionetworks.web.shared.OpenTeamInvitationBundle;
@@ -230,37 +227,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
-	@Override
-	public EntityBundlePlus getEntityBundlePlusForVersion(String entityId,
-			Long versionNumber, int partsMask) throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			EntityBundlePlus ebp = new EntityBundlePlus();
-			EntityBundle eb;
-			Entity en = synapseClient.getEntityById(entityId);
-			if (en instanceof Versionable) {
-				// Get the correct version, now that we now it's Versionable
-				Long latestVersionNumber =  synapseClient.getEntityVersions(entityId, ZERO_OFFSET, 1)
-						.getResults().get(0).getVersionNumber();
-				if (versionNumber == null || latestVersionNumber.equals(versionNumber)) {
-					versionNumber = latestVersionNumber;
-					eb = synapseClient.getEntityBundle(entityId, partsMask);
-				} else {
-					eb = synapseClient.getEntityBundle(entityId, versionNumber, partsMask);	
-				}
-				ebp.setLatestVersionNumber(latestVersionNumber);
-			} else {
-				eb = synapseClient.getEntityBundle(entityId, partsMask);
-			}
-			ebp.setEntityBundle(eb);
-			return ebp;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} catch (Throwable e) {
-			throw new UnknownErrorException(e.getMessage());
-		}	
-	}
-
 	@Override
 	public PaginatedResults<VersionInfo> getEntityVersions(String entityId, int offset, int limit)
 			throws RestServiceException {
@@ -1174,37 +1140,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		return synapseClient.listUserProfiles(userIdsLong);
 	}
 	
-	@Override
-	public List<Team> getTeamsForUser(String userId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			org.sagebionetworks.reflection.model.PaginatedResults<Team> teams = synapseClient.getTeamsForUser(
-					userId, MAX_LIMIT, ZERO_OFFSET);
-			List<Team> teamList = teams.getResults();
-			Collections.sort(teamList, new Comparator<Team>() {
-				@Override
-				public int compare(Team o1, Team o2) {
-					return o1.getName().compareToIgnoreCase(o2.getName());
-				}
-			});
-			return teamList;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} 
-	}
-
-	@Override
-	public PaginatedResults<Team> getTeams(String userId, Integer limit, Integer offset)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return convertPaginated(synapseClient.getTeamsForUser(
-					userId, limit, offset));
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
 	public PaginatedResults<Team> getTeamsBySearch(String searchTerm, Integer limit,
 			Integer offset) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -1841,21 +1776,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			return synapseClient.retrieveApiKey();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public String createColumnModel(String columnModelJson)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			ColumnModel column = new ColumnModel(
-					adapterFactory.createNew(columnModelJson));
-			ColumnModel createdColumn = synapseClient.createColumnModel(column);
-			return createdColumn.writeToJSONObject(adapterFactory.createNew())
-					.toJSONString();
-		} catch (Exception e) {
-			throw new UnknownErrorException(e.getMessage());
 		}
 	}
 
