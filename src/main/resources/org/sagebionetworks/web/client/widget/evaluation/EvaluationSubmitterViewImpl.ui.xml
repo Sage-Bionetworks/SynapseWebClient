@@ -73,7 +73,7 @@
 							<bh:Paragraph emphasis="DANGER" ui:field="teamIneligibleHtml" />
 							<bh:Div ui:field="availableTeamsUI">
 								<b:FormGroup>
-									<b:FormLabel>Select Team</b:FormLabel> 
+									<b:FormLabel>Select Team</b:FormLabel>
 									<g:ListBox ui:field="teamComboBox" styleName="form-control" />
 									<b:Anchor ui:field="registerMyTeamLink" text="Register a different team" />
 								</b:FormGroup>
