@@ -51,6 +51,9 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 				false;
 		
 		String alias = widgetDescriptor.get(WidgetConstants.ALIAS_KEY);
+		if (alias == null && widgetDescriptor.containsKey(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY)) {
+			alias = widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY);
+		}
 		if (alias != null) {
 			// get user group header for this alias (using a new service)
 			usgFromAliasAsyncHandler.getUserGroupHeader(alias, new AsyncCallback<UserGroupHeader>() {
@@ -98,8 +101,6 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			badge.setSize(BadgeSize.SMALLER);
 			if (id != null) {
 				badge.configure(id);
-			} else if (widgetDescriptor != null && widgetDescriptor.containsKey(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY)) {
-				badge.configureWithUsername(widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY));
 			} else {
 				badge.configure((String)null);
 			}

@@ -241,33 +241,4 @@ public class UserBadgeTest {
 		//test negative hashcode
 		assertNotNull(userBadge.getColor(-418745608));
 	}
-	
-	@Test
-	public void testConfigureFromUsernameAsync() throws Exception {
-		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseClient).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
-		userBadge.configureWithUsername(DOEBOY);
-		verify(mockSynapseClient).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
-		verify(mockView).setDisplayName(eq(displayName), anyString());
-	}
-	
-	@Test
-	public void testConfigureFromUsernameAsyncFailure() throws Exception {
-		String errorMessage = "not found";
-		Exception ex = new Exception(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
-		userBadge.configureWithUsername(DOEBOY);
-		verify(mockSynapseClient).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
-		verify(mockView).showLoadError(errorMessage);
-	}
-	
-	@Test
-	public void testConfigureFromUsernameFromCache() throws Exception {
-		userBadge.setMaxNameLength(max);
-		when(mockCache.get(anyString())).thenReturn(principalId, (String)null);
-		
-		userBadge.configureWithUsername(DOEBOY);
-		verify(mockCache, times(2)).get(anyString());
-		verify(mockSynapseClient, never()).getUserProfileFromUsername(eq(DOEBOY), any(AsyncCallback.class));
-		verify(mockUserProfileAsyncHandler).getUserProfile(eq(principalId), any(AsyncCallback.class));
-	}
 }
