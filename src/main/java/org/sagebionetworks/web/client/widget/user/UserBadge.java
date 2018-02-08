@@ -183,23 +183,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		}
 	}
 	
-	public void configureWithUsername(final String username) {
-		//get user profile and configure
-		principalId = null;
-		profile = null;
-		view.clear();
-		view.showLoading();
-		
-		String principalId = clientCache.get(username + WebConstants.USERNAME_SUFFIX);
-		if (principalId != null) {
-			configure(principalId);	
-		} else {
-			this.username = username;
-			loadBadge();
-		}
-	}
-	
-	
 	public void configure(String principalId, boolean isShowCompany) {
 		this.isShowCompany = isShowCompany;
 		configure(principalId);
