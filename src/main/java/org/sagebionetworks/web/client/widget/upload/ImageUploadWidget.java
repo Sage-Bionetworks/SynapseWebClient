@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -19,14 +20,23 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 	private SynapseJSNIUtils synapseJsniUtils;
 	private FileMetadata fileMeta;
 	private ImageFileValidator validator = new ImageFileValidator();
+	private PortalGinInjector ginInjector;
 	@Inject
-	public ImageUploadWidget(ImageUploadView view, MultipartUploader multipartUploader,
-			SynapseJSNIUtils synapseJsniUtils, SynapseAlert synAlert) {
+	public ImageUploadWidget(MultipartUploader multipartUploader,
+			SynapseJSNIUtils synapseJsniUtils, SynapseAlert synAlert, PortalGinInjector ginInjector) {
 		super();
 		this.synAlert = synAlert;
 		this.multipartUploader = multipartUploader;
 		this.synapseJsniUtils = synapseJsniUtils;
-		setView(view);
+		this.ginInjector = ginInjector;
+	}
+	
+	public ImageUploadView getView() {
+		if (view == null) {
+			view = ginInjector.getImageUploadView();
+			setView(view);
+		}
+		return view;
 	}
 	
 	public void setView(ImageUploadView view) {
@@ -37,7 +47,7 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 	
 	@Override
 	public Widget asWidget() {
-		return this.view.asWidget();
+		return getView().asWidget();
 	}
 
 	public void configure(CallbackP<FileUpload> finishedUploadingCallback) {
@@ -50,11 +60,11 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 	}
 	
 	public void setUploadedFileText(String text) {
-		view.setUploadedFileText(text);
+		getView().setUploadedFileText(text);
 	}
 	
 	public FileMetadata getSelectedFileMetadata() {
-		String inputId = view.getInputId();
+		String inputId = getView().getInputId();
 		JavaScriptObject fileList = synapseJsniUtils.getFileList(inputId);
 		String[] fileNames = synapseJsniUtils.getMultipleUploadFileNames(fileList);
 		if(fileNames != null && fileNames.length > 0) {
@@ -72,7 +82,7 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 		FileMetadata fileMeta = getSelectedFileMetadata();
 		if (fileMeta != null) {
 			if (validator.isValid(fileMeta)) {
-				view.processFile();
+				getView().processFile();
 			} else {
 				Callback invalidFileCallback = validator.getInvalidFileCallback();
 				if (invalidFileCallback == null) {
@@ -98,9 +108,9 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 			if (startedUploadingCallback != null) {
 				startedUploadingCallback.invoke();
 			}
-			view.updateProgress(1, "1%");
-			view.showProgress(true);
-			view.setInputEnabled(false);
+			getView().updateProgress(1, "1%");
+			getView().showProgress(true);
+			getView().setInputEnabled(false);
 			if (forcedContentType != null) {
 				fileMeta.setContentType(forcedContentType);
 			}
@@ -109,10 +119,10 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 	}
 	
 	public void reset() {
-		view.setInputEnabled(true);
-		view.showProgress(false);
+		getView().setInputEnabled(true);
+		getView().showProgress(false);
 		synAlert.clear();
-		view.resetForm();
+		getView().resetForm();
 	}
 	
 	private void doMultipartUpload(final FileMetadata fileMeta, JavaScriptObjectWrapper blob) {
@@ -122,16 +132,16 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 				@Override
 				public void uploadSuccess(String fileHandleId) {
 					FileUpload uploadedFile = new FileUpload(fileMeta, fileHandleId);
-					view.updateProgress(100, "100%");
-					view.showProgress(false);
-					view.setInputEnabled(true);
+					getView().updateProgress(100, "100%");
+					getView().showProgress(false);
+					getView().setInputEnabled(true);
 					finishedUploadingCallback.invoke(uploadedFile);
 				}
 
 				@Override
 				public void uploadFailed(String error) {
-					view.showProgress(false);
-					view.setInputEnabled(true);
+					getView().showProgress(false);
+					getView().setInputEnabled(true);
 					synAlert.showError(error);
 				}
 
@@ -139,9 +149,9 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 				public void updateProgress(double currentProgress,
 						String progressText, String uploadSpeed) {
 					int totalProgress = (int)(currentProgress * 100);
-					view.updateProgress(totalProgress, totalProgress + "%");
+					getView().updateProgress(totalProgress, totalProgress + "%");
 				}
-		}, null, view);
+		}, null, getView());
 	}
 
 }

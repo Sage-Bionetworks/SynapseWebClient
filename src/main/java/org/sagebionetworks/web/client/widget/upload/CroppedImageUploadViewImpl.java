@@ -127,7 +127,12 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 
 		if (file && canProcess) {
 			var fileUrl = $wnd.URL.createObjectURL(file);
+			if ($wnd.cropping) {
+				$wnd.cropping.destroy();
+			}
 			$wnd.cropping = new $wnd.Croppie(imagePreviewEl, {
+				enableExif: true,
+				enableOrientation: true,
 			    viewport: { width: 200, height: 200 },
 			    boundary: { width: 400, height: 400 }
 			});
