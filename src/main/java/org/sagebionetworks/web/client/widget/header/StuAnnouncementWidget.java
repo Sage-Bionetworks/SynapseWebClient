@@ -64,7 +64,7 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 
 			@Override
 			public void onFailure(Throwable caught) {
-				synapseJSNIUtils.consoleError(caught.getMessage());
+				synapseJSNIUtils.consoleError("Stu Announcement widget initialization failure: " + caught.getMessage());
 			}
 
 			@Override
