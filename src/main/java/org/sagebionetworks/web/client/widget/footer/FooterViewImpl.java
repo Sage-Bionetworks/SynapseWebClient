@@ -44,7 +44,7 @@ public class FooterViewImpl implements FooterView {
 	Anchor reportAbuseLink;
 	@UiField
 	Span hideACTActionsContainer;
-	
+	String portalVersion, repoVersion;
 	private Presenter presenter;
 	private CookieProvider cookies;
 	private GlobalApplicationState globalAppState;
@@ -68,8 +68,13 @@ public class FooterViewImpl implements FooterView {
 					presenter.onReportAbuseClicked();
 				}
 			});
+			
+			if (portalVersion != null) {
+				portalVersionSpan.setText(portalVersion);
+				repoVersionSpan.setText(repoVersion);
+			}
 		};
-		gwt.scheduleDeferred(constructViewCallback);
+		gwt.scheduleExecution(constructViewCallback, 2500);
 		this.cookies = cookies;
 		this.globalAppState = globalAppState;
 		this.hideACTActionsButton = hideACTActionsButton;
@@ -116,8 +121,12 @@ public class FooterViewImpl implements FooterView {
 	public void setVersion(String portalVersion, String repoVersion) {
 		if(portalVersion == null) portalVersion = "--";
 		if(repoVersion == null) repoVersion = "--";
-		portalVersionSpan.setText(portalVersion);
-		repoVersionSpan.setText(repoVersion);		
+		this.portalVersion = portalVersion;
+		this.repoVersion = repoVersion;
+		if (portalVersionSpan != null) {
+			portalVersionSpan.setText(portalVersion);
+			repoVersionSpan.setText(repoVersion);	
+		}
 	}
 	@Override
 	public void open(String url) {

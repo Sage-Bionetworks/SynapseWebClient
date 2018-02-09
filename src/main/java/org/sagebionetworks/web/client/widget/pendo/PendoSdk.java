@@ -1,10 +1,9 @@
 package org.sagebionetworks.web.client.widget.pendo;
 
-import static org.sagebionetworks.web.client.ClientProperties.PENDO_SDK_JS;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.utils.Callback;
 
-import org.sagebionetworks.web.client.resources.ResourceLoader;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.core.shared.GWT;
 import com.google.inject.Inject;
 
 /**
@@ -13,36 +12,31 @@ import com.google.inject.Inject;
  *
  */
 public class PendoSdk {
-	ResourceLoader resourceLoader;
-	
+	GWTWrapper gwt;
+	Callback initializeCallback;
+	String userId, email;
 	@Inject
-	public PendoSdk(
-			ResourceLoader resourceLoader
-			) {
-		this.resourceLoader = resourceLoader;
+	public PendoSdk(GWTWrapper gwt) {
+		this.gwt = gwt;
+		this.initializeCallback = () -> {
+			initialize(userId, email);
+		};
 	}
 
-	private void initJs(final AsyncCallback<Void> callback) {
-		if (!resourceLoader.isLoaded(PENDO_SDK_JS)) {
-			resourceLoader.requires(PENDO_SDK_JS, callback);
+	public void initialize(String userId, String email) {
+		this.userId = userId;
+		this.email = email;
+		if (_isLoaded()) {
+			_initialize(userId, email);	
 		} else {
-			callback.onSuccess(null);
+			gwt.scheduleExecution(initializeCallback, 200);
 		}
 	}
-
-	public void initialize(final String userId, final String email) {
-		initJs(new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				_initialize(userId, email);
-			}
-
-			@Override
-			public void onFailure(Throwable caught) {
-			}
-		});
-	}
-
+	
+	private static native boolean _isLoaded() /*-{
+		return $wnd.pendo;
+	}-*/;
+	
 	private static native void _initialize(
 			String userId,
 			String synapseEmail) /*-{
