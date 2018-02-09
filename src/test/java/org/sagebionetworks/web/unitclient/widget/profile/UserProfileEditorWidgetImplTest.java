@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.profile;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.reset;
@@ -9,18 +8,14 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.profile.ProfileImageWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetView;
-import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
-import org.sagebionetworks.web.client.widget.upload.FileValidator;
-import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
+import org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 
 public class UserProfileEditorWidgetImplTest {
@@ -33,11 +28,14 @@ public class UserProfileEditorWidgetImplTest {
 	UserProfileEditorWidgetImpl widget;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	CroppedImageUploadViewImpl mockCroppedImageUploadViewImpl;
 	UserProfile profile;
 	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
+		when(mockPortalGinInjector.getCroppedImageUploadView()).thenReturn(mockCroppedImageUploadViewImpl);
 		widget = new UserProfileEditorWidgetImpl(mockView, mockImageWidget, mockfileHandleUploadWidget, mockPortalGinInjector);
 		
 		profile = new UserProfile();
@@ -53,6 +51,11 @@ public class UserProfileEditorWidgetImplTest {
 		profile.setUrl("http://spys.r.us");
 		profile.setSummary("My live story...");
 		profile.setProfilePicureFileHandleId("45678");
+	}
+	
+	@Test
+	public void testConstruction() {
+		verify(mockfileHandleUploadWidget).setView(mockCroppedImageUploadViewImpl);
 	}
 	
 	@Test

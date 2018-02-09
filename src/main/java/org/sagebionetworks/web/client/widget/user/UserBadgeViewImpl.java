@@ -53,7 +53,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 				presenter.badgeClicked(event);
 			}
 		};
-		pictureSpan.setHeight((BadgeSize.LARGE.pictureHeightPx() + 2) + "px");
+		pictureSpan.setHeight((BadgeSize.LARGE.pictureHeightPx() + 4) + "px");
 		pictureFocusPanel.addClickHandler(badgeClicked);
 		
 		userPicture.addErrorHandler(new ErrorHandler() {

@@ -38,7 +38,6 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		this.view.addImageWidget(imageWidget);
 		this.view.setPresenter(this);
 	}
-
 	
 	@Override
 	public Widget asWidget() {
