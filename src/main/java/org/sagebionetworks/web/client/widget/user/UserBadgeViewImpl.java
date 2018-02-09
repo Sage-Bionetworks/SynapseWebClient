@@ -53,7 +53,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 				presenter.badgeClicked(event);
 			}
 		};
-		pictureSpan.setHeight(BadgeSize.LARGE.pictureHeight());
+		pictureSpan.setHeight((BadgeSize.LARGE.pictureHeightPx() + 4) + "px");
 		pictureFocusPanel.addClickHandler(badgeClicked);
 		
 		userPicture.addErrorHandler(new ErrorHandler() {
@@ -98,9 +98,10 @@ public class UserBadgeViewImpl implements UserBadgeView {
 			defaultUserPicture.addStyleName(size.getDefaultPictureStyle());	
 		}
 		usernameLink.setStyleName(size.textStyle());
-		userPicture.setHeight(size.pictureHeight());
+		int pictureHeightPx = size.pictureHeightPx();
+		userPicture.setHeight(pictureHeightPx + "px");
 		usernameLink.setVisible(size.isTextVisible());
-		pictureSpan.setHeight(size.pictureHeight());
+		pictureSpan.setHeight((pictureHeightPx + 4) + "px");
 	}
 
 	@Override

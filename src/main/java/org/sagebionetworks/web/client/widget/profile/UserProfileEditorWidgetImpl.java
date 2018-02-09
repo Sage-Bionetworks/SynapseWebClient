@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.profile;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.ValidationUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -23,17 +24,20 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	String fileHandleId;
 	
 	@Inject
-	public UserProfileEditorWidgetImpl(UserProfileEditorWidgetView view,
-			ProfileImageWidget imageWidget, ImageUploadWidget fileHandleUploadWidget) {
+	public UserProfileEditorWidgetImpl(
+			UserProfileEditorWidgetView view,
+			ProfileImageWidget imageWidget, 
+			ImageUploadWidget fileHandleUploadWidget,
+			PortalGinInjector ginInjector) {
 		super();
 		this.view = view;
 		this.imageWidget = imageWidget;
 		this.fileHandleUploadWidget = fileHandleUploadWidget;
+		fileHandleUploadWidget.setView(ginInjector.getCroppedImageUploadView());
 		this.view.addFileInputWidget(fileHandleUploadWidget);
 		this.view.addImageWidget(imageWidget);
 		this.view.setPresenter(this);
 	}
-
 	
 	@Override
 	public Widget asWidget() {

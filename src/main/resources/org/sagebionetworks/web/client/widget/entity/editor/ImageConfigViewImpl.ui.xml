@@ -32,15 +32,15 @@
 				<bh:Div addStyleNames="form-horizontal">
 					<b:FieldSet>
 						<b:FormGroup>
-							<b:FormLabel for="url" addStyleNames="col-xs-2">Image URL</b:FormLabel>
+							<b:FormLabel addStyleNames="col-xs-2">Image URL</b:FormLabel>
 							<g:FlowPanel addStyleNames="col-xs-10">
-								<b:TextBox ui:field="urlField" name="url" b:id="url" />
+								<b:TextBox ui:field="urlField" />
 							</g:FlowPanel>
 						</b:FormGroup>
 						<b:FormGroup>
-							<b:FormLabel for="linktext" addStyleNames="col-xs-2">Alternate text</b:FormLabel>
+							<b:FormLabel addStyleNames="col-xs-2">Alternate text</b:FormLabel>
 							<g:FlowPanel addStyleNames="col-xs-10">
-								<b:TextBox ui:field="nameField" name="linktext" b:id="linktext" />
+								<b:TextBox ui:field="nameField" />
 							</g:FlowPanel>
 						</b:FormGroup>
 					</b:FieldSet>
@@ -50,9 +50,9 @@
 				<bh:Div>
 					<b:FieldSet>
 						<b:FormGroup>
-							<b:FormLabel for="url">Image file entity</b:FormLabel>
+							<b:FormLabel>Image file entity</b:FormLabel>
 							<b:InputGroup>
-								<b:TextBox ui:field="entityField" name="url" b:id="url" />
+								<b:TextBox ui:field="entityField"/>
 								<b:InputGroupButton>
 									<b:Button ui:field="findEntitiesButton" icon="SEARCH" height="34px"/>
 								</b:InputGroupButton>

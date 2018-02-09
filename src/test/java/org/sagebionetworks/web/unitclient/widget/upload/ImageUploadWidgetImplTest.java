@@ -19,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.mockito.internal.verification.VerificationModeFactory;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -51,6 +52,8 @@ public class ImageUploadWidgetImplTest {
 	String inputId;
 	@Mock
 	FileMetadata mockMetadata;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
 	
 	@Captor
 	ArgumentCaptor<ProgressingFileUploadHandler> handleCaptor;
@@ -65,14 +68,14 @@ public class ImageUploadWidgetImplTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		widget = new ImageUploadWidget(mockView, mockMultipartUploader, mockJSNIUtils, mockSynAlert);
+		widget = new ImageUploadWidget(mockMultipartUploader, mockJSNIUtils, mockSynAlert, mockPortalGinInjector);
 		inputId = "987";
 
 		//The metadata returned should correspond to testFileName
 		when(mockView.getInputId()).thenReturn(inputId);
 		when(mockJSNIUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(new String[]{"testName.png"});
 		when(mockJSNIUtils.getContentType(any(JavaScriptObject.class), anyInt())).thenReturn("image/png");
-		
+		when(mockPortalGinInjector.getImageUploadView()).thenReturn(mockView);
 	}
 	
 	@Test

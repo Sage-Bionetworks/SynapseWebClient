@@ -11,19 +11,22 @@
 		</b:Form>
 		<b:Button addStyleNames="margin-right-5" ui:field="uploadbutton" icon="UPLOAD">Upload</b:Button>
 		<bh:Span ui:field="uploadedFileNameField"/>
-		 
+		
 		<w:LoadingSpinner ui:field="loadingUI" size="16px" addStyleNames="margin-right-5" visible="false"/>
 		
-		<g:HTMLPanel visible="false" >
-			<canvas ui:field="originalCanvas" />
-			<canvas ui:field="resizedCanvas" />
-		</g:HTMLPanel> 
 		<bh:Div styleName="margin-top-15" />
 		<b:Progress ui:field="progressContainer" visible="false">
 			<b:ProgressBar ui:field="progressBar" type="INFO"
 				percent="0" text="0%" />
 		</b:Progress>
 		<bh:Div ui:field="synAlertContainer" />
+		<b:Modal ui:field="previewModal" closable="false" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="topLevelZIndex" title="Crop Image" >
+			<b:ModalBody ui:field="previewModalBody">
+			</b:ModalBody>
+			<b:ModalFooter>
+				<b:Button ui:field="cancelCropButton">Cancel</b:Button>
+				<b:Button ui:field="saveCropButton" type="PRIMARY" >Save</b:Button>
+			</b:ModalFooter>
+		</b:Modal>
 	</g:HTMLPanel>
-
 </ui:UiBinder>
