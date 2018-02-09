@@ -2,25 +2,25 @@ package org.sagebionetworks.web.client.widget.user;
 
 
 public enum BadgeSize {
-    LARGER("fa-2x", "font-size-20", "64px", true),
-    LARGE("fa-lg", "font-size-17", "32px", true),
-    DEFAULT("", "", "27px", true),
-    SMALLER("font-size-0-9em", "font-size-13", "20px", true),
-    LARGER_PICTURE_ONLY("font-size-12x", "", "128px", false),
-    LARGE_PICTURE_ONLY("fa-lg", "", "32px", false),
-    SMALL_PICTURE_ONLY("", "", "27px", false),
-    EXTRA_SMALL("font-size-0-9em", "", "16px", false);
+    LARGER("fa-2x", "font-size-20", 60, true),
+    LARGE("fa-lg", "font-size-17", 28, true),
+    DEFAULT("", "", 23, true),
+    SMALLER("font-size-0-9em", "font-size-13", 18, true),
+    LARGER_PICTURE_ONLY("font-size-12x", "", 124, false),
+    LARGE_PICTURE_ONLY("fa-lg", "", 28, false),
+    SMALL_PICTURE_ONLY("", "", 23, false),
+    EXTRA_SMALL("font-size-0-9em", "", 12, false);
     
     private String defaultPictureStyle;
     private String textStyle;
     private boolean isTextVisible;
-    private String pictureHeight;
+    private int pictureHeightPx;
     
-    BadgeSize (String defaultPictureStyle, String textStyle, String pictureHeight, boolean isTextVisible) {
+    BadgeSize (String defaultPictureStyle, String textStyle, int pictureHeightPx, boolean isTextVisible) {
     	this.defaultPictureStyle = defaultPictureStyle;
     	this.textStyle = textStyle;
     	this.isTextVisible = isTextVisible;
-    	this.pictureHeight = pictureHeight;
+    	this.pictureHeightPx = pictureHeightPx;
     }
     
     public String getDefaultPictureStyle() {
@@ -35,8 +35,8 @@ public enum BadgeSize {
     	return isTextVisible;
     }
     
-    public String pictureHeight() {
-		return pictureHeight;
+    public int pictureHeightPx() {
+		return pictureHeightPx;
 	}
     
 }

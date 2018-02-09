@@ -240,6 +240,7 @@ import org.sagebionetworks.web.client.widget.team.JoinTeamWidget;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
+import org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleLink;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
@@ -591,7 +592,7 @@ public interface PortalGinInjector extends Ginjector {
 	CopyTextModal getCopyTextModal();
 	UserProfileModalWidget getUserProfileModalWidget();
 	PromptModalView getPromptModal();
-	
+	CroppedImageUploadViewImpl getCroppedImageUploadView();
 	SynapseJSNIUtils getSynapseJSNIUtils();
 	GWTWrapper getGWT();
 	LazyLoadHelper getLazyLoadHelper();

@@ -23,14 +23,18 @@ public class ImageUploadWidget implements ImageUploadView.Presenter, IsWidget {
 	public ImageUploadWidget(ImageUploadView view, MultipartUploader multipartUploader,
 			SynapseJSNIUtils synapseJsniUtils, SynapseAlert synAlert) {
 		super();
-		this.view = view;
 		this.synAlert = synAlert;
 		this.multipartUploader = multipartUploader;
 		this.synapseJsniUtils = synapseJsniUtils;
+		setView(view);
+	}
+	
+	public void setView(ImageUploadView view) {
+		this.view = view;
 		this.view.setPresenter(this);
 		view.setSynAlert(synAlert);
 	}
-
+	
 	@Override
 	public Widget asWidget() {
 		return this.view.asWidget();
