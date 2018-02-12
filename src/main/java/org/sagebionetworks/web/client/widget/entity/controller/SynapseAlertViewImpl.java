@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -42,7 +43,7 @@ public class SynapseAlertViewImpl implements
 	ClickHandler onCreateJiraIssue;
 	JiraDialog jiraDialog;
 	
-	Div synapseAlertContainer = new Div();
+	Span synapseAlertContainer = new Span();
 	public SynapseAlertViewImpl(){
 		onCreateJiraIssue = event -> {
 			presenter.onCreateJiraIssue(jiraDialog.getText());
