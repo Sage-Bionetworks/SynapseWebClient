@@ -14,12 +14,15 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -65,8 +68,16 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	
 	Callback onAttachCallback;
 	Anchor entityAnchor;
-	PlaceChanger placeChanger;
-	ClickHandler customClickHandler;
+	public static PlaceChanger placeChanger = null;
+	HandlerRegistration clickHandlerRegistration;
+	public static final String ENTITY_ID_ATTRIBUTE = "data-entity-id";
+	
+	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
+		event.preventDefault();
+		Widget panel = (Widget)event.getSource();
+		String entityId = panel.getElement().getAttribute(ENTITY_ID_ATTRIBUTE);
+		placeChanger.goTo(new Synapse(entityId));
+	};
 	
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
@@ -75,9 +86,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			GlobalApplicationState globalAppState) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		initWidget(uiBinder.createAndBindUi(this));
-		this.placeChanger = globalAppState.getPlaceChanger();
+		placeChanger = globalAppState.getPlaceChanger();
 		idField.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
 		md5Field.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
+		
 	}
 
 	@Override
@@ -105,26 +117,12 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		
 		if(entityHeader != null) {
 			entityAnchor = new Anchor();
+			clickHandlerRegistration = entityAnchor.addClickHandler(STANDARD_CLICKHANDLER);
 			entityAnchor.setText(entityHeader.getName());
 			entityAnchor.addStyleName("link");
 			entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
-			entityAnchor.addClickHandler(event -> {
-				event.preventDefault();
-				if (customClickHandler != null) {
-					customClickHandler.onClick(event);
-				} else {
-					placeChanger.goTo(new Synapse(entityHeader.getId()));	
-				}
-			});
-			
-			ClickHandler clickHandler = new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					entityAnchor.fireEvent(event);
-				}
-			};
+			entityAnchor.getElement().setAttribute(ENTITY_ID_ATTRIBUTE, entityHeader.getId());
 			iconContainer.setWidget(icon);
-			iconContainer.addClickHandler(clickHandler);
 			entityContainer.add(entityAnchor);
 			idField.setText(entityHeader.getId());
 		} 		
@@ -147,7 +145,13 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	
 	@Override
 	public void addClickHandler(final ClickHandler handler) {
-		customClickHandler = handler;
+		if (clickHandlerRegistration != null) {
+			clickHandlerRegistration.removeHandler();	
+		}
+		clickHandlerRegistration = entityAnchor.addClickHandler(event -> {
+			event.preventDefault();
+			handler.onClick(event);
+		});
 	}
 	
 	@Override

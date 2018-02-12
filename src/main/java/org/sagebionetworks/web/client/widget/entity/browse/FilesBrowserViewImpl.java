@@ -41,11 +41,6 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	};
 	
 	@Override
-	public void setEntityClickedHandler(CallbackP<String> callback) {
-		entityTreeBrowser.setEntityClickedHandler(callback);
-	}
-	
-	@Override
 	public Widget asWidget() {
 		return widget;
 	}

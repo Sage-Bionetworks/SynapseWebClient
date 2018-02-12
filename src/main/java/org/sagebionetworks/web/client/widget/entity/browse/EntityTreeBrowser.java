@@ -23,7 +23,6 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
@@ -43,7 +42,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	private PortalGinInjector ginInjector;
 	private String currentSelection;
 	EntitySelectedHandler entitySelectedHandler;
-	CallbackP<String> entityClickedHandler;
 	EntityFilter filter = EntityFilter.ALL;
 	
 	@Inject
@@ -68,7 +66,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		view.clear();
 		// remove handlers
 		entitySelectedHandler = null;
-		entityClickedHandler = null;
 	}
 
 	public void clear() {
@@ -199,10 +196,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		makeSelectable();
 	}
 	
-	public void setEntityClickedHandler(CallbackP<String> callback) {
-		entityClickedHandler = callback;
-	}
-	
 	public EntitySelectedHandler getEntitySelectedHandler() {
 		return entitySelectedHandler;
 	}
@@ -257,9 +250,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			boolean isRootItem, boolean isExpandable) {
 		final EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
 		childItem.configure(header, isRootItem, isExpandable);
-		if (entityClickedHandler != null) {
-			childItem.setEntityClickedHandler(entityClickedHandler);
-		}
 		return childItem;
 	}
 

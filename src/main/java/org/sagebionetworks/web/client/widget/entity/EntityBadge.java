@@ -5,9 +5,9 @@ import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.RESTRICTION_INFORMATION;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
-import static org.sagebionetworks.repo.model.EntityBundle.RESTRICTION_INFORMATION;
 
 import java.util.List;
 
@@ -37,7 +37,6 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -229,16 +228,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	public void addClickHandler(ClickHandler handler) {
 		modifiedByUserBadge.setCustomClickHandler(handler);
 		view.addClickHandler(handler);
-	}
-	
-	public void setEntityClickedHandler(final CallbackP<String> callback) {
-		view.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				// get teh entity header id from the click event (somehow)
-				callback.invoke(entityHeader.getId());
-			}
-		});
 	}
 	
 	public String getEntityId() {
