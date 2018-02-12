@@ -227,7 +227,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	 * @param clickHandler
 	 */
 	public void setCustomClickHandler(ClickHandler clickHandler) {
-		view.setClickHandler(clickHandler);
+		view.setCustomClickHandler(clickHandler);
 	}	
 
 	public static UserProfile getUserProfileFromCache(String principalId, AdapterFactory adapterFactory, ClientCache clientCache) {

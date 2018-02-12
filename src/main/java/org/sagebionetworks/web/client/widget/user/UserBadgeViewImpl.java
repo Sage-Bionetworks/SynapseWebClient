@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client.widget.user;
 
+import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
+import static org.sagebionetworks.web.client.DisplayUtils.isDefined;
+import static org.sagebionetworks.web.client.DisplayUtils.newWindow;
+
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.constants.Emphasis;
@@ -7,12 +11,10 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.client.ui.html.Text;
-import static org.sagebionetworks.web.client.DisplayUtils.*;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Profile;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
@@ -49,12 +51,12 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	HandlerRegistration handlerRegistration, pictureHandlerRegistration;
 	
 	public static final String USER_ID_ATTRIBUTE = "data-profile-user-id";
-	public static PlaceChanger PLACECHANGER = null;
+	public static PlaceChanger placeChanger = null;
 	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
 		event.preventDefault();
 		Widget panel = (Widget)event.getSource();
 		String userId = panel.getElement().getAttribute(USER_ID_ATTRIBUTE);
-		PLACECHANGER.goTo(new Profile(userId));
+		placeChanger.goTo(new Profile(userId));
 	};
 	
 	public static final ClickHandler NEW_WINDOW_CLICKHANDLER = event -> {
@@ -67,7 +69,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@Inject
 	public UserBadgeViewImpl(Binder uiBinder, GlobalApplicationState globalAppState) {
 		widget = uiBinder.createAndBindUi(this);
-		PLACECHANGER = globalAppState.getPlaceChanger();
+		placeChanger = globalAppState.getPlaceChanger();
 		pictureSpan.setHeight((BadgeSize.LARGE.pictureHeightPx() + 4) + "px");
 		handlerRegistration = usernameLink.addClickHandler(STANDARD_CLICKHANDLER);
 		pictureHandlerRegistration = pictureFocusPanel.addClickHandler(STANDARD_CLICKHANDLER);
@@ -107,12 +109,19 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		defaultUserPicture.setVisible(true);
 	}
 	
-	@Override
 	public void setClickHandler(ClickHandler clickHandler) {
 		handlerRegistration.removeHandler();
 		pictureHandlerRegistration.removeHandler();
 		handlerRegistration = usernameLink.addClickHandler(clickHandler);
 		pictureHandlerRegistration = pictureFocusPanel.addClickHandler(clickHandler);
+	}
+	
+	@Override
+	public void setCustomClickHandler(final ClickHandler clickHandler) {
+		setClickHandler(event -> {
+			event.preventDefault();
+			clickHandler.onClick(event);
+		});
 	}
 	
 	@Override

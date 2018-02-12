@@ -24,7 +24,7 @@ public interface UserBadgeView extends IsWidget, SynapseView {
 	void setHref(String href);
 	void setStyleNames(String style);
 	void setHeight(String height);
-	void setClickHandler(ClickHandler clickHandler);
+	void setCustomClickHandler(ClickHandler clickHandler);
 	void setUserId(String userId);
 	void setOpenInNewWindow();
 	void doNothingOnClick();

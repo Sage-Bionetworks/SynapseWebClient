@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -20,6 +21,7 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
@@ -33,6 +35,15 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	ClickHandler customClickHandler;
 	Anchor anchor = new Anchor();
 	String teamId;
+	public static PlaceChanger placeChanger = null;
+	public static final String TEAM_ID_ATTRIBUTE = "data-team-id";
+	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
+		event.preventDefault();
+		Widget panel = (Widget)event.getSource();
+		String teamId = panel.getElement().getAttribute(TEAM_ID_ATTRIBUTE);
+		placeChanger.goTo(new org.sagebionetworks.web.client.place.Team(teamId));
+	};
+	
 	@Inject
 	public TeamBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
 			GlobalApplicationState globalApplicationState,
@@ -44,17 +55,9 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		addStyleName("teamBadge displayInline");
 		notificationsPanel = new SimplePanel();
 		notificationsPanel.addStyleName("margin-left-5 displayInline");
-		
+		placeChanger = globalApplicationState.getPlaceChanger();
 		publicAclPrincipalId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID));
 		authenticatedAclPrincipalId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));
-		anchor.addClickHandler(event -> {
-			event.preventDefault();
-			if (customClickHandler != null) {
-				customClickHandler.onClick(event);
-			} else {
-				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(teamId));
-			}
-		});
 	}
 	
 	@Override
@@ -62,9 +65,17 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 		clear();
 		teamId = team.getId();
 		this.customClickHandler = customClickHandler;
+		if (customClickHandler == null) {
+			anchor.addClickHandler(STANDARD_CLICKHANDLER);
+		} else {
+			anchor.addClickHandler(event -> {
+				event.preventDefault();
+				customClickHandler.onClick(event);
+			});
+		}
 		notificationsPanel.clear();
 		if(team == null)  throw new IllegalArgumentException("Team is required");
-		
+		anchor.getElement().setAttribute(TEAM_ID_ATTRIBUTE, teamId);
 		if(team != null) {
 			String name = maxNameLength == null ? team.getName() : DisplayUtils.stubStrPartialWord(team.getName(), maxNameLength);
 			anchor.setText(name);
