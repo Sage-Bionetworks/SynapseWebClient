@@ -1,5 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity;
-
+import static org.sagebionetworks.web.client.DisplayUtils.*;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.Emphasis;
@@ -67,6 +67,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Anchor entityAnchor;
 	PlaceChanger placeChanger;
 	ClickHandler customClickHandler;
+	
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
 			final SynapseJSNIUtils synapseJSNIUtils,
@@ -75,18 +76,8 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		initWidget(uiBinder.createAndBindUi(this));
 		this.placeChanger = globalAppState.getPlaceChanger();
-		idField.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				idField.selectAll();
-			}
-		});
-		md5Field.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				md5Field.selectAll();
-			}
-		});
+		idField.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
+		md5Field.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
 	}
 
 	@Override

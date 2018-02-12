@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
@@ -36,8 +35,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	SynapseClientAsync synapseClient;
 	private Integer maxNameLength;
 	UserProfile profile;
-	ClickHandler customClickHandler;
-	boolean openNewWindow;
 	GlobalApplicationState globalApplicationState;
 	SynapseJSNIUtils synapseJSNIUtils;
 	boolean isShowCompany;
@@ -73,7 +70,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		this.adapterFactory = adapterFactory;
 		this.jsClient = jsClient;
-		this.openNewWindow = false;
 		view.setPresenter(this);
 		view.setSize(BadgeSize.DEFAULT);
 		clearState();
@@ -99,15 +95,16 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		if (isShowCompany) {
 			view.showDescription(profile.getCompany());
 		}
-		
+		view.setUserId(profile.getOwnerId());
 		view.setHref("#!Profile:" + profile.getOwnerId());
 		useCachedImage = true;
 		configurePicture();
 	}
 	
 	public void setOpenNewWindow(boolean value) {
-		this.openNewWindow = value;
-		this.view.setOpenNewWindow(value ? "_blank" : "");
+		if (value) {
+			view.setOpenInNewWindow();
+		}
 	}
 	
 	public void setSize(BadgeSize size) {
@@ -230,21 +227,8 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	 * @param clickHandler
 	 */
 	public void setCustomClickHandler(ClickHandler clickHandler) {
-		customClickHandler = clickHandler;
+		view.setClickHandler(clickHandler);
 	}	
-	
-	@Override
-	public void badgeClicked(ClickEvent event) {
-		if (customClickHandler == null) 
-			if (openNewWindow) {
-				view.openNewWindow("#!Profile:" + profile.getOwnerId());
-			} else {
-				globalApplicationState.getPlaceChanger().goTo(new Profile(profile.getOwnerId()));				
-			}
-		else {
-			customClickHandler.onClick(event);
-		}			
-	}
 
 	public static UserProfile getUserProfileFromCache(String principalId, AdapterFactory adapterFactory, ClientCache clientCache) {
 		String profileString = clientCache.get(principalId + WebConstants.USER_PROFILE_SUFFIX);
@@ -269,7 +253,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	
 	public void clearState() {
 		profile = null;
-		customClickHandler = null;
 		isShowCompany = false;
 		maxNameLength = null;
 		view.clear();
@@ -296,6 +279,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	}
 	
 	public void setDoNothingOnClick() {
-		customClickHandler = DO_NOTHING_ON_CLICK;
+		view.doNothingOnClick();
 	}
 }

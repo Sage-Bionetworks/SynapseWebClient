@@ -37,6 +37,7 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
@@ -57,6 +58,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private LazyLoadHelper lazyLoadHelper;
 	private DateTimeUtils dateTimeUtils;
 	private PopupUtilsView popupUtils;
+	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
@@ -233,6 +235,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		view.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				// get teh entity header id from the click event (somehow)
 				callback.invoke(entityHeader.getId());
 			}
 		});

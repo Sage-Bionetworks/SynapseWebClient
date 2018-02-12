@@ -72,6 +72,7 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style;
@@ -94,6 +95,7 @@ import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -105,6 +107,14 @@ public class DisplayUtils {
         WARNING,
         QUESTION
 	}
+	
+	public static final ClickHandler TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER = event -> {
+		TextBox source = (TextBox)event.getSource();
+		source.selectAll();
+	};
+	public static final ClickHandler DO_NOTHING_CLICKHANDLER = event -> {
+		event.preventDefault();
+	};
 	
 	public static NotifySettings getDefaultSettings() {
 		NotifySettings notifySettings = NotifySettings.newSettings();
