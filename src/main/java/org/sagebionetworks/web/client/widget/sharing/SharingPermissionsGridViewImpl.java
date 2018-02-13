@@ -8,6 +8,8 @@ import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -91,16 +93,18 @@ public class SharingPermissionsGridViewImpl extends Composite implements Sharing
 		row.add(data);
 		
 		// Permissions List Box
-		data = new TableData();
+		
 		ListBox permListBox = createEditAccessListBox(aclEntry, permissionLevels, permissionDisplay);
 		permListBox.addStyleName("input-xs");
-		data.add(permListBox);
+		data = new TableData();
 		row.add(data);
 		if (!deleteButtonVisible || deleteButtonCallback == null) {
 			// Don't allow editing the permissions and don't add delete button.
-			permListBox.setEnabled(false);
+			String selectedItemText = permListBox.getSelectedItemText();
+			data.add(new Text(selectedItemText));
 			permissionColumnHeader.setStyleName("col-md-3");
 		} else {
+			data.add(permListBox);
 			// Add delete button and size columns.
 			data = new TableData();
 			Button button = new Button("", new ClickHandler() {

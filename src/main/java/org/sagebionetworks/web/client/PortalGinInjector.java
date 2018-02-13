@@ -191,6 +191,8 @@ import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.AclAddPeoplePanel;
+import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGrid;
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
@@ -598,4 +600,6 @@ public interface PortalGinInjector extends Ginjector {
 	SynapseJSNIUtils getSynapseJSNIUtils();
 	GWTWrapper getGWT();
 	LazyLoadHelper getLazyLoadHelper();
+	SharingPermissionsGrid getSharingPermissionsGrid();
+	AclAddPeoplePanel getAclAddPeoplePanel();
 }
