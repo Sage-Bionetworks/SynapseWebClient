@@ -239,7 +239,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				getAclAddPeoplePanel().configure(permList, addPersonCallback, makePublicCallback, isPubliclyVisible);
 				add(getAclAddPeoplePanel().asWidget());
 				if (canEnableInheritance) {
-					Label deleteInfoLabel = new Label("By default the sharing settings will be inherited from the parent folder or project if local sharing settings are deleted.");
+					Label deleteInfoLabel = new Label("The sharing settings will be inherited from the parent folder or project if local sharing settings are deleted.");
 					deleteInfoLabel.addStyleName("margin-bottom-10");
 					add(deleteInfoLabel);
 					add(deleteAclButton);
