@@ -70,8 +70,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 	
 public interface SynapseClientAsync {
-	void getEntityBundlePlusForVersion(String entityId, Long versionNumber, int partsMask, AsyncCallback<EntityBundlePlus> callback);
-	
 	void getEntityVersions(String entityId, int offset, int limit,
 			AsyncCallback<PaginatedResults<VersionInfo>> callback);
 
@@ -159,13 +157,10 @@ public interface SynapseClientAsync {
 	/////////////////
 	void createTeam(String teamName,AsyncCallback<String> callback);
 	void deleteTeam(String teamId,AsyncCallback<Void> callback);
-	void getTeams(String userId, Integer limit, Integer offset,
-			AsyncCallback<PaginatedResults<Team>> callback);
 	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset,
 			AsyncCallback<PaginatedResults<Team>> callback);
 	void getTeamBundle(String userId, String teamId, boolean isLoggedIn, AsyncCallback<TeamBundle> callback);
 	void getOpenRequestCount(String currentUserId, String teamId, AsyncCallback<Long> callback);
-	void getTeamsForUser(String userId, AsyncCallback<List<Team>> asyncCallback);
 	void getOpenInvitations(String userId, AsyncCallback<ArrayList<OpenUserInvitationBundle>> callback);
 	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<ArrayList<OpenTeamInvitationBundle>> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
@@ -211,8 +206,6 @@ public interface SynapseClientAsync {
 
 	void getColumnModelsForTableEntity(String tableEntityId, AsyncCallback<List<ColumnModel>> asyncCallback);
 
-	void createColumnModel(String columnModelJson, AsyncCallback<String> callback);
-	
 	void sendMessage(Set<String> recipients, String subject, String message, String hostPageBaseURL, AsyncCallback<String> callback);
 	void sendMessageToEntityOwner(String entityId, String subject, String messageBody, String hostPageBaseURL, AsyncCallback<String> callback);
 	
@@ -283,23 +276,6 @@ public interface SynapseClientAsync {
 	 * @throws RestServiceException
 	 */
 	void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback);
-
-	/**
-	 * Return all projects that the current user can access, sorted by access time
-	 * @param limit
-	 * @param offset
-	 * @param projectHeaders
-	 */
-	void getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectPagedResults> projectHeaders);
-	/**
-	 * Return projects that the current user can access due to being on a particular team. 
-	 * @param teamId
-	 * @param limit
-	 * @param offset
-	 * @param projectHeaders
-	 */
-	void getProjectsForTeam(String teamId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectPagedResults> projectHeaders);
-	void getUserProjects(String userId, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<ProjectPagedResults> projectHeaders);
 	
 	void getHost(String urlString, AsyncCallback<String> callback);
 

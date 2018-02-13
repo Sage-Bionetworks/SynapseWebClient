@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -131,6 +130,7 @@ public class FileHandleList implements FileHandleListView.Presenter, IsWidget {
 			}
 		}
 		refreshLinkUI();
+		uploadWidget.reset();
 	}
 	
 	/**

@@ -29,6 +29,7 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -176,8 +177,8 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 	}
 	
 	@Override
-	public void addWidget(Widget widget, String divID) {
-		panel.add(widget, divID);
+	public void addWidget(IsWidget widget, String divID) {
+		panel.add(widget.asWidget(), divID);
 	}
 	
 	/**
@@ -231,7 +232,7 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 	}
 	
 	@Override
-	public void showError(Widget synAlert) {
+	public void showError(IsWidget synAlert) {
 		clear();
 		add(synAlert);	
 	}

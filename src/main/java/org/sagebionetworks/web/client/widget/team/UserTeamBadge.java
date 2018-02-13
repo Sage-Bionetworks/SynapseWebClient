@@ -39,7 +39,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 		this.usgFromIdAsyncHandler = usgFromIdAsyncHandler;
 		this.usgFromAliasAsyncHandler = usgFromAliasAsyncHandler;
 		this.div = div;
-		div.addStyleName("displayInline");
+		div.addStyleName("displayInlineBlock");
 	}
 	
 	@Override
@@ -51,6 +51,9 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 				false;
 		
 		String alias = widgetDescriptor.get(WidgetConstants.ALIAS_KEY);
+		if (alias == null && widgetDescriptor.containsKey(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY)) {
+			alias = widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY);
+		}
 		if (alias != null) {
 			// get user group header for this alias (using a new service)
 			usgFromAliasAsyncHandler.getUserGroupHeader(alias, new AsyncCallback<UserGroupHeader>() {
@@ -98,8 +101,6 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			badge.setSize(BadgeSize.SMALLER);
 			if (id != null) {
 				badge.configure(id);
-			} else if (widgetDescriptor != null && widgetDescriptor.containsKey(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY)) {
-				badge.configureWithUsername(widgetDescriptor.get(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY));
 			} else {
 				badge.configure((String)null);
 			}
@@ -108,7 +109,7 @@ public class UserTeamBadge implements WidgetRendererPresenter {
 			}
 			
 			theWidget = badge.asWidget();
-			theWidget.addStyleName("movedown-6");
+			theWidget.addStyleName("moveup-3");
 		} else {
 			//team
 			ClickHandler customClickHandler = null;

@@ -196,10 +196,16 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 						}
 					}
 					
+					if (rowCount == 0 && tableConfig.getColumnConfigs().isEmpty()) {
+						//no results, and no column configs (so we don't know the structure of the table). show nothing
+						return;
+					}
+					
 					//if node query, remove the object type from the column names (ie remove "project." from "project.id")
 					if(isNodeQueryService(tableConfig.getUri())) {
 						fixColumnNames(columnData);
 					}
+					
 					//define the column names
 					String[] columnNamesArray = getColumnNamesArray(columnData);
 					//create renderers

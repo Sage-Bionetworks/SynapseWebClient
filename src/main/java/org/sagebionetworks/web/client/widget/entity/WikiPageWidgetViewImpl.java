@@ -12,6 +12,7 @@ import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -76,7 +77,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	SimplePanel synAlertPanel;
 	
 	@UiField
-	HTMLPanel loadingPanel;
+	LoadingSpinner loadingPanel;
 	
 	@UiField
 	SimplePanel markdownPanel;

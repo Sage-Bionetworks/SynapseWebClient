@@ -91,14 +91,14 @@ public class SynapseAlertImplTest {
 	@Test
 	public void testHandleServiceExceptionReadOnly() {
 		widget.handleException(new ReadOnlyModeException());
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		verify(mockPlaceChanger).goTo(isA(Down.class));
 	}
 	
 	@Test
 	public void testHandleServiceExceptionDown() {
 		widget.handleException(new SynapseDownException());
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		verify(mockPlaceChanger).goTo(isA(Down.class));
 	}
 	
@@ -106,7 +106,7 @@ public class SynapseAlertImplTest {
 	public void testHandleStatusCodeExceptionWithMessage() {
 		String statusText = "error described here";
 		widget.handleException(new StatusCodeException(1, statusText, ""));
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		verify(mockView).showError(statusText);
 		verify(mockView, never()).setRetryButtonVisible(true);
 	}
@@ -115,14 +115,14 @@ public class SynapseAlertImplTest {
 	public void testHandleStatusCodeExceptionWithStatusCodeOnly() {
 		int statusCode = 418; //I'm a teapot status code
 		widget.handleException(new StatusCodeException(statusCode, ""));
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		verify(mockView).showError(SynapseAlertImpl.SERVER_STATUS_CODE_MESSAGE + statusCode);
 		verify(mockView, never()).setRetryButtonVisible(true);
 	}
 	
 	public void testHandleStatusCodeExceptionZero() {
 		widget.handleException(new StatusCodeException(0, ""));
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		verify(mockView).showError(DisplayConstants.NETWORK_ERROR);
 		verify(mockView).setRetryButtonVisible(true);
 	}
@@ -130,7 +130,7 @@ public class SynapseAlertImplTest {
 	@Test
 	public void testHandleServiceExceptionForbiddenLoggedIn() {
 		widget.handleException(new ForbiddenException());
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		ArgumentCaptor<String> c = ArgumentCaptor.forClass(String.class);
 		verify(mockView).showError(c.capture());
 		assertTrue(c.getValue().startsWith(DisplayConstants.ERROR_FAILURE_PRIVLEDGES));
@@ -149,7 +149,7 @@ public class SynapseAlertImplTest {
 	@Test
 	public void testHandleServiceExceptionNotFound() {
 		widget.handleException(new NotFoundException());
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		ArgumentCaptor<String> c = ArgumentCaptor.forClass(String.class);
 		verify(mockView).showError(c.capture());
 		assertTrue(c.getValue().startsWith(DisplayConstants.ERROR_NOT_FOUND));
@@ -159,7 +159,7 @@ public class SynapseAlertImplTest {
 	public void testHandleServiceUnknownErrorExceptionLoggedIn() {
 		String errorMessage= "unknown";
 		widget.handleException(new UnknownErrorException(errorMessage));
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		verify(mockView).showError(errorMessage);
 		verify(mockView).showJiraDialog(errorMessage);
 	}
@@ -169,7 +169,7 @@ public class SynapseAlertImplTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		String errorMessage= "unknown";
 		widget.handleException(new UnknownErrorException(errorMessage));
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		verify(mockView).showError(errorMessage);
 		verify(mockView, never()).showJiraDialog(errorMessage);
 		
@@ -201,7 +201,7 @@ public class SynapseAlertImplTest {
 	public void testHandleServiceUnrecognizedException() {
 		String errorMessage = "unrecognized";
 		widget.handleException(new IllegalArgumentException(errorMessage));
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		verify(mockView).showError(errorMessage);
 	}
 	
@@ -209,7 +209,7 @@ public class SynapseAlertImplTest {
 	public void testHandleServiceUnrecognizedExceptionNullMessage() {
 		String errorMessage = null;
 		widget.handleException(new IllegalArgumentException(errorMessage));
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		verify(mockView).showError(DisplayConstants.ERROR_RESPONSE_UNAVAILABLE);
 	}
 	
@@ -217,7 +217,7 @@ public class SynapseAlertImplTest {
 	public void testHandleServiceUnrecognizedExceptionEmptyMessage() {
 		String errorMessage = "";
 		widget.handleException(new IllegalArgumentException(errorMessage));
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		verify(mockView).showError(DisplayConstants.ERROR_RESPONSE_UNAVAILABLE);
 	}
 	
@@ -225,7 +225,7 @@ public class SynapseAlertImplTest {
 	public void testHandleServiceUnrecognizedExceptionZeroMessage() {
 		String errorMessage = "0";
 		widget.handleException(new IllegalArgumentException(errorMessage));
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		verify(mockView).showError(DisplayConstants.ERROR_RESPONSE_UNAVAILABLE);
 	}
 	
@@ -253,7 +253,7 @@ public class SynapseAlertImplTest {
 	@Test
 	public void testShowMustLogin() {
 		widget.showLogin();
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		verify(mockPortalGinInjector).getLoginWidget();
 		verify(mockView).setLoginWidget(any(Widget.class));
 		verify(mockView).showLogin();
@@ -263,7 +263,7 @@ public class SynapseAlertImplTest {
 	public void testShowError() {
 		String errorMessage = "a handled error";
 		widget.showError(errorMessage);
-		verify(mockView, times(2)).clearState();
+		verify(mockView).clearState();
 		verify(mockView).showError(errorMessage);
 	}
 }

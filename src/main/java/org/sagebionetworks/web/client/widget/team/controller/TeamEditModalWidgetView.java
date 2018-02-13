@@ -12,6 +12,7 @@ public interface TeamEditModalWidgetView {
 		void setRefreshCallback(Callback refreshCallback);
 		void onConfirm();
 		void hide();
+		void onRemovePicture();
 	}
 
 	public Widget asWidget();

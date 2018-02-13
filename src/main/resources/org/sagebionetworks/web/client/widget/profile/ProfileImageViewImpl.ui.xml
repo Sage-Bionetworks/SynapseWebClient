@@ -8,7 +8,7 @@
 			addStyleNames="font-size-150 lightGreyText" visible="true"/>
 		<g:HTMLPanel width="150px" addStyleNames="position-relative">
 		    <bh:Div addStyleNames="position-absolute topLevelZIndex">
-    			<b:Button ui:field="removePicture" icon="TIMES" size="EXTRA_SMALL" type="DANGER"/>
+    				<b:Button ui:field="removePicture" icon="TIMES" size="EXTRA_SMALL" type="DANGER"/>
        		</bh:Div>
        		<b:Image ui:field="image" type="ROUNDED" width="150px" visible="false"/>
 		</g:HTMLPanel>

@@ -61,7 +61,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 		this.challengeId = challengeId;
 		view.setRecruitmentMessage("");
 		view.setNewTeamLink("#!Profile:"+authenticationController.getCurrentUserPrincipalId()+Profile.DELIMITER+Synapse.ProfileArea.TEAMS);
-		getRegistratableTeams();
+		refreshRegistratableTeams();
 	}
 	
 	public ConfirmCallback getConfirmCallback() {
@@ -74,7 +74,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 		};
 	}
 
-	public void getRegistratableTeams() {
+	public void refreshRegistratableTeams() {
 		challengeClient.getRegistratableTeams(authenticationController.getCurrentUserPrincipalId(), challengeId, new AsyncCallback<List<Team>>() {
 			@Override
 			public void onSuccess(List<Team> result) {

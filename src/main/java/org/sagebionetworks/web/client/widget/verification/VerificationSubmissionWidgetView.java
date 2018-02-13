@@ -15,8 +15,6 @@ public interface VerificationSubmissionWidgetView extends SynapseView, IsWidget 
 	void hide();
 	void setSynAlert(Widget w);
 	void setFileHandleList(Widget w);
-	void setWikiPage(Widget w);
-	void setWikiPageVisible(boolean visible);
 	void setPresenter(Presenter presenter);
 	void setTitle(String title);
 	void setEmails(List<String> emails);

@@ -104,7 +104,7 @@ public class UserBadgeItem implements IsWidget, SelectableListItem {
 		
 		UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
 		userBadge.configure(userId);
-		userBadge.setSize(BadgeSize.SMALL);
+		userBadge.setSize(BadgeSize.DEFAULT);
 		userBadge.setCustomClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {

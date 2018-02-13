@@ -7,9 +7,9 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalBody;
 import org.gwtbootstrap3.client.ui.ModalFooter;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.core.shared.GWT;
@@ -27,7 +27,7 @@ import com.google.inject.Inject;
 public class FilesTabViewImpl implements FilesTabView {
 	private static final String DISCUSSION_ABOUT = "Discussion about ";
 	@UiField
-	Span loading;
+	LoadingSpinner loading;
 	@UiField
 	SimplePanel fileBrowserContainer;
 	@UiField

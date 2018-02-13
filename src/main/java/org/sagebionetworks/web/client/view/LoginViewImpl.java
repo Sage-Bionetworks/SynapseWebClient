@@ -1,14 +1,15 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
@@ -59,7 +60,9 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	Button takePledgeButton;
 	@UiField
-	Div loadingUi;
+	LoadingSpinner loadingUi;
+	@UiField
+	Heading loadingUiText;
 	@UiField
 	Modal termsOfUseDialog;
 	@UiField
@@ -95,11 +98,13 @@ public class LoginViewImpl extends Composite implements LoginView {
 	public void showLoggingInLoader() {
 		hideViews();
 		loadingUi.setVisible(true);
+		loadingUiText.setVisible(true);
 	}
 
 	@Override
 	public void hideLoggingInLoader() {
 		loadingUi.setVisible(false);
+		loadingUiText.setVisible(false);
 	}
 
 	@Override
@@ -210,6 +215,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	}
 	private void hideViews() {
 		loadingUi.setVisible(false);
+		loadingUiText.setVisible(false);
 		loginView.setVisible(false);
 		termsOfServiceView.setVisible(false);
 	}

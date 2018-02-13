@@ -18,7 +18,6 @@ import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.ServiceDefTarget;
-import com.google.gwt.user.client.rpc.XsrfTokenServiceAsync;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 
@@ -30,13 +29,17 @@ public class Portal implements EntryPoint {
 	//If there's a failure to load the code from the server, how long (in ms) should we wait before trying again...
 	public static final int CODE_LOAD_DELAY = 5000;
 	//  We are using gin to create all of our objects
-	private final PortalGinInjector ginjector = GWT.create(PortalGinInjector.class);
+	private static final PortalGinInjector ginjector = GWT.create(PortalGinInjector.class);
 	
 	private SimplePanel appWidget = new SimplePanel();
 	public final static native void _consoleError(String message) /*-{
 		console.error(message);
 	}-*/;
 
+	public static PortalGinInjector getInjector() {
+		return ginjector;
+	}
+	
 	/**
 	 * This is the entry point method.
 	 */
@@ -85,7 +88,6 @@ public class Portal implements EntryPoint {
 						RootPanel.get("rootPanel").add(appWidget);
 						RootPanel.get("headerPanel").add(header);
 						RootPanel.get("footerPanel").add(footer);
-						
 						RootPanel.get("initialLoadingUI").setVisible(false);
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
@@ -100,6 +102,8 @@ public class Portal implements EntryPoint {
 								
 								// start version timer
 								ginjector.getVersionTimer().start();
+								// start timer to check for user logout (session expired, or user explicitly logged out)
+								ginjector.getSessionTokenDetector().start();
 								
 								// Goes to place represented on URL or default place
 								historyHandler.handleCurrentHistory();

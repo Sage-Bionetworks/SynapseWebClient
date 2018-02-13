@@ -58,12 +58,12 @@ public class TableEntityListGroupItem extends ListGroupItem {
 //		createdOnDiv.add(hiddenOnXs);
 //		hiddenOnXs.add(new Text(BY));
 //		hiddenOnXs.add(createdByUserBadge);
-//		createdByUserBadge.asWidget().addStyleName("movedown-9 margin-right-10");
+//		createdByUserBadge.asWidget().addStyleName("margin-right-10");
 		
 		// Uncomment when PLFM-3054/PLFM-4220 have been fixed.
 //		hiddenOnXs.add(new Text(MODIFIED_ON+DATE_FORMAT.format(header.getModifiedOn())+BY));
 //		hiddenOnXs.add(modifiedByUserBadge);
-//		modifiedByUserBadge.asWidget().addStyleName("movedown-9");
+//		
 		
 		final TextBox synIdTextBox = new TextBox();
 		synIdTextBox.addStyleName("hidden-xs right border-none noBackground margin-right-15");

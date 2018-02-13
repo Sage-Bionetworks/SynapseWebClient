@@ -22,7 +22,9 @@ import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SessionTokenDetector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -57,6 +59,10 @@ public class AuthenticationControllerImplTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
+	SessionTokenDetector mockSessionTokenDetector;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	HashMap<String, String> serverProperties;
@@ -72,13 +78,14 @@ public class AuthenticationControllerImplTest {
 		sessionData.getSession().setSessionToken("1111");
 		
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
-		
+		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
 		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockSynapseClient, mockGinInjector);
 		serverProperties = new HashMap<String, String>();
 		AsyncMockStubber.callSuccessWith(serverProperties).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 		when(mockGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		when(mockGinInjector.getSessionTokenDetector()).thenReturn(mockSessionTokenDetector);
 	}
 	
 	@Test
@@ -104,7 +111,6 @@ public class AuthenticationControllerImplTest {
 		
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("");
 		assertFalse(authenticationController.isLoggedIn());
-		
 	}
 	
 	@Test
@@ -196,6 +202,7 @@ public class AuthenticationControllerImplTest {
 		verify(mockClientCache).clear();
 		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
 		verify(mockClientCache).put(eq(propKey), eq(propValue), anyLong());
+		verify(mockSessionTokenDetector).initializeSessionTokenState();
 	}
 	
 	
@@ -233,7 +240,7 @@ public class AuthenticationControllerImplTest {
 		loginResponse.setAcceptsTermsOfUse(true);
 		loginResponse.setAuthenticationReceipt(newAuthReceipt);
 		loginResponse.setSessionToken(newSessionToken);
-		AsyncMockStubber.callSuccessWith(loginResponse).when(mockUserAccountService).initiateSession(any(LoginRequest.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(loginResponse).when(mockJsClient).login(any(LoginRequest.class), any(AsyncCallback.class));
 		AsyncCallback loginCallback = mock(AsyncCallback.class);
 		
 		//make the actual call
@@ -241,7 +248,7 @@ public class AuthenticationControllerImplTest {
 		
 		//verify input arguments (including the cached receipt)
 		ArgumentCaptor<LoginRequest> loginRequestCaptor = ArgumentCaptor.forClass(LoginRequest.class);
-		verify(mockUserAccountService).initiateSession(loginRequestCaptor.capture(), any(AsyncCallback.class));
+		verify(mockJsClient).login(loginRequestCaptor.capture(), any(AsyncCallback.class));
 		LoginRequest request = loginRequestCaptor.getValue();
 		assertEquals(username, request.getUsername());
 		assertEquals(password, request.getPassword());
@@ -251,12 +258,13 @@ public class AuthenticationControllerImplTest {
 		verify(mockClientCache).put(eq(username + AuthenticationControllerImpl.USER_AUTHENTICATION_RECEIPT), eq(newAuthReceipt), anyLong());
 		
 		verify(loginCallback).onSuccess(any(UserSessionData.class));
+		verify(mockSessionTokenDetector).initializeSessionTokenState();
 	}
 	
 	@Test
 	public void testLoginUserFailure() {
 		Exception ex = new Exception("invalid login");
-		AsyncMockStubber.callFailureWith(ex).when(mockUserAccountService).initiateSession(any(LoginRequest.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).login(any(LoginRequest.class), any(AsyncCallback.class));
 		String username = "testusername";
 		String password = "pw";
 		AsyncCallback loginCallback = mock(AsyncCallback.class);
@@ -272,7 +280,7 @@ public class AuthenticationControllerImplTest {
 		//successfully log the user in, but put the stack into read only mode after login (so session token validation fails with a ReadOnlyException).
 		LoginResponse loginResponse = new LoginResponse();
 		loginResponse.setSessionToken("213344");
-		AsyncMockStubber.callSuccessWith(loginResponse).when(mockUserAccountService).initiateSession(any(LoginRequest.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(loginResponse).when(mockJsClient).login(any(LoginRequest.class), any(AsyncCallback.class));
 		ReadOnlyModeException ex = new ReadOnlyModeException();
 		AsyncMockStubber.callFailureWith(ex).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
 		String username = "testusername";

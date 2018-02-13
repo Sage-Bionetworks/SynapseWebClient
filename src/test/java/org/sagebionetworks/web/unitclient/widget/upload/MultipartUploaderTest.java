@@ -39,6 +39,7 @@ import org.sagebionetworks.repo.model.file.PartPresignedUrl;
 import org.sagebionetworks.repo.model.file.PartUtils;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.MultipartFileUploadClientAsync;
 import org.sagebionetworks.web.client.ProgressCallback;
@@ -158,6 +159,23 @@ public class MultipartUploaderTest {
     
 	private void setPartsState(String partsState) {
 		when(mockMultipartUploadStatus.getPartsState()).thenReturn(partsState);
+	}
+	
+	@Test
+	public void testDirectUploadFolder() throws Exception {
+		setPartsState("0");
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+                final Object[] args = invocation.getArguments();
+                ((MD5Callback) args[args.length - 1]).setMD5(null);
+				return null;
+			}
+		}).when(synapseJsniUtils).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
+		
+		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
+		verify(synapseJsniUtils).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
+		verify(mockHandler).uploadFailed(DisplayConstants.MD5_CALCULATION_ERROR);
 	}
 	
 	@Test

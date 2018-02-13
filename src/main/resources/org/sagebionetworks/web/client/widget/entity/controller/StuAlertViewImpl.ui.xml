@@ -30,10 +30,7 @@
 			  			<b:Heading size="H4" addStyleNames="displayInline" text="You can" />
 			  			<b:Anchor addStyleNames="displayInline font-size-20 margin-5" ui:field="requestAccessLink" text="request access"/>
 			  			<b:Heading addStyleNames="displayInline" size="H4" text="from the owner." />
-			  			<bh:Div addStyleNames="center margin-top-10" ui:field="requestLoadingUI">
-						  	<w:LoadingSpinner size="16px" />
-							<bh:Text>&nbsp;Sending request...</bh:Text>
-						</bh:Div>
+						<w:LoadingSpinner size="16px" ui:field="requestLoadingUI" />
 			  		</bh:Div>
   				</b:Column>
   			</b:Row>

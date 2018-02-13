@@ -478,6 +478,8 @@ import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.HeaderViewImpl;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetView;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueue;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueueImpl;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapperView;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapperViewImpl;
 import org.sagebionetworks.web.client.widget.login.LoginModalView;
@@ -743,24 +745,21 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(JsoProviderImpl.class).in(Singleton.class);
 		
 		// AuthenticationController
-		bind(AuthenticationControllerImpl.class).in(Singleton.class);
-		bind(AuthenticationController.class).to(AuthenticationControllerImpl.class);
+		bind(AuthenticationController.class).to(AuthenticationControllerImpl.class).in(Singleton.class);;
 
 		// GlobalApplicationState
-		bind(GlobalApplicationStateImpl.class).in(Singleton.class);
-		bind(GlobalApplicationState.class).to(GlobalApplicationStateImpl.class);
+		bind(GlobalApplicationState.class).to(GlobalApplicationStateImpl.class).in(Singleton.class);
 		bind(GlobalApplicationStateView.class).to(GlobalApplicationStateViewImpl.class);
 		
-		bind(ResourceLoaderImpl.class).in(Singleton.class);
-		bind(ResourceLoader.class).to(ResourceLoaderImpl.class);
+		bind(LazyLoadCallbackQueue.class).to(LazyLoadCallbackQueueImpl.class).in(Singleton.class);
+		
+		bind(ResourceLoader.class).to(ResourceLoaderImpl.class).in(Singleton.class);
 		
 		// Header & Footer
 		bind(Header.class).in(Singleton.class);
-		bind(HeaderViewImpl.class).in(Singleton.class);
-		bind(HeaderView.class).to(HeaderViewImpl.class);
+		bind(HeaderView.class).to(HeaderViewImpl.class).in(Singleton.class);
 		bind(Footer.class).in(Singleton.class);
-		bind(FooterViewImpl.class).in(Singleton.class);
-		bind(FooterView.class).to(FooterViewImpl.class);
+		bind(FooterView.class).to(FooterViewImpl.class).in(Singleton.class);
 		
 		// JSONAdapters
 		bind(JSONObjectAdapter.class).to(JSONObjectGwt.class);
@@ -781,13 +780,13 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(FileHistoryWidgetView.class).to(FileHistoryWidgetViewImpl.class);
 				
 		// The URL cache
-		bind(UrlCacheImpl.class).in(Singleton.class);
-		bind(UrlCache.class).to(UrlCacheImpl.class);
+		bind(UrlCache.class).to(UrlCacheImpl.class).in(Singleton.class);;
 		
 		//GWT utility methods
-		bind(GWTWrapperImpl.class).in(Singleton.class);
-		bind(GWTWrapper.class).to(GWTWrapperImpl.class);
+		bind(GWTWrapper.class).to(GWTWrapperImpl.class).in(Singleton.class);
 		bind(GWTTimer.class).to(GWTTimerImpl.class);
+		
+		bind(SessionTokenDetector.class).in(Singleton.class);
 		
 		//RequestBuilder
 		bind(RequestBuilderWrapper.class).to(RequestBuilderWrapperImpl.class);
@@ -798,85 +797,69 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(JiraURLHelper.class).to(JiraURLHelperImpl.class);
 		
 		// ClientCache
-		bind(ClientCacheImpl.class).in(Singleton.class);
-		bind(ClientCache.class).to(ClientCacheImpl.class);
+		bind(ClientCache.class).to(ClientCacheImpl.class).in(Singleton.class);
 
 		// Storage wrapper
-		bind(StorageImpl.class).in(Singleton.class);
-		bind(StorageWrapper.class).to(StorageImpl.class);
+		bind(StorageWrapper.class).to(StorageImpl.class).in(Singleton.class);;
 		
 		/*
 		 * Vanilla Implementation binding
 		 */
 		
 		// JSNI impls
-		bind(SynapseJSNIUtilsImpl.class).in(Singleton.class);
-		bind(SynapseJSNIUtils.class).to(SynapseJSNIUtilsImpl.class);
+		bind(SynapseJSNIUtils.class).to(SynapseJSNIUtilsImpl.class).in(Singleton.class);
 		
 		/*
 		 * Places
 		 */
 		
 		// The home page
-		bind(HomeViewImpl.class).in(Singleton.class);
-		bind(HomeView.class).to(HomeViewImpl.class);
+		bind(HomeView.class).to(HomeViewImpl.class).in(Singleton.class);
 
 		// EntityView
-		bind(EntityViewImpl.class).in(Singleton.class);
-		bind(EntityView.class).to(EntityViewImpl.class);
+		bind(EntityView.class).to(EntityViewImpl.class).in(Singleton.class);
 		
 		// LoginView
-		bind(LoginViewImpl.class).in(Singleton.class);
-		bind(LoginView.class).to(LoginViewImpl.class);
+		bind(LoginView.class).to(LoginViewImpl.class).in(Singleton.class);
 		
 		// PasswordResetView
-		bind(PasswordResetViewImpl.class).in(Singleton.class);
-		bind(PasswordResetView.class).to(PasswordResetViewImpl.class);
+		bind(PasswordResetView.class).to(PasswordResetViewImpl.class).in(Singleton.class);
 		
 		// NewAccountView
-		bind(NewAccountViewImpl.class).in(Singleton.class);
-		bind(NewAccountView.class).to(NewAccountViewImpl.class);
+		bind(NewAccountView.class).to(NewAccountViewImpl.class).in(Singleton.class);
 
 		// RegisterAccountView
-		bind(RegisterAccountViewImpl.class).in(Singleton.class);
-		bind(RegisterAccountView.class).to(RegisterAccountViewImpl.class);
+		bind(RegisterAccountView.class).to(RegisterAccountViewImpl.class).in(Singleton.class);
 
 		bind(RegisterWidgetView.class).to(RegisterWidgetViewImpl.class);
 
 		// ProfileView
-		bind(ProfileViewImpl.class).in(Singleton.class);
-		bind(ProfileView.class).to(ProfileViewImpl.class);		
+		bind(ProfileView.class).to(ProfileViewImpl.class).in(Singleton.class);		
 		
 		// SettingsView
-		bind(SettingsViewImpl.class).in(Singleton.class);
-		bind(SettingsView.class).to(SettingsViewImpl.class);	
+		bind(SettingsView.class).to(SettingsViewImpl.class).in(Singleton.class);	
 		
 		// CominSoonView
-		bind(ComingSoonViewImpl.class).in(Singleton.class);
-		bind(ComingSoonView.class).to(ComingSoonViewImpl.class);									
+		bind(ComingSoonView.class).to(ComingSoonViewImpl.class).in(Singleton.class);									
 		
 		// BCCOverviewView
 		bind(ChallengeOverviewViewImpl.class).in(Singleton.class);
 		bind(ChallengeOverviewView.class).to(ChallengeOverviewViewImpl.class);	
 		
 		//Help
-		bind(HelpViewImpl.class).in(Singleton.class);
-		bind(HelpView.class).to(HelpViewImpl.class);	
+		bind(HelpView.class).to(HelpViewImpl.class).in(Singleton.class);	
 		
 		// SearchView
-		bind(SearchViewImpl.class).in(Singleton.class);
-		bind(SearchView.class).to(SearchViewImpl.class);
+		bind(SearchView.class).to(SearchViewImpl.class).in(Singleton.class);
 
 		// Down
-		bind(DownViewImpl.class).in(Singleton.class);
-		bind(DownView.class).to(DownViewImpl.class);
+		bind(DownView.class).to(DownViewImpl.class).in(Singleton.class);
 
 		//Synapse Wiki Pages
 		bind(SynapseWikiView.class).to(SynapseWikiViewImpl.class);
 		
 		// QuizView
-		bind(QuizViewImpl.class).in(Singleton.class);
-		bind(QuizView.class).to(QuizViewImpl.class);
+		bind(QuizView.class).to(QuizViewImpl.class).in(Singleton.class);
 		
 		//Certificate place
 		bind(CertificateView.class).to(CertificateViewImpl.class);
@@ -885,20 +868,16 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CertificateWidgetView.class).to(CertificateWidgetViewImpl.class);		
 		
 		//Account
-		bind(AccountViewImpl.class).in(Singleton.class);
-		bind(AccountView.class).to(AccountViewImpl.class);
+		bind(AccountView.class).to(AccountViewImpl.class).in(Singleton.class);
 		
 		//ChangeUsername
-		bind(ChangeUsernameViewImpl.class).in(Singleton.class);
-		bind(ChangeUsernameView.class).to(ChangeUsernameViewImpl.class);
+		bind(ChangeUsernameView.class).to(ChangeUsernameViewImpl.class).in(Singleton.class);
 		
 		//SignedToken
-		bind(SignedTokenViewImpl.class).in(Singleton.class);
-		bind(SignedTokenView.class).to(SignedTokenViewImpl.class);
+		bind(SignedTokenView.class).to(SignedTokenViewImpl.class).in(Singleton.class);
 		
 		// Trash
-		bind(TrashViewImpl.class).in(Singleton.class);
-		bind(TrashView.class).to(TrashViewImpl.class);
+		bind(TrashView.class).to(TrashViewImpl.class).in(Singleton.class);
 		
 		// Asynchronous progress
 		bind(TimerProvider.class).to(TimerProviderImpl.class);
@@ -907,8 +886,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AsynchronousJobTracker.class).to(AsynchronousJobTrackerImpl.class);
 
 		// EmailInvitation
-		bind(EmailInvitationViewImpl.class).in(Singleton.class);
-		bind(EmailInvitationView.class).to(EmailInvitationViewImpl.class);
+		bind(EmailInvitationView.class).to(EmailInvitationViewImpl.class).in(Singleton.class);
 
 		/*
 		 * Widgets
@@ -921,8 +899,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(DoiWidgetView.class).to(DoiWidgetViewImpl.class);
 		
 		// LoginWidget
-		bind(LoginWidgetViewImpl.class).in(Singleton.class);
-		bind(LoginWidgetView.class).to(LoginWidgetViewImpl.class);
+		bind(LoginWidgetView.class).to(LoginWidgetViewImpl.class).in(Singleton.class);
 		
 		// Breadcrumb
 		bind(BreadcrumbView.class).to(BreadcrumbViewImpl.class);
@@ -966,13 +943,11 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RenameEntityModalWidget.class).to(RenameEntityModalWidgetImpl.class);
 		
 		// FileBox
-		bind(FileTitleBarViewImpl.class).in(Singleton.class);
-		bind(FileTitleBarView.class).to(FileTitleBarViewImpl.class);
+		bind(FileTitleBarView.class).to(FileTitleBarViewImpl.class).in(Singleton.class);
 		bind(BasicTitleBarView.class).to(BasicTitleBarViewImpl.class);
 				
 		// Search Box
-		bind(SearchBoxViewImpl.class).in(Singleton.class);
-		bind(SearchBoxView.class).to(SearchBoxViewImpl.class);
+		bind(SearchBoxView.class).to(SearchBoxViewImpl.class).in(Singleton.class);
 		
 		// User Suggest Box
 		bind(SynapseSuggestBoxView.class).to(SynapseSuggestBoxViewImpl.class);
@@ -992,8 +967,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(EntityTreeBrowserView.class).to(EntityTreeBrowserViewImpl.class);
 
 		// MyEntitiesBrowser
-		bind(MyEntitiesBrowser.class).in(Singleton.class);
-		bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class);
+		bind(MyEntitiesBrowserView.class).to(MyEntitiesBrowserViewImpl.class).in(Singleton.class);
 
 		// Wiki Attachments		
 		bind(WikiAttachmentsView.class).to(WikiAttachmentsViewImpl.class);
@@ -1036,16 +1010,13 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiSubpageNavigationTreeView.class).to(WikiSubpageNavigationTreeViewImpl.class);
 		
 		//Widget Registration
-		bind(WidgetRegistrarImpl.class).in(Singleton.class);
-		bind(WidgetRegistrar.class).to(WidgetRegistrarImpl.class);
+		bind(WidgetRegistrar.class).to(WidgetRegistrarImpl.class).in(Singleton.class);
 		
 		// UI Widget Descriptor editor
 		bind(BaseEditWidgetDescriptorView.class).to(BaseEditWidgetDescriptorViewImpl.class);
 		bind(ReferenceConfigView.class).to(ReferenceConfigViewImpl.class);
-		bind(ImageConfigViewImpl.class).in(Singleton.class);
-		bind(ImageConfigView.class).to(ImageConfigViewImpl.class);
-		bind(AttachmentConfigViewImpl.class).in(Singleton.class);
-		bind(AttachmentConfigView.class).to(AttachmentConfigViewImpl.class);
+		bind(ImageConfigView.class).to(ImageConfigViewImpl.class).in(Singleton.class);
+		bind(AttachmentConfigView.class).to(AttachmentConfigViewImpl.class).in(Singleton.class);
 		bind(ProvenanceConfigView.class).to(ProvenanceConfigViewImpl.class);
 		bind(LinkConfigView.class).to(LinkConfigViewImpl.class);
 		bind(TabbedTableConfigView.class).to(TabbedTableConfigViewImpl.class);
@@ -1184,18 +1155,15 @@ public class PortalGinModule extends AbstractGinModule {
 		 * Teams Places
 		 */
 		// Team Page
-		bind(TeamViewImpl.class).in(Singleton.class);
-		bind(TeamView.class).to(TeamViewImpl.class);
+		bind(TeamView.class).to(TeamViewImpl.class).in(Singleton.class);
 		
 		// Team Search Page
-		bind(TeamSearchViewImpl.class).in(Singleton.class);
-		bind(TeamSearchView.class).to(TeamSearchViewImpl.class);
+		bind(TeamSearchView.class).to(TeamSearchViewImpl.class).in(Singleton.class);
 		
 		bind(MapView.class).to(MapViewImpl.class);
 		
 		// People Search Page
-		bind(PeopleSearchViewImpl.class).in(Singleton.class);
-		bind(PeopleSearchView.class).to(PeopleSearchViewImpl.class);
+		bind(PeopleSearchView.class).to(PeopleSearchViewImpl.class).in(Singleton.class);
 		
 		/*
 		 * Teams Widgets
@@ -1261,13 +1229,11 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SingleButtonView.class).to(SingleButtonViewImpl.class);
 		bind(UserListView.class).to(UserListViewImpl.class);
 		
-		bind(AnnotationTransformerImpl.class).in(Singleton.class);
-		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class);
+		bind(AnnotationTransformer.class).to(AnnotationTransformerImpl.class).in(Singleton.class);
 		bind(AnnotationEditorView.class).to(AnnotationEditorViewImpl.class);
 		bind(EditAnnotationsDialogView.class).to(EditAnnotationsDialogViewImpl.class);
 		
-		bind(AnnotationCellFactoryImpl.class).in(Singleton.class);
-		bind(AnnotationCellFactory.class).to(AnnotationCellFactoryImpl.class);
+		bind(AnnotationCellFactory.class).to(AnnotationCellFactoryImpl.class).in(Singleton.class);
 		
 		bind(FileHistoryRowView.class).to(FileHistoryRowViewImpl.class);
 		bind(SynapseStandaloneWikiView.class).to(SynapseStandaloneWikiViewImpl.class);
@@ -1367,28 +1333,21 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(LazyLoadWikiWidgetWrapperView.class).to(LazyLoadWikiWidgetWrapperViewImpl.class);
 		
-		bind(EntityHeaderAsyncHandlerImpl.class).in(Singleton.class);
-		bind(EntityHeaderAsyncHandler.class).to(EntityHeaderAsyncHandlerImpl.class);
+		bind(EntityHeaderAsyncHandler.class).to(EntityHeaderAsyncHandlerImpl.class).in(Singleton.class);
 		
 		bind(GoogleMapView.class).to(GoogleMapViewImpl.class);
 		
-		bind(FileHandleAsyncHandlerImpl.class).in(Singleton.class);
-		bind(FileHandleAsyncHandler.class).to(FileHandleAsyncHandlerImpl.class);
+		bind(FileHandleAsyncHandler.class).to(FileHandleAsyncHandlerImpl.class).in(Singleton.class);
 		
-		bind(PresignedURLAsyncHandlerImpl.class).in(Singleton.class);
-		bind(PresignedURLAsyncHandler.class).to(PresignedURLAsyncHandlerImpl.class);
+		bind(PresignedURLAsyncHandler.class).to(PresignedURLAsyncHandlerImpl.class).in(Singleton.class);
 		
-		bind(UserProfileAsyncHandlerImpl.class).in(Singleton.class);
-		bind(UserProfileAsyncHandler.class).to(UserProfileAsyncHandlerImpl.class);
+		bind(UserProfileAsyncHandler.class).to(UserProfileAsyncHandlerImpl.class).in(Singleton.class);
 		
-		bind(TeamAsyncHandlerImpl.class).in(Singleton.class);
-		bind(TeamAsyncHandler.class).to(TeamAsyncHandlerImpl.class);
+		bind(TeamAsyncHandler.class).to(TeamAsyncHandlerImpl.class).in(Singleton.class);
 		
-		bind(UserGroupHeaderAsyncHandlerImpl.class).in(Singleton.class);
-		bind(UserGroupHeaderAsyncHandler.class).to(UserGroupHeaderAsyncHandlerImpl.class);
+		bind(UserGroupHeaderAsyncHandler.class).to(UserGroupHeaderAsyncHandlerImpl.class).in(Singleton.class);
 		
-		bind(UserGroupHeaderFromAliasAsyncHandlerImpl.class).in(Singleton.class);
-		bind(UserGroupHeaderFromAliasAsyncHandler.class).to(UserGroupHeaderFromAliasAsyncHandlerImpl.class);
+		bind(UserGroupHeaderFromAliasAsyncHandler.class).to(UserGroupHeaderFromAliasAsyncHandlerImpl.class).in(Singleton.class);
 		
 		bind(DivView.class).to(DivViewImpl.class);
 		bind(FacetColumnResultValuesView.class).to(FacetColumnResultValuesViewImpl.class);
@@ -1410,11 +1369,9 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(CreateBasicAccessRequirementStep2View.class).to(CreateBasicAccessRequirementStep2ViewImpl.class);
 		bind(Button.class).to(ButtonImpl.class);
 
-		bind(IsACTMemberAsyncHandlerImpl.class).in(Singleton.class);
-		bind(IsACTMemberAsyncHandler.class).to(IsACTMemberAsyncHandlerImpl.class);
+		bind(IsACTMemberAsyncHandler.class).to(IsACTMemberAsyncHandlerImpl.class).in(Singleton.class);
 		
-		bind(PopupUtilsViewImpl.class).in(Singleton.class);
-		bind(PopupUtilsView.class).to(PopupUtilsViewImpl.class);
+		bind(PopupUtilsView.class).to(PopupUtilsViewImpl.class).in(Singleton.class);
 		bind(ProfileCertifiedValidatedView.class).to(ProfileCertifiedValidatedViewImpl.class);
 		bind(ACTDataAccessSubmissionsView.class).to(ACTDataAccessSubmissionsViewImpl.class);
 		bind(RestrictionWidgetView.class).to(RestrictionWidgetViewImpl.class);
@@ -1426,8 +1383,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(PlotlyWidgetView.class).to(PlotlyWidgetViewImpl.class);
 		bind(PlotlyConfigView.class).to(PlotlyConfigViewImpl.class);
 		
-		bind(DateTimeUtilsImpl.class).in(Singleton.class);
-		bind(DateTimeUtils.class).to(DateTimeUtilsImpl.class);
+		bind(DateTimeUtils.class).to(DateTimeUtilsImpl.class).in(Singleton.class);
 		bind(ACTAccessApprovalsView.class).to(ACTAccessApprovalsViewImpl.class);
 		bind(AccessorGroupView.class).to(AccessorGroupViewImpl.class);
 		bind(SelfSignAccessRequirementWidgetView.class).to(SelfSignAccessRequirementWidgetViewImpl.class);

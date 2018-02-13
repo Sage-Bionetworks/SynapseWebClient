@@ -10,8 +10,8 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
@@ -34,7 +34,6 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	
 	private FileHistoryWidgetView view;
 	private EntityBundle bundle;
-	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
@@ -107,7 +106,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 						public void onSuccess(Entity result) {
 							view.hideEditVersionInfo();
 							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated " + vb.getName());
-							fireEntityUpdatedEvent();
+							refreshFileHistory();
 						}
 					});
 		}
@@ -127,7 +126,12 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo("Version deleted", "Version "+ versionNumber + " of " + bundle.getEntity().getId() + " " + DisplayConstants.LABEL_DELETED);
-				fireEntityUpdatedEvent();
+				//SWC-4002: if deleting the version that we're looking at, go to the latest version
+				if (versionNumber.equals(FileHistoryWidget.this.versionNumber)) {
+					gotoCurrentVersion();
+				} else {
+					refreshFileHistory();
+				}
 			}
 		});
 	}
@@ -138,14 +142,14 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		return view.asWidget();
 	}
 	
-	
-	public void fireEntityUpdatedEvent() {
-		if (entityUpdatedHandler != null)
-			entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
+	public void refreshFileHistory() {
+		onPageChange(WebConstants.ZERO_OFFSET);
 	}
 	
-	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		this.entityUpdatedHandler = handler;
+	public void gotoCurrentVersion() {
+		Long targetVersion = null;
+		Synapse synapse = new Synapse(bundle.getEntity().getId(), targetVersion, EntityArea.FILES, null);
+		globalApplicationState.getPlaceChanger().goTo(synapse);
 	}
 	
 	@Override

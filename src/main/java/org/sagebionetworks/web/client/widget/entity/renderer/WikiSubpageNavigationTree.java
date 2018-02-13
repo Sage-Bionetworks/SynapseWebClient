@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -71,18 +72,21 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 
 		// Assign child references.
 		for (V2WikiHeader header : wikiHeaders) {
-			
 			if (header.getParentId() == null) {
 				overallRoot = headerToNode.get(header);
 			} else {
 				SubpageNavTreeNode child = headerToNode.get(header);
 				SubpageNavTreeNode parent = idToNode.get(header.getParentId());
-				parent.setCollapsed(isCurrentWikiRoot);
-				parent.getChildren().add(child);
+				if (parent != null) {
+					parent.setCollapsed(isCurrentWikiRoot);
+					parent.getChildren().add(child);	
+				}
 			}
 		}
-		overallRoot.setCollapsed(false);
-		view.configure(overallRoot);
+		if (overallRoot != null) {
+			overallRoot.setCollapsed(false);
+			view.configure(overallRoot);
+		}
 	}
 
 	@Override

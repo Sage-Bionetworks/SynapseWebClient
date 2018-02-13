@@ -27,7 +27,8 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 	void clearTeams();
 	void showTeamsUI(List<Team> registeredTeams);
 	void hideTeamsUI();
-	void setIsIndividualSubmissionActive(boolean isActive);
+	void setIndividualSubmissionActive();
+	void setTeamSubmissionActive();
 	void setContributorsLoading(boolean isVisible);
 	void setNextButtonLoading();
 	void resetNextButton();
@@ -41,12 +42,12 @@ public interface EvaluationSubmitterView extends SynapseView, IsWidget {
 		void onNextClicked(Reference selectedEntity, String submissionName, Evaluation evaluation);
 		void onDoneClicked();
 		void onTeamSelected(int index);
-		void teamAdded();
 		void onRegisterTeamClicked();
 		void onNewTeamClicked();
 		void onIndividualSubmissionOptionClicked();
 		void onTeamSubmissionOptionClicked();
 		void onDockerCommitNextButton();
+		void refreshRegisteredTeams(); 
 	}
 	void setChallengesSynAlertWidget(Widget synAlert);
 	void setTeamSelectSynAlertWidget(Widget synAlert);

@@ -12,6 +12,7 @@ import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.PartPresignedUrl;
 import org.sagebionetworks.repo.model.file.PartUtils;
 import org.sagebionetworks.repo.model.util.ContentTypeUtils;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.MultipartFileUploadClientAsync;
@@ -99,6 +100,10 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
 			@Override
 			public void setMD5(String md5) {
+				if (md5 == null) {
+					handler.uploadFailed(DisplayConstants.MD5_CALCULATION_ERROR);
+					return;
+				}
 				long fileSize = (long)synapseJsniUtils.getFileSize(blob);
 				long partSizeBytes = PartUtils.choosePartSize(fileSize);
 				long numberOfParts = PartUtils.calculateNumberOfParts(

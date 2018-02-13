@@ -1,14 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.restriction.v2;
 
-import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.InlineRadio;
-import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -25,8 +23,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	public interface Binder extends UiBinder<Widget, RestrictionWidgetViewImpl> {}
 	
 	@UiField
-	Div loadingUI;
-	
+	LoadingSpinner loadingUI;
 	@UiField
 	Span controlledUseUI;
 	@UiField
@@ -58,71 +55,25 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	Span anonymousFlagUI;
 	@UiField
 	Anchor anonymousReportIssueLink;
-
 	
-	@UiField
-	Modal imposeRestrictionModal;
-	@UiField
-	InlineRadio yesHumanDataRadio;
-	@UiField
-	InlineRadio noHumanDataRadio;
-	@UiField
-	Alert notSensitiveHumanDataMessage;
-	
-	@UiField
-	Button imposeRestrictionOkButton;
-	@UiField
-	Button imposeRestrictionCancelButton;
-	
-	@UiField
-	Modal flagModal;
-	@UiField
-	Button flagModalOkButton;
-	
-	@UiField
-	Modal anonymousFlagModal;
-	@UiField
-	Button anonymousFlagModalOkButton;
 	@UiField
 	Div folderRestrictionUI;
 	@UiField
 	Paragraph folderRestrictedMessage;
 	@UiField
 	Paragraph folderUnrestrictedMessage;
-	Presenter presenter;
+	@UiField
+	Span modalsContainer;
 	
+	Presenter presenter;
 	//this UI widget
 	Widget widget;
-	
+	RestrictionWidgetModalsViewImpl modals;
 	@Inject
-	public RestrictionWidgetViewImpl(Binder binder) {
+	public RestrictionWidgetViewImpl(Binder binder, RestrictionWidgetModalsViewImpl modals) {
 		this.widget = binder.createAndBindUi(this);
-		yesHumanDataRadio.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.yesHumanDataClicked();
-			}
-		});
-		noHumanDataRadio.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.notHumanDataClicked();
-			}
-		});
-
-		imposeRestrictionOkButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.imposeRestrictionOkClicked();
-			}
-		});
-
-		imposeRestrictionCancelButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.imposeRestrictionCancelClicked();
-			}
-		});
+		this.modals = modals;
+		modalsContainer.add(modals);
 
 		changeLink.addClickHandler(new ClickHandler() {
 			@Override
@@ -144,21 +95,6 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 				presenter.linkClicked();
 			}
 		});
-
-		
-		flagModalOkButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.flagData();
-			}
-		});
-		
-		anonymousFlagModalOkButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.anonymousFlagModalOkClicked();
-			}
-		});
 		
 		reportIssueLink.addClickHandler(new ClickHandler() {
 			@Override
@@ -178,6 +114,7 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter=presenter;
+		modals.setPresenter(presenter);
 	}
 
 	@Override
@@ -186,8 +123,9 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 	}
 	
 	public void showVerifyDataSensitiveDialog() {
-		resetImposeRestrictionModal();
-		imposeRestrictionModal.show();
+		modals.resetImposeRestrictionModal();
+		modals.lazyConstruct();
+		modals.imposeRestrictionModal.show();
 	}
 	
 	@Override
@@ -269,49 +207,48 @@ public class RestrictionWidgetViewImpl implements RestrictionWidgetView {
 		showLink.setVisible(false);
 		showUnmetLink.setVisible(false);
 		changeLink.setVisible(false);
-		resetImposeRestrictionModal();
+		modals.resetImposeRestrictionModal();
 		unmetRequirementsIcon.setVisible(false);
 		metRequirementsIcon.setVisible(false);
 	}
 	
-	private void resetImposeRestrictionModal() {
-		yesHumanDataRadio.setValue(false);
-		noHumanDataRadio.setValue(false);
-		notSensitiveHumanDataMessage.setVisible(false);
-		imposeRestrictionOkButton.setEnabled(true);
-	}
-	
 	@Override
 	public void showFlagModal() {
-		flagModal.show();
+		modals.lazyConstruct();
+		modals.flagModal.show();
 	}
 	
 	@Override
 	public void showAnonymousFlagModal() {
-		anonymousFlagModal.show();
+		modals.lazyConstruct();
+		modals.anonymousFlagModal.show();
 	}
 	
 	@Override
 	public void setNotSensitiveHumanDataMessageVisible(boolean visible) {
-		notSensitiveHumanDataMessage.setVisible(visible);
+		modals.lazyConstruct();
+		modals.notSensitiveHumanDataMessage.setVisible(visible);
 	}
 	
 	@Override
 	public Boolean isNoHumanDataRadioSelected() {
-		return noHumanDataRadio.getValue();
+		modals.lazyConstruct();
+		return modals.noHumanDataRadio.getValue();
 	}
 	
 	@Override
 	public Boolean isYesHumanDataRadioSelected() {
-		return yesHumanDataRadio.getValue();
+		modals.lazyConstruct();
+		return modals.yesHumanDataRadio.getValue();
 	}
 
 	@Override
 	public void setImposeRestrictionModalVisible(boolean visible) {
+		modals.lazyConstruct();
 		if (visible) {
-			imposeRestrictionModal.show();
+			modals.imposeRestrictionModal.show();
 		} else {
-			imposeRestrictionModal.hide();
+			modals.imposeRestrictionModal.hide();
 		}
 	}
 	@Override

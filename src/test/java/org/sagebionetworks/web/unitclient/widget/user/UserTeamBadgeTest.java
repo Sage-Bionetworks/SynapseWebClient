@@ -103,9 +103,12 @@ public class UserTeamBadgeTest {
 		String username = "Potter";
 		widgetDescriptor.remove(WidgetConstants.USER_TEAM_BADGE_WIDGET_ID_KEY);
 		widgetDescriptor.put(WidgetConstants.USER_TEAM_BADGE_WIDGET_USERNAME_KEY, username);
+		String ownerId = "userId";
+		when(mockUserGroupHeader.getIsIndividual()).thenReturn(true);
+		when(mockUserGroupHeader.getOwnerId()).thenReturn(ownerId);
 		badge.configure(null, widgetDescriptor, null, null);
-		verify(mockGinInjector).getUserBadgeWidget();
-		verify(mockUserBadge).configureWithUsername(username);
+		verify(mockUserGroupHeaderAsyncHandler).getUserGroupHeader(eq(username), any(AsyncCallback.class));
+		verify(mockUserBadge).configure(ownerId);
 	}
 	
 	@Test

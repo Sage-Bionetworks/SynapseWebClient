@@ -25,10 +25,7 @@
 								<bh:Span ui:field="subscribersContainer" addStyleNames="right margin-left-10 margin-right-10"/>
 							</b:Column>
 							<b:Column size="XS_12">
-								<g:HTMLPanel ui:field="loadingMessage" visible="false">
-									<bh:ClearFix />
-									<w:LoadingSpinner size="31px"/>
-								</g:HTMLPanel>
+								<w:LoadingSpinner ui:field="loadingMessage" visible="false" size="31px"/>
 								<bh:Div ui:field="threadMessage"></bh:Div>
 							</b:Column>
 							<b:Column size="XS_12">

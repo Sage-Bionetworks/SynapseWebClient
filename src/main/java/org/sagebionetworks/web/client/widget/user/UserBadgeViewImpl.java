@@ -2,12 +2,12 @@ package org.sagebionetworks.web.client.widget.user;
 
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.base.HasHref;
+import org.gwtbootstrap3.client.ui.constants.Emphasis;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.view.bootstrap.table.Table;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -24,24 +24,21 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public interface Binder extends UiBinder<Widget, UserBadgeViewImpl> {	}
 	
 	@UiField
-	TableData loadingUI;
+	FocusPanel pictureFocusPanel;
 	@UiField
-	FocusPanel defaultUserPicture;
+	Span defaultUserPicture;
 	@UiField
 	Image userPicture;
 	@UiField
 	Anchor usernameLink;
 	@UiField
-	Paragraph description;
-	@UiField
-	Paragraph errorLoadingUI;
-	@UiField
 	Strong defaultUserPictureLetter;
 	@UiField
 	Icon squareIcon;
 	@UiField
-	Table userBadgeTable;
-	
+	Span otherWidgets;
+	@UiField
+	Span pictureSpan;
 	private Presenter presenter;
 	Widget widget;
 	ClickHandler badgeClicked;
@@ -56,8 +53,8 @@ public class UserBadgeViewImpl implements UserBadgeView {
 				presenter.badgeClicked(event);
 			}
 		};
-		userPicture.addClickHandler(badgeClicked);
-		defaultUserPicture.addClickHandler(badgeClicked);
+		pictureSpan.setHeight((BadgeSize.LARGE.pictureHeightPx() + 4) + "px");
+		pictureFocusPanel.addClickHandler(badgeClicked);
 		
 		userPicture.addErrorHandler(new ErrorHandler() {
 			@Override
@@ -77,11 +74,9 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		defaultUserPictureLetter.setText(letter);
 	}
 	public void clear() {
-		loadingUI.setVisible(false);
+		otherWidgets.clear();
 		defaultUserPicture.setVisible(false);
 		userPicture.setVisible(false);
-		description.setVisible(false);
-		errorLoadingUI.setVisible(false);
 	}
 	
 	@Override
@@ -103,26 +98,31 @@ public class UserBadgeViewImpl implements UserBadgeView {
 			defaultUserPicture.addStyleName(size.getDefaultPictureStyle());	
 		}
 		usernameLink.setStyleName(size.textStyle());
-		userPicture.setHeight(size.pictureHeight());
+		int pictureHeightPx = size.pictureHeightPx();
+		userPicture.setHeight(pictureHeightPx + "px");
 		usernameLink.setVisible(size.isTextVisible());
+		pictureSpan.setHeight((pictureHeightPx + 4) + "px");
 	}
 
 	@Override
 	public void setDisplayName(String displayName, String shortDisplayName) {
-		loadingUI.setVisible(false);
+		otherWidgets.clear();
 		usernameLink.setText(shortDisplayName);
 	}
 	
 	@Override
 	public void showLoadError(String error) {
-		loadingUI.setVisible(false);
-		errorLoadingUI.setText("Error loading profile: " + error);
-		errorLoadingUI.setVisible(true);	
+		otherWidgets.clear();
+		Paragraph errorParagraph = new Paragraph();
+		errorParagraph.setEmphasis(Emphasis.DANGER);
+		errorParagraph.setText("Error loading profile: " + error);
+		otherWidgets.add(errorParagraph);
 	}
 	
 	@Override
 	public void showLoading() {
-		loadingUI.setVisible(true);
+		otherWidgets.clear();
+		otherWidgets.add(new Text("Loading..."));
 	}
 
 	@Override
@@ -143,8 +143,10 @@ public class UserBadgeViewImpl implements UserBadgeView {
 
 	@Override
 	public void showDescription(String descriptionText) {
-		description.setText(descriptionText);
-		description.setVisible(true);
+		otherWidgets.clear();
+		Paragraph descriptionParagraph = new Paragraph();
+		descriptionParagraph.setText(descriptionText);
+		otherWidgets.add(descriptionParagraph);
 	}
 
 	@Override
@@ -169,7 +171,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	
 	@Override
 	public void setStyleNames(String style) {
-		userBadgeTable.setStyleName(style);
+		widget.addStyleName(style);
 	}
 	@Override
 	public void setHeight(String height) {

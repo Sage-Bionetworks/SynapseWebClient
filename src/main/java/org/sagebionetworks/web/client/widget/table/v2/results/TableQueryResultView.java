@@ -64,5 +64,6 @@ public interface TableQueryResultView extends IsWidget {
 	 */
 	void setProgressWidgetVisible(boolean visible);
 
+	void scrollTableIntoView();
 
 }

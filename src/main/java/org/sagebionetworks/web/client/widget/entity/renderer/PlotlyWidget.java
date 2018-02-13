@@ -1,15 +1,23 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_JS;
+import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_REACT_JS;
 import static org.sagebionetworks.web.client.place.Synapse.EntityArea.TABLES;
 import static org.sagebionetworks.web.client.widget.entity.tabs.TablesTab.TABLE_QUERY_PREFIX;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_COUNT;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_RESULTS;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_SELECT_COLUMNS;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
 import static org.sagebionetworks.web.shared.WidgetConstants.FILL_COLUMN_NAME;
+import static org.sagebionetworks.web.shared.WidgetConstants.IS_HORIZONTAL;
+import static org.sagebionetworks.web.shared.WidgetConstants.SHOW_LEGEND;
 import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
 import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
-import static org.sagebionetworks.web.shared.WidgetConstants.*;
+import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
+import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TYPE;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,7 +29,6 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
-import org.sagebionetworks.repo.model.table.ColumnType;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
@@ -63,8 +70,6 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	String xAxisType, yAxisType;
 	BarMode barMode;
 	private AsynchronousJobTracker jobTracker;
-	// Mask to get all parts of a query.
-	public static final Long ALL_PARTS_MASK = new Long(255);
 	Query query;
 	Long currentOffset;
 	QueryBundleRequest qbr;
@@ -74,7 +79,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	private ResourceLoader resourceLoader;
 	QueryTokenProvider queryTokenProvider;
 	public static final String X_AXIS_CATEGORY_TYPE = "category";
-	boolean showLegend;
+	boolean showLegend, isHorizontal;
 	
 	@Inject
 	public PlotlyWidget(PlotlyWidgetView view,
@@ -113,7 +118,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		xAxisType = descriptor.containsKey(X_AXIS_TYPE) ? descriptor.get(X_AXIS_TYPE) : "-"; 
 		yAxisType = descriptor.containsKey(Y_AXIS_TYPE) ? descriptor.get(Y_AXIS_TYPE) : "-";
 		showLegend = descriptor.containsKey(SHOW_LEGEND) ? Boolean.valueOf(descriptor.get(SHOW_LEGEND)) : true;
-		
+		isHorizontal = descriptor.containsKey(IS_HORIZONTAL) ? Boolean.valueOf(descriptor.get(IS_HORIZONTAL)) : false;
 		if (descriptor.containsKey(BAR_MODE)) {
 			barMode = BarMode.valueOf(descriptor.get(BAR_MODE));
 		} else {
@@ -130,7 +135,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		query.setLimit(LIMIT);
 		
 		qbr = new QueryBundleRequest();
-		qbr.setPartMask(ALL_PARTS_MASK);
+		qbr.setPartMask(BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_COUNT);
 		qbr.setQuery(query);
 		qbr.setEntityId(QueryBundleUtils.getTableId(query));
 		
@@ -233,6 +238,10 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			resourceLoader.requires(PLOTLY_JS, initializedCallback);
 			return;
 		}
+		if (!resourceLoader.isLoaded(PLOTLY_REACT_JS)) {
+			resourceLoader.requires(PLOTLY_REACT_JS, initializedCallback);
+			return;
+		}
 		
 		try {
 			List<PlotlyTraceWrapper> plotlyGraphData;
@@ -241,6 +250,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			} else { 
 				plotlyGraphData = transform(xAxisColumnName, graphType, graphData); 
 			}
+			initializeOrientation(plotlyGraphData);
 			view.setLoadingVisible(false);
 			view.showChart(title, xTitle, yTitle, plotlyGraphData, barMode.toString().toLowerCase(), xAxisType, yAxisType, showLegend);
 		} catch (Throwable ex) {
@@ -249,6 +259,20 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		view.setSourceDataLinkVisible(true);
 	}
 	
+	public void initializeOrientation(List<PlotlyTraceWrapper> plotlyGraphData) {
+		for (PlotlyTraceWrapper trace : plotlyGraphData) {
+			trace.setIsHorizontal(isHorizontal);
+		}
+		if (isHorizontal) {
+			String temp = xAxisType;
+			xAxisType = yAxisType;
+			yAxisType = temp;
+
+			temp = xTitle;
+			xTitle = yTitle;
+			yTitle = temp;
+		}
+	}
 	
 	/**
 	 * Transforms graph data into standard x/y traces, used by xy line and bar charts.
@@ -315,7 +339,6 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		
 		return plotlyTraceData;
 	}
-	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

@@ -191,11 +191,8 @@ public class EntityBadgeTest {
 		
 		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showPublicIcon();
-		verify(mockView).showAnnotationsIcon();
-		verify(mockView).setAnnotations(anyString());
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
-		verify(mockView).setDiscussionThreadIconVisible(false);
 		verify(mockFileDownloadButton, never()).configure(any(EntityBundle.class));
 		verify(mockView, never()).setFileDownloadButton(any(Widget.class));
 	}
@@ -225,11 +222,9 @@ public class EntityBadgeTest {
 		verify(mockView).setModifiedOn(smallDateString);
 				
 		verify(mockView).showPublicIcon();
-		verify(mockView).showAnnotationsIcon();
-		verify(mockView).setAnnotations(anyString());
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
-		verify(mockView).setDiscussionThreadIconVisible(true);
+		verify(mockView).showDiscussionThreadIcon();
 		verify(mockFileDownloadButton).configure(any(EntityBundle.class));
 		verify(mockFileDownloadButton).hideClientHelp();
 		verify(mockView).setFileDownloadButton(any(Widget.class));
@@ -243,8 +238,7 @@ public class EntityBadgeTest {
 		Exception ex = new Exception(errorMessage);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		widget.getEntityBundle();
-
-		verify(mockView).showErrorIcon();
+		
 		verify(mockView).setError(errorMessage);
 	}
 

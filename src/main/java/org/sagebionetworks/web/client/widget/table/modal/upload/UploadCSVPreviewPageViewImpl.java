@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
+import org.gwtbootstrap3.client.ui.Button;
+
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -22,13 +24,17 @@ public class UploadCSVPreviewPageViewImpl implements UploadCSVPreviewPageView {
 	SimplePanel trackerPanel;
 	@UiField
 	SimplePanel optionsPanel;
-	
+	@UiField
+	Button optionsButton;
 	Widget widget;
 	Presenter presenter;
-	
 	@Inject
 	public UploadCSVPreviewPageViewImpl(Binder binder){
 		this.widget = binder.createAndBindUi(this);
+		optionsButton.addClickHandler(event -> {
+			// toggle visibility
+			optionsPanel.setVisible(!optionsPanel.isVisible());
+		});
 	}
 	
 	@Override

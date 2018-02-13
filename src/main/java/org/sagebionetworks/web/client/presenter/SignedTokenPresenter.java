@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.message.NotificationSettingsSignedToken;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.place.EmailInvitation;
 import org.sagebionetworks.web.client.place.SignedToken;
 import org.sagebionetworks.web.client.place.Team;
@@ -27,7 +28,6 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class SignedTokenPresenter extends AbstractActivity implements SignedTokenView.Presenter, Presenter<SignedToken> {
-	private SignedToken place;
 	private SignedTokenView view;
 	private SynapseClientAsync synapseClient;
 	private GWTWrapper gwt;
@@ -65,7 +65,6 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 
 	@Override
 	public void setPlace(SignedToken place) {
-		this.place = place;
 		this.view.setPresenter(this);
 
 		configure(place.getTokenType(), place.getSignedEncodedToken());
@@ -176,6 +175,6 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 
 	@Override
 	public void okClicked() {
-		globalApplicationState.gotoLastPlace();
+		globalApplicationState.getPlaceChanger().goTo(AppActivityMapper.getDefaultPlace());
 	}
 }

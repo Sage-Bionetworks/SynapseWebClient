@@ -143,6 +143,8 @@ public class WidgetConstants {
 	public static final String FLOAT_RIGHT = "Right";
 	public static final String FLOAT_CENTER = "Center";
 	
+	public static final String SUBMIT_TO_CHALLENGE = "Submit To Challenge";
+	
 	@Deprecated
 	public static final String PROV_WIDGET_ENTITY_ID_KEY = "entityId";
 	public static final String PROV_WIDGET_ENTITY_LIST_KEY = "entityList";
@@ -229,6 +231,7 @@ public class WidgetConstants {
 	public static final String Y_AXIS_TITLE = "ytitle";
 	public static final String Y_AXIS_TYPE = "yaxistype";
 	public static final String SHOW_LEGEND = "showlegend";
+	public static final String IS_HORIZONTAL = "horizontal";
 	public static final String TYPE = "type";
 	public static final String BAR_MODE = "barmode";
 }

@@ -4,17 +4,15 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
+	
 	<g:HTMLPanel>
 		<b:Form visible="false" ui:field="form">
-			<b:Input ui:field="fileInput" b:id="fileInputWidget" type="FILE" />
+			<b:Input ui:field="fileInput" type="FILE" />
 		</b:Form>
 		<b:Button addStyleNames="margin-right-5" ui:field="uploadbutton" icon="UPLOAD">Upload</b:Button>
 		<bh:Span ui:field="uploadedFileNameField"/>
-		 <g:HTMLPanel ui:field="loadingUI" addStyleNames="displayInline" visible="false">
-		 	<w:LoadingSpinner size="16px" addStyleNames="margin-right-5"/>
-			Loading...
-		</g:HTMLPanel>
+		 
+		<w:LoadingSpinner ui:field="loadingUI" size="16px" addStyleNames="margin-right-5" visible="false"/>
 		
 		<g:HTMLPanel visible="false" >
 			<canvas ui:field="originalCanvas" />

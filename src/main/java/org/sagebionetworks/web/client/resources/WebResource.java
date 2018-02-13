@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.resources;
 
 public class WebResource {
-	public enum ResourceType { JAVASCRIPT, CSS };
+	public enum ResourceType { JAVASCRIPT };
 	
 	private String url;
 	private ResourceType type;

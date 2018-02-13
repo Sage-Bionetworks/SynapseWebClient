@@ -114,7 +114,6 @@ public class PlotlyConfigEditorTest {
 		String tableSynId = "syn987";
 		String advancedClause = "where \"x Column\" > 2 group by \'y column\'";
 		String sql = "select \"" + X_COLUMN_NAME + "\", \'" + Y_COLUMN_NAME + "\' from " + tableSynId + " " + advancedClause;
-		
 		columnModels.add(mockXColumnModel);
 		columnModels.add(mockYColumnModel);
 		
@@ -124,6 +123,7 @@ public class PlotlyConfigEditorTest {
 		String xAxisTitle = "X";
 		String yAxisTitle = "Y";
 		boolean showLegend = true;
+		boolean isHorizontalBarChart = true;
 		
 		Map<String, String> params = new HashMap<>();
 		params.put(TABLE_QUERY_KEY, sql);
@@ -133,6 +133,7 @@ public class PlotlyConfigEditorTest {
 		params.put(TYPE, type.name());
 		params.put(BAR_MODE, barMode.name());
 		params.put(SHOW_LEGEND, Boolean.toString(showLegend));
+		params.put(IS_HORIZONTAL, Boolean.toString(isHorizontalBarChart));
 		
 		WikiPageKey wikiKey = null;
 		DialogCallback callback = null;
@@ -146,6 +147,7 @@ public class PlotlyConfigEditorTest {
 		verify(mockView).setAdvancedClause(advancedClause);
 		verify(mockView).setAdvancedUIVisible(true);
 		verify(mockView).setShowLegend(showLegend);
+		verify(mockView).setBarOrientationHorizontal(isHorizontalBarChart);
 	}
 	
 	@Test
@@ -220,6 +222,43 @@ public class PlotlyConfigEditorTest {
 		assertEquals(GraphType.SCATTER.toString(), params.get(TYPE));
 		assertEquals(Boolean.toString(showLegend), params.get(SHOW_LEGEND));
 	}
+	
+	@Test
+	public void testUpdateDescriptorFromViewBarChart() {
+		Map<String, String> params = new HashMap<>();
+		WikiPageKey wikiKey = null;
+		DialogCallback callback = null;
+		editor.configure(wikiKey, params, callback);
+
+		// simulate table selected, x column selected, and y column added
+		String newSynId = "syn999999";
+		String newX = "new X";
+		String newY1 = "new Y1";
+		when(mockXColumnModel.getName()).thenReturn(newX);
+		when(mockYColumnModel.getName()).thenReturn(newY1);
+		columnModels.add(mockXColumnModel);
+		columnModels.add(mockYColumnModel);
+		when(mockView.getXAxisColumnName()).thenReturn(newX);
+		boolean showLegend = true;
+		when(mockView.isShowLegend()).thenReturn(showLegend);
+		editor.setTableId(newSynId);
+		editor.onXColumnChanged();
+		editor.onAddYColumn(newY1);
+		boolean isHorizontalBarChart = false;
+		when(mockView.isBarOrientationHorizontal()).thenReturn(isHorizontalBarChart);
+		BarMode mode = BarMode.STACK;
+		when(mockView.getBarMode()).thenReturn(mode);
+		GraphType type = GraphType.BAR;
+		when(mockView.getGraphType()).thenReturn(type);
+		
+		editor.updateDescriptorFromView();
+		
+		//verify
+		assertEquals(GraphType.BAR.toString(), params.get(TYPE));
+		assertEquals(Boolean.toString(isHorizontalBarChart), params.get(IS_HORIZONTAL));
+		assertEquals(mode.toString(), params.get(BAR_MODE));
+	}
+	
 	@Test (expected=IllegalArgumentException.class)
 	public void testUpdateDescriptorFromViewFailure() {
 		Map<String, String> params = new HashMap<>();

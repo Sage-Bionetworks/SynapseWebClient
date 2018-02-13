@@ -8,11 +8,8 @@
 	
 	<ui:with field='icons' type='org.sagebionetworks.web.client.IconsImageBundle'/>
  	<bh:Span addStyleNames="restrictionWidget">
-	    <bh:Div ui:field="loadingUI" >
-			<w:LoadingSpinner size="16px"/>
-			<bh:Text> Loading...</bh:Text>
-		</bh:Div>
-	    <bh:Span ui:field="controlledUseUI">
+	    	<w:LoadingSpinner ui:field="loadingUI" size="16px" visible="false"/>
+		<bh:Span ui:field="controlledUseUI">
 	        <g:Image ui:field="unmetRequirementsIcon" styleName="displayInline moveup-2" resource='{icons.shieldRed16}' />
 	        <g:Image ui:field="metRequirementsIcon" styleName="displayInline moveup-2" resource='{icons.shieldRed16WithGreenCheckmark}' />
 			<!-- Note, tooltip does not work if wrapping Text -->
@@ -52,42 +49,6 @@
 		</bh:Div>
 		
 		<!-- Modals associated with the restriction widget -->
-			
-		<b:Modal ui:field="imposeRestrictionModal" title="Conditions for Use" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
-			<b:ModalBody>
-			    <g:InlineLabel styleName="margin-right-10" text="Is this sensitive human data that must be protected?" />
-			    <b:InlineRadio ui:field="yesHumanDataRadio" name="humandata" text="Yes"/>
-	        	<b:InlineRadio ui:field="noHumanDataRadio" name="humandata" text="No"/>
-	        	<bh:Div styleName="margin-top-10">
-					<b:Alert ui:field="notSensitiveHumanDataMessage"  type="WARNING">
-						<bh:Text text="Sage Bionetworks does not typically impose conditions on use of Folder content containing non-human data unless there is a legal, ethical or regulatory reason to do so.
-	        	        If you want to add conditions to use of this folder content, please contact the Synapse Access and Compliance Team (ACT) to discuss at act@sagebase.org"/>
-					</b:Alert>
-	        	</bh:Div>
-			</b:ModalBody>
-			<b:ModalFooter>
-				<b:Button ui:field="imposeRestrictionCancelButton" type="DEFAULT">Cancel</b:Button>
-				<b:Button ui:field="imposeRestrictionOkButton" type="PRIMARY">OK</b:Button>
-			</b:ModalFooter>
-		</b:Modal>
-		
-		<b:Modal ui:field="flagModal" title="Flag Data" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
-			<b:ModalBody>
-			    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please alert the Synapse Access and Compliance Team (ACT) by clicking below.</bh:Text>
-			</b:ModalBody>
-			<b:ModalFooter>
-				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
-				<b:Button ui:field="flagModalOkButton" type="PRIMARY" dataDismiss="MODAL">Flag Data</b:Button>
-			</b:ModalFooter>
-		</b:Modal>
-		<b:Modal ui:field="anonymousFlagModal" title="Flag Data" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
-			<b:ModalBody>
-			    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please log in to alert the Synapse Access and Compliance Team (ACT).</bh:Text>
-			</b:ModalBody>
-			<b:ModalFooter>
-				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
-				<b:Button ui:field="anonymousFlagModalOkButton" type="PRIMARY" dataDismiss="MODAL">Login</b:Button>
-			</b:ModalFooter>
-		</b:Modal>
+		<bh:Span ui:field="modalsContainer" />			
 	</bh:Span>
 </ui:UiBinder>

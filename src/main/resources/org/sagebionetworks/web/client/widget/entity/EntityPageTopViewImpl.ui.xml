@@ -15,9 +15,7 @@
 					<bh:Span addStyleNames="margin-left-15 margin-right-15">
 						<g:SimplePanel ui:field="projectMetadataContainer"/>
 					</bh:Span>
-					<bh:Span ui:field="loadingUI" addStyleNames="center-block center">
-						<w:LoadingSpinner size="40px"/>
-					</bh:Span>
+					<w:LoadingSpinner size="40px" ui:field="loadingUI" addStyleNames="center-block center" />
 				</b:Column>
 			</b:Row>
 		</bh:Div>

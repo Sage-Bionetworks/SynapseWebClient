@@ -2,6 +2,7 @@ package org.sagebionetworks.web.shared;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.search.query.KeyValue;
@@ -48,8 +49,8 @@ public class SearchQueryUtils {
 	static SearchQuery getBaseSearchQueryNoFacets() {
 		SearchQuery query = new SearchQuery();
 		// start with a blank, valid query
-		query.setQueryTerm(Arrays.asList(new String[] {""}));		
-		query.setReturnFields(Arrays.asList(new String[] {"name","description","id", "node_type_r", "created_by_r", "created_on", "modified_by_r", "modified_on", "path"}));
+		query.setQueryTerm(Collections.singletonList(""));
+		query.setReturnFields(Arrays.asList("name","description", "node_type", "created_by", "created_on", "modified_by", "modified_on"));
 		return query;
 	}
 
@@ -57,17 +58,17 @@ public class SearchQueryUtils {
 	 * Search
 	 */
 	public final static String SEARCH_KEY_NODE_TYPE = "node_type";
-	public final static String SEARCH_KEY_SPECIES = "species";
 	public final static String SEARCH_KEY_DISEASE = "disease";
 	public final static String SEARCH_KEY_MODIFIED_ON = "modified_on";
 	public final static String SEARCH_KEY_CREATED_ON = "created_on";
 	public final static String SEARCH_KEY_TISSUE = "tissue";
 	public final static String SEARCH_KEY_NUM_SAMPLES = "num_samples";
 	public final static String SEARCH_KEY_CREATED_BY = "created_by";
+	public final static String SEARCH_KEY_CONSORTIUM = "consortium";
 	public final static List<String> FACETS_DISPLAY_ORDER = Arrays
-	.asList(new String[] { SEARCH_KEY_NODE_TYPE, SEARCH_KEY_SPECIES,
+	.asList(SEARCH_KEY_NODE_TYPE, SEARCH_KEY_CONSORTIUM,
 			SEARCH_KEY_DISEASE, SEARCH_KEY_MODIFIED_ON,
 			SEARCH_KEY_CREATED_ON, SEARCH_KEY_TISSUE,
-			SEARCH_KEY_NUM_SAMPLES, SEARCH_KEY_CREATED_BY });
+			SEARCH_KEY_NUM_SAMPLES, SEARCH_KEY_CREATED_BY);
 
 }

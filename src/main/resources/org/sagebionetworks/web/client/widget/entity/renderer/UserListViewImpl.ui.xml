@@ -8,11 +8,7 @@
 	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
 	
 	<bh:Div addStyleNames="margin-left-5 margin-right-5">
-		<bh:Div ui:field="loadingUI" >
-			<w:LoadingSpinner size="16px"/>
-			<bh:Text>&nbsp; Loading...</bh:Text>
-		</bh:Div>
-
+		<w:LoadingSpinner ui:field="loadingUI" size="16px"/>
 		<b:Alert type="WARNING" ui:field="errorUI">
 			<bh:Strong text="Markdown Widget Warning: "/>
 			<bh:Text ui:field="errorText" text=""/>

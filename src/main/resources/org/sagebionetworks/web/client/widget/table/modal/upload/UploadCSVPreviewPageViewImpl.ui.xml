@@ -10,11 +10,9 @@
 		<g:SimplePanel ui:field="previewPanel" />
 		<g:SimplePanel ui:field="trackerPanel" />
 		<bh:Div styleName="margin-top-15" />
-		<b:Button dataToggle="COLLAPSE" dataTarget="#optionsCollapse" text="Options"/>
+		<b:Button ui:field="optionsButton" text="Options"/>
 		<bh:Div styleName="margin-top-15" />
-		<b:Collapse b:id="optionsCollapse" toggle="false">
-			<g:SimplePanel ui:field="optionsPanel" />
-		</b:Collapse>
+		<g:SimplePanel ui:field="optionsPanel" visible="false"/>
 	</g:HTMLPanel>
 
 </ui:UiBinder>

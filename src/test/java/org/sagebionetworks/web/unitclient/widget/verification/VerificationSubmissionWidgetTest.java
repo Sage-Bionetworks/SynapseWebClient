@@ -58,10 +58,6 @@ public class VerificationSubmissionWidgetTest {
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
-	MarkdownWidget mockMarkdownWidget;
-	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
 	SynapseAlert mockSynapseAlert;
 	@Mock
 	FileHandleList mockFileHandleList;
@@ -97,7 +93,7 @@ public class VerificationSubmissionWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getVerificationSubmissionModalViewImpl()).thenReturn(mockView);
 		when(mockGinInjector.getVerificationSubmissionRowViewImpl()).thenReturn(mockRowView);
-		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockMarkdownWidget, mockSynapseClient, mockSynapseAlert, mockFileHandleList, mockPromptModalView, mockGlobalApplicationState, mockGWT);
+		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockSynapseAlert, mockFileHandleList, mockPromptModalView, mockGlobalApplicationState, mockGWT);
 		
 		ArgumentCaptor<PromptModalView.Presenter> captor = ArgumentCaptor.forClass(PromptModalView.Presenter.class);
 		verify(mockPromptModalView).setPresenter(captor.capture());
@@ -132,7 +128,6 @@ public class VerificationSubmissionWidgetTest {
 		fileHandleIds = new ArrayList<String>();
 		when(mockFileHandleList.getFileHandleIds()).thenReturn(fileHandleIds);
 		
-		AsyncMockStubber.callSuccessWith(mockWikiPageMap).when(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		when(mockView.getOrganization()).thenReturn(submissionCompany);
 		when(mockView.getFirstName()).thenReturn(submissionFirstName);
 		when(mockView.getLastName()).thenReturn(submissionLastName);
@@ -166,7 +161,6 @@ public class VerificationSubmissionWidgetTest {
 		assertFalse(widget.isNewSubmission());
 		verify(mockGinInjector).getVerificationSubmissionModalViewImpl();
 		verify(mockView).setFileHandleList(any(Widget.class));
-		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setPromptModal(any(Widget.class));
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockView).setPresenter(widget);
@@ -184,7 +178,6 @@ public class VerificationSubmissionWidgetTest {
 		assertTrue(widget.isNewSubmission());
 		verify(mockGinInjector).getVerificationSubmissionModalViewImpl();
 		verify(mockView).setFileHandleList(any(Widget.class));
-		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setPromptModal(any(Widget.class));
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockView).setPresenter(widget);
@@ -198,7 +191,6 @@ public class VerificationSubmissionWidgetTest {
 		widget.configure(mockSubmission, isACTMember, isModal);
 		verify(mockGinInjector).getVerificationSubmissionRowViewImpl();
 		verify(mockRowView).setFileHandleList(any(Widget.class));
-		verify(mockRowView).setWikiPage(any(Widget.class));
 		verify(mockRowView).setPromptModal(any(Widget.class));
 		verify(mockRowView).setSynAlert(any(Widget.class));
 		verify(mockRowView).setPresenter(widget);
@@ -246,7 +238,6 @@ public class VerificationSubmissionWidgetTest {
 		widget.configure(profile, orcId, isModal, submissionAttachments);
 		widget.show();
 		verify(mockView).clear();
-		verify(mockView).setWikiPageVisible(true);
 		verify(mockView).setCancelButtonVisible(true);
 		verify(mockView).setSubmitButtonVisible(true);
 		verify(mockFileHandleList).configure();
@@ -278,7 +269,6 @@ public class VerificationSubmissionWidgetTest {
 		setCurrentMockState(VerificationStateEnum.SUBMITTED, null);
 		
 		widget.show();
-		verify(mockView).setWikiPageVisible(false);
 		verify(mockView).setFirstName(submissionFirstName);
 		verify(mockView).setLastName(submissionLastName);
 		verify(mockView).setLocation(submissionLocation);
@@ -354,15 +344,6 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockView).setCloseButtonVisible(true);
 	}
 
-	@Test
-	public void testLoadWikiHelpContent() {
-		configureWithMockSubmission();
-		WikiPageKey mockKey = mock(WikiPageKey.class);
-		widget.loadWikiHelpContent(mockKey);
-		verify(mockMarkdownWidget).loadMarkdownFromWikiPage(mockKey, false);
-		verify(mockView).setWikiPageVisible(true);
-	}
-	
 	@Test
 	public void testUpdateVerificationState() {
 		configureWithMockSubmission();

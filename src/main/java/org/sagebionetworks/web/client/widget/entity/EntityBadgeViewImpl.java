@@ -2,7 +2,10 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.Emphasis;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -51,33 +54,15 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	Label modifiedOnField;
 	
 	@UiField
-	Tooltip annotationsField;
-	@UiField
 	Label sizeField;
 	@UiField
 	TextBox md5Field;
 	@UiField
-	Icon publicIcon;
-	@UiField
-	Icon privateIcon;
-	@UiField
-	Icon sharingSetIcon;
-	@UiField
-	Icon wikiIcon;
-	@UiField
-	Icon annotationsIcon;
-	@UiField
-	Tooltip errorField;
-	@UiField
-	Icon errorIcon;
-	@UiField
 	Span fileDownloadButtonContainer;
+	
 	@UiField
-	Icon discussionIcon;
-	@UiField
-	Tooltip discussion;
-	@UiField
-	Icon unLinkIcon;
+	Div nameContainer;
+	
 	Callback onAttachCallback;
 	Anchor entityAnchor;
 	PlaceChanger placeChanger;
@@ -100,12 +85,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			@Override
 			public void onClick(ClickEvent event) {
 				md5Field.selectAll();
-			}
-		});
-		unLinkIcon.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onUnlink();
 			}
 		});
 	}
@@ -204,22 +183,22 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	
 	@Override
 	public void setAnnotations(String html) {
-		annotationsField.setHtml(SafeHtmlUtils.fromTrustedString(html));
-		annotationsField.reconfigure();
-	}
-	@Override
-	public void showAnnotationsIcon() {
-		annotationsIcon.setVisible(true);
+		Icon icon = new Icon(IconType.TAGS);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		Tooltip tooltip = new Tooltip(icon);
+		tooltip.setHtml(SafeHtmlUtils.fromTrustedString(html));
+		nameContainer.add(tooltip);
 	}
 	
 	@Override
 	public void setError(String error) {
-		errorField.setTitle(error);
-		errorField.reconfigure();
-	}
-	@Override
-	public void showErrorIcon() {
-		errorIcon.setVisible(true);
+		Icon icon = new Icon(IconType.EXCLAMATION_CIRCLE);
+		icon.setFixedWidth(true);
+		icon.setEmphasis(Emphasis.DANGER);
+		icon.setPull(Pull.RIGHT);
+		Tooltip tooltip = new Tooltip(icon, error);
+		nameContainer.add(tooltip);
 	}
 	
 	@Override
@@ -233,21 +212,32 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 
 	@Override
 	public void showHasWikiIcon() {
-		wikiIcon.setVisible(true);
+		Icon icon = new Icon(IconType.NEWSPAPER_O);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		nameContainer.add(new Tooltip(icon, "Has a wiki"));
 	}
 	@Override
 	public void showPrivateIcon() {
-		privateIcon.setVisible(true);
+		Icon icon = new Icon(IconType.LOCK);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		nameContainer.add(new Tooltip(icon, "Private"));
 	}
 	@Override
 	public void showPublicIcon() {
-		publicIcon.setVisible(true);
+		Icon icon = new Icon(IconType.GLOBE);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		nameContainer.add(new Tooltip(icon, "Public"));
 	}
 	@Override
 	public void showSharingSetIcon() {
-		sharingSetIcon.setVisible(true);
+		Icon icon = new Icon(IconType.CHECK);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		nameContainer.add(new Tooltip(icon, "Sharing Settings have been set"));
 	}
-
 	@Override
 	public boolean isInViewport() {
 		return DisplayUtils.isInViewport(this);
@@ -259,12 +249,25 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}
 
 	@Override
-	public void setDiscussionThreadIconVisible(boolean visible){
-		discussionIcon.setVisible(visible);
+	public void showDiscussionThreadIcon(){
+		Icon icon = new Icon(IconType.COMMENT);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		nameContainer.add(new Tooltip(icon, "Has been mentioned in discussion"));
 	}
+	
 	@Override
 	public void showUnlinkIcon() {
-		unLinkIcon.setVisible(true);
+		Icon icon = new Icon(IconType.CHAIN_BROKEN);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		icon.setEmphasis(Emphasis.DANGER);
+		icon.addStyleName("imageButton");
+		icon.addClickHandler(event -> {
+			presenter.onUnlink();
+		});
+		
+		nameContainer.add(new Tooltip(icon, "Remove this link"));
 	}
 	
 

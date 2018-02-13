@@ -8,9 +8,7 @@
 		dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
 		<b:ModalBody>
 			<g:SimplePanel ui:field="bodyPanel" />
-			<g:SimplePanel ui:field="loadingPanel">
-				<w:LoadingSpinner size="31px"/>
-			</g:SimplePanel>
+			<w:LoadingSpinner size="31px" ui:field="loadingPanel"/>
 			<bh:Div styleName="margin-top-15" />
 			<b:Alert ui:field="alert" type="DANGER" visible="false"></b:Alert>
 			<g:FlowPanel addStyleNames="help-panel">

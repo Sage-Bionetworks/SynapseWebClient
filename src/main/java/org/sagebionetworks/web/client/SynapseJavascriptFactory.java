@@ -18,11 +18,15 @@ import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.asynch.AsyncJobId;
+import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -39,6 +43,7 @@ import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -46,6 +51,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
 
 public class SynapseJavascriptFactory {
 	public enum OBJECT_TYPE {
@@ -62,6 +68,7 @@ public class SynapseJavascriptFactory {
 		UserBundle,
 		Count,
 		PaginatedResultsEntityHeader,
+		PaginatedResultProjectHeader,
 		V2WikiPage,
 		V2WikiOrderHint,
 		DockerRepository,
@@ -91,6 +98,9 @@ public class SynapseJavascriptFactory {
 		InviteeVerificationSignedToken,
 		ListWrapperColumnModel,
 		PaginatedTeamIds,
+		QueryResultBundle,
+		AsyncJobId,
+		LoginResponse,
 		None,
 		String
 	}
@@ -98,8 +108,9 @@ public class SynapseJavascriptFactory {
 	/**
 	 * Create a new instance of a concrete class using the object type
 	 * @throws JSONObjectAdapterException 
+	 * @throws ResultNotReadyException 
 	 */
-	public Object newInstance(OBJECT_TYPE type, JSONObjectAdapter json) throws JSONObjectAdapterException {
+	public Object newInstance(OBJECT_TYPE type, JSONObjectAdapter json) throws JSONObjectAdapterException, ResultNotReadyException {
 		if (OBJECT_TYPE.Entity.equals(type) && json.has("concreteType")) {
 			// attempt to construct based on concreteType
 			String concreteType = json.getString("concreteType");
@@ -185,6 +196,15 @@ public class SynapseJavascriptFactory {
 				entityHeaderList.add(new EntityHeader(jsonObject));
 			}
 			return entityHeaderList;
+		case PaginatedResultProjectHeader : 
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<ProjectHeader> projectHeaderList = new ArrayList<>();
+			JSONArrayAdapter projectResultsJsonArray = json.getJSONArray("results");
+			for (int i = 0; i < projectResultsJsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = projectResultsJsonArray.getJSONObject(i);
+				projectHeaderList.add(new ProjectHeader(jsonObject));
+			}
+			return projectHeaderList;
 		case ListWrapperColumnModel :
 			List<ColumnModel> columnModelList = new ArrayList<>();
 			JSONArrayAdapter columnModelJsonList = json.getJSONArray("list");
@@ -217,6 +237,17 @@ public class SynapseJavascriptFactory {
 			return new InviteeVerificationSignedToken(json);
 		case PaginatedTeamIds:
 			return new PaginatedTeamIds(json);
+		case QueryResultBundle:
+			try {
+				AsynchronousJobStatus status = new AsynchronousJobStatus(json); 
+				throw new ResultNotReadyException(status);
+			} catch (JSONObjectAdapterException e) {
+				return new QueryResultBundle(json);				
+			}
+		case AsyncJobId:
+			return new AsyncJobId(json).getToken();
+		case LoginResponse:
+			return new LoginResponse(json);
 		default:
 			throw new IllegalArgumentException("No match found for : "+ type);
 		}

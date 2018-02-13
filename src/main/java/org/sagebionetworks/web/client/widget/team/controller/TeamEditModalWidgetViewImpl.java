@@ -8,15 +8,11 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -60,11 +56,13 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	Image previewImage;
 	
 	@UiField
-	Div teamImageLoading;
+	LoadingSpinner teamImageLoading;
 	
 	@UiField
 	Div iconContainer;
-
+	@UiField
+	Button removePicture;
+	
 	public interface Binder extends UiBinder<Widget, TeamEditModalWidgetViewImpl> {}
 	
 	Widget widget;
@@ -74,26 +72,20 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	@Inject
 	public TeamEditModalWidgetViewImpl(Binder uiBinder) {
 		this.widget = uiBinder.createAndBindUi(this);
-		primaryButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onConfirm();
-			}
+		primaryButton.addClickHandler(event -> {
+			presenter.onConfirm();
 		});
-		secondaryButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				modal.hide();
-			}
+		secondaryButton.addClickHandler(event -> {
+			modal.hide();
 		});
-		KeyDownHandler saveInfo = new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					primaryButton.click();
-				}
+		KeyDownHandler saveInfo = event -> {
+			if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
+				primaryButton.click();
 			}
 		};
+		removePicture.addClickHandler(event -> {
+			presenter.onRemovePicture();
+		});
 		editNameField.addKeyDownHandler(saveInfo);
 	}
 	
@@ -131,6 +123,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		primaryButton.setEnabled(false);
 		iconContainer.setVisible(false);
 		teamImageLoading.setVisible(true);
+		removePicture.setVisible(false);
 	}
 	
 	@Override
@@ -181,6 +174,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		previewImage.setVisible(true);
 		teamImageLoading.setVisible(false);
 		previewImage.setUrl(url);
+		removePicture.setVisible(true);
 	}	
 	
 	@Override
@@ -188,6 +182,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		defaultIcon.setVisible(true);
 		previewImage.setVisible(false);
 		teamImageLoading.setVisible(false);
+		removePicture.setVisible(false);
 	}
 	
 	@Override

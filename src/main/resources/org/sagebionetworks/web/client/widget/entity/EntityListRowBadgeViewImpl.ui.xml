@@ -9,10 +9,7 @@
   xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
   
   	<bh:Div addStyleNames="border-top-1">
-  		<g:HTMLPanel ui:field="loadingUI">
-			<w:LoadingSpinner size="16px" />
-			&nbsp;Loading...
-		</g:HTMLPanel>
+		<w:LoadingSpinner size="16px" ui:field="loadingUI" />
 	  	<t:Table width="100%" height="36px">
 			<t:TableRow ui:field="row" visible="false">
 				<t:TableData width="35px" ui:field="selectTableData">
