@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidgetImpl;
@@ -20,7 +21,7 @@ public class AccessControlListModalWidgetImplTest {
 
 	AccessControlListModalWidgetView mockView;
 	AccessControlListEditor mockEditor;
-	Entity mockEntity;
+	FileEntity fileEntity;
 	Callback mockCallback;
 	
 	AccessControlListModalWidgetImpl modal;
@@ -29,7 +30,7 @@ public class AccessControlListModalWidgetImplTest {
 	public void before(){
 		mockView = Mockito.mock(AccessControlListModalWidgetView.class);
 		mockEditor = Mockito.mock(AccessControlListEditor.class);
-		mockEntity = Mockito.mock(Entity.class);
+		fileEntity = new FileEntity();
 		mockCallback = Mockito.mock(Callback.class);
 		modal = new AccessControlListModalWidgetImpl(mockView, mockEditor);
 	}
@@ -37,7 +38,7 @@ public class AccessControlListModalWidgetImplTest {
 	@Test
 	public void testConfigureCanEdit(){
 		boolean canChangePermission = true;
-		modal.configure(mockEntity, canChangePermission);
+		modal.configure(fileEntity, canChangePermission);
 		verify(mockView).setPrimaryButtonVisible(true);
 		verify(mockView).setDefaultButtonText(CANCEL);
 	}
@@ -45,7 +46,7 @@ public class AccessControlListModalWidgetImplTest {
 	@Test
 	public void testConfigurReadOnly(){
 		boolean canChangePermission = false;
-		modal.configure(mockEntity, canChangePermission);
+		modal.configure(fileEntity, canChangePermission);
 		verify(mockView).setPrimaryButtonVisible(false);
 		verify(mockView).setDefaultButtonText(OK);
 	}
@@ -53,7 +54,7 @@ public class AccessControlListModalWidgetImplTest {
 	@Test
 	public void testOnChange(){
 		boolean canChangePermission = true;
-		modal.configure(mockEntity, canChangePermission);
+		modal.configure(fileEntity, canChangePermission);
 		modal.hasChanges(true);
 		verify(mockView).setLoading(false);
 		verify(mockView).setPrimaryButtonEnabled(true);
@@ -61,7 +62,7 @@ public class AccessControlListModalWidgetImplTest {
 	@Test
 	public void testOnChangeNoChange(){
 		boolean canChangePermission = true;
-		modal.configure(mockEntity, canChangePermission);
+		modal.configure(fileEntity, canChangePermission);
 		modal.hasChanges(false);
 		verify(mockView).setLoading(false);
 		verify(mockView).setPrimaryButtonEnabled(false);
@@ -70,7 +71,7 @@ public class AccessControlListModalWidgetImplTest {
 	@Test
 	public void testShowSharing(){
 		boolean canChangePermission = true;
-		modal.configure(mockEntity, canChangePermission);
+		modal.configure(fileEntity, canChangePermission);
 		modal.showSharing(mockCallback);
 		verify(mockView).setLoading(false);
 		verify(mockEditor).refresh();
@@ -82,7 +83,7 @@ public class AccessControlListModalWidgetImplTest {
 		// Invoke the callback.
 		AsyncMockStubber.callWithInvoke().when(mockEditor).pushChangesToSynapse(anyBoolean(), any(Callback.class));
 		boolean canChangePermission = true;
-		modal.configure(mockEntity, canChangePermission);
+		modal.configure(fileEntity, canChangePermission);
 		modal.showSharing(mockCallback);
 		modal.onPrimary();
 		verify(mockView).hideDialog();

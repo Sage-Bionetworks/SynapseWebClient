@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
 import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditor.HasChangesHandler;
 
@@ -37,6 +38,8 @@ public class AccessControlListModalWidgetImpl implements AccessControlListModalW
 	@Override
 	public void configure(Entity entity, boolean canChangePermission) {
 		editor.configure(entity, canChangePermission, this);
+		String entityTypeName = EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entity.getClass()));
+		view.setTitle(entityTypeName + " Sharing Settings");
 		if(canChangePermission){
 			view.setPrimaryButtonVisible(true);
 			view.setDefaultButtonText(CANCEL);
