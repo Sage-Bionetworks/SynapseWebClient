@@ -87,6 +87,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		this.tableType = tableType;
 		this.rowSelectionListener = rowSelectionListener;
 		this.resetFacetsHandler = resetFacetsHandler;
+		view.showLoading();
 		Integer rowCount = bundle.getQueryResult().getQueryResults().getRows().size();
 		// The pagination widget is only visible if a listener was provider
 		if(pageChangeListener != null) {
@@ -159,6 +160,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			// Create the row 
 			addRow(row, isEditable);
 		}
+		view.hideLoading();
 	}
 	
 	/**

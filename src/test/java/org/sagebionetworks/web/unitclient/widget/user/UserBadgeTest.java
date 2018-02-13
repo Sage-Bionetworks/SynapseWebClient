@@ -147,27 +147,12 @@ public class UserBadgeTest {
 		verify(mockView).showLoadError(anyString());
 	}
 	
-	@Test
-	public void testBadgeClicked() {
-		userBadge.configure(profile);
-		userBadge.badgeClicked(null);
-		verify(mockPlaceChanger).goTo(isA(Profile.class));
-	}
 	
 	@Test
 	public void testBadgeClickedNewWindowTrue() {
 		userBadge.configure(profile);
 		userBadge.setOpenNewWindow(true);
-		userBadge.badgeClicked(null);
-		verify(mockView).openNewWindow(anyString());
-	}
-	
-	@Test
-	public void testBadgeClickedNewWindowFalse() {
-		userBadge.configure(profile);
-		userBadge.setOpenNewWindow(false);
-		userBadge.badgeClicked(null);
-		verify(mockPlaceChanger).goTo(isA(Profile.class));
+		verify(mockView).setOpenInNewWindow();
 	}
 	
 	@Test
@@ -175,22 +160,7 @@ public class UserBadgeTest {
 		userBadge.configure(profile);
 		ClickHandler mockClickHandler = mock(ClickHandler.class);
 		userBadge.setCustomClickHandler(mockClickHandler);
-		userBadge.badgeClicked(null);
-		verify(mockClickHandler).onClick(any(ClickEvent.class));
-	}
-	
-	@Test
-	public void testTargetWhenSetOpenWindowTrue() {
-		userBadge.configure(profile);
-		userBadge.setOpenNewWindow(true);
-		verify(mockView).setOpenNewWindow("_blank");
-	}
-	
-	@Test
-	public void testTargetWhenSetOpenWindowFalse() {
-		userBadge.configure(profile);
-		userBadge.setOpenNewWindow(false);
-		verify(mockView).setOpenNewWindow("");
+		verify(mockView).setCustomClickHandler(mockClickHandler);
 	}
 	
 	@Test
