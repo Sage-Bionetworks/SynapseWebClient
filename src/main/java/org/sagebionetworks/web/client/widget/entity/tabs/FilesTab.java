@@ -113,13 +113,6 @@ public class FilesTab {
 			});
 			
 			configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
-			CallbackP<String> entityClicked = new CallbackP<String> () {
-				@Override
-				public void invoke(String id) {
-					entitySelectedCallback.invoke(id);
-				}
-			};
-			filesBrowser.setEntityClickedHandler(entityClicked);
 			initBreadcrumbLinkClickedHandler();
 		}
 	}

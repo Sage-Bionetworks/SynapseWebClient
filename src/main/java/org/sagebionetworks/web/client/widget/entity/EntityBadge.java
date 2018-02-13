@@ -5,9 +5,9 @@ import static org.sagebionetworks.repo.model.EntityBundle.BENEFACTOR_ACL;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.repo.model.EntityBundle.RESTRICTION_INFORMATION;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
-import static org.sagebionetworks.repo.model.EntityBundle.RESTRICTION_INFORMATION;
 
 import java.util.List;
 
@@ -57,6 +57,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private LazyLoadHelper lazyLoadHelper;
 	private DateTimeUtils dateTimeUtils;
 	private PopupUtilsView popupUtils;
+	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
@@ -227,15 +228,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	public void addClickHandler(ClickHandler handler) {
 		modifiedByUserBadge.setCustomClickHandler(handler);
 		view.addClickHandler(handler);
-	}
-	
-	public void setEntityClickedHandler(final CallbackP<String> callback) {
-		view.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				callback.invoke(entityHeader.getId());
-			}
-		});
 	}
 	
 	public String getEntityId() {

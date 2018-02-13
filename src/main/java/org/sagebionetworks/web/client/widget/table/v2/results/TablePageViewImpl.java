@@ -10,7 +10,6 @@ import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ScrollEvent;
@@ -31,7 +30,8 @@ import com.google.inject.Inject;
 public class TablePageViewImpl implements TablePageView {
 	
 	public interface Binder extends UiBinder<Widget, TablePageViewImpl> {}
-	
+	@UiField
+	Div loadingUI;
 	@UiField
 	TableRow header;
 	@UiField
@@ -46,7 +46,7 @@ public class TablePageViewImpl implements TablePageView {
 	ScrollPanel facetsWidgetContainer;
 	@UiField
 	Div tablePanel;
-	Widget widget;
+	Div widget;
 	Presenter presenter;
 	@UiField
 	Button clearFacetsButton;
@@ -62,7 +62,8 @@ public class TablePageViewImpl implements TablePageView {
 	public TablePageViewImpl(
 			Binder binder, 
 			final GWTWrapper gwt){
-		widget = binder.createAndBindUi(this);
+		widget = (Div)binder.createAndBindUi(this);
+		
 		clearFacetsButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -155,5 +156,21 @@ public class TablePageViewImpl implements TablePageView {
 	@Override
 	public void setTableVisible(boolean visible) {
 		tablePanel.setVisible(visible);
+	}
+	@Override
+	public void hideLoading() {
+		loadingUI.setVisible(false);
+		if (!facetsWidgetContainer.isAttached()) {
+			widget.add(facetsWidgetContainer);
+		}
+		if (!tablePanel.isAttached()) {
+			widget.add(tablePanel);
+		}
+	}
+	@Override
+	public void showLoading() {
+		loadingUI.setVisible(true);
+		tablePanel.removeFromParent();
+		facetsWidgetContainer.removeFromParent();
 	}
 }

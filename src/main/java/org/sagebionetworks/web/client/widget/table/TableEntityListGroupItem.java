@@ -1,5 +1,5 @@
 package org.sagebionetworks.web.client.widget.table;
-
+import static org.sagebionetworks.web.client.DisplayUtils.*;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
@@ -70,12 +70,7 @@ public class TableEntityListGroupItem extends ListGroupItem {
 		synIdTextBox.setReadOnly(true);
 		synIdTextBox.setWidth("130px");
 		synIdTextBox.setValue(header.getId());
-		synIdTextBox.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				synIdTextBox.selectAll();
-			}
-		});
+		synIdTextBox.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
 		
 		Div div = new Div();
 		div.add(new ClearFix());

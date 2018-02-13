@@ -62,4 +62,6 @@ public interface TablePageView extends IsWidget {
 	void setFacetsVisible(boolean visible);
 	void setTableVisible(boolean visible);
 	void setPresenter(Presenter presenter);
+	void showLoading();
+	void hideLoading();
 }

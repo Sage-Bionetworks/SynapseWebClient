@@ -19,7 +19,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPresenter {
+public class ProjectBadge implements SynapseWidgetPresenter {
 	
 	private ProjectBadgeView view;
 	private ProjectHeader header;
@@ -36,7 +36,6 @@ public class ProjectBadge implements ProjectBadgeView.Presenter, SynapseWidgetPr
 		this.favoritesWidget = favoritesWidget;
 		this.gwt = gwt;
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
-		view.setPresenter(this);
 		view.setFavoritesWidget(favoritesWidget.asWidget());
 	}
 	
