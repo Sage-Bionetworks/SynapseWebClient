@@ -41,12 +41,12 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	Widget widget;
 	DateTimeUtils dateTimeUtils;
 	String projectId;
-	public static PlaceChanger PLACE_CHANGER = null;
+	public static PlaceChanger placeChanger = null;
 	public static final ClickHandler PROJECT_BADGE_CLICKHANDLER = event -> {
 		Anchor anchor = (Anchor)event.getSource();
 		event.preventDefault();
 		String projectId = anchor.getElement().getAttribute(ATTRIBUTE_PROJECT_ID);
-		PLACE_CHANGER.goTo(new Synapse(projectId));
+		placeChanger.goTo(new Synapse(projectId));
 	};
 	@Inject
 	public ProjectBadgeViewImpl(final Binder uiBinder,
@@ -58,7 +58,7 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 		widget = uiBinder.createAndBindUi(this);
 		this.sageImageBundle = sageImageBundle;
 		this.dateTimeUtils = dateTimeUtils;
-		PLACE_CHANGER = globalAppState.getPlaceChanger();
+		placeChanger = globalAppState.getPlaceChanger();
 		anchor.addClickHandler(PROJECT_BADGE_CLICKHANDLER);
 	}
 	

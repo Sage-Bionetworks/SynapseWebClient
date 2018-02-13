@@ -73,7 +73,6 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		pictureSpan.setHeight((BadgeSize.LARGE.pictureHeightPx() + 4) + "px");
 		handlerRegistration = usernameLink.addClickHandler(STANDARD_CLICKHANDLER);
 		pictureHandlerRegistration = pictureFocusPanel.addClickHandler(STANDARD_CLICKHANDLER);
-		usernameLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
 		userPicture.addErrorHandler(new ErrorHandler() {
 			@Override
 			public void onError(ErrorEvent event) {
@@ -127,6 +126,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	@Override
 	public void doNothingOnClick() {
 		handlerRegistration.removeHandler();
+		handlerRegistration = usernameLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
 	}
 	
 	@Override
