@@ -266,7 +266,10 @@ public class AccessControlListEditorTest {
 		localACL.setCreationDate(returnedACL.getCreationDate());
 		assertEquals("Created ACL is invalid", localACL, returnedACL);
 		verify(mockACLEView, never()).showErrorMessage(anyString());
-		verify(mockACLEView, times(3)).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
+		// verify initially inherited acl, then local ACL
+		verify(mockACLEView, times(1)).buildWindow(anyBoolean(), anyBoolean(), eq(INHERITED_ACL_ID), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
+		verify(mockACLEView, times(2)).buildWindow(anyBoolean(), anyBoolean(), eq(ENTITY_ID), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
+		
 		verify(mockACLEView).setPublicAclPrincipalId(any(Long.class));
 		
 		verify(mockSynapseClient, never()).sendMessage(anySet(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
@@ -530,7 +533,12 @@ public class AccessControlListEditorTest {
 		acle.pushChangesToSynapse(false,mockPushToSynapseCallback);
 		
 		verify(mockSynAlert).showError(anyString());
-		verify(mockACLEView).buildWindow(anyBoolean(), anyBoolean(), anyString(), anyBoolean(), anyBoolean(), eq(PermissionLevel.CAN_DOWNLOAD));
+		boolean isProject = true;
+		boolean isInherited = false;
+		String aclEntityId = ENTITY_ID;
+		boolean canEnableInheritance = true;
+		boolean canChangePermission = true;
+		verify(mockACLEView).buildWindow(eq(isProject), eq(isInherited), eq(aclEntityId), eq(canEnableInheritance), eq(canChangePermission), eq(PermissionLevel.CAN_DOWNLOAD));
 	}
 	
 	@SuppressWarnings("unchecked")
