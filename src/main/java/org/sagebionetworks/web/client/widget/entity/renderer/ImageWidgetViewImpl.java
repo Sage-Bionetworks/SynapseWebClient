@@ -48,7 +48,9 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 	
 	@Override
 	public void configure(final String url, final String fileName,
-			final String scale, String alignment, final String synapseId, final boolean isLoggedIn) {
+			final String scale, String alignment,
+			String altText,
+			final String synapseId, final boolean isLoggedIn) {
 		clear();
 		add(synAlert);
 		hasTriedCache = false;
@@ -81,6 +83,12 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 				return;
 			}
 		}
+		
+		if (altText == null) {
+			altText="";
+		}
+		image.setAltText(altText);
+		
 		//don't show until we have the correct size (otherwise it's initially shown at 100%, then scaled down!).
 		image.addErrorHandler(new ErrorHandler() {
 			@Override
