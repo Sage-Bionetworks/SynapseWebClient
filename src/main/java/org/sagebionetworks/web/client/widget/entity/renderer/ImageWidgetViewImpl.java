@@ -118,6 +118,7 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 			@Override
 			public void onLoad(LoadEvent event) {
 				try {
+					image.removeStyleName("blur");
 					float imageHeight = image.getHeight();
 					float imageWidth = image.getWidth();
 					if (scale != null && !"100".equals(scale) && imageWidth > 0 && imageHeight > 0) {
@@ -138,7 +139,6 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 							image.setHeight(scaledImageHeight + "px");
 						}
 					}
-					image.getElement().getStyle().setVisibility(Visibility.VISIBLE);
 				} catch (Throwable e) {
 					remove(image);
 					p.handleLoadingError(DisplayConstants.IMAGE_FAILED_TO_LOAD + e.getMessage());
@@ -150,9 +150,9 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 				image.setHeight(imageHeight * MAX_IMAGE_WIDTH / imageWidth + "px");
 			}
 		});
-		image.getElement().getStyle().setVisibility(Visibility.HIDDEN);
 		add(image);
 		image.setUrl(url);
+		image.addStyleName("blur");
 	}
 	
 	public void addStyleName(String style) {

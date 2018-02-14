@@ -129,6 +129,7 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, A
 		for (Action action : this.actionListenerMap.keySet()) {
 			getActionView(action).setVisible(false);
 		}
+		setACTDividerVisible(false);
 		view.setNoActionsAvailableVisible(true);
 	}
 

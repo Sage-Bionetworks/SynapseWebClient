@@ -2512,3 +2512,8 @@ div.colborder {
 	border: 1px dashed grey;
 	border-radius: 4px;
 }
+.blur {
+	-webkit-filter: blur(4px);
+	filter: blur(4px);
+}
+
