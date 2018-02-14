@@ -172,6 +172,5 @@ public class TablePageViewImpl implements TablePageView {
 		loadingUI.setVisible(true);
 		tablePanel.removeFromParent();
 		facetsWidgetContainer.removeFromParent();
-		loadingUI.getElement().scrollIntoView();
 	}
 }
