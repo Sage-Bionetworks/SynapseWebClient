@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -148,14 +149,16 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	UploadTableModalWidget uploadTableModalWidget;
 	AddExternalRepoModal addExternalRepoModal;
 	String currentChallengeId;
-	
+	GWTWrapper gwt;
+	Callback reconfigureActionsCallback;
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
 			PreflightController preflightController,
 			PortalGinInjector ginInjector,
 			AuthenticationController authenticationController,
 			CookieProvider cookies,
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
+			GWTWrapper gwt) {
 		super();
 		this.view = view;
 		this.ginInjector = ginInjector;
@@ -163,6 +166,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.authenticationController = authenticationController;
 		this.cookies = cookies;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
+		this.gwt = gwt;
 		view.setPresenter(this);
 		entityUpdatedWizardCallback = new WizardCallback() {
 			@Override
@@ -173,6 +177,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			@Override
 			public void onCanceled() {
 			}
+		};
+		reconfigureActionsCallback = () -> {
+			reconfigureActions();
 		};
 	}
 	
@@ -343,7 +350,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 		// hide all commands by default
 		actionMenu.hideAllActions();
-		
+		gwt.scheduleExecution(reconfigureActionsCallback, 2000);
+	}
+	
+	private void reconfigureActions() {
 		// Setup the actions
 		configureDeleteAction();
 		configureShareAction();

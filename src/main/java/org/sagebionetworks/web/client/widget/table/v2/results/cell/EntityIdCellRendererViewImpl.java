@@ -6,9 +6,12 @@ import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Synapse;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -28,18 +31,22 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	@UiField
 	Anchor entityLink;
 	String entityId;
-	ClickHandler customClickHandler;
+	
+	public static final String ENTITY_ID_ATTRIBUTE = "data-entity-id";
+	public static PlaceChanger placeChanger = null;
+	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
+		event.preventDefault();
+		Widget panel = (Widget)event.getSource();
+		String entityId = panel.getElement().getAttribute(ENTITY_ID_ATTRIBUTE);
+		placeChanger.goTo(new Synapse(entityId));
+	};
+	HandlerRegistration handlerRegistration;
+	
 	@Inject
 	public EntityIdCellRendererViewImpl(Binder binder, GlobalApplicationState globalAppState){
 		w = binder.createAndBindUi(this);
-		entityLink.addClickHandler(event -> {
-			event.preventDefault();
-			if (customClickHandler != null) {
-				customClickHandler.onClick(event);
-			} else {
-				globalAppState.getPlaceChanger().goTo(new Synapse(entityId));
-			}
-		});
+		placeChanger = globalAppState.getPlaceChanger();
+		handlerRegistration = entityLink.addClickHandler(STANDARD_CLICKHANDLER);
 	}
 	
 	@Override
@@ -59,11 +66,16 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	public void setEntityId(String entityId) {
 		entityLink.setHref(Synapse.getHrefForDotVersion(entityId));
 		this.entityId = entityId;
+		entityLink.getElement().setAttribute(ENTITY_ID_ATTRIBUTE, entityId);
 	}
 	
 	@Override
 	public void setClickHandler(ClickHandler clickHandler) {
-		customClickHandler = clickHandler;
+		handlerRegistration.removeHandler();
+		handlerRegistration = entityLink.addClickHandler(event -> {
+			event.preventDefault();
+			clickHandler.onClick(event);
+		});
 	}
 	
 	@Override

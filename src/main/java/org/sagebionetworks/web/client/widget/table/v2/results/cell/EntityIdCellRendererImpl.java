@@ -2,7 +2,10 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.EntityTypeUtils;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -18,6 +21,7 @@ public class EntityIdCellRendererImpl implements EntityIdCellRenderer{
 	String entityId, entityName;
 	ClickHandler customClickHandler;
 	boolean hideIfLoadError;
+	
 	@Inject
 	public EntityIdCellRendererImpl(EntityIdCellRendererView view, 
 			EntityHeaderAsyncHandler entityHeaderAsyncHandler,
