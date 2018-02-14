@@ -7,6 +7,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -76,6 +77,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -129,6 +131,7 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+import org.sagebionetworks.web.test.helper.CallbackMockStubber;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -214,7 +217,8 @@ public class EntityActionControllerImplTest {
 	UploadTableModalWidget mockUploadTableModalWidget;
 	@Mock
 	AddExternalRepoModal mockAddExternalRepoModal; 
-	
+	@Mock
+	GWTWrapper mockGWT;
 	Set<ResourceAccess> resourceAccessSet;
 	
 	public static final String SELECTED_TEAM_ID = "987654";
@@ -279,7 +283,8 @@ public class EntityActionControllerImplTest {
 				mockPortalGinInjector,
 				mockAuthenticationController, 
 				mockCookies,
-				mockIsACTMemberAsyncHandler);
+				mockIsACTMemberAsyncHandler,
+				mockGWT);
 		
 		parentId = "syn456";
 		entityId = "syn123";
@@ -324,12 +329,13 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callSuccessWith(mockWikiPageToDelete).when(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(getWikiHeaderTree()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		currentEntityArea = null;
+		CallbackMockStubber.invokeCallback().when(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 	}
 
 	@Test
 	public void testConfigure(){
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
-		
+		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 		// delete
 		verify(mockActionMenu).setActionVisible(Action.DELETE_ENTITY, true);
 		verify(mockActionMenu).setActionText(Action.DELETE_ENTITY, DELETE_PREFIX+EntityTypeUtils.getDisplayName(EntityType.table));
