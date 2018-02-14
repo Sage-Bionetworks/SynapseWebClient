@@ -48,7 +48,9 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 	
 	@Override
 	public void configure(final String url, final String fileName,
-			final String scale, String alignment, final String synapseId, final boolean isLoggedIn) {
+			final String scale, String alignment,
+			String altText,
+			final String synapseId, final boolean isLoggedIn) {
 		clear();
 		add(synAlert);
 		hasTriedCache = false;
@@ -81,6 +83,12 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 				return;
 			}
 		}
+		
+		if (altText == null) {
+			altText="";
+		}
+		image.setAltText(altText);
+		
 		//don't show until we have the correct size (otherwise it's initially shown at 100%, then scaled down!).
 		image.addErrorHandler(new ErrorHandler() {
 			@Override
@@ -110,6 +118,7 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 			@Override
 			public void onLoad(LoadEvent event) {
 				try {
+					image.removeStyleName("blur");
 					float imageHeight = image.getHeight();
 					float imageWidth = image.getWidth();
 					if (scale != null && !"100".equals(scale) && imageWidth > 0 && imageHeight > 0) {
@@ -130,7 +139,6 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 							image.setHeight(scaledImageHeight + "px");
 						}
 					}
-					image.getElement().getStyle().setVisibility(Visibility.VISIBLE);
 				} catch (Throwable e) {
 					remove(image);
 					p.handleLoadingError(DisplayConstants.IMAGE_FAILED_TO_LOAD + e.getMessage());
@@ -142,9 +150,9 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 				image.setHeight(imageHeight * MAX_IMAGE_WIDTH / imageWidth + "px");
 			}
 		});
-		image.getElement().getStyle().setVisibility(Visibility.HIDDEN);
 		add(image);
 		image.setUrl(url);
+		image.addStyleName("blur");
 	}
 	
 	public void addStyleName(String style) {

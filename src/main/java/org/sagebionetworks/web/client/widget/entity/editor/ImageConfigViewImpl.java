@@ -166,7 +166,14 @@ public class ImageConfigViewImpl implements ImageConfigView {
 	public Integer getScale() {
 		return getCurrentParamsPanel().getScale();
 	}
-	
+	@Override
+	public void setAltText(String altText) {
+		getCurrentParamsPanel().setAltText(altText);
+	}
+	@Override
+	public String getAltText() {
+		return getCurrentParamsPanel().getAltText();	
+	}
 	@Override
 	public void showUploadFailureUI(String error) {
 		uploadErrorText.setText(error);
@@ -245,7 +252,7 @@ public class ImageConfigViewImpl implements ImageConfigView {
 		return urlField.getValue();
 	}
 	@Override
-	public String getAltText() {
+	public String getExternalAltText() {
 		return nameField.getValue();
 	}
 	@Override

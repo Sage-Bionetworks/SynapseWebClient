@@ -9,6 +9,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +29,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.repo.model.file.FileResultFailureCode;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
@@ -35,7 +37,7 @@ import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.ImageWidgetView;
-import org.sagebionetworks.web.shared.WidgetConstants;
+
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -71,6 +73,7 @@ public class ImageWidgetTest {
 	
 	public static final String PRESIGNED_URL = "https://s3.presigned/image.jpg";
 	public static final String FILE_NAME = "image.jpg";
+	public static final String ALT_TEXT = "image alternate text";
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
@@ -83,7 +86,8 @@ public class ImageWidgetTest {
 				mockSynapseJavascriptClient,
 				mockSynAlert);
 		descriptor = new HashMap<String, String>();
-		descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, FILE_NAME);
+		descriptor.put(IMAGE_WIDGET_FILE_NAME_KEY, FILE_NAME);
+		descriptor.put(IMAGE_WIDGET_ALT_TEXT_KEY, ALT_TEXT);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockFileResult.getPreSignedURL()).thenReturn(PRESIGNED_URL);
 		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockPresignedURLAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
@@ -99,7 +103,7 @@ public class ImageWidgetTest {
 	public void testConfigureFromSynapseId() {
 		AsyncMockStubber.callSuccessWith(mockFileEntity).when(mockSynapseJavascriptClient).getEntityForVersion(anyString(), anyLong(), any(AsyncCallback.class));
 		String synId = "syn239";
-		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
+		descriptor.put(IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
 		String dataFileHandleId = "8765";
 		when(mockFileEntity.getId()).thenReturn(synId);
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(dataFileHandleId);
@@ -110,7 +114,7 @@ public class ImageWidgetTest {
 		verify(mockSynapseJavascriptClient).getEntityForVersion(eq(synId), eq((Long)null), any(AsyncCallback.class));
 		verify(mockPresignedURLAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		boolean isLoggedIn = true;
-		verify(mockView).configure(eq(PRESIGNED_URL), eq(FILE_NAME), anyString(), anyString(), eq(synId), eq(isLoggedIn));
+		verify(mockView).configure(eq(PRESIGNED_URL), eq(FILE_NAME), anyString(), anyString(), eq(ALT_TEXT), eq(synId), eq(isLoggedIn));
 	}
 	
 	@Test
@@ -118,8 +122,8 @@ public class ImageWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockFileEntity).when(mockSynapseJavascriptClient).getEntityForVersion(anyString(), anyLong(), any(AsyncCallback.class));
 		String synId = "syn239";
 		Long version = 999L;
-		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
-		descriptor.put(WidgetConstants.WIDGET_ENTITY_VERSION_KEY, version.toString());
+		descriptor.put(IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
+		descriptor.put(WIDGET_ENTITY_VERSION_KEY, version.toString());
 		String dataFileHandleId = "8765";
 		when(mockFileEntity.getId()).thenReturn(synId);
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(dataFileHandleId);
@@ -134,7 +138,7 @@ public class ImageWidgetTest {
 		assertEquals(FileHandleAssociateType.FileEntity, fha.getAssociateObjectType());
 		assertEquals(dataFileHandleId, fha.getFileHandleId());
 		boolean isLoggedIn = true;
-		verify(mockView).configure(eq(PRESIGNED_URL), eq(FILE_NAME), anyString(), anyString(), eq(synId), eq(isLoggedIn));
+		verify(mockView).configure(eq(PRESIGNED_URL), eq(FILE_NAME), anyString(), anyString(), eq(ALT_TEXT), eq(synId), eq(isLoggedIn));
 	}
 	
 	@Test
@@ -142,7 +146,7 @@ public class ImageWidgetTest {
 		Exception ex = new Exception("so sad");
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityForVersion(anyString(), anyLong(), any(AsyncCallback.class));
 		String synId = "syn239";
-		descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
+		descriptor.put(IMAGE_WIDGET_SYNAPSE_ID_KEY, synId);
 		
 		widget.configure(wikiKey,descriptor, null, null);
 		
@@ -174,7 +178,7 @@ public class ImageWidgetTest {
 		assertEquals(FileHandleAssociateType.WikiAttachment, fha.getAssociateObjectType());
 		assertEquals(fileHandleId2, fha.getFileHandleId());
 		boolean isLoggedIn = true;
-		verify(mockView).configure(eq(PRESIGNED_URL), eq(FILE_NAME), anyString(), anyString(), eq((String)null), eq(isLoggedIn));
+		verify(mockView).configure(eq(PRESIGNED_URL), eq(FILE_NAME), anyString(), anyString(), eq(ALT_TEXT), eq((String)null), eq(isLoggedIn));
 	}
 	
 	@Test
@@ -191,19 +195,19 @@ public class ImageWidgetTest {
 	
 	@Test
 	public void testConfigureDefaultResponsive() {
-		descriptor.put(WidgetConstants.IMAGE_WIDGET_RESPONSIVE_KEY, null);
+		descriptor.put(IMAGE_WIDGET_RESPONSIVE_KEY, null);
 		widget.configure(wikiKey,descriptor, null, null);
 		verify(mockView, never()).addStyleName(ImageWidget.MAX_WIDTH_NONE);
 	}
 	@Test
 	public void testConfigureResponsive() {
-		descriptor.put(WidgetConstants.IMAGE_WIDGET_RESPONSIVE_KEY, Boolean.TRUE.toString());
+		descriptor.put(IMAGE_WIDGET_RESPONSIVE_KEY, Boolean.TRUE.toString());
 		widget.configure(wikiKey,descriptor, null, null);
 		verify(mockView, never()).addStyleName(ImageWidget.MAX_WIDTH_NONE);
 	}
 	@Test
 	public void testConfigureNotResponsive() {
-		descriptor.put(WidgetConstants.IMAGE_WIDGET_RESPONSIVE_KEY, Boolean.FALSE.toString());
+		descriptor.put(IMAGE_WIDGET_RESPONSIVE_KEY, Boolean.FALSE.toString());
 		widget.configure(wikiKey,descriptor, null, null);
 		verify(mockView).addStyleName(ImageWidget.MAX_WIDTH_NONE);
 	}
