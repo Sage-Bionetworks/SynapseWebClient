@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
+
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +17,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.shared.WidgetConstants;
+
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -57,10 +59,11 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 		presignedURLAsyncHandler.getFileResult(fha, new AsyncCallback<FileResult>() {
 			public void onSuccess(FileResult fileResult) {
 				view.configure(fileResult.getPreSignedURL(),
-						descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY),
-						descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY),
-						descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY),
-						descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY), 
+						descriptor.get(IMAGE_WIDGET_FILE_NAME_KEY),
+						descriptor.get(IMAGE_WIDGET_SCALE_KEY),
+						descriptor.get(IMAGE_WIDGET_ALIGNMENT_KEY),
+						descriptor.get(IMAGE_WIDGET_ALT_TEXT_KEY),
+						descriptor.get(IMAGE_WIDGET_SYNAPSE_ID_KEY), 
 						authenticationController.isLoggedIn());
 			};
 			@Override
@@ -73,10 +76,10 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 	public void configure(final WikiPageKey wikiKey, final Map<String, String> widgetDescriptor, Callback widgetRefreshRequired, Long wikiVersionInView) {
 		this.descriptor = widgetDescriptor;
 		this.wikiKey = wikiKey;
-		String synapseId = descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY);
+		String synapseId = descriptor.get(IMAGE_WIDGET_SYNAPSE_ID_KEY);
 		Long version = null;
-		if (descriptor.containsKey(WidgetConstants.WIDGET_ENTITY_VERSION_KEY)) {
-			version = Long.parseLong(descriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY));
+		if (descriptor.containsKey(WIDGET_ENTITY_VERSION_KEY)) {
+			version = Long.parseLong(descriptor.get(WIDGET_ENTITY_VERSION_KEY));
 		}
 		synAlert.clear();		
 		if (synapseId != null) {
@@ -106,7 +109,7 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 			jsClient.getWikiAttachmentFileHandles(wikiKey, wikiVersionInView, new AsyncCallback<List<FileHandle>>() {
 				public void onSuccess(List<FileHandle> fileHandles) {
 					FileHandle targetFileHandle = null;
-					String fileName = descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY);
+					String fileName = descriptor.get(IMAGE_WIDGET_FILE_NAME_KEY);
 					for (FileHandle fileHandle : fileHandles) {
 						if (fileName.equals(fileHandle.getFileName())) {
 							targetFileHandle = fileHandle;
@@ -130,7 +133,7 @@ public class ImageWidget implements ImageWidgetView.Presenter, WidgetRendererPre
 			});
 		}
 		
-		String responsiveValue = descriptor.get(WidgetConstants.IMAGE_WIDGET_RESPONSIVE_KEY);
+		String responsiveValue = descriptor.get(IMAGE_WIDGET_RESPONSIVE_KEY);
 		if (responsiveValue != null && !Boolean.parseBoolean(responsiveValue)) {
 			view.addStyleName(MAX_WIDTH_NONE);
 		}

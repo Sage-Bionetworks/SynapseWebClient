@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -60,29 +60,32 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		if (wikiKey != null) {
 			wikiAttachments.configure(wikiKey);
 		}
-		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
+		if (descriptor.containsKey(IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
 			// existing synapse id
 			view.setWikiFilesTabVisible(false);
 			view.showSynapseTab();
-			String synId = descriptor.get(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY);
+			String synId = descriptor.get(IMAGE_WIDGET_SYNAPSE_ID_KEY);
 			Long version = null;
-			if (descriptor.containsKey(WidgetConstants.WIDGET_ENTITY_VERSION_KEY)) {
-				version = Long.parseLong(descriptor.get(WidgetConstants.WIDGET_ENTITY_VERSION_KEY));
+			if (descriptor.containsKey(WIDGET_ENTITY_VERSION_KEY)) {
+				version = Long.parseLong(descriptor.get(WIDGET_ENTITY_VERSION_KEY));
 			}
 			view.setSynapseId(DisplayUtils.createEntityVersionString(synId, version));
 		} else {
 			view.showWikiFilesTab();
-			if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY)) {
+			if (descriptor.containsKey(IMAGE_WIDGET_FILE_NAME_KEY)) {
 				// existing attachment
-				wikiAttachments.setSelectedFilename(descriptor.get(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY));
+				wikiAttachments.setSelectedFilename(descriptor.get(IMAGE_WIDGET_FILE_NAME_KEY));
 			}
 		}
 		
-		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY)) {
-			view.setAlignment(descriptor.get(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY));
+		if (descriptor.containsKey(IMAGE_WIDGET_ALIGNMENT_KEY)) {
+			view.setAlignment(descriptor.get(IMAGE_WIDGET_ALIGNMENT_KEY));
 		}
-		if (descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SCALE_KEY)) {
-			view.setScale(Integer.parseInt(descriptor.get(WidgetConstants.IMAGE_WIDGET_SCALE_KEY)));
+		if (descriptor.containsKey(IMAGE_WIDGET_SCALE_KEY)) {
+			view.setScale(Integer.parseInt(descriptor.get(IMAGE_WIDGET_SCALE_KEY)));
+		}
+		if (descriptor.containsKey(IMAGE_WIDGET_ALT_TEXT_KEY)) {
+			view.setAltText(descriptor.get(IMAGE_WIDGET_ALT_TEXT_KEY));
 		}
 	}
 
@@ -90,7 +93,7 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 			DialogCallback dialogCallback) {
 		configure(wikiKey, widgetDescriptor, dialogCallback);
 		view.setWikiFilesTabVisible(false);
-		if (!descriptor.containsKey(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
+		if (!descriptor.containsKey(IMAGE_WIDGET_SYNAPSE_ID_KEY)) {
 			view.showExternalTab();
 		}
 	}
@@ -110,30 +113,31 @@ public class ImageConfigEditor implements ImageConfigView.Presenter, WidgetEdito
 		view.checkParams();
 		if (!view.isExternal()) {
 			if (view.isSynapseEntity()) {
-				descriptor.put(WidgetConstants.IMAGE_WIDGET_SYNAPSE_ID_KEY, view.getSynapseId());
+				descriptor.put(IMAGE_WIDGET_SYNAPSE_ID_KEY, view.getSynapseId());
 				Long version = view.getVersion();
 				if (version != null) {
-					descriptor.put(WidgetConstants.WIDGET_ENTITY_VERSION_KEY, version.toString());
+					descriptor.put(WIDGET_ENTITY_VERSION_KEY, version.toString());
 				}
 			} else if (!fileHandleIds.isEmpty()) {
-				descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, file.getFileMeta().getFileName());
+				descriptor.put(IMAGE_WIDGET_FILE_NAME_KEY, file.getFileMeta().getFileName());
 			} else {
 				if (!wikiAttachments.isValid()) {
 					throw new IllegalArgumentException(DisplayConstants.ERROR_SELECT_ATTACHMENT_MESSAGE);
 				}
-				descriptor.put(WidgetConstants.IMAGE_WIDGET_FILE_NAME_KEY, wikiAttachments.getSelectedFilename());
+				descriptor.put(IMAGE_WIDGET_FILE_NAME_KEY, wikiAttachments.getSelectedFilename());
 			}
 				
-			descriptor.put(WidgetConstants.IMAGE_WIDGET_ALIGNMENT_KEY, view.getAlignment());
-			descriptor.put(WidgetConstants.IMAGE_WIDGET_SCALE_KEY, view.getScale().toString());
-			descriptor.put(WidgetConstants.IMAGE_WIDGET_RESPONSIVE_KEY, Boolean.TRUE.toString());
+			descriptor.put(IMAGE_WIDGET_ALIGNMENT_KEY, view.getAlignment());
+			descriptor.put(IMAGE_WIDGET_SCALE_KEY, view.getScale().toString());
+			descriptor.put(IMAGE_WIDGET_RESPONSIVE_KEY, Boolean.TRUE.toString());
+			descriptor.put(IMAGE_WIDGET_ALT_TEXT_KEY, view.getAltText());
 		}
 	}
 	
 	@Override
 	public String getTextToInsert() {
 		if (view.isExternal())
-			return "!["+view.getAltText()+"]("+view.getImageUrl()+")";
+			return "!["+view.getExternalAltText()+"]("+view.getImageUrl()+")";
 		else return null;
 	}
 

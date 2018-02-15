@@ -61,6 +61,14 @@ public class ImageParamsPanel implements ImageParamsPanelView.Presenter {
 		return view.getScale();
 	}
 	
+	public String getAltText() {
+		return view.getAltText();
+	}
+	
+	public void setAltText(String altText) {
+		view.setAltText(altText);
+	}
+	
 	public Widget asWidget() {
 		return view.asWidget();
 	}

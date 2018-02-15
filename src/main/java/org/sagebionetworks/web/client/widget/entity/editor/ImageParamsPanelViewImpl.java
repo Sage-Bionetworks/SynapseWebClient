@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.slider.client.ui.Slider;
 
@@ -27,6 +28,8 @@ public class ImageParamsPanelViewImpl implements ImageParamsPanelView {
 	Button rightButton;
 	@UiField
 	Div scaleSliderContainer;
+	@UiField
+	TextBox altText;
 	Slider scaleSlider;
 	
 	@Inject
@@ -34,6 +37,7 @@ public class ImageParamsPanelViewImpl implements ImageParamsPanelView {
 		widget = binder.createAndBindUi(this);
 		initClickHandlers();
 		setScale(100);
+		altText.clear();
 	}
 	
 	private void initClickHandlers() {
@@ -116,5 +120,13 @@ public class ImageParamsPanelViewImpl implements ImageParamsPanelView {
 		scaleSlider = new Slider(1.0, 100.0, scale.doubleValue());
 		scaleSlider.setStep(1.0);
 		scaleSliderContainer.add(scaleSlider);
+	}
+	@Override
+	public void setAltText(String altTextValue) {
+		altText.setValue(altTextValue);
+	}
+	@Override
+	public String getAltText() {
+		return altText.getValue();
 	}
 }

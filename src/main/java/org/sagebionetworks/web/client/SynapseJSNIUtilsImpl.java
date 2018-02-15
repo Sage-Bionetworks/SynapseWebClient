@@ -574,6 +574,14 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				      // do not filter doctype
 				      return html;
 				    }
+				},
+				safeAttrValue: function (tag, name, value) {
+					// returning nothing means keep the default behavior
+					if (tag === 'img' && name === 'src') {
+						if (value && value.startsWith('data:image/')) {
+							return value;
+						}
+					}
 				}
 			};
 			$wnd.xss = new $wnd.filterXSS.FilterXSS(options);
