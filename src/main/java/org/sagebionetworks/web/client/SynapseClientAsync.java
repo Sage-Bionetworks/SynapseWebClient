@@ -192,10 +192,6 @@ public interface SynapseClientAsync {
 			AsyncCallback<Doi> callback);
 	void createDoi(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 	
-	void getSynapseVersions(AsyncCallback<String> callback);
-
-	void getSynapseProperties(AsyncCallback<HashMap<String, String>> callback);
-
 	void handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL, AsyncCallback<ResponseMessage> callback);
 	
 	void hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString, AsyncCallback<SignedTokenInterface> callback);

@@ -203,10 +203,6 @@ public interface SynapseClient extends RemoteService{
 	Doi getEntityDoi(String entityId, Long versionNumber) throws RestServiceException;
 	void createDoi(String entityId, Long versionNumber) throws RestServiceException;
 
-	String getSynapseVersions() throws RestServiceException;
-
-	HashMap<String, String> getSynapseProperties();
-
 	String getAPIKey() throws RestServiceException;
 
 	ResponseMessage handleSignedToken(SignedTokenInterface signedToken, String hostPageBaseURL) throws RestServiceException;

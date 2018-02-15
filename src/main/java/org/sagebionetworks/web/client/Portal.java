@@ -119,34 +119,27 @@ public class Portal implements EntryPoint {
 					}
 				}
 			});
-			
 		}
 	}
 	
 	public void fixGWTRpcServiceEntryPoints() {
+		fixServiceEntryPoint((ServiceDefTarget)ginjector.getStackConfigServiceAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getChallengeClientAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDataAccessClientAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDiscussionForumClientAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDockerClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getJiraClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getLinkedInServiceAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getStackConfigServiceAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getSubscriptionClientAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getSynapseClientAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getUserAccountServiceAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getUserProfileClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getMultipartFileUploadClientAsync());
 	}
-	
-	public void fixServiceEntryPoint(ServiceDefTarget serviceDefTarget) {
+	public static void fixServiceEntryPoint(ServiceDefTarget serviceDefTarget) {
 		String oldUrl = serviceDefTarget.getServiceEntryPoint();
 		if (oldUrl.startsWith(GWT.getModuleBaseURL())) {
 			String serviceEntryPoint = GWTWrapperImpl.getRealGWTModuleBaseURL() + oldUrl.substring(GWT.getModuleBaseURL().length());
 			serviceDefTarget.setServiceEntryPoint(serviceEntryPoint);
-			
 		}
 	}
-	
 	public void delayLoadOfZxcvbn() {
 		Timer timer = new Timer() { 
 		    public void run() {

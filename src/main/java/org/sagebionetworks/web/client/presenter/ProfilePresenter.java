@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-
+import static org.sagebionetworks.web.client.Portal.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
+import org.sagebionetworks.web.client.Portal;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -63,6 +64,7 @@ import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -151,6 +153,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.challengeClient = challengeClient;
 		this.cookies = cookies;
 		this.linkedInService = linkedInServic;
+		fixServiceEntryPoint((ServiceDefTarget)linkedInService);
 		this.gwt = gwt;
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;

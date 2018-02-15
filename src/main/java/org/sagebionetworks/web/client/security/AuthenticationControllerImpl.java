@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -16,7 +15,7 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -26,7 +25,6 @@ import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -49,7 +47,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private SessionStorage sessionStorage;
 	private ClientCache localStorage;
 	private AdapterFactory adapterFactory;
-	private SynapseClientAsync synapseClient;
+	private StackConfigServiceAsync stackConfigService;
 	private PortalGinInjector ginInjector;
 	
 	@Inject
@@ -59,14 +57,14 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			SessionStorage sessionStorage, 
 			ClientCache localStorage, 
 			AdapterFactory adapterFactory,
-			SynapseClientAsync synapseClient,
+			StackConfigServiceAsync stackConfigService,
 			PortalGinInjector ginInjector){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
 		this.sessionStorage = sessionStorage;
 		this.localStorage = localStorage;
 		this.adapterFactory = adapterFactory;
-		this.synapseClient = synapseClient;
+		this.stackConfigService = stackConfigService;
 		this.ginInjector = ginInjector;
 	}
 
@@ -118,7 +116,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	}
 
 	public void initSynapsePropertiesFromServer() {
-		synapseClient.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
+		stackConfigService.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
 				for (String key : properties.keySet()) {

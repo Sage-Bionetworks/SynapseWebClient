@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import static org.sagebionetworks.web.client.Portal.fixServiceEntryPoint;
+
 import java.util.Collections;
 import java.util.Date;
 
@@ -27,6 +29,7 @@ import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 import com.google.inject.Inject;
@@ -81,6 +84,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		this.gwt = gwt;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.multipartFileUploadClient = multipartFileUploadClient;
+		fixServiceEntryPoint((ServiceDefTarget)multipartFileUploadClient);
 		this.percentFormat = gwt.getNumberFormat("##");;
 		this.cookies = cookies;
 	}
