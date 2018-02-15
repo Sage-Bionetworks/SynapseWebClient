@@ -1,5 +1,4 @@
 package org.sagebionetworks.web.client;
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.*;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -17,7 +16,6 @@ import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 
@@ -52,7 +50,6 @@ public class Portal implements EntryPoint {
 			Window.Location.replace(fullUrl);
 			Window.Location.reload();
 		} else {
-			fixGWTRpcServiceEntryPoints();
 			// This is a split point where the browser can download the first large code file.
 			GWT.runAsync(new RunAsyncCallback() {
 				@Override
@@ -122,10 +119,6 @@ public class Portal implements EntryPoint {
 		}
 	}
 	
-	public void fixGWTRpcServiceEntryPoints() {
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getUserAccountServiceAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getUserProfileClientAsync());
-	}
 	public void delayLoadOfZxcvbn() {
 		Timer timer = new Timer() { 
 		    public void run() {

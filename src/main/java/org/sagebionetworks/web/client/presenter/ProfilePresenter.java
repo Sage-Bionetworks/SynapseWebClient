@@ -160,6 +160,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.userProfileClient = userProfileClient;
+		fixServiceEntryPoint(userProfileClient);
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.dateTimeUtils = dateTimeUtils;
 		this.jsClient = jsClient;

@@ -41,7 +41,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -140,7 +139,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
 	ApproveUserAccessModal approveUserAccessModal;
-	UserProfileClientAsync userProfileClient;
 	PortalGinInjector ginInjector;
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	AddFolderDialogWidget addFolderDialogWidget;
