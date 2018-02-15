@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
 
@@ -213,12 +214,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private ChallengeClientAsync getChallengeClient() {
 		if (challengeClient == null) {
 			challengeClient = ginInjector.getChallengeClientAsync();
+			fixServiceEntryPoint(challengeClient);
 		}
 		return challengeClient;
 	}
 	private SynapseClientAsync getSynapseClient() {
 		if (synapseClient == null) {
 			synapseClient = ginInjector.getSynapseClientAsync();
+			fixServiceEntryPoint(synapseClient);
 		}
 		return synapseClient;
 	}

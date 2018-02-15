@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.security;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
@@ -65,6 +67,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		this.localStorage = localStorage;
 		this.adapterFactory = adapterFactory;
 		this.stackConfigService = stackConfigService;
+		fixServiceEntryPoint(stackConfigService);
 		this.ginInjector = ginInjector;
 	}
 

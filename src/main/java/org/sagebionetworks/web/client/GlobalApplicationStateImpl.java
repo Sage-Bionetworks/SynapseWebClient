@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.CURRENT_PLACE;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.LAST_PLACE;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
@@ -31,6 +32,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
@@ -76,6 +78,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
 		this.stackConfigService = stackConfigService;
+		fixServiceEntryPoint(stackConfigService);
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.localStorage = localStorage;
 		this.dateTimeUtils = dateTimeUtils;

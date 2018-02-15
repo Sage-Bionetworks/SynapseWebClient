@@ -1,5 +1,5 @@
 package org.sagebionetworks.web.client;
-
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.*;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -123,8 +123,6 @@ public class Portal implements EntryPoint {
 	}
 	
 	public void fixGWTRpcServiceEntryPoints() {
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getStackConfigServiceAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getChallengeClientAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDataAccessClientAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDiscussionForumClientAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDockerClientAsync());
@@ -132,13 +130,6 @@ public class Portal implements EntryPoint {
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getSynapseClientAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getUserAccountServiceAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getUserProfileClientAsync());
-	}
-	public static void fixServiceEntryPoint(ServiceDefTarget serviceDefTarget) {
-		String oldUrl = serviceDefTarget.getServiceEntryPoint();
-		if (oldUrl.startsWith(GWT.getModuleBaseURL())) {
-			String serviceEntryPoint = GWTWrapperImpl.getRealGWTModuleBaseURL() + oldUrl.substring(GWT.getModuleBaseURL().length());
-			serviceDefTarget.setServiceEntryPoint(serviceEntryPoint);
-		}
 	}
 	public void delayLoadOfZxcvbn() {
 		Timer timer = new Timer() { 
