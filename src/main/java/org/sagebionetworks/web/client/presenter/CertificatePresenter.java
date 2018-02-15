@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -36,6 +38,7 @@ public class CertificatePresenter extends AbstractActivity implements Certificat
 			SynapseAlert synAlert){
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
+		fixServiceEntryPoint(synapseClient);
 		this.synapseClient = synapseClient;
 		this.jsClient = jsClient;
 		this.adapterFactory = adapterFactory;

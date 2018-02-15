@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.provenance;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -88,6 +90,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseJSNIUtils = synapseJSNIUtils;

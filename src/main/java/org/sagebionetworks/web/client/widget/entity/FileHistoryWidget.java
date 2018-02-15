@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Objects;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -50,6 +52,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 			 PreflightController preflightController) {
 		super();
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;

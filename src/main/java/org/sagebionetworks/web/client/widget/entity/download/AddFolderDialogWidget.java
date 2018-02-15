@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -36,6 +38,7 @@ public class AddFolderDialogWidget implements AddFolderDialogWidgetView.Presente
 		this.view = view;
 		this.sharingAndDataUseWidget = sharingAndDataUseWidget;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.globalAppState = globalAppState;

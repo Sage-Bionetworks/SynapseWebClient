@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.DEFAULT_LIMIT;
 import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.DEFAULT_OFFSET;
 
@@ -78,6 +79,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			ClientCache clientCache,
 			GWTWrapper gwt) {
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();

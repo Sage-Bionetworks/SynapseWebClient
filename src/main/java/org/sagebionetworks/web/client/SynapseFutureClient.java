@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.function.Consumer;
 
 import org.sagebionetworks.repo.model.SignedTokenInterface;
@@ -15,6 +17,7 @@ public class SynapseFutureClient {
 	@Inject
 	public SynapseFutureClient(SynapseClientAsync synapseClient) {
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 	}
 
 	public FluentFuture<SignedTokenInterface> hexDecodeAndDeserialize(String tokenTypeName, String signedTokenString) {

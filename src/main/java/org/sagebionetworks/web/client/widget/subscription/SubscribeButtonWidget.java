@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,6 +50,7 @@ public class SubscribeButtonWidget implements SubscribeButtonWidgetView.Presente
 		this.view = view;
 		this.synAlert = synAlert;
 		this.subscribeClient = subscribeClient;
+		fixServiceEntryPoint(subscribeClient);
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
 		iconOnly = false;

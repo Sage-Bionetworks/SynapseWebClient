@@ -149,6 +149,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.globalApplicationState = globalApplicationState;
 		this.ginInjector = ginInjector;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.challengeClient = challengeClient;
 		fixServiceEntryPoint(challengeClient);
 		this.cookies = cookies;

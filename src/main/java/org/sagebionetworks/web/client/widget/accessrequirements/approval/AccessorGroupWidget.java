@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.approval;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.dataaccess.AccessorGroup;
@@ -48,6 +50,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 		this.popupUtils = popupUtils;
 		this.accessRequirementWidget = accessRequirementWidget;
 		this.dataAccessClient = dataAccessClient;
+		fixServiceEntryPoint(dataAccessClient);
 		this.dateTimeUtils = dateTimeUtils;
 		this.showEmailsButton = showEmailsButton;
 		view.setPresenter(this);

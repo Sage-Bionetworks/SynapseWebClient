@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -89,6 +91,7 @@ public class FilesTab {
 			this.wikiPageWidget = ginInjector.getWikiPageWidget();
 			this.synAlert = ginInjector.getStuAlert();
 			this.synapseClient = ginInjector.getSynapseClientAsync();
+			fixServiceEntryPoint(synapseClient);
 			this.globalApplicationState = ginInjector.getGlobalApplicationState();
 			this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
 			this.discussionThreadListWidget = ginInjector.getDiscussionThreadListWidget();

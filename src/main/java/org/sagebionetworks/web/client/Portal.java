@@ -123,11 +123,6 @@ public class Portal implements EntryPoint {
 	}
 	
 	public void fixGWTRpcServiceEntryPoints() {
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDataAccessClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDiscussionForumClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDockerClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getSubscriptionClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getSynapseClientAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getUserAccountServiceAsync());
 		fixServiceEntryPoint((ServiceDefTarget)ginjector.getUserProfileClientAsync());
 	}

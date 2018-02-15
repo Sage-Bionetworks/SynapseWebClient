@@ -63,6 +63,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			PortalGinInjector ginInjector){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
+		fixServiceEntryPoint(userAccountService);
 		this.sessionStorage = sessionStorage;
 		this.localStorage = localStorage;
 		this.adapterFactory = adapterFactory;

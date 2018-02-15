@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,6 +67,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.dataAccessClient = dataAccessClient;
+		fixServiceEntryPoint(dataAccessClient);
 		this.entityIdRenderer = entityIdRenderer;
 		this.teamBadge = teamBadge;
 		this.createAccessRequirementButton = createAccessRequirementButton;

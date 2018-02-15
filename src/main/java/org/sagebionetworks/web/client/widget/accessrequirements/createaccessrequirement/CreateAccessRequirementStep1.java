@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -51,6 +53,7 @@ public class CreateAccessRequirementStep1 implements ModalPage, CreateAccessRequ
 		this.basicStep2 = touStep2;
 		this.subjectsWidget = subjectsWidget;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		view.setSubjects(subjectsWidget);
 		view.setPresenter(this);
 		CallbackP<RestrictableObjectDescriptor> deleteSubjectCallback = new CallbackP<RestrictableObjectDescriptor>() {

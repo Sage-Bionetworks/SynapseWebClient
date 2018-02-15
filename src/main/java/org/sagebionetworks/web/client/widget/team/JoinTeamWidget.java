@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -82,6 +84,7 @@ public class JoinTeamWidget implements JoinTeamWidgetView.Presenter, WidgetRende
 		this.view = view;
 		view.setPresenter(this);
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.gwt = gwt;

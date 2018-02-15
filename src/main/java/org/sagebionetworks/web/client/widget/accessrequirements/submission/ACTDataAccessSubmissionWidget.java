@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +58,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		this.view = view;
 		this.synAlert = synAlert;
 		this.dataAccessClient = dataAccessClient;
+		fixServiceEntryPoint(dataAccessClient);
 		this.promptDialog = promptDialog;
 		this.jsniUtils = jsniUtils;
 		this.ginInjector = ginInjector;

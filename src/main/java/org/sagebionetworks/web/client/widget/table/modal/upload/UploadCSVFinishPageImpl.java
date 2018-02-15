@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,6 +58,7 @@ public class UploadCSVFinishPageImpl implements UploadCSVFinishPage {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.portalGinInjector = portalGinInjector;
 		this.jobTrackingWidget = jobTrackingWidget;
 		this.keyboardNavigationHandler = keyboardNavigationHandler;

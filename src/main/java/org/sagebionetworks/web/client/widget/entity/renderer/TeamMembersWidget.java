@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Map;
 
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -40,6 +42,7 @@ public class TeamMembersWidget implements WidgetRendererPresenter, PageChangeLis
 		this.view = view;
 		this.paginationWidget = paginationWidget;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		view.setPaginationWidget(paginationWidget);

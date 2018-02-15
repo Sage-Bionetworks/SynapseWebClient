@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
@@ -29,6 +31,7 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 			SynapseClientAsync synapseClient){
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.view.setPresenter(this);
 	}
 

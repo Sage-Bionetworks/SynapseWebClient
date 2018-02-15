@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.header;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Date;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
@@ -43,6 +45,7 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 		this.view = view;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.discussionForumClient = discussionForumClient;
+		fixServiceEntryPoint(discussionForumClient);
 		this.globalApplicationState = globalApplicationState;
 		this.clientCache = clientCache;
 		view.setPresenter(this);

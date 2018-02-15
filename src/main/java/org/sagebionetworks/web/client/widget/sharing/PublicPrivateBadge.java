@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -38,6 +40,7 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.userAccountService = userAccountService;
+		fixServiceEntryPoint(userAccountService);
 		view.setPresenter(this);
 	}	
 

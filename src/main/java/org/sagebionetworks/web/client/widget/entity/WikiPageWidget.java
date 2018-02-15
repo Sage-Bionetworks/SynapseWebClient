@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Objects;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -82,6 +84,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.stuAlert = stuAlert;
 		this.historyWidget = historyWidget;
 		this.markdownWidget = markdownWidget;

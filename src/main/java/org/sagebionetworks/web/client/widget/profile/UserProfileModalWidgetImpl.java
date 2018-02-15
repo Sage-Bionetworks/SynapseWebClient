@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -34,6 +36,7 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 		this.modalView = view;
 		this.editorWidget = editorWidget;
 		this.synapse = synapse;
+		fixServiceEntryPoint(synapse);
 		this.jsClient = jsClient;
 		this.authController = authController;
 		this.clientCache = clientCache;
