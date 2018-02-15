@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionDashboardPresenter;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter;
@@ -23,7 +22,6 @@ import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.MapPresenter;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
-import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
@@ -269,7 +267,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	GlobalApplicationState getGlobalApplicationState();
 
-	PresenterProxy<HomePresenter, Home> getHomePresenter();
+	HomePresenter getHomePresenter();
 
 	EntityPresenter getEntityPresenter();
 

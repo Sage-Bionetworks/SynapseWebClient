@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -12,7 +13,6 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.HomeView;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -35,6 +35,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public static final int TWITTER_STANDARD_HEIGHT = 390;
 	public static final int TWITTER_MINIMAL_HEIGHT = 200;
 	public static final String TWITTER_ELEMENT_ID = "twitter-feed";
+	PortalGinInjector ginInjector;
 	
 	@Inject
 	public HomePresenter(HomeView view,  
@@ -42,7 +43,8 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			GlobalApplicationState globalApplicationState,
 			CookieProvider cookies,
 			ResourceLoader resourceLoader,
-			SynapseJSNIUtils jsniUtils){
+			SynapseJSNIUtils jsniUtils, 
+			PortalGinInjector ginInjector){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
@@ -50,6 +52,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		this.cookies = cookies;
 		this.resourceLoader = resourceLoader;
 		this.jsniUtils = jsniUtils;
+		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 	}
 
@@ -80,6 +83,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		}
 		loadNewsFeed();
 	}
+	
 	public void loadNewsFeed(){
 		long uniqueId = new Date().getTime();
 		final String twitterElementId = TWITTER_ELEMENT_ID+uniqueId;

@@ -80,14 +80,15 @@ public class Portal implements EntryPoint {
 						appWidget.addStyleName("rootPanel");
 
 						// Start PlaceHistoryHandler with our PlaceHistoryMapper
-						AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);		
+						AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
 						final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
 						historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());						
 						Header header = ginjector.getHeader();
-						Footer footer = ginjector.getFooter();
-						RootPanel.get("rootPanel").add(appWidget);
 						RootPanel.get("headerPanel").add(header);
+						Footer footer = ginjector.getFooter();
 						RootPanel.get("footerPanel").add(footer);
+						
+						RootPanel.get("rootPanel").add(appWidget);
 						RootPanel.get("initialLoadingUI").setVisible(false);
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);

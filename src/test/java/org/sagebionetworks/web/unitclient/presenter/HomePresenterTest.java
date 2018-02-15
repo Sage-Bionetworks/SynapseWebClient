@@ -15,7 +15,9 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -24,6 +26,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -45,14 +48,23 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class HomePresenterTest {
 
 	HomePresenter homePresenter;
+	@Mock
 	HomeView mockView;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
 	StackConfigServiceAsync mockStackConfigService;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	CookieProvider mockCookies;
+	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
 	GWTWrapper mockGwtWrapper;
 	
 	List<EntityHeader> testEvaluationResults;
@@ -60,19 +72,14 @@ public class HomePresenterTest {
 	
 	String testTeamId = "42";
 	UserSessionData testSessionData;
+	@Mock
 	ResourceLoader mockResourceLoader;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
 	
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{
-		mockView = mock(HomeView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockGwtWrapper = mock(GWTWrapper.class);
-		mockCookies = mock(CookieProvider.class);
-		mockResourceLoader = mock(ResourceLoader.class);
+		MockitoAnnotations.initMocks(this);
 		
 		org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> testBatchResults = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
 		testEvaluationResults = new ArrayList<EntityHeader>();
@@ -91,13 +98,14 @@ public class HomePresenterTest {
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		
+		when(mockPortalGinInjector.getGWT()).thenReturn(mockGwtWrapper);
 		homePresenter = new HomePresenter(mockView, 
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
 				mockCookies,
 				mockResourceLoader,
-				mockSynapseJSNIUtils
+				mockSynapseJSNIUtils,
+				mockPortalGinInjector
 				);
 		verify(mockView).setPresenter(homePresenter);
 		
