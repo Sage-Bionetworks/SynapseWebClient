@@ -267,6 +267,7 @@ public class DisplayUtils {
 		if (timeout != null) {
 			settings.setDelay(timeout);	
 		}
+		settings.setZIndex(2001);
 		notify(title, message, settings);
 	}
 	
