@@ -35,7 +35,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	public static final int TWITTER_STANDARD_HEIGHT = 390;
 	public static final int TWITTER_MINIMAL_HEIGHT = 200;
 	public static final String TWITTER_ELEMENT_ID = "twitter-feed";
-	PortalGinInjector ginInjector;
 	
 	@Inject
 	public HomePresenter(HomeView view,  
@@ -43,8 +42,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 			GlobalApplicationState globalApplicationState,
 			CookieProvider cookies,
 			ResourceLoader resourceLoader,
-			SynapseJSNIUtils jsniUtils, 
-			PortalGinInjector ginInjector){
+			SynapseJSNIUtils jsniUtils){
 		this.view = view;
 		// Set the presenter on the view
 		this.authenticationController = authenticationController;
@@ -52,7 +50,6 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		this.cookies = cookies;
 		this.resourceLoader = resourceLoader;
 		this.jsniUtils = jsniUtils;
-		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 	}
 

@@ -5,7 +5,6 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -23,10 +22,8 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -64,8 +61,6 @@ public class HomePresenterTest {
 	CookieProvider mockCookies;
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	@Mock
-	GWTWrapper mockGwtWrapper;
 	
 	List<EntityHeader> testEvaluationResults;
 	List<OpenUserInvitationBundle> openInvitations;
@@ -74,8 +69,6 @@ public class HomePresenterTest {
 	UserSessionData testSessionData;
 	@Mock
 	ResourceLoader mockResourceLoader;
-	@Mock
-	PortalGinInjector mockPortalGinInjector;
 	
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{
@@ -98,14 +91,12 @@ public class HomePresenterTest {
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		when(mockPortalGinInjector.getGWT()).thenReturn(mockGwtWrapper);
 		homePresenter = new HomePresenter(mockView, 
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
 				mockCookies,
 				mockResourceLoader,
-				mockSynapseJSNIUtils,
-				mockPortalGinInjector
+				mockSynapseJSNIUtils
 				);
 		verify(mockView).setPresenter(homePresenter);
 		
