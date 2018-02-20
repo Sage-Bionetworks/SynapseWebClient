@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBox;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -56,6 +57,8 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	Button okButton;
 	@UiField
 	Button cancelButton;
+	@UiField
+	HelpWidget helpWidget;
 	
 	@UiField
 	SimplePanel browseMyEntitiesContainer;
@@ -122,6 +125,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				presenter.okClicked();
 			}
 		});
+		okButton.addDomHandler(DisplayUtils.getPreventTabHandler(okButton), KeyDownEvent.getType());
 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -474,6 +478,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	public void show() {
 		//show modal
 		modal.show();
+		helpWidget.focus();
 	}
 	
 	@Override

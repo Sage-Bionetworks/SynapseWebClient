@@ -53,6 +53,7 @@ public class LoginModalViewImpl implements LoginModalView {
 	@Inject
 	public LoginModalViewImpl(Binder binder){
 		modal = binder.createAndBindUi(this);
+		primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
 	}
 	
 	@Override

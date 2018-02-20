@@ -7,7 +7,7 @@
 	<b:Modal dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="entityFinder modal-fullscreen topLevelZIndex">
 		<b:ModalHeader closable="false">
 			<b:Heading size="H4" text="Find in Synapse" addStyleNames="displayInline" />
-			<w:HelpWidget helpMarkdown="Finding items in Synapse can be done by either “browsing”, “searching,” or directly entering the Synapse ID.&#10;Alternatively, navigate to the desired location in the current project, favorite projects or projects you own." 
+			<w:HelpWidget ui:field="helpWidget" helpMarkdown="Finding items in Synapse can be done by either “browsing”, “searching,” or directly entering the Synapse ID.&#10;Alternatively, navigate to the desired location in the current project, favorite projects or projects you own." 
 				addStyleNames="margin-left-5" placement="BOTTOM"/>
 		</b:ModalHeader>
 		<b:ModalBody>
