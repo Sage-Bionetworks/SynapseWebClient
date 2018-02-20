@@ -1193,6 +1193,11 @@ h1, h2, h3, h4, h5, h6 {
 	text-decoration:none; 
 }
 
+/** SWC-4059: fix focus by changing tree items to block (so that top and left positions are set properly) **/
+.gwt-TreeItem {
+	display: block !important;
+}
+
 .gwt-TreeItem-selected {
   background: #ffffff !important;
   text-decoration:underline;
