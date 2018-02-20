@@ -74,8 +74,8 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 		};
 		
 		saveButton.addClickHandler(onSave);
-		saveButton.addDomHandler(DisplayUtils.getPreventTabHandler(saveButton), KeyDownEvent.getType());
 		cancelButton.addClickHandler(onCancel);
+		cancelButton.addDomHandler(DisplayUtils.getPreventTabHandler(cancelButton), KeyDownEvent.getType());
 		editorDialog.addCloseHandler(onCancel);
 		deleteButton.addClickHandler(onDelete);
 	}
