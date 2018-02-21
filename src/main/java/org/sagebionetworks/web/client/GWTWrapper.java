@@ -49,8 +49,8 @@ public interface GWTWrapper {
 	boolean isWhitespace(String text);
 
 	void newItem(String historyToken, boolean issueEvent);
-
 	void replaceItem(String historyToken, boolean issueEvent);
+	String getCurrentHistoryToken();
 	
 	ServiceDefTarget asServiceDefTarget(Object service);
 	HasRpcToken asHasRpcToken(Object service);

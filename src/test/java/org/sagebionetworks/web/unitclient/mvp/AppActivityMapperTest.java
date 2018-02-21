@@ -101,7 +101,6 @@ public class AppActivityMapperTest {
 		
 		appActivityMapper.getActivity(loginPlace1);
 		verify(mockGlobalApplicationState).setLastPlace(entityPlace);
-		verify(mockGlobalApplicationState).setCurrentPlace(loginPlace1);
 		
 		// Part 2
 		reset(mockGlobalApplicationState);
@@ -110,6 +109,5 @@ public class AppActivityMapperTest {
 		Place loginPlace2 = new LoginPlace("EXAMPLE_SSO_TOKEN");
 		appActivityMapper.getActivity(loginPlace2);		
 		verify(mockGlobalApplicationState, times(0)).setLastPlace(any(Place.class));
-		verify(mockGlobalApplicationState).setCurrentPlace(loginPlace2);
 	}
 }

@@ -132,8 +132,6 @@ public class AppActivityMapper implements ActivityMapper {
 		
 		isFirstTime = false;
 		
-		globalApplicationState.setCurrentPlace(place);
-		
 		// If the user is not logged in then we redirect them to the login screen
 		// except for the fully public places
 		if(!openAccessPlaces.contains(place.getClass())) {

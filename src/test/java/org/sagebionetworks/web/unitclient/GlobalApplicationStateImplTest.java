@@ -309,12 +309,6 @@ public class GlobalApplicationStateImplTest {
 	}
 	
 	@Test
-	public void testClearCurrentPlace() {
-		globalApplicationState.clearCurrentPlace();
-		verify(mockCookieProvider).removeCookie(CookieKeys.CURRENT_PLACE);
-	}
-	
-	@Test
 	public void testPushCurrentPlace(){
 		String newToken = "/some/new/token";
 		Place mockPlace = mock(Place.class);
@@ -322,16 +316,13 @@ public class GlobalApplicationStateImplTest {
 		globalApplicationState.pushCurrentPlace(mockPlace);
 		//should have set the last place (to the current), and the current place (as requested)
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
-		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
 		verify(mockGWT).newItem(newToken, false);
 		
 		//if I push the same place again, it should not push the history state again
-		when(mockCookieProvider.getCookie(CookieKeys.CURRENT_PLACE)).thenReturn("current place is set");
 		when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
 		globalApplicationState.pushCurrentPlace(mockPlace);
 		//verify that these were still only called once
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
-		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
 		verify(mockGWT).newItem(newToken, false);
 	}
 	
@@ -343,16 +334,13 @@ public class GlobalApplicationStateImplTest {
 		globalApplicationState.replaceCurrentPlace(mockPlace);
 		//should have set the last place (to the current), and the current place (as requested)
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
-		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
 		verify(mockGWT).replaceItem(newToken, false);
 		
 		//if I push the same place again, it should not push the history state again
-		when(mockCookieProvider.getCookie(CookieKeys.CURRENT_PLACE)).thenReturn("current place is set");
 		when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
 		globalApplicationState.replaceCurrentPlace(mockPlace);
 		//verify that these were still only called once
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
-		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
 		verify(mockGWT).replaceItem(newToken, false);
 	}
 	

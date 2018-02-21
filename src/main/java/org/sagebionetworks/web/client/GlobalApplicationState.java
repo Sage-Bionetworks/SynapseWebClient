@@ -73,12 +73,6 @@ public interface GlobalApplicationState {
 	public Place getCurrentPlace();
 	
 	/**
-	 * Sets the last visited place (should only used in the AppActivityMapper) 
-	 * @param lastPlace
-	 */
-	public void setCurrentPlace(Place currentPlace);
-	
-	/**
 	 * Sets the App Place History Mapper
 	 * @param appPlaceHistoryMapper
 	 */
@@ -106,7 +100,6 @@ public interface GlobalApplicationState {
 	String getSynapseProperty(String key);
 	
 	void clearLastPlace();
-	void clearCurrentPlace();
 	
 	public boolean isWikiBasedEntity(String entityId);
 
