@@ -13,6 +13,8 @@ import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
+import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -124,6 +126,8 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 				presenter.onSave();
 			}
 		});
+		//SWC-1748: prevent TAB out of modal
+		saveRowsButton.addDomHandler(DisplayUtils.getPreventTabHandler(saveRowsButton), KeyDownEvent.getType());
 		// Track clicks to the close button at the top of the dialog
 		editRowsModal.addCloseHandler(new ClickHandler() {
 			@Override

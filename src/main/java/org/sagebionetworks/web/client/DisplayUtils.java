@@ -26,7 +26,6 @@ import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -72,13 +71,14 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -90,6 +90,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -115,6 +116,21 @@ public class DisplayUtils {
 	public static final ClickHandler DO_NOTHING_CLICKHANDLER = event -> {
 		event.preventDefault();
 	};
+	
+	/**
+	 * This key down handler prevents the user from tabbing forward off of the given Focusable widget.
+	 * User can still shift-tab to go back.
+	 * @param lastWidget
+	 * @return
+	 */
+	public static KeyDownHandler getPreventTabHandler(Focusable lastWidget) {
+		return event -> {
+			if (KeyCodes.KEY_TAB == event.getNativeKeyCode() && !event.isShiftKeyDown()) {
+				event.preventDefault();
+				lastWidget.setFocus(true);
+			}
+		};
+	}
 	
 	public static NotifySettings getDefaultSettings() {
 		NotifySettings notifySettings = NotifySettings.newSettings();

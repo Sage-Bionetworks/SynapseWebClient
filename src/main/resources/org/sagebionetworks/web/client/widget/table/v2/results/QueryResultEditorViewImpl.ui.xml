@@ -37,9 +37,9 @@
 				</g:HTMLPanel>
 			</b:ModalBody>
 			<b:ModalFooter>
+				<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
 				<b:Button ui:field="saveRowsButton" type="PRIMARY"
 					dataLoadingText="Saving...">Save</b:Button>
-				<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 		<b:Modal ui:field="inProgressModal" title="Edit Rows" closable="true"

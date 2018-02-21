@@ -3,9 +3,11 @@ package org.sagebionetworks.web.client.widget.sharing;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -39,6 +41,7 @@ public class AccessControlListModalWidgetViewImpl implements
 	@Inject
 	public AccessControlListModalWidgetViewImpl(Binder binder) {
 		modal = binder.createAndBindUi(this);
+		primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
 	}
 
 	@Override
