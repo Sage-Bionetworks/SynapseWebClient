@@ -39,8 +39,6 @@ import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
-import org.sagebionetworks.web.client.presenter.HomePresenter;
-import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.activity.shared.Activity;
@@ -146,22 +144,13 @@ public class AppActivityMapper implements ActivityMapper {
 		
 		// We use GIN to generate and inject all presenters with 
 		// their dependencies.
-		if(place instanceof Home) {
-			// Split the code
-			PresenterProxy<HomePresenter, Home> presenter = ginjector.getHomePresenter();
-			presenter.setPlace((Home)place);
-			presenter.setGinInjector(ginjector);
-			lastActivity = presenter;
-			return presenter;
-		} else {
-			if(loading != null) loading.showWidget();
-			BulkPresenterProxy bulkPresenterProxy = ginjector.getBulkPresenterProxy();
-			bulkPresenterProxy.setGinjector(ginjector);
-			bulkPresenterProxy.setloader(loading);
-			bulkPresenterProxy.setPlace(place);
-			lastActivity = bulkPresenterProxy;
-			return bulkPresenterProxy;
-		}
+		if(loading != null) loading.showWidget();
+		BulkPresenterProxy bulkPresenterProxy = ginjector.getBulkPresenterProxy();
+		bulkPresenterProxy.setGinjector(ginjector);
+		bulkPresenterProxy.setloader(loading);
+		bulkPresenterProxy.setPlace(place);
+		lastActivity = bulkPresenterProxy;
+		return bulkPresenterProxy;
 	}
 
 	/**

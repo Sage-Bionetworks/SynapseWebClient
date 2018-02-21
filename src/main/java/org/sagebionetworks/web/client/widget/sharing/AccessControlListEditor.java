@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -78,6 +80,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			SynapseAlert synAlert) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
+		fixServiceEntryPoint(synapseClient);
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.gwt = gwt;

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserProfile;
@@ -35,6 +37,7 @@ public class ChallengeParticipantsWidget implements UserListView.Presenter, Widg
 		this.view = view;
 		this.paginationWidget = paginationWidget;
 		this.challengeClient = synapseClient;
+		fixServiceEntryPoint(challengeClient);
 		view.setPaginationWidget(paginationWidget.asWidget());
 		view.setPresenter(this);
 	}

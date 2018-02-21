@@ -8,7 +8,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.ServiceEntryPointUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
@@ -34,6 +34,7 @@ public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget
 			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.challengeClient = challengeClient;
+		ServiceEntryPointUtils.fixServiceEntryPoint(challengeClient);
 		this.authController = authController;
 		this.synAlert = synAlert;
 		this.adapterFactory = adapterFactory;

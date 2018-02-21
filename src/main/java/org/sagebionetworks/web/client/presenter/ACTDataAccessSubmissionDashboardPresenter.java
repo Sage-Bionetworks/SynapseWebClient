@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmission;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmissionPage;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
@@ -43,6 +45,7 @@ public class ACTDataAccessSubmissionDashboardPresenter extends AbstractActivity 
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.dataAccessClient = dataAccessClient;
+		fixServiceEntryPoint(dataAccessClient);
 		this.loadMoreContainer = loadMoreContainer;
 		this.noResultsDiv = noResultsDiv;
 

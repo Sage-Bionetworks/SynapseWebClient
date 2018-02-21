@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.schema;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Iterator;
 import java.util.List;
 
@@ -77,6 +79,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		this.baseView.setJobTrackingWidget(jobTrackingWidget);
 		this.baseView.setJobTrackingWidgetVisible(false);
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.fileViewDefaultColumns = fileViewDefaultColumns;
 		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
 			@Override

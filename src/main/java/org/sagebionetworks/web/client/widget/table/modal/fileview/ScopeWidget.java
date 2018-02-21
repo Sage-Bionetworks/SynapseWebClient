@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.getTableType;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -71,6 +72,7 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 			EntityContainerListWidget editScopeWidget,
 			SynapseAlert synAlert){
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.view = view;
 		this.viewScopeWidget = viewScopeWidget;
 		this.editScopeWidget = editScopeWidget;

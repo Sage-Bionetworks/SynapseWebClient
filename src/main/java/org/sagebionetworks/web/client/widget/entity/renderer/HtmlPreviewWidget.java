@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.web.client.ClientProperties.MB;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
@@ -61,6 +62,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 		this.requestBuilder = requestBuilder;
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.popupUtils = popupUtils;
 		this.gwt = gwt;
 		view.setSynAlert(synAlert);

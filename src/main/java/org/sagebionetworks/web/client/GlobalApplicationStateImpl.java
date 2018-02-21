@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.LAST_PLACE;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
 
@@ -30,6 +31,7 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
@@ -42,7 +44,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private PlaceController placeController;
 	private CookieProvider cookieProvider;
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
-	private SynapseClientAsync synapseClient;
+	private StackConfigServiceAsync stackConfigService;
 	private PlaceChanger placeChanger;
 	private JiraURLHelper jiraUrlHelper;
 	private EventBus eventBus;
@@ -65,7 +67,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			CookieProvider cookieProvider,
 			JiraURLHelper jiraUrlHelper, 
 			EventBus eventBus, 
-			SynapseClientAsync synapseClient, 
+			StackConfigServiceAsync stackConfigService, 
 			SynapseJSNIUtils synapseJSNIUtils, 
 			ClientCache localStorage, 
 			GWTWrapper gwt,
@@ -74,7 +76,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
-		this.synapseClient = synapseClient;
+		this.stackConfigService = stackConfigService;
+		fixServiceEntryPoint(stackConfigService);
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.localStorage = localStorage;
 		this.dateTimeUtils = dateTimeUtils;
@@ -240,7 +243,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		// don't check for the next minute
 		localStorage.put(RECENTLY_CHECKED_SYNAPSE_VERSION, Boolean.TRUE.toString(), new Date(System.currentTimeMillis() + 1000*60).getTime());
 		
-		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
+		stackConfigService.getSynapseVersions(new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String versions) {
 				if (synapseVersion == null) {
@@ -302,7 +305,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 	
 	public void initSynapsePropertiesFromServer() {
-		synapseClient.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
+		stackConfigService.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
 				for (String key : properties.keySet()) {
@@ -324,7 +327,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 	
 	public void initSynapseVersions(final Callback c) {
-		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
+		stackConfigService.getSynapseVersions(new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String versions) {
 				synapseVersion = versions;

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
 
@@ -40,7 +41,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -139,7 +139,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
 	ApproveUserAccessModal approveUserAccessModal;
-	UserProfileClientAsync userProfileClient;
 	PortalGinInjector ginInjector;
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	AddFolderDialogWidget addFolderDialogWidget;
@@ -213,12 +212,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private ChallengeClientAsync getChallengeClient() {
 		if (challengeClient == null) {
 			challengeClient = ginInjector.getChallengeClientAsync();
+			fixServiceEntryPoint(challengeClient);
 		}
 		return challengeClient;
 	}
 	private SynapseClientAsync getSynapseClient() {
 		if (synapseClient == null) {
 			synapseClient = ginInjector.getSynapseClientAsync();
+			fixServiceEntryPoint(synapseClient);
 		}
 		return synapseClient;
 	}

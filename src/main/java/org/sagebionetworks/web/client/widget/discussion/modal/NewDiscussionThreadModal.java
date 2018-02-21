@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -46,6 +48,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
+		fixServiceEntryPoint(discussionForumClient);
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
 		this.authController = authController;

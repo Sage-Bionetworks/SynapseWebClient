@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import java.util.HashMap;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
@@ -11,7 +13,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  *
  */
 public interface StackConfigServiceAsync {
-
-	void getBCCSignupEnabled(AsyncCallback<String> callback);
 	void getDoiPrefix(AsyncCallback<String> callback);
+	void getSynapseVersions(AsyncCallback<String> callback);
+	void getSynapseProperties(AsyncCallback<HashMap<String, String>> callback);
 }

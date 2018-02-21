@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -49,6 +51,7 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.wikiMarkdownEditor = wikiMarkdownEditor;
 		wikiMarkdownEditor.setDeleteButtonVisible(false);
 		this.wikiPageRenderer = wikiPageRenderer;

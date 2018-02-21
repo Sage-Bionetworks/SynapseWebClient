@@ -23,6 +23,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SessionTokenDetector;
+import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
@@ -52,7 +53,7 @@ public class AuthenticationControllerImplTest {
 	@Mock
 	ClientCache mockClientCache;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
+	StackConfigServiceAsync mockStackConfigService;
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
@@ -80,9 +81,9 @@ public class AuthenticationControllerImplTest {
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockSynapseClient, mockGinInjector);
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockStackConfigService, mockGinInjector);
 		serverProperties = new HashMap<String, String>();
-		AsyncMockStubber.callSuccessWith(serverProperties).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(serverProperties).when(mockStackConfigService).getSynapseProperties(any(AsyncCallback.class));
 		when(mockGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockGinInjector.getSessionTokenDetector()).thenReturn(mockSessionTokenDetector);
@@ -200,7 +201,7 @@ public class AuthenticationControllerImplTest {
 		verify(mockCookieProvider).removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		verify(mockSessionStorage).clear();
 		verify(mockClientCache).clear();
-		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		verify(mockStackConfigService).getSynapseProperties(any(AsyncCallback.class));
 		verify(mockClientCache).put(eq(propKey), eq(propValue), anyLong());
 		verify(mockSessionTokenDetector).initializeSessionTokenState();
 	}

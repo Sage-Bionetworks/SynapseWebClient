@@ -12,6 +12,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.HAS_CHILDREN;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.TABLE_DATA;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Entity;
@@ -108,6 +109,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.tabs = tabs;
 		this.wikiTab = wikiTab;
 		this.filesTab = filesTab;

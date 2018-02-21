@@ -138,4 +138,8 @@ public class HelpWidget implements IsWidget {
 	public Popover getHelpPopover() {
 		return helpPopover;
 	}
+	
+	public void focus() {
+		anchor.setFocus(true);
+	}
 }

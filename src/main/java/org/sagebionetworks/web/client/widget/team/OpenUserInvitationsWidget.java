@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget.DELETED_INVITATION_MESSAGE;
 
 import java.util.ArrayList;
@@ -57,6 +58,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		view.setPresenter(this);
 		view.setSynAlert(synAlert);
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.globalApplicationState = globalApplicationState;
 		this.jsClient = jsClient;
 		this.popupUtils = popupUtils;

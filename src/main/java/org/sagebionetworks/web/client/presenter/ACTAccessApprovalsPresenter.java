@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.ACCESS_REQUIREMENT_ID_PARAM;
 import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.EXPIRES_BEFORE_PARAM;
 import static org.sagebionetworks.web.client.place.ACTAccessApprovalsPlace.SUBMITTER_ID_PARAM;
@@ -75,6 +76,7 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.dataAccessClient = dataAccessClient;
+		fixServiceEntryPoint(dataAccessClient);
 		this.loadMoreContainer = loadMoreContainer;
 		this.selectedUserBadge = selectedUserBadge;
 		this.showHideAccessRequirementButton = showHideAccessRequirementButton;

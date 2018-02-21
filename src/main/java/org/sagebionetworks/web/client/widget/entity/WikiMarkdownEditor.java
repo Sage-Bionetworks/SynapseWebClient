@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.HashSet;
 import java.util.List;
 
@@ -40,6 +42,7 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 		this.view = view;
 		this.editor = editor;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.globalApplicationState = globalApplicationState;
 		this.jsClient = jsClient;
 		view.setPresenter(this);

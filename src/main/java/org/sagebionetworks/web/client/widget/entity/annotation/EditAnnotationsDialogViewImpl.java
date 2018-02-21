@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -37,23 +38,18 @@ public class EditAnnotationsDialogViewImpl implements EditAnnotationsDialogView{
 	@Inject
 	public EditAnnotationsDialogViewImpl(final Binder uiBinder){
 		widget = uiBinder.createAndBindUi(this);
+		saveButton.addClickHandler(event -> {
+			presenter.onSave();
+		});
+		addAnnotationButton.addClickHandler(event -> {
+			presenter.onAddNewAnnotation();
+		});
+		saveButton.addDomHandler(DisplayUtils.getPreventTabHandler(saveButton), KeyDownEvent.getType());
 	}
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		saveButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSave();
-			}
-		});
-		addAnnotationButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onAddNewAnnotation();
-			}
-		});
 	}
 
 	@Override

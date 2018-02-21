@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import static org.sagebionetworks.web.shared.WidgetConstants.*;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.shared.WebConstants.*;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +79,7 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.gwt = gwt;
 		this.cookies = cookies;
 		this.widgetDescriptorEditor = widgetDescriptorEditor;

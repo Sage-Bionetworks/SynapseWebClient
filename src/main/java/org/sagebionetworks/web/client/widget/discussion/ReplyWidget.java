@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Set;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
@@ -74,6 +76,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.synAlert = synAlert;
 		this.requestBuilder = requestBuilder;
 		this.discussionForumClientAsync = discussionForumClientAsync;
+		fixServiceEntryPoint(discussionForumClientAsync);
 		this.authController = authController;
 		this.editReplyModal = editReplyModal;
 		this.markdownWidget = markdownWidget;

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +47,7 @@ public class SubmitToEvaluationWidget implements SubmitToEvaluationWidgetView.Pr
 		this.view = view;
 		view.setPresenter(this);
 		this.challengeClient = challengeClient;
+		fixServiceEntryPoint(challengeClient);
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.ginInjector = ginInjector;

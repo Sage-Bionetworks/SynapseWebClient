@@ -13,6 +13,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -49,6 +50,7 @@ public class BaseEditWidgetDescriptorViewImpl implements BaseEditWidgetDescripto
 				presenter.apply();
 			}
 		});
+		okButton.addDomHandler(DisplayUtils.getPreventTabHandler(okButton), KeyDownEvent.getType());
 		
 		dialogCallback = new DialogCallback() {
 			@Override

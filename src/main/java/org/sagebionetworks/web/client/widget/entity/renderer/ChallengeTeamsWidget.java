@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,6 +47,7 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 		this.dialog = dialog;
 		this.paginationWidget = paginationWidget;
 		this.challengeClient = challengeClient;
+		fixServiceEntryPoint(challengeClient);
 		this.authController = authController;
 		view.setPaginationWidget(paginationWidget.asWidget());
 		view.setEditRegisteredTeamDialog(dialog.asWidget());

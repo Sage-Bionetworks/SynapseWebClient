@@ -199,7 +199,7 @@
 					<i18nMessagesBundle>org.sagebionetworks.web.client.Messages</i18nMessagesBundle>
 					<module>org.sagebionetworks.web.Portal${gwt.module.suffix}</module>
 					<!-- GWT compiler options -->
-					<compileReport>false</compileReport>
+					<compileReport>true</compileReport>
 					<!-- Disabled because it causes an EmptyStackException on GWT 2.8.1
 					<soycDetailed>true</soycDetailed> -->
 					<encoding>${project.build.sourceEncoding}</encoding>

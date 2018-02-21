@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.shared.WidgetConstants.*;
 
 import java.util.ArrayList;
@@ -68,6 +69,7 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		this.finder = finder;
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
 		this.showHideAdvancedButton = showHideAdvancedButton;
 		view.setSynAlert(synAlert);
