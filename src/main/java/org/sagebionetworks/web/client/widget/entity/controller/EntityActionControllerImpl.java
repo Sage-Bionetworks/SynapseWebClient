@@ -480,12 +480,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void configureCreateDOI() {
 		boolean canEdit = permissions.getCanEdit();
 		actionMenu.setActionVisible(Action.CREATE_DOI, false);
-		if (canEdit && !isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
+		if (canEdit &&
+				!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
+				!(entityBundle.getEntity() instanceof EntityView)) {
 			actionMenu.setActionListener(Action.CREATE_DOI, this);
 			if (entityBundle.getDoi() == null) {
-				//show command if not returned, thus not in existence
+				// show command if not returned, thus not in existence
 				actionMenu.setActionVisible(Action.CREATE_DOI, true);
-				actionMenu.setActionText(Action.CREATE_DOI, "Create DOI for  "+enityTypeDisplay);
+				actionMenu.setActionText(Action.CREATE_DOI, "Create DOI for  " + enityTypeDisplay);
 			}
 		}
 	}
