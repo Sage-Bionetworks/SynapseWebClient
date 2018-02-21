@@ -136,7 +136,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	@Override
 	public void onLogoutClick() {
 		//explicitly logging out, clear the current and last place.
-		globalApplicationState.clearCurrentPlace();
 		globalApplicationState.clearLastPlace();
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));	
 	}

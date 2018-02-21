@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import static org.sagebionetworks.web.client.cookie.CookieKeys.CURRENT_PLACE;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.LAST_PLACE;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
 
@@ -169,10 +168,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void clearLastPlace() {
 		cookieProvider.removeCookie(LAST_PLACE);
 	}
-	@Override
-	public void clearCurrentPlace() {
-		cookieProvider.removeCookie(CURRENT_PLACE);
-	}
 	
 	@Override
 	public void gotoLastPlace() {
@@ -197,14 +192,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 
 	@Override
 	public Place getCurrentPlace() {
-		String historyValue = cookieProvider.getCookie(CURRENT_PLACE);
-		return getPlaceFromHistoryValue(historyValue, AppActivityMapper.getDefaultPlace());		
-	}
-
-	@Override
-	public void setCurrentPlace(Place currentPlace) {		
-		Date expires = new Date(System.currentTimeMillis() + 300000); // store for 5 minutes
-		cookieProvider.setCookie(CURRENT_PLACE, appPlaceHistoryMapper.getToken(currentPlace), expires);
+		//get the current place based on the current browser window history token
+		String token = gwt.getCurrentHistoryToken();
+		return appPlaceHistoryMapper.getPlace(token);
 	}
 
 	@Override
@@ -393,7 +383,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		try {
 			if (targetPlace != null && !(targetPlace.equals(getCurrentPlace()))) {
 				setLastPlace(getCurrentPlace());
-				setCurrentPlace(targetPlace);
 				String token = appPlaceHistoryMapper.getToken(targetPlace);
 				if (pushState) {
 					gwt.newItem(token, false);

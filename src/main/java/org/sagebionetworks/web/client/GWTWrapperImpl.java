@@ -158,6 +158,10 @@ public class GWTWrapperImpl implements GWTWrapper {
 	public void replaceItem(String historyToken, boolean issueEvent) {
 		History.replaceItem(historyToken, issueEvent);
 	}
+	@Override
+	public String getCurrentHistoryToken() {
+		return History.getToken();
+	}
 	
 	@Override
 	public ServiceDefTarget asServiceDefTarget(Object serviceAsync) {

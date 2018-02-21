@@ -48,7 +48,6 @@ public class MyEntitiesBrowserTest {
 	MyEntitiesBrowserView mockView;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
-	SynapseClientAsync mockSynapseClient;
 	JSONObjectAdapter jsonObjectAdapter;
 	@Mock
 	EntityTreeBrowser mockEntityTreeBrowser;
@@ -67,9 +66,8 @@ public class MyEntitiesBrowserTest {
 		mockView = mock(MyEntitiesBrowserView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		widget = new MyEntitiesBrowser(mockView, mockAuthenticationController,
-				mockGlobalApplicationState, mockSynapseClient,
+				mockGlobalApplicationState,
 				jsonObjectAdapter,
 				mockSynapseJavascriptClient);
 		mockEntityTreeBrowser = mock(EntityTreeBrowser.class);
@@ -145,8 +143,6 @@ public class MyEntitiesBrowserTest {
 		
 		//test refresh when the context has not changed
 		widget.refresh();
-		//should have done nothing
-		verifyZeroInteractions(mockSynapseClient);
 		
 		//test clearState() when context has not changed
 		widget.clearState();
