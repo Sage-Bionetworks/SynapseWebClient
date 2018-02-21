@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Map;
 
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -27,6 +29,7 @@ public class TeamMemberCountWidget implements WidgetRendererPresenter {
 		SynapseClientAsync synapseClient,
 		SynapseAlert synAlert) {
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.view = view;
 		this.synAlert = synAlert;
 		view.setSynAlert(synAlert.asWidget());

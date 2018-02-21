@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,6 +58,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
 		// default selection behavior is to do nothing
 		this.selectedHandler = new SelectedHandler() {			

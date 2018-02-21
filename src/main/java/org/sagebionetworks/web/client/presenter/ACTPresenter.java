@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +59,7 @@ public class ACTPresenter extends AbstractActivity implements ACTView.Presenter,
 			LoadMoreWidgetContainer loadMoreContainer) {
 		this.view = view;
 		this.userProfileClient = userProfileClient;
+		fixServiceEntryPoint(userProfileClient);
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.ginInjector = ginInjector;

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -65,6 +67,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 			ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.ginInjector = ginInjector;
@@ -74,6 +77,7 @@ public class ManagedACTAccessRequirementWidget implements ManagedACTAccessRequir
 		this.reviewAccessRequestsButton = reviewAccessRequestsButton;
 		this.manageAccessButton = manageAccessButton;
 		this.dataAccessClient = dataAccessClient;
+		fixServiceEntryPoint(dataAccessClient);
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.authController = authController;
 		this.submitterUserBadge = submitterUserBadge;

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -35,6 +37,7 @@ public class FavoriteWidget implements Presenter, IsWidget {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.jsClient = jsClient;

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
@@ -57,8 +59,10 @@ public class SettingsPresenter implements SettingsView.Presenter {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.userService = userService;
+		fixServiceEntryPoint(userService);
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.ginInjector = ginInjector;
 		this.userProfileModalWidget = userProfileModalWidget;
 		this.subscriptionListWidget = subscriptionListWidget;

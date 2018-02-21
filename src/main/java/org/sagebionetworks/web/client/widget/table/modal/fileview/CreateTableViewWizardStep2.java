@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,6 +62,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			ViewDefaultColumns fileViewDefaultColumns){
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.editor = editor;
 		this.jobTrackingWidget = jobTrackingWidget;
 		this.fileViewDefaultColumns = fileViewDefaultColumns;

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.user;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserProfile;
@@ -64,6 +66,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.globalApplicationState = globalApplicationState;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.clientCache = clientCache;

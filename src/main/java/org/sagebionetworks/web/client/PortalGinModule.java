@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.cache.StorageImpl;
 import org.sagebionetworks.web.client.cache.StorageWrapper;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.cookie.GWTCookieImpl;
+import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
@@ -743,7 +744,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// JsoProvider
 		bind(JsoProvider.class).to(JsoProviderImpl.class);
 		bind(JsoProviderImpl.class).in(Singleton.class);
-		
 		// AuthenticationController
 		bind(AuthenticationController.class).to(AuthenticationControllerImpl.class).in(Singleton.class);;
 

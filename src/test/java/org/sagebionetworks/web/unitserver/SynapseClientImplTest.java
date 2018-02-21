@@ -1847,18 +1847,6 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testGetStorageLocationSettingDefaultUploadDestination() throws SynapseException, RestServiceException {
-		UploadDestination setting = Mockito.mock(UploadDestination.class);
-		String defaultStorageId = synapseClient.getSynapseProperties().get(SynapseClientImpl.DEFAULT_STORAGE_ID_PROPERTY_KEY);
-		when(setting.getStorageLocationId()).thenReturn(Long.parseLong(defaultStorageId));
-		when(mockSynapse.getDefaultUploadDestination(entityId)).thenReturn(setting);
-		StorageLocationSetting mockStorageLocationSetting = Mockito.mock(StorageLocationSetting.class);
-		when(mockSynapse.getMyStorageLocationSetting(anyLong())).thenReturn(mockStorageLocationSetting);
-		
-		assertNull(synapseClient.getStorageLocationSetting(entityId));
-	}
-	
-	@Test
 	public void testGetStorageLocationSetting() throws SynapseException, RestServiceException {
 		UploadDestination setting = Mockito.mock(UploadDestination.class);
 		when(setting.getStorageLocationId()).thenReturn(42L);

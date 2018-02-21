@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.docker.modal;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -31,6 +33,7 @@ public class AddExternalRepoModal implements AddExternalRepoModalView.Presenter 
 		this.view = view;
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(ADD_EXTERNAL_REPO_MODAL_TITLE);

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -29,6 +31,7 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 			GlobalApplicationState globalAppState){
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.globalAppState = globalAppState;
 		view.setPresenter(this);
 	}

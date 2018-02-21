@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -148,14 +149,18 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.globalApplicationState = globalApplicationState;
 		this.ginInjector = ginInjector;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.challengeClient = challengeClient;
+		fixServiceEntryPoint(challengeClient);
 		this.cookies = cookies;
 		this.linkedInService = linkedInServic;
+		fixServiceEntryPoint(linkedInService);
 		this.gwt = gwt;
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.userProfileClient = userProfileClient;
+		fixServiceEntryPoint(userProfileClient);
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.dateTimeUtils = dateTimeUtils;
 		this.jsClient = jsClient;

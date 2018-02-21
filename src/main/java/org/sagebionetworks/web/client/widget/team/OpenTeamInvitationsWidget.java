@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +56,7 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 		view.setPresenter(this);
 		view.setSynAlert(synAlert);
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.ginInjector = ginInjector;

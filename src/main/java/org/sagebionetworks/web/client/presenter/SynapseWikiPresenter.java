@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Wiki;
@@ -22,6 +24,7 @@ public class SynapseWikiPresenter extends AbstractActivity implements SynapseWik
 	public SynapseWikiPresenter(SynapseWikiView view, SynapseClientAsync synapseClient){
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		view.setPresenter(this);
 	}
 

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -61,6 +63,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synAlert = synAlert;
 		this.loadMoreWidgetContainer = loadMoreWidgetContainer;

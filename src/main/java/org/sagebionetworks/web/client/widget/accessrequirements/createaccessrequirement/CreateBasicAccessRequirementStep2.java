@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.createaccessrequirement;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.HasAccessorRequirement;
@@ -51,6 +53,7 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 		this.wikiMarkdownEditor = wikiMarkdownEditor;
 		this.wikiPageRenderer = wikiPageRenderer;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.synAlert = synAlert;
 		this.popupUtils = popupUtils;
 		wikiMarkdownEditor.setDeleteButtonVisible(false);

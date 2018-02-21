@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.team;
 
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -38,6 +40,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.membersContainer = membersContainer;
 		view.setMembersContainer(membersContainer);
 		membersContainer.configure(new Callback() {

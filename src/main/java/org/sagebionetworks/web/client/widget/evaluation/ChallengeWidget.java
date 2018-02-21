@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -31,6 +33,7 @@ public class ChallengeWidget implements ChallengeWidgetView.Presenter, IsWidget 
 			SelectTeamModal selectTeamModal
 			) {
 		this.challengeClient = challengeClient;
+		fixServiceEntryPoint(challengeClient);
 		this.view = view;
 		this.synAlert = synAlert;
 		this.teamBadge = teamBadge;

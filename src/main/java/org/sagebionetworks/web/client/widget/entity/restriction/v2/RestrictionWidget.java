@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.restriction.v2;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -57,6 +59,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 		this.globalApplicationState = globalApplicationState;
 		this.jiraURLHelper = jiraURLHelper;
 		this.dataAccessClient = dataAccessClient;
+		fixServiceEntryPoint(dataAccessClient);
 		this.synAlert = synAlert;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.jsClient = jsClient;

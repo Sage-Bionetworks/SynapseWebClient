@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -38,6 +40,7 @@ public class StorageLocationWidget implements StorageLocationWidgetView.Presente
 			CookieProvider cookies) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.synAlert = synAlert;
 		this.cookies = cookies;
 		view.setSynAlertWidget(synAlert);

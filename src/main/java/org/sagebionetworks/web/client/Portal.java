@@ -1,5 +1,4 @@
 package org.sagebionetworks.web.client;
-
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -17,7 +16,6 @@ import com.google.gwt.place.shared.PlaceHistoryHandler;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 
@@ -52,7 +50,6 @@ public class Portal implements EntryPoint {
 			Window.Location.replace(fullUrl);
 			Window.Location.reload();
 		} else {
-			fixGWTRpcServiceEntryPoints();
 			// This is a split point where the browser can download the first large code file.
 			GWT.runAsync(new RunAsyncCallback() {
 				@Override
@@ -80,14 +77,15 @@ public class Portal implements EntryPoint {
 						appWidget.addStyleName("rootPanel");
 
 						// Start PlaceHistoryHandler with our PlaceHistoryMapper
-						AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);		
+						AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
 						final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
 						historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());						
 						Header header = ginjector.getHeader();
-						Footer footer = ginjector.getFooter();
-						RootPanel.get("rootPanel").add(appWidget);
 						RootPanel.get("headerPanel").add(header);
+						Footer footer = ginjector.getFooter();
 						RootPanel.get("footerPanel").add(footer);
+						
+						RootPanel.get("rootPanel").add(appWidget);
 						RootPanel.get("initialLoadingUI").setVisible(false);
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
@@ -118,31 +116,6 @@ public class Portal implements EntryPoint {
 					}
 				}
 			});
-			
-		}
-	}
-	
-	public void fixGWTRpcServiceEntryPoints() {
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getChallengeClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDataAccessClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDiscussionForumClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getDockerClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getJiraClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getLinkedInServiceAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getStackConfigServiceAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getSubscriptionClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getSynapseClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getUserAccountServiceAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getUserProfileClientAsync());
-		fixServiceEntryPoint((ServiceDefTarget)ginjector.getMultipartFileUploadClientAsync());
-	}
-	
-	public void fixServiceEntryPoint(ServiceDefTarget serviceDefTarget) {
-		String oldUrl = serviceDefTarget.getServiceEntryPoint();
-		if (oldUrl.startsWith(GWT.getModuleBaseURL())) {
-			String serviceEntryPoint = GWTWrapperImpl.getRealGWTModuleBaseURL() + oldUrl.substring(GWT.getModuleBaseURL().length());
-			serviceDefTarget.setServiceEntryPoint(serviceEntryPoint);
-			
 		}
 	}
 	

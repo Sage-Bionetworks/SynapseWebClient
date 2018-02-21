@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,6 +39,7 @@ public class UploadCSVAppendPageImpl implements UploadCSVAppendPage {
 	public UploadCSVAppendPageImpl(UploadCSVAppendPageView view, SynapseClientAsync synapseClient, JobTrackingWidget jobTrackingWidget) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.jobTrackingWidget = jobTrackingWidget;
 		this.view.addJobTrackingWidget(jobTrackingWidget);
 	}

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -56,6 +58,7 @@ public class EntityMetadata implements Presenter {
 		this.annotationsWidget = annotationsWidget;
 		this.fileHistoryWidget = fileHistoryWidget;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.jsni = jsni;
 		this.restrictionWidgetV2 = restrictionWidgetV2;
 		this.cookies = cookies;

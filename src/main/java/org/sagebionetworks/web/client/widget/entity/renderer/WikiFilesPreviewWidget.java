@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.file.FileHandleResults;
@@ -22,6 +24,7 @@ public class WikiFilesPreviewWidget implements WikiFilesPreviewWidgetView.Presen
 	public WikiFilesPreviewWidget(WikiFilesPreviewWidgetView view, SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		view.setPresenter(this);
 	}
 	

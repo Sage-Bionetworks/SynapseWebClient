@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.profile;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.UserProfile;
@@ -45,6 +47,7 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 			PopupUtilsView popupUtils,
 			GWTWrapper gwt) {
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
 		this.view = view;
 		this.synAlert = synAlert;

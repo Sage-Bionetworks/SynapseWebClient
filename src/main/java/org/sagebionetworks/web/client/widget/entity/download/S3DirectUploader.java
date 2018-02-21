@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.PLEASE_SELECT_A_FILE;
 
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
@@ -51,6 +52,7 @@ public class S3DirectUploader implements S3DirectUploadHandler {
 		this.awsSdk = awsSdk;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.percentFormat = gwt.getNumberFormat("##");
 	}
 	

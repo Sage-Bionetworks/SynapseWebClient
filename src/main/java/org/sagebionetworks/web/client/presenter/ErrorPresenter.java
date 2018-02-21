@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -25,6 +27,7 @@ public class ErrorPresenter extends AbstractActivity implements ErrorView.Presen
 			SynapseAlert synAlert,
 			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
+		fixServiceEntryPoint(synapseClient);
 		this.synapseClient = synapseClient;
 		this.synAlert = synAlert;
 		this.jsniUtils = jsniUtils;

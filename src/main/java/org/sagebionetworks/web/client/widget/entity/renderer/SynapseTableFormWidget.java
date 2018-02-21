@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,6 +60,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 		this.rowWidget = rowWidget;
 		this.jobTracker = jobTracker;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.ownerUserBadge = ownerUserBadge;
 		this.jsClient = jsClient;
 		view.setRowFormWidget(rowWidget.asWidget());

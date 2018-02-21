@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -42,6 +44,7 @@ public class DeleteAccessRequirementButton implements IsWidget {
 		this.button = button;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.popupUtils = popupUtils;
 		this.cookies = cookies;
 		button.setVisible(false);
