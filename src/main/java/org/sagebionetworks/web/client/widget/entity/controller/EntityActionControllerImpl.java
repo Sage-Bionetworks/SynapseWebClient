@@ -551,7 +551,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void onDeleteChallenge() {
 		// Confirm the delete with the user.
-		view.showConfirmDialog(CONFIRM_DELETE_TITLE, DisplayConstants.CONFIRM_DELETE_CHALLENGE, () -> {
+		view.showConfirmDeleteDialog(CONFIRM_DELETE_TITLE, DisplayConstants.CONFIRM_DELETE_CHALLENGE, () -> {
 			postConfirmedDeleteChallenge();
 		});
 	}
@@ -1474,12 +1474,12 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	@Override
 	public void onDeleteEntity() {
 		// Confirm the delete with the user. Mention that everything inside folder will also be deleted if this is a folder entity.
-		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+this.enityTypeDisplay+" "+this.entity.getName()+"?";
+		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+this.enityTypeDisplay+" \""+this.entity.getName()+"\"?";
 		if (this.entity instanceof Folder) {
 			display += DELETE_FOLDER_EXPLANATION;
 		}
 		
-		view.showConfirmDialog(CONFIRM_DELETE_TITLE,display, new Callback() {
+		view.showConfirmDeleteDialog(CONFIRM_DELETE_TITLE,display, new Callback() {
 			@Override
 			public void invoke() {
 				postConfirmedDeleteEntity();

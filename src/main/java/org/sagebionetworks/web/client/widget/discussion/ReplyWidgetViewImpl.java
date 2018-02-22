@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.discussion;
 import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_CANCEL;
 import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_DELETE;
 import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYLE;
-import static org.sagebionetworks.web.client.DisplayConstants.DEFAULT_BUTTON_STYLE;
+import static org.sagebionetworks.web.client.DisplayConstants.LINK_BUTTON_STYLE;
 
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Label;
@@ -130,7 +130,7 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 		DialogOptions options = DialogOptions.newOptions(deleteConfirmMessage);
 		options.setCloseButton(false);
 		options.setTitle(CONFIRM_DELETE_DIALOG_TITLE);
-		options.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE);
+		options.addButton(BUTTON_CANCEL, LINK_BUTTON_STYLE);
 		options.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback);
 		
 		Bootbox.dialog(options);

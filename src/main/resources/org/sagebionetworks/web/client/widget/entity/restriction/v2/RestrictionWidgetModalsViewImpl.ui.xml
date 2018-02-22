@@ -20,7 +20,7 @@
 	        	</bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button ui:field="imposeRestrictionCancelButton" type="DEFAULT">Cancel</b:Button>
+				<b:Button ui:field="imposeRestrictionCancelButton" type="LINK">Cancel</b:Button>
 				<b:Button ui:field="imposeRestrictionOkButton" type="PRIMARY">OK</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
@@ -30,7 +30,7 @@
 			    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please alert the Synapse Access and Compliance Team (ACT) by clicking below.</bh:Text>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button type="LINK" dataDismiss="MODAL">Cancel</b:Button>
 				<b:Button ui:field="flagModalOkButton" type="PRIMARY" dataDismiss="MODAL">Flag Data</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
@@ -39,7 +39,7 @@
 			    <bh:Text>If you think this data is posted inappropriately or should have different access conditions, please log in to alert the Synapse Access and Compliance Team (ACT).</bh:Text>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button type="LINK" dataDismiss="MODAL">Cancel</b:Button>
 				<b:Button ui:field="anonymousFlagModalOkButton" type="PRIMARY" dataDismiss="MODAL">Login</b:Button>
 			</b:ModalFooter>
 		</b:Modal>

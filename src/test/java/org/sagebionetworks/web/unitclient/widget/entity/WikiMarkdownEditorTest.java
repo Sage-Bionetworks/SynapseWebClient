@@ -1,19 +1,22 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -23,7 +26,6 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
@@ -101,32 +103,6 @@ public class WikiMarkdownEditorTest {
 		verify(mockView).setTitleEditorVisible(false);
 		verify(mockGlobalApplicationState).setIsEditing(true);
 		verify(mockView).showEditorModal();
-	}
-	
-	@Test
-	public void testDeleteConfirmedCallback() {
-		boolean isConfirmed = true;
-
-		presenter.deleteClicked();
-		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
-		verify(mockView).confirm(anyString(), captor.capture());
-		//confirm deletion
-		captor.getValue().callback(isConfirmed);
-		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		verify(mockView).hideEditorModal();
-		verify(mockPlaceChanger).goTo(isA(Synapse.class));
-	}
-	
-	@Test
-	public void testDeleteCancelCallback() {
-		boolean isConfirmed = false;
-		
-		presenter.deleteClicked();
-		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
-		verify(mockView).confirm(anyString(), captor.capture());
-		//confirm deletion cancelled
-		captor.getValue().callback(isConfirmed);
-		verify(mockSynapseClient, Mockito.never()).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 	}
 	
 	@Test

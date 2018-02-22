@@ -5,13 +5,11 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.HashSet;
 import java.util.List;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -178,36 +176,5 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 
 	public void hideEditorModal() {
 		view.hideEditorModal();
-	}
-	
-	@Override
-	public void deleteClicked() {
-		view.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
-			@Override
-			public void callback(boolean isConfirmed) {
-				if (isConfirmed)
-					deleteConfirmed();
-			}
-		});
-	}
-	
-	public void deleteConfirmed() {
-		synapseClient.deleteV2WikiPage(wikiKey, new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				globalApplicationState.setIsEditing(false);
-				view.hideEditorModal();
-				globalApplicationState.getPlaceChanger().goTo(new Synapse(wikiKey.getOwnerObjectId()));
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-		});	
-	}
-	
-	public void setDeleteButtonVisible(boolean visible) {
-		view.setDeleteButtonVisible(visible);
 	}
 }

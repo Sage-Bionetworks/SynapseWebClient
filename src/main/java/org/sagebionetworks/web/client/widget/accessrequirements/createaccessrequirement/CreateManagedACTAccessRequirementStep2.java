@@ -53,7 +53,6 @@ public class CreateManagedACTAccessRequirementStep2 implements ModalPage, Create
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.wikiMarkdownEditor = wikiMarkdownEditor;
-		wikiMarkdownEditor.setDeleteButtonVisible(false);
 		this.wikiPageRenderer = wikiPageRenderer;
 		this.ducTemplateUploader = ducTemplateUploader;
 		this.ducTemplateFileHandleWidget = ducTemplateFileHandleWidget;

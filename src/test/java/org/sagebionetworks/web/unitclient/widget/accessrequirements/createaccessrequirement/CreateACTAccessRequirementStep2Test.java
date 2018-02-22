@@ -99,7 +99,6 @@ public class CreateACTAccessRequirementStep2Test {
 		verify(mockView).setDUCTemplateWidget(any(IsWidget.class));
 		verify(mockView).setPresenter(widget);
 		verify(mockWikiPageRenderer).setModifiedCreatedByHistoryVisible(false);
-		verify(mockWikiMarkdownEditor).setDeleteButtonVisible(false);
 	}
 	
 	@Test

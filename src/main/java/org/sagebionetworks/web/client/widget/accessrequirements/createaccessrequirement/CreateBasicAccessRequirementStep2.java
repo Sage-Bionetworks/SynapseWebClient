@@ -56,7 +56,6 @@ public class CreateBasicAccessRequirementStep2 implements ModalPage, CreateBasic
 		fixServiceEntryPoint(synapseClient);
 		this.synAlert = synAlert;
 		this.popupUtils = popupUtils;
-		wikiMarkdownEditor.setDeleteButtonVisible(false);
 		view.setWikiPageRenderer(wikiPageRenderer.asWidget());
 		view.setPresenter(this);
 		view.setSynAlert(synAlert);

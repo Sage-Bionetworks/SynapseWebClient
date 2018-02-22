@@ -25,7 +25,7 @@
 				<b:Alert type="DANGER" ui:field="alert" visible="false" title="Error" addStyleNames="margin-top-10"/>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button ui:field="cancelButton" type="DEFAULT"
+				<b:Button ui:field="cancelButton" type="LINK"
 					dataDismiss="MODAL">Cancel</b:Button>
 				<b:Button ui:field="saveButton" type="PRIMARY"
 					dataLoadingText="Saving...">Save</b:Button>

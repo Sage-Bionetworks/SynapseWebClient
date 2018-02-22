@@ -24,7 +24,7 @@
 			</g:FlowPanel>
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="defaultButton" type="DEFAULT" >Cancel</b:Button>
+			<b:Button ui:field="defaultButton" type="LINK" >Cancel</b:Button>
 			<b:Button ui:field="primaryButton" type="PRIMARY"
 				dataLoadingText="Saving...">Save</b:Button>
 		</b:ModalFooter>

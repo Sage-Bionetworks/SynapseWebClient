@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.ListItem;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Pre;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.UnorderedList;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
@@ -18,6 +19,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -48,6 +50,13 @@ public class EntityActionControllerViewImpl implements
 	Span widget = new Span();
 	Presenter presenter;
 	Widget viewWidget = null;
+	@UiField
+	Modal deleteConfirmationDialog;
+	@UiField
+	Button deleteConfirmedButton;
+	@UiField
+	Paragraph deleteConfirmationText;
+	HandlerRegistration deleteConfirmedButtonHandler;
 	@Inject
 	public EntityActionControllerViewImpl(Binder binder){
 		this.binder = binder;
@@ -75,10 +84,20 @@ public class EntityActionControllerViewImpl implements
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
-
+	
 	@Override
-	public void showConfirmDialog(String title, String string, Callback callback) {
-		DisplayUtils.showConfirmDialog(title, string, callback);
+	public void showConfirmDeleteDialog(String title, String string, Callback callback) {
+		lazyConstruct();
+		if (deleteConfirmedButtonHandler != null) {
+			deleteConfirmedButtonHandler.removeHandler();
+		}
+		deleteConfirmedButtonHandler = deleteConfirmedButton.addClickHandler(event -> {
+			deleteConfirmationDialog.hide();
+			callback.invoke();
+		});
+		deleteConfirmationDialog.setTitle(title);
+		deleteConfirmationText.setText(string);
+		deleteConfirmationDialog.show();
 	}
 
 	@Override

@@ -13,7 +13,7 @@
 				<bh:Div ui:field="teamSelectBoxContainer"/>
 			</b:ModalBody>
 			<b:ModalFooter>
-			    <b:Button type="DEFAULT" ui:field="cancelButton">Cancel</b:Button>
+			    <b:Button type="LINK" ui:field="cancelButton">Cancel</b:Button>
 			    <b:Button type="PRIMARY" text="OK" ui:field="selectTeamButton"/>
 			</b:ModalFooter>
 		</b:Modal>
