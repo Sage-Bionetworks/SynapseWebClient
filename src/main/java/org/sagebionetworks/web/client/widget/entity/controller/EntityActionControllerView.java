@@ -22,7 +22,7 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	 * @param string
 	 * @param action
 	 */
-	void showConfirmDeleteDialog(String title, String string, Callback callback);
+	void showConfirmDeleteDialog(String message, Callback callback);
 	
 
 	/**

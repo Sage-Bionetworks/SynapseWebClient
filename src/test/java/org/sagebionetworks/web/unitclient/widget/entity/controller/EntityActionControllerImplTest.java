@@ -910,7 +910,7 @@ public class EntityActionControllerImplTest {
 		// the call under test
 		controller.onAction(Action.DELETE_WIKI_PAGE);
 		verify(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		verify(mockView, never()).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		verify(mockView, never()).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		verify(mockView).showErrorMessage(error);
 	}
 	
@@ -920,11 +920,11 @@ public class EntityActionControllerImplTest {
 		 *  The user must be shown a confirm dialog before a delete.  Confirm is signaled via the Callback.invoke()
 		 *  in this case we do not want to confirm.
 		 */
-		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		// the call under tests
 		controller.onAction(Action.DELETE_ENTITY);
-		verify(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		// should not make it to the pre-flight check
 		verify(mockPreflightController, never()).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 	}
@@ -932,7 +932,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testOnDeleteConfirmedPreFlightFailed(){
 		// confirm the delete
-		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		/*
 		 * The preflight check is confirmed by calling Callback.invoke(), in this case it must not be invoked.
 		 */
@@ -940,7 +940,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		// the call under test
 		controller.onAction(Action.DELETE_ENTITY);
-		verify(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// Must not make it to the actual delete since preflight failed.
 		verify(mockSynapseJavascriptClient, never()).deleteEntityById(anyString(), any(AsyncCallback.class));
@@ -949,7 +949,7 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testOnDeleteConfirmedPreFlightPassedDeleteFailed(){
 		// confirm the delete
-		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		// confirm pre-flight
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		String error = "some error";
@@ -957,7 +957,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		// the call under test
 		controller.onAction(Action.DELETE_ENTITY);
-		verify(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// an attempt to delete should be made
 		verify(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
@@ -967,14 +967,14 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testOnDeleteConfirmedPreFlightPassedDeleteSuccess(){
 		// confirm the delete
-		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		// confirm pre-flight
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		// the call under test
 		controller.onAction(Action.DELETE_ENTITY);
-		verify(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// an attempt to delete should be made
 		verify(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
@@ -1742,7 +1742,7 @@ public class EntityActionControllerImplTest {
 		 *  The user must be shown a confirm dialog before a delete.  Confirm is signaled via the Callback.invoke()
 		 *  in this case we do not want to confirm.
 		 */
-		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		Folder f = new Folder();
 		f.setName("Test");
 		entityBundle.setEntity(f);
@@ -1750,7 +1750,7 @@ public class EntityActionControllerImplTest {
 		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+"Folder \"Test\"?" + DELETE_FOLDER_EXPLANATION;
 		// the call under tests
 		controller.onAction(Action.DELETE_ENTITY);
-		verify(mockView).showConfirmDeleteDialog(anyString(), eq(display), any(Callback.class));
+		verify(mockView).showConfirmDeleteDialog(eq(display), any(Callback.class));
 		// should not make it to the pre-flight check
 		verify(mockPreflightController, never()).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 	}
@@ -1761,7 +1761,7 @@ public class EntityActionControllerImplTest {
 		 *  The user must be shown a confirm dialog before a delete.  Confirm is signaled via the Callback.invoke()
 		 *  in this case we do not want to confirm.
 		 */
-		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		Project p = new Project();
 		p.setName("Test");
 		entityBundle.setEntity(p);
@@ -1770,8 +1770,8 @@ public class EntityActionControllerImplTest {
 		String folderDisplay = display + DELETE_FOLDER_EXPLANATION;
 		// the call under tests
 		controller.onAction(Action.DELETE_ENTITY);
-		verify(mockView).showConfirmDeleteDialog(anyString(), eq(display), any(Callback.class));
-		verify(mockView, times(0)).showConfirmDeleteDialog(anyString(), eq(folderDisplay), any(Callback.class));
+		verify(mockView).showConfirmDeleteDialog(eq(display), any(Callback.class));
+		verify(mockView, times(0)).showConfirmDeleteDialog(eq(folderDisplay), any(Callback.class));
 		// should not make it to the pre-flight check
 		verify(mockPreflightController, never()).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 	}
@@ -1885,12 +1885,12 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testDeleteChallengeCancelConfirm(){
-		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		AsyncMockStubber.callNoInvovke().when(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		
 		controller.onAction(Action.DELETE_CHALLENGE);
 		
-		verify(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		// should not make it to the pre-flight check
 		verify(mockPreflightController, never()).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 	}
@@ -1898,13 +1898,13 @@ public class EntityActionControllerImplTest {
 	@Test
 	public void testDeleteChallengeConfirmed(){
 		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).deleteChallenge(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		
 		controller.onAction(Action.DELETE_CHALLENGE);
 		
-		verify(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		verify(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		verify(mockChallengeClient).deleteChallenge(anyString(), any(AsyncCallback.class));
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
@@ -1914,7 +1914,7 @@ public class EntityActionControllerImplTest {
 	public void testDeleteChallengeFailure(){
 		String error = "unable to delete challenge";
 		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockChallengeClient).deleteChallenge(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDeleteDialog(anyString(), anyString(), any(Callback.class));
+		AsyncMockStubber.callWithInvoke().when(mockView).showConfirmDeleteDialog(anyString(), any(Callback.class));
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		

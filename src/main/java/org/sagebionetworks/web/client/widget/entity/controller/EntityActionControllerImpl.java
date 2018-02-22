@@ -551,7 +551,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void onDeleteChallenge() {
 		// Confirm the delete with the user.
-		view.showConfirmDeleteDialog(CONFIRM_DELETE_TITLE, DisplayConstants.CONFIRM_DELETE_CHALLENGE, () -> {
+		view.showConfirmDeleteDialog(DisplayConstants.CONFIRM_DELETE_CHALLENGE, () -> {
 			postConfirmedDeleteChallenge();
 		});
 	}
@@ -1479,7 +1479,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			display += DELETE_FOLDER_EXPLANATION;
 		}
 		
-		view.showConfirmDeleteDialog(CONFIRM_DELETE_TITLE,display, new Callback() {
+		view.showConfirmDeleteDialog(display, new Callback() {
 			@Override
 			public void invoke() {
 				postConfirmedDeleteEntity();
