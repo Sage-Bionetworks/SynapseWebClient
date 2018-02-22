@@ -4,7 +4,6 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 
 import java.util.Set;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -185,12 +184,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	@Override
 	public void onClickDeleteReply() {
-		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, new SimpleCallback(){
-
-			@Override
-			public void callback() {
-				deleteReply();
-			}
+		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, () -> {
+			deleteReply();
 		});
 	}
 

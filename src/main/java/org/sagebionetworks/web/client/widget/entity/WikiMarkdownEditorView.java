@@ -28,6 +28,5 @@ public interface WikiMarkdownEditorView extends IsWidget,SynapseView {
 		void cancelClicked();
 		void saveClicked();
 	}
-	void confirm(String string, ConfirmCallback confirmCallback);
 	void setMarkdownEditorWidget(Widget markdownEditorWidget);
 }

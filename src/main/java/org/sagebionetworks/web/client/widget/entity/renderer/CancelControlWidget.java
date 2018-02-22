@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.evaluation.model.CancelControl;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -71,13 +70,8 @@ public class CancelControlWidget implements SingleButtonView.Presenter, IsWidget
 	@Override
 	public void onClick() {
 		synAlert.clear();
-		view.showConfirmDialog(CONFIRM_CANCEL, new ConfirmCallback() {
-			@Override
-			public void callback(boolean confirmed) {
-				if (confirmed) {
-					requestToCancelSubmission();
-				}
-			}
+		view.showConfirmDialog(CONFIRM_CANCEL, () -> {
+			requestToCancelSubmission();
 		});
 	}
 	

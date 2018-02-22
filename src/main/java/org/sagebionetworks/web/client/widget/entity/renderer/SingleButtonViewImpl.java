@@ -6,8 +6,9 @@ import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.Callback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
+import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -89,8 +90,8 @@ public class SingleButtonViewImpl implements SingleButtonView {
 	}
 	
 	@Override
-	public void showConfirmDialog(String message, ConfirmCallback callback) {
-		Bootbox.confirm(message, callback);
+	public void showConfirmDialog(String message, Callback callback) {
+		DisplayUtils.confirm(message, callback);
 	}
 	
 	@Override

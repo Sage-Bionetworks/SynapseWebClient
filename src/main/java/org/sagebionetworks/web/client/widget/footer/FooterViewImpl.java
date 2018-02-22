@@ -5,8 +5,6 @@ import java.util.Date;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -15,7 +13,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.ToggleACTActionsButton;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
@@ -91,16 +88,11 @@ public class FooterViewImpl implements FooterView {
 			public void onClick(ClickEvent event) {
 				if (!DisplayUtils.isInTestWebsite(cookies)) {
 					//verify
-					Bootbox.confirm(DisplayConstants.TEST_MODE_WARNING, new ConfirmCallback() {
-						@Override
-						public void callback(boolean isConfirmed) {
-							if (isConfirmed) {
-								//switch to pre-release test website mode
-								DisplayUtils.setTestWebsite(true, cookies);
-								Window.scrollTo(0, 0);
-								globalAppState.refreshPage();
-							}
-						}
+					DisplayUtils.confirm(DisplayConstants.TEST_MODE_WARNING, () -> {
+						//switch to pre-release test website mode
+						DisplayUtils.setTestWebsite(true, cookies);
+						Window.scrollTo(0, 0);
+						globalAppState.refreshPage();
 					});
 				} else {
 					//switch back to standard mode
