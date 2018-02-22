@@ -414,7 +414,7 @@ public class DisplayUtils {
 		boolean isSecondaryButton = secondaryButtonCallback != null;
 		
 		if (isSecondaryButton) {
-			Bootbox.confirm(popupHtml.asString(), new ConfirmCallback() {
+			confirm(popupHtml.asString(), new ConfirmCallback() {
 				@Override
 				public void callback(boolean isConfirmed) {
 					if (isConfirmed) {
@@ -436,6 +436,21 @@ public class DisplayUtils {
 			});
 		}
 	}
+	
+	public static native void confirm(String msg, ConfirmCallback cb) /*-{
+		$wnd.bootbox.confirm({
+		    message: msg,
+		    buttons: {
+		        cancel: {
+		            label: 'Cancel',
+		            className: 'btn-link'
+		        }
+		    },
+		    callback: function (result) {
+		        cb.@org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback::callback(Z)(result);
+		    }
+		});
+	}-*/;
 	
 	public static SafeHtml getPopupSafeHtml(String title, String message, DisplayUtils.MessagePopup iconStyle) {
 		String iconHtml = "";

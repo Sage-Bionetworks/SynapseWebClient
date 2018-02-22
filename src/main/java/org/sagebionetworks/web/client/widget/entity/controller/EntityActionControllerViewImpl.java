@@ -11,11 +11,12 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.UnorderedList;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -57,9 +58,12 @@ public class EntityActionControllerViewImpl implements
 	@UiField
 	Paragraph deleteConfirmationText;
 	HandlerRegistration deleteConfirmedButtonHandler;
+	PromptModalView promptModalView;
+	PortalGinInjector ginInjector;
 	@Inject
-	public EntityActionControllerViewImpl(Binder binder){
+	public EntityActionControllerViewImpl(Binder binder, PortalGinInjector ginInjector){
 		this.binder = binder;
+		this.ginInjector = ginInjector;
 	}
 
 	private void lazyConstruct() {
@@ -73,6 +77,8 @@ public class EntityActionControllerViewImpl implements
 					presenter.onConfirmDeleteWiki();	
 				}
 			});
+			promptModalView = ginInjector.getPromptModal();
+			widget.add(promptModalView);
 		}
 	}
 	
@@ -111,8 +117,14 @@ public class EntityActionControllerViewImpl implements
 	}
 	
 	@Override
-	public void showPromptDialog(String prompt, PromptCallback callback) {
-		Bootbox.prompt(prompt, callback);
+	public void showPromptDialog(String title, PromptCallback callback) {
+		lazyConstruct();
+		promptModalView.configure(title, "", "OK", "");
+		promptModalView.setPresenter(() -> {
+			promptModalView.hide();
+			callback.callback(promptModalView.getValue());
+		});
+		promptModalView.show();
 	}
 	
 	@Override
