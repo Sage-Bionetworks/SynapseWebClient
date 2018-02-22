@@ -27,7 +27,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		widget = binder.createAndBindUi(this);
 		this.entityTreeBrowser = entityTreeBrowser;
 		Widget etbW = entityTreeBrowser.asWidget();
-		etbW.addStyleName("margin-top-10");
+		etbW.addStyleName("margin-top-10 notaclass");
 		files.setWidget(etbW);
 	}
 
