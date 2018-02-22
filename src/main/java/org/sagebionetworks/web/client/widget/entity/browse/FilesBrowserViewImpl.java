@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -27,7 +26,7 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		widget = binder.createAndBindUi(this);
 		this.entityTreeBrowser = entityTreeBrowser;
 		Widget etbW = entityTreeBrowser.asWidget();
-		etbW.addStyleName("margin-top-10 notaclass");
+		etbW.addStyleName("margin-top-10");
 		files.setWidget(etbW);
 	}
 
