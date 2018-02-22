@@ -1621,7 +1621,6 @@ public class EntityActionControllerImplTest {
 		entityBundle.setDoi(null);
 		entityBundle.setEntity(new EntityView());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
-		//initially hide, then show
 		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
 		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
 	}
