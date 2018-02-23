@@ -87,7 +87,7 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 		if (altText == null) {
 			altText="";
 		}
-		image.setAltText(altText);
+		image.getElement().setAttribute("alt", altText);
 		
 		//don't show until we have the correct size (otherwise it's initially shown at 100%, then scaled down!).
 		image.addErrorHandler(new ErrorHandler() {
