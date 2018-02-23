@@ -169,7 +169,11 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	public String getUserSessionDataString(UserSessionData session) {
 		JSONObjectAdapter adapter = adapterFactory.createNew();
 		try {
+			String sessionToken = session.getSession().getSessionToken();
+			//session token not stored in local storage
+			session.getSession().setSessionToken("");
 			session.writeToJSONObject(adapter);
+			session.getSession().setSessionToken(sessionToken);
 			return adapter.toJSONString();
 		} catch (JSONObjectAdapterException e) {
 			return null;
@@ -225,6 +229,8 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			String sessionStorageString = localStorage.get(USER_SESSION_DATA_CACHE_KEY);
 			if (sessionStorageString != null) {
 				currentUser = getUserSessionData(sessionStorageString);
+				// session token is not in the local storage
+				currentUser.getSession().setSessionToken(sessionToken);
 			} else {
 				logoutUser();
 			}
