@@ -38,9 +38,13 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 	public Button saveButton;
 	@UiField
 	public Button cancelButton;
+	@UiField
+	public Button deleteButton;
 	
 	//this UI widget
 	Widget widget;
+	
+	
 	
 	@Inject
 	public WikiMarkdownEditorViewImpl(Binder binder) {
@@ -59,11 +63,18 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 				presenter.saveClicked();
 			}
 		};
+		ClickHandler onDelete = new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.deleteClicked();
+			}
+		};
 		
 		saveButton.addClickHandler(onSave);
-		saveButton.addDomHandler(DisplayUtils.getPreventTabHandler(saveButton), KeyDownEvent.getType());
 		cancelButton.addClickHandler(onCancel);
+		cancelButton.addDomHandler(DisplayUtils.getPreventTabHandler(cancelButton), KeyDownEvent.getType());
 		editorDialog.addCloseHandler(onCancel);
+		deleteButton.addClickHandler(onDelete);
 	}
 	
 	@Override
@@ -131,5 +142,9 @@ public class WikiMarkdownEditorViewImpl implements WikiMarkdownEditorView {
 	public void setMarkdownEditorWidget(Widget markdownEditorWidget) {
 		markdownEditorContainer.clear();
 		markdownEditorContainer.add(markdownEditorWidget);
+	}
+	@Override
+	public void setDeleteButtonVisible(boolean visible) {
+		deleteButton.setVisible(visible);
 	}
 }
