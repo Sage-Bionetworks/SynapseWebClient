@@ -427,18 +427,31 @@ public class DisplayUtils {
 		});
 		Bootbox.dialog(options);
 	}
+
+	public static void confirm(
+			String trustedHtmlMessage,
+			Callback okCallback
+			) {
+		confirm(trustedHtmlMessage, null, okCallback);
+	}
 	
 	public static void confirm(
 			String trustedHtmlMessage,
-			Callback yesCallback
+			Callback cancelCallback,
+			Callback okCallback
 			) {
 		
 		DialogOptions options = DialogOptions.newOptions(trustedHtmlMessage);
 		options.setCloseButton(false);
-		options.addButton(BUTTON_CANCEL, LINK_BUTTON_STYLE);
+		options.addButton(BUTTON_CANCEL, LINK_BUTTON_STYLE, () -> {
+			if (cancelCallback != null) {
+				cancelCallback.invoke();
+			}
+		});
 		options.addButton(OK, PRIMARY_BUTTON_STYLE, () -> {
-			if (yesCallback != null)
-				yesCallback.invoke();
+			if (okCallback != null) {
+				okCallback.invoke();
+			}
 		});
 		Bootbox.dialog(options);
 	}
@@ -453,17 +466,7 @@ public class DisplayUtils {
 		boolean isSecondaryButton = secondaryButtonCallback != null;
 		
 		if (isSecondaryButton) {
-			DialogOptions options = DialogOptions.newOptions(popupHtml.asString());
-			options.setCloseButton(false);
-			options.addButton(BUTTON_CANCEL, LINK_BUTTON_STYLE, () -> {
-				if (secondaryButtonCallback != null)
-					secondaryButtonCallback.invoke();
-			});
-			options.addButton(OK, PRIMARY_BUTTON_STYLE, () -> {
-				if (primaryButtonCallback != null)
-					primaryButtonCallback.invoke();
-			});
-			Bootbox.dialog(options);
+			confirm(popupHtml.asString(), secondaryButtonCallback, primaryButtonCallback);
 		} else {
 			Bootbox.alert(popupHtml.asString(), new SimpleCallback() {
 				@Override
