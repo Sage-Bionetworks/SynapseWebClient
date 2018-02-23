@@ -27,7 +27,8 @@ public class WikiPageDeleteConfirmationDialogViewImpl implements WikiPageDeleteC
 	Div wikiHeaderTreeContainer;
 	@UiField
 	Button deleteWikiButton;
-	
+	@UiField
+	Button cancelDeleteWikiButton;
 	Modal modal;
 	@Inject
 	public WikiPageDeleteConfirmationDialogViewImpl(WikiPageDeleteConfirmationDialogViewImplUiBinder binder) {
@@ -35,6 +36,9 @@ public class WikiPageDeleteConfirmationDialogViewImpl implements WikiPageDeleteC
 		
 		deleteWikiButton.addClickHandler(event -> {
 			presenter.onDeleteWiki();
+			modal.hide();
+		});
+		cancelDeleteWikiButton.addClickHandler(event -> {
 			modal.hide();
 		});
 	}

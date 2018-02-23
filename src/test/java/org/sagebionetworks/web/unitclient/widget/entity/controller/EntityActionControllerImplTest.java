@@ -33,7 +33,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
@@ -59,7 +58,6 @@ import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResourceAccess;
@@ -77,8 +75,8 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -99,12 +97,9 @@ import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
-import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
-import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
-import org.sagebionetworks.web.client.widget.entity.annotation.EditAnnotationsDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl;
@@ -116,7 +111,6 @@ import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidg
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
-import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
@@ -138,13 +132,6 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityActionControllerImplTest {
 
-	private static final String WIKI_TREE_PAGE_A2_TITLE = "title(A2)";
-	private static final String WIKI_TREE_PAGE_A2_ID = "A2";
-	private static final String WIKI_TREE_PAGE_A1_TITLE = "title(A1)";
-	private static final String WIKI_TREE_PAGE_A1_ID = "A1";
-	public static final String WIKI_TREE_PAGE_A_TITLE = "title(A)";
-	public static final String WIKI_TREE_PAGE_A_ID = "A";
-	public static final String WIKI_TREE_ROOT_ID = "root";
 	EntityActionControllerView mockView;
 	PreflightController mockPreflightController;
 	SynapseClientAsync mockSynapseClient;
@@ -170,13 +157,10 @@ public class EntityActionControllerImplTest {
 	String entityId;
 	String currentUserId = "12344321";
 	String wikiPageId = "999";
-	String parentWikiPageId = "888";
-	String wikiPageTitle="To delete, or not to delete.";
 	WikiMarkdownEditor mockMarkdownEditorWidget;
 	ProvenanceEditorWidget mockProvenanceEditorWidget;
 	StorageLocationWidget mockStorageLocationWidget;
 	Reference selected;
-	V2WikiPage mockWikiPageToDelete;
 	List<AccessRequirement> accessReqs;
 	@Mock
 	EvaluationEditorModal mockEvalEditor;
@@ -322,12 +306,6 @@ public class EntityActionControllerImplTest {
 				return null;
 			}
 		}).when(mockEntityFinder).configure(any(EntityFilter.class), anyBoolean(), any(SelectedHandler.class));
-		mockWikiPageToDelete = Mockito.mock(V2WikiPage.class);
-		when(mockWikiPageToDelete.getId()).thenReturn(wikiPageId);
-		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(parentWikiPageId);
-		when(mockWikiPageToDelete.getTitle()).thenReturn(wikiPageTitle);
-		AsyncMockStubber.callSuccessWith(mockWikiPageToDelete).when(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-//		AsyncMockStubber.callSuccessWith(getWikiHeaderTree()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		currentEntityArea = null;
 		CallbackMockStubber.invokeCallback().when(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 	}
@@ -415,6 +393,17 @@ public class EntityActionControllerImplTest {
 	
 	@Test
 	public void testConfigureReorderWikiSubpagesWithTree(){
+		List<V2WikiHeader> headers = new ArrayList<>();
+		V2WikiHeader page = new V2WikiHeader();
+		page.setId("rootid");
+		headers.add(page);
+		page = new V2WikiHeader();
+		page.setId("page 1");
+		page.setTitle("page 1 title");
+		page.setParentId("rootid");
+		headers.add(page);
+		
+		AsyncMockStubber.callSuccessWith(headers).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
 		entityBundle.setEntity(new Project());
 		currentEntityArea = EntityArea.WIKI;
 		boolean canEdit = true;
@@ -778,142 +767,7 @@ public class EntityActionControllerImplTest {
 		verify(mockProvenanceEditorWidget).configure(entityBundle, mockEntityUpdatedHandler);
 		verify(mockProvenanceEditorWidget).show();
 	}
-//	
-//	/**
-//	 * Sets up the wiki header tree to have a root page (id=root) that has one child page (id=A), which has 2 children (id=A1 and id=A2). 
-//	 * @return
-//	 */
-//	private List<V2WikiHeader> getWikiHeaderTree() {
-//		List<V2WikiHeader> headers = new ArrayList<>();
-//		V2WikiHeader page = new V2WikiHeader();
-//		page.setId(WIKI_TREE_ROOT_ID);
-//		headers.add(page);
-//		page = new V2WikiHeader();
-//		page.setId(WIKI_TREE_PAGE_A_ID);
-//		page.setTitle(WIKI_TREE_PAGE_A_TITLE);
-//		page.setParentId(WIKI_TREE_ROOT_ID);
-//		headers.add(page);
-//		page = new V2WikiHeader();
-//		page.setId(WIKI_TREE_PAGE_A1_ID);
-//		page.setTitle(WIKI_TREE_PAGE_A1_TITLE);
-//		page.setParentId(WIKI_TREE_PAGE_A_ID);
-//		headers.add(page);
-//		page = new V2WikiHeader();
-//		page.setId(WIKI_TREE_PAGE_A2_ID);
-//		page.setTitle(WIKI_TREE_PAGE_A2_TITLE);
-//		page.setParentId(WIKI_TREE_PAGE_A_ID);
-//		headers.add(page);
-//		return headers;
-//	}
-//	
-//	@Test
-//	public void testGetWikiHeaderMap() {
-//		// set up the entity name to verify that the root wiki header title has been updated
-//		Project p = new Project();
-//		p.setName("project name");
-//		entityBundle.setEntity(p);
-//		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
-//		
-//		Map<String, V2WikiHeader> headerMap = controller.getWikiHeaderMap(getWikiHeaderTree());
-//		
-//		V2WikiHeader page = headerMap.get(WIKI_TREE_ROOT_ID);
-//		assertNull(page.getParentId());
-//		assertEquals(p.getName(), page.getTitle());
-//		
-//		page = headerMap.get(WIKI_TREE_PAGE_A_ID);
-//		assertEquals(WIKI_TREE_ROOT_ID, page.getParentId());
-//		assertEquals(WIKI_TREE_PAGE_A_TITLE, page.getTitle());
-//		
-//		page = headerMap.get(WIKI_TREE_PAGE_A1_ID);
-//		assertEquals(WIKI_TREE_PAGE_A_ID, page.getParentId());
-//		assertEquals(WIKI_TREE_PAGE_A1_TITLE, page.getTitle());
-//		
-//		page = headerMap.get(WIKI_TREE_PAGE_A2_ID);
-//		assertEquals(WIKI_TREE_PAGE_A_ID, page.getParentId());
-//		assertEquals(WIKI_TREE_PAGE_A2_TITLE, page.getTitle());
-//	}
-//	
-//
-//	@Test
-//	public void testGetWikiChildrenMap() {
-//		Map<String, List<V2WikiHeader>> childrenMap = controller.getWikiChildrenMap(getWikiHeaderTree());
-//		
-//		List<V2WikiHeader> children = childrenMap.get(WIKI_TREE_ROOT_ID);
-//		assertTrue(children.size() == 1 && children.get(0).getId().equals(WIKI_TREE_PAGE_A_ID));
-//		
-//		children = childrenMap.get(WIKI_TREE_PAGE_A_ID);
-//		assertTrue(children.size() == 2);
-//		assertTrue(children.get(0).getId().equals(WIKI_TREE_PAGE_A1_ID) || children.get(0).getId().equals(WIKI_TREE_PAGE_A2_ID));
-//		
-//		assertFalse(childrenMap.containsKey(WIKI_TREE_PAGE_A1_ID));
-//		assertFalse(childrenMap.containsKey(WIKI_TREE_PAGE_A2_ID));
-//	}
-//	
-//	@Test
-//	public void testOnDeleteWiki(){
-//		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
-//		// let's simulate that this is the root wiki.
-//		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(null);
-//		// the call under tests
-//		controller.onAction(Action.DELETE_WIKI_PAGE);
-//		verify(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-//		verify(mockSynapseClient).getV2WikiHeaderTree(eq(entityBundle.getEntity().getId()), eq(ObjectType.ENTITY.name()), any(AsyncCallback.class));
-//		
-//		verify(mockView).showDeleteWikiModal(eq(wikiPageId), any(Map.class), any(Map.class));
-//
-//		// should not make it to the delete wiki page call
-//		verify(mockSynapseClient, never()).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-//	}
-//	
-//	@Test
-//	public void testOnDeleteWikiPageConfirmedDeleteFailed(){
-//		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(parentWikiPageId);
-//		String error = "some error";
-//		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-//		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
-//		controller.onAction(Action.DELETE_WIKI_PAGE);
-//		// did not make it to the delete wiki page call
-//		verify(mockSynapseClient, never()).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-//		
-//		controller.onConfirmDeleteWiki();
-//		
-//		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-//		verify(mockView).showErrorMessage(error);
-//	}
-//	
-//	@Test
-//	public void testOnDeleteWikiPageConfirmedDeleteSuccess(){
-//		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(parentWikiPageId);
-//		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-//		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
-//		controller.onAction(Action.DELETE_WIKI_PAGE);
-//		// did not make it to the delete wiki page call
-//		verify(mockSynapseClient, never()).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-//		
-//		controller.onConfirmDeleteWiki();
-//		
-//		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-//		verify(mockView).showInfo(DELETED, THE + WIKI + WAS_SUCCESSFULLY_DELETED);
-//		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.WIKI, parentWikiPageId) );
-//	}
-//	
-//
-//	@Test
-//	public void testOnDeleteWikiPageFailureToGetPage(){
-//		String error = "Unable to get wiki page being deleted";
-//		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-//		
-//		/*
-//		 * The preflight check is confirmed by calling Callback.invoke(), in this case it must not be invoked.
-//		 */
-//		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
-//		// the call under test
-//		controller.onAction(Action.DELETE_WIKI_PAGE);
-//		verify(mockSynapseJavascriptClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-//		verify(mockView, never()).showConfirmDeleteDialog(anyString(), any(Callback.class));
-//		verify(mockView).showErrorMessage(error);
-//	}
-//	
+
 	@Test
 	public void testOnDeleteConfirmCancel(){
 		/*

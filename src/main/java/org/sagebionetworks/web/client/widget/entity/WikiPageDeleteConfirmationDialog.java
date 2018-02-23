@@ -24,6 +24,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class WikiPageDeleteConfirmationDialog implements WikiPageDeleteConfirmationDialogView.Presenter, IsWidget {
+	public static final String ROOT_WIKI_PAGE_NAME = "(the root wiki)";
 	private WikiPageDeleteConfirmationDialogView view;
 	private SynapseJavascriptClient jsClient;
 	private SynapseClientAsync synapseClient;
@@ -85,7 +86,7 @@ public class WikiPageDeleteConfirmationDialog implements WikiPageDeleteConfirmat
 		for (V2WikiHeader v2WikiHeader : wikiHeaders) {
 			if (v2WikiHeader.getParentId() == null) {
 				//update the root wiki title to be the entity name
-				v2WikiHeader.setTitle("(the root wiki)");
+				v2WikiHeader.setTitle(ROOT_WIKI_PAGE_NAME);
 			}
 			id2Header.put(v2WikiHeader.getId(), v2WikiHeader);
 		}
