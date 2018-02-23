@@ -46,6 +46,7 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 		this.view = view;
 		this.editor = editor;
 		this.synapseClient = synapseClient;
+		this.ginInjector = ginInjector;
 		fixServiceEntryPoint(synapseClient);
 		this.globalApplicationState = globalApplicationState;
 		this.jsClient = jsClient;

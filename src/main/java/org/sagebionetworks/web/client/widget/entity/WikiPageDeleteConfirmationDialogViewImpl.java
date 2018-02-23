@@ -35,6 +35,7 @@ public class WikiPageDeleteConfirmationDialogViewImpl implements WikiPageDeleteC
 		
 		deleteWikiButton.addClickHandler(event -> {
 			presenter.onDeleteWiki();
+			modal.hide();
 		});
 	}
 	
