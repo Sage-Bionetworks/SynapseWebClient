@@ -87,6 +87,7 @@ import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
+import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
 import org.sagebionetworks.web.client.widget.entity.act.ACTRevokeUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
@@ -599,4 +600,5 @@ public interface PortalGinInjector extends Ginjector {
 	SharingPermissionsGrid getSharingPermissionsGrid();
 	AclAddPeoplePanel getAclAddPeoplePanel();
 	FileHandleUploadWidget getFileHandleUploadWidget();
+	WikiPageDeleteConfirmationDialog getWikiPageDeleteConfirmationDialog(); 
 }

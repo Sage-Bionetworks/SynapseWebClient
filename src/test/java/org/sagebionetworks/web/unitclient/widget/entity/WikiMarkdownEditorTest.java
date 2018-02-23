@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -57,6 +58,8 @@ public class WikiMarkdownEditorTest {
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
+	PortalGinInjector mockPortalGinInjector;
+	@Mock
 	WikiPage mockWikiPage;
 	
 	@Before
@@ -67,7 +70,7 @@ public class WikiMarkdownEditorTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		presenter = new WikiMarkdownEditor(mockView, mockMarkdownEditorWidget, mockSynapseClient, mockGlobalApplicationState, mockSynapseJavascriptClient);
+		presenter = new WikiMarkdownEditor(mockView, mockMarkdownEditorWidget, mockSynapseClient, mockGlobalApplicationState, mockSynapseJavascriptClient, mockPortalGinInjector);
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		mockDescriptorUpdatedHandler = mock(CallbackP.class);
 		initialMarkdown = "Hello Markdown";
