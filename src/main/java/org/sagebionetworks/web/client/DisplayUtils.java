@@ -481,11 +481,11 @@ public class DisplayUtils {
 	public static SafeHtml getPopupSafeHtml(String title, String message, DisplayUtils.MessagePopup iconStyle) {
 		String iconHtml = "";
 		if (MessagePopup.INFO.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-info-sign font-size-32 col-xs-1");
+			iconHtml = getFontAwesomeIcon("info-circle font-size-32 col-xs-1");
 		else if (MessagePopup.WARNING.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-exclamation-sign font-size-32 col-xs-1");
+			iconHtml = getFontAwesomeIcon("exclamation-circle font-size-32 col-xs-1");
 		else if (MessagePopup.QUESTION.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-question-sign font-size-32 col-xs-1");
+			iconHtml = getFontAwesomeIcon("question-circle font-size-32 col-xs-1");
 		SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		if (DisplayUtils.isDefined(title)) {
 			builder.appendHtmlConstant("<h5>");
