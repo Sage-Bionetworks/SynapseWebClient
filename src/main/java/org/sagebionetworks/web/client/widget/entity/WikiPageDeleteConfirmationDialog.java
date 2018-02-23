@@ -26,17 +26,14 @@ import com.google.inject.Inject;
 public class WikiPageDeleteConfirmationDialog implements WikiPageDeleteConfirmationDialogView.Presenter, IsWidget {
 	public static final String ROOT_WIKI_PAGE_NAME = "(the root wiki)";
 	private WikiPageDeleteConfirmationDialogView view;
-	private SynapseJavascriptClient jsClient;
 	private SynapseClientAsync synapseClient;
 	String parentWikiPageId;
 	WikiPageKey key;
 	CallbackP<String> callback;
 	@Inject
 	public WikiPageDeleteConfirmationDialog(WikiPageDeleteConfirmationDialogView view,
-			SynapseJavascriptClient jsClient,
 			SynapseClientAsync synapseClient) {
 		this.view = view;
-		this.jsClient = jsClient;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		view.setPresenter(this);
@@ -54,30 +51,19 @@ public class WikiPageDeleteConfirmationDialog implements WikiPageDeleteConfirmat
 	public void show(WikiPageKey key, CallbackP<String> callbackAfterDelete) {
 		this.key = key;
 		this.callback = callbackAfterDelete;
-		// Get the wiki page title and parent wiki id.  Go to the parent wiki if this delete is successful.
-		jsClient.getV2WikiPage(key, new AsyncCallback<V2WikiPage>() {
-			@Override
-			public void onSuccess(V2WikiPage page) {
-				// Confirm the delete with the user.
-				parentWikiPageId = page.getParentWikiId();
-				onDeleteWikiGetHeaderTree(key, page.getTitle());
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-		});
+		onDeleteWikiGetHeaderTree(key);
 	}
 	
-	public void onDeleteWikiGetHeaderTree(WikiPageKey key, final String currentPageTitle) {
+	public void onDeleteWikiGetHeaderTree(WikiPageKey key) {
 		synapseClient.getV2WikiHeaderTree(key.getOwnerObjectId(), key.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
 			}
 			public void onSuccess(List<V2WikiHeader> wikiHeaders) {
-				view.showModal(key.getWikiPageId(), getWikiHeaderMap(wikiHeaders), getWikiChildrenMap(wikiHeaders));		
+				Map<String, V2WikiHeader> wikiHeaderMap = getWikiHeaderMap(wikiHeaders);
+				parentWikiPageId = wikiHeaderMap.get(key.getWikiPageId()).getParentId();
+				view.showModal(key.getWikiPageId(), wikiHeaderMap, getWikiChildrenMap(wikiHeaders));		
 			};
 		});
 	}

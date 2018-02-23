@@ -24,9 +24,7 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
 import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialogView;
@@ -44,18 +42,12 @@ public class WikiPageDeleteConfirmationDialogTest {
 	private static final String WIKI_TREE_PAGE_A_ID = "A";
 	private static final String WIKI_TREE_ROOT_ID = "root";
 
-	String wikiPageId = "999";
-	String parentWikiPageId = "888";
 	String wikiPageTitle="To delete, or not to delete.";
 	
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
 	WikiPageDeleteConfirmationDialogView mockView;
-	@Mock
-	SynapseJavascriptClient mockJsClient;
-	@Mock
-	V2WikiPage mockWikiPageToDelete;
 	@Mock
 	WikiPageKey mockWikiPageKey;
 	@Mock
@@ -65,12 +57,8 @@ public class WikiPageDeleteConfirmationDialogTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		AsyncMockStubber.callSuccessWith(getWikiHeaderTree()).when(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		when(mockWikiPageKey.getWikiPageId()).thenReturn(wikiPageId);
-		when(mockWikiPageToDelete.getId()).thenReturn(wikiPageId);
-		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(parentWikiPageId);
-		when(mockWikiPageToDelete.getTitle()).thenReturn(wikiPageTitle);
-		AsyncMockStubber.callSuccessWith(mockWikiPageToDelete).when(mockJsClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		dialog = new WikiPageDeleteConfirmationDialog(mockView, mockJsClient, mockSynapseClient);
+		when(mockWikiPageKey.getWikiPageId()).thenReturn(WIKI_TREE_PAGE_A2_ID);
+		dialog = new WikiPageDeleteConfirmationDialog(mockView, mockSynapseClient);
 	}
 	
 	/**
@@ -141,14 +129,12 @@ public class WikiPageDeleteConfirmationDialogTest {
 	@Test
 	public void testOnDeleteWiki(){
 		// let's simulate that this is the root wiki.
-		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(null);
+		when(mockWikiPageKey.getWikiPageId()).thenReturn(WIKI_TREE_ROOT_ID);
 		// the call under tests
 		dialog.show(mockWikiPageKey, mockAfterDeleteCallback);
 		
-		verify(mockJsClient).getV2WikiPage(eq(mockWikiPageKey), any(AsyncCallback.class));
 		verify(mockSynapseClient).getV2WikiHeaderTree(anyString(), anyString(), any(AsyncCallback.class));
-		
-		verify(mockView).showModal(eq(wikiPageId), any(Map.class), any(Map.class));
+		verify(mockView).showModal(eq(WIKI_TREE_ROOT_ID), any(Map.class), any(Map.class));
 
 		// should not make it to the delete wiki page call
 		verify(mockSynapseClient, never()).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
@@ -156,7 +142,6 @@ public class WikiPageDeleteConfirmationDialogTest {
 	
 	@Test
 	public void testOnDeleteWikiPageConfirmedDeleteFailed(){
-		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(parentWikiPageId);
 		String error = "some error";
 		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		dialog.show(mockWikiPageKey, mockAfterDeleteCallback);
@@ -172,7 +157,6 @@ public class WikiPageDeleteConfirmationDialogTest {
 	
 	@Test
 	public void testOnDeleteWikiPageConfirmedDeleteSuccess(){
-		when(mockWikiPageToDelete.getParentWikiId()).thenReturn(parentWikiPageId);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		dialog.show(mockWikiPageKey, mockAfterDeleteCallback);
 		// did not make it to the delete wiki page call
@@ -182,21 +166,6 @@ public class WikiPageDeleteConfirmationDialogTest {
 		
 		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockView).showInfo(DELETED, THE + WIKI + WAS_SUCCESSFULLY_DELETED);
-		verify(mockAfterDeleteCallback).invoke(parentWikiPageId);
+		verify(mockAfterDeleteCallback).invoke(WIKI_TREE_PAGE_A_ID);
 	}
-	
-
-	@Test
-	public void testOnDeleteWikiPageFailureToGetPage(){
-		String error = "Unable to get wiki page being deleted";
-		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockJsClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		
-		dialog.show(mockWikiPageKey, mockAfterDeleteCallback);
-		
-		verify(mockJsClient).getV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		verify(mockView, never()).showModal(eq(wikiPageId), any(Map.class), any(Map.class));
-		verify(mockView).showErrorMessage(error);
-	}
-	
-
 }
