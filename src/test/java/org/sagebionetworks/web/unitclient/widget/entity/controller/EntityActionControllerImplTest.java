@@ -1615,6 +1615,15 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, true);
 	}
 	
+	@Test
+	public void testConfigureDoiView() throws Exception {
+		// Create DOI not available for Views
+		entityBundle.setDoi(null);
+		entityBundle.setEntity(new EntityView());
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
+	}
 	
 	@Test
 	public void testConfigureDoiNotFoundNonEditable() throws Exception {
