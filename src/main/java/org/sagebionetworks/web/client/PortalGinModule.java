@@ -266,6 +266,8 @@ import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorView;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorViewImpl;
+import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialogView;
+import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
@@ -1400,5 +1402,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(HtmlPreviewView.class).to(HtmlPreviewViewImpl.class);
 		bind(S3DirectLoginDialog.class).to(S3DirectLoginDialogImpl.class);
+		bind(WikiPageDeleteConfirmationDialogView.class).to(WikiPageDeleteConfirmationDialogViewImpl.class);
 	}
 }

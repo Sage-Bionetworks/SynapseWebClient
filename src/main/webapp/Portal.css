@@ -2017,8 +2017,16 @@ div.input-group > input.search-textbox {
 	text-align: left;
 }
 
-.text-danger-imp {
-	color: #f94e4b !important;
+.text-danger, #rootPanel .text-danger {
+	color: #d9534f;
+}
+
+.text-primary, #rootPanel .text-primary {
+	color: #1e7098;
+}
+
+.text-warning, #rootPanel .text-warning {
+	color: #f19223;
 }
 
 /**Override JQuery table styles **/

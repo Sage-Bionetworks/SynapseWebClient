@@ -17,7 +17,7 @@
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button ui:field="saveButton" text="Add" type="PRIMARY"/>
-		    <b:Button text="Cancel" ui:field="cancelButton" addStyleNames="right margin-right-5"/>
+		    <b:Button text="Cancel" type="LINK" ui:field="cancelButton" addStyleNames="right margin-right-5"/>
 		</b:ModalFooter>
 	</b:Modal>
 

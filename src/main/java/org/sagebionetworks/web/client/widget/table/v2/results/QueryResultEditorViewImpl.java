@@ -7,14 +7,12 @@ import org.gwtbootstrap3.client.ui.ButtonToolBar;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -192,14 +190,7 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 
 	@Override
 	public void showConfirmDialog(String message, final Callback callback) {
-		Bootbox.confirm(message, new ConfirmCallback() {
-			@Override
-			public void callback(boolean okay) {
-				if (okay) {
-					callback.invoke();
-				}
-			}
-		});
+		DisplayUtils.confirm(message, callback);
 	}
 
 	@Override

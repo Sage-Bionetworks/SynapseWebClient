@@ -151,7 +151,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		uploadBtn.setPull(Pull.RIGHT);
 		
 		cancelBtn = new Button(DisplayConstants.BUTTON_CANCEL);
-		cancelBtn.setType(ButtonType.DEFAULT);
+		cancelBtn.setType(ButtonType.LINK);
 		cancelBtn.setPull(Pull.RIGHT);
 		cancelBtn.setMarginRight(5);
 

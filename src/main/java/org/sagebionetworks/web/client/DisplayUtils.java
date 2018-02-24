@@ -7,6 +7,13 @@ import static org.sagebionetworks.web.client.ClientProperties.KB;
 import static org.sagebionetworks.web.client.ClientProperties.MB;
 import static org.sagebionetworks.web.client.ClientProperties.STYLE_DISPLAY_INLINE;
 import static org.sagebionetworks.web.client.ClientProperties.TB;
+import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_CANCEL;
+import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_DELETE;
+import static org.sagebionetworks.web.client.DisplayConstants.CONFIRM_DELETE_DIALOG_TITLE;
+import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYLE;
+import static org.sagebionetworks.web.client.DisplayConstants.LINK_BUTTON_STYLE;
+import static org.sagebionetworks.web.client.DisplayConstants.OK;
+import static org.sagebionetworks.web.client.DisplayConstants.PRIMARY_BUTTON_STYLE;
 
 import java.util.Date;
 import java.util.List;
@@ -28,8 +35,8 @@ import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
+import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
@@ -405,7 +412,52 @@ public class DisplayUtils {
 		});
 	}
 	
-	public static void showPopup(String title, String message,
+	public static void confirmDelete(
+			String trustedHtmlMessage,
+			Callback yesCallback
+			) {
+		
+		DialogOptions options = DialogOptions.newOptions(trustedHtmlMessage);
+		options.setCloseButton(false);
+		options.setTitle(CONFIRM_DELETE_DIALOG_TITLE);
+		options.addButton(BUTTON_CANCEL, LINK_BUTTON_STYLE);
+		options.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, () -> {
+			if (yesCallback != null)
+				yesCallback.invoke();
+		});
+		Bootbox.dialog(options);
+	}
+
+	public static void confirm(
+			String trustedHtmlMessage,
+			Callback okCallback
+			) {
+		confirm(trustedHtmlMessage, null, okCallback);
+	}
+	
+	public static void confirm(
+			String trustedHtmlMessage,
+			Callback cancelCallback,
+			Callback okCallback
+			) {
+		
+		DialogOptions options = DialogOptions.newOptions(trustedHtmlMessage);
+		options.setCloseButton(false);
+		options.addButton(BUTTON_CANCEL, LINK_BUTTON_STYLE, () -> {
+			if (cancelCallback != null) {
+				cancelCallback.invoke();
+			}
+		});
+		options.addButton(OK, PRIMARY_BUTTON_STYLE, () -> {
+			if (okCallback != null) {
+				okCallback.invoke();
+			}
+		});
+		Bootbox.dialog(options);
+	}
+	
+	public static void showPopup(String title, 
+			String message,
 			DisplayUtils.MessagePopup iconStyle,
 			final Callback primaryButtonCallback,
 			final Callback secondaryButtonCallback) {
@@ -414,18 +466,7 @@ public class DisplayUtils {
 		boolean isSecondaryButton = secondaryButtonCallback != null;
 		
 		if (isSecondaryButton) {
-			Bootbox.confirm(popupHtml.asString(), new ConfirmCallback() {
-				@Override
-				public void callback(boolean isConfirmed) {
-					if (isConfirmed) {
-						if (primaryButtonCallback != null)
-							primaryButtonCallback.invoke();
-					} else {
-						if (secondaryButtonCallback != null)
-							secondaryButtonCallback.invoke();
-					}
-				}
-			});
+			confirm(popupHtml.asString(), secondaryButtonCallback, primaryButtonCallback);
 		} else {
 			Bootbox.alert(popupHtml.asString(), new SimpleCallback() {
 				@Override
@@ -440,11 +481,11 @@ public class DisplayUtils {
 	public static SafeHtml getPopupSafeHtml(String title, String message, DisplayUtils.MessagePopup iconStyle) {
 		String iconHtml = "";
 		if (MessagePopup.INFO.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-info-sign font-size-32 col-xs-1");
+			iconHtml = getFontAwesomeIcon("info-circle font-size-32 col-xs-1");
 		else if (MessagePopup.WARNING.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-exclamation-sign font-size-32 col-xs-1");
+			iconHtml = getFontAwesomeIcon("exclamation-circle font-size-32 col-xs-1");
 		else if (MessagePopup.QUESTION.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-question-sign font-size-32 col-xs-1");
+			iconHtml = getFontAwesomeIcon("question-circle font-size-32 col-xs-1");
 		SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		if (DisplayUtils.isDefined(title)) {
 			builder.appendHtmlConstant("<h5>");

@@ -26,7 +26,7 @@
 		</b:ModalBody>
 		<b:ModalFooter>
 		    <b:Button ui:field="primaryButton" type="PRIMARY" dataLoadingText="Processing..." >Login</b:Button>
-			<b:Button ui:field="defaultButton" type="DEFAULT"
+			<b:Button ui:field="defaultButton" type="LINK"
 				dataDismiss="MODAL">Cancel</b:Button>
 		</b:ModalFooter>
 	</b:Modal>

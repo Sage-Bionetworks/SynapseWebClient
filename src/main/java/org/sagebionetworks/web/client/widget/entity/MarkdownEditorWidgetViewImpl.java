@@ -197,11 +197,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 		this.binder = binder;
 	}
 	
-	@Override 
-	public void confirm(String text, ConfirmCallback callback) {
-		Bootbox.confirm(text, callback);
-	}
-	
 	@Override
 	public void addTextAreaKeyUpHandler(KeyUpHandler handler) {
 		markdownTextArea.addKeyUpHandler(handler);

@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -32,7 +33,7 @@ public interface ReplyWidgetView extends IsWidget{
 
 	void setDeleteIconVisibility(Boolean visible);
 
-	void showDeleteConfirm(String deleteConfirmMessage, SimpleCallback callback);
+	void showDeleteConfirm(String deleteConfirmMessage, Callback callback);
 
 	void setEditIconVisible(boolean visible);
 
