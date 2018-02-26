@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_CERTIFIED;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.IS_VERIFIED;
 
@@ -62,7 +63,9 @@ public class SelfSignAccessRequirementWidget implements SelfSignAccessRequiremen
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.dataAccessClient = dataAccessClient;
+		fixServiceEntryPoint(dataAccessClient);
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.authController = authController;

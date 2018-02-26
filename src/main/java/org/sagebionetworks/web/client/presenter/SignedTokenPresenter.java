@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.AccessRequirement;
@@ -47,6 +49,7 @@ public class SignedTokenPresenter extends AbstractActivity implements SignedToke
 								AuthenticationController authController){
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.synapseAlert = synapseAlert;
 		this.gwt = gwt;
 		this.globalApplicationState = globalApplicationState;

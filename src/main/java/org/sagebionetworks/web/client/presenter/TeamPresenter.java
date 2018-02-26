@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
@@ -71,6 +73,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.synAlert = synAlert;
 		this.leaveTeamWidget = leaveTeamWidget;
 		this.deleteTeamWidget = deleteTeamWidget;

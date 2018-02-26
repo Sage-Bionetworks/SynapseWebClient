@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
@@ -36,6 +38,7 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 		this.view = view;
 		this.synAlert = synAlert;
 		this.subscribeClient = subscribeClient;
+		fixServiceEntryPoint(subscribeClient);
 		this.authController = authController;
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;

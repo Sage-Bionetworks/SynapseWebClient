@@ -13,14 +13,11 @@ import com.google.inject.Inject;
 
 public class AttachmentPreviewWidgetViewImpl extends FlowPanel implements AttachmentPreviewWidgetView {
 
-	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
-	private AuthenticationController authController;
+	
 	@Inject
-	public AttachmentPreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils,
-			AuthenticationController authController) {
+	public AttachmentPreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils) {
 		this.synapseJsniUtils= synapseJsniUtils;
-		this.authController = authController;
 	}
 	
 	@Override
@@ -38,10 +35,10 @@ public class AttachmentPreviewWidgetViewImpl extends FlowPanel implements Attach
 		if (lastDotIndex > -1) {
 			String extension = fileName.substring(lastDotIndex+1);
 			if (ContentTypeUtils.isRecognizedImageContentType("image/"+extension)) {
-				sb.append("<img class=\"imageDescriptor\" ");
+				sb.append("<img class=\"imageDescriptor\" alt" );
 				sb.append(" src=\"");
 				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true));
-				sb.append("\"></img>");
+				sb.append("\" ></img>");
 				isPreviewed = true;
 			}
 		}
@@ -58,15 +55,4 @@ public class AttachmentPreviewWidgetViewImpl extends FlowPanel implements Attach
 	public Widget asWidget() {
 		return this;
 	}	
-
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
-		
-	
-	/*
-	 * Private Methods
-	 */
-
 }

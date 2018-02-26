@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
@@ -26,6 +28,7 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 			SynapseAlert synAlert) {
 		this.view = view;
 		this.challengeClient = challengeClient;
+		fixServiceEntryPoint(challengeClient);
 		this.synAlert = synAlert;
 		
 		rpcCallback = new AsyncCallback<Void>() {

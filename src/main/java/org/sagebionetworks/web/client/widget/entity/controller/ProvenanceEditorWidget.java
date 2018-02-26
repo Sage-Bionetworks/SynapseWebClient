@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,6 +46,7 @@ public class ProvenanceEditorWidget implements ProvenanceEditorWidgetView.Presen
 			ProvenanceURLDialogWidget urlDialog) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.entityFinder = entityFinder;

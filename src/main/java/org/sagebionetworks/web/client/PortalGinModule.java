@@ -14,6 +14,7 @@ import org.sagebionetworks.web.client.cache.StorageImpl;
 import org.sagebionetworks.web.client.cache.StorageWrapper;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.cookie.GWTCookieImpl;
+import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
 import org.sagebionetworks.web.client.presenter.DownPresenter;
 import org.sagebionetworks.web.client.presenter.EntityPresenter;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
@@ -265,6 +266,8 @@ import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorView;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorViewImpl;
+import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialogView;
+import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
@@ -743,7 +746,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// JsoProvider
 		bind(JsoProvider.class).to(JsoProviderImpl.class);
 		bind(JsoProviderImpl.class).in(Singleton.class);
-		
 		// AuthenticationController
 		bind(AuthenticationController.class).to(AuthenticationControllerImpl.class).in(Singleton.class);;
 
@@ -1400,5 +1402,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(HtmlPreviewView.class).to(HtmlPreviewViewImpl.class);
 		bind(S3DirectLoginDialog.class).to(S3DirectLoginDialogImpl.class);
+		bind(WikiPageDeleteConfirmationDialogView.class).to(WikiPageDeleteConfirmationDialogViewImpl.class);
 	}
 }

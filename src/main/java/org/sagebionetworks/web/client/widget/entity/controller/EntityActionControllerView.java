@@ -1,10 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
-import java.util.List;
-import java.util.Map;
-
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.ShowsErrors;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -22,7 +18,7 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	 * @param string
 	 * @param action
 	 */
-	void showConfirmDialog(String title, String string, Callback callback);
+	void showConfirmDeleteDialog(String message, Callback callback);
 	
 
 	/**
@@ -42,13 +38,7 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	 * @param prompt
 	 * @param callback
 	 */
-	void showPromptDialog(String prompt, PromptCallback callback);
+	void showPromptDialog(String title, PromptCallback callback);
 
 	void addWidget(IsWidget asWidget);
-	void showDeleteWikiModal(String wikiPageId, Map<String, V2WikiHeader> id2HeaderMap, Map<String, List<V2WikiHeader>> id2ChildrenMap);
-	void setPresenter(Presenter p);
-	
-	public interface Presenter {
-		void onConfirmDeleteWiki();
-	}
 }

@@ -22,7 +22,7 @@
 				</b:Alert>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button ui:field="cancelButton" type="DEFAULT" text="Cancel" />
+				<b:Button ui:field="cancelButton" type="LINK" text="Cancel" />
 				<b:Button ui:field="revokeButton" type="DANGER" dataLoadingText="Loading..." text="Revoke Access" />
 			</b:ModalFooter>
 		</b:Modal>

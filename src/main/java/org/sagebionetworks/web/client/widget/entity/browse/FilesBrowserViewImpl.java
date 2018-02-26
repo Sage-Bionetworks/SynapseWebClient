@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;

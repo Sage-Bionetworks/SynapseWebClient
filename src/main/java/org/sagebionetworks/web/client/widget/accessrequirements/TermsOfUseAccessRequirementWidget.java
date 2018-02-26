@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
@@ -48,7 +50,9 @@ public class TermsOfUseAccessRequirementWidget implements TermsOfUseAccessRequir
 			ReviewAccessorsButton manageAccessButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.dataAccessClient = dataAccessClient;
+		fixServiceEntryPoint(dataAccessClient);
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.authController = authController;

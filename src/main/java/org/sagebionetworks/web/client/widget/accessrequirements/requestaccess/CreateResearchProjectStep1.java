@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
@@ -36,6 +38,7 @@ public class CreateResearchProjectStep1 implements ModalPage {
 		this.view = view;
 		this.step2 = step2;
 		this.client = client;
+		fixServiceEntryPoint(client);
 	}
 	
 	/**

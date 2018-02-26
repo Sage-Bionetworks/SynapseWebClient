@@ -3,9 +3,11 @@ package org.sagebionetworks.web.client.widget.profile;
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -42,6 +44,7 @@ public class UserProfileModalViewImpl implements UserProfileModalView {
 		primaryButton.addClickHandler(event -> {
 			presenter.onSave();
 		});
+		primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
 	}
 
 	@Override

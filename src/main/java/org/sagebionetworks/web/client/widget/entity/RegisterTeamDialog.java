@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.List;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
@@ -35,6 +37,7 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 			AuthenticationController authenticationController) {
 		this.view = view;
 		this.challengeClient = challengeClient;
+		fixServiceEntryPoint(challengeClient);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		
@@ -64,13 +67,9 @@ public class RegisterTeamDialog implements RegisterTeamDialogView.Presenter {
 		refreshRegistratableTeams();
 	}
 	
-	public ConfirmCallback getConfirmCallback() {
-		return new ConfirmCallback() {
-			@Override
-			public void callback(boolean confirmed) {
-				if (confirmed)
-					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-			}
+	public Callback getConfirmCallback() {
+		return () ->{
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		};
 	}
 

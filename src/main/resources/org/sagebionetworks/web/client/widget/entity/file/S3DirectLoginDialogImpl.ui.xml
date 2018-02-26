@@ -14,7 +14,7 @@
 			</b:ModalBody>
 			<b:ModalFooter>
 			    <b:Button ui:field="s3DirectLoginDialogButton" type="PRIMARY">Login</b:Button>
-				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button type="LINK" dataDismiss="MODAL">Cancel</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 		<b:Modal ui:field="s3DirectDownloadDialog" title="Ready to download" closable="true" dataKeyboard="false">

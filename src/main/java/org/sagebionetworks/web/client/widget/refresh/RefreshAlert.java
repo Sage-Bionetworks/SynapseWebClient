@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.refresh;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -34,6 +36,7 @@ public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPr
 			SynapseJSNIUtils utils) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.gwt = gwt;
 		this.globalAppState = globalAppState;
 		this.utils = utils;

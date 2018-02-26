@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ANNOTATIONS;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +52,7 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 			AnnotationTransformer transformer,
 			SynapseJavascriptClient jsClient) {
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.factory = factory;
 		this.cache = cache;
 		this.transformer = transformer;

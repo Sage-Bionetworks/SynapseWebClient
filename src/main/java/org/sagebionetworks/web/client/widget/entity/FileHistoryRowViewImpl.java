@@ -2,9 +2,8 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.file.Md5Link;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -49,12 +48,9 @@ public class FileHistoryRowViewImpl implements FileHistoryRowView {
 		deleteButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				Bootbox.confirm(DisplayConstants.PROMPT_SURE_DELETE + " version?", new ConfirmCallback() {
-					@Override
-					public void callback(boolean confirmed) {
-						if (confirmed && deleteCallback != null) {
-							deleteCallback.invoke();			
-						}
+				DisplayUtils.confirmDelete(DisplayConstants.PROMPT_SURE_DELETE + " version?", () -> {
+					if (deleteCallback != null) {
+						deleteCallback.invoke();			
 					}
 				});
 			}

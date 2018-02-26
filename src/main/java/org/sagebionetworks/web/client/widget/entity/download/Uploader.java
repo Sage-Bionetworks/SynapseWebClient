@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
 import static org.sagebionetworks.repo.model.util.ModelConstants.VALID_ENTITY_NAME_REGEX;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.List;
 
@@ -99,6 +100,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 		this.view = view;		
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.gwt = gwt;
 		this.percentFormat = gwt.getNumberFormat("##");

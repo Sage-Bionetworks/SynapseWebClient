@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.view.users;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.ValidationUtils.isValidEmail;
 
 import org.sagebionetworks.repo.model.auth.NewUser;
@@ -29,6 +30,7 @@ public class RegisterWidget implements RegisterWidgetView.Presenter, SynapseWidg
 			SynapseAlert synAlert) {
 		this.view = view;
 		this.userService = userService;
+		fixServiceEntryPoint(userService);
 		this.gwt = gwt;
 		this.synAlert = synAlert;
 		view.setPresenter(this);

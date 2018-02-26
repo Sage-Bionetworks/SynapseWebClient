@@ -24,11 +24,6 @@ public class CookieKeys {
 	 * Last Place in the app
 	 */
 	public static String LAST_PLACE = "org.sagebionetworks.synapse.place.last.place";
-	
-	/**
-	 * Current Place in the app
-	 */
-	public static String CURRENT_PLACE = "org.sagebionetworks.synapse.place.current.place";
 
 	/**
 	 * LinkedIn requestToken key

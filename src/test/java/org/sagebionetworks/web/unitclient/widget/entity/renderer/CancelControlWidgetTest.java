@@ -1,28 +1,25 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.verification.AtLeast;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -30,7 +27,6 @@ import org.sagebionetworks.web.client.widget.entity.renderer.CancelControlWidget
 import org.sagebionetworks.web.client.widget.entity.renderer.SingleButtonView;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import org.sagebionetworks.web.test.helper.CallbackMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -133,7 +129,7 @@ public class CancelControlWidgetTest {
 	public void testOnClick() {
 		widget.onClick();
 		verify(mockSynAlert).clear();
-		verify(mockView).showConfirmDialog(eq(CancelControlWidget.CONFIRM_CANCEL), any(ConfirmCallback.class));
+		verify(mockView).showConfirmDialog(eq(CancelControlWidget.CONFIRM_CANCEL), any(Callback.class));
 	}
 	
 	@Test

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -45,6 +46,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 			SynapseAlert synAlert) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.cache = cache;

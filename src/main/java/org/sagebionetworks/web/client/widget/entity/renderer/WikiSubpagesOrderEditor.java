@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
@@ -32,6 +34,7 @@ public class WikiSubpagesOrderEditor {
 		this.editorTree = editorTree;
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		refreshCallback = new CallbackP<String>() {
 			@Override
 			public void invoke(String selectWikiPageId) {

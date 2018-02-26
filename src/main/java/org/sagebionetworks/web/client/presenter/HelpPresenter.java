@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,6 +27,7 @@ public class HelpPresenter extends AbstractActivity implements HelpView.Presente
 	public HelpPresenter(HelpView view, SynapseClientAsync synapseClient){
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		view.setPresenter(this);
 	}
 

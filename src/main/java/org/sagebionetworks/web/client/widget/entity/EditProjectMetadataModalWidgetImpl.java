@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.web.client.StringUtils;
@@ -23,6 +25,7 @@ public class EditProjectMetadataModalWidgetImpl implements EditProjectMetadataMo
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.view.setPresenter(this);
 	}
 	

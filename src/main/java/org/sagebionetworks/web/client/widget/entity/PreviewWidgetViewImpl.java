@@ -28,15 +28,12 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private boolean isCode;
-	private SageImageBundle sageImageBundle;
 	private Dialog previewDialog;
 	private Widget dialogContent;
 	@Inject
 	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, 
-			SageImageBundle sageImageBundle, 
 			final Dialog previewDialog) {
 		this.synapseJSNIUtils = synapseJsniUtils;
-		this.sageImageBundle = sageImageBundle;
 		this.previewDialog = previewDialog;
 		previewDialog.configure("", null, "Close", new Dialog.Callback() {
 			@Override
@@ -86,6 +83,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	public void setImagePreview(final String fullFileUrl) {
 		clear();
 		Image fullImage = new Image();
+		fullImage.getElement().setAttribute("alt", "");
 		fullImage.addStyleName("imageButton maxWidth100 maxHeight100 margin-left-20");
 		fullImage.addErrorHandler(new ErrorHandler() {
 			@Override

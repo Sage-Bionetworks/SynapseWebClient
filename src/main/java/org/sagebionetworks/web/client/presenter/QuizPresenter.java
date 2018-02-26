@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -59,6 +61,7 @@ public class QuizPresenter extends AbstractActivity implements QuizView.Presente
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.adapterFactory = adapterFactory;
 		this.ginInjector = ginInjector;
 		this.synAlert = synAlert;

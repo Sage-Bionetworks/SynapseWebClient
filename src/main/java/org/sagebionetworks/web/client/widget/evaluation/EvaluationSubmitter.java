@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -84,6 +86,7 @@ public class EvaluationSubmitter implements Presenter {
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.challengeClient = challengeClient;
+		fixServiceEntryPoint(challengeClient);
 		this.gwt = gwt;
 		this.dockerCommitList = dockerCommitList;
 		this.challengeListSynAlert = ginInjector.getSynapseAlertWidget();

@@ -78,6 +78,7 @@ public class TabViewImpl implements TabView {
 		fp.addClickHandler(event -> {
 			anchor.fireEvent(event);
 		});
+		fp.setTabIndex(-1);
 		fp.addStyleName("margin-right-5 displayInline");
 		fp.add(anchor);
 		tabItem.add(fp);

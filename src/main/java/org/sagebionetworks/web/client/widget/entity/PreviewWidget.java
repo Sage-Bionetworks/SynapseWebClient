@@ -10,6 +10,7 @@ import static org.sagebionetworks.web.client.ContentTypeUtils.isRecognizedImageC
 import static org.sagebionetworks.web.client.ContentTypeUtils.isTAB;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isTextType;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isWebRecognizedCodeFileName;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.Map;
 
@@ -85,6 +86,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.synapseAlert = synapseAlert;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.authController = authController;
 		this.ginInjector = ginInjector;
 		this.jsClient = jsClient;

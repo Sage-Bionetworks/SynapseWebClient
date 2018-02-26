@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -50,6 +52,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
+		fixServiceEntryPoint(discussionForumClient);
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
 		this.authController = authController;

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -38,6 +40,7 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseAlert synAlert){
 		this.view = view;
+		fixServiceEntryPoint(synapseClient);
 		this.synapseClient = synapseClient;
 		this.globalAppState = globalAppState;
 		this.authController = authController;
