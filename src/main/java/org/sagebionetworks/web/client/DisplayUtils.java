@@ -805,23 +805,6 @@ public class DisplayUtils {
 			cookies.removeCookie(cookieKey);
 		}
 	}
-
-		
-	
-	/**
-	 * Create the URL to a version of a wiki's attachments.
-	 * @param baseFileHandleUrl
-	 * @param wikiKey
-	 * @param fileName
-	 * @param preview
-	 * @param wikiVersion
-	 * @return
-	 */
-	public static String createVersionOfWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, 
-			boolean preview, Long wikiVersion) {
-		String attachmentUrl = createWikiAttachmentUrl(baseFileHandleUrl, wikiKey, fileName, preview);
-		return attachmentUrl + "&" + WebConstants.WIKI_VERSION_PARAM_KEY + "=" + wikiVersion.toString();
-	}
 	
 	/**
 		 * Create the url to a wiki filehandle.
