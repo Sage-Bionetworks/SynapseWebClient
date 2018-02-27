@@ -6,7 +6,9 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -17,6 +19,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -40,9 +44,8 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private SynapseJavascriptClient jsClient;
 	private FavoriteWidget favWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private StuAnnouncementWidget stuAnnouncementWidget;
 	private PendoSdk pendoSdk;
-	
+	PortalGinInjector portalGinInjector;
 	@Inject
 	public Header(HeaderView view, 
 			AuthenticationController authenticationController,
@@ -50,22 +53,36 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			SynapseJavascriptClient jsClient,
 			FavoriteWidget favWidget, 
 			SynapseJSNIUtils synapseJSNIUtils, 
-			StuAnnouncementWidget stuAnnouncementWidget,
-			PendoSdk pendoSdk) {
+			PendoSdk pendoSdk,
+			PortalGinInjector portalGinInjector) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.jsClient = jsClient;
 		this.favWidget = favWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.portalGinInjector = portalGinInjector;
 		view.clear();
-		this.stuAnnouncementWidget = stuAnnouncementWidget;
 		this.pendoSdk = pendoSdk;
 		view.setPresenter(this);
-		stuAnnouncementWidget.init();
 		initStagingAlert();
+		initStuAnnouncementWidget();
 	}
-	
+	public void initStuAnnouncementWidget() {
+		GWT.runAsync(StuAnnouncementWidget.class, new RunAsyncCallback() {
+			@Override
+			public void onSuccess() {
+				StuAnnouncementWidget stuAnnouncementWidget = portalGinInjector.getStuAnnouncementWidget();
+				view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
+				stuAnnouncementWidget.init();		
+			}
+			
+			@Override
+			public void onFailure(Throwable reason) {
+				SynapseJSNIUtilsImpl._consoleError(reason.getMessage());
+			}
+		});
+	}
 	public void initStagingAlert() {
 		String hostName = synapseJSNIUtils.getCurrentHostName().toLowerCase();
 		boolean visible = !hostName.contains(WWW_SYNAPSE_ORG);
@@ -119,7 +136,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.refresh();
 		view.setSearchVisible(true);
 		view.setProjectFavoriteWidget(favWidget);
-		view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
 		if (authenticationController.isLoggedIn()) {
 			String userName = userSessionData.getProfile().getUserName();
 			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);

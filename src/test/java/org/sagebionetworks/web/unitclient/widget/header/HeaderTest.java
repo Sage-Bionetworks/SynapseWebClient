@@ -29,6 +29,7 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -71,7 +72,8 @@ public class HeaderTest {
 	UserProfile mockUserProfile;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
-	
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
@@ -84,7 +86,8 @@ public class HeaderTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget, mockPendoSdk);
+		when(mockPortalGinInjector.getStuAnnouncementWidget()).thenReturn(mockStuAnnouncementWidget);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
