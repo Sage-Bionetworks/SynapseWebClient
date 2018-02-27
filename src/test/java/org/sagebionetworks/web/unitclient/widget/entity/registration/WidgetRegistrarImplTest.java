@@ -38,29 +38,29 @@ public class WidgetRegistrarImplTest {
 	
 	@Test
 	public void testCreateWidgets() {
-		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, null, null);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.YOUTUBE_CONTENT_TYPE);
 		verify(mockGinInjector).getVideoWidget();
-		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, null, null);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.IMAGE_CONTENT_TYPE);
 		verify(mockGinInjector).getImageRenderer();
 		reset(mockGinInjector);
-		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE, null, null, null);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE);
 		verify(mockGinInjector).getImageRenderer();
-		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, null, null);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.PROVENANCE_CONTENT_TYPE);
 		verify(mockGinInjector).getProvenanceRenderer();
-		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.API_TABLE_CONTENT_TYPE, null, null, null);
-		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.QUERY_TABLE_CONTENT_TYPE, null, null, null);
-		widgetRegistrar.getWidgetRendererForWidgetDescriptor(null, WidgetConstants.LEADERBOARD_CONTENT_TYPE, null, null, null);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.API_TABLE_CONTENT_TYPE);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.QUERY_TABLE_CONTENT_TYPE);
+		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.LEADERBOARD_CONTENT_TYPE);
 		verify(mockGinInjector, times(3)).getSynapseAPICallRenderer();
 	}
 	@Test
 	public void testCreateWidgetEditors() {
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, null, mockAsyncCallback);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, null);
 		verify(mockGinInjector).getVideoConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, null, mockAsyncCallback);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, null);
 		verify(mockGinInjector).getImageConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE, null, null, mockAsyncCallback);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE, null, null);
 		verify(mockGinInjector).getImageLinkConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, null, mockAsyncCallback);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, null);
 		verify(mockGinInjector).getProvenanceConfigEditor();
 	}
 	

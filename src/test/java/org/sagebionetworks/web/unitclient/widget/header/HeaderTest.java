@@ -16,6 +16,7 @@ import static org.sagebionetworks.web.client.widget.header.Header.SYNAPSE_ORG;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -46,6 +47,7 @@ import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidget;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.junit.GWTMockUtilities;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -77,6 +79,7 @@ public class HeaderTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
+		GWTMockUtilities.disarm();
 		mockView = Mockito.mock(HeaderView.class);		
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
@@ -93,12 +96,15 @@ public class HeaderTest {
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
 		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
 	}
+	@After
+	public void tearDown() {
+		GWTMockUtilities.restore();
+	}
 
 	@Test
 	public void testSetPresenter() {
 		verify(mockView).setPresenter(header);
 		verify(mockView).setStagingAlertVisible(false);
-		verify(mockStuAnnouncementWidget).init();
 	}
 
 	@Test

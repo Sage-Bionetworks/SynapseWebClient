@@ -32,7 +32,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	JSONObjectAdapter adapter;
 	
 	@Inject
-	public WidgetRegistrarImpl(PortalGinInjector ginInjector, JSONObjectAdapter adapter) {
+	public WidgetRegistrarImpl(
+			PortalGinInjector ginInjector, 
+			JSONObjectAdapter adapter) {
 		this.ginInjector = ginInjector;
 		this.adapter = adapter;
 		initWithKnownWidgets();
@@ -54,55 +56,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		GWT.runAsync(WidgetEditorPresenter.class, new RunAsyncCallback() {
 			@Override
 			public void onSuccess() {
-				//use gin to create a new instance of the proper class.
-				WidgetEditorPresenter presenter = null;
-				if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
-					presenter = ginInjector.getReferenceConfigEditor();
-				} else if (contentTypeKey.equals(JOIN_TEAM_CONTENT_TYPE)) {
-					presenter = ginInjector.getJoinTeamConfigEditor();
-				} else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
-					presenter = ginInjector.getProvenanceConfigEditor();
-				} else if (contentTypeKey.equals(IMAGE_CONTENT_TYPE)) {
-					presenter = ginInjector.getImageConfigEditor();
-				} else if (contentTypeKey.equals(IMAGE_LINK_EDITOR_CONTENT_TYPE)) {
-					presenter = ginInjector.getImageLinkConfigEditor();
-				} else if (contentTypeKey.equals(LINK_CONTENT_TYPE)) {
-					presenter = ginInjector.getLinkConfigEditor();
-				} else if (contentTypeKey.equals(TABBED_TABLE_CONTENT_TYPE)) {
-					presenter = ginInjector.getTabbedTableConfigEditor();
-				} else if (contentTypeKey.equals(API_TABLE_CONTENT_TYPE)) {
-					presenter = ginInjector.getSynapseAPICallConfigEditor();
-				} else if (contentTypeKey.equals(QUERY_TABLE_CONTENT_TYPE)) {
-					presenter = ginInjector.getSynapseQueryConfigEditor();
-				} else if (contentTypeKey.equals(LEADERBOARD_CONTENT_TYPE)) {
-					presenter = ginInjector.getLeaderboardConfigEditor();
-				} else if (contentTypeKey.equals(ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
-					presenter = ginInjector.getAttachmentConfigEditor();
-				} else if (contentTypeKey.equals(ENTITYLIST_CONTENT_TYPE)) {
-					presenter = ginInjector.getEntityListConfigEditor();
-				} else if (contentTypeKey.equals(SHINYSITE_CONTENT_TYPE)) {
-					presenter = ginInjector.getShinySiteConfigEditor();
-				} else if (contentTypeKey.equals(BUTTON_LINK_CONTENT_TYPE)) {
-					presenter = ginInjector.getButtonLinkConfigEditor();
-				} else if (contentTypeKey.equals(USER_TEAM_BADGE_CONTENT_TYPE)) {
-					presenter = ginInjector.getUserTeamConfigEditor();
-				} else if (contentTypeKey.equals(VIDEO_CONTENT_TYPE) ||
-						contentTypeKey.equals(YOUTUBE_CONTENT_TYPE) ||
-						contentTypeKey.equals(VIMEO_CONTENT_TYPE)) {
-					presenter = ginInjector.getVideoConfigEditor();
-				} else if (contentTypeKey.equals(SYNAPSE_TABLE_CONTENT_TYPE)) {
-					presenter = ginInjector.getSynapseTableQueryResultEditor();
-				} else if (contentTypeKey.equals(PREVIEW_CONTENT_TYPE)) {
-					presenter = ginInjector.getPreviewConfigEditor();
-				} else if(contentTypeKey.equals(BIODALLIANCE13_CONTENT_TYPE)) {
-					presenter = ginInjector.getBiodallianceEditor();
-				} else if (contentTypeKey.equals(CYTOSCAPE_CONTENT_TYPE)) {
-					presenter = ginInjector.getCytoscapeConfigEditor();
-				} else if(contentTypeKey.equals(PLOT_CONTENT_TYPE)) {
-					presenter = ginInjector.getPlotlyConfigEditor();
-				} //TODO: add other widget descriptors to this mapping as they become available
-				if (presenter != null)
-					presenter.configure(wikiKey, model, dialogCallback);
+				WidgetEditorPresenter presenter = getWidgetEditorForWidgetDescriptor(wikiKey, contentTypeKey, model, dialogCallback);
 				callback.onSuccess(presenter);
 			}
 			
@@ -113,6 +67,68 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		});
 	}
 
+	/**
+	 * Is public for testing purposes only
+	 * @param wikiKey
+	 * @param contentTypeKey
+	 * @param model
+	 * @param dialogCallback
+	 * @return
+	 */
+	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, DialogCallback dialogCallback) {
+		//use gin to create a new instance of the proper class.
+		WidgetEditorPresenter presenter = null;
+		if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
+			presenter = ginInjector.getReferenceConfigEditor();
+		} else if (contentTypeKey.equals(JOIN_TEAM_CONTENT_TYPE)) {
+			presenter = ginInjector.getJoinTeamConfigEditor();
+		} else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
+			presenter = ginInjector.getProvenanceConfigEditor();
+		} else if (contentTypeKey.equals(IMAGE_CONTENT_TYPE)) {
+			presenter = ginInjector.getImageConfigEditor();
+		} else if (contentTypeKey.equals(IMAGE_LINK_EDITOR_CONTENT_TYPE)) {
+			presenter = ginInjector.getImageLinkConfigEditor();
+		} else if (contentTypeKey.equals(LINK_CONTENT_TYPE)) {
+			presenter = ginInjector.getLinkConfigEditor();
+		} else if (contentTypeKey.equals(TABBED_TABLE_CONTENT_TYPE)) {
+			presenter = ginInjector.getTabbedTableConfigEditor();
+		} else if (contentTypeKey.equals(API_TABLE_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseAPICallConfigEditor();
+		} else if (contentTypeKey.equals(QUERY_TABLE_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseQueryConfigEditor();
+		} else if (contentTypeKey.equals(LEADERBOARD_CONTENT_TYPE)) {
+			presenter = ginInjector.getLeaderboardConfigEditor();
+		} else if (contentTypeKey.equals(ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
+			presenter = ginInjector.getAttachmentConfigEditor();
+		} else if (contentTypeKey.equals(ENTITYLIST_CONTENT_TYPE)) {
+			presenter = ginInjector.getEntityListConfigEditor();
+		} else if (contentTypeKey.equals(SHINYSITE_CONTENT_TYPE)) {
+			presenter = ginInjector.getShinySiteConfigEditor();
+		} else if (contentTypeKey.equals(BUTTON_LINK_CONTENT_TYPE)) {
+			presenter = ginInjector.getButtonLinkConfigEditor();
+		} else if (contentTypeKey.equals(USER_TEAM_BADGE_CONTENT_TYPE)) {
+			presenter = ginInjector.getUserTeamConfigEditor();
+		} else if (contentTypeKey.equals(VIDEO_CONTENT_TYPE) ||
+				contentTypeKey.equals(YOUTUBE_CONTENT_TYPE) ||
+				contentTypeKey.equals(VIMEO_CONTENT_TYPE)) {
+			presenter = ginInjector.getVideoConfigEditor();
+		} else if (contentTypeKey.equals(SYNAPSE_TABLE_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseTableQueryResultEditor();
+		} else if (contentTypeKey.equals(PREVIEW_CONTENT_TYPE)) {
+			presenter = ginInjector.getPreviewConfigEditor();
+		} else if(contentTypeKey.equals(BIODALLIANCE13_CONTENT_TYPE)) {
+			presenter = ginInjector.getBiodallianceEditor();
+		} else if (contentTypeKey.equals(CYTOSCAPE_CONTENT_TYPE)) {
+			presenter = ginInjector.getCytoscapeConfigEditor();
+		} else if(contentTypeKey.equals(PLOT_CONTENT_TYPE)) {
+			presenter = ginInjector.getPlotlyConfigEditor();
+		} //TODO: add other widget descriptors to this mapping as they become available
+		if (presenter != null)
+			presenter.configure(wikiKey, model, dialogCallback);
+		
+		return presenter;
+	}
+	
 	@Override
 	public String getWidgetContentType(Map<String, String> model) {
 		return model.get("contentType");
@@ -136,71 +152,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		GWT.runAsync(WidgetRendererPresenter.class, new RunAsyncCallback() {
 			@Override
 			public void onSuccess() {
-				WidgetRendererPresenter presenter = null;
-				if(contentTypeKey.equals(BOOKMARK_CONTENT_TYPE)) {
-					presenter = ginInjector.getBookmarkRenderer();
-				} else if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
-					presenter = ginInjector.getReferenceRenderer();
-				} else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
-					presenter = ginInjector.getProvenanceRenderer();
-				} else if (contentTypeKey.equals(IMAGE_CONTENT_TYPE) ||
-						contentTypeKey.equals(IMAGE_LINK_EDITOR_CONTENT_TYPE)) {
-					presenter = ginInjector.getImageRenderer();
-				} else if (contentTypeKey.equals(API_TABLE_CONTENT_TYPE) || 
-						contentTypeKey.equals(QUERY_TABLE_CONTENT_TYPE) ||
-						contentTypeKey.equals(LEADERBOARD_CONTENT_TYPE)) {
-					presenter = ginInjector.getSynapseAPICallRenderer();
-				} else if (contentTypeKey.equals(TOC_CONTENT_TYPE)) {
-					presenter = ginInjector.getTableOfContentsRenderer();
-				} else if (contentTypeKey.equals(WIKI_FILES_PREVIEW_CONTENT_TYPE)) {
-					presenter = ginInjector.getWikiFilesPreviewRenderer();
-				} else if (contentTypeKey.equals(ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
-					presenter = ginInjector.getAttachmentPreviewRenderer();
-				} else if (contentTypeKey.equals(ENTITYLIST_CONTENT_TYPE)) {
-					presenter = ginInjector.getEntityListRenderer();
-				} else if (contentTypeKey.equals(SHINYSITE_CONTENT_TYPE)) {
-					presenter = ginInjector.getShinySiteRenderer();
-				} else if (contentTypeKey.equals(USERBADGE_CONTENT_TYPE)) {
-					presenter = ginInjector.getUserBadgeWidget();
-				} else if (contentTypeKey.equals(USER_TEAM_BADGE_CONTENT_TYPE)) {
-					presenter = ginInjector.getUserTeamBadgeWidget();
-				} else if (contentTypeKey.equals(JOIN_TEAM_CONTENT_TYPE)) {
-					presenter = ginInjector.getJoinTeamWidget();
-				} else if (contentTypeKey.equals(SUBMIT_TO_EVALUATION_CONTENT_TYPE) || contentTypeKey.equals(OLD_JOIN_EVALUATION_CONTENT_TYPE)) {
-					presenter = ginInjector.getEvaluationSubmissionWidget();
-				} else if (contentTypeKey.equals(BUTTON_LINK_CONTENT_TYPE)) {
-					presenter = ginInjector.getButtonLinkWidget();
-				} else if (contentTypeKey.equals(TUTORIAL_WIZARD_CONTENT_TYPE)) {
-					presenter = ginInjector.getTutorialWidgetRenderer();
-				} else if (contentTypeKey.equals(WIKI_SUBPAGES_CONTENT_TYPE) || contentTypeKey.equals(NO_AUTO_WIKI_SUBPAGES)) {
-					presenter = ginInjector.getEmptyWidget();
-				} else if (contentTypeKey.equals(VIDEO_CONTENT_TYPE) ||
-						contentTypeKey.equals(YOUTUBE_CONTENT_TYPE) ||
-						contentTypeKey.equals(VIMEO_CONTENT_TYPE)) {
-					presenter = ginInjector.getVideoWidget();
-				} else if (contentTypeKey.equals(SYNAPSE_TABLE_CONTENT_TYPE)) {
-					presenter = ginInjector.getSynapseTableQueryResultWikiWidget();
-				} else if (contentTypeKey.equals(REGISTER_CHALLENGE_TEAM_CONTENT_TYPE)) {
-					presenter = ginInjector.getRegisterChallengeTeamWidget();
-				} else if (contentTypeKey.equals(CHALLENGE_TEAMS_CONTENT_TYPE)) {
-					presenter = ginInjector.getChallengeTeamsWidget();
-				} else if (contentTypeKey.equals(CHALLENGE_PARTICIPANTS_CONTENT_TYPE)) {
-					presenter = ginInjector.getChallengeParticipantsWidget();
-				} else if (contentTypeKey.equals(PREVIEW_CONTENT_TYPE)) {
-					presenter = ginInjector.getPreviewWidget();
-				} else if (contentTypeKey.equals(BIODALLIANCE13_CONTENT_TYPE)) {
-					presenter = ginInjector.getBiodallianceRenderer();
-				} else if (contentTypeKey.equals(CYTOSCAPE_CONTENT_TYPE)) {
-					presenter = ginInjector.getCytoscapeRenderer();
-				} else if (contentTypeKey.equals(SYNAPSE_FORM_CONTENT_TYPE)) {
-					presenter = ginInjector.getSynapseTableFormWidget();
-				} else if (contentTypeKey.equals(TEAM_MEMBERS_CONTENT_TYPE)) {
-					presenter = ginInjector.getTeamMembersWidget();
-				} else if (contentTypeKey.equals(TEAM_MEMBER_COUNT_CONTENT_TYPE)) {
-					presenter = ginInjector.getTeamMemberCountWidget();
-				} else if (contentTypeKey.equals(PLOT_CONTENT_TYPE)) {
-					presenter = ginInjector.getPlotlyWidget();
-				}
+				WidgetRendererPresenter presenter = getWidgetRendererForWidgetDescriptorAfterLazyLoad(contentTypeKey);
 				callback.onSuccess(presenter);
 			}
 			
@@ -209,6 +161,80 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 				callback.onFailure(reason);
 			}
 		});
+	}
+	
+	/**
+	 * Is public for testing purposes only
+	 * @param contentTypeKey
+	 * @return
+	 */
+	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptorAfterLazyLoad(String contentTypeKey) {
+		WidgetRendererPresenter presenter = null;
+		if(contentTypeKey.equals(BOOKMARK_CONTENT_TYPE)) {
+			presenter = ginInjector.getBookmarkRenderer();
+		} else if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
+			presenter = ginInjector.getReferenceRenderer();
+		} else if (contentTypeKey.equals(PROVENANCE_CONTENT_TYPE)) {
+			presenter = ginInjector.getProvenanceRenderer();
+		} else if (contentTypeKey.equals(IMAGE_CONTENT_TYPE) ||
+				contentTypeKey.equals(IMAGE_LINK_EDITOR_CONTENT_TYPE)) {
+			presenter = ginInjector.getImageRenderer();
+		} else if (contentTypeKey.equals(API_TABLE_CONTENT_TYPE) || 
+				contentTypeKey.equals(QUERY_TABLE_CONTENT_TYPE) ||
+				contentTypeKey.equals(LEADERBOARD_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseAPICallRenderer();
+		} else if (contentTypeKey.equals(TOC_CONTENT_TYPE)) {
+			presenter = ginInjector.getTableOfContentsRenderer();
+		} else if (contentTypeKey.equals(WIKI_FILES_PREVIEW_CONTENT_TYPE)) {
+			presenter = ginInjector.getWikiFilesPreviewRenderer();
+		} else if (contentTypeKey.equals(ATTACHMENT_PREVIEW_CONTENT_TYPE)) {
+			presenter = ginInjector.getAttachmentPreviewRenderer();
+		} else if (contentTypeKey.equals(ENTITYLIST_CONTENT_TYPE)) {
+			presenter = ginInjector.getEntityListRenderer();
+		} else if (contentTypeKey.equals(SHINYSITE_CONTENT_TYPE)) {
+			presenter = ginInjector.getShinySiteRenderer();
+		} else if (contentTypeKey.equals(USERBADGE_CONTENT_TYPE)) {
+			presenter = ginInjector.getUserBadgeWidget();
+		} else if (contentTypeKey.equals(USER_TEAM_BADGE_CONTENT_TYPE)) {
+			presenter = ginInjector.getUserTeamBadgeWidget();
+		} else if (contentTypeKey.equals(JOIN_TEAM_CONTENT_TYPE)) {
+			presenter = ginInjector.getJoinTeamWidget();
+		} else if (contentTypeKey.equals(SUBMIT_TO_EVALUATION_CONTENT_TYPE) || contentTypeKey.equals(OLD_JOIN_EVALUATION_CONTENT_TYPE)) {
+			presenter = ginInjector.getEvaluationSubmissionWidget();
+		} else if (contentTypeKey.equals(BUTTON_LINK_CONTENT_TYPE)) {
+			presenter = ginInjector.getButtonLinkWidget();
+		} else if (contentTypeKey.equals(TUTORIAL_WIZARD_CONTENT_TYPE)) {
+			presenter = ginInjector.getTutorialWidgetRenderer();
+		} else if (contentTypeKey.equals(WIKI_SUBPAGES_CONTENT_TYPE) || contentTypeKey.equals(NO_AUTO_WIKI_SUBPAGES)) {
+			presenter = ginInjector.getEmptyWidget();
+		} else if (contentTypeKey.equals(VIDEO_CONTENT_TYPE) ||
+				contentTypeKey.equals(YOUTUBE_CONTENT_TYPE) ||
+				contentTypeKey.equals(VIMEO_CONTENT_TYPE)) {
+			presenter = ginInjector.getVideoWidget();
+		} else if (contentTypeKey.equals(SYNAPSE_TABLE_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseTableQueryResultWikiWidget();
+		} else if (contentTypeKey.equals(REGISTER_CHALLENGE_TEAM_CONTENT_TYPE)) {
+			presenter = ginInjector.getRegisterChallengeTeamWidget();
+		} else if (contentTypeKey.equals(CHALLENGE_TEAMS_CONTENT_TYPE)) {
+			presenter = ginInjector.getChallengeTeamsWidget();
+		} else if (contentTypeKey.equals(CHALLENGE_PARTICIPANTS_CONTENT_TYPE)) {
+			presenter = ginInjector.getChallengeParticipantsWidget();
+		} else if (contentTypeKey.equals(PREVIEW_CONTENT_TYPE)) {
+			presenter = ginInjector.getPreviewWidget();
+		} else if (contentTypeKey.equals(BIODALLIANCE13_CONTENT_TYPE)) {
+			presenter = ginInjector.getBiodallianceRenderer();
+		} else if (contentTypeKey.equals(CYTOSCAPE_CONTENT_TYPE)) {
+			presenter = ginInjector.getCytoscapeRenderer();
+		} else if (contentTypeKey.equals(SYNAPSE_FORM_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseTableFormWidget();
+		} else if (contentTypeKey.equals(TEAM_MEMBERS_CONTENT_TYPE)) {
+			presenter = ginInjector.getTeamMembersWidget();
+		} else if (contentTypeKey.equals(TEAM_MEMBER_COUNT_CONTENT_TYPE)) {
+			presenter = ginInjector.getTeamMemberCountWidget();
+		} else if (contentTypeKey.equals(PLOT_CONTENT_TYPE)) {
+			presenter = ginInjector.getPlotlyWidget();
+		}
+		return presenter;
 	}
 	
 	@Override

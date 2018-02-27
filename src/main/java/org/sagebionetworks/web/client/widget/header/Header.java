@@ -68,21 +68,27 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		initStagingAlert();
 		initStuAnnouncementWidget();
 	}
+	
 	public void initStuAnnouncementWidget() {
-		GWT.runAsync(StuAnnouncementWidget.class, new RunAsyncCallback() {
-			@Override
-			public void onSuccess() {
-				StuAnnouncementWidget stuAnnouncementWidget = portalGinInjector.getStuAnnouncementWidget();
-				view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
-				stuAnnouncementWidget.init();		
-			}
-			
-			@Override
-			public void onFailure(Throwable reason) {
-				SynapseJSNIUtilsImpl._consoleError(reason.getMessage());
-			}
-		});
+		try {
+			GWT.runAsync(StuAnnouncementWidget.class, new RunAsyncCallback() {
+				@Override
+				public void onSuccess() {
+					StuAnnouncementWidget stuAnnouncementWidget = portalGinInjector.getStuAnnouncementWidget();
+					view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
+					stuAnnouncementWidget.init();		
+				}
+				
+				@Override
+				public void onFailure(Throwable e) {
+					synapseJSNIUtils.consoleError(e.getMessage());
+				}
+			});
+		} catch (Exception e) {
+			synapseJSNIUtils.consoleError(e.getMessage());
+		}
 	}
+	
 	public void initStagingAlert() {
 		String hostName = synapseJSNIUtils.getCurrentHostName().toLowerCase();
 		boolean visible = !hostName.contains(WWW_SYNAPSE_ORG);

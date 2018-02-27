@@ -9,6 +9,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -20,6 +21,7 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapperView;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
 public class LazyLoadWikiWidgetWrapperTest {
@@ -38,6 +40,8 @@ public class LazyLoadWikiWidgetWrapperTest {
 	Map<String, String> mockWidgetDescriptor;
 	@Mock
 	Callback mockWidgetRefreshRequired;
+	@Captor
+	ArgumentCaptor<AsyncCallback<WidgetRendererPresenter>> callbackCaptor;
 	@Mock
 	WidgetRegistrar mockWidgetRegistrar;
 	Long wikiVersionInView = 20L;
@@ -62,6 +66,9 @@ public class LazyLoadWikiWidgetWrapperTest {
 		verify(mockView).showLoading();
 		
 		simulateLazyLoadEvent();
+		verify(mockWidgetRegistrar).getWidgetRendererForWidgetDescriptorAfterLazyLoad(eq(WIDGET_CONTENT_TYPE), callbackCaptor.capture());
+		callbackCaptor.getValue().onSuccess(mockWikiWidget);
+		
 		verify(mockWikiWidget).configure(mockWikiKey, mockWidgetDescriptor, mockWidgetRefreshRequired, wikiVersionInView);
 		String className = mockWikiWidget.getClass().getSimpleName();
 		verify(mockView).showWidget(any(Widget.class), eq(className));
