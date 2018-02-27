@@ -12,6 +12,7 @@ import org.gwtbootstrap3.client.ui.html.UnorderedList;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,6 +42,7 @@ public class WikiPageDeleteConfirmationDialogViewImpl implements WikiPageDeleteC
 		cancelDeleteWikiButton.addClickHandler(event -> {
 			modal.hide();
 		});
+		deleteWikiButton.addDomHandler(DisplayUtils.getPreventTabHandler(deleteWikiButton), KeyDownEvent.getType());
 	}
 	
 	@Override
