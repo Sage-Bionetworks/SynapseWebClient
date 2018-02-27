@@ -203,13 +203,11 @@
 					<!-- Disabled because it causes an EmptyStackException on GWT 2.8.1
 					<soycDetailed>true</soycDetailed> -->
 					<encoding>${project.build.sourceEncoding}</encoding>
+					<!-- <compilerMetrics>true</compilerMetrics> -->
 					<logLevel>INFO</logLevel>
 					<sourceLevel>auto</sourceLevel>
 					<extraJvmArgs>-Xmx2048m -Xms2048m</extraJvmArgs>
-
-					<!-- Does not work on GWT 2.8.1
-					<enableClosureCompiler>true</enableClosureCompiler> -->
-					<!--           <fragmentCount>12</fragmentCount> -->
+					<fragmentCount>1</fragmentCount>
 				</configuration>
 			</plugin>
 

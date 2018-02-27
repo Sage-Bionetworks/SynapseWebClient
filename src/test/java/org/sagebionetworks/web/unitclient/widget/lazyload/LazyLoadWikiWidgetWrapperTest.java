@@ -14,6 +14,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapperView;
@@ -37,12 +38,14 @@ public class LazyLoadWikiWidgetWrapperTest {
 	Map<String, String> mockWidgetDescriptor;
 	@Mock
 	Callback mockWidgetRefreshRequired;
+	@Mock
+	WidgetRegistrar mockWidgetRegistrar;
 	Long wikiVersionInView = 20L;
-	
+	public static final String WIDGET_CONTENT_TYPE = "image";
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new LazyLoadWikiWidgetWrapper(mockView, mockLazyLoadHelper, mockSynapseJSNIUtils);
+		widget = new LazyLoadWikiWidgetWrapper(mockView, mockLazyLoadHelper, mockSynapseJSNIUtils, mockWidgetRegistrar);
 	}
 	
 	private void simulateLazyLoadEvent() {
@@ -54,7 +57,7 @@ public class LazyLoadWikiWidgetWrapperTest {
 	@Test
 	public void testHappyCase() {
 		//configure
-		widget.configure(mockWikiWidget, mockWikiKey, mockWidgetDescriptor, mockWidgetRefreshRequired, wikiVersionInView);
+		widget.configure(WIDGET_CONTENT_TYPE, mockWikiKey, mockWidgetDescriptor, mockWidgetRefreshRequired, wikiVersionInView);
 		verify(mockLazyLoadHelper).setIsConfigured();
 		verify(mockView).showLoading();
 		

@@ -7,23 +7,31 @@ import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.shared.WidgetConstants;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import junit.framework.Assert;
 
 public class WidgetRegistrarImplTest {
 		
 	WidgetRegistrarImpl widgetRegistrar;
+	@Mock
 	PortalGinInjector mockGinInjector;
 	Map<String, String> testImageWidgetDescriptor;
 	String testFileName = "testfile.png";
+	@Mock
+	AsyncCallback<WidgetEditorPresenter> mockAsyncCallback; 
 	@Before
 	public void setup(){	
-		mockGinInjector = mock(PortalGinInjector.class);
+		MockitoAnnotations.initMocks(this);
 		widgetRegistrar= new WidgetRegistrarImpl(mockGinInjector, new JSONObjectAdapterImpl());
 		testImageWidgetDescriptor = new HashMap<String, String>();
 	}
@@ -46,13 +54,13 @@ public class WidgetRegistrarImplTest {
 	}
 	@Test
 	public void testCreateWidgetEditors() {
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, null);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, null, mockAsyncCallback);
 		verify(mockGinInjector).getVideoConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, null);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_CONTENT_TYPE, null, null, mockAsyncCallback);
 		verify(mockGinInjector).getImageConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE, null, null);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.IMAGE_LINK_EDITOR_CONTENT_TYPE, null, null, mockAsyncCallback);
 		verify(mockGinInjector).getImageLinkConfigEditor();
-		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, null);
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.PROVENANCE_CONTENT_TYPE, null, null, mockAsyncCallback);
 		verify(mockGinInjector).getProvenanceConfigEditor();
 	}
 	
