@@ -426,6 +426,7 @@ public class DisplayUtils {
 				yesCallback.invoke();
 		});
 		Bootbox.dialog(options);
+		focusOnBootboxButton(LINK_BUTTON_STYLE);
 	}
 
 	public static void confirm(
@@ -454,7 +455,13 @@ public class DisplayUtils {
 			}
 		});
 		Bootbox.dialog(options);
+		focusOnBootboxButton(PRIMARY_BUTTON_STYLE);
 	}
+	
+    public static native void focusOnBootboxButton(String buttonStyle) /*-{
+    		$wnd.jQuery(".bootbox ." + buttonStyle).focus();
+	}-*/;
+
 	
 	public static void showPopup(String title, 
 			String message,

@@ -67,6 +67,7 @@ public class WikiPageDeleteConfirmationDialogViewImpl implements WikiPageDeleteC
 		wikiHeaderTreeContainer.add(ul);
 		addToDeleteListRecursive(wikiPageId, id2HeaderMap, id2ChildrenMap, ul);
 		modal.show();
+		cancelDeleteWikiButton.setFocus(true);
 	}
 	
 	private void addToDeleteListRecursive(String pageId, Map<String, V2WikiHeader> id2HeaderMap, Map<String, List<V2WikiHeader>> id2ChildrenMap, UnorderedList parentUL) {
