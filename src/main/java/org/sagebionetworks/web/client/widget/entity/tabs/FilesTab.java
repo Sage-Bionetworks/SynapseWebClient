@@ -87,6 +87,7 @@ public class FilesTab {
 			this.breadcrumb = ginInjector.getBreadcrumb();
 			this.metadata = ginInjector.getEntityMetadata();
 			this.filesBrowser = ginInjector.getFilesBrowser();
+			filesBrowser.setEntityClickedHandler(entitySelectedCallback);
 			this.previewWidget = ginInjector.getPreviewWidget();
 			this.wikiPageWidget = ginInjector.getWikiPageWidget();
 			this.synAlert = ginInjector.getStuAlert();

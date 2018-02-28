@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.CallbackP;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -38,6 +39,11 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	public void setEntitySelectedHandler(org.sagebionetworks.web.client.events.EntitySelectedHandler handler) {
 		entityTreeBrowser.setEntitySelectedHandler(handler);
 	};
+	
+	@Override
+	public void setEntityClickedHandler(CallbackP<String> callback) {
+		entityTreeBrowser.setEntityClickedHandler(callback);
+	}
 	
 	@Override
 	public Widget asWidget() {
