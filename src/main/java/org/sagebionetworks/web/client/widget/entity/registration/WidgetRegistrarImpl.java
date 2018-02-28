@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.registration;
 
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import static org.sagebionetworks.web.shared.WidgetConstants.*;
+
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -15,6 +17,9 @@ import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.RunAsyncCallback;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.inject.Inject;
 
@@ -27,7 +32,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	JSONObjectAdapter adapter;
 	
 	@Inject
-	public WidgetRegistrarImpl(PortalGinInjector ginInjector, JSONObjectAdapter adapter) {
+	public WidgetRegistrarImpl(
+			PortalGinInjector ginInjector, 
+			JSONObjectAdapter adapter) {
 		this.ginInjector = ginInjector;
 		this.adapter = adapter;
 		initWithKnownWidgets();
@@ -45,7 +52,30 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 * @return
 	 */
 	@Override
-	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, DialogCallback dialogCallback) { 
+	public void getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, DialogCallback dialogCallback, AsyncCallback<WidgetEditorPresenter> callback) {
+		GWT.runAsync(WidgetEditorPresenter.class, new RunAsyncCallback() {
+			@Override
+			public void onSuccess() {
+				WidgetEditorPresenter presenter = getWidgetEditorForWidgetDescriptor(wikiKey, contentTypeKey, model, dialogCallback);
+				callback.onSuccess(presenter);
+			}
+			
+			@Override
+			public void onFailure(Throwable reason) {
+				callback.onFailure(reason);
+			}
+		});
+	}
+
+	/**
+	 * Is public for testing purposes only
+	 * @param wikiKey
+	 * @param contentTypeKey
+	 * @param model
+	 * @param dialogCallback
+	 * @return
+	 */
+	public WidgetEditorPresenter getWidgetEditorForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, DialogCallback dialogCallback) {
 		//use gin to create a new instance of the proper class.
 		WidgetEditorPresenter presenter = null;
 		if(contentTypeKey.equals(REFERENCE_CONTENT_TYPE)) {
@@ -95,9 +125,10 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} //TODO: add other widget descriptors to this mapping as they become available
 		if (presenter != null)
 			presenter.configure(wikiKey, model, dialogCallback);
+		
 		return presenter;
 	}
-
+	
 	@Override
 	public String getWidgetContentType(Map<String, String> model) {
 		return model.get("contentType");
@@ -110,7 +141,34 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 	 */
 	@Override
 	public IsWidget getWidgetRendererForWidgetDescriptor(WikiPageKey wikiKey, String contentTypeKey, Map<String, String> model, Callback widgetRefreshRequired, Long wikiVersionInView) { 
+		LazyLoadWikiWidgetWrapper wrapper = ginInjector.getLazyLoadWikiWidgetWrapper();
+		wrapper.configure(contentTypeKey, wikiKey, model, widgetRefreshRequired, wikiVersionInView);
+		return wrapper;
+	}
+	
+	@Override
+	public void getWidgetRendererForWidgetDescriptorAfterLazyLoad(String contentTypeKey, AsyncCallback<WidgetRendererPresenter> callback) {
 		//use gin to create a new instance of the proper class.
+		GWT.runAsync(WidgetRendererPresenter.class, new RunAsyncCallback() {
+			@Override
+			public void onSuccess() {
+				WidgetRendererPresenter presenter = getWidgetRendererForWidgetDescriptorAfterLazyLoad(contentTypeKey);
+				callback.onSuccess(presenter);
+			}
+			
+			@Override
+			public void onFailure(Throwable reason) {
+				callback.onFailure(reason);
+			}
+		});
+	}
+	
+	/**
+	 * Is public for testing purposes only
+	 * @param contentTypeKey
+	 * @return
+	 */
+	public WidgetRendererPresenter getWidgetRendererForWidgetDescriptorAfterLazyLoad(String contentTypeKey) {
 		WidgetRendererPresenter presenter = null;
 		if(contentTypeKey.equals(BOOKMARK_CONTENT_TYPE)) {
 			presenter = ginInjector.getBookmarkRenderer();
@@ -176,16 +234,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		} else if (contentTypeKey.equals(PLOT_CONTENT_TYPE)) {
 			presenter = ginInjector.getPlotlyWidget();
 		}
-		
-		//TODO: add other widget descriptors to this mapping as they become available
-		
-		if (presenter != null) {
-			LazyLoadWikiWidgetWrapper wrapper = ginInjector.getLazyLoadWikiWidgetWrapper();
-			wrapper.configure(presenter, wikiKey, model, widgetRefreshRequired, wikiVersionInView);
-			return wrapper;
-		}	
 		return presenter;
 	}
+	
 	@Override
 	public String getFriendlyTypeName(String contentTypeKey) {
 		String friendlyName = contentType2FriendlyName.get(contentTypeKey);

@@ -16,6 +16,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -101,17 +102,29 @@ public class BaseEditWidgetDescriptorViewImpl implements BaseEditWidgetDescripto
 		synAlert.clear();
 		okButton.setEnabled(true);
 		paramsPanel.clear();
-		widgetDescriptorPresenter = widgetRegistrar.getWidgetEditorForWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor, dialogCallback);
-		if (widgetDescriptorPresenter != null) {
-			Widget w = widgetDescriptorPresenter.asWidget();
-			paramsPanel.add(w);
-			//finish setting up the main dialog
-			String friendlyName = widgetRegistrar.getFriendlyTypeName(contentTypeKey);
-			modal.setTitle(friendlyName);
-		} else {
-			showErrorMessage("No editor found for the content type: " + contentTypeKey);
-		}
+		widgetRegistrar.getWidgetEditorForWidgetDescriptor(wikiKey, contentTypeKey, widgetDescriptor, dialogCallback, new AsyncCallback<WidgetEditorPresenter>() {
+			@Override
+			public void onSuccess(WidgetEditorPresenter result) {
+				widgetDescriptorPresenter = result;
+				if (widgetDescriptorPresenter != null) {
+					Widget w = widgetDescriptorPresenter.asWidget();
+					paramsPanel.add(w);
+					//finish setting up the main dialog
+					String friendlyName = widgetRegistrar.getFriendlyTypeName(contentTypeKey);
+					modal.setTitle(friendlyName);
+				} else {
+					showErrorMessage("No editor found for the content type: " + contentTypeKey);
+				}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				showErrorMessage("Editor not loaded: " + caught.getMessage());
+			}
+		});
 	}
+	
+	
 	
 	@Override
 	public String getTextToInsert() {

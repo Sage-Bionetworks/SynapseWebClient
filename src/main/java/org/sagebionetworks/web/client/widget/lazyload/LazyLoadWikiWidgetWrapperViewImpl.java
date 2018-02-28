@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.lazyload;
 
+import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.constants.AlertType;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -64,6 +66,11 @@ public class LazyLoadWikiWidgetWrapperViewImpl implements LazyLoadWikiWidgetWrap
 	public void showLoading() {
 		widgetContainer.setVisible(false);
 		loadingUI.setVisible(true);
+	}
+	
+	@Override
+	public void showError(String text) {
+		loadingUI.add(new Alert(text, AlertType.WARNING));
 	}
 	
 	@Override

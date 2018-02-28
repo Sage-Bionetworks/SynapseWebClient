@@ -179,6 +179,7 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidget;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
@@ -600,5 +601,6 @@ public interface PortalGinInjector extends Ginjector {
 	SharingPermissionsGrid getSharingPermissionsGrid();
 	AclAddPeoplePanel getAclAddPeoplePanel();
 	FileHandleUploadWidget getFileHandleUploadWidget();
-	WikiPageDeleteConfirmationDialog getWikiPageDeleteConfirmationDialog(); 
+	WikiPageDeleteConfirmationDialog getWikiPageDeleteConfirmationDialog();
+	StuAnnouncementWidget getStuAnnouncementWidget();
 }
