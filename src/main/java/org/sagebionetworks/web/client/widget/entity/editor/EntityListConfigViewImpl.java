@@ -131,12 +131,12 @@ public class EntityListConfigViewImpl implements EntityListConfigView {
 	@Override
 	public void setButtonToolbarVisible(boolean visible) {
 		selectionToolbar.setVisible(visible);
+		editNoteButton.setVisible(visible);
 	}
 	@Override
 	public void setCanEditNote(boolean canEditNote) {
 		editNoteButton.setEnabled(canEditNote);
 	}
-	
 	@Override
 	public void clear() {
 	}
