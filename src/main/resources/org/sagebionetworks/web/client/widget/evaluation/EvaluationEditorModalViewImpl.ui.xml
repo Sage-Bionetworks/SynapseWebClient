@@ -26,8 +26,8 @@
 			<bh:Div ui:field="synAlertContainer"/>
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving..." text="Save" />
 			<b:Button ui:field="cancelButton" type="LINK" text="Cancel" />
+			<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving..." text="Save" />
 		</b:ModalFooter>
 	</b:Modal>
 </ui:UiBinder>
