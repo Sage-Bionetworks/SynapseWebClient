@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.browse;
 
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
 import com.google.gwt.user.client.ui.Widget;
@@ -38,5 +39,9 @@ public class FilesBrowser implements SynapseWidgetPresenter {
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	public void setEntityClickedHandler(CallbackP<String> callback) {
+		view.setEntityClickedHandler(callback);
 	}
 }

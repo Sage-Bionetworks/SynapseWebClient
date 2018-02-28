@@ -235,7 +235,7 @@ public class FilesTabTest {
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setFileBrowserVisible(true);
 		verify(mockFilesBrowser).configure(projectEntityId);
-		
+		verify(mockFilesBrowser).setEntityClickedHandler(mockEntitySelectedCallback);
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab, times(2)).setEntityNameAndPlace(eq(projectName), captor.capture());
 		Synapse place = captor.getValue();
