@@ -49,6 +49,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -181,21 +182,44 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		});
 
 		discussionTab.setTabClickedCallback(tab -> {
+			//SWC-4078: if already on tab, reset to top level thread list.
+			if (EntityArea.DISCUSSION.equals(area)) {
+				discussionAreaToken = null;
+				discussionTab.asTab().setContentStale(true);
+			}
+
 			area = EntityArea.DISCUSSION;
 			configureDiscussionTab();
 			projectMetadata.setVisible(true);
 		});
 		filesTab.setTabClickedCallback(tab -> {
+			//SWC-4078: if already on tab, reset to project level.
+			if (EntityArea.FILES.equals(area)) {
+				filesEntityBundle = projectBundle;
+				filesTab.asTab().setContentStale(true);
+			}
 			area = EntityArea.FILES;
 			configureFilesTab();
 			projectMetadata.setVisible(projectBundle != null && filesEntityBundle.getEntity() instanceof Project);
 		});
 		tablesTab.setTabClickedCallback(tab -> {
+			//SWC-4078: if already on tab, reset to project level.
+			if (EntityArea.TABLES.equals(area)) {
+				tablesEntityBundle = projectBundle;
+				tablesTab.asTab().setContentStale(true);
+			}
+
 			area = EntityArea.TABLES;
 			configureTablesTab();
 			projectMetadata.setVisible(projectBundle != null && tablesEntityBundle.getEntity() instanceof Project);
 		});
 		dockerTab.setTabClickedCallback(tab -> {
+			//SWC-4078: if already on tab, reset to project level.
+			if (EntityArea.DOCKER.equals(area)) {
+				dockerEntityBundle = projectBundle;
+				dockerTab.asTab().setContentStale(true);
+			}
+
 			area = EntityArea.DOCKER;
 			configureDockerTab();
 			projectMetadata.setVisible(projectBundle != null && dockerEntityBundle.getEntity() instanceof Project);

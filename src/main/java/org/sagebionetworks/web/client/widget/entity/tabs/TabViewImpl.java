@@ -71,13 +71,10 @@ public class TabViewImpl implements TabView {
 		tabItem.clear();
 		anchor = new Anchor();
 		anchor.add(new InlineHTML(tabTitle));
-		anchor.addClickHandler(tabClickedHandler);
 		anchor.addStyleName("textDecorationNone");
 		
 		FocusPanel fp = new FocusPanel();
-		fp.addClickHandler(event -> {
-			anchor.fireEvent(event);
-		});
+		fp.addClickHandler(tabClickedHandler);
 		fp.setTabIndex(-1);
 		fp.addStyleName("margin-right-5 displayInline");
 		fp.add(anchor);
