@@ -11,10 +11,12 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandler;
 import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.TeamBadgeView;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -38,7 +40,11 @@ public class TeamBadgeTest {
 	TeamAsyncHandler mockTeamAsyncHandler;
 	@Mock
 	SynapseJavascriptClient mockJsClient;
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
 	public static final String TEAM_ICON_URL = "http://team.icon.png";
+	public static final String PUBLIC_USER_ID = "222";
+	public static final String AUTHENTICATED_USERS_GROUP_ID = "444";
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
@@ -46,7 +52,9 @@ public class TeamBadgeTest {
 		team.setName("name");
 		team.setId(principalId);
 		when(mockJsClient.getTeamIconUrl(anyString())).thenReturn(TEAM_ICON_URL);
-		badge = new TeamBadge(mockView, mockTeamAsyncHandler, mockJsClient);
+		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)).thenReturn(PUBLIC_USER_ID);
+		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)).thenReturn(AUTHENTICATED_USERS_GROUP_ID);
+		badge = new TeamBadge(mockView, mockTeamAsyncHandler, mockJsClient, mockGlobalApplicationState);
 		
 	}
 	
@@ -117,5 +125,15 @@ public class TeamBadgeTest {
 		badge.setOpenNewWindow(false);
 		verify(mockView).setTarget("");
 	}
+	@Test
+	public void testPublicUserGroup() {
+		badge.configure(PUBLIC_USER_ID);
+		verify(mockView).setTeamWithoutLink(TeamBadge.PUBLIC_GROUP_NAME, true);
+	}
 	
+	@Test
+	public void testAuthenticatedUserGroup() {
+		badge.configure(AUTHENTICATED_USERS_GROUP_ID);
+		verify(mockView).setTeamWithoutLink(TeamBadge.AUTHENTICATED_USERS_GROUP_NAME, true);
+	}
 }

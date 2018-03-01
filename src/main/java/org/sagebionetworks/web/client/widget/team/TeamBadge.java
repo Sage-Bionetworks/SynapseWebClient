@@ -1,11 +1,12 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandler;
+import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -21,14 +22,20 @@ public class TeamBadge implements SynapseWidgetPresenter, HasNotificationUI, IsW
 	private String teamName;
 	private ClickHandler customClickHandler = null;
 	private SynapseJavascriptClient jsClient;
+	String publicAclPrincipalId, authenticatedAclPrincipalId;
+	public static final String PUBLIC_GROUP_NAME = "Anyone on the web";
+	public static final String AUTHENTICATED_USERS_GROUP_NAME = "All registered Synapse users";
 	
 	@Inject
 	public TeamBadge(TeamBadgeView view, 
 			TeamAsyncHandler teamAsyncHandler,
-			SynapseJavascriptClient jsClient) {
+			SynapseJavascriptClient jsClient,
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
 		this.teamAsyncHandler = teamAsyncHandler;
 		this.jsClient = jsClient;
+		publicAclPrincipalId = globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID);
+		authenticatedAclPrincipalId = globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID);
 	}
 	
 	public void setMaxNameLength(Integer maxLength) {
@@ -39,23 +46,29 @@ public class TeamBadge implements SynapseWidgetPresenter, HasNotificationUI, IsW
 		configure(teamId);
 	}
 	
-	public void configure(final String teamId) {
+	public void configure(String teamId) {
 		if (teamId != null && teamId.trim().length() > 0) {
-			view.showLoading();
-			teamAsyncHandler.getTeam(teamId, new AsyncCallback<Team>() {
-				@Override
-				public void onSuccess(Team team) {
-					configure(team);
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					if (teamName != null) {
-						view.setTeamWithoutLink(teamName, teamId);
-					} else {
-						view.showLoadError(teamId);
+			if (teamId.equals(publicAclPrincipalId)) {
+				view.setTeamWithoutLink(PUBLIC_GROUP_NAME, true);
+			} else if (teamId.equals(authenticatedAclPrincipalId)) {
+				view.setTeamWithoutLink(AUTHENTICATED_USERS_GROUP_NAME, true);
+			} else {
+				view.showLoading();
+				teamAsyncHandler.getTeam(teamId, new AsyncCallback<Team>() {
+					@Override
+					public void onSuccess(Team team) {
+						configure(team);
 					}
-				}
-			});
+					@Override
+					public void onFailure(Throwable caught) {
+						if (teamName != null) {
+							view.setTeamWithoutLink(teamName, false);
+						} else {
+							view.showLoadError(teamId);
+						}
+					}
+				});
+			};
 		}
 		
 	}
