@@ -4,20 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Callback;
 import com.google.gwt.core.client.ScriptInjector;
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestBuilder;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -25,7 +21,7 @@ import com.google.inject.Inject;
 public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 	public static boolean isLoaded = false;
 	SynapseJSNIUtils utils;
-	RequestBuilderWrapper requestBuilder;
+	SynapseJavascriptClient jsClient;
 	private String jsonURL;
 	public static final String S3_PREFIX = "https://s3.amazonaws.com/geoloc.sagebase.org/";
 	public static final String ALL_POINTS_URL = S3_PREFIX + "allPoints.json";
@@ -37,13 +33,13 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 	@Inject
 	public GoogleMap(GoogleMapView view, 
 			SynapseJSNIUtils utils, 
-			RequestBuilderWrapper requestBuilder, 
+			SynapseJavascriptClient jsClient, 
 			SynapseAlert synAlert, 
 			PortalGinInjector ginInjector, 
 			LazyLoadHelper lazyLoadHelper) {
 		this.view = view;
 		this.utils = utils;
-		this.requestBuilder = requestBuilder;
+		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.lazyLoadHelper = lazyLoadHelper;
@@ -79,29 +75,15 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 	}
 	
 	public void getFileContents(final String url, final CallbackP<String> c) {
-		requestBuilder.configure(RequestBuilder.GET, url);
-		requestBuilder.setHeader(WebConstants.CONTENT_TYPE, WebConstants.TEXT_PLAIN_CHARSET_UTF8);
-		try {
-			requestBuilder.sendRequest(null, new RequestCallback() {
-				@Override
-				public void onResponseReceived(Request request,
-						Response response) {
-					int statusCode = response.getStatusCode();
-					if (statusCode == Response.SC_OK) {
-						c.invoke(response.getText());
-					} else {
-						onError(null, new IllegalArgumentException("Unable to retrieve map data for " + url + ". Reason: " + response.getStatusText()));
-					}
-				}
-
-				@Override
-				public void onError(Request request, Throwable exception) {
-					synAlert.handleException(exception);
-				}
-			});
-		} catch (final Exception e) {
-			synAlert.handleException(e);
-		}
+		jsClient.doGetString(url, new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable ex) {
+				synAlert.handleException(ex);
+			}
+			public void onSuccess(String result) {
+				c.invoke(result);
+			};
+		});
 	}
 	
 	private void loadData() {

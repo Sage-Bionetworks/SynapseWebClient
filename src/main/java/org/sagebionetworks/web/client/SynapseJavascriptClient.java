@@ -254,7 +254,7 @@ public class SynapseJavascriptClient {
 		doGet(url, responseType, APPLICATION_JSON_CHARSET_UTF8, callback);
 	}
 	
-	private void doGetString(String url, AsyncCallback callback) {
+	public void doGetString(String url, AsyncCallback callback) {
 		doGet(url, OBJECT_TYPE.String, null, callback);
 	}
 	
