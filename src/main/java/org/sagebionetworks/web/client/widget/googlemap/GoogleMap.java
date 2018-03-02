@@ -75,7 +75,8 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 	}
 	
 	public void getFileContents(final String url, final CallbackP<String> c) {
-		jsClient.doGetString(url, new AsyncCallback<String>() {
+		boolean forceAnonymous = true;
+		jsClient.doGetString(url, forceAnonymous, new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable ex) {
 				synAlert.handleException(ex);

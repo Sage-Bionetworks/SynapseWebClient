@@ -1,49 +1,51 @@
 package org.sagebionetworks.web.client.widget.search;
 
-import static org.sagebionetworks.web.client.widget.googlemap.GoogleMap.GOOGLE_MAP_URL;
-
 import java.util.ArrayList;
 
-import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
+import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
 
 public class GooglePlacesSuggestOracle extends SuggestOracle {
-
+	public static final int DELAY = 2000;	// milliseconds
 	public SuggestOracle.Request request;
 	public SuggestOracle.Callback callback;
 	public int offset;
 	public boolean isLoading = false;
 	private GWTTimer timer;
 	private SynapseJavascriptClient jsClient;
-	private JSONObjectAdapter jsonObjectAdapter;
 	private static String key;
+	public static final String S3_PREFIX = "https://s3.amazonaws.com/suggest-places.sagebase.org/";
+	public static final String GOOGLE_PEOPLE_SUGGESTIONS_URL = S3_PREFIX + "google-place-suggestions.txt";
+	String searchTerm;
+	ArrayList<PlaceSuggestion> suggestions;
 	@Inject
 	public GooglePlacesSuggestOracle(
 			GWTTimer timer,
-			SynapseJavascriptClient jsClient,
-			JSONObjectAdapter jsonObjectAdapter) {
+			SynapseJavascriptClient jsClient) {
 		this.jsClient = jsClient;
 		this.timer = timer;
-		this.jsonObjectAdapter = jsonObjectAdapter;
 		init();
+		timer.configure(() -> {
+			getSuggestions(offset);
+		});
 	}
 	
 	private void init() {
 		if (key == null) {
-			jsClient.doGetString(GOOGLE_MAP_URL, new AsyncCallback<String>() {
+			boolean forceAnonymous = true;
+			jsClient.doGetString(GOOGLE_PEOPLE_SUGGESTIONS_URL, forceAnonymous, new AsyncCallback<String>() {
 				@Override
 				public void onFailure(Throwable ex) {
 				}
 				@Override
 				public void onSuccess(String result) {
 					key = result;
+					ScriptInjector.fromUrl("https://maps.googleapis.com/maps/api/js?key=" + key + "&libraries=places").inject();
 				}
 			});
 		}
@@ -53,31 +55,32 @@ public class GooglePlacesSuggestOracle extends SuggestOracle {
 	public SuggestOracle.Callback getCallback()	{	return callback;	}
 
 	public void getSuggestions(final int offset) {
-		if (!isLoading) {
+		
+		if (!isLoading && !request.getQuery().equals(searchTerm)) {
 			isLoading = true;
-			String searchTerm = request.getQuery();
-			String url = "https://maps.googleapis.com/maps/api/place/autocomplete/json?input="+searchTerm+"&types=(cities)&key="+key;
-			jsClient.doGetString(url, new AsyncCallback<String>() {
-				@Override
-				public void onFailure(Throwable ex) {
-					isLoading = false;
-				}
-				@Override
-				public void onSuccess(String json) {
-					try {
-						JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(json);
-						JSONArrayAdapter jsonArray = jsonObject.getJSONArray("predictions");
-						SuggestOracle.Response response = new SuggestOracle.Response(getSuggestions(jsonArray));
-						callback.onSuggestionsReady(request, response);
-						isLoading = false;
-					} catch (Exception e) {
-						onFailure(e);
-					}
-				}
-			});
+			searchTerm = request.getQuery();
+			suggestions = new ArrayList<>();
+			_getPredictions(this, searchTerm);
 		}
 	}
 	
+	public final static native void _getPredictions(GooglePlacesSuggestOracle oracle, String searchTerm) /*-{
+		var displaySuggestions = function(predictions, status) {
+          if (status != google.maps.places.PlacesServiceStatus.OK) {
+	            alert(status);
+	            return;
+          }
+
+          predictions.forEach(function(prediction) {
+          		//call addSuggestion with prediction.description
+          		oracle.@org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle::addSuggestion(Ljava/lang/String;)(prediction.description);
+          		// call on suggestions ready
+          });
+        };
+		var service = new google.maps.places.AutocompleteService();
+    		service.getQueryPredictions({ input: searchTerm }, displaySuggestions);
+	}-*/;
+
 	public class PlaceSuggestion implements SuggestOracle.Suggestion {
 		String displayString;
 		public PlaceSuggestion(String displayString) {
@@ -92,14 +95,14 @@ public class GooglePlacesSuggestOracle extends SuggestOracle {
 			return displayString;
 		}
 	}
+	public void addSuggestion(String description) {
+		suggestions.add(new PlaceSuggestion(description));
+	}
 	
-	public ArrayList<PlaceSuggestion> getSuggestions(JSONArrayAdapter predictionsArray) throws JSONObjectAdapterException {
-		ArrayList<PlaceSuggestion> suggestions = new ArrayList<>(predictionsArray.length());
-		for (int i = 0; i < predictionsArray.length(); i++) {
-			JSONObjectAdapter prediction = predictionsArray.getJSONObject(i);
-			suggestions.add(new PlaceSuggestion(prediction.getString("description")));
-		}
-		return suggestions;
+	public void onSuggestionsReady() {
+		SuggestOracle.Response response = new SuggestOracle.Response(suggestions);
+		callback.onSuggestionsReady(request, response);
+		isLoading = false;
 	}
 	
 	@Override
@@ -107,6 +110,6 @@ public class GooglePlacesSuggestOracle extends SuggestOracle {
 		this.request = request;
 		this.callback = callback;
 		timer.cancel();
-		timer.schedule(SynapseSuggestBox.DELAY);
+		timer.schedule(DELAY);
 	}	
 }
