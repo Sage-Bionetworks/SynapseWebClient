@@ -412,12 +412,16 @@ public class EntityPageTopTest {
 		verify(mockFilesTab).setTabClickedCallback(tabCaptor.capture());
 		tabCaptor.getValue().invoke(null);
 		verify(mockProjectMetadata).setVisible(false);
+		verify(mockFilesInnerTab, times(2)).setContentStale(true);
 		
 		//click on the tables tab
 		reset(mockProjectMetadata);
 		verify(mockTablesTab).setTabClickedCallback(tabCaptor.capture());
 		tabCaptor.getValue().invoke(null);
 		verify(mockProjectMetadata).setVisible(true);
+		verify(mockTablesInnerTab).setContentStale(true);
+		tabCaptor.getValue().invoke(null);
+		verify(mockTablesInnerTab, times(2)).setContentStale(true);
 		
 		//click on the challenge tab
 		reset(mockProjectMetadata);
@@ -430,12 +434,18 @@ public class EntityPageTopTest {
 		verify(mockDiscussionTab).setTabClickedCallback(tabCaptor.capture());
 		tabCaptor.getValue().invoke(null);
 		verify(mockProjectMetadata).setVisible(true);
+		verify(mockDiscussionInnerTab).setContentStale(true);
+		tabCaptor.getValue().invoke(null);
+		verify(mockDiscussionInnerTab, times(2)).setContentStale(true);
 		
 		//click on the docker tab
 		reset(mockProjectMetadata);
 		verify(mockDockerTab).setTabClickedCallback(tabCaptor.capture());
 		tabCaptor.getValue().invoke(null);
 		verify(mockProjectMetadata).setVisible(true);
+		verify(mockDockerInnerTab).setContentStale(true);
+		tabCaptor.getValue().invoke(null);
+		verify(mockDockerInnerTab, times(2)).setContentStale(true);
 	}
 	
 	@Test
