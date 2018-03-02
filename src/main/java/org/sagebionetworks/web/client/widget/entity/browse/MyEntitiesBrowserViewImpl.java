@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -101,7 +100,9 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 		});
 		
 		setTabSelected(myProjectsLink, myProjectsListItem, myProjectsTabContents);
+		initSelectedHandlers();
 	}
+	
 	@Override
 	public void setIsMoreUpdatableEntities(boolean isMore) {
 		myProjectsContainerWrapper.setIsMore(isMore);	
@@ -124,8 +125,6 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 
 	@Override 
 	public void setPresenter(Presenter presenter) {		
-		// create a new handler for this presenter
-		createSelectedHandlers();
 		this.presenter = presenter;
 	}
 		
@@ -153,6 +152,9 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 	@Override
 	public void clear() {
 		myTreeBrowser.clearState();
+		favoritesTreeBrowser.clearState();
+		currentContextTreeBrowser.clearState();
+		initSelectedHandlers();
 	}
 
 	@Override
@@ -168,32 +170,22 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 	/*
 	 * Private Methods
 	 */
-	private void createSelectedHandlers() {
-		EntitySelectedHandler mySelectedHandler = new EntitySelectedHandler() {			
-			@Override
-			public void onSelection(EntitySelectedEvent event) {
-				presenter.entitySelected(myTreeBrowser.getSelected());
-			}
+	private void initSelectedHandlers() {
+		EntitySelectedHandler mySelectedHandler = event -> {
+			presenter.entitySelected(myTreeBrowser.getSelected());
 		};
 		myTreeBrowser.setEntitySelectedHandler(mySelectedHandler);
 
-		EntitySelectedHandler favoritesSelectedHandler = new EntitySelectedHandler() {			
-			@Override
-			public void onSelection(EntitySelectedEvent event) {
-				presenter.entitySelected(favoritesTreeBrowser.getSelected());
-			}
+		EntitySelectedHandler favoritesSelectedHandler = event -> {			
+			presenter.entitySelected(favoritesTreeBrowser.getSelected());
 		};
 		favoritesTreeBrowser.setEntitySelectedHandler(favoritesSelectedHandler);
 		
-		EntitySelectedHandler currentContextSelectedHandler = new EntitySelectedHandler() {			
-			@Override
-			public void onSelection(EntitySelectedEvent event) {
-				presenter.entitySelected(currentContextTreeBrowser.getSelected());
-			}
+		EntitySelectedHandler currentContextSelectedHandler = event -> {			
+			presenter.entitySelected(currentContextTreeBrowser.getSelected());
 		};
 		currentContextTreeBrowser.setEntitySelectedHandler(currentContextSelectedHandler);
 	}
-	
 	
 
 	/**
