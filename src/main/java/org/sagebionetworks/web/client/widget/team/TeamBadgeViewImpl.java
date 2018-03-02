@@ -11,7 +11,6 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -27,11 +26,9 @@ import com.google.inject.Inject;
 public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	
 	SynapseJSNIUtils synapseJSNIUtils;
-	GlobalApplicationState globalApplicationState;
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
 	SimplePanel notificationsPanel;
-	Long publicAclPrincipalId, authenticatedAclPrincipalId;
 	ClickHandler customClickHandler;
 	Anchor anchor = new Anchor();
 	String teamId;
@@ -45,19 +42,18 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	};
 	
 	@Inject
-	public TeamBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
-			GlobalApplicationState globalApplicationState,
-			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle) {
+	public TeamBadgeViewImpl(
+			SynapseJSNIUtils synapseJSNIUtils,
+			SageImageBundle sageImageBundle, 
+			IconsImageBundle iconsImageBundle,
+			GlobalApplicationState globalApplicationState) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		addStyleName("teamBadge displayInline");
 		notificationsPanel = new SimplePanel();
 		notificationsPanel.addStyleName("margin-left-5 displayInline");
 		placeChanger = globalApplicationState.getPlaceChanger();
-		publicAclPrincipalId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID));
-		authenticatedAclPrincipalId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));
 	}
 	
 	@Override
@@ -105,22 +101,13 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	}
 	
 	@Override
-	public void setTeamWithoutLink(String name, String teamId) {
+	public void setTeamWithoutLink(String name, boolean isPublic) {
 		clear();
 		notificationsPanel.clear();
 		
 		InlineLabel nameLabel = new InlineLabel(name);
-		nameLabel.addStyleName("font-size-15 boldText");
-		Icon profilePicture;
-		if (publicAclPrincipalId != null && Long.parseLong(teamId) == publicAclPrincipalId) {
-			profilePicture = new Icon(IconType.GLOBE);
-			nameLabel.setText("Anyone on the web");
-		} else if (authenticatedAclPrincipalId != null && Long.parseLong(teamId) == authenticatedAclPrincipalId) {
-			profilePicture = new Icon(IconType.GLOBE);
-			nameLabel.setText("All registered Synapse users");
-		} else {
-			profilePicture = new Icon(IconType.USERS);
-		}
+		nameLabel.addStyleName("font-size-13 boldText");
+		Icon profilePicture = isPublic ? new Icon(IconType.GLOBE) : new Icon(IconType.USERS);
 		profilePicture.addStyleName("font-size-lg imageButton lightGreyText margin-right-4 margin-left-5");
 		add(profilePicture);
 			
