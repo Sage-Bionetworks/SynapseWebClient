@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.search;
 
 import java.util.ArrayList;
 
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
@@ -12,7 +11,7 @@ import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
 
 public class GooglePlacesSuggestOracle extends SuggestOracle {
-	public static final int DELAY = 1500;	// milliseconds
+	public static final int DELAY = 1000;	// milliseconds
 	public SuggestOracle.Request request;
 	public SuggestOracle.Callback callback;
 	public int offset;
@@ -56,7 +55,7 @@ public class GooglePlacesSuggestOracle extends SuggestOracle {
 	public SuggestOracle.Callback getCallback()	{	return callback;	}
 
 	public void getSuggestions(final int offset) {
-		if (!isLoading && !request.getQuery().equals(searchTerm)) {
+		if (!isLoading && !request.getQuery().equals(searchTerm) && !request.getQuery().isEmpty()) {
 			isLoading = true;
 			searchTerm = request.getQuery();
 			suggestions = new ArrayList<>();
@@ -65,21 +64,21 @@ public class GooglePlacesSuggestOracle extends SuggestOracle {
 	}
 
 	public final static native void _getPredictions(GooglePlacesSuggestOracle oracle, String searchTerm) /*-{
-		 var displaySuggestions = function(predictions, status) {
-          if (status != google.maps.places.PlacesServiceStatus.OK) {
-          		console.error("unable to get place suggestions: " + status);
-	            return;
-          }
-
-          predictions.forEach(function(prediction) {
-          		//call addSuggestion with prediction.description
-          		oracle.@org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle::addSuggestion(Ljava/lang/String;)(prediction.description);
-          });
-          // call on suggestions ready
-          oracle.@org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle::onSuggestionsReady()();
-        };
+		var displaySuggestions = function (predictions, status) {
+		    if (status != google.maps.places.PlacesServiceStatus.OK) {
+		        console.error("unable to get place suggestions: " + status);
+		        return;
+		    }
+		
+		    predictions.forEach(function (prediction) {
+		        //call addSuggestion with prediction.description
+		        oracle.@org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle::addSuggestion(Ljava/lang/String;)(prediction.description);
+		    });
+		    // call on suggestions ready
+		    oracle.@org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle::onSuggestionsReady()();
+		};
 		var service = new google.maps.places.AutocompleteService();
-    		service.getQueryPredictions({ input: searchTerm }, displaySuggestions);
+		service.getQueryPredictions({ input: searchTerm }, displaySuggestions);
 	}-*/;
 
 	public class PlaceSuggestion implements SuggestOracle.Suggestion {
