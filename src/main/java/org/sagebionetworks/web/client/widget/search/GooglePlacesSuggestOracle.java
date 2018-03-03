@@ -7,13 +7,11 @@ import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 
-import com.google.gwt.core.client.ScriptInjector;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
 import com.google.inject.Inject;
 
 public class GooglePlacesSuggestOracle extends SuggestOracle {
-	public static final int DELAY = 1000;	// milliseconds
+	public static final int DELAY = 500;	// milliseconds
 	public SuggestOracle.Request request;
 	public SuggestOracle.Callback callback;
 	public int offset;
