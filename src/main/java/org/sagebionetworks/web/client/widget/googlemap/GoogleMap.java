@@ -87,30 +87,53 @@ public class GoogleMap implements IsWidget, GoogleMapView.Presenter {
 		});
 	}
 	
-	private void loadData() {
+	public static void initGoogleLibrary(SynapseJavascriptClient jsClient, AsyncCallback<Void> callback) {
 		if (!isLoaded) {
-			getFileContents(GOOGLE_MAP_URL, new CallbackP<String>() {
+			boolean forceAnonymous = true;
+			jsClient.doGetString(GOOGLE_MAP_URL, forceAnonymous, new AsyncCallback<String>() {
 				@Override
-				public void invoke(String key) {
-					ScriptInjector.fromUrl("https://maps.googleapis.com/maps/api/js?key=" + key).setCallback(
+				public void onFailure(Throwable ex) {
+					if (callback != null) {
+						callback.onFailure(ex);	
+					}
+				}
+				public void onSuccess(String key) {
+					ScriptInjector.fromUrl("https://maps.googleapis.com/maps/api/js?key=" + key + "&libraries=places").setCallback(
 						     new Callback<Void, Exception>() {
 								@Override
 								public void onSuccess(Void result) {
 									isLoaded = true;
-									utils.consoleLog("Loaded Google Maps API");
-									initMap();
+									if (callback != null) {
+										callback.onSuccess(null);
+									}
 								}
 								
 								@Override
 								public void onFailure(Exception reason) {
-									synAlert.handleException(reason);
+									if (callback != null) {
+										callback.onFailure(reason);
+									}
 								}
 							}).inject();
-				}
+				};
 			});
 		} else {
-			initMap();
+			if (callback != null) {
+				callback.onSuccess(null);
+			}
 		}
+	}
+	private void loadData() {
+		initGoogleLibrary(jsClient, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			@Override
+			public void onSuccess(Void result) {
+				initMap();
+			}
+		});
 	}
 
 	@Override

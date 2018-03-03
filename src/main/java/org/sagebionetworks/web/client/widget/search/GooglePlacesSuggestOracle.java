@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 
 import com.google.gwt.core.client.ScriptInjector;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -19,9 +20,6 @@ public class GooglePlacesSuggestOracle extends SuggestOracle {
 	public boolean isLoading = false;
 	private GWTTimer timer;
 	private SynapseJavascriptClient jsClient;
-	private static String key;
-	public static final String S3_PREFIX = "https://s3.amazonaws.com/suggest-places.sagebase.org/";
-	public static final String GOOGLE_PEOPLE_SUGGESTIONS_URL = S3_PREFIX + "google-place-suggestions.txt";
 	String searchTerm;
 	ArrayList<PlaceSuggestion> suggestions;
 	@Inject
@@ -30,26 +28,10 @@ public class GooglePlacesSuggestOracle extends SuggestOracle {
 			SynapseJavascriptClient jsClient) {
 		this.jsClient = jsClient;
 		this.timer = timer;
-		init();
+		GoogleMap.initGoogleLibrary(jsClient, null);
 		timer.configure(() -> {
 			getSuggestions(offset);
 		});
-	}
-
-	private void init() {
-		if (key == null) {
-			boolean forceAnonymous = true;
-			jsClient.doGetString(GOOGLE_PEOPLE_SUGGESTIONS_URL, forceAnonymous, new AsyncCallback<String>() {
-				@Override
-				public void onFailure(Throwable ex) {
-				}
-				@Override
-				public void onSuccess(String result) {
-					key = result;
-					ScriptInjector.fromUrl("https://maps.googleapis.com/maps/api/js?key=" + key + "&libraries=places").inject();
-				}
-			});
-		}
 	}
 
 	public SuggestOracle.Request getRequest()	{	return request;		}
