@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.search;
 
 import java.util.ArrayList;
 
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTTimer;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
@@ -56,6 +57,7 @@ public class GooglePlacesSuggestOracle extends SuggestOracle {
 
 	public void getSuggestions(final int offset) {
 		if (!isLoading && !request.getQuery().equals(searchTerm) && !request.getQuery().isEmpty()) {
+			DisplayUtils.scrollToTop();
 			isLoading = true;
 			searchTerm = request.getQuery();
 			suggestions = new ArrayList<>();
