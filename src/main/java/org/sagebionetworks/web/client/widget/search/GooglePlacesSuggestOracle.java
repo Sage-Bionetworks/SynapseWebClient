@@ -60,7 +60,6 @@ public class GooglePlacesSuggestOracle extends SuggestOracle {
 			isLoading = true;
 			searchTerm = request.getQuery();
 			suggestions = new ArrayList<>();
-			DisplayUtils.scrollToTop();
 			_getPredictions(this, searchTerm);
 		}
 	}
