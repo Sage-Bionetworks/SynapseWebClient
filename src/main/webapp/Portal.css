@@ -1415,12 +1415,13 @@ ol.lowerroman {
 	z-index: 2000;
 }
 
-.gwt-SuggestBoxPopup {
+.gwt-SuggestBoxPopup, #rootPanel gwt-SuggestBoxPopup {
 	z-index: 2010;
 	cursor: pointer; 
 	padding: 4px;
 	border: 1px solid #ccc;
 	border-top: 0px;
+	background-color: #000000;
 }
 
 .gwt-PopupPanel {

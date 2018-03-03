@@ -68,7 +68,7 @@ public class GoogleMapTest {
 		verifyZeroInteractions(mockJsClient);
 		simulateInView();
 		//verify attempt to load
-		verify(mockJsClient).doGetString(eq(GoogleMap.GOOGLE_MAP_URL), any(AsyncCallback.class));
+		verify(mockJsClient).doGetString(eq(GoogleMap.GOOGLE_MAP_URL), eq(true), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -76,7 +76,7 @@ public class GoogleMapTest {
 		map.configure();
 		
 		String data = "map data";
-		AsyncMockStubber.callSuccessWith(data).when(mockJsClient).doGetString(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(data).when(mockJsClient).doGetString(anyString(), eq(true), any(AsyncCallback.class));
 		
 		simulateInView();
 		//verify attempt to load all data
@@ -89,7 +89,7 @@ public class GoogleMapTest {
 		map.configure(teamId);
 		
 		String data = "map data";
-		AsyncMockStubber.callSuccessWith(data).when(mockJsClient).doGetString(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(data).when(mockJsClient).doGetString(anyString(), eq(true),  any(AsyncCallback.class));
 
 		simulateInView();
 		//verify attempt to load team data
@@ -99,7 +99,7 @@ public class GoogleMapTest {
 	@Test
 	public void testFailedRequest() throws RequestException {
 		Exception ex = new Exception("failure to load");
-		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).doGetString(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient).doGetString(anyString(), eq(true), any(AsyncCallback.class));
 		map.configure();
 		simulateInView();
 		verify(mockSynapseAlert).handleException(ex);
