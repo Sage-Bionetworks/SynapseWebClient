@@ -64,13 +64,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		helpWidget.setAddStyleNames("margin-left-5");
 		
 		// 'Delete ACL' button
-		deleteAclButton.setType(ButtonType.DANGER);
+		deleteAclButton.addStyleName("text-danger");
 		deleteAclButton.setSize(ButtonSize.SMALL);
-		deleteAclButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent ce) {
-				presenter.deleteAcl();					
-			}
+		deleteAclButton.addClickHandler( event -> {
+			presenter.deleteAcl();			
 		});
 	}
 	public AclAddPeoplePanel getAclAddPeoplePanel() {
