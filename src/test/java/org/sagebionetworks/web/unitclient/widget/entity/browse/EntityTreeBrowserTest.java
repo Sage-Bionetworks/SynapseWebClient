@@ -247,10 +247,6 @@ public class EntityTreeBrowserTest {
 		//verify firing a selection event
 		entityTreeBrowser.fireEntitySelectedEvent();
 		verify(handler).onSelection(any(EntitySelectedEvent.class));
-		//verify clearing the state clears the selection handler
-		entityTreeBrowser.clearState();
-		assertNull(entityTreeBrowser.getEntitySelectedHandler());
-		entityTreeBrowser.fireEntitySelectedEvent();
 	}
 	
 	private EntityHeader createEntityHeader(String id, String name, String type, Long versionNumber) {
