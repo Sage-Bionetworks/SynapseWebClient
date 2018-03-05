@@ -19,6 +19,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class AddFolderDialogWidget implements AddFolderDialogWidgetView.Presenter, SynapseWidgetPresenter {
+	public static final String FOLDER_CREATION_ERROR = "Unable to create a new folder";
 	private AddFolderDialogWidgetView view;
 	private SharingAndDataUseConditionWidget sharingAndDataUseWidget;
 	private SynapseClientAsync synapseClient;
@@ -76,7 +77,7 @@ public class AddFolderDialogWidget implements AddFolderDialogWidgetView.Presente
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				popupUtils.showErrorMessage(FOLDER_CREATION_ERROR, caught.getMessage());
 			}
 		});
 	}
