@@ -77,8 +77,7 @@
 				<b:FormGroup>
 					<b:FormLabel for="location">City, Country</b:FormLabel>
 					<b:Icon type="ASTERISK" addStyleNames="small-icon margin-left-2 synapse-blue"/>
-					<b:TextBox name="location" ui:field="location"
-						placeholder="Enter City, Country" />
+					<bh:Div ui:field="locationSuggestBoxContainer" />
 				</b:FormGroup>
 			</b:Column>
 		</b:Row>

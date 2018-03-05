@@ -12,5 +12,3 @@ import com.google.gwt.core.client.JavaScriptObject;
 public 	interface JavaScriptCallback {
 	void invoke(JavaScriptObject event);
 }
-
-
