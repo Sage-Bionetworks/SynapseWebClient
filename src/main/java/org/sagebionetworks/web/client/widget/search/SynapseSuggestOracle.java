@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.search;
 
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GWTTimer;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -12,7 +11,6 @@ public class SynapseSuggestOracle extends SuggestOracle {
 
 	public SuggestOracle.Request request;
 	public SuggestOracle.Callback callback;
-	public SynapseClientAsync synapseClient;
 	public int pageSize;
 	public int offset;
 	public boolean isLoading;
