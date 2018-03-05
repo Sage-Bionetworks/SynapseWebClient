@@ -84,7 +84,7 @@ public class AddFolderDialogWidgetTest {
 	
 	@Test
 	public void testCreateFolderFail() {
-		String error = "Too many files in one folder, Tom!";
+		String error = "Too many files in one folder, Kenny!";
 		Exception ex = new Exception(error);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), 
 				any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
