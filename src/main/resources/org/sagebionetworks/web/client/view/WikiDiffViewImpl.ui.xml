@@ -8,7 +8,7 @@
 			<bh:Div ui:field="synAlertContainer" />
 			<b:Row>
 				<b:Column size="SM_12">
-					<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+					<b:Panel>
 						<b:PanelHeader>
 							<b:Heading size="H3" text="Compare Wiki Versions" />
 						</b:PanelHeader>
