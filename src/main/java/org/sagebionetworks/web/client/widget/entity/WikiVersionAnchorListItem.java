@@ -25,6 +25,7 @@ public class WikiVersionAnchorListItem implements IsWidget {
 		this.modifiedByBadge = modifiedByBadge;
 		this.dateTimeUtils = dateTimeUtils;
 		modifiedByBadge.setDoNothingOnClick();
+		fp.addStyleName("imageButton");
 	}
 	
 	public void setV2WikiHistorySnapshot(V2WikiHistorySnapshot version) {
