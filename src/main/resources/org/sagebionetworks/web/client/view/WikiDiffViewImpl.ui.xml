@@ -5,34 +5,28 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
 		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10">
+			<bh:Div ui:field="synAlertContainer" />
 			<b:Row>
-				<b:Column size="SM_6">
+				<b:Column size="SM_12">
 					<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
+						<b:PanelHeader>
+							<b:Heading size="H3" text="Compare Wiki Versions" />
+						</b:PanelHeader>
 						<b:PanelBody>
 							<b:ButtonGroup>
-								<b:Button ui:field="version1DropdownButton" dataToggle="DROPDOWN" text="Select a version..."/>
+								<b:Button ui:field="version1DropdownButton" dataToggle="DROPDOWN" text="Select a base version..."/>
 								<b:DropDownMenu ui:field="version1Dropdown" />
 							</b:ButtonGroup>
-						</b:PanelBody>
-					</b:Panel>
-				</b:Column>
-				<b:Column size="SM_6">
-					<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
-						<b:PanelBody>
+							<b:Icon type="EXCHANGE" addStyleNames="margin-left-15 margin-right-15" />
 							<b:ButtonGroup>
-								<b:Button ui:field="version2DropdownButton" dataToggle="DROPDOWN" text="Select a version..."/>
+								<b:Button ui:field="version2DropdownButton" dataToggle="DROPDOWN" text="Select another version..."/>
 								<b:DropDownMenu ui:field="version2Dropdown" />
 							</b:ButtonGroup>
 						</b:PanelBody>
 					</b:Panel>
 				</b:Column>
 			</b:Row>
-			<b:Row>
-				<b:Column size="XS_12">
-					<bh:Div ui:field="synAlertContainer" />
-					<bh:Div ui:field="diffContainer" width="100%"/>
-				</b:Column>
-			</b:Row>
+			<b:Panel ui:field="diffContainer" width="100%"/>
 		</bh:Div>
 	</bh:Div>
 </ui:UiBinder> 

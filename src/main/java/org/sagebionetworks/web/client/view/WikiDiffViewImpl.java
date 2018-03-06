@@ -4,13 +4,13 @@ import java.util.List;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.entity.WikiVersionAnchorListItem;
 import org.sagebionetworks.web.client.widget.header.Header;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -25,7 +25,7 @@ public class WikiDiffViewImpl implements WikiDiffView {
 	@UiField
 	Div synAlertContainer;
 	@UiField
-	Div diffContainer;
+	Panel diffContainer;
 	@UiField
 	DropDownMenu version1Dropdown;
 	@UiField
