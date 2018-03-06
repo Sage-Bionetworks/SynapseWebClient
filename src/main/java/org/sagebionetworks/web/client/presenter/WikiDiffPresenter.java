@@ -3,14 +3,13 @@ package org.sagebionetworks.web.client.presenter;
 import static org.sagebionetworks.web.client.ClientProperties.DIFF_LIB_JS;
 import static org.sagebionetworks.web.client.ClientProperties.DIFF_VIEW_JS;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
+import static org.sagebionetworks.web.client.place.WikiDiff.*;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.WikiDiff;
@@ -40,11 +39,11 @@ public class WikiDiffPresenter extends AbstractActivity implements WikiDiffView.
 	List<V2WikiHistorySnapshot> wikiVersionHistory;
 	public static final Long LIMIT = 30L;
 	@Inject
-	public WikiDiffPresenter(WikiDiffView view,
+	public WikiDiffPresenter(
+			WikiDiffView view,
 			SynapseClientAsync synapseClient,
 			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert,
-			PortalGinInjector ginInjector,
 			GlobalApplicationState globalAppState,
 			ResourceLoader resourceLoader) {
 		this.view = view;
@@ -79,7 +78,6 @@ public class WikiDiffPresenter extends AbstractActivity implements WikiDiffView.
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		// Install the view
 		panel.setWidget(view);
-		loadData();
 	}
 	
 	public void loadData() {
@@ -149,13 +147,14 @@ public class WikiDiffPresenter extends AbstractActivity implements WikiDiffView.
 	public void setPlace(WikiDiff place) {
 		this.place = place;
 		this.view.setPresenter(this);
-		String ownerId = place.getParam(WikiDiff.OWNER_ID);
-		String ownerType = place.getParam(WikiDiff.OWNER_TYPE);
-		String wikiPageId = place.getParam(WikiDiff.WIKI_ID);
+		String ownerId = place.getParam(OWNER_ID);
+		String ownerType = place.getParam(OWNER_TYPE);
+		String wikiPageId = place.getParam(WIKI_ID);
 		key = new WikiPageKey(ownerId, ownerType, wikiPageId);
 		wikiVersionHistory = null;
-		version1 = place.getParam(WikiDiff.WIKI_VERSION_1);
-		version2 = place.getParam(WikiDiff.WIKI_VERSION_2);
+		version1 = place.getParam(WIKI_VERSION_1);
+		version2 = place.getParam(WIKI_VERSION_2);
+		loadData();
 	}
 	
 	public WikiDiff getPlace() {
@@ -165,14 +164,14 @@ public class WikiDiffPresenter extends AbstractActivity implements WikiDiffView.
 	@Override
 	public void onVersion1Selected(String version) {
 		version1 = version;
-		place.putParam(WikiDiff.WIKI_VERSION_1, version1);
+		place.putParam(WIKI_VERSION_1, version1);
 		loadData();
 	}
 	
 	@Override
 	public void onVersion2Selected(String version) {
 		version2 = version;
-		place.putParam(WikiDiff.WIKI_VERSION_2, version2);
+		place.putParam(WIKI_VERSION_2, version2);
 		loadData();
 	}
 	
