@@ -90,9 +90,11 @@ public class WikiDiffPresenter extends AbstractActivity implements WikiDiffView.
 		view.setVersion2(version2);
 		
 		// refresh wiki versions available (kick off recursive call to get all versions, 30 at a time)
-		wikiVersionHistory = new ArrayList<>();
-		Long offset = 0L;
-		getVersions(offset);
+		if (wikiVersionHistory == null) {
+			wikiVersionHistory = new ArrayList<>();
+			Long offset = 0L;
+			getVersions(offset);
+		}
 		
 		// get selected wiki versions (if set)
 		if (version1 != null && version2 != null) {
@@ -151,7 +153,7 @@ public class WikiDiffPresenter extends AbstractActivity implements WikiDiffView.
 		String ownerType = place.getParam(WikiDiff.OWNER_TYPE);
 		String wikiPageId = place.getParam(WikiDiff.WIKI_ID);
 		key = new WikiPageKey(ownerId, ownerType, wikiPageId);
-		
+		wikiVersionHistory = null;
 		version1 = place.getParam(WikiDiff.WIKI_VERSION_1);
 		version2 = place.getParam(WikiDiff.WIKI_VERSION_2);
 	}
