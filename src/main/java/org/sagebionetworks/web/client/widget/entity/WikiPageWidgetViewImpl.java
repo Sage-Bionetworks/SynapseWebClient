@@ -11,9 +11,14 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.ParameterizedPlace;
+import org.sagebionetworks.web.client.place.ParameterizedToken;
+import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -63,6 +68,8 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	
 	@UiField
 	Button wikiHistoryButton;
+	@UiField
+	Button wikiCompareButton;
 	
 	@UiField
 	Button restoreButton;
@@ -92,6 +99,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	Div wikiHeadingContainer;
 	Heading wikiHeading;
 	Widget widget;
+	WikiPageKey key;
 
 	@Override
 	public void setPresenter(Presenter presenter) {
@@ -130,6 +138,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 		});
 		historyCollapse.hide();
 		wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
+		wikiCompareButton.addClickHandler(event -> {
+			WikiDiff place = new WikiDiff(key);
+			DisplayUtils.newWindow("#!WikiDiff:" + place.toToken(), "_blank", "");
+		});
 	}
 	
 	@Override
@@ -295,5 +307,11 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public void setModifiedOn(String date) {
 		modifiedOnText.setText(date);
+	}
+	
+	@Override
+	public void setWikiHistoryDiffToolButtonVisible(boolean visible, WikiPageKey key) {
+		this.key = key;
+		wikiCompareButton.setVisible(visible);
 	}
 }

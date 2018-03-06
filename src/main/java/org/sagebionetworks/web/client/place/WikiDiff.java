@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.place;
 
+import org.sagebionetworks.web.shared.WikiPageKey;
+
 import com.google.gwt.place.shared.PlaceTokenizer;
 import com.google.gwt.place.shared.Prefix;
 
@@ -12,6 +14,13 @@ public class WikiDiff extends ParameterizedPlace{
 
 	public WikiDiff(String token) {
 		super(token);
+	}
+	
+	public WikiDiff(WikiPageKey key) {
+		super(ParameterizedToken.DEFAULT_TOKEN);
+		putParam(OWNER_ID, key.getOwnerObjectId());
+		putParam(OWNER_TYPE, key.getOwnerObjectType());
+		putParam(WIKI_ID, key.getWikiPageId());
 	}
 
 	@Prefix("!WikiDiff")
