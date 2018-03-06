@@ -7,12 +7,9 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 
 import com.google.gwt.dom.client.LIElement;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
@@ -72,31 +69,19 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 		myProjectsContainer.setWidget(myProjectsContainerWrapper.asWidget());
 		myFavoritesContainer.setWidget(favoritesTreeBrowser.asWidget());
 		currentContextContainer.setWidget(currentContextTreeBrowser.asWidget());
-		myProjectsContainerWrapper.configure(new Callback() {
-			@Override
-			public void invoke() {
-				presenter.loadMoreUserUpdateable();
-			}
+		myProjectsContainerWrapper.configure(() -> {
+			presenter.loadMoreUserUpdateable();
 		});
-		myProjectsLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setTabSelected(myProjectsLink, myProjectsListItem, myProjectsTabContents);
-			}
+		myProjectsLink.addClickHandler(event -> {
+			setTabSelected(myProjectsLink, myProjectsListItem, myProjectsTabContents);
 		});
 		
-		myFavoritesLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setTabSelected(myFavoritesLink, myFavoritesListItem, myFavoritesTabContents);
-			}
+		myFavoritesLink.addClickHandler(event -> {
+			setTabSelected(myFavoritesLink, myFavoritesListItem, myFavoritesTabContents);
 		});
 		
-		currentContextLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setTabSelected(currentContextLink, currentContextListItem, currentContextTabContents);
-			}
+		currentContextLink.addClickHandler(event -> {
+			setTabSelected(currentContextLink, currentContextListItem, currentContextTabContents);
 		});
 		
 		setTabSelected(myProjectsLink, myProjectsListItem, myProjectsTabContents);
@@ -151,10 +136,9 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 	
 	@Override
 	public void clear() {
-		myTreeBrowser.clearState();
-		favoritesTreeBrowser.clearState();
-		currentContextTreeBrowser.clearState();
-		initSelectedHandlers();
+		myTreeBrowser.clear();
+		favoritesTreeBrowser.clear();
+		currentContextTreeBrowser.clear();
 	}
 
 	@Override

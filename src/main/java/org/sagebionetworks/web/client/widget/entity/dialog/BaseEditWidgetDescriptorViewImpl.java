@@ -63,12 +63,7 @@ public class BaseEditWidgetDescriptorViewImpl implements BaseEditWidgetDescripto
 	
 	@Override
 	public void show() {
-		if (widgetDescriptorPresenter != null) {
-			modal.show();
-		} else {
-			//widget editor presenter not found for this content type
-			showErrorMessage("No editor was found for the selected widget.");
-		}
+		modal.show();
 	}
 
 	@Override
