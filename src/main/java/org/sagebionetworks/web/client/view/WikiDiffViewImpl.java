@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.entity.WikiVersionAnchorListItem;
 import org.sagebionetworks.web.client.widget.header.Header;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -111,7 +112,7 @@ public class WikiDiffViewImpl implements WikiDiffView {
 		//split text into lines
 	    var base = $wnd.difflib.stringAsLines(markdown1);
 	    var newtxt = $wnd.difflib.stringAsLines(markdown2);
-	    var sm = new difflib.SequenceMatcher(base, newtxt);
+	    var sm = new $wnd.difflib.SequenceMatcher(base, newtxt);
 	    // get the opcodes from the SequenceMatcher instance
 	    // opcodes is a list of 3-tuples describing what changes should be made to the base text
 	    // in order to yield the new text

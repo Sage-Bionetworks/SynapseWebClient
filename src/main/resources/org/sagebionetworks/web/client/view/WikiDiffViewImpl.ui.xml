@@ -7,7 +7,7 @@
 		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10">
 			<b:Row>
 				<b:Column size="SM_6">
-					<b:Panel addStyleNames="margin-top-10 margin-left-10 margin-right-10 margin-bottom-20">
+					<b:Panel addStyleNames="margin-left-10 margin-right-10 margin-bottom-20">
 						<b:PanelBody>
 							<b:ButtonGroup>
 								<b:Button ui:field="version1DropdownButton" dataToggle="DROPDOWN" text="Select a version..."/>

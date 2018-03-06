@@ -153,7 +153,7 @@ public class WikiDiffPresenter extends AbstractActivity implements WikiDiffView.
 		key = new WikiPageKey(ownerId, ownerType, wikiPageId);
 		
 		version1 = place.getParam(WikiDiff.WIKI_VERSION_1);
-		version2 = place.getParam(WikiDiff.WIKI_VERSION_1);
+		version2 = place.getParam(WikiDiff.WIKI_VERSION_2);
 	}
 	
 	public WikiDiff getPlace() {
