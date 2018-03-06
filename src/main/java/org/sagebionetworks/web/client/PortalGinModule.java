@@ -767,10 +767,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(JSONObjectAdapter.class).to(JSONObjectGwt.class);
 		bind(JSONArrayAdapter.class).to(JSONArrayGwt.class);
 		
-		// EntitySchemaCacheImpl
-		bind(EntitySchemaCacheImpl.class).in(Singleton.class);
-		bind(EntitySchemaCache.class).to(EntitySchemaCacheImpl.class);
-		
 		// cache place presenters
 		bind(ProfilePresenter.class).in(Singleton.class);
 		bind(EntityPresenter.class).in(Singleton.class);

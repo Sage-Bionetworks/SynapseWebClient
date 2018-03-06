@@ -38,7 +38,6 @@ import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -72,8 +71,6 @@ public class FileHistoryWidgetTest {
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
 	FileHistoryWidgetView mockView;
-	@Mock
-	EntitySchemaCache mockSchemaCache;
 	@Mock
 	IconsImageBundle mockIconsImageBundle;
 	@Mock
