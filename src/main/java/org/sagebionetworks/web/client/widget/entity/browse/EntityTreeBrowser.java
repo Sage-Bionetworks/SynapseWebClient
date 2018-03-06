@@ -64,13 +64,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		view.setPresenter(this);
 	}
 	
-	public void clearState() {
-		view.clear();
-		// remove handlers
-		entitySelectedHandler = null;
-		entityClickedHandler = null;
-	}
-
 	public void clear() {
 		view.clear();
 	}
