@@ -5,27 +5,18 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.ArrayList;
 import java.util.List;
 
-import org.sagebionetworks.repo.model.UserGroupHeader;
-import org.sagebionetworks.repo.model.principal.TypeFilter;
-import org.sagebionetworks.repo.model.verification.VerificationPagedResults;
-import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
-import org.sagebionetworks.repo.model.verification.VerificationSubmission;
+import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
+import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.UserProfileClientAsync;
-import org.sagebionetworks.web.client.place.ACTPlace;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.WikiDiff;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.view.ACTView;
-import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.view.WikiDiffView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
+import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -33,25 +24,30 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
-public class WikiDiffPresenter extends AbstractActivity implements ACTView.Presenter, Presenter<WikiDiff> {
+public class WikiDiffPresenter extends AbstractActivity implements WikiDiffView.Presenter, Presenter<WikiDiff> {
 	private WikiDiff place;
-	private ACTView view;
-	private PortalGinInjector ginInjector;
+	private WikiDiffView view;
 	private SynapseAlert synAlert;
 	private GlobalApplicationState globalAppState;
 	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
+	WikiPageKey key;
+	String version1, version2;
+	List<V2WikiHistorySnapshot> wikiVersionHistory;
+	public static final Long LIMIT = 30L;
 	@Inject
-	public WikiDiffPresenter(ACTView view,
+	public WikiDiffPresenter(WikiDiffView view,
 			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
 			GlobalApplicationState globalAppState) {
 		this.view = view;
 		this.synAlert = synAlert;
-		this.ginInjector = ginInjector;
 		this.globalAppState = globalAppState;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
 	}
@@ -66,99 +62,95 @@ public class WikiDiffPresenter extends AbstractActivity implements ACTView.Prese
 	public void loadData() {
 		synAlert.clear();
 		globalAppState.pushCurrentPlace(place);
-		userProfileClient.listVerificationSubmissions(stateFilter, submitterIdFilter, LIMIT, currentOffset, new AsyncCallback<VerificationPagedResults>() {
-			@Override
-			public void onSuccess(VerificationPagedResults results) {
-				currentOffset += LIMIT;
-				loadMoreContainer.setIsMore(!results.getResults().isEmpty());
-				boolean isACT = true;
-				boolean isModal = false;
-				for (VerificationSubmission submission : results.getResults()) {
-					VerificationSubmissionWidget w = ginInjector.getVerificationSubmissionWidget();
-					w.configure(submission, isACT, isModal);
-					loadMoreContainer.add(w.asWidget());
-					w.show();
-				}
-			}
+		
+		// refresh wiki versions available (kick off recursive call to get all versions, 30 at a time)
+		wikiVersionHistory = new ArrayList<>();
+		Long offset = 0L;
+		getVersions(offset);
+		
+		// get selected wiki versions (if set)
+		if (version1 != null && version2 != null) {
+			getWikiMarkdown(version1, markdown1 -> {
+				getWikiMarkdown(version2, markdown2 -> {
+					view.showDiff(markdown1, markdown2);
+				});
+			});
+		}
+	}
+	
+	public void getVersions(Long offset) {
+		synapseClient.getV2WikiHistory(key, LIMIT, offset, new AsyncCallback<PaginatedResults<V2WikiHistorySnapshot>>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				loadMoreContainer.setIsMore(false);
 				synAlert.handleException(caught);
+			}
+
+			@Override
+			public void onSuccess(PaginatedResults<V2WikiHistorySnapshot> result) {
+				PaginatedResults<V2WikiHistorySnapshot> paginatedHistory = result;
+				// paginatedHistory.getTotalNumberOfResults() should return total!
+				List<V2WikiHistorySnapshot> historyAsListOfHeaders = paginatedHistory.getResults();
+				if (historyAsListOfHeaders == null || historyAsListOfHeaders.isEmpty()) {
+					// done
+					view.setVersionHistory(wikiVersionHistory);
+				} else {
+					// add versions, and look for more
+					wikiVersionHistory.addAll(historyAsListOfHeaders);
+					getVersions(offset+LIMIT);
+				}
+			}
+		});
+	}
+	public void getWikiMarkdown(String wikiVersion, CallbackP<String> callback) {
+		synAlert.clear();
+		Long version = Long.parseLong(wikiVersion);
+		jsClient.getVersionOfV2WikiPageAsV1(key, version, new AsyncCallback<WikiPage>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+
+			@Override
+			public void onSuccess(WikiPage result) {
+				callback.invoke(result.getMarkdown());
 			}
 		});
 	}
 	
-	
 	@Override
-	public void setPlace(ACTPlace place) {
+	public void setPlace(WikiDiff place) {
 		this.place = place;
 		this.view.setPresenter(this);
-		String stateFilterParam = place.getParam(ACTPlace.STATE_FILTER_PARAM);
-		view.setSelectedStateText("");
-		peopleSuggestWidget.clear();
-		view.setSelectedUserBadgeVisible(false);
+		String ownerId = place.getParam(WikiDiff.OWNER_ID);
+		String ownerType = place.getParam(WikiDiff.OWNER_TYPE);
+		String wikiPageId = place.getParam(WikiDiff.WIKI_ID);
+		key = new WikiPageKey(ownerId, ownerType, wikiPageId);
 		
-		if (stateFilterParam != null) {
-			stateFilter = VerificationStateEnum.valueOf(stateFilterParam);
-			view.setSelectedStateText(stateFilterParam);
-		}
-		String submitterIdFilterParam =  place.getParam(ACTPlace.SUBMITTER_ID_FILTER_PARAM);
-		if (submitterIdFilterParam != null) {
-			submitterIdFilter = Long.parseLong(submitterIdFilterParam);
-			selectedUserBadge.configure(submitterIdFilterParam);
-			view.setSelectedUserBadgeVisible(true);
-		}
+		version1 = place.getParam(WikiDiff.WIKI_VERSION_1);
+		version2 = place.getParam(WikiDiff.WIKI_VERSION_1);
 	}
-	/**
-	 * For testing
-	 * @return
-	 */
-	public ACTPlace getPlace() {
+	
+	public WikiDiff getPlace() {
 		return place;
 	}
 	
 	@Override
-	public void onStateSelected(String selectedState) {
-		stateFilter = VerificationStateEnum.valueOf(selectedState);
-		place.putParam(ACTPlace.STATE_FILTER_PARAM, selectedState);
-		view.setSelectedStateText(selectedState);
+	public void onVersion1Selected(String version) {
+		version1 = version;
+		place.putParam(WikiDiff.WIKI_VERSION_1, version1);
 		loadData();
 	}
 	
 	@Override
-	public void onClearStateFilter() {
-		stateFilter = null;
-		place.removeParam(ACTPlace.STATE_FILTER_PARAM);
-		view.setSelectedStateText("");
+	public void onVersion2Selected(String version) {
+		version2 = version;
+		place.putParam(WikiDiff.WIKI_VERSION_2, version2);
 		loadData();
 	}
 	
-	public void onUserSelected(UserGroupSuggestion suggestion) {
-		if(suggestion != null) {
-			UserGroupHeader header = suggestion.getHeader();
-			submitterIdFilter = Long.parseLong(header.getOwnerId());
-			place.putParam(ACTPlace.SUBMITTER_ID_FILTER_PARAM, header.getOwnerId());
-			selectedUserBadge.configure(header.getOwnerId());
-			peopleSuggestWidget.clear();
-			view.setSelectedUserBadgeVisible(true);
-			loadData();
-		} else {
-			onClearUserFilter();
-		}
-	}
-	
-	@Override
-	public void onClearUserFilter() {
-		submitterIdFilter = null;
-		place.removeParam(ACTPlace.SUBMITTER_ID_FILTER_PARAM);
-		view.setSelectedUserBadgeVisible(false);
-		peopleSuggestWidget.clear();
-		loadData();
-	}
 	@Override
     public String mayStop() {
         view.clear();
         return null;
     }
-	
 }
