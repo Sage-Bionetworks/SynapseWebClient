@@ -65,16 +65,16 @@
 			var script = document.createElement('script');
 			script.onload = function () {
 				head.load("Portal.css");
-				head.load("//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js");
+				head.load("//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js");
 				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
 				head.load(cdnEndpoint + "js/spark-md5.min.js");
 				head.load(cdnEndpoint + "js/swfobject/swfobject.js");
 				head.load(cdnEndpoint + "js/jquery.tablesorter.min.js");
 				head.load(cdnEndpoint + "js/jquery.tablesorter.scinot.js");
 				head.load(cdnEndpoint + "js/highlight.pack.js");
-				head.load("//cdnjs.cloudflare.com/ajax/libs/jsPlumb/1.7.10/jsPlumb.min.js");
+				head.load("//cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.1.8/jsPlumb.min.js");
 				head.load(cdnEndpoint + "js/init-nchart.js");
-				head.load("//cdn.jsdelivr.net/npm/moment@2.18.1/min/moment.min.js");
+				head.load("//cdn.jsdelivr.net/npm/moment@2.21.0/min/moment.min.js");
 				head.load("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js");
 				head.load(cdnEndpoint + "js/markdown-it-plugins-11.min.js");
 				head.load(cdnEndpoint + "js/polyfill.js");
@@ -89,6 +89,7 @@
 				head.load("https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.1/croppie.min.css");
 				head.load("https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.1/croppie.min.js");
 				head.load("https://cdn.pendo.io/agent/static/f155f8f7-30b9-4cc3-671a-70f99f803504/pendo.js");
+				head.load(cdnEndpoint + "js/diff/diffview.css");
 			};
 			script.src = cdnEndpoint + "js/head.load.min.js";
 			document.head.appendChild(script);

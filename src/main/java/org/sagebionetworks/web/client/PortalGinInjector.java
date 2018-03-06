@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
+import org.sagebionetworks.web.client.presenter.WikiDiffPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -89,6 +90,7 @@ import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
+import org.sagebionetworks.web.client.widget.entity.WikiVersionAnchorListItem;
 import org.sagebionetworks.web.client.widget.entity.act.ACTRevokeUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
@@ -337,6 +339,7 @@ public interface PortalGinInjector extends Ginjector {
 	SynapseForumPresenter getSynapseForumPresenter();
 	SubscriptionPresenter getSubscriptionPresenter();
 	ACTAccessApprovalsPresenter getACTAccessApprovalsPresenter();
+	WikiDiffPresenter getWikiDiffPresenter();
 
 	EmailInvitationPresenter getEmailInvitationPresenter();
 
@@ -603,4 +606,6 @@ public interface PortalGinInjector extends Ginjector {
 	FileHandleUploadWidget getFileHandleUploadWidget();
 	WikiPageDeleteConfirmationDialog getWikiPageDeleteConfirmationDialog();
 	StuAnnouncementWidget getStuAnnouncementWidget();
+	
+	WikiVersionAnchorListItem getWikiVersionAnchorListItem();
 }

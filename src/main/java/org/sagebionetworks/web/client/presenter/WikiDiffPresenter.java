@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ClientProperties.DIFF_LIB_JS;
+import static org.sagebionetworks.web.client.ClientProperties.DIFF_VIEW_JS;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.ArrayList;
@@ -12,6 +14,8 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.WikiDiff;
+import org.sagebionetworks.web.client.resources.ResourceLoader;
+import org.sagebionetworks.web.client.resources.WebResource;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.WikiDiffView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -41,7 +45,8 @@ public class WikiDiffPresenter extends AbstractActivity implements WikiDiffView.
 			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
-			GlobalApplicationState globalAppState) {
+			GlobalApplicationState globalAppState,
+			ResourceLoader resourceLoader) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.globalAppState = globalAppState;
@@ -50,8 +55,26 @@ public class WikiDiffPresenter extends AbstractActivity implements WikiDiffView.
 		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
+		loadDiffLibrary(resourceLoader);
 	}
 
+	private void loadDiffLibrary(ResourceLoader resourceLoader) {
+		if (!resourceLoader.isLoaded(DIFF_LIB_JS)) {
+			List<WebResource> resources = new ArrayList<>();
+			resources.add(DIFF_LIB_JS);
+			resources.add(DIFF_VIEW_JS);
+			resourceLoader.requires(resources, new AsyncCallback<Void>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+				}
+				@Override
+				public void onSuccess(Void result) {
+				}
+			});
+		}
+	}
+	
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		// Install the view
@@ -62,6 +85,9 @@ public class WikiDiffPresenter extends AbstractActivity implements WikiDiffView.
 	public void loadData() {
 		synAlert.clear();
 		globalAppState.pushCurrentPlace(place);
+		
+		view.setVersion1(version1);
+		view.setVersion2(version2);
 		
 		// refresh wiki versions available (kick off recursive call to get all versions, 30 at a time)
 		wikiVersionHistory = new ArrayList<>();
