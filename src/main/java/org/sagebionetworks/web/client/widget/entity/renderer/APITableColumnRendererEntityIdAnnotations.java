@@ -13,7 +13,6 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.web.client.EntitySchemaCache;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
@@ -38,7 +37,6 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 	List<String> entityIds;
 	List<Annotation> masterAnnotationList;
 	AdapterFactory factory;
-	EntitySchemaCache cache;
 	AnnotationTransformer transformer;
 	private List<String> outputColumnNames;
 	private Map<String, List<String>> outputColumnData;
@@ -47,14 +45,12 @@ public class APITableColumnRendererEntityIdAnnotations implements APITableColumn
 	@Inject
 	public APITableColumnRendererEntityIdAnnotations(
 			AdapterFactory factory, 
-			EntitySchemaCache cache, 
 			SynapseClientAsync synapseClient, 
 			AnnotationTransformer transformer,
 			SynapseJavascriptClient jsClient) {
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.factory = factory;
-		this.cache = cache;
 		this.transformer = transformer;
 		this.jsClient = jsClient;
 	}

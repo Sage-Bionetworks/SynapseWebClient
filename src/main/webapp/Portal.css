@@ -2166,7 +2166,9 @@ td.datePickerMonth {
     border-radius: .2em;
     box-shadow: inset 0 -1px 0 #ddd;
 }
-
+.whitespace-nowrap {
+	white-space: nowrap;
+}
 /* Provenance graph css */
 .provEntityNode {
 	opacity:0.9; 

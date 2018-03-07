@@ -42,6 +42,7 @@ import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.Wiki;
+import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
@@ -488,6 +489,19 @@ public class BulkPresenterProxy extends AbstractActivity {
 				public void onSuccess() {
 					SubscriptionPresenter presenter = ginjector.getSubscriptionPresenter();
 					presenter.setPlace((SubscriptionPlace) place);
+					presenter.start(panel, eventBus);
+				}
+				@Override
+				public void onFailure(Throwable caught) {
+					loadError(caught);
+				}
+			});
+		} else if (place instanceof WikiDiff) {
+			GWT.runAsync(WikiDiff.class, new RunAsyncCallback() {
+				@Override
+				public void onSuccess() {
+					WikiDiffPresenter presenter = ginjector.getWikiDiffPresenter();
+					presenter.setPlace((WikiDiff) place);
 					presenter.start(panel, eventBus);
 				}
 				@Override

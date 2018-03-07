@@ -56,4 +56,5 @@ public interface WikiPageWidgetView extends IsWidget {
 	void showInfo(String title, String message);
 	public void clear();
 	void addStyleName(String style);
+	void setWikiHistoryDiffToolButtonVisible(boolean visible, WikiPageKey key);
 }

@@ -32,6 +32,8 @@
 			    		<bh:Italic text="and last modified on" addStyleNames="margin-left-5 margin-right-5"/>
 			    		<bh:Italic ui:field="modifiedOnText"/>
 		    		</bh:Div>
+		    		 
+		    		<b:Button ui:field="wikiCompareButton" iconPosition="LEFT" icon="EXCHANGE" text="Wiki Revision Diff Tool" visible="false" addStyleNames="margin-top-10 margin-right-10"/>
 		    		<b:Button ui:field="wikiHistoryButton" iconPosition="LEFT" icon="CARET_SQUARE_O_RIGHT" 
 				        text="Wiki Revision History" addStyleNames="margin-top-10"/>
 				    <b:Collapse ui:field="historyCollapse" toggle="false">
