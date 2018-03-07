@@ -93,30 +93,46 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 
 	@Override
 	public int getRootCount() {
-		return entityTree.getItemCount();
+		return getTree().getItemCount();
 	}
 
 	@Override
 	public void clear() {
-		// On open, it will call expandTreeItemOnOpen, which starts a loading message.
-		entityTree = new Tree(new EntityTreeResources());
-		entityTree.addOpenHandler(event -> {
-			final EntityTreeItem target = treeItem2entityTreeItem.get(event
-					.getTarget());
-			presenter.expandTreeItemOnOpen(target);
-		});
-		treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();
-		presenter.clearRecordsFetchedChildren();
-		
-		if (isSelectable) {
-			entityTree.addSelectionHandler(event -> {
-				final EntityTreeItem targetItem = treeItem2entityTreeItem
-						.get(event.getSelectedItem());
-				selectEntity(targetItem);
-			});
-		}
 		entityTreeContainer.clear();
-		entityTreeContainer.add(entityTree);
+		entityTree = null;
+		treeItem2entityTreeItem = null;
+	}
+	
+	private Map<TreeItem, EntityTreeItem> getTreeItem2entityTreeItem() {
+		if (treeItem2entityTreeItem == null) {
+			treeItem2entityTreeItem = new HashMap<TreeItem, EntityTreeItem>();
+		}
+		return treeItem2entityTreeItem;
+	}
+	
+	private Tree getTree() {
+		if (entityTree == null) {
+			// On open, it will call expandTreeItemOnOpen, which starts a loading message.
+			entityTree = new Tree(new EntityTreeResources());
+			entityTree.addOpenHandler(event -> {
+				final EntityTreeItem target = getTreeItem2entityTreeItem().get(event
+						.getTarget());
+				presenter.expandTreeItemOnOpen(target);
+			});
+			
+			presenter.clearRecordsFetchedChildren();
+			
+			if (isSelectable) {
+				entityTree.addSelectionHandler(event -> {
+					final EntityTreeItem targetItem = getTreeItem2entityTreeItem()
+							.get(event.getSelectedItem());
+					selectEntity(targetItem);
+				});
+			}
+			entityTreeContainer.clear();
+			entityTreeContainer.add(entityTree);
+		}
+		return entityTree;
 	}
 
 	@Override
@@ -130,7 +146,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		configureEntityTreeItem(childToAdd);
 		// Place the created child in the tree as the child of the given parent
 		// entity.
-		entityTree.addItem(childToAdd.asTreeItem());
+		getTree().addItem(childToAdd.asTreeItem());
 	}
 
 	@Override
@@ -143,7 +159,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 			});
 		}
 		// Update fields.
-		treeItem2entityTreeItem.put(childToAdd.asTreeItem(), childToAdd);
+		getTreeItem2entityTreeItem().put(childToAdd.asTreeItem(), childToAdd);
 		// Add dummy item to childItem to make expandable.
 		// Pass in something to tell it to add a createDummy item for folder
 		// expansion or not
@@ -178,7 +194,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 			presenter.getChildren(parentId, null, nextPageToken);
 			childToCreate.setVisible(false);
 		});
-		entityTree.addItem(childToCreate.asTreeItem());
+		getTree().addItem(childToCreate.asTreeItem());
 	}
 
 	/**
