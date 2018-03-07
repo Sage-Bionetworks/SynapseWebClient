@@ -202,6 +202,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 
 	@Override
 	public void clear() {
+		selectedRef.clear();
 		presenter.clearSelectedEntities();
 		updateSelectedView();
 		selectedRef.clear();
