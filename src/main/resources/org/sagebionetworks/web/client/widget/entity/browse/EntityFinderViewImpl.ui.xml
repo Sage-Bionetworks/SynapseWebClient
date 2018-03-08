@@ -17,25 +17,25 @@
 						paddingRight="10">
 						<b:Panel>
 							<b:PanelBody>
-								<g:SimplePanel ui:field="browseMyEntitiesContainer" />
-								<g:SimplePanel ui:field="searchContainer" />
-								<g:SimplePanel ui:field="enterSynapseIdContainer" />
-								<g:SimplePanel ui:field="enterSynapseMultiIdContainer" />
+								<bh:Div ui:field="browseMyEntitiesContainer" />
+								<bh:Div ui:field="searchContainer" />
+								<bh:Div ui:field="enterSynapseIdContainer" />
+								<bh:Div ui:field="enterSynapseMultiIdContainer" />
 							</b:PanelBody>
 						</b:Panel>
 					</t:TableData>
 					<t:TableData addStyleNames="vertical-align-top">
 						<b:Panel>
 							<b:PanelBody>
-								<g:SimplePanel ui:field="myEntitiesBrowserContainer" />
+								<bh:Div ui:field="myEntitiesBrowserContainer" />
 								<!-- entity search widget container -->
-								<g:FlowPanel ui:field="entitySearchWidgetContainer">
+								<bh:Div ui:field="entitySearchWidgetContainer">
 									<b:Heading size="H4">
 										<bh:Text>Search</bh:Text>
 									</b:Heading>
-									<g:SimplePanel ui:field="entitySearchBoxContainer" />
-								</g:FlowPanel>
-								<g:FlowPanel ui:field="enterIdWidgetContainer">
+									<bh:Div ui:field="entitySearchBoxContainer" />
+								</bh:Div>
+								<bh:Div ui:field="enterIdWidgetContainer">
 									<b:Heading size="H4">
 										<bh:Text>Enter Synapse ID</bh:Text>
 									</b:Heading>
@@ -46,8 +46,8 @@
 											<b:Button ui:field="lookupSynapseIdButton" text="Lookup" />
 										</b:InputGroupButton>
 									</b:InputGroup>
-								</g:FlowPanel>
-								<g:FlowPanel ui:field="enterMultiIdWidgetContainer">
+								</bh:Div>
+								<bh:Div ui:field="enterMultiIdWidgetContainer">
 									<b:Heading size="H4">
 										<bh:Text>Enter List of Synapse Ids</bh:Text>
 									</b:Heading>
@@ -58,9 +58,8 @@
 											<b:Button ui:field="lookupSynapseMultiIdButton" text="Lookup" />
 										</b:InputGroupButton>
 									</b:InputGroup>
-								</g:FlowPanel>
-
-								<g:FlowPanel ui:field="versionUI" addStyleNames="margin-top-10">
+								</bh:Div>
+								<bh:Div ui:field="versionUI" addStyleNames="margin-top-10">
 									<b:Radio ui:field="currentVersionRadio" name="versionRadio"
 										text="Current Version" />
 									<b:Radio ui:field="currentVersionRadioShowingVersions"
@@ -74,8 +73,7 @@
 										<b:DropDownMenu ui:field="versionDropDownMenu"
 											addStyleNames="btn-block" />
 									</b:ButtonGroup>
-								</g:FlowPanel>
-
+								</bh:Div>
 							</b:PanelBody>
 						</b:Panel>
 						<!-- right bottom -->
