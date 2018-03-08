@@ -208,6 +208,8 @@
 					<sourceLevel>auto</sourceLevel>
 					<extraJvmArgs>-Xmx2048m -Xms2048m</extraJvmArgs>
 					<fragmentCount>1</fragmentCount>
+					<disableCastChecking>true</disableCastChecking>
+					<disableClassMetaData>true</disableClassMetaData>
 				</configuration>
 			</plugin>
 
