@@ -113,6 +113,9 @@ public class StuAlertViewImpl implements
 	
 	@Override
 	public void setVisible(boolean visible) {
+		if (visible) {
+			lazyConstruct();	
+		}
 		container.setVisible(visible);
 	}
 }
