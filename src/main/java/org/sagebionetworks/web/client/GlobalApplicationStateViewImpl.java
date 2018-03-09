@@ -31,6 +31,7 @@ public class GlobalApplicationStateViewImpl implements
 			iframe.setWidth("1px");
 			iframe.setHeight("1px");
 			RootPanel.getBodyElement().appendChild(iframe.getElement());
+			iframe.setVisible(false);
 		}
 	}
 }
