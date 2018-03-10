@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -38,6 +40,7 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 			SynapseJavascriptClient jsClient) {
 		super();
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.timerProvider = timerProvider;
 		this.jsClient = jsClient;
 	}

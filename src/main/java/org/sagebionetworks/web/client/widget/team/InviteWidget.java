@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.ValidationUtils.isValidEmail;
 
 import org.sagebionetworks.repo.model.Team;
@@ -35,6 +36,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 						UserGroupSuggestionProvider provider) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.gwt = gwt;
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;

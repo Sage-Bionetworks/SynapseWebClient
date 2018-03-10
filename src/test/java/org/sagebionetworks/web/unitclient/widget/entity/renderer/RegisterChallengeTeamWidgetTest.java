@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
 import org.sagebionetworks.repo.model.ObjectType;
@@ -85,7 +84,7 @@ public class RegisterChallengeTeamWidgetTest {
 		
 		//on click, should show anonymous join message
 		widget.onClick();
-		verify(mockView).showConfirmDialog(anyString(), any(ConfirmCallback.class));
+		verify(mockView).showConfirmDialog(anyString(), any(Callback.class));
 	}
 	
 	@Test

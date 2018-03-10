@@ -13,8 +13,8 @@ public interface TeamBadgeView extends IsWidget, SynapseView {
 	
 	public void setRequestCount(String count);
 	
-	void setTeamWithoutLink(String name, String teamId);
-
+	void setTeamWithoutLink(String name, boolean isPublic);
+	
 	void setVisible(boolean visible);
 	void addStyleName(String style);
 	void setTarget(String target);

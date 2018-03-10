@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.List;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
@@ -30,6 +32,7 @@ public class AdministerEvaluationsList implements SynapseWidgetPresenter, Evalua
 			EvaluationEditorModal evalEditor,
 			SynapseAlert synAlert) {
 		this.challengeClient = challengeClient;
+		fixServiceEntryPoint(challengeClient);
 		this.aclEditor = aclEditor;
 		this.view = view;
 		this.synAlert = synAlert;

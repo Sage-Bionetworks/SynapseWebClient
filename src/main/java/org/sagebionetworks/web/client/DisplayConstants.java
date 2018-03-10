@@ -107,6 +107,7 @@ public class DisplayConstants {
 	public static final String TEXT_LINK_SAVED = "Link saved.";
 	public static final String ERROR_UPDATE_FAILED = "Update failed. Please try again.";
 	public static final String EMPTY = "Empty";
+	public static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
 	public static final String ERROR_CANT_MOVE_HERE = "Sorry, you cannot move this item to the requested spot.";
 	public static final String TEXT_NO_COLUMNS = "No Columns.";
@@ -282,6 +283,7 @@ public class DisplayConstants {
 
 	// Button styles
 	public static final String PRIMARY_BUTTON_STYLE = "btn-primary";
+	public static final String LINK_BUTTON_STYLE = "btn-link";
 	public static final String DEFAULT_BUTTON_STYLE = "btn-default";
 	public static final String DANGER_BUTTON_STYLE = "btn-danger";
 	public static final int DELAY_UNTIL_IN_VIEW = 1200;

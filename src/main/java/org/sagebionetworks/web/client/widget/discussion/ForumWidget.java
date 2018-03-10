@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -88,6 +90,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		this.threadListWidget = threadListWidget;
 		this.newThreadModal = newThreadModal;
 		this.discussionForumClient = discussionForumClient;
+		fixServiceEntryPoint(discussionForumClient);
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
 		this.singleThreadWidget = singleThreadWidget;

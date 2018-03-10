@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.verification;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -57,6 +59,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			) {
 		this.ginInjector = ginInjector;
 		this.userProfileClient = userProfileClient;
+		fixServiceEntryPoint(userProfileClient);
 		this.synAlert = synAlert;
 		this.fileHandleList = fileHandleList;
 		this.promptModal = promptModalView;

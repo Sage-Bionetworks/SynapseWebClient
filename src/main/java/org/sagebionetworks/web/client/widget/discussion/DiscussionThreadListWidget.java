@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -60,6 +62,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.discussionForumClientAsync = discussionForumClientAsync;
+		fixServiceEntryPoint(discussionForumClientAsync);
 		this.synAlert = synAlert;
 		this.threadsContainer = loadMoreWidgetContainer;
 		this.jsniUtils = jsniUtils;

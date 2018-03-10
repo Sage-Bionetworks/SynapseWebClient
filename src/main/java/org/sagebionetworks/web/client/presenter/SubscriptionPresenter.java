@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.Topic;
@@ -36,6 +38,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 			) {
 		this.view = view;
 		this.subscriptionClient = subscriptionClient;
+		fixServiceEntryPoint(subscriptionClient);
 		this.synAlert = synAlert;
 		this.globalAppState = globalAppState;
 		this.topicWidget = topicWidget;

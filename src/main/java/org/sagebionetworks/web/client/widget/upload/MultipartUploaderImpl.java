@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Collections;
 import java.util.Date;
 
@@ -11,7 +13,6 @@ import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.PartPresignedUrl;
 import org.sagebionetworks.repo.model.file.PartUtils;
-import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -23,7 +24,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.core.client.JavaScriptObject;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -81,6 +81,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		this.gwt = gwt;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.multipartFileUploadClient = multipartFileUploadClient;
+		fixServiceEntryPoint(multipartFileUploadClient);
 		this.percentFormat = gwt.getNumberFormat("##");;
 		this.cookies = cookies;
 	}

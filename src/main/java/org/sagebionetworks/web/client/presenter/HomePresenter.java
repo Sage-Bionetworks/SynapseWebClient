@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -12,7 +13,6 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.HomeView;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
 import com.google.gwt.event.shared.EventBus;
@@ -80,6 +80,7 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 		}
 		loadNewsFeed();
 	}
+	
 	public void loadNewsFeed(){
 		long uniqueId = new Date().getTime();
 		final String twitterElementId = TWITTER_ELEMENT_ID+uniqueId;

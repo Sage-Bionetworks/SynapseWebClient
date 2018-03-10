@@ -7,8 +7,6 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -26,6 +24,7 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 	@Inject
 	public BreadcrumbViewImpl() {
 		panel = new FlowPanel();
+		panel.addStyleName("font-size-16");
 	}
 
 	@Override
@@ -58,12 +57,9 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 				Synapse synapsePlace = (Synapse)data.getPlace();
 				anchor.setHref("#" + DisplayUtils.getSynapseHistoryTokenNoHash(synapsePlace.getEntityId(), synapsePlace.getVersionNumber(), synapsePlace.getArea(), synapsePlace.getAreaToken()));
 			}
-			anchor.addClickHandler(new ClickHandler() {				
-				@Override
-				public void onClick(ClickEvent event) {
-					event.preventDefault();
-					presenter.goTo(data.getPlace());
-				}
+			anchor.addClickHandler(event -> {			
+				event.preventDefault();
+				presenter.goTo(data.getPlace());
 			});
 			if (i > 0) {
 				panel.add(new InlineHTML(SafeHtmlUtils.fromSafeConstant(ClientProperties.BREADCRUMB_SEP)));

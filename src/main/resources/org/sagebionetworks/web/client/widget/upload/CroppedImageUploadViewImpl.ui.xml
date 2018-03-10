@@ -24,7 +24,7 @@
 			<b:ModalBody ui:field="previewModalBody">
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button ui:field="cancelCropButton">Cancel</b:Button>
+				<b:Button ui:field="cancelCropButton" type="LINK">Cancel</b:Button>
 				<b:Button ui:field="saveCropButton" type="PRIMARY" >Save</b:Button>
 			</b:ModalFooter>
 		</b:Modal>

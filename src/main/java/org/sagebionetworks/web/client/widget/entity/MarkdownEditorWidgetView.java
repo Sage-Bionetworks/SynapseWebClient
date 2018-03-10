@@ -51,8 +51,6 @@ public interface MarkdownEditorWidgetView extends IsWidget,SynapseView {
 
 	void addTextAreaClickHandler(ClickHandler clickHandler);
 
-	void confirm(String string, ConfirmCallback confirmCallback);
-
 	void setFormattingGuideWidget(Widget formattingGuideWidget);
 
 	void configure(String markdown);

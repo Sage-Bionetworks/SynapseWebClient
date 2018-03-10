@@ -26,11 +26,9 @@ import org.apache.http.entity.ContentType;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Whitelist;
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.AsynchJobType;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
-import org.sagebionetworks.client.exceptions.SynapseTableUnavailableException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -108,7 +106,6 @@ import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHistorySnapshot;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
-import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONEntity;
@@ -137,7 +134,6 @@ import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.shared.exceptions.TableQueryParseException;
-import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
@@ -1600,23 +1596,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
-	@Override
-	public String getSynapseVersions() throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
-		try {
-			SynapseVersionInfo versionInfo = synapseClient.getVersionInfo();
-			new PortalVersionHolder();
-			return PortalVersionHolder.getVersionInfo() + ","
-					+ versionInfo.getVersion();
-		} catch (Exception e) {
-			throw new UnknownErrorException(e.getMessage());
-		}
-	}
-
-	private static class PortalVersionHolder {
+	public static class PortalVersionHolder {
 		private static String versionInfo = "";
-
 		static {
 			InputStream s = SynapseClientImpl.class
 					.getResourceAsStream("/version-info.properties");
@@ -1631,24 +1612,13 @@ public class SynapseClientImpl extends SynapseClientBase implements
 					.getProperty("org.sagebionetworks.portal.version");
 		}
 
-		private static String getVersionInfo() {
+		public static String getVersionInfo() {
 			return versionInfo;
 		}
-
 	}
 	
 	private String getSynapseProperty(String key) {
 		return PortalPropertiesHolder.getProperty(key);
-	}
-
-	@Override
-	public HashMap<String, String> getSynapseProperties(){
-		HashMap<String, String> properties = PortalPropertiesHolder.getPropertiesMap();
-		properties.put(WebConstants.REPO_SERVICE_URL_KEY, StackConfiguration.getRepositoryServiceEndpoint());
-		properties.put(WebConstants.FILE_SERVICE_URL_KEY, StackConfiguration.getFileServiceEndpoint());
-		properties.put(WebConstants.AUTH_PUBLIC_SERVICE_URL_KEY, StackConfiguration.getAuthenticationServicePublicEndpoint());
-		properties.put(WebConstants.SYNAPSE_VERSION_KEY, PortalVersionHolder.getVersionInfo());
-		return properties;
 	}
 
 	public static class PortalPropertiesHolder {
@@ -1859,17 +1829,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	private void handleTableUnavailableException(
-			SynapseTableUnavailableException e) throws TableUnavilableException {
-		try {
-			throw new TableUnavilableException(e.getStatus()
-					.writeToJSONObject(adapterFactory.createNew())
-					.toJSONString());
-		} catch (JSONObjectAdapterException e1) {
-			throw new TableUnavilableException(e.getMessage());
-		}
-	}
-
 	@Override
 	public HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> getPageNameToWikiKeyMap()
 			throws RestServiceException {
@@ -1880,7 +1839,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	private void initHelpPagesMap() {
 		if (pageName2WikiKeyMap == null) {
 			HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> tempMap = new HashMap<String, org.sagebionetworks.web.shared.WikiPageKey>();
-			HashMap<String, String> properties = getSynapseProperties();
+			HashMap<String, String> properties = PortalPropertiesHolder.getPropertiesMap();
 			for (String key : properties.keySet()) {
 				if (key.startsWith(WebConstants.WIKI_PROPERTIES_PACKAGE)) {
 					String value = properties.get(key);

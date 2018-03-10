@@ -216,7 +216,6 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 			document.onselectstart = function () { return false; };
 			$wnd.jsPlumbDemo.init();
 			try {
-				jsPlumbInstance.setRenderMode($wnd.jsPlumb.SVG);
 				jsPlumbInstance.setSuspendDrawing(true);
 				jsPlumbInstance.setContainer(containerId);
 			} catch(err) {

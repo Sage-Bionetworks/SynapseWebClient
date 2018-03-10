@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.AliasType;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
@@ -38,8 +40,10 @@ public class NewAccountPresenter extends AbstractActivity implements NewAccountV
 			PasswordStrengthWidget passwordStrengthWidget){
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.globalAppState = globalAppState;
 		this.userAccountService = userAccountService;
+		fixServiceEntryPoint(userAccountService);
 		this.authController = authController;
 		this.passwordStrengthWidget = passwordStrengthWidget;
 		view.setPasswordStrengthWidget(passwordStrengthWidget.asWidget());

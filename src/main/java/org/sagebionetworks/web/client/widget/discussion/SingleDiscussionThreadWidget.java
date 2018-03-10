@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
@@ -121,6 +123,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.synAlert = synAlert;
 		this.authorWidget = authorWidget;
 		this.discussionForumClientAsync = discussionForumClientAsync;
+		fixServiceEntryPoint(discussionForumClientAsync);
 		this.requestBuilder = requestBuilder;
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;

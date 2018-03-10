@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -78,6 +80,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 			SynapseAlert synAlert) {
 		this.view = view;
 		this.synapseClient = synapseClientAsync;
+		fixServiceEntryPoint(synapseClient);
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.gwt = gwt;
@@ -129,16 +132,12 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		}
 	}
 	
-	public static final PermissionLevel[] PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_DOWNLOAD, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
-	public static final PermissionLevel[] NON_PROJECT_PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_DOWNLOAD, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
+	public static final PermissionLevel[] PERMISSIONS =  new PermissionLevel[] {PermissionLevel.CAN_VIEW, PermissionLevel.CAN_DOWNLOAD, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER};
 	
 	public PermissionLevel[] getPermList() {
-		if (entity instanceof Project) {
-			return PROJECT_PERMISSIONS;
-		} else {
-			return NON_PROJECT_PERMISSIONS;
-		}
+		return PERMISSIONS;
 	}
+	
 	public HashMap<PermissionLevel, String> getPermissionsToDisplay() {
 		HashMap<PermissionLevel, String> permissionDisplay = new HashMap<PermissionLevel, String>();
 		permissionDisplay.put(PermissionLevel.CAN_VIEW, DisplayConstants.MENU_PERMISSION_LEVEL_CAN_VIEW);
@@ -204,7 +203,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		view.showLoading();
 		boolean isInherited = !acl.getId().equals(entity.getId());
 		boolean canEnableInheritance = uep.getCanEnableInheritance();
-		view.buildWindow(isInherited, canEnableInheritance, canChangePermission, PermissionLevel.CAN_DOWNLOAD);
+		view.buildWindow(entity instanceof Project, isInherited, acl.getId(), canEnableInheritance, canChangePermission, PermissionLevel.CAN_DOWNLOAD);
 		populateAclEntries();
 		updateIsPublicAccess();
 	}

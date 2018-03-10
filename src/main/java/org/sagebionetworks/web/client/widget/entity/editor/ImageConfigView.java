@@ -19,7 +19,7 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public boolean isExternal();
 	public boolean isSynapseEntity();
 	public String getImageUrl();
-	public String getAltText();
+	public String getExternalAltText();
 	public void setImageUrl(String url);
 	void setFileInputWidget(Widget fileInputWidget);
 	void setWikiAttachmentsWidget(Widget widget);
@@ -29,6 +29,8 @@ public interface ImageConfigView extends IsWidget, WidgetEditorView {
 	public String getAlignment();
 	public Integer getScale();
 	public void setScale(Integer scale);
+	String getAltText();
+	void setAltText(String altText);
 	public String getSynapseId();
 	public Long getVersion();
 	

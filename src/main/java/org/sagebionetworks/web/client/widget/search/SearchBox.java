@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.search;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Arrays;
 
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
@@ -36,6 +38,7 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 		this.globalApplicationState = globalApplicationState;
 		this.adapterFactory = adapterFactory;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		view.setPresenter(this);
 	}	
 	

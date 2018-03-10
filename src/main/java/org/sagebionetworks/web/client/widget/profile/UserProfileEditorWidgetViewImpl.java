@@ -1,20 +1,20 @@
 package org.sagebionetworks.web.client.widget.profile;
 
-import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.widget.search.GooglePlacesSuggestOracle;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.SuggestBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -45,7 +45,7 @@ public class UserProfileEditorWidgetViewImpl implements
 	@UiField
 	TextBox industry;
 	@UiField
-	TextBox location;
+	Div locationSuggestBoxContainer;
 	@UiField
 	FormGroup linkFormGroup;
 	@UiField
@@ -54,12 +54,17 @@ public class UserProfileEditorWidgetViewImpl implements
 	HelpBlock linkHelpBlock;
 	@UiField
 	TextArea bio;
-	
+	SuggestBox locationSuggestBox;
 	private Widget widget;
 	
 	@Inject
-	public UserProfileEditorWidgetViewImpl(Binder binder){
+	public UserProfileEditorWidgetViewImpl(Binder binder, 
+			GooglePlacesSuggestOracle locationOracle){
 		widget = binder.createAndBindUi(this);
+		locationSuggestBox = new SuggestBox(locationOracle);
+		locationSuggestBox.setWidth("100%");
+		locationSuggestBox.getTextBox().getElement().setAttribute("placeholder", "Enter City, Country");
+		locationSuggestBoxContainer.add(locationSuggestBox);
 	}
 
 	@Override
@@ -183,12 +188,12 @@ public class UserProfileEditorWidgetViewImpl implements
 
 	@Override
 	public void setLocation(String location) {
-		this.location.setText(location);
+		this.locationSuggestBox.setText(location);
 	}
 
 	@Override
 	public String getLocation() {
-		return this.location.getText();
+		return this.locationSuggestBox.getText();
 	}
 
 	@Override
@@ -204,7 +209,7 @@ public class UserProfileEditorWidgetViewImpl implements
 		currentPosition.addKeyDownHandler(keyDownHandler);
 		currentAffiliation.addKeyDownHandler(keyDownHandler);
 		industry.addKeyDownHandler(keyDownHandler);
-		location.addKeyDownHandler(keyDownHandler);
+		locationSuggestBox.addKeyDownHandler(keyDownHandler);
 		link.addKeyDownHandler(keyDownHandler);
 		bio.addKeyDownHandler(keyDownHandler);
 	}

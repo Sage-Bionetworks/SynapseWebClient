@@ -6,6 +6,8 @@ import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
+
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.presenter.ProfilePresenter.*;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
@@ -30,6 +32,7 @@ public class IsACTMemberAsyncHandlerImpl implements IsACTMemberAsyncHandler {
 			AuthenticationController authController,
 			SynapseJSNIUtils jsniUtils) {
 		this.userProfileClient = userProfileClient;
+		fixServiceEntryPoint(userProfileClient);
 		this.sessionStorage = sessionStorage;
 		this.authController = authController;
 		this.jsniUtils = jsniUtils;

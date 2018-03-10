@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter.users;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
@@ -50,6 +52,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 			SynapseAlert synAlert) {
 		this.view = view;
 		this.userService = userService;
+		fixServiceEntryPoint(userService);
 		this.authenticationController = authenticationController;
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;

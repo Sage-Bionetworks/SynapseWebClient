@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -85,10 +87,12 @@ public class FilesTab {
 			this.breadcrumb = ginInjector.getBreadcrumb();
 			this.metadata = ginInjector.getEntityMetadata();
 			this.filesBrowser = ginInjector.getFilesBrowser();
+			filesBrowser.setEntityClickedHandler(entitySelectedCallback);
 			this.previewWidget = ginInjector.getPreviewWidget();
 			this.wikiPageWidget = ginInjector.getWikiPageWidget();
 			this.synAlert = ginInjector.getStuAlert();
 			this.synapseClient = ginInjector.getSynapseClientAsync();
+			fixServiceEntryPoint(synapseClient);
 			this.globalApplicationState = ginInjector.getGlobalApplicationState();
 			this.modifiedCreatedBy = ginInjector.getModifiedCreatedByWidget();
 			this.discussionThreadListWidget = ginInjector.getDiscussionThreadListWidget();
@@ -113,13 +117,6 @@ public class FilesTab {
 			});
 			
 			configMap = ProvenanceWidget.getDefaultWidgetDescriptor();
-			CallbackP<String> entityClicked = new CallbackP<String> () {
-				@Override
-				public void invoke(String id) {
-					entitySelectedCallback.invoke(id);
-				}
-			};
-			filesBrowser.setEntityClickedHandler(entityClicked);
 			initBreadcrumbLinkClickedHandler();
 		}
 	}

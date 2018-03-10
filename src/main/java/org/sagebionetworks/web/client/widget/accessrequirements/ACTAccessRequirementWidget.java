@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.UserProfile;
@@ -61,6 +63,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			ConvertACTAccessRequirementButton convertACTAccessRequirementButton) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.ginInjector = ginInjector;
@@ -68,6 +71,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 		this.createAccessRequirementButton = createAccessRequirementButton;
 		this.deleteAccessRequirementButton = deleteAccessRequirementButton;
 		this.dataAccessClient = dataAccessClient;
+		fixServiceEntryPoint(dataAccessClient);
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.authController = authController;
 		this.jiraURLHelper = jiraURLHelper;

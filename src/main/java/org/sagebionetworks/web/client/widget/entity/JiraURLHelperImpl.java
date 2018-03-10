@@ -1,7 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserProfile;
@@ -104,6 +105,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 			AuthenticationController authenticationController
 			) {
 		this.jiraClient = jiraClient;
+		fixServiceEntryPoint(jiraClient);
 		this.gwt = gwt;
 		this.authenticationController = authenticationController;
 		jiraProjectId = constants.jiraProjectId();

@@ -75,6 +75,7 @@ public class AddFolderDialogWidgetViewImpl implements AddFolderDialogWidgetView 
 		folderNameField.setText("");
 		setSaveEnabled(true);
 		newFolderDialog.show();
+		folderNameField.setFocus(true);
 	}
 
 	@Override

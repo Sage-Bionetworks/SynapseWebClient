@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.sharing;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -77,6 +79,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 		this.view = view;
 		this.jsClient = jsClient;
 		this.challengeClient = challengeClient;
+		fixServiceEntryPoint(challengeClient);
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.jsonObjectAdapter = jsonObjectAdapter;
@@ -209,7 +212,7 @@ public class EvaluationAccessControlListEditor implements AccessControlListEdito
 	private void setViewDetails() {
 		validateEditorState();
 		view.showLoading();
-		view.buildWindow(false, false, true, PermissionLevel.CAN_VIEW);
+		view.buildWindow(false, false, null, false, true, PermissionLevel.CAN_VIEW);
 		populateAclEntries();
 		updateIsPublicAccess();
 	}

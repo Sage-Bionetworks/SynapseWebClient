@@ -8,7 +8,7 @@
 		<bh:Div ui:field="newReplyContainer" visible="false" addStyleNames="margin-top-10 margin-bottom-40">
 			<bh:Div ui:field="markdownEditorContainer" />
 			<b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Posting..." text="Post" addStyleNames="margin-right-5 margin-top-5" pull="RIGHT"/>
-			<b:Button ui:field="cancelButton" type="DEFAULT" text="Cancel" addStyleNames="margin-right-5 margin-top-5" pull="RIGHT"/>
+			<b:Button ui:field="cancelButton" type="LINK" text="Cancel" addStyleNames="margin-right-5 margin-top-5" pull="RIGHT"/>
 		</bh:Div>
 		<bh:Div ui:field="synAlert" />
 	</bh:Div>

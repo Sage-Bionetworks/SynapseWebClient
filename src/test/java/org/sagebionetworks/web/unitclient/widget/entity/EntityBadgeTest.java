@@ -49,7 +49,6 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
@@ -245,14 +244,9 @@ public class EntityBadgeTest {
 	@Test
 	public void testEntityClickedCustomHandler() throws Exception {
 		configure();
-		CallbackP<String> mockEntityClicked = mock(CallbackP.class);
-		widget.setEntityClickedHandler(mockEntityClicked);
-		verify(mockView).addClickHandler(clickHandlerCaptor.capture());
-		// test click handler calls us back
-		ClickHandler clickHandler = clickHandlerCaptor.getValue();
-		verify(mockEntityClicked, never()).invoke(anyString());
-		clickHandler.onClick(null);
-		verify(mockEntityClicked).invoke(anyString());
+		ClickHandler mockEntityClicked = mock(ClickHandler.class);
+		widget.addClickHandler(mockEntityClicked);
+		verify(mockView).addClickHandler(mockEntityClicked);
 	}
 	
 	@Test

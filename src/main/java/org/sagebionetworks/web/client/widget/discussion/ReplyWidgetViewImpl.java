@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.discussion;
 import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_CANCEL;
 import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_DELETE;
 import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYLE;
-import static org.sagebionetworks.web.client.DisplayConstants.DEFAULT_BUTTON_STYLE;
+import static org.sagebionetworks.web.client.DisplayConstants.LINK_BUTTON_STYLE;
 
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Label;
@@ -13,6 +13,7 @@ import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -24,8 +25,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class ReplyWidgetViewImpl implements ReplyWidgetView {
-
-	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
 
 	public interface Binder extends UiBinder<Widget, ReplyWidgetViewImpl> {}
 
@@ -126,15 +125,8 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 	}
 
 	@Override
-	public void showDeleteConfirm(String deleteConfirmMessage, SimpleCallback deleteCallback) {
-		DialogOptions options = DialogOptions.newOptions(deleteConfirmMessage);
-		options.setCloseButton(false);
-		options.setTitle(CONFIRM_DELETE_DIALOG_TITLE);
-		options.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE);
-		options.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, deleteCallback);
-		
-		Bootbox.dialog(options);
-		
+	public void showDeleteConfirm(String deleteConfirmMessage, Callback deleteCallback) {
+		DisplayUtils.confirmDelete(deleteConfirmMessage, deleteCallback);
 	}
 
 	@Override

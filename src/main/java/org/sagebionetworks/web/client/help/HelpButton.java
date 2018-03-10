@@ -26,50 +26,49 @@ Use:
 
  */
 public class HelpButton extends Div implements HasHTML {
-	
-    private final Icon helpButton = new Icon(IconType.QUESTION_CIRCLE);
-    private final Popover popover = new Popover(helpButton);
-    
-    public HelpButton() {
-    	addStyleName("displayInline margin-left-5 margin-right-5");
-    	popover.setTrigger(Trigger.CLICK);
-    	popover.setIsHtml(true);
-    	helpButton.addStyleName("imageButton synapse-blue");
-    	add(helpButton);
-    }
-    
-    public void setHref(String href) {
-    	popover.setContent("<a href=\""+href+"\" target=\"_blank\"><button class=\"btn btn-primary right\">Learn More</button></a>");
-    }
-    
-    public void setPlacement(Placement placement) {
-    	popover.setPlacement(placement);
-    }
-    
-    @Override
-    public void add(final Widget w) {
-    	if (w instanceof Text) {
-        	popover.setTitle(((Text)w).getText());
-        } else {
-            super.add(w);
-        }
-    }
 
-    @Override
-    public String getHTML() {
-    	return popover.getTitle();
-    }
-    @Override
-    public String getText() {
-    	return popover.getTitle();
-    }
-    @Override
-    public void setHTML(String html) {
-    	popover.setTitle(html);
-    }
-    @Override
-    public void setText(String text) {
-    	popover.setTitle(text);
-    }
+	private final Icon helpButton = new Icon(IconType.QUESTION_CIRCLE);
+	private final Popover popover = new Popover(helpButton);
 
+	public HelpButton() {
+		addStyleName("displayInline margin-left-5 margin-right-5");
+		popover.setTrigger(Trigger.CLICK);
+		popover.setIsHtml(true);
+		helpButton.addStyleName("imageButton synapse-blue");
+		add(helpButton);
+	}
+
+	public void setHref(String href) {
+		popover.setContent("<a href=\""+href+"\" target=\"_blank\"><button class=\"btn btn-primary right\">Learn More</button></a>");
+	}
+
+	public void setPlacement(Placement placement) {
+		popover.setPlacement(placement);
+	}
+
+	@Override
+	public void add(final Widget w) {
+		if (w instanceof Text) {
+			popover.setTitle(((Text)w).getText());
+		} else {
+			super.add(w);
+		}
+	}
+
+	@Override
+	public String getHTML() {
+		return popover.getTitle();
+	}
+	@Override
+	public String getText() {
+		return popover.getTitle();
+	}
+	@Override
+	public void setHTML(String html) {
+		popover.setTitle(html);
+	}
+	@Override
+	public void setText(String text) {
+		popover.setTitle(text);
+	}
 }

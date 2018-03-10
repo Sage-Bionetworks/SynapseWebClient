@@ -55,7 +55,6 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
-import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -86,7 +85,6 @@ import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
@@ -251,21 +249,22 @@ public class SynapseJavascriptClient {
 	}
 
 	private void doGet(String url, OBJECT_TYPE responseType, AsyncCallback callback) {
-		doGet(url, responseType, APPLICATION_JSON_CHARSET_UTF8, callback);
+		doGet(url, responseType, APPLICATION_JSON_CHARSET_UTF8, authController.getCurrentUserSessionToken(), callback);
 	}
 	
-	private void doGetString(String url, AsyncCallback callback) {
-		doGet(url, OBJECT_TYPE.String, null, callback);
+	public void doGetString(String url, boolean forceAnonymous, AsyncCallback callback) {
+		String sessionToken = forceAnonymous ? null : authController.getCurrentUserSessionToken();
+		doGet(url, OBJECT_TYPE.String, null, sessionToken, callback);
 	}
 	
-	private void doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, AsyncCallback callback) {
+	private void doGet(String url, OBJECT_TYPE responseType, String acceptedResponseType, String sessionToken, AsyncCallback callback) {
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(GET, url);
 		if (acceptedResponseType != null) {
 			requestBuilder.setHeader(ACCEPT, acceptedResponseType);	
 		}
-		if (authController.isLoggedIn()) {
-			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
+		if (sessionToken != null) {
+			requestBuilder.setHeader(SESSION_TOKEN_HEADER, sessionToken);
 		}
 		sendRequest(requestBuilder, null, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
@@ -386,7 +385,7 @@ public class SynapseJavascriptClient {
 				return new UnknownErrorException(reasonStr);
 		}
 	}
-
+	
 	public void getEntityBundle(String entityId, int partsMask, final AsyncCallback<EntityBundle> callback) {
 		getEntityBundleForVersion(entityId, null, partsMask, callback);
 	}

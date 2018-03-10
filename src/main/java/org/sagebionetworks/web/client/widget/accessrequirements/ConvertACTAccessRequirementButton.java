@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
@@ -42,6 +44,7 @@ public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.popupUtils = popupUtilsView;
 		this.dataAccessClient = dataAccessClient;
+		fixServiceEntryPoint(dataAccessClient);
 		button.setVisible(false);
 		button.addStyleName("margin-left-10");
 		button.setType(ButtonType.WARNING);

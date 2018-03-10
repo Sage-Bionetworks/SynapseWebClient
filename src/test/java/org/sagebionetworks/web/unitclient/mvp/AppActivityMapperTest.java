@@ -20,9 +20,7 @@ import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.presenter.BulkPresenterProxy;
-import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
-import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
 import com.google.gwt.activity.shared.Activity;
@@ -38,7 +36,6 @@ public class AppActivityMapperTest {
 	
 	PortalGinInjector mockInjector;
 
-	PresenterProxy<HomePresenter, Home> mockAll;
 	GlobalApplicationState mockGlobalApplicationState;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	AppActivityMapper appActivityMapper;
@@ -60,9 +57,6 @@ public class AppActivityMapperTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockSynapseJSNIUtils.getCurrentHistoryToken()).thenReturn(historyToken);
 		
-		// Home
-		mockAll = Mockito.mock(PresenterProxy.class);
-		when(mockInjector.getHomePresenter()).thenReturn(mockAll);
 		// Global App State
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		when(mockInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
@@ -83,7 +77,7 @@ public class AppActivityMapperTest {
 		assertNotNull(object);
 		
 		// Validate that the place was set.
-		verify(mockAll).setPlace((Home) anyObject());
+		verify(mockBulkPresenterProxy).setPlace(unknownPlace);
 		
 		// validate that the place change was recorded
 		verify(mockGlobalApplicationState).recordPlaceVisit(unknownPlace);
@@ -107,7 +101,6 @@ public class AppActivityMapperTest {
 		
 		appActivityMapper.getActivity(loginPlace1);
 		verify(mockGlobalApplicationState).setLastPlace(entityPlace);
-		verify(mockGlobalApplicationState).setCurrentPlace(loginPlace1);
 		
 		// Part 2
 		reset(mockGlobalApplicationState);
@@ -116,6 +109,5 @@ public class AppActivityMapperTest {
 		Place loginPlace2 = new LoginPlace("EXAMPLE_SSO_TOKEN");
 		appActivityMapper.getActivity(loginPlace2);		
 		verify(mockGlobalApplicationState, times(0)).setLastPlace(any(Place.class));
-		verify(mockGlobalApplicationState).setCurrentPlace(loginPlace2);
 	}
 }

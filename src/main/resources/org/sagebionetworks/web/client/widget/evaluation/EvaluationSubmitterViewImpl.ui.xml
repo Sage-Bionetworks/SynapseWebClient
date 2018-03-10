@@ -23,7 +23,7 @@
 				</bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button type="LINK" dataDismiss="MODAL">Cancel</b:Button>
 				<b:Button ui:field="dockerCommitNextButton" type="PRIMARY" dataLoadingText="Processing...">Next</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
@@ -56,7 +56,7 @@
 				</bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button type="LINK" dataDismiss="MODAL">Cancel</b:Button>
 				<b:Button ui:field="nextButton" type="PRIMARY" dataLoadingText="Processing...">Next</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
@@ -94,7 +94,7 @@
 				</b:FieldSet>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button type="LINK" dataDismiss="MODAL">Cancel</b:Button>
 				<b:Button ui:field="okButton" type="PRIMARY" dataLoadingText="Processing...">Submit</b:Button>
 			</b:ModalFooter>
 		</b:Modal>

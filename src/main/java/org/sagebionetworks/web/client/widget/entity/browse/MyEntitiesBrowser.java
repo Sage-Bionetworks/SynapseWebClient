@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,12 +18,10 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
-import org.sagebionetworks.web.shared.ProjectPagedResults;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -36,7 +35,6 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	private MyEntitiesBrowserView view;	
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private SynapseClientAsync synapseClient;
 	private SynapseJavascriptClient jsClient;
 	private SelectedHandler selectedHandler;
 	private Place cachedPlace;
@@ -50,13 +48,11 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	public MyEntitiesBrowser(MyEntitiesBrowserView view,
 			AuthenticationController authenticationController,
 			final GlobalApplicationState globalApplicationState,
-			SynapseClientAsync synapseClient,
 			JSONObjectAdapter jsonObjectAdapter,
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.synapseClient = synapseClient;
 		this.jsClient = jsClient;
 		// default selection behavior is to do nothing
 		this.selectedHandler = new SelectedHandler() {			

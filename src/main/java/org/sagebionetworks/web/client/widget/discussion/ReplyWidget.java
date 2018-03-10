@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Set;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -74,6 +75,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.synAlert = synAlert;
 		this.requestBuilder = requestBuilder;
 		this.discussionForumClientAsync = discussionForumClientAsync;
+		fixServiceEntryPoint(discussionForumClientAsync);
 		this.authController = authController;
 		this.editReplyModal = editReplyModal;
 		this.markdownWidget = markdownWidget;
@@ -182,12 +184,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	@Override
 	public void onClickDeleteReply() {
-		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, new SimpleCallback(){
-
-			@Override
-			public void callback() {
-				deleteReply();
-			}
+		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, () -> {
+			deleteReply();
 		});
 	}
 

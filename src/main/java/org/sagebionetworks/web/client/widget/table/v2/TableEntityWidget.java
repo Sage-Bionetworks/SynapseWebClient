@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.getTableType;
 
 import org.gwtbootstrap3.client.ui.constants.AlertType;
@@ -100,6 +101,7 @@ public class TableEntityWidget implements IsWidget,
 		this.queryInputWidget = queryInputWidget;
 		this.preflightController = preflightController;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.fileViewClientsHelp = fileViewClientsHelp;
 		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);

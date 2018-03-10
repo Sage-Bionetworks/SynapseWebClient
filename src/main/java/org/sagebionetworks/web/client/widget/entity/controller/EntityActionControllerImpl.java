@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.CONTAINER;
 import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.PROJECT;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
@@ -29,17 +27,16 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
+import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -56,6 +53,7 @@ import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
+import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
@@ -83,7 +81,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class EntityActionControllerImpl implements EntityActionController, ActionListener, EntityActionControllerView.Presenter {
+public class EntityActionControllerImpl implements EntityActionController, ActionListener{
 	
 	public static final String MOVE_PREFIX = "Move ";
 
@@ -138,7 +136,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
 	ApproveUserAccessModal approveUserAccessModal;
-	UserProfileClientAsync userProfileClient;
 	PortalGinInjector ginInjector;
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
 	AddFolderDialogWidget addFolderDialogWidget;
@@ -148,14 +145,17 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	UploadTableModalWidget uploadTableModalWidget;
 	AddExternalRepoModal addExternalRepoModal;
 	String currentChallengeId;
-	
+	GWTWrapper gwt;
+	Callback reconfigureActionsCallback;
+	WikiPageDeleteConfirmationDialog wikiPageDeleteConfirmationDialog;
 	@Inject
 	public EntityActionControllerImpl(EntityActionControllerView view,
 			PreflightController preflightController,
 			PortalGinInjector ginInjector,
 			AuthenticationController authenticationController,
 			CookieProvider cookies,
-			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
+			GWTWrapper gwt) {
 		super();
 		this.view = view;
 		this.ginInjector = ginInjector;
@@ -163,7 +163,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		this.authenticationController = authenticationController;
 		this.cookies = cookies;
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
-		view.setPresenter(this);
+		this.gwt = gwt;
 		entityUpdatedWizardCallback = new WizardCallback() {
 			@Override
 			public void onFinished() {
@@ -174,8 +174,17 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			public void onCanceled() {
 			}
 		};
+		reconfigureActionsCallback = () -> {
+			reconfigureActions();
+		};
 	}
-	
+	private WikiPageDeleteConfirmationDialog getWikiPageDeleteConfirmationDialog() {
+		if (wikiPageDeleteConfirmationDialog == null) {
+			wikiPageDeleteConfirmationDialog = ginInjector.getWikiPageDeleteConfirmationDialog();
+			view.addWidget(wikiPageDeleteConfirmationDialog);
+		}
+		return wikiPageDeleteConfirmationDialog;
+	}
 	private AddFolderDialogWidget getAddFolderDialogWidget() {
 		if (addFolderDialogWidget == null) {
 			addFolderDialogWidget = ginInjector.getAddFolderDialogWidget();
@@ -206,12 +215,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private ChallengeClientAsync getChallengeClient() {
 		if (challengeClient == null) {
 			challengeClient = ginInjector.getChallengeClientAsync();
+			fixServiceEntryPoint(challengeClient);
 		}
 		return challengeClient;
 	}
 	private SynapseClientAsync getSynapseClient() {
 		if (synapseClient == null) {
 			synapseClient = ginInjector.getSynapseClientAsync();
+			fixServiceEntryPoint(synapseClient);
 		}
 		return synapseClient;
 	}
@@ -343,7 +354,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 
 		// hide all commands by default
 		actionMenu.hideAllActions();
-		
+		gwt.scheduleExecution(reconfigureActionsCallback, 2000);
+	}
+	
+	private void reconfigureActions() {
 		// Setup the actions
 		configureDeleteAction();
 		configureShareAction();
@@ -469,12 +483,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	private void configureCreateDOI() {
 		boolean canEdit = permissions.getCanEdit();
 		actionMenu.setActionVisible(Action.CREATE_DOI, false);
-		if (canEdit && !isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea)) {
+		if (canEdit &&
+				!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
+				!(entityBundle.getEntity() instanceof EntityView)) {
 			actionMenu.setActionListener(Action.CREATE_DOI, this);
 			if (entityBundle.getDoi() == null) {
-				//show command if not returned, thus not in existence
+				// show command if not returned, thus not in existence
 				actionMenu.setActionVisible(Action.CREATE_DOI, true);
-				actionMenu.setActionText(Action.CREATE_DOI, "Create DOI for  "+enityTypeDisplay);
+				actionMenu.setActionText(Action.CREATE_DOI, "Create DOI for  " + enityTypeDisplay);
 			}
 		}
 	}
@@ -540,7 +556,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	private void onDeleteChallenge() {
 		// Confirm the delete with the user.
-		view.showConfirmDialog(CONFIRM_DELETE_TITLE, DisplayConstants.CONFIRM_DELETE_CHALLENGE, () -> {
+		view.showConfirmDeleteDialog(DisplayConstants.CONFIRM_DELETE_CHALLENGE, () -> {
 			postConfirmedDeleteChallenge();
 		});
 	}
@@ -1381,94 +1397,20 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	
 	public void onDeleteWiki() {
 		final WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
-		// Get the wiki page title and parent wiki id.  Go to the parent wiki if this delete is successful.
-		getSynapseJavascriptClient().getV2WikiPage(key, new AsyncCallback<V2WikiPage>() {
-			@Override
-			public void onSuccess(V2WikiPage page) {
-				// Confirm the delete with the user.
-				parentWikiPageId = page.getParentWikiId();
-				onDeleteWikiGetHeaderTree(key, page.getTitle());
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
+		getWikiPageDeleteConfirmationDialog().show(key, parentWikiId -> {
+			getGlobalApplicationState().getPlaceChanger().goTo(new Synapse(entityBundle.getEntity().getId(), null, EntityArea.WIKI, parentWikiId));	
 		});
 	}
-	
-	public void onDeleteWikiGetHeaderTree(WikiPageKey key, final String currentPageTitle) {
-		getSynapseClient().getV2WikiHeaderTree(key.getOwnerObjectId(), key.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-			public void onSuccess(List<V2WikiHeader> wikiHeaders) {
-				view.showDeleteWikiModal(wikiPageId, getWikiHeaderMap(wikiHeaders), getWikiChildrenMap(wikiHeaders));		
-			};
-		});
-	}
-	public Map<String, V2WikiHeader> getWikiHeaderMap(List<V2WikiHeader> wikiHeaders) {
-		Map<String, V2WikiHeader> id2Header = new HashMap<>();
-		for (V2WikiHeader v2WikiHeader : wikiHeaders) {
-			if (v2WikiHeader.getParentId() == null) {
-				//update the root wiki title to be the entity name
-				v2WikiHeader.setTitle(entityBundle.getEntity().getName());
-			}
-			id2Header.put(v2WikiHeader.getId(), v2WikiHeader);
-		}
-		return id2Header;
-	}
-	
-	public Map<String, List<V2WikiHeader>> getWikiChildrenMap(List<V2WikiHeader> wikiHeaders) {
-		Map<String, List<V2WikiHeader>> id2Children = new HashMap<>();
-		for (V2WikiHeader v2WikiHeader : wikiHeaders) {
-			if (v2WikiHeader.getParentId() != null) {
-				List<V2WikiHeader> children = id2Children.get(v2WikiHeader.getParentId());
-				if (children == null) {
-					children = new ArrayList<>();
-					id2Children.put(v2WikiHeader.getParentId(), children);
-				}
-				children.add(v2WikiHeader);
-			}
-		}
-		return id2Children;
-	}
-	
-	@Override
-	public void onConfirmDeleteWiki() {
-		postConfirmedDeleteWiki(parentWikiPageId);
-	}
-
-	/**
-	 * Called after the user has confirmed the delete of the entity.
-	 */
-	public void postConfirmedDeleteWiki(final String parentWikiId) {
-		WikiPageKey key = new WikiPageKey(this.entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), wikiPageId);
-		getSynapseClient().deleteV2WikiPage(key, new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				view.showInfo(DELETED, THE + WIKI + WAS_SUCCESSFULLY_DELETED);
-				getGlobalApplicationState().getPlaceChanger().goTo(new Synapse(entityBundle.getEntity().getId(), null, EntityArea.WIKI, parentWikiId));
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-		});
-	}
-
 	
 	@Override
 	public void onDeleteEntity() {
 		// Confirm the delete with the user. Mention that everything inside folder will also be deleted if this is a folder entity.
-		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+this.enityTypeDisplay+" "+this.entity.getName()+"?";
+		String display = ARE_YOU_SURE_YOU_WANT_TO_DELETE+this.enityTypeDisplay+" \""+this.entity.getName()+"\"?";
 		if (this.entity instanceof Folder) {
 			display += DELETE_FOLDER_EXPLANATION;
 		}
 		
-		view.showConfirmDialog(CONFIRM_DELETE_TITLE,display, new Callback() {
+		view.showConfirmDeleteDialog(display, new Callback() {
 			@Override
 			public void invoke() {
 				postConfirmedDeleteEntity();

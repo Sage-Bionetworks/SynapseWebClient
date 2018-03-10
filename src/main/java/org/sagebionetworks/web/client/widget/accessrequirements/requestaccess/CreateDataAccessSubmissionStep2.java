@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.requestaccess;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,6 +85,7 @@ public class CreateDataAccessSubmissionStep2 implements ModalPage {
 		super();
 		this.view = view;
 		this.client = client;
+		fixServiceEntryPoint(client);
 		this.templateFileRenderer = templateFileRenderer;
 		this.ginInjector = ginInjector;
 		this.jsniUtils = jsniUtils;

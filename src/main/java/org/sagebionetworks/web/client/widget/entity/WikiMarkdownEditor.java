@@ -1,15 +1,18 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.HashSet;
 import java.util.List;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -29,6 +32,8 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 	WikiMarkdownEditorView view;
 	GlobalApplicationState globalApplicationState;
 	SynapseJavascriptClient jsClient;
+	WikiPageDeleteConfirmationDialog wikiPageDeleteConfirmationDialog;
+	PortalGinInjector ginInjector;
 	
 	@Inject
 	public WikiMarkdownEditor(
@@ -36,10 +41,13 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 			MarkdownEditorWidget editor,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
-			SynapseJavascriptClient jsClient) {
+			SynapseJavascriptClient jsClient, 
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.editor = editor;
 		this.synapseClient = synapseClient;
+		this.ginInjector = ginInjector;
+		fixServiceEntryPoint(synapseClient);
 		this.globalApplicationState = globalApplicationState;
 		this.jsClient = jsClient;
 		view.setPresenter(this);
@@ -58,6 +66,13 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 		});
 	}
 	
+	private WikiPageDeleteConfirmationDialog getWikiPageDeleteConfirmationDialog() {
+		if (wikiPageDeleteConfirmationDialog == null) {
+			wikiPageDeleteConfirmationDialog = ginInjector.getWikiPageDeleteConfirmationDialog();
+		}
+		return wikiPageDeleteConfirmationDialog;
+	}
+
 	public void filesAdded(List<String> fileHandleIds) {
 		HashSet<String> fileHandleIdsSet = new HashSet<String>();
         fileHandleIdsSet.addAll(currentPage.getAttachmentFileHandleIds());
@@ -134,6 +149,7 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 		view.setTitle(currentPage.getTitle());
 		globalApplicationState.setIsEditing(true);
 		view.showEditorModal();
+		editor.setMarkdownFocus();
 	}
 
 	public void saveClicked() {
@@ -179,29 +195,11 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 	
 	@Override
 	public void deleteClicked() {
-		view.confirm(DisplayConstants.PROMPT_SURE_DELETE + " Page and Subpages?", new ConfirmCallback() {
-			@Override
-			public void callback(boolean isConfirmed) {
-				if (isConfirmed)
-					deleteConfirmed();
-			}
+		getWikiPageDeleteConfirmationDialog().show(wikiKey, parentWikiId -> {
+			globalApplicationState.setIsEditing(false);
+			view.hideEditorModal();
+			globalApplicationState.getPlaceChanger().goTo(new Synapse(wikiKey.getOwnerObjectId(), null, EntityArea.WIKI, parentWikiId));
 		});
-	}
-	
-	public void deleteConfirmed() {
-		synapseClient.deleteV2WikiPage(wikiKey, new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				globalApplicationState.setIsEditing(false);
-				view.hideEditorModal();
-				globalApplicationState.getPlaceChanger().goTo(new Synapse(wikiKey.getOwnerObjectId()));
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-		});	
 	}
 	
 	public void setDeleteButtonVisible(boolean visible) {

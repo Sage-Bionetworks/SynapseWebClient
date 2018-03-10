@@ -34,10 +34,12 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -93,6 +95,8 @@ public class WikiPageWidgetTest {
 	ArgumentCaptor<CallbackP<WikiPageKey>> callbackPCaptor;
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
+	@Mock
+	CookieProvider mockCookies;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
 	WikiPageWidget presenter;
@@ -105,7 +109,7 @@ public class WikiPageWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		presenter = new WikiPageWidget(mockView, mockSynapseClient, mockStuAlert, mockHistoryWidget, mockMarkdownWidget,
 				mockSubpages, mockInjector, mockSessionStorage, mockAuthController, adapterFactory, mockDateTimeUtils,
-				mockSynapseJavascriptClient);
+				mockSynapseJavascriptClient, mockCookies);
 		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
 		headers.setTotalNumberOfResults(1);
 		List<EntityHeader> resultHeaderList = new ArrayList<EntityHeader>();
@@ -123,6 +127,7 @@ public class WikiPageWidgetTest {
 		WikiPage fakeWiki = new WikiPage();
 		fakeWiki.setMarkdown("Fake wiki");
 		AsyncMockStubber.callSuccessWith(fakeWiki).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 	}
 	
 	@Test
@@ -137,7 +142,8 @@ public class WikiPageWidgetTest {
 		String suffix = "-test-suffix";
 		String formattedDate = "today";
 		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(formattedDate);
-		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null);
+		WikiPageKey key = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null);
+		presenter.configure(key, canEdit, null);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
 		verify(mockMarkdownWidget).configure(anyString(), any(WikiPageKey.class), any(Long.class));
@@ -159,6 +165,17 @@ public class WikiPageWidgetTest {
 		verify(mockHistoryWidget, never()).configure(any(WikiPageKey.class), anyBoolean(), any(ActionHandler.class));
 		presenter.showWikiHistory();
 		verify(mockHistoryWidget).configure(any(WikiPageKey.class), anyBoolean(), any(ActionHandler.class));
+		// in alpha mode, so show diff tool button
+		verify(mockView).setWikiHistoryDiffToolButtonVisible(true, key);
+	}
+	
+	//TODO: remove if exposing this outside of alpha mode
+	@Test
+	public void testDiffToolHiddenInNormalMode() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn(null);
+		WikiPageKey key = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null);
+		presenter.configure(key, false, null);
+		verify(mockView).setWikiHistoryDiffToolButtonVisible(false, key);
 	}
 	
 	@Test

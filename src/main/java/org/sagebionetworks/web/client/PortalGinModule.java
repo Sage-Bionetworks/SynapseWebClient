@@ -89,6 +89,8 @@ import org.sagebionetworks.web.client.view.TeamView;
 import org.sagebionetworks.web.client.view.TeamViewImpl;
 import org.sagebionetworks.web.client.view.TrashView;
 import org.sagebionetworks.web.client.view.TrashViewImpl;
+import org.sagebionetworks.web.client.view.WikiDiffView;
+import org.sagebionetworks.web.client.view.WikiDiffViewImpl;
 import org.sagebionetworks.web.client.view.users.PasswordResetView;
 import org.sagebionetworks.web.client.view.users.PasswordResetViewImpl;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
@@ -265,6 +267,8 @@ import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorView;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorViewImpl;
+import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialogView;
+import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialogViewImpl;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
@@ -289,7 +293,6 @@ import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserViewImpl;
-import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserView;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowserViewImpl;
 import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserController;
@@ -743,7 +746,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// JsoProvider
 		bind(JsoProvider.class).to(JsoProviderImpl.class);
 		bind(JsoProviderImpl.class).in(Singleton.class);
-		
 		// AuthenticationController
 		bind(AuthenticationController.class).to(AuthenticationControllerImpl.class).in(Singleton.class);;
 
@@ -764,10 +766,6 @@ public class PortalGinModule extends AbstractGinModule {
 		// JSONAdapters
 		bind(JSONObjectAdapter.class).to(JSONObjectGwt.class);
 		bind(JSONArrayAdapter.class).to(JSONArrayGwt.class);
-		
-		// EntitySchemaCacheImpl
-		bind(EntitySchemaCacheImpl.class).in(Singleton.class);
-		bind(EntitySchemaCache.class).to(EntitySchemaCacheImpl.class);
 		
 		// cache place presenters
 		bind(ProfilePresenter.class).in(Singleton.class);
@@ -1400,5 +1398,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(HtmlPreviewView.class).to(HtmlPreviewViewImpl.class);
 		bind(S3DirectLoginDialog.class).to(S3DirectLoginDialogImpl.class);
+		bind(WikiPageDeleteConfirmationDialogView.class).to(WikiPageDeleteConfirmationDialogViewImpl.class);
+		bind(WikiDiffView.class).to(WikiDiffViewImpl.class);
 	}
 }

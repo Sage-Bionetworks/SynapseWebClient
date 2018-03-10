@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.OpenSubmission;
@@ -33,6 +35,7 @@ public class OpenSubmissionWidget implements OpenSubmissionWidgetView.Presenter,
 		this.view = view;
 		this.accessRequirementWidget = accessRequirementWidget;
 		this.dataAccessClient = dataAccessClient;
+		fixServiceEntryPoint(dataAccessClient);
 		this.synAlert = synAlert;
 		this.lazyLoadHelper = lazyLoadHelper;
 		view.setSynAlert(synAlert);

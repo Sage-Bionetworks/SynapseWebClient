@@ -21,6 +21,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -46,20 +47,27 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsTreeItem;
 
 public class EntityTreeBrowserTest {
+	@Mock
 	EntityTreeBrowserView mockView;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	IconsImageBundle mockIconsImageBundle;
+	@Mock
 	PortalGinInjector mockInjector;
 	AdapterFactory adapterFactory;
 	EntityTreeBrowser entityTreeBrowser;
@@ -67,24 +75,24 @@ public class EntityTreeBrowserTest {
 	EntityChildrenResponse mockResults;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	CallbackP<String> mockEntityClickedCallback;
 	List<EntityHeader> searchResults;
-	
+	@Mock
 	EntityTreeItem mockEntityTreeItem;
+	@Mock
 	MoreTreeItem mockMoreTreeItem;
+	@Mock
 	IsTreeItem mockLoadingItem;
+	@Captor
+	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
+	@Mock
+	EntityHeader mockEntityHeader;
 	String parentId;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
-		mockView = mock(EntityTreeBrowserView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockIconsImageBundle = mock(IconsImageBundle.class);
-		mockInjector = mock(PortalGinInjector.class);
-		mockEntityTreeItem = mock(EntityTreeItem.class);
-		mockMoreTreeItem = mock(MoreTreeItem.class);
-		mockLoadingItem = mock(IsTreeItem.class);
 		adapterFactory = new AdapterFactoryImpl();
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
 				mockSynapseJavascriptClient, mockAuthenticationController,  mockGlobalApplicationState,
@@ -114,13 +122,24 @@ public class EntityTreeBrowserTest {
 
 	@Test
 	public void testGetChildren() {
+		String childEntityId = "syn98765";
+		searchResults.add(mockEntityHeader);
+		when(mockEntityHeader.getId()).thenReturn(childEntityId);
+		when(mockEntityHeader.getType()).thenReturn(FileEntity.class.getName());
+		
+		entityTreeBrowser.setEntityClickedHandler(mockEntityClickedCallback);
 		entityTreeBrowser.getChildren("123", null, null);
+		
 		ArgumentCaptor<EntityChildrenRequest> captor = ArgumentCaptor
 				.forClass(EntityChildrenRequest.class);
 		verify(mockSynapseJavascriptClient).getEntityChildren(captor.capture(), any(AsyncCallback.class));
 		EntityChildrenRequest request = captor.getValue();
 		assertEquals("123", request.getParentId());
 		assertNull(request.getNextPageToken());
+		verify(mockEntityTreeItem).setClickHandler(clickHandlerCaptor.capture());
+		verify(mockEntityClickedCallback, never()).invoke(anyString());
+		clickHandlerCaptor.getValue().onClick(null);
+		verify(mockEntityClickedCallback).invoke(childEntityId);
 	}
 
 	@Test
@@ -228,10 +247,6 @@ public class EntityTreeBrowserTest {
 		//verify firing a selection event
 		entityTreeBrowser.fireEntitySelectedEvent();
 		verify(handler).onSelection(any(EntitySelectedEvent.class));
-		//verify clearing the state clears the selection handler
-		entityTreeBrowser.clearState();
-		assertNull(entityTreeBrowser.getEntitySelectedHandler());
-		entityTreeBrowser.fireEntitySelectedEvent();
 	}
 	
 	private EntityHeader createEntityHeader(String id, String name, String type, Long versionNumber) {

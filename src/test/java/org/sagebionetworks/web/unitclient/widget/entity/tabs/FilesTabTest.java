@@ -189,7 +189,6 @@ public class FilesTabTest {
 		verify(mockView).setMetadata(any(Widget.class));
 		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setSynapseAlert(any(Widget.class));
-		verify(mockFilesBrowser).setEntityClickedHandler(any(CallbackP.class));
 		verify(mockBreadcrumb).setLinkClickedHandler(any(CallbackP.class));
 		verify(mockView).setDiscussionThreadListWidget(any(Widget.class));
 		ArgumentCaptor<CallbackP> captor = ArgumentCaptor.forClass(CallbackP.class);
@@ -205,15 +204,6 @@ public class FilesTabTest {
 	public void testSetTabClickedCallback() {
 		tab.setTabClickedCallback(mockOnClickCallback);
 		verify(mockTab).addTabClickedCallback(mockOnClickCallback);
-	}
-	
-	@Test
-	public void testClickFilesBrowser() {
-		//verify that clicking on an item in the files browser sends the event back to the entity page top (to get the new target entity)
-		String newEntityId = "syn9839248";
-		verify(mockFilesBrowser).setEntityClickedHandler(callbackPCaptor.capture());
-		callbackPCaptor.getValue().invoke(newEntityId);
-		verify(mockEntitySelectedCallback).invoke(newEntityId);
 	}
 
 	@Test
@@ -245,7 +235,7 @@ public class FilesTabTest {
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setFileBrowserVisible(true);
 		verify(mockFilesBrowser).configure(projectEntityId);
-		
+		verify(mockFilesBrowser).setEntityClickedHandler(mockEntitySelectedCallback);
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab, times(2)).setEntityNameAndPlace(eq(projectName), captor.capture());
 		Synapse place = captor.getValue();

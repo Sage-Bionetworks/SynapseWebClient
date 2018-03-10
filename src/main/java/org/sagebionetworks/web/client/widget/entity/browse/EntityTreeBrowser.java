@@ -64,13 +64,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		view.setPresenter(this);
 	}
 	
-	public void clearState() {
-		view.clear();
-		// remove handlers
-		entitySelectedHandler = null;
-		entityClickedHandler = null;
-	}
-
 	public void clear() {
 		view.clear();
 	}
@@ -199,14 +192,14 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		makeSelectable();
 	}
 	
-	public void setEntityClickedHandler(CallbackP<String> callback) {
-		entityClickedHandler = callback;
-	}
-	
 	public EntitySelectedHandler getEntitySelectedHandler() {
 		return entitySelectedHandler;
 	}
 
+	public void setEntityClickedHandler(CallbackP<String> entityClickedHandler) {
+		this.entityClickedHandler = entityClickedHandler;
+	}
+	
 	/**
 	 * Rather than linking to the Entity Page, a clicked entity in the tree will
 	 * become selected.
@@ -258,7 +251,9 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		final EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
 		childItem.configure(header, isRootItem, isExpandable);
 		if (entityClickedHandler != null) {
-			childItem.setEntityClickedHandler(entityClickedHandler);
+			childItem.setClickHandler(event -> {
+				entityClickedHandler.invoke(header.getId());
+			});
 		}
 		return childItem;
 	}

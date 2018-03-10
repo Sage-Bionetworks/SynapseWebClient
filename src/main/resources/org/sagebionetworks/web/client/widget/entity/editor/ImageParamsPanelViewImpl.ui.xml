@@ -7,6 +7,10 @@
 	
 	<b:Panel addStyleNames="margin-top-10 margin-bottom-10">
 		<b:PanelBody>
+			<b:FormGroup>
+				<b:FormLabel>Alternate text</b:FormLabel>
+				<b:TextBox ui:field="altText"/>
+			</b:FormGroup>
 			<bh:Div>
 				<b:FormLabel>Scale (%)</b:FormLabel>
 			</bh:Div>

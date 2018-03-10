@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.presenter.ACTAccessApprovalsPresenter;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionDashboardPresenter;
 import org.sagebionetworks.web.client.presenter.ACTDataAccessSubmissionsPresenter;
@@ -23,7 +22,6 @@ import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.presenter.MapPresenter;
 import org.sagebionetworks.web.client.presenter.NewAccountPresenter;
 import org.sagebionetworks.web.client.presenter.PeopleSearchPresenter;
-import org.sagebionetworks.web.client.presenter.PresenterProxy;
 import org.sagebionetworks.web.client.presenter.ProfilePresenter;
 import org.sagebionetworks.web.client.presenter.QuestionContainerWidget;
 import org.sagebionetworks.web.client.presenter.QuizPresenter;
@@ -37,6 +35,7 @@ import org.sagebionetworks.web.client.presenter.SynapseWikiPresenter;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.presenter.TeamSearchPresenter;
 import org.sagebionetworks.web.client.presenter.TrashPresenter;
+import org.sagebionetworks.web.client.presenter.WikiDiffPresenter;
 import org.sagebionetworks.web.client.presenter.users.PasswordResetPresenter;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -89,7 +88,9 @@ import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
 import org.sagebionetworks.web.client.widget.entity.TutorialWizard;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
+import org.sagebionetworks.web.client.widget.entity.WikiPageDeleteConfirmationDialog;
 import org.sagebionetworks.web.client.widget.entity.WikiPageWidget;
+import org.sagebionetworks.web.client.widget.entity.WikiVersionAnchorListItem;
 import org.sagebionetworks.web.client.widget.entity.act.ACTRevokeUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
@@ -180,6 +181,7 @@ import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidget;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
@@ -191,6 +193,8 @@ import org.sagebionetworks.web.client.widget.refresh.RefreshAlert;
 import org.sagebionetworks.web.client.widget.refresh.ReplyCountAlert;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.sharing.AclAddPeoplePanel;
+import org.sagebionetworks.web.client.widget.sharing.SharingPermissionsGrid;
 import org.sagebionetworks.web.client.widget.subscription.TopicRowWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
@@ -242,6 +246,7 @@ import org.sagebionetworks.web.client.widget.team.TeamBadge;
 import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleLink;
+import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.ImageUploadView;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.client.widget.user.UserGroupListWidget;
@@ -266,7 +271,7 @@ public interface PortalGinInjector extends Ginjector {
 
 	GlobalApplicationState getGlobalApplicationState();
 
-	PresenterProxy<HomePresenter, Home> getHomePresenter();
+	HomePresenter getHomePresenter();
 
 	EntityPresenter getEntityPresenter();
 
@@ -334,6 +339,7 @@ public interface PortalGinInjector extends Ginjector {
 	SynapseForumPresenter getSynapseForumPresenter();
 	SubscriptionPresenter getSubscriptionPresenter();
 	ACTAccessApprovalsPresenter getACTAccessApprovalsPresenter();
+	WikiDiffPresenter getWikiDiffPresenter();
 
 	EmailInvitationPresenter getEmailInvitationPresenter();
 
@@ -552,11 +558,8 @@ public interface PortalGinInjector extends Ginjector {
 	ChallengeClientAsync getChallengeClientAsync();
 	UserProfileClientAsync getUserProfileClientAsync();
 	DataAccessClientAsync getDataAccessClientAsync();
-	MultipartFileUploadClientAsync getMultipartFileUploadClientAsync();
 	DiscussionForumClientAsync getDiscussionForumClientAsync();
 	DockerClientAsync getDockerClientAsync();
-	JiraClientAsync getJiraClientAsync();
-	LinkedInServiceAsync getLinkedInServiceAsync();
 	StackConfigServiceAsync getStackConfigServiceAsync();
 	SubscriptionClientAsync getSubscriptionClientAsync();
 	UserAccountServiceAsync getUserAccountServiceAsync();
@@ -598,4 +601,11 @@ public interface PortalGinInjector extends Ginjector {
 	SynapseJSNIUtils getSynapseJSNIUtils();
 	GWTWrapper getGWT();
 	LazyLoadHelper getLazyLoadHelper();
+	SharingPermissionsGrid getSharingPermissionsGrid();
+	AclAddPeoplePanel getAclAddPeoplePanel();
+	FileHandleUploadWidget getFileHandleUploadWidget();
+	WikiPageDeleteConfirmationDialog getWikiPageDeleteConfirmationDialog();
+	StuAnnouncementWidget getStuAnnouncementWidget();
+	
+	WikiVersionAnchorListItem getWikiVersionAnchorListItem();
 }

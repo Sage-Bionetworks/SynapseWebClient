@@ -7,7 +7,7 @@
 	<b:Modal dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="entityFinder modal-fullscreen topLevelZIndex">
 		<b:ModalHeader closable="false">
 			<b:Heading size="H4" text="Find in Synapse" addStyleNames="displayInline" />
-			<w:HelpWidget helpMarkdown="Finding items in Synapse can be done by either “browsing”, “searching,” or directly entering the Synapse ID.&#10;Alternatively, navigate to the desired location in the current project, favorite projects or projects you own." 
+			<w:HelpWidget ui:field="helpWidget" helpMarkdown="Finding items in Synapse can be done by either “browsing”, “searching,” or directly entering the Synapse ID.&#10;Alternatively, navigate to the desired location in the current project, favorite projects or projects you own." 
 				addStyleNames="margin-left-5" placement="BOTTOM"/>
 		</b:ModalHeader>
 		<b:ModalBody>
@@ -17,25 +17,25 @@
 						paddingRight="10">
 						<b:Panel>
 							<b:PanelBody>
-								<g:SimplePanel ui:field="browseMyEntitiesContainer" />
-								<g:SimplePanel ui:field="searchContainer" />
-								<g:SimplePanel ui:field="enterSynapseIdContainer" />
-								<g:SimplePanel ui:field="enterSynapseMultiIdContainer" />
+								<bh:Div ui:field="browseMyEntitiesContainer" />
+								<bh:Div ui:field="searchContainer" />
+								<bh:Div ui:field="enterSynapseIdContainer" />
+								<bh:Div ui:field="enterSynapseMultiIdContainer" />
 							</b:PanelBody>
 						</b:Panel>
 					</t:TableData>
 					<t:TableData addStyleNames="vertical-align-top">
 						<b:Panel>
 							<b:PanelBody>
-								<g:SimplePanel ui:field="myEntitiesBrowserContainer" />
+								<bh:Div ui:field="myEntitiesBrowserContainer" />
 								<!-- entity search widget container -->
-								<g:FlowPanel ui:field="entitySearchWidgetContainer">
+								<bh:Div ui:field="entitySearchWidgetContainer">
 									<b:Heading size="H4">
 										<bh:Text>Search</bh:Text>
 									</b:Heading>
-									<g:SimplePanel ui:field="entitySearchBoxContainer" />
-								</g:FlowPanel>
-								<g:FlowPanel ui:field="enterIdWidgetContainer">
+									<bh:Div ui:field="entitySearchBoxContainer" />
+								</bh:Div>
+								<bh:Div ui:field="enterIdWidgetContainer">
 									<b:Heading size="H4">
 										<bh:Text>Enter Synapse ID</bh:Text>
 									</b:Heading>
@@ -46,8 +46,8 @@
 											<b:Button ui:field="lookupSynapseIdButton" text="Lookup" />
 										</b:InputGroupButton>
 									</b:InputGroup>
-								</g:FlowPanel>
-								<g:FlowPanel ui:field="enterMultiIdWidgetContainer">
+								</bh:Div>
+								<bh:Div ui:field="enterMultiIdWidgetContainer">
 									<b:Heading size="H4">
 										<bh:Text>Enter List of Synapse Ids</bh:Text>
 									</b:Heading>
@@ -58,9 +58,8 @@
 											<b:Button ui:field="lookupSynapseMultiIdButton" text="Lookup" />
 										</b:InputGroupButton>
 									</b:InputGroup>
-								</g:FlowPanel>
-
-								<g:FlowPanel ui:field="versionUI" addStyleNames="margin-top-10">
+								</bh:Div>
+								<bh:Div ui:field="versionUI" addStyleNames="margin-top-10">
 									<b:Radio ui:field="currentVersionRadio" name="versionRadio"
 										text="Current Version" />
 									<b:Radio ui:field="currentVersionRadioShowingVersions"
@@ -74,8 +73,7 @@
 										<b:DropDownMenu ui:field="versionDropDownMenu"
 											addStyleNames="btn-block" />
 									</b:ButtonGroup>
-								</g:FlowPanel>
-
+								</bh:Div>
 							</b:PanelBody>
 						</b:Panel>
 						<!-- right bottom -->
@@ -93,7 +91,7 @@
 			</t:Table>
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="cancelButton" type="DEFAULT">Cancel</b:Button>
+			<b:Button ui:field="cancelButton" type="LINK">Cancel</b:Button>
 			<b:Button ui:field="okButton" type="PRIMARY">Select</b:Button>
 		</b:ModalFooter>
 	</b:Modal>

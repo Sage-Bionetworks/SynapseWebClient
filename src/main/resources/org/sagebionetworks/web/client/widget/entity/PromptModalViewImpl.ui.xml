@@ -18,7 +18,7 @@
 			<b:Alert ui:field="alert" type="DANGER" visible="false"></b:Alert>
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="defaultButton" type="DEFAULT" text="Cancel"></b:Button>
+			<b:Button ui:field="defaultButton" type="LINK" text="Cancel"></b:Button>
 			<b:Button ui:field="primaryButton" type="PRIMARY" dataLoadingText="Saving..." text="Save"></b:Button>
 		</b:ModalFooter>
 	</b:Modal>

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.team.controller;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -51,6 +53,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		this.synAlert = synAlert;
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.uploader = uploader;
 		this.baseImageURL = jsniUtils.getBaseFileHandleUrl();
 		this.authController = authenticationController;

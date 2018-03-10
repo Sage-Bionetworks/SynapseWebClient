@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.place.Team;
 import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.Wiki;
+import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 
@@ -59,6 +60,6 @@ import com.google.gwt.place.shared.WithTokenizers;
 		SynapseForumPlace.Tokenizer.class, SubscriptionPlace.Tokenizer.class,
 		AccessRequirementsPlace.Tokenizer.class, ACTDataAccessSubmissionsPlace.Tokenizer.class,
 		ACTDataAccessSubmissionDashboardPlace.Tokenizer.class, ACTAccessApprovalsPlace.Tokenizer.class,
-		EmailInvitation.Tokenizer.class})
+		EmailInvitation.Tokenizer.class, WikiDiff.Tokenizer.class})
 public interface AppPlaceHistoryMapper extends PlaceHistoryMapper {
 }

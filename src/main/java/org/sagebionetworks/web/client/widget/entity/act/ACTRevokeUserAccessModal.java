@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.ACTAccessRequirementInterface;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -37,6 +39,7 @@ public class ACTRevokeUserAccessModal implements RevokeUserAccessModalView.Prese
 		this.synAlert = synAlert;
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		peopleSuggestWidget.setSuggestionProvider(provider);
 		peopleSuggestWidget.setTypeFilter(TypeFilter.USERS_ONLY);
 		view.setPresenter(this);

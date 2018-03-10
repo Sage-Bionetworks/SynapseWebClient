@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -9,6 +11,7 @@ public class UrlCacheImpl implements UrlCache {
 	
 	@Inject
 	public UrlCacheImpl(SynapseClientAsync client, final SynapseJSNIUtils jsniUtils){
+		fixServiceEntryPoint(client);
 		client.getRepositoryServiceUrl(new AsyncCallback<String>() {
 			
 			@Override

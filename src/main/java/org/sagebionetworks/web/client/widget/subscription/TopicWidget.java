@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
@@ -30,6 +32,7 @@ public class TopicWidget implements TopicWidgetView.Presenter, SynapseWidgetPres
 			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.forumClient = forumClient;
+		fixServiceEntryPoint(forumClient);
 		this.synAlert = synAlert;
 		this.jsClient = jsClient;
 		view.setPresenter(this);

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Objects;
 
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -9,11 +11,13 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -67,7 +71,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		public void noWikiFound();
 	}
 	private DateTimeUtils dateTimeUtils;
-	
+	private CookieProvider cookies;
 	@Inject
 	public WikiPageWidget(WikiPageWidgetView view,
 			SynapseClientAsync synapseClient,
@@ -78,10 +82,12 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			AuthenticationController authController,
 			AdapterFactory adapterFactory,
 			DateTimeUtils dateTimeUtils,
-			SynapseJavascriptClient jsClient
+			SynapseJavascriptClient jsClient,
+			CookieProvider cookies
 			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.stuAlert = stuAlert;
 		this.historyWidget = historyWidget;
 		this.markdownWidget = markdownWidget;
@@ -92,6 +98,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		this.adapterFactory = adapterFactory;
 		this.dateTimeUtils = dateTimeUtils;
 		this.jsClient = jsClient;
+		this.cookies = cookies;
 		view.setPresenter(this);
 		view.setSynapseAlertWidget(stuAlert.asWidget());
 		view.setWikiHistoryWidget(historyWidget);
@@ -140,6 +147,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			};
 		}
 		reloadWikiPage();
+		view.setWikiHistoryDiffToolButtonVisible(DisplayUtils.isInTestWebsite(cookies), wikiKey);
 	}
 	
 	public void showSubpages(ActionMenuWidget actionMenu) {

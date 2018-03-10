@@ -308,16 +308,14 @@ public class SettingsPresenterTest {
 	@Test
 	public void testConfirmAPIKeyChange(){
 		presenter.changeApiKey();
-		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockView).showConfirm(anyString(),  captor.capture());
 		
-		ConfirmCallback callback = captor.getValue();
-		//test not confirmed (user clicked cancel)
-		callback.callback(false);
+		Callback callback = captor.getValue();
 		verify(mockSynapseClient, never()).deleteApiKey(any(AsyncCallback.class));
 		verify(mockView, never()).setApiKey(APIKEY2);
 		
-		callback.callback(true);
+		callback.invoke();
 		verify(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
 		verify(mockView).setApiKey(APIKEY2);
 	}
