@@ -936,7 +936,7 @@ public class ProfilePresenterTest {
 	public void testRefreshChallenges() {
 		profilePresenter.setPlace(place);
 		profilePresenter.tabClicked(ProfileArea.CHALLENGES);
-		verify(mockView, times(2)).clearChallenges();
+		verify(mockView).clearChallenges();
 		assertEquals(ProfilePresenter.CHALLENGE_PAGE_SIZE, profilePresenter.getCurrentChallengeOffset());
 		verify(mockView, times(2)).showChallengesLoading(anyBoolean());
 		verify(mockView).addChallengeWidget(any(Widget.class));
