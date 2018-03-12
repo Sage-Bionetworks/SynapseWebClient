@@ -265,6 +265,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				view.showGetVersionError(caught.getMessage());
 				if (callback != null) {
 					callback.onFailure(caught);	
 				}
