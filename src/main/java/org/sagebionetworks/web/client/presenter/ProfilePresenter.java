@@ -845,7 +845,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void addChallengeResults(List<Challenge> challenges) {
 		view.showChallengesLoading(false);
-		view.clearChallenges();
 		for (Challenge challenge : challenges) {
 			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
 			badge.configure(challenge);
