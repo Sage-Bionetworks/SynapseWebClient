@@ -204,6 +204,18 @@ public class GlobalApplicationStateImplTest {
 		
 	}
 	
+	@Test
+	public void testCheckVersionCompatibilityFailure() {
+		Exception ex = new Exception("couldn't get version");
+		AsyncMockStubber.callFailureWith(ex).when(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
+		globalApplicationState.initSynapseProperties(() -> {});
+		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
+		globalApplicationState.checkVersionCompatibility(callback);
+		verify(mockStackConfigService, times(2)).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockView).showGetVersionError(ex.getMessage());
+		verify(callback).onFailure(ex);
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCheckVersionCompatibilityCheckedRecently() {
