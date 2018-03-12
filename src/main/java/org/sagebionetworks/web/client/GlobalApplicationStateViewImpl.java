@@ -16,7 +16,11 @@ public class GlobalApplicationStateViewImpl implements
 		DisplayUtils.showError(DisplayConstants.NEW_VERSION_AVAILABLE, DisplayConstants.NEW_VERSION_INSTRUCTIONS, UNLIMITED_TIME);
 		preloadNewVersion();
 	}
-	
+	@Override
+	public void showGetVersionError(String error) {
+		DisplayUtils.showError("Unable to determine the Synapse version. Please refresh the page to get the latest version.", error, 5000);
+		preloadNewVersion();
+	}
 	@Override
 	public void initGlobalViewProperties() {
 		DialogOptions options = DialogOptions.newOptions("");
@@ -25,13 +29,14 @@ public class GlobalApplicationStateViewImpl implements
 	}
 	
 	public void preloadNewVersion() {
-		if (iframe == null) {
-			String currentURL = Window.Location.getHref();
-			iframe = new Frame(currentURL);
-			iframe.setWidth("1px");
-			iframe.setHeight("1px");
-			RootPanel.getBodyElement().appendChild(iframe.getElement());
-			iframe.setVisible(false);
+		if (iframe != null) {
+			RootPanel.getBodyElement().removeChild(iframe.getElement());
 		}
+		String currentURL = Window.Location.getHref();
+		iframe = new Frame(currentURL);
+		iframe.setWidth("1px");
+		iframe.setHeight("1px");
+		RootPanel.getBodyElement().appendChild(iframe.getElement());
+		iframe.setVisible(false);
 	}
 }
