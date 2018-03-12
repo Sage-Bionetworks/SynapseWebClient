@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -116,6 +117,7 @@ import com.google.inject.Inject;
  */
 public class SynapseJavascriptClient {
 	public static final String TYPE_FILTER_PARAMETER = "&typeFilter=";
+	public static final String CHALLENGE = "/challenge";
 	public static final String WIKI = "/wiki/";
 	public static final String WIKI2 = "/wiki2/";
 	public static final String WIKIKEY = "/wikikey";
@@ -605,6 +607,18 @@ public class SynapseJavascriptClient {
 			};
 		};
 		doGet(url, OBJECT_TYPE.PaginatedResultsEntityHeader, paginatedResultsCallback);
+	}
+	
+	public void getChallenges(String userId, Integer limit, Integer offset, AsyncCallback<List<Challenge>> callback) {
+		String url = getRepoServiceUrl() + 
+				CHALLENGE+"?participantId="+userId;
+		if  (limit!=null) {
+			url+=	"&"+LIMIT_PARAMETER+limit;
+		}
+		if  (offset!=null) {
+			url+="&"+OFFSET_PARAMETER+offset;
+		}
+		doGet(url, OBJECT_TYPE.ChallengePagedResults, callback);
 	}
 	
 	public void getUserBundle(Long principalId, int mask, AsyncCallback<UserBundle> callback) {

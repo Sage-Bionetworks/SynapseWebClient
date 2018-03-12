@@ -1,36 +1,52 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Challenge;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
-import org.sagebionetworks.web.shared.ChallengeBundle;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.test.helper.AsyncMockStubber;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ChallengeBadgeTest {
 
+	@Mock
 	ChallengeBadgeView mockView;
+	@Mock
+	EntityHeaderAsyncHandler mockEntityHeaderAsyncHandler;
+	@Mock
+	SynapseJSNIUtils mockSynapseJSNIUtils;
 	ChallengeBadge widget;
-	ChallengeBundle testChallengeBundle;
-	Challenge testChallenge;
+	@Mock
+	Challenge mockTestChallenge;
+	@Mock
+	EntityHeader mockChallengeProjectHeader;
 	public static final String testProjectName= "my test challenge project";
 	public static final String testProjectId = "syn123";
+	
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		mockView = mock(ChallengeBadgeView.class);
-		widget = new ChallengeBadge(mockView);
-		testChallengeBundle = new ChallengeBundle();
-		testChallenge = new Challenge();
-		testChallenge.setProjectId(testProjectId);
-		testChallenge.setParticipantTeamId("12345");
-		testChallengeBundle.setChallenge(testChallenge);
-		testChallengeBundle.setProjectName(testProjectName);
+		MockitoAnnotations.initMocks(this);
+		widget = new ChallengeBadge(mockView, mockEntityHeaderAsyncHandler, mockSynapseJSNIUtils);
+		when(mockTestChallenge.getProjectId()).thenReturn(testProjectId);
+		when(mockChallengeProjectHeader.getName()).thenReturn(testProjectName);
+		AsyncMockStubber.callSuccessWith(mockChallengeProjectHeader).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
 	}
 	
 	private void verifyNoProjectIdSet() {
@@ -49,22 +65,22 @@ public class ChallengeBadgeTest {
 	
 	@Test
 	public void testConfigure() {
-		widget.configure(testChallengeBundle);
+		widget.configure(mockTestChallenge);
 		String projectId = verifyProjectId();
 		assertEquals(testProjectId, projectId);
 	}
 	
 	@Test
 	public void testConfigureNullChallenge() {
-		testChallengeBundle.setChallenge(null);
-		widget.configure(testChallengeBundle);
+		widget.configure(null);
 		verifyNoProjectIdSet();
 	}
 	
 	@Test
-	public void testConfigureNullProjectId() {
-		testChallenge.setProjectId(null);
-		widget.configure(testChallengeBundle);
-		verifyNoProjectIdSet();
+	public void testConfigureNullProjectHeader() {
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockEntityHeaderAsyncHandler).getEntityHeader(anyString(), any(AsyncCallback.class));
+		widget.configure(mockTestChallenge);
+		verifyProjectId();
+		verify(mockView, never()).setProjectName(anyString());
 	}
 }
