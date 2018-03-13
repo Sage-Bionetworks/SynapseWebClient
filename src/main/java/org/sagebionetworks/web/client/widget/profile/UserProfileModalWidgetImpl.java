@@ -42,6 +42,12 @@ public class UserProfileModalWidgetImpl implements UserProfileModalWidget {
 		this.clientCache = clientCache;
 		this.modalView.setPresenter(this);
 		this.modalView.addEditorWidget(editorWidget);
+		editorWidget.setUploadingCallback(() -> {
+			modalView.setProcessing(true);
+		});
+		editorWidget.setUploadingCompleteCallback(() -> {
+			modalView.setProcessing(false);
+		});
 	}
 	
 	@Override

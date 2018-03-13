@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.profile;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -80,5 +81,6 @@ public interface UserProfileEditorWidget extends IsWidget {
 	String getSummary();
 
 	void addKeyDownHandler(KeyDownHandler keyDownHandler);
-
+	void setUploadingCallback(Callback startedUploadingCallback);
+	void setUploadingCompleteCallback(Callback uploadCompleteCallback);
 }

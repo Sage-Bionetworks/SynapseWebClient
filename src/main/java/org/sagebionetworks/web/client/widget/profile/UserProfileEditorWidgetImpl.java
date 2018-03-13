@@ -22,7 +22,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 	ProfileImageWidget imageWidget;
 	ImageUploadWidget fileHandleUploadWidget;
 	String fileHandleId;
-	
+	Callback uploadCompleteCallback;
 	@Inject
 	public UserProfileEditorWidgetImpl(
 			UserProfileEditorWidgetView view,
@@ -153,12 +153,21 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		this.fileHandleId = fileHandleId;
 		this.fileHandleUploadWidget.reset();
 		this.imageWidget.configure(this.fileHandleId);
+		if (uploadCompleteCallback != null) {
+			uploadCompleteCallback.invoke();
+		}
 	}
 
 	@Override
 	public void addKeyDownHandler(KeyDownHandler keyDownHandler) {
 		view.addKeyDownHandlerToFields(keyDownHandler);
 	}
-	
-
+	@Override
+	public void setUploadingCallback(Callback startedUploadingCallback) {
+		fileHandleUploadWidget.setUploadingCallback(startedUploadingCallback);	
+	}
+	@Override
+	public void setUploadingCompleteCallback(Callback uploadCompleteCallback) {
+		this.uploadCompleteCallback = uploadCompleteCallback;
+	}
 }
