@@ -2,7 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.profile;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -12,6 +12,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.profile.ProfileImageWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetView;
@@ -30,6 +31,8 @@ public class UserProfileEditorWidgetImplTest {
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
 	CroppedImageUploadViewImpl mockCroppedImageUploadViewImpl;
+	@Mock
+	Callback mockCallback;
 	UserProfile profile;
 	
 	@Before
@@ -73,6 +76,24 @@ public class UserProfileEditorWidgetImplTest {
 		verify(mockView).setLink(profile.getUrl());
 		verify(mockView).setBio(profile.getSummary());
 		verify(mockImageWidget).configure(profile.getProfilePicureFileHandleId());
+	}
+	
+	@Test
+	public void testSetNewFileHandle() {
+		String newFileHandle = "293";
+		widget.setUploadingCompleteCallback(mockCallback);
+		verify(mockCallback, never()).invoke();
+		
+		widget.setNewFileHandle(newFileHandle);
+		
+		verify(mockImageWidget).configure(newFileHandle);
+		verify(mockCallback).invoke();
+	}
+	
+	@Test
+	public void testSetUploadingCallback() {
+		widget.setUploadingCallback(mockCallback);
+		verify(mockfileHandleUploadWidget).setUploadingCallback(mockCallback);
 	}
 	
 	@Test

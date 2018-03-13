@@ -149,7 +149,7 @@ public class UserProfileEditorWidgetImpl implements UserProfileEditorWidget, Use
 		return view.getBio();
 	}
 	
-	private void setNewFileHandle(String fileHandleId) {
+	public void setNewFileHandle(String fileHandleId) {
 		this.fileHandleId = fileHandleId;
 		this.fileHandleUploadWidget.reset();
 		this.imageWidget.configure(this.fileHandleId);
