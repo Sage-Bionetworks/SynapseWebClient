@@ -26,6 +26,8 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsyncJobId;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBodyInstanceFactory;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
@@ -43,7 +45,6 @@ import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -93,12 +94,12 @@ public class SynapseJavascriptFactory {
 		StackStatus,
 		UserProfile,
 		FileHandleResults,
+		AsyncResponse,
 		JSON,
 		MembershipInvitation,
 		InviteeVerificationSignedToken,
 		ListWrapperColumnModel,
 		PaginatedTeamIds,
-		QueryResultBundle,
 		AsyncJobId,
 		LoginResponse,
 		None,
@@ -117,7 +118,19 @@ public class SynapseJavascriptFactory {
 			Entity entity = EntityInstanceFactory.singleton().newInstance(concreteType);
 			entity.initializeFromJSONObject(json);
 			return entity;
-		} 
+		}
+		if (OBJECT_TYPE.AsyncResponse.equals(type)) {
+			if (json.has("concreteType")) {
+				String concreteType = json.getString("concreteType");
+				AsynchronousResponseBodyInstanceFactory asyncResponseFactory = AsynchronousResponseBodyInstanceFactory.singleton();
+				AsynchronousResponseBody response = asyncResponseFactory.newInstance(concreteType);
+				response.initializeFromJSONObject(json);
+				return response;
+			} else {
+				AsynchronousJobStatus status = new AsynchronousJobStatus(json);
+				throw new ResultNotReadyException(status);
+			}
+		}
 		switch (type) {
 		case EntityBundle :
 			return new EntityBundle(json);
@@ -237,13 +250,6 @@ public class SynapseJavascriptFactory {
 			return new InviteeVerificationSignedToken(json);
 		case PaginatedTeamIds:
 			return new PaginatedTeamIds(json);
-		case QueryResultBundle:
-			try {
-				AsynchronousJobStatus status = new AsynchronousJobStatus(json); 
-				throw new ResultNotReadyException(status);
-			} catch (JSONObjectAdapterException e) {
-				return new QueryResultBundle(json);				
-			}
 		case AsyncJobId:
 			return new AsyncJobId(json).getToken();
 		case LoginResponse:
