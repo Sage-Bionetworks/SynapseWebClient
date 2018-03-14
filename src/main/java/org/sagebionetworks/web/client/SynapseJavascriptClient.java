@@ -52,6 +52,7 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
@@ -327,6 +328,10 @@ public class SynapseJavascriptClient {
 								responseObject = null;
 							} else if (OBJECT_TYPE.String.equals(responseType)) {
 								responseObject = response.getText();
+							} else if (OBJECT_TYPE.AsyncResponse.equals(responseType) && statusCode == 202) {
+								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
+								responseObject = new AsynchronousJobStatus(jsonObject);
+								throw new ResultNotReadyException((AsynchronousJobStatus)responseObject);
 							} else {
 								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
 								responseObject = jsFactory.newInstance(responseType, jsonObject);

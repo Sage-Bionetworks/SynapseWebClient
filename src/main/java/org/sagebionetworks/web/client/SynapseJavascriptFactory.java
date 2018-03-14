@@ -120,16 +120,11 @@ public class SynapseJavascriptFactory {
 			return entity;
 		}
 		if (OBJECT_TYPE.AsyncResponse.equals(type)) {
-			if (json.has("concreteType")) {
-				String concreteType = json.getString("concreteType");
-				AsynchronousResponseBodyInstanceFactory asyncResponseFactory = AsynchronousResponseBodyInstanceFactory.singleton();
-				AsynchronousResponseBody response = asyncResponseFactory.newInstance(concreteType);
-				response.initializeFromJSONObject(json);
-				return response;
-			} else {
-				AsynchronousJobStatus status = new AsynchronousJobStatus(json);
-				throw new ResultNotReadyException(status);
-			}
+			String concreteType = json.getString("concreteType");
+			AsynchronousResponseBodyInstanceFactory asyncResponseFactory = AsynchronousResponseBodyInstanceFactory.singleton();
+			AsynchronousResponseBody response = asyncResponseFactory.newInstance(concreteType);
+			response.initializeFromJSONObject(json);
+			return response;
 		}
 		switch (type) {
 		case EntityBundle :
