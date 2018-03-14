@@ -22,6 +22,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.junit.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -45,11 +46,16 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
+import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
+import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -516,6 +522,23 @@ public class SynapseJavascriptClientTest {
 	}
 	
 	@Test
+	public void testAsyncTableTransaction() throws RequestException, JSONObjectAdapterException {
+		String tableId = "syn3889291";
+		String jobId = "99994";
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		TableUpdateTransactionRequest request = new TableUpdateTransactionRequest();
+		request.setEntityId(tableId);
+		client.getAsynchJobResults(AsynchType.TableTransaction, jobId, request, mockAsyncCallback);
+		
+		//verify url and method
+		String url = REPO_ENDPOINT + ENTITY + "/" + tableId + TABLE_TRANSACTION + ASYNC_GET + jobId;
+		verify(mockRequestBuilder).configure(GET, url);
+		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
+	}
+	
+	@Test
 	public void testStartTableQueryJob() throws RequestException, JSONObjectAdapterException {
 		QueryBundleRequest request = new QueryBundleRequest();
 		request.setEntityId("syn292");
@@ -531,21 +554,55 @@ public class SynapseJavascriptClientTest {
 		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
 	}
 	
-//	@Test
-//	public void testGetAsynchJobResults() throws RequestException, JSONObjectAdapterException {
-//		String entityId = "syn387453";
-//		String jobId = "99992";
-//		when(mockAuthController.isLoggedIn()).thenReturn(true);
-//		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
-//		
-//		client.getAsynchJobResults(type, jobId, request, callback);
-//		
-//		//verify url and method
-//		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + TABLE_QUERY + ASYNC_GET + jobId;
-//		verify(mockRequestBuilder).configure(GET, url);
-//		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
-//		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
-//	}
+	@Test
+	public void testAsyncGetTableQueryJobResults() throws RequestException, JSONObjectAdapterException {
+		String entityId = "syn387453";
+		String jobId = "99992";
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		QueryBundleRequest request = new QueryBundleRequest();
+		request.setEntityId(entityId);
+		client.getAsynchJobResults(AsynchType.TableQuery, jobId, request, mockAsyncCallback);
+		
+		//verify url and method
+		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + TABLE_QUERY + ASYNC_GET + jobId;
+		verify(mockRequestBuilder).configure(GET, url);
+		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
+	}
+	
+	@Test
+	public void testAsyncBulkFileDownload() throws RequestException, JSONObjectAdapterException {
+		String jobId = "99993";
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		BulkFileDownloadRequest request = new BulkFileDownloadRequest();
+		request.setRequestedFiles(new ArrayList<>());
+		client.getAsynchJobResults(AsynchType.BulkFileDownload, jobId, request, mockAsyncCallback);
+		
+		//verify url and method
+		String url = FILE_ENDPOINT + FILE_BULK + ASYNC_GET + jobId;
+		verify(mockRequestBuilder).configure(GET, url);
+		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
+	}
+	
+	@Test
+	public void testAsyncCSVDownload() throws RequestException, JSONObjectAdapterException {
+		String tableId = "syn388378";
+		String jobId = "99994";
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		DownloadFromTableRequest request = new DownloadFromTableRequest();
+		request.setEntityId(tableId);
+		client.getAsynchJobResults(AsynchType.TableCSVDownload, jobId, request, mockAsyncCallback);
+		
+		//verify url and method
+		String url = REPO_ENDPOINT + ENTITY + "/" + tableId + TABLE_DOWNLOAD_CSV + ASYNC_GET + jobId;
+		verify(mockRequestBuilder).configure(GET, url);
+		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
+	}
 	
 	public void testGetTableQueryJobResultsReady() throws RequestException, JSONObjectAdapterException, ResultNotReadyException {
 		// test round trip (response really is a QueryResultBundle, which should be re-created from the json)

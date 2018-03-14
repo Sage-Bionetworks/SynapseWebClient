@@ -29,7 +29,6 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  */
 
 public enum AsynchType implements IsSerializable{
-	
 	TableAppendRowSet(TABLE_APPEND, AppendableRowSetRequest.class, RowReferenceSetResults.class),
 	TableQuery(TABLE_QUERY, QueryBundleRequest.class, QueryResultBundle.class),
 	TableQueryNextPage(TABLE_QUERY_NEXTPAGE, QueryNextPageToken.class, QueryResult.class),

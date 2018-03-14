@@ -332,6 +332,8 @@ public class SynapseJavascriptClient {
 								responseObject = jsFactory.newInstance(responseType, jsonObject);
 							}
 							callback.onSuccess(responseObject);
+						} catch (JSONObjectAdapterException e) {
+							onError(null, e);
 						} catch (ResultNotReadyException e) {
 							onError(request, e);
 						} catch (Exception e) {
