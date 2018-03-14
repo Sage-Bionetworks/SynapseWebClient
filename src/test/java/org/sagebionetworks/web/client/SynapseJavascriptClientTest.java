@@ -42,6 +42,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
@@ -569,6 +570,23 @@ public class SynapseJavascriptClientTest {
 		verify(mockRequestBuilder).configure(GET, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
+		
+		// response status code is OK, but if we request a query result but it responds with a job status, then a ResultNotReadyException should be thrown
+		AsynchronousJobStatus jobStatus = new AsynchronousJobStatus();
+		jobStatus.setJobState(AsynchJobState.PROCESSING);
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		jobStatus.writeToJSONObject(adapter);
+		
+		verify(mockRequestBuilder).sendRequest(eq((String)null), requestCallbackCaptor.capture());
+		RequestCallback requestCallback = requestCallbackCaptor.getValue();
+		when(mockResponse.getStatusCode()).thenReturn(SC_ACCEPTED);
+		when(mockResponse.getText()).thenReturn(adapter.toJSONString());
+		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		
+		verify(mockAsyncCallback).onFailure(throwableCaptor.capture());
+		Throwable th = throwableCaptor.getValue();
+		assertTrue(th instanceof ResultNotReadyException);
+		assertEquals(jobStatus, ((ResultNotReadyException)th).getStatus());
 	}
 	
 	@Test
@@ -614,19 +632,5 @@ public class SynapseJavascriptClientTest {
 		QueryResultBundle newResultBundleInstance = (QueryResultBundle) synapseJsFactory.newInstance(OBJECT_TYPE.AsyncResponse, adapter);
 		
 		assertEquals(resultBundle, newResultBundleInstance);
-	}
-	@Test
-	public void testGetTableQueryJobResultsNotReady() throws RequestException, JSONObjectAdapterException, ResultNotReadyException {
-		// response status code is OK, but if we request a query result but it responds with a job status, then a ResultNotReadyException should be thrown
-		AsynchronousJobStatus jobStatus = new AsynchronousJobStatus();
-		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-		jobStatus.writeToJSONObject(adapter);
-		
-		try {
-			synapseJsFactory.newInstance(OBJECT_TYPE.AsyncResponse, adapter);
-			fail("expected result not ready exception");
-		} catch (ResultNotReadyException ex) {
-			assertEquals(jobStatus, ex.getStatus());
-		}
 	}
 }
