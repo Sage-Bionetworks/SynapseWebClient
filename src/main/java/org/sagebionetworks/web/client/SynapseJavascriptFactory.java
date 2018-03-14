@@ -45,7 +45,6 @@ import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -101,7 +100,6 @@ public class SynapseJavascriptFactory {
 		InviteeVerificationSignedToken,
 		ListWrapperColumnModel,
 		PaginatedTeamIds,
-		QueryResultBundle,
 		AsyncJobId,
 		LoginResponse,
 		None,
@@ -252,13 +250,6 @@ public class SynapseJavascriptFactory {
 			return new InviteeVerificationSignedToken(json);
 		case PaginatedTeamIds:
 			return new PaginatedTeamIds(json);
-		case QueryResultBundle:
-			try {
-				AsynchronousJobStatus status = new AsynchronousJobStatus(json); 
-				throw new ResultNotReadyException(status);
-			} catch (JSONObjectAdapterException e) {
-				return new QueryResultBundle(json);				
-			}
 		case AsyncJobId:
 			return new AsyncJobId(json).getToken();
 		case LoginResponse:

@@ -611,7 +611,7 @@ public class SynapseJavascriptClientTest {
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		resultBundle.writeToJSONObject(adapter);
 		
-		QueryResultBundle newResultBundleInstance = (QueryResultBundle) synapseJsFactory.newInstance(OBJECT_TYPE.QueryResultBundle, adapter);
+		QueryResultBundle newResultBundleInstance = (QueryResultBundle) synapseJsFactory.newInstance(OBJECT_TYPE.AsyncResponse, adapter);
 		
 		assertEquals(resultBundle, newResultBundleInstance);
 	}
@@ -623,7 +623,7 @@ public class SynapseJavascriptClientTest {
 		jobStatus.writeToJSONObject(adapter);
 		
 		try {
-			synapseJsFactory.newInstance(OBJECT_TYPE.QueryResultBundle, adapter);
+			synapseJsFactory.newInstance(OBJECT_TYPE.AsyncResponse, adapter);
 			fail("expected result not ready exception");
 		} catch (ResultNotReadyException ex) {
 			assertEquals(jobStatus, ex.getStatus());
