@@ -2032,17 +2032,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
-	@Override
-	public AsynchronousResponseBody getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody body)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try{
-			return synapseClient.getAsyncResult(AsynchJobType.valueOf(type.name()), jobId, body);
-		}catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} 
-	}
 	
 	public EntityChildrenResponse getEntityChildren(EntityChildrenRequest request) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();

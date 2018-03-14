@@ -52,6 +52,8 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
@@ -86,6 +88,7 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
@@ -186,10 +189,24 @@ public class SynapseJavascriptClient {
 	private static final String ASCENDING_PARAM = "ascending=";
 	
 	public static final String COLUMN = "/column";
+	public static final String COLUMN_BATCH = COLUMN + "/batch";
 	public static final String COLUMN_VIEW_DEFAULT = COLUMN + "/tableview/defaults/";
+	public static final String TABLE = "/table";
+	public static final String ROW_ID = "/row";
+	public static final String ROW_VERSION = "/version";
+	public static final String TABLE_QUERY = TABLE + "/query";
+	public static final String TABLE_QUERY_NEXTPAGE = TABLE_QUERY + "/nextPage";
+	public static final String TABLE_DOWNLOAD_CSV = TABLE + "/download/csv";
+	public static final String TABLE_UPLOAD_CSV = TABLE + "/upload/csv";
+	public static final String TABLE_UPLOAD_CSV_PREVIEW = TABLE + "/upload/csv/preview";
+	public static final String TABLE_APPEND = TABLE + "/append";
+	public static final String TABLE_TRANSACTION = TABLE+"/transaction";
+	public static final String ASYNCHRONOUS_JOB = "/asynchronous/job";
+	public static final String FILE = "/file";
+	public static final String FILE_BULK = FILE+"/bulk";
+
 	public static final String ASYNC_START = "/async/start";
 	public static final String ASYNC_GET = "/async/get/";
-	public static final String TABLE_QUERY = "/table/query";
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	
@@ -311,6 +328,10 @@ public class SynapseJavascriptClient {
 								responseObject = null;
 							} else if (OBJECT_TYPE.String.equals(responseType)) {
 								responseObject = response.getText();
+							} else if (OBJECT_TYPE.AsyncResponse.equals(responseType) && statusCode == 202) {
+								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
+								responseObject = new AsynchronousJobStatus(jsonObject);
+								throw new ResultNotReadyException((AsynchronousJobStatus)responseObject);
 							} else {
 								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
 								responseObject = jsFactory.newInstance(responseType, jsonObject);
@@ -320,6 +341,8 @@ public class SynapseJavascriptClient {
 							onError(null, e);
 						} catch (ResultNotReadyException e) {
 							onError(request, e);
+						} catch (Exception e) {
+							onError(null, e);
 						}
 					} else {
 						// Status code could be 0 if the preflight request failed, or if the network connection is down.
@@ -910,12 +933,7 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + TABLE_QUERY + ASYNC_START;
 		doPost(url, request, OBJECT_TYPE.AsyncJobId, callback);
 	}
-	
-	public void getTableQueryJobResults(String entityId, String jobId, AsyncCallback<AsynchronousResponseBody> callback) {
-		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + TABLE_QUERY + ASYNC_GET + jobId;
-		doGet(url, OBJECT_TYPE.QueryResultBundle, callback);
-	}
-	
+
 	public void login(LoginRequest loginRequest, AsyncCallback<LoginResponse> callback) {
 		String url = getAuthServiceUrl() + "/login";
 		doPost(url, loginRequest, OBJECT_TYPE.LoginResponse, callback);
@@ -952,6 +970,17 @@ public class SynapseJavascriptClient {
 		url += '?' + OFFSET_PARAMETER + offset + '&' + LIMIT_PARAMETER + limit + "&sort=" + sortBy.name() + "&sortDirection="
 				+ sortDir.name();
 		doGet(url, OBJECT_TYPE.PaginatedResultProjectHeader, projectHeadersCallback);
+	}
+	
+	public void getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody request, AsyncCallback<AsynchronousResponseBody> callback) {
+		String endpoint;
+		if (AsynchType.BulkFileDownload.equals(type)) {
+			endpoint = getFileServiceUrl();
+		} else {
+			endpoint = getRepoServiceUrl();
+		}
+		String url = type.getResultUrl(jobId, request);
+		doGet(endpoint + url, OBJECT_TYPE.AsyncResponse, callback);
 	}
 }
 
