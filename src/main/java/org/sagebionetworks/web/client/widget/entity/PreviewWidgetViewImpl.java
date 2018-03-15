@@ -84,7 +84,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		clear();
 		Image fullImage = new Image();
 		fullImage.getElement().setAttribute("alt", "");
-		fullImage.addStyleName("imageButton maxWidth100 maxHeight100 margin-left-20");
+		fullImage.addStyleName("imageButton maxWidth100 maxHeight100");
 		fullImage.addErrorHandler(new ErrorHandler() {
 			@Override
 		    public void onError(ErrorEvent event) {
