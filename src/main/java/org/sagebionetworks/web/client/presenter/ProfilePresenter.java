@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.ProjectHeader;
@@ -19,7 +20,6 @@ import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
-import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -54,8 +54,6 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
-import org.sagebionetworks.web.shared.ChallengeBundle;
-import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.LinkedInInfo;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
@@ -87,7 +85,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private ProfileView view;
 	private SynapseClientAsync synapseClient;
 	private UserProfileClientAsync userProfileClient;
-	private ChallengeClientAsync challengeClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookies;
@@ -133,7 +130,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			ChallengeClientAsync challengeClient,
 			CookieProvider cookies,
 			LinkedInServiceAsync linkedInServic,
 			GWTWrapper gwt,
@@ -150,8 +146,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.ginInjector = ginInjector;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
-		this.challengeClient = challengeClient;
-		fixServiceEntryPoint(challengeClient);
 		this.cookies = cookies;
 		this.linkedInService = linkedInServic;
 		fixServiceEntryPoint(linkedInService);
@@ -774,17 +768,19 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void getMoreChallenges() {
 		challengeSynAlert.clear();
 		view.showChallengesLoading(true);
-		challengeClient.getChallenges(currentUserId, CHALLENGE_PAGE_SIZE, currentChallengeOffset, new AsyncCallback<ChallengePagedResults>() {
+		jsClient.getChallenges(currentUserId, CHALLENGE_PAGE_SIZE, currentChallengeOffset, new AsyncCallback<List<Challenge>>() {
 			@Override
-			public void onSuccess(ChallengePagedResults challengeResults) {
-				addChallengeResults(challengeResults.getResults());
-				challengePageAdded(challengeResults.getTotalNumberOfResults());
+			public void onSuccess(List<Challenge> challengeList) {
+				addChallengeResults(challengeList);
+				challengePageAdded(challengeList.size());
 			}
-	            @Override
+			
+			@Override
 			public void onFailure(Throwable caught) {
 				view.showChallengesLoading(false);
 				challengeSynAlert.handleException(caught);
 			}
+			
 		});
 	}
 	
@@ -847,10 +843,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	public void addChallengeResults(List<ChallengeBundle> challenges) {
+	public void addChallengeResults(List<Challenge> challenges) {
 		view.showChallengesLoading(false);
-		view.clearChallenges();
-		for (ChallengeBundle challenge : challenges) {
+		for (Challenge challenge : challenges) {
 			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
 			badge.configure(challenge);
 			Widget widget = badge.asWidget();
@@ -867,9 +862,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		loadMoreProjectsWidgetContainer.setIsMore(projectsAdded >= PROJECT_PAGE_SIZE);
 	}
 	
-	public void challengePageAdded(Long totalNumberOfResults) {
+	public void challengePageAdded(int challengesAdded) {
 		currentChallengeOffset += CHALLENGE_PAGE_SIZE;
-		view.setIsMoreChallengesVisible(currentChallengeOffset < totalNumberOfResults);
+		view.setIsMoreChallengesVisible(challengesAdded >= CHALLENGE_PAGE_SIZE);
 	}
 	
 	public void getFavorites() {

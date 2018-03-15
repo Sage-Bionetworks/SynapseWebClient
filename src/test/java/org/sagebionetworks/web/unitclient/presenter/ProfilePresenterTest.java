@@ -31,6 +31,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Annotations;
+import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
@@ -49,7 +50,6 @@ import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -88,8 +88,6 @@ import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
-import org.sagebionetworks.web.shared.ChallengeBundle;
-import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -113,8 +111,6 @@ public class ProfilePresenterTest {
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
-	ChallengeClientAsync mockChallengeClient;
-	@Mock
 	LinkedInServiceAsync mockLinkedInServic;
 	@Mock
 	GWTWrapper mockGwt;
@@ -136,8 +132,7 @@ public class ProfilePresenterTest {
 	SortOptionEnum sort = SortOptionEnum.LATEST_ACTIVITY;
 	List<EntityHeader> myFavorites;
 	List<ProjectHeader> myProjects;
-	ChallengePagedResults testChallengePagedResults;
-	List<ChallengeBundle> testChallenges;
+	List<Challenge> testChallenges;
 	@Mock
 	ProjectBadge mockProjectBadge;
 	@Mock
@@ -189,7 +184,6 @@ public class ProfilePresenterTest {
 				mockAuthenticationController, 
 				mockGlobalApplicationState, 
 				mockSynapseClient, 
-				mockChallengeClient, 
 				mockCookies, 
 				mockLinkedInServic, 
 				mockGwt, 
@@ -314,13 +308,9 @@ public class ProfilePresenterTest {
 	
 	
 	public void setupTestChallengePagedResults() {
-		testChallengePagedResults = new ChallengePagedResults();
-		testChallenges = new ArrayList<ChallengeBundle>();
-		ChallengeBundle bundle = new ChallengeBundle(ChallengeClientImplTest.getTestChallenge(), "my challenge project");
-		testChallenges.add(bundle);
-		testChallengePagedResults.setResults(testChallenges);
-		testChallengePagedResults.setTotalNumberOfResults(1L);
-		AsyncMockStubber.callSuccessWith(testChallengePagedResults).when(mockChallengeClient).getChallenges(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
+		testChallenges = new ArrayList<Challenge>();
+		testChallenges.add(ChallengeClientImplTest.getTestChallenge());
+		AsyncMockStubber.callSuccessWith(testChallenges).when(mockSynapseJavascriptClient).getChallenges(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -946,7 +936,7 @@ public class ProfilePresenterTest {
 	public void testRefreshChallenges() {
 		profilePresenter.setPlace(place);
 		profilePresenter.tabClicked(ProfileArea.CHALLENGES);
-		verify(mockView, times(2)).clearChallenges();
+		verify(mockView).clearChallenges();
 		assertEquals(ProfilePresenter.CHALLENGE_PAGE_SIZE, profilePresenter.getCurrentChallengeOffset());
 		verify(mockView, times(2)).showChallengesLoading(anyBoolean());
 		verify(mockView).addChallengeWidget(any(Widget.class));

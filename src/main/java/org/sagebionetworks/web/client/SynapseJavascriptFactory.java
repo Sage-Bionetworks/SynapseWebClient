@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.ChallengePagedResults;
 import org.sagebionetworks.repo.model.Count;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -102,6 +103,7 @@ public class SynapseJavascriptFactory {
 		PaginatedTeamIds,
 		AsyncJobId,
 		LoginResponse,
+		ChallengePagedResults,
 		None,
 		String
 	}
@@ -193,6 +195,8 @@ public class SynapseJavascriptFactory {
 			return new UserProfile(json);
 		case FileHandleResults :
 			return new FileHandleResults(json).getList();
+		case ChallengePagedResults:
+			return new ChallengePagedResults(json).getResults();
 		case JSON :
 			return json;
 		case PaginatedResultsEntityHeader :
