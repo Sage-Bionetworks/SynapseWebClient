@@ -568,6 +568,11 @@ public class ProfilePresenterTest {
 		verify(mockSynapseJavascriptClient).getMyProjects(eq(ProjectListType.MY_PROJECTS), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),  any(AsyncCallback.class));
 		verify(mockLoadMoreContainer, times(2)).add(any(Widget.class));
 		verify(mockView).setProjectSortVisible(true);
+		verify(mockLoadMoreContainer, never()).clear();
+		
+		// if we set the place and get projects again, verify existing project load more container is cleared (deregisters callback)
+		profilePresenter.setPlace(place);
+		verify(mockLoadMoreContainer).clear();
 	}
 	
 	@Test
@@ -970,6 +975,11 @@ public class ProfilePresenterTest {
 		verify(mockSynapseJavascriptClient).listTeams(teamIds);
 		verify(mockTeamListWidget).addTeam(any(Team.class));
 		verify(mockView, Mockito.never()).setTeamNotificationCount(anyString());
+		verify(mockLoadMoreContainer, never()).clear();
+		
+		// if we set the place and get teams again, verify existing teams load more container is cleared (deregisters callback)
+		profilePresenter.setPlace(place);
+		verify(mockLoadMoreContainer).clear();
 	}
 	
 	@Test
