@@ -79,6 +79,7 @@ public class LoadMoreWidgetContainer implements IsWidget, HasWidgets {
 	@Override
 	public void clear() {
 		view.clear();
+		setIsMore(false);
 	}
 
 	@Override

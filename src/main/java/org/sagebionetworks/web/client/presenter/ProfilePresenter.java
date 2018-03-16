@@ -59,6 +59,7 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -247,7 +248,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void setPlace(Profile place) {
 		this.place = place;
-		this.view.setPresenter(this);
 		this.view.clear();
 		resetSynAlertWidgets();
 		showView(place);
@@ -998,7 +998,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		currentArea = place.getArea();
 		filterType = place.getProjectFilter();
 		filterTeamId = place.getTeamId();
-		view.setPresenter(this);
+		if (loadMoreProjectsWidgetContainer != null) {
+			loadMoreProjectsWidgetContainer.clear();
+		}
+		if (loadMoreTeamsWidgetContainer != null) {
+			loadMoreTeamsWidgetContainer.clear();
+		}
+		
 		if (token.equals("oauth_bound")) {
 			view.showInfo("", DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
 			token = "v";

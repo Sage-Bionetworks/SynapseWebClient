@@ -41,6 +41,7 @@ public class LoadMoreWidgetContainerTest {
 		widget.setIsMore(isMore);
 		verify(mockView).setLoadMoreVisibility(isMore);
 		verify(mockLazyLoadCallbackQueue).subscribe(any(Callback.class));
+		verify(mockLazyLoadCallbackQueue, never()).unsubscribe(any(Callback.class));
 	}
 	
 	@Test
@@ -49,6 +50,7 @@ public class LoadMoreWidgetContainerTest {
 		widget.setIsMore(isMore);
 		verify(mockView).setLoadMoreVisibility(isMore);
 		verify(mockLazyLoadCallbackQueue, never()).subscribe(any(Callback.class));
+		verify(mockLazyLoadCallbackQueue).unsubscribe(any(Callback.class));
 	}
 
 
@@ -68,6 +70,8 @@ public class LoadMoreWidgetContainerTest {
 	public void testClear() {
 		widget.clear();
 		verify(mockView).clear();
+		verify(mockView).setLoadMoreVisibility(false);
+		verify(mockLazyLoadCallbackQueue).unsubscribe(any(Callback.class));
 	}
 
 	@Test
@@ -77,7 +81,6 @@ public class LoadMoreWidgetContainerTest {
 		verify(mockLazyLoadCallbackQueue, never()).subscribe(any(Callback.class));
 		verify(mockLoadMoreCallback, never()).invoke();
 	}
-
 	
 	@Test
 	public void testCheckForInViewAndLoadDataAttachedNotInViewport() {
