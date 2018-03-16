@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -37,6 +39,7 @@ public class FileTitleBar implements SynapseWidgetPresenter {
 		this.globalAppState = globalAppState;
 		this.fileDownloadButton = fileDownloadButton;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		view.setFileDownloadButton(fileDownloadButton.asWidget());
 	}	
 	

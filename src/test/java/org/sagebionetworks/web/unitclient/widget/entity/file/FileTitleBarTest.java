@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
@@ -31,6 +32,8 @@ import junit.framework.Assert;
 public class FileTitleBarTest {
 		
 	FileTitleBar fileTitleBar;
+	@Mock
+	SynapseClientAsync mockSynapseClient;
 	@Mock
 	FileTitleBarView mockView;
 	@Mock
@@ -51,7 +54,7 @@ public class FileTitleBarTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		fileTitleBar = new FileTitleBar(mockView, mockGlobalAppState, mockFileDownloadButton);
+		fileTitleBar = new FileTitleBar(mockView, mockGlobalAppState, mockFileDownloadButton, mockSynapseClient);
 		Mockito.when(mockFileEntity.getId()).thenReturn("syn123");
 		Mockito.when(mockFileEntity.getName()).thenReturn("syn123");
 		Mockito.when(mockFileEntity.getDataFileHandleId()).thenReturn(DATA_FILE_HANDLE_ID);
