@@ -247,8 +247,6 @@ public interface SynapseClientAsync {
 
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds, AsyncCallback<Void> callback);
 
-	void startAsynchJob(AsynchType type, AsynchronousRequestBody body, AsyncCallback<String> callback);
-
 	void createEntity(Entity entity,
 			AsyncCallback<Entity> callback);
 
