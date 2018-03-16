@@ -1,5 +1,15 @@
 package org.sagebionetworks.web.shared.asynch;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.ASYNC_GET;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.ASYNC_START;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.FILE_BULK;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_APPEND;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_DOWNLOAD_CSV;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_QUERY;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_QUERY_NEXTPAGE;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_TRANSACTION;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_UPLOAD_CSV;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_UPLOAD_CSV_PREVIEW;
+
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
@@ -102,5 +112,14 @@ public enum AsynchType implements IsSerializable{
 			return "/entity/" + entityId + prefix + ASYNC_GET + token;
 		}
 		return prefix+ASYNC_GET + token;
+	}
+	
+	public String getStartUrl(AsynchronousRequestBody request){
+		String entityId = getEntityIdFromRequest(request);
+		if (entityId != null) {
+			return "/entity/" + entityId + prefix + ASYNC_START;
+		} else {
+			return prefix + ASYNC_START;
+		}
 	}
 }

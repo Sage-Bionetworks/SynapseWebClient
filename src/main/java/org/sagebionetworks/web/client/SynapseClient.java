@@ -26,7 +26,6 @@ import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
@@ -59,7 +58,6 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.RemoteService;
@@ -244,15 +242,6 @@ public interface SynapseClient extends RemoteService{
 	 * @throws RestServiceException
 	 */
 	List<SortItem> getSortFromTableQuery(String sql) throws RestServiceException;
-	
-	/**
-	 * Start a new Asynchronous job of a the given type with the provided request JSON.
-	 * @param type The type of job to run.
-	 * @param body The JSON of the AsynchronousRequestBody.
-	 * @return
-	 * @throws RestServiceException
-	 */
-	String startAsynchJob(AsynchType type, AsynchronousRequestBody body) throws RestServiceException;
 	
 	/**
 	 * Create or update an Entity.

@@ -1,12 +1,8 @@
 package org.sagebionetworks.web.client.widget.asynch;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
-import org.sagebionetworks.repo.model.table.QueryBundleRequest;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.asynch.TimerProvider.FireHandler;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -23,8 +19,6 @@ import com.google.inject.Inject;
  * 
  */
 public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
-
-	private SynapseClientAsync synapseClient;
 	private TimerProvider timerProvider;
 	private int waitTimeMS;
 	private AsynchType type;
@@ -35,12 +29,10 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	private SynapseJavascriptClient jsClient;
 	
 	@Inject
-	public AsynchronousJobTrackerImpl(SynapseClientAsync synapseClient,
+	public AsynchronousJobTrackerImpl(
 			TimerProvider timerProvider,
 			SynapseJavascriptClient jsClient) {
 		super();
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
 		this.timerProvider = timerProvider;
 		this.jsClient = jsClient;
 	}
@@ -81,11 +73,7 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 			}
 		};
 		// Start the job.
-		if (AsynchType.TableQuery.equals(type)) {
-			jsClient.startTableQueryJob((QueryBundleRequest)requestBody, callback);
-		} else {
-			synapseClient.startAsynchJob(type, requestBody, callback);	
-		}
+		jsClient.startAsynchJob(type, requestBody, callback);
 	}
 
 	/**
