@@ -329,6 +329,8 @@ public class SynapseJavascriptClient {
 								responseObject = response.getText();
 							} else if (OBJECT_TYPE.AsyncResponse.equals(responseType) && statusCode == 202) {
 								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
+								//SWC-4114: remove requestBody, attempted construction can result in a json object adapter exception in PartialRow
+								jsonObject.put("requestBody", (String)null);
 								responseObject = new AsynchronousJobStatus(jsonObject);
 								throw new ResultNotReadyException((AsynchronousJobStatus)responseObject);
 							} else {
