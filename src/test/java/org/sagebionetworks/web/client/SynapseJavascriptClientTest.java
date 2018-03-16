@@ -540,13 +540,13 @@ public class SynapseJavascriptClientTest {
 	}
 	
 	@Test
-	public void testStartTableQueryJob() throws RequestException, JSONObjectAdapterException {
+	public void testStartAsynchJob() throws RequestException, JSONObjectAdapterException {
 		QueryBundleRequest request = new QueryBundleRequest();
 		request.setEntityId("syn292");
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
 		
-		client.startTableQueryJob(request, mockAsyncCallback);
+		client.startAsynchJob(AsynchType.TableQuery, request, mockAsyncCallback);
 		//verify url and method
 		String url = REPO_ENDPOINT + ENTITY + "/syn292" + TABLE_QUERY + ASYNC_START;
 		verify(mockRequestBuilder).configure(POST, url);

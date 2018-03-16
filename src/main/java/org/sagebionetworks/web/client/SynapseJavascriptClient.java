@@ -75,7 +75,6 @@ import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -928,12 +927,6 @@ public class SynapseJavascriptClient {
 		return getRepoServiceUrl() + TEAM + "/" + teamId + ICON + "?" + REDIRECT_PARAMETER +"true";
 	}
 	
-	public void startTableQueryJob(QueryBundleRequest request, AsyncCallback<String> callback) {
-		String entityId = request.getEntityId();
-		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + TABLE_QUERY + ASYNC_START;
-		doPost(url, request, OBJECT_TYPE.AsyncJobId, callback);
-	}
-
 	public void login(LoginRequest loginRequest, AsyncCallback<LoginResponse> callback) {
 		String url = getAuthServiceUrl() + "/login";
 		doPost(url, loginRequest, OBJECT_TYPE.LoginResponse, callback);
@@ -972,15 +965,23 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.PaginatedResultProjectHeader, projectHeadersCallback);
 	}
 	
-	public void getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody request, AsyncCallback<AsynchronousResponseBody> callback) {
+	private String getEndpoint(AsynchType type) {
 		String endpoint;
 		if (AsynchType.BulkFileDownload.equals(type)) {
 			endpoint = getFileServiceUrl();
 		} else {
 			endpoint = getRepoServiceUrl();
 		}
+		return endpoint;
+	}
+	public void getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody request, AsyncCallback<AsynchronousResponseBody> callback) {
 		String url = type.getResultUrl(jobId, request);
-		doGet(endpoint + url, OBJECT_TYPE.AsyncResponse, callback);
+		doGet(getEndpoint(type) + url, OBJECT_TYPE.AsyncResponse, callback);
+	}
+
+	public void startAsynchJob(AsynchType type, AsynchronousRequestBody request, AsyncCallback<String> callback) {
+		String url = type.getStartUrl(request);
+		doPost(getEndpoint(type) + url, request, OBJECT_TYPE.AsyncJobId, callback);
 	}
 }
 
