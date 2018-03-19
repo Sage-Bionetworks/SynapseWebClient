@@ -294,8 +294,6 @@ public interface SynapseClientAsync {
 	void getUserIdFromUsername(String username, AsyncCallback<String> callback);
 	void getUserProfileFromUsername(String username, AsyncCallback<UserProfile> callback);
 
-	void getEtag(String objectId, ObjectType objectType, AsyncCallback<Etag> callback);
-
 	void deleteAccessRequirement(Long accessRequirementId, AsyncCallback<Void> callback);
 	
 	void deleteAccessApprovals(String accessRequirement, String accessorId, AsyncCallback<Void> asyncCallback);

@@ -39,6 +39,7 @@ import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.ProjectHeader;
@@ -73,6 +74,7 @@ import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.status.StackStatus;
+import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -147,6 +149,8 @@ public class SynapseJavascriptClient {
 	private static final String PROFILE_IMAGE = "/image";
 	private static final String PROFILE_IMAGE_PREVIEW = PROFILE_IMAGE+"/preview";
 	private static final String REDIRECT_PARAMETER = "redirect=";
+	public static final String OBJECT = "/object";
+	public static final String ETAG = "etag";
 	
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
@@ -998,6 +1002,11 @@ public class SynapseJavascriptClient {
 	public void startAsynchJob(AsynchType type, AsynchronousRequestBody request, AsyncCallback<String> callback) {
 		String url = type.getStartUrl(request);
 		doPost(getEndpoint(type) + url, request, OBJECT_TYPE.AsyncJobId, callback);
+	}
+	
+	public void getEtag(String objectId, ObjectType objectType, AsyncCallback<Etag> callback) {
+		String url =  getRepoServiceUrl() + OBJECT+"/"+objectId+"/"+objectType.name()+"/"+ETAG;
+		doGet(url, OBJECT_TYPE.Etag, callback);
 	}
 }
 

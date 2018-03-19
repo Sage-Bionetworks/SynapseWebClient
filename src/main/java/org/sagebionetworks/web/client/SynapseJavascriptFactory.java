@@ -42,6 +42,7 @@ import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.status.StackStatus;
+import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -104,6 +105,7 @@ public class SynapseJavascriptFactory {
 		AsyncJobId,
 		LoginResponse,
 		ChallengePagedResults,
+		Etag,
 		None,
 		String
 	}
@@ -253,6 +255,8 @@ public class SynapseJavascriptFactory {
 			return new AsyncJobId(json).getToken();
 		case LoginResponse:
 			return new LoginResponse(json);
+		case Etag:
+			return new Etag(json);
 		default:
 			throw new IllegalArgumentException("No match found for : "+ type);
 		}

@@ -301,8 +301,6 @@ public interface SynapseClient extends RemoteService{
 
 	String getUserIdFromUsername(String username) throws RestServiceException;
 
-	Etag getEtag(String objectId, ObjectType objectType) throws RestServiceException;
-
 	UserProfile getUserProfileFromUsername(String username) throws RestServiceException;
 
 	Entity updateFileEntity(FileEntity toUpdate, FileHandleCopyRequest copyRequest) throws RestServiceException;
