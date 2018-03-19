@@ -15,8 +15,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LogEntry;
-import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
@@ -24,8 +22,6 @@ import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
-import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
@@ -37,10 +33,8 @@ import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
-import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
-import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
@@ -59,7 +53,6 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -112,8 +105,6 @@ public interface SynapseClientAsync {
 
 	void createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
-	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback);
-
 	void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
 	void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	
@@ -130,9 +121,6 @@ public interface SynapseClientAsync {
 
 	void createV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
 	void updateV2WikiPageWithV1(String ownerId, String ownerType, WikiPage wikiPage, AsyncCallback<WikiPage> callback);
-	
-	void getEntitiesGeneratedBy(String activityId, Integer limit,
-			Integer offset, AsyncCallback<PaginatedResults<Reference>> callback);
 
 	void addFavorite(String entityId, AsyncCallback<EntityHeader> callback);
 

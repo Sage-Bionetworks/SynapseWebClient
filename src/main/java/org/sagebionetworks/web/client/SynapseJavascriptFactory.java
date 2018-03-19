@@ -20,6 +20,7 @@ import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
@@ -41,6 +42,7 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
+import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
@@ -72,6 +74,7 @@ public class SynapseJavascriptFactory {
 		Count,
 		PaginatedResultsEntityHeader,
 		PaginatedResultProjectHeader,
+		PaginatedResultReference,
 		V2WikiPage,
 		V2WikiOrderHint,
 		DockerRepository,
@@ -106,6 +109,7 @@ public class SynapseJavascriptFactory {
 		LoginResponse,
 		ChallengePagedResults,
 		Etag,
+		Activity,
 		None,
 		String
 	}
@@ -219,6 +223,15 @@ public class SynapseJavascriptFactory {
 				projectHeaderList.add(new ProjectHeader(jsonObject));
 			}
 			return projectHeaderList;
+		case PaginatedResultReference : 
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<Reference> referenceList = new ArrayList<>();
+			JSONArrayAdapter referenceResultsJsonArray = json.getJSONArray("results");
+			for (int i = 0; i < referenceResultsJsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = referenceResultsJsonArray.getJSONObject(i);
+				referenceList.add(new Reference(jsonObject));
+			}
+			return referenceList;
 		case ListWrapperColumnModel :
 			List<ColumnModel> columnModelList = new ArrayList<>();
 			JSONArrayAdapter columnModelJsonList = json.getJSONArray("list");
@@ -257,6 +270,8 @@ public class SynapseJavascriptFactory {
 			return new LoginResponse(json);
 		case Etag:
 			return new Etag(json);
+		case Activity:
+			return new Activity(json);
 		default:
 			throw new IllegalArgumentException("No match found for : "+ type);
 		}

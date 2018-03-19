@@ -17,7 +17,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LogEntry;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
 import org.sagebionetworks.repo.model.Team;
@@ -136,10 +135,6 @@ public interface SynapseClient extends RemoteService{
 	AccessRequirement createOrUpdateAccessRequirement(AccessRequirement arEW) throws RestServiceException;
 	
 	List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException;
-
-	Activity getActivityForEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
-
-	PaginatedResults<Reference> getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset) throws RestServiceException;
 
 	String getRootWikiId(String ownerId, String ownerType) throws RestServiceException;
 	FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;

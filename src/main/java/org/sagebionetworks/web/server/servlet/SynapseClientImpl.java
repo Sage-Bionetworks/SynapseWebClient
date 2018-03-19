@@ -46,7 +46,6 @@ import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipRequest;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.RestrictableObjectDescriptor;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
@@ -752,18 +751,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
-	@Override
-	public Activity getActivityForEntityVersion(String entityId,
-			Long versionNumber) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getActivityForEntityVersion(
-					entityId, versionNumber);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
 	
 	@Override
 	public Activity getOrCreateActivityForEntityVersion(String entityId,
@@ -792,18 +779,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			synapseClient.putActivity(update);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public PaginatedResults<Reference> getEntitiesGeneratedBy(String activityId, Integer limit,
-			Integer offset) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return convertPaginated(synapseClient
-					.getEntitiesGeneratedBy(activityId, limit, offset));
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
