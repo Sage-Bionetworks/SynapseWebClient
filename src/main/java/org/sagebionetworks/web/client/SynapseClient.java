@@ -17,7 +17,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.LogEntry;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.ResponseMessage;
 import org.sagebionetworks.repo.model.SignedTokenInterface;
@@ -37,10 +36,8 @@ import org.sagebionetworks.repo.model.project.StorageLocationSetting;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
-import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
-import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.SortItem;
@@ -140,11 +137,7 @@ public interface SynapseClient extends RemoteService{
 	
 	List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException;
 
-	Activity getActivityForEntity(String entityId) throws RestServiceException;
-
 	Activity getActivityForEntityVersion(String entityId, Long versionNumber) throws RestServiceException;
-
-	Activity getActivity(String activityId) throws RestServiceException;
 
 	PaginatedResults<Reference> getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset) throws RestServiceException;
 
@@ -156,7 +149,6 @@ public interface SynapseClient extends RemoteService{
 	void deleteV2WikiPage(WikiPageKey key) throws RestServiceException;
 	List<V2WikiHeader> getV2WikiHeaderTree(String ownerId, String ownerType) throws RestServiceException;
 	V2WikiOrderHint getV2WikiOrderHint(WikiPageKey key) throws RestServiceException;
-	V2WikiOrderHint updateV2WikiOrderHint(V2WikiOrderHint toUpdate) throws RestServiceException;
 	FileHandleResults getV2WikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	PaginatedResults<V2WikiHistorySnapshot> getV2WikiHistory(WikiPageKey key, Long limit, Long offset) throws RestServiceException;
 

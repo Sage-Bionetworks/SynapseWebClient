@@ -754,28 +754,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public Activity getActivityForEntity(String entityId)
-			throws RestServiceException {
-		return getActivityForEntityVersion(entityId, null);
-	}
-
-	@Override
 	public Activity getActivityForEntityVersion(String entityId,
 			Long versionNumber) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.getActivityForEntityVersion(
 					entityId, versionNumber);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public Activity getActivity(String activityId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getActivity(activityId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
@@ -927,17 +911,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 	
-	@Override
-	public V2WikiOrderHint updateV2WikiOrderHint(V2WikiOrderHint toUpdate) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			V2WikiOrderHint orderHint = synapseClient.updateV2WikiOrderHint(toUpdate);
-			return orderHint;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
 	@Override
 	public FileHandleResults getV2WikiAttachmentHandles(
 			org.sagebionetworks.web.shared.WikiPageKey key)

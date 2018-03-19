@@ -114,10 +114,6 @@ public interface SynapseClientAsync {
 
 	void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback);
 
-	void getActivityForEntity(String entityId, AsyncCallback<Activity> callback);
-
-	void getActivity(String activityId, AsyncCallback<Activity> callback);
-
 	void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
 	void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	
@@ -127,7 +123,6 @@ public interface SynapseClientAsync {
 	void getV2WikiHeaderTree(String ownerId, String ownerType,
 			AsyncCallback<List<V2WikiHeader>> callback);
 	void getV2WikiOrderHint(WikiPageKey key, AsyncCallback<V2WikiOrderHint> callback);
-	void updateV2WikiOrderHint(V2WikiOrderHint toUpdate, AsyncCallback<V2WikiOrderHint> callback);
 	void getV2WikiAttachmentHandles(WikiPageKey key,
 			AsyncCallback<FileHandleResults> callback);
 	void getV2WikiHistory(WikiPageKey key, Long limit, Long offset,
