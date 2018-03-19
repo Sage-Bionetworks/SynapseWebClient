@@ -46,7 +46,7 @@ public class FileTitleBar implements SynapseWidgetPresenter {
 	public void configure(EntityBundle bundle) {
 		this.entityBundle = bundle;
 		
-		view.setShowCurrentVersionLinkVisible(false);
+		view.setVersionUIVisible(false);
 		view.setExternalUrlUIVisible(false);
 		view.setExternalObjectStoreUIVisible(false);
 		view.setFileSize("");
@@ -89,7 +89,7 @@ public class FileTitleBar implements SynapseWidgetPresenter {
 					if (!versions.isEmpty()) {
 						Long currentVersionNumber = versions.get(0).getVersionNumber();
 						Long viewingVersionNumber = ((FileEntity)entityBundle.getEntity()).getVersionNumber();
-						view.setShowCurrentVersionLinkVisible(!currentVersionNumber.equals(viewingVersionNumber));
+						view.setVersionUIVisible(!currentVersionNumber.equals(viewingVersionNumber));
 					}
 				}
 

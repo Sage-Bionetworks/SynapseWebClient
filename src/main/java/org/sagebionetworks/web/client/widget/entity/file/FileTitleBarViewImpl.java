@@ -67,10 +67,10 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	Span version;
 	@UiField
-	Span currentVersionLinkUI;
-	@UiField
 	Anchor currentVersionLink;
-
+	@UiField
+	Div versionInfoUI;
+	
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
 	private String currentEntityId;
@@ -179,8 +179,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		fileKey.setText(fileKeyValue);
 	}
 	@Override
-	public void setShowCurrentVersionLinkVisible(boolean visible) {
-		currentVersionLinkUI.setVisible(visible);
+	public void setVersionUIVisible(boolean visible) {
+		versionInfoUI.setVisible(visible);
 	}
 	@Override
 	public void setVersion(Long versionNumber) {

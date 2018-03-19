@@ -25,5 +25,5 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 	void setExternalObjectStoreUIVisible(boolean visible);
 	void setExternalObjectStoreInfo(String endpoint, String bucket, String fileKey);
 	void setVersion(Long version);
-	void setShowCurrentVersionLinkVisible(boolean visible);
+	void setVersionUIVisible(boolean visible);
 }
