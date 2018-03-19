@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -8,7 +8,8 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
 import com.google.gwt.core.client.GWT;
@@ -63,17 +64,23 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	Span bucket;
 	@UiField
 	Span fileKey;
+	@UiField
+	Span version;
+	@UiField
+	Anchor currentVersionLink;
+	@UiField
+	Div versionInfoUI;
 	
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
-
+	private String currentEntityId;
 	private static FileTitleBarViewImplUiBinder uiBinder = GWT
 			.create(FileTitleBarViewImplUiBinder.class);
-	
 	@Inject
-	public FileTitleBarViewImpl(SageImageBundle sageImageBundle,
+	public FileTitleBarViewImpl(
 			FavoriteWidget favoriteWidget,
-			Md5Link md5Link) {
+			Md5Link md5Link, 
+			GlobalApplicationState globalAppState) {
 		this.favoriteWidget = favoriteWidget;
 		this.md5Link = md5Link;
 		
@@ -82,15 +89,21 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
+		currentVersionLink.addClickHandler(event -> {
+			event.preventDefault();
+			globalAppState.getPlaceChanger().goTo(new Synapse(currentEntityId));
+		});
 	}
 	
 	@Override
 	public void createTitlebar(Entity entity) {
-		favoriteWidget.configure(entity.getId());
+		currentEntityId = entity.getId();
+		favoriteWidget.configure(currentEntityId);
 		md5Link.clear();
 		md5LinkContainer.clear();
 		md5LinkContainer.add(md5Link);
 		entityIcon.setType(EntityTypeUtils.getIconTypeForEntity(entity));
+		currentVersionLink.setHref("#!Synapse:"+currentEntityId);
 	}
 	
 	@Override
@@ -164,5 +177,13 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		endpoint.setText(endpointValue);
 		bucket.setText(bucketValue);
 		fileKey.setText(fileKeyValue);
+	}
+	@Override
+	public void setVersionUIVisible(boolean visible) {
+		versionInfoUI.setVisible(visible);
+	}
+	@Override
+	public void setVersion(Long versionNumber) {
+		version.setText(versionNumber.toString());
 	}
 }
