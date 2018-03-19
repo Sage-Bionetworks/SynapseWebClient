@@ -80,7 +80,7 @@ public class FileTitleBar implements SynapseWidgetPresenter {
 	}
 	
 	public void getLatestVersion() {
-		// determine if we should show the "Go to latest version" link
+		// determine if we should show report the version (only shows if we're looking at an older version of the file).
 		synapseClient.getEntityVersions(entityBundle.getEntity().getId(), 0, 1,
 			new AsyncCallback<PaginatedResults<VersionInfo>>() {
 				@Override
