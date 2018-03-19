@@ -235,8 +235,7 @@ public class ProvUtilsTest {
 		header.setVersionNumber(ref.getTargetVersionNumber());
 		UsedEntity ue = new UsedEntity();
 		ue.setReference(ref);
-		PaginatedResults<EntityHeader> referenceHeaders = new PaginatedResults<EntityHeader>();
-		referenceHeaders.setResults(new ArrayList<EntityHeader>(Arrays.asList(new EntityHeader[] { header })));
+		ArrayList<EntityHeader> referenceHeaders = new ArrayList<EntityHeader>(Arrays.asList(new EntityHeader[] { header }));
 				
 		Map<Reference, EntityHeader> refToHeader = ProvUtils.mapReferencesToHeaders(referenceHeaders);
 		assertTrue(refToHeader.containsKey(ref));

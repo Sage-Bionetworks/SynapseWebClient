@@ -13,9 +13,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -23,10 +21,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.ObjectType;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
@@ -51,7 +46,6 @@ import org.sagebionetworks.web.client.widget.entity.WikiPageWidgetView;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -101,7 +95,6 @@ public class WikiPageWidgetTest {
 	
 	WikiPageWidget presenter;
 	WikiPage testPage;
-	private static final String MY_TEST_ENTITY_OWNER_NAME = "My Test Entity Owner Name";
 	public static final String WIKI_PAGE_ID = "12345";
 	
 	@Before
@@ -110,15 +103,6 @@ public class WikiPageWidgetTest {
 		presenter = new WikiPageWidget(mockView, mockSynapseClient, mockStuAlert, mockHistoryWidget, mockMarkdownWidget,
 				mockSubpages, mockInjector, mockSessionStorage, mockAuthController, adapterFactory, mockDateTimeUtils,
 				mockSynapseJavascriptClient, mockCookies);
-		PaginatedResults<EntityHeader> headers = new PaginatedResults<EntityHeader>();
-		headers.setTotalNumberOfResults(1);
-		List<EntityHeader> resultHeaderList = new ArrayList<EntityHeader>();
-		EntityHeader testEntityHeader = new EntityHeader();
-		testEntityHeader.setName(MY_TEST_ENTITY_OWNER_NAME);
-		testEntityHeader.setType(Project.class.getName());
-		resultHeaderList.add(testEntityHeader);
-		headers.setResults(resultHeaderList);
-		AsyncMockStubber.callSuccessWith(headers).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
 		testPage = new WikiPage();
 		testPage.setId(WIKI_PAGE_ID);
 		testPage.setMarkdown("my test markdown");

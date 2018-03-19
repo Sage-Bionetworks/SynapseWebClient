@@ -89,6 +89,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -822,6 +823,10 @@ public class SynapseJavascriptClient {
 			ref.setTargetId(entityId);
 			list.add(ref);
 		}
+		getEntityHeaderBatchFromReferences(list, callback);
+	}
+	
+	public void getEntityHeaderBatchFromReferences(List<Reference> list, AsyncCallback<ArrayList<EntityHeader>> callback) {
 		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/header";
 		ReferenceList refList = new ReferenceList();
 		refList.setReferences(list);

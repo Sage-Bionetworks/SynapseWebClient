@@ -26,7 +26,6 @@ import org.apache.http.entity.ContentType;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document.OutputSettings;
 import org.jsoup.safety.Whitelist;
-import org.sagebionetworks.client.AsynchJobType;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
@@ -58,8 +57,6 @@ import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.repo.model.TrashedEntity;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
-import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.NewUserSignedToken;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.dao.WikiPageKeyHelper;
@@ -89,10 +86,8 @@ import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.repo.model.quiz.Quiz;
 import org.sagebionetworks.repo.model.quiz.QuizResponse;
-import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
-import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.table.ColumnChange;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
@@ -127,7 +122,6 @@ import org.sagebionetworks.web.shared.TeamBundle;
 import org.sagebionetworks.web.shared.TeamMemberBundle;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
@@ -315,19 +309,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 
-	}
-
-	@Override
-	public PaginatedResults<EntityHeader> getEntityHeaderBatch(ReferenceList list)
-			throws RestServiceException {
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> results = synapseClient
-					.getEntityHeaderBatch(list.getReferences());
-			return new PaginatedResults<EntityHeader>(results.getResults(), results.getTotalNumberOfResults());
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		} 
 	}
 
 	@Override

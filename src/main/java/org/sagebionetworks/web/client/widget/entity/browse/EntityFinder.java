@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -37,13 +38,15 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	private SelectedHandler<List<Reference>> selectedMultiHandler;
 	private EntityFilter filter;
 	private SynapseAlert synAlert;
+	private SynapseJavascriptClient jsClient;
 	@Inject
 	public EntityFinder(EntityFinderView view,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			ClientCache cache,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -51,6 +54,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		this.authenticationController = authenticationController;
 		this.cache = cache;
 		this.synAlert = synAlert;
+		this.jsClient = jsClient;
 		this.selectedEntities = new ArrayList<Reference>();
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
@@ -156,21 +160,17 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	
 	@Override
 	public void lookupEntity(ReferenceList rl, final AsyncCallback<List<EntityHeader>> callback) {
-		synapseClient.getEntityHeaderBatch(rl, new AsyncCallback<PaginatedResults<EntityHeader>>() {
-
+		jsClient.getEntityHeaderBatchFromReferences(rl.getReferences(), new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 				callback.onFailure(caught);
 			}
-
 			@Override
-			public void onSuccess(PaginatedResults<EntityHeader> result) {
-				callback.onSuccess(result.getResults());
+			public void onSuccess(ArrayList<EntityHeader> result) {
+				callback.onSuccess(result);
 			}
-			
 		});
-		
 	}
 
 	@Override

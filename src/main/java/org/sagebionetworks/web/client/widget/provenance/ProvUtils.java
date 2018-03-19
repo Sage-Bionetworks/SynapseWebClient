@@ -11,21 +11,14 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.provenance.UsedURL;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
 import org.sagebionetworks.web.shared.provenance.ActivityTypeUtil;
@@ -35,8 +28,6 @@ import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ProvUtils {
 
@@ -163,9 +154,9 @@ public class ProvUtils {
 		return allRefs;
 	}
 	
-	public static Map<Reference, EntityHeader> mapReferencesToHeaders(PaginatedResults<EntityHeader> headers) {
+	public static Map<Reference, EntityHeader> mapReferencesToHeaders(ArrayList<EntityHeader> headers) {
 		Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
-		for(EntityHeader header : headers.getResults()) {
+		for(EntityHeader header : headers) {
 			Reference equivalentRef = new Reference();
 			equivalentRef.setTargetId(header.getId());
 			equivalentRef.setTargetVersionNumber(header.getVersionNumber());

@@ -75,9 +75,6 @@ public interface SynapseClientAsync {
 	void createOrUpdateEntity(Entity entity, Annotations annos,
 			boolean isNew, AsyncCallback<String> callback);
 	
-	void getEntityHeaderBatch(ReferenceList referenceList,
-			AsyncCallback<PaginatedResults<EntityHeader>> callback);
-
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);

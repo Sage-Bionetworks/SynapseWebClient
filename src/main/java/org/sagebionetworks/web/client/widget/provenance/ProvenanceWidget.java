@@ -15,7 +15,6 @@ import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
-import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -376,15 +375,13 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	}
 	
 	private void lookupReferencesThenBuildGraph() {			
-		ReferenceList list = new ReferenceList();
-		list.setReferences(new ArrayList<Reference>(references));
 		if (references.isEmpty()) {
 			view.clear();
 			return;
 		}
-		synapseClient.getEntityHeaderBatch(list, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+		jsClient.getEntityHeaderBatchFromReferences(new ArrayList<Reference>(references), new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
-			public void onSuccess(PaginatedResults<EntityHeader> headers) {
+			public void onSuccess(ArrayList<EntityHeader> headers) {
 				refToHeader = ProvUtils.mapReferencesToHeaders(headers);
 				buildGraphLayoutSendToView();
 			}
@@ -511,13 +508,11 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		}
 		
 		// batch request all entity ids to get current version. Notify view of non current versions
-		ReferenceList referenceList = new ReferenceList();
-		referenceList.setReferences(new ArrayList<Reference>(entityIds));		
-		synapseClient.getEntityHeaderBatch(referenceList, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+		jsClient.getEntityHeaderBatchFromReferences(new ArrayList<Reference>(entityIds), new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
-			public void onSuccess(PaginatedResults<EntityHeader> currentVersions) {
+			public void onSuccess(ArrayList<EntityHeader> currentVersions) {
 				Map<String,Long> entityToCurrentVersion = new HashMap<String, Long>();
-				for(EntityHeader header : currentVersions.getResults()) {
+				for(EntityHeader header : currentVersions) {
 					entityToCurrentVersion.put(header.getId(), header.getVersionNumber());
 				}
 				

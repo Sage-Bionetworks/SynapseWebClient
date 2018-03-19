@@ -79,8 +79,6 @@ public interface SynapseClient extends RemoteService{
 	void purgeMultipleTrashedEntitiesForUser(Set<String> entityIds) throws RestServiceException;
 
 	SearchResults search(SearchQuery searchQuery) throws RestServiceException;
-
-	PaginatedResults<EntityHeader> getEntityHeaderBatch(ReferenceList referenceList) throws RestServiceException;
 	
 	/**
 	 * Update an entity.
