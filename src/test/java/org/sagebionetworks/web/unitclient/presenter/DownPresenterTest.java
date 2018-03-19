@@ -70,21 +70,25 @@ public class DownPresenterTest {
 
 	@Test
 	public void testUpdateTimer() {
+		// verify initial stack status check, and then verify the timer based update.
+		presenter.setPlace(mockDownPlace);
+		verify(mockView).setTimerVisible(false);
+		verify(mockSynapseJavascriptClient).getStackStatus(any(AsyncCallback.class));
+		
 		//kick off the timer
-		presenter.scheduleRepoDownCheck();
-		verify(mockGWT).scheduleExecution(callbackCaptor.capture(), eq(SECOND_MS));
+		verify(mockGWT).scheduleFixedDelay(callbackCaptor.capture(), eq(SECOND_MS));
 		Callback secondTimerFired = callbackCaptor.getValue();
 		secondTimerFired.invoke();
 		verify(mockView).updateTimeToNextRefresh((DELAY_MS-SECOND_MS)/1000); //in seconds
 		verify(mockView).setTimerVisible(true);
-		verify(mockGWT, times(2)).scheduleExecution(eq(secondTimerFired), eq(SECOND_MS));
+		
 		//now that we've verified the repeating scheduled execution, eat up the rest of the seconds to get down to zero
 		for (int i = 1; i < DELAY_MS/SECOND_MS; i++) {
 			secondTimerFired.invoke();
 		}
 		//verify it checks the stack status
-		verify(mockView).setTimerVisible(false);
-		verify(mockSynapseJavascriptClient).getStackStatus(any(AsyncCallback.class));
+		verify(mockView, times(2)).setTimerVisible(false);
+		verify(mockSynapseJavascriptClient, times(2)).getStackStatus(any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -102,7 +106,6 @@ public class DownPresenterTest {
 		when(mockStackStatus.getCurrentMessage()).thenReturn(currentMessage);
 		presenter.checkForRepoDown();
 		verify(mockView).setMessage(currentMessage);
-		verify(mockGWT).scheduleExecution(any(Callback.class), eq(SECOND_MS));
 	}
 
 	@Test
@@ -111,6 +114,5 @@ public class DownPresenterTest {
 		AsyncMockStubber.callFailureWith(new Exception(error)).when(mockSynapseJavascriptClient).getStackStatus(any(AsyncCallback.class));
 		presenter.checkForRepoDown();
 		verify(mockView).setMessage(error);
-		verify(mockGWT).scheduleExecution(any(Callback.class), eq(SECOND_MS));
 	}
 }
