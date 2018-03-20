@@ -160,7 +160,7 @@ public interface SynapseClientAsync {
 			AsyncCallback<PassingRecord> callback);
 	
 	void getFileEntityIdWithSameName(String fileName, String parentEntityId, AsyncCallback<String> callback);
-	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, AsyncCallback<String> callback) throws RestServiceException;
+	void setFileEntityFileHandle(String fileHandleId, String entityId, String parentEntityId, AsyncCallback<String> callback);
 	
 	
 	void getEntityDoi(String entityId, Long versionNumber,
