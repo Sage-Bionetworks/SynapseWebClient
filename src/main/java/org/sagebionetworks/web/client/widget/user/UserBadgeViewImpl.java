@@ -150,7 +150,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		int pictureHeightPx = size.pictureHeightPx();
 		userPicture.setHeight(pictureHeightPx + "px");
 		usernameLink.setVisible(size.isTextVisible());
-		pictureSpan.setHeight((pictureHeightPx + 4) + "px");
+		pictureSpan.setHeight((pictureHeightPx + 6) + "px");
 	}
 
 	@Override
