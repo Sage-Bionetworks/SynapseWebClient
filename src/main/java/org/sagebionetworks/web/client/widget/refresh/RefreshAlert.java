@@ -1,13 +1,11 @@
 package org.sagebionetworks.web.client.widget.refresh;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
@@ -18,7 +16,7 @@ import com.google.inject.Inject;
 public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPresenter {
 	
 	private RefreshAlertView view;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private GWTWrapper gwt;
 	private GlobalApplicationState globalAppState;
 	private SynapseJSNIUtils utils;
@@ -30,13 +28,12 @@ public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPr
 	public static final int DELAY = 60000; // check every minute (until detached, configuration cleared, or a change has been detected)
 	@Inject
 	public RefreshAlert(RefreshAlertView view, 
-			SynapseClientAsync synapseClient, 
+			SynapseJavascriptClient jsClient, 
 			GWTWrapper gwt,
 			GlobalApplicationState globalAppState,
 			SynapseJSNIUtils utils) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.gwt = gwt;
 		this.globalAppState = globalAppState;
 		this.utils = utils;
@@ -93,7 +90,7 @@ public class RefreshAlert implements RefreshAlertView.Presenter, SynapseWidgetPr
 	
 	private void checkEtag() {
 		if (view.isAttached() && objectId != null && objectType != null) {
-			synapseClient.getEtag(objectId, objectType, new AsyncCallback<Etag>() {
+			jsClient.getEtag(objectId, objectType, new AsyncCallback<Etag>() {
 				@Override
 				public void onSuccess(Etag result) {
 					if (etag == null) {

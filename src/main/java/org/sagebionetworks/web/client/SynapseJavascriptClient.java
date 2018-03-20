@@ -39,6 +39,7 @@ import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.ProjectHeader;
@@ -71,8 +72,10 @@ import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
+import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.status.StackStatus;
+import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -87,6 +90,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -147,7 +151,10 @@ public class SynapseJavascriptClient {
 	private static final String PROFILE_IMAGE = "/image";
 	private static final String PROFILE_IMAGE_PREVIEW = PROFILE_IMAGE+"/preview";
 	private static final String REDIRECT_PARAMETER = "redirect=";
-	
+	public static final String OBJECT = "/object";
+	public static final String ETAG = "etag";
+	public static final String GENERATED_PATH = "/generated";
+	public static final String GENERATED_BY_SUFFIX = "/generatedBy";
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	private static final String LOG = "/log";
@@ -205,7 +212,8 @@ public class SynapseJavascriptClient {
 	public static final String ASYNCHRONOUS_JOB = "/asynchronous/job";
 	public static final String FILE = "/file";
 	public static final String FILE_BULK = FILE+"/bulk";
-
+	public static final String ACTIVITY_URI_PATH = "/activity";
+	
 	public static final String ASYNC_START = "/async/start";
 	public static final String ASYNC_GET = "/async/get/";
 	
@@ -818,6 +826,10 @@ public class SynapseJavascriptClient {
 			ref.setTargetId(entityId);
 			list.add(ref);
 		}
+		getEntityHeaderBatchFromReferences(list, callback);
+	}
+	
+	public void getEntityHeaderBatchFromReferences(List<Reference> list, AsyncCallback<ArrayList<EntityHeader>> callback) {
 		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/header";
 		ReferenceList refList = new ReferenceList();
 		refList.setReferences(list);
@@ -998,6 +1010,25 @@ public class SynapseJavascriptClient {
 	public void startAsynchJob(AsynchType type, AsynchronousRequestBody request, AsyncCallback<String> callback) {
 		String url = type.getStartUrl(request);
 		doPost(getEndpoint(type) + url, request, OBJECT_TYPE.AsyncJobId, callback);
+	}
+	
+	public void getEtag(String objectId, ObjectType objectType, AsyncCallback<Etag> callback) {
+		String url =  getRepoServiceUrl() + OBJECT+"/"+objectId+"/"+objectType.name()+"/"+ETAG;
+		doGet(url, OBJECT_TYPE.Etag, callback);
+	}
+	
+	public void getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset, AsyncCallback<ArrayList<Reference>> callback) {
+		String url = getRepoServiceUrl() + ACTIVITY_URI_PATH + "/" + activityId + GENERATED_PATH + "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER + limit;
+		doGet(url, OBJECT_TYPE.PaginatedResultReference, callback);
+	}
+	
+	public void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback) {
+		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId;
+		if (versionNumber != null) {
+			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
+		}
+		url += GENERATED_BY_SUFFIX;
+		doGet(url, OBJECT_TYPE.Activity, callback);
 	}
 }
 

@@ -865,15 +865,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testUpdateV2WikiOrderHint() throws Exception {
-		V2WikiOrderHint orderHint = new V2WikiOrderHint();
-		when(mockSynapse.updateV2WikiOrderHint(any(V2WikiOrderHint.class)))
-				.thenReturn(orderHint);
-		synapseClient.updateV2WikiOrderHint(orderHint);
-		verify(mockSynapse).updateV2WikiOrderHint(any(V2WikiOrderHint.class));
-	}
-
-	@Test
 	public void testGetV2WikiHistory() throws Exception {
 		PaginatedResults<V2WikiHistorySnapshot> historyResults = new PaginatedResults<V2WikiHistorySnapshot>();
 		when(
