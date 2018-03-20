@@ -11,9 +11,9 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -41,60 +41,38 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		view.setPresenter(this);
 	} 
 
-	private AcceptTermsOfUseCallback getAcceptTermsOfUseCallback() {
-		return new AcceptTermsOfUseCallback() {
-			public void accepted() {
-				synAlert.clear();
-				view.showLoggingInLoader();
-				authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
+	private Callback getAcceptTermsOfUseCallback() {
+		return () -> {
+			synAlert.clear();
+			view.showLoggingInLoader();
+			authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+					view.showLogin();
+				}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						synAlert.handleException(caught);
-						view.showLogin();
-					}
+				@Override
+				public void onSuccess(Void result) {
+					// Have to get the UserSessionData again, 
+					// since it won't contain the UserProfile if the terms haven't been signed
+					synAlert.clear();
+					authenticationController.revalidateSession(authenticationController.getCurrentUserSessionToken(), new AsyncCallback<UserSessionData>() {
+						@Override
+						public void onFailure(
+								Throwable caught) {
+							synAlert.handleException(caught);
+							view.showLogin();
+						}
 
-					@Override
-					public void onSuccess(Void result) {
-						// Have to get the UserSessionData again, 
-						// since it won't contain the UserProfile if the terms haven't been signed
-						synAlert.clear();
-						authenticationController.revalidateSession(authenticationController.getCurrentUserSessionToken(), new AsyncCallback<UserSessionData>() {
-							@Override
-							public void onFailure(
-									Throwable caught) {
-								synAlert.handleException(caught);
-								view.showLogin();
-							}
-
-							@Override
-							public void onSuccess(UserSessionData result) {
-								// Signed ToU. Check for temp username, passing record, and then forward
-								userAuthenticated();
-							}	
-							
-						});
-					}
-				});
-			}
-
-			@Override
-			public void rejected() {
-				synAlert.clear();
-				authenticationController.signTermsOfUse(false, new AsyncCallback<Void> () {
-					@Override
-					public void onFailure(Throwable caught) {
-						synAlert.handleException(caught);
-						view.showLogin();
-					}
-
-					@Override
-					public void onSuccess(Void result) {
-						authenticationController.logoutUser();
-						goToLastPlace();
-					}
-				});
-			}
+						@Override
+						public void onSuccess(UserSessionData result) {
+							// Signed ToU. Check for temp username, passing record, and then forward
+							userAuthenticated();
+						}	
+					});
+				}
+			});
 		};
 	}
 	@Override
@@ -189,7 +167,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	 */
 	
 	
-	public void showTermsOfUse(final AcceptTermsOfUseCallback callback) {
+	public void showTermsOfUse(final Callback callback) {
 		synAlert.clear();
 		authenticationController.getTermsOfUse(new AsyncCallback<String>() {
 			public void onSuccess(String termsOfUseContents) {

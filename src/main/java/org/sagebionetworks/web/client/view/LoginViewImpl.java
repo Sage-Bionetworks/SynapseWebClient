@@ -9,9 +9,9 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.client.widget.login.LoginWidget;
 import org.sagebionetworks.web.client.widget.login.UserListener;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -179,7 +179,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	}
 	
 	@Override
-	public void showTermsOfUse(final String content, final AcceptTermsOfUseCallback callback) {
+	public void showTermsOfUse(final String content, final Callback callback) {
 		hideViews();
 		//initialize checkboxes
 		actEthicallyCb.setValue(false);
@@ -197,7 +197,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 				@Override
 				public void onClick(ClickEvent event) {
 					if(validatePledge()) {
-						callback.accepted();
+						callback.invoke();
 					} else {
 						showErrorMessage("To take the pledge, you must first agree to all of the statements.");
 					}

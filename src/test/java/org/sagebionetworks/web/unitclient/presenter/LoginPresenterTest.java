@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.presenter;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
@@ -28,9 +29,9 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.LoginView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -58,8 +59,13 @@ public class LoginPresenterTest {
 	EventBus mockEventBus;
 	@Mock
 	LoginPlace mockLoginPlace;
+	@Mock
+	Callback mockTouCallback;
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
+	@Captor
+	ArgumentCaptor<Callback> touCallbackCaptor;
+	
 	UserSessionData usd;
 	String userId = "007";
 	
@@ -105,17 +111,31 @@ public class LoginPresenterTest {
 	}
 	
 	@Test 
-	public void testSetPlaceShowToU() {
+	public void testSetPlaceShowAndAcceptToU() {
 		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.SHOW_TOU);
 		
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		usd.getSession().setAcceptsTermsOfUse(false);
 		AsyncMockStubber.callSuccessWith("tou").when(mockAuthenticationController).getTermsOfUse(any(AsyncCallback.class));
 		
+		//method under test
 		loginPresenter.setPlace(mockLoginPlace);
-		verify(mockView).showTermsOfUse(anyString(), any(AcceptTermsOfUseCallback.class));
+		verify(mockView).showTermsOfUse(anyString(), touCallbackCaptor.capture());
+		Callback touCallback = touCallbackCaptor.getValue();
+		//set up revalidateSession response such that user has now accepted the tou
+		usd.getSession().setAcceptsTermsOfUse(true);
+		AsyncMockStubber.callSuccessWith(null).when(mockAuthenticationController).signTermsOfUse(anyBoolean(), any(AsyncCallback.class));
+		
+		touCallback.invoke();
+		
+		verify(mockAuthenticationController).signTermsOfUse(eq(true), any(AsyncCallback.class));
+		verify(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
+		// verify we only showed this once:
+		verify(mockView).showTermsOfUse(anyString(), any(Callback.class));
+		//go to the last place (or the user dashboard Profile place if last place is not set)
+		verify(mockGlobalApplicationState).gotoLastPlace(any(Profile.class));
 	}
-
+	
 	@Test 
 	public void testSetPlaceShowTouUserAlreadyAccepted() {
 		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.SHOW_TOU);
@@ -125,7 +145,7 @@ public class LoginPresenterTest {
 		AsyncMockStubber.callSuccessWith("tou").when(mockAuthenticationController).getTermsOfUse(any(AsyncCallback.class));
 		
 		loginPresenter.setPlace(mockLoginPlace);
-		verify(mockView, never()).showTermsOfUse(anyString(), any(AcceptTermsOfUseCallback.class));
+		verify(mockView, never()).showTermsOfUse(anyString(), any(Callback.class));
 		verify(mockGlobalApplicationState).gotoLastPlace();
 	}
 	
@@ -214,9 +234,8 @@ public class LoginPresenterTest {
 		
 		verify(mockAuthenticationController).revalidateSession(eq(fakeToken), any(AsyncCallback.class));
 		
-		ArgumentCaptor<AcceptTermsOfUseCallback> argument = ArgumentCaptor.forClass(AcceptTermsOfUseCallback.class);
 		//shows terms of use
-		verify(mockView).showTermsOfUse(anyString(), argument.capture());
+		verify(mockView).showTermsOfUse(anyString(), any(Callback.class));
 	}
 
 	@Test
@@ -236,5 +255,23 @@ public class LoginPresenterTest {
 		Place defaultPlace = placeCaptor.getValue();
 		assertTrue(defaultPlace instanceof Profile);
 		assertEquals(userId, ((Profile)defaultPlace).getUserId());
+	}
+	
+	@Test
+	public void testGotoPlace() {
+		loginPresenter.goTo(mockLoginPlace);
+		verify(mockPlaceChanger).goTo(mockLoginPlace);
+	}
+	
+	@Test
+	public void testGetTermsOfUseFailure() {
+		Exception ex = new Exception();
+		AsyncMockStubber.callFailureWith(ex).when(mockAuthenticationController).getTermsOfUse(any(AsyncCallback.class));
+		
+		loginPresenter.showTermsOfUse(mockTouCallback);
+		
+		verify(mockSynAlert).clear();
+		verify(mockSynAlert).handleException(ex);
+		verify(mockView).showLogin();
 	}
 }
