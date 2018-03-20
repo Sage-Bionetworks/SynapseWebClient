@@ -16,7 +16,9 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
@@ -106,6 +108,10 @@ public class WikiMarkdownEditorTest {
 		verify(mockView).setTitleEditorVisible(false);
 		verify(mockGlobalApplicationState).setIsEditing(true);
 		verify(mockView).showEditorModal();
+		// SWC-4121: order is important - we must set the cursor position to the start index before focus so that the browser will auto-scroll to the top
+		InOrder inOrder = Mockito.inOrder(mockMarkdownEditorWidget);
+		inOrder.verify(mockMarkdownEditorWidget).setCursorPos(0);
+		inOrder.verify(mockMarkdownEditorWidget).setMarkdownFocus();
 	}
 	
 	@Test
