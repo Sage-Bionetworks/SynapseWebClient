@@ -6,7 +6,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,21 +13,15 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
+import org.mockito.Captor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.ChangeUsername;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -36,6 +29,7 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.LoginPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.LoginView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -48,99 +42,89 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 public class LoginPresenterTest {
 	
 	LoginPresenter loginPresenter;
+	@Mock
 	LoginView mockView;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
-	CookieProvider mockCookieProvier;
-	GWTWrapper mockGwtWrapper;
-	SynapseJSNIUtils mockJSNIUtils;
-	SynapseClientAsync mockSynapseClient;
-	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	private static JSONObjectAdapter jsonObjectAdapter = new JSONObjectAdapterImpl();
+	@Mock
+	SynapseAlert mockSynAlert;
+	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
 	AcceptsOneWidget mockPanel;
+	@Mock
 	EventBus mockEventBus;
+	@Mock
+	LoginPlace mockLoginPlace;
+	@Captor
+	ArgumentCaptor<Place> placeCaptor;
 	UserSessionData usd;
 	String userId = "007";
 	
 	@Before
 	public void setup(){
-		mockView = mock(LoginView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockCookieProvier = mock(CookieProvider.class);
-		mockGwtWrapper = mock(GWTWrapper.class);
-		mockJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockPlaceChanger = mock(PlaceChanger.class);		
-		mockPanel = mock(AcceptsOneWidget.class);
-		mockEventBus = mock(EventBus.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
+		MockitoAnnotations.initMocks(this);
 		usd = new UserSessionData();
 		Session session = new Session();
 		session.setAcceptsTermsOfUse(true);
 		usd.setSession(session);
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState);
+		loginPresenter = new LoginPresenter(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynAlert);
 		loginPresenter.start(mockPanel, mockEventBus);
 		verify(mockView).setPresenter(loginPresenter);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 	}	
-	
-	private void setPlace() {
-		LoginPlace place = Mockito.mock(LoginPlace.class);
-		loginPresenter.setPlace(place);
-	}
 	
 	@Test 
 	public void testSetPlaceLogout() {
-		LoginPlace place = new LoginPlace(LoginPlace.LOGOUT_TOKEN);
-		loginPresenter.setPlace(place);
+		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.LOGOUT_TOKEN);
+		loginPresenter.setPlace(mockLoginPlace);
 		verify(mockView).showLogout();
 		verify(mockAuthenticationController).logoutUser();
 	}
 
 	@Test 
 	public void testSetPlaceUnknownSSOUser() {
-		LoginPlace place = new LoginPlace(WebConstants.OPEN_ID_UNKNOWN_USER_ERROR_TOKEN);
-		loginPresenter.setPlace(place);
-		ArgumentCaptor<Place> argument = ArgumentCaptor.forClass(Place.class);				   
+		when(mockLoginPlace.toToken()).thenReturn(WebConstants.OPEN_ID_UNKNOWN_USER_ERROR_TOKEN);
+		loginPresenter.setPlace(mockLoginPlace);
 		verify(mockView).showErrorMessage(anyString());
-		verify(mockPlaceChanger).goTo(argument.capture());
-		assertTrue(argument.getValue() instanceof RegisterAccount);
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		assertTrue(placeCaptor.getValue() instanceof RegisterAccount);
 	}
 
 	@Test 
 	public void testSetPlaceUnknownSSOError() {
-		LoginPlace place = new LoginPlace(WebConstants.OPEN_ID_ERROR_TOKEN);
-		loginPresenter.setPlace(place);
+		when(mockLoginPlace.toToken()).thenReturn(WebConstants.OPEN_ID_ERROR_TOKEN);
+		loginPresenter.setPlace(mockLoginPlace);
 		verify(mockView).showErrorMessage(anyString());
 		verify(mockView).showLogin();
 	}
 	
 	@Test 
 	public void testSetPlaceShowToU() {
-		LoginPlace place = new LoginPlace(LoginPlace.SHOW_TOU);
+		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.SHOW_TOU);
 		
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		usd.getSession().setAcceptsTermsOfUse(false);
 		AsyncMockStubber.callSuccessWith("tou").when(mockAuthenticationController).getTermsOfUse(any(AsyncCallback.class));
 		
-		loginPresenter.setPlace(place);
+		loginPresenter.setPlace(mockLoginPlace);
 		verify(mockView).showTermsOfUse(anyString(), any(AcceptTermsOfUseCallback.class));
 	}
 
 	@Test 
 	public void testSetPlaceShowTouUserAlreadyAccepted() {
-		LoginPlace place = new LoginPlace(LoginPlace.SHOW_TOU);
+		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.SHOW_TOU);
 		
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		usd.getSession().setAcceptsTermsOfUse(true);
 		AsyncMockStubber.callSuccessWith("tou").when(mockAuthenticationController).getTermsOfUse(any(AsyncCallback.class));
 		
-		loginPresenter.setPlace(place);
+		loginPresenter.setPlace(mockLoginPlace);
 		verify(mockView, never()).showTermsOfUse(anyString(), any(AcceptTermsOfUseCallback.class));
 		verify(mockGlobalApplicationState).gotoLastPlace();
 	}
@@ -148,16 +132,16 @@ public class LoginPresenterTest {
 	@Test 
 	public void testSetPlaceSSOLogin() throws JSONObjectAdapterException {
 		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
-		LoginPlace place = new LoginPlace(fakeToken);
+		when(mockLoginPlace.toToken()).thenReturn(fakeToken);
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		
-		loginPresenter.setPlace(place);
+		loginPresenter.setPlace(mockLoginPlace);
 		verify(mockAuthenticationController).revalidateSession(eq(fakeToken), any(AsyncCallback.class));
 		verify(mockGlobalApplicationState).gotoLastPlace(any(Place.class));
 	}
 	
 	@Test 
-	public void testCheckTempUsername() throws JSONObjectAdapterException {
+	public void testCheckTempUsername() {
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
 		profile.setUserName(WebConstants.TEMPORARY_USERNAME_PREFIX + "222");
@@ -167,7 +151,7 @@ public class LoginPresenterTest {
 	}
 	
 	@Test 
-	public void testCheckTempUsernameNotTemp() throws JSONObjectAdapterException {
+	public void testCheckTempUsernameNotTemp() {
 		UserProfile profile = new UserProfile();
 		profile.setOwnerId("1233");
 		profile.setUserName("not-temp");
@@ -177,27 +161,26 @@ public class LoginPresenterTest {
 		verify(mockGlobalApplicationState).gotoLastPlace(any(Place.class));
 	}
 	
-	
 	@Test 
-	public void testSetPlaceChangeUsername()throws JSONObjectAdapterException {
-		LoginPlace place = new LoginPlace(LoginPlace.CHANGE_USERNAME);
-		loginPresenter.setPlace(place);
+	public void testSetPlaceChangeUsername() {
+		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.CHANGE_USERNAME);
+		loginPresenter.setPlace(mockLoginPlace);
 		verify(mockPlaceChanger).goTo(isA(ChangeUsername.class));
 	}
 
 	@Test
-	public void testOpenInvitations() throws JSONObjectAdapterException {
+	public void testOpenInvitations() {
 		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
-		LoginPlace place = new LoginPlace(fakeToken);
+		when(mockLoginPlace.toToken()).thenReturn(fakeToken);
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		
-		loginPresenter.setPlace(place);
+		loginPresenter.setPlace(mockLoginPlace);
 		verify(mockAuthenticationController).revalidateSession(eq(fakeToken), any(AsyncCallback.class));
 	}
 	
 	
 	@Test
-	public void testSetNewUserSSO() throws JSONObjectAdapterException {
+	public void testSetNewUserSSO() {
 		UserSessionData sessionData = new UserSessionData();
 		Session session = new Session();
 		session.setSessionToken("my session token");
@@ -219,15 +202,15 @@ public class LoginPresenterTest {
 	}
 	
 	@Test 
-	public void testSetPlaceSSOLoginNotSignedToU() throws JSONObjectAdapterException {
+	public void testSetPlaceSSOLoginNotSignedToU() {
 		String fakeToken = "0e79b99-4bf8-4999-b3a2-5f8c0a9499eb";
-		LoginPlace place = new LoginPlace(fakeToken);
+		when(mockLoginPlace.toToken()).thenReturn(fakeToken);
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));		
 		usd.getSession().setAcceptsTermsOfUse(false);
 		AsyncMockStubber.callSuccessWith("tou").when(mockAuthenticationController).getTermsOfUse(any(AsyncCallback.class));
 		
 		//run the test
-		loginPresenter.setPlace(place);
+		loginPresenter.setPlace(mockLoginPlace);
 		
 		verify(mockAuthenticationController).revalidateSession(eq(fakeToken), any(AsyncCallback.class));
 		
@@ -244,17 +227,14 @@ public class LoginPresenterTest {
 		verify(mockView).showLogin();
 	}
 	
-	
 	@Test
 	public void testLastPlaceAfterLogin() {
 		//this should send to this user's profile (dashboard) by default
 		loginPresenter.goToLastPlace();
-		ArgumentCaptor<Place> defaultPlaceCaptor = ArgumentCaptor.forClass(Place.class);
-		verify(mockGlobalApplicationState).gotoLastPlace(defaultPlaceCaptor.capture());
-		Place defaultPlace = defaultPlaceCaptor.getValue();
+		
+		verify(mockGlobalApplicationState).gotoLastPlace(placeCaptor.capture());
+		Place defaultPlace = placeCaptor.getValue();
 		assertTrue(defaultPlace instanceof Profile);
 		assertEquals(userId, ((Profile)defaultPlace).getUserId());
 	}
-	
-	
 }

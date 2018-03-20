@@ -26,6 +26,7 @@ import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -67,6 +68,8 @@ public class LoginViewImpl extends Composite implements LoginView {
 	Modal termsOfUseDialog;
 	@UiField
 	SimplePanel termsOfUseContainer;
+	@UiField
+	Div synAlertContainer;
 	
 	private Presenter presenter;
 	private LoginWidget loginWidget;
@@ -218,5 +221,10 @@ public class LoginViewImpl extends Composite implements LoginView {
 		loadingUiText.setVisible(false);
 		loginView.setVisible(false);
 		termsOfServiceView.setVisible(false);
+	}
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }

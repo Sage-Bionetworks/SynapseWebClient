@@ -20,11 +20,12 @@ public interface LoginView extends IsWidget, SynapseView {
 	void showLogin();	
 	
 	void showTermsOfUse(String content, AcceptTermsOfUseCallback callback);
+
+	void setSynAlert(IsWidget w);
 	
 	public interface Presenter {
 		void goTo(Place place);
 		void goToLastPlace();
 		void setNewUser(UserSessionData newUser);
     }
-	
 }
