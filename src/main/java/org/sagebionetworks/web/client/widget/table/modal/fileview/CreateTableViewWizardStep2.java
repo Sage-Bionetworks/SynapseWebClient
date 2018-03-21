@@ -13,10 +13,13 @@ import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -43,7 +46,9 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	TableType tableType;
 	SynapseClientAsync synapseClient;
 	JobTrackingWidget jobTrackingWidget;
+	SynapseJavascriptClient jsClient;
 	CreateTableViewWizardStep2View view;
+	SynapseJSNIUtils jsniUtils;
 	
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
@@ -59,13 +64,17 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			ColumnModelsEditorWidget editor, 
 			SynapseClientAsync synapseClient, 
 			JobTrackingWidget jobTrackingWidget,
-			ViewDefaultColumns fileViewDefaultColumns){
+			ViewDefaultColumns fileViewDefaultColumns,
+			SynapseJavascriptClient jsClient,
+			SynapseJSNIUtils jsniUtils){
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.editor = editor;
 		this.jobTrackingWidget = jobTrackingWidget;
 		this.fileViewDefaultColumns = fileViewDefaultColumns;
+		this.jsClient = jsClient;
+		this.jsniUtils = jsniUtils;
 		view.setJobTracker(jobTrackingWidget.asWidget());
 		view.setEditor(editor.asWidget());
 		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
@@ -133,6 +142,33 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	public void setModalPresenter(ModalPresenter presenter) {
 		this.presenter = presenter;
 		presenter.setPrimaryButtonText(FINISH);
+		
+		((ModalWizardWidget)presenter).addCallback(new ModalWizardWidget.WizardCallback() {
+			
+			@Override
+			public void onFinished() {
+			}
+			
+			@Override
+			public void onCanceled() {
+				onCancel();
+			}
+		});
+	}
+	
+	public void onCancel() {
+		//user decided not to create the table/view.  clean it up.
+		String entityId = entity.getId();
+		jsClient.deleteEntityById(entityId, true, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				jsniUtils.consoleError("Unable to delete table/view: " + caught.getMessage());
+			}
+			@Override
+			public void onSuccess(Void result) {
+				jsniUtils.consoleLog("User cancelled creation of table/view.  Deleted placeholder: " + entityId);
+			}
+		});
 	}
 	
 	@Override

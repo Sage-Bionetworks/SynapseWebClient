@@ -31,6 +31,8 @@ import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
@@ -89,12 +91,17 @@ public class CreateTableViewWizardStep2Test {
 	List<ColumnModel> mockAnnotationColumnsPage1;
 	@Mock
 	List<ColumnModel> mockAnnotationColumnsPage2;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
+	@Mock
+	SynapseJSNIUtils mockJsniUtils;
+
 	public static final String NEXT_PAGE_TOKEN = "nextPageToken";
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 	
-		widget = new CreateTableViewWizardStep2(mockView, mockEditor, mockSynapseClient, mockJobTrackingWidget, mockFileViewDefaultColumns);
+		widget = new CreateTableViewWizardStep2(mockView, mockEditor, mockSynapseClient, mockJobTrackingWidget, mockFileViewDefaultColumns, mockJsClient, mockJsniUtils);
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
 		when(mockEditor.validate()).thenReturn(true);
