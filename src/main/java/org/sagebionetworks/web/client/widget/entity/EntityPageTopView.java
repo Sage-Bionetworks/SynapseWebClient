@@ -10,6 +10,6 @@ public interface EntityPageTopView extends IsWidget, SynapseView {
 	void setTabs(Widget w);
 	void setProjectActionMenu(Widget w);
 	void setEntityActionMenu(Widget w);
-	void setLoadingVisible(boolean visible);
+	void setProjectLoadingVisible(boolean visible);
 	void scrollToTop();
 }

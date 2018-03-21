@@ -11,6 +11,7 @@ import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -53,6 +54,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	HTMLPanel panel;
 	Presenter presenter;
 	PortalGinInjector ginInjector;
+	@UiField
+	LoadingSpinner loadingUI;
 	
 	@Inject
 	public TableListWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
@@ -101,7 +104,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	
 	@Override
 	public void clearTableWidgets() {
-		tablesList.clear();	
+		tablesList.clear();
 	}
 	
 	@Override
@@ -122,6 +125,11 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	
 	@Override
 	public void showLoading() {
+		loadingUI.setVisible(true);
+	}
+	@Override
+	public void hideLoading() {
+		loadingUI.setVisible(false);	
 	}
 
 	@Override

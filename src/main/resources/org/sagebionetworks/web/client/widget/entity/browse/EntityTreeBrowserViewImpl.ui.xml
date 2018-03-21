@@ -35,7 +35,7 @@
 				</t:TableHeader>
 			</t:TableRow>
 		</t:Table>
-		<bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
+		<bh:Hr ui:field="hrUnderTableHeaders" addStyleNames="margin-top-5 margin-bottom-5" />
 		<bh:Div ui:field="mainContainer" />
 	</bh:Div>
 
