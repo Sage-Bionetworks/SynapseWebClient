@@ -742,4 +742,12 @@ public class UploaderTest {
 		uploader.uploadBasedOnConfiguration();
 		verify(view).showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, WebConstants.INVALID_ENTITY_NAME_MESSAGE);
 	}
+	
+	@Test
+	public void testUploadIllegalNameTrailingWhitespace() {
+		String[] files = {"test.txt   "};
+		uploader.setFileNames(files);
+		uploader.uploadBasedOnConfiguration();
+		verify(view).showErrorMessage(DisplayConstants.ERROR_UPLOAD_TITLE, WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+	}
 }
