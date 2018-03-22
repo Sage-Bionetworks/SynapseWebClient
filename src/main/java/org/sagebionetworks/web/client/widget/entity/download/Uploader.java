@@ -516,29 +516,25 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void setFileEntityFileHandle(String fileHandleId) {
 		if (entityId != null || parentEntityId != null) {
-			try {
-				synapseClient.setFileEntityFileHandle(fileHandleId, entityId, parentEntityId, new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(String entityId) {
-						fileHasBeenUploaded = true;
-						if (currIndex + 1 == fileNames.length) {
-							//to new file handle id, or create new file entity with this file handle id
-							view.hideLoading();
-							refreshAfterSuccessfulUpload(entityId);
-						} else {
-							//more files to upload
-							currIndex++;
-							handleUploads();
-						}
+			synapseClient.setFileEntityFileHandle(fileHandleId, entityId, parentEntityId, new AsyncCallback<String>() {
+				@Override
+				public void onSuccess(String entityId) {
+					fileHasBeenUploaded = true;
+					if (currIndex + 1 == fileNames.length) {
+						//to new file handle id, or create new file entity with this file handle id
+						view.hideLoading();
+						refreshAfterSuccessfulUpload(entityId);
+					} else {
+						//more files to upload
+						currIndex++;
+						handleUploads();
 					}
-					@Override
-					public void onFailure(Throwable t) {
-						uploadError(t.getMessage(), t);		
-					}
-				});
-			} catch (RestServiceException e) {
-				uploadError(e.getMessage(), e);
-			}
+				}
+				@Override
+				public void onFailure(Throwable t) {
+					uploadError(t.getMessage(), t);		
+				}
+			});
 		}
 		if (fileHandleIdCallback != null) {
 			fileHandleIdCallback.invoke(fileHandleId);

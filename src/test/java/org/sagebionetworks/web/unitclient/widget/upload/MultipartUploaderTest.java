@@ -17,6 +17,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.ContentTypeUtils.*;
+import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -194,6 +195,15 @@ public class MultipartUploaderTest {
 	}
 	
 	@Test
+	public void testDirectUploadEmptyFile() throws Exception {
+		when(synapseJsniUtils.getFileSize(any(JavaScriptObject.class))).thenReturn(0.0);
+		setPartsState("0");
+		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
+		verify(mockMultipartFileUploadClient, never()).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockHandler).uploadFailed(EMPTY_FILE_ERROR_MESSAGE + FILE_NAME);
+	}
+	
+	@Test
 	public void testDirectUploadSinglePart() throws Exception {
 		setPartsState("0");
 		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
@@ -210,7 +220,6 @@ public class MultipartUploaderTest {
 		verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
 	}
 	
-
 	@Test
 	public void testDirectUploadSingleSecondPart() throws Exception {
 		setPartsState("10");
