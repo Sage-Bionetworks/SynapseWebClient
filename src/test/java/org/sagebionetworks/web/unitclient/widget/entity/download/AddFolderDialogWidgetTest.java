@@ -103,7 +103,8 @@ public class AddFolderDialogWidgetTest {
 		
 		verify(mockSynapseJavascriptClient).deleteEntityById(eq(NEW_FOLDER_ID), eq(skipTrashCan), any(AsyncCallback.class));
 		verify(mockView).hide();
-		verify(mockGlobalAppState).refreshPage();
+		// does not need to refresh (SWC-4089)
+		verify(mockGlobalAppState, never()).refreshPage();
 	}
 
 	@Test
