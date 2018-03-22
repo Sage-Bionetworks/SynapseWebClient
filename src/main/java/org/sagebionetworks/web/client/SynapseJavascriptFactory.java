@@ -27,7 +27,6 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsyncJobId;
-import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBodyInstanceFactory;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
@@ -43,7 +42,6 @@ import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.provenance.Activity;
-import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
@@ -96,7 +94,6 @@ public class SynapseJavascriptFactory {
 		SubscriberPagedResults,
 		SubscriberCount,
 		BatchFileResult,
-		StackStatus,
 		UserProfile,
 		FileHandleResults,
 		AsyncResponse,
@@ -195,8 +192,6 @@ public class SynapseJavascriptFactory {
 			return new SubscriberCount(json).getCount();
 		case BatchFileResult :
 			return new BatchFileResult(json);
-		case StackStatus :
-			return new StackStatus(json);
 		case UserProfile :
 			return new UserProfile(json);
 		case FileHandleResults :

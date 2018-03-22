@@ -37,5 +37,5 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 	void setLoadMoreWidget(IsWidget w);
 	void setSynAlert(IsWidget w);
 	void resetSortUI();
-	
+	void hideLoading();
 }

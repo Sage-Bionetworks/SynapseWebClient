@@ -78,7 +78,7 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	@Override
-	public void setLoadingVisible(boolean visible) {
+	public void setProjectLoadingVisible(boolean visible) {
 		loadingUI.setVisible(visible);
 	}
 	@Override

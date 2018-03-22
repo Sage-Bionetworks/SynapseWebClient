@@ -266,7 +266,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	}
 	
 	public void configureProject() {
-		view.setLoadingVisible(true);
+		view.setProjectLoadingVisible(true);
 		hideTabs();
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
 		projectBundle = null;
@@ -275,7 +275,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
 			public void onSuccess(EntityBundle bundle) {
-				view.setLoadingVisible(false);
+				view.setProjectLoadingVisible(false);
 				// by default, all tab entity bundles point to the project entity bundle
 				projectBundle = filesEntityBundle = tablesEntityBundle = dockerEntityBundle = bundle;
 				projectMetadata.configure(projectBundle, null, projectActionMenu);
@@ -287,7 +287,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 
 			@Override
 			public void onFailure(Throwable caught) {
-				view.setLoadingVisible(false);
+				view.setProjectLoadingVisible(false);
 				projectBundleLoadError = caught;
 				configureEntity(entity.getId(), filesVersionNumber);
 				showSelectedTabs();
@@ -297,7 +297,6 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	}
 
 	public void configureEntity(String entityId, final Long version) {
-		view.setLoadingVisible(true);
 		int mask = ENTITY | ANNOTATIONS | PERMISSIONS | ENTITY_PATH | HAS_CHILDREN | FILE_HANDLES | ROOT_WIKI_ID | DOI | FILE_NAME | BENEFACTOR_ACL | TABLE_DATA | ACL | BENEFACTOR_ACL;
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
@@ -307,13 +306,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				entityActionController.configure(entityActionMenu, bundle, isCurrentVersion, null, area, entityUpdateHandler);
 				projectMetadata.setVisible(bundle.getEntity() instanceof Project);
 				reconfigureCurrentArea();
-				view.setLoadingVisible(false);
 			}
 
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
-				view.setLoadingVisible(false);
 			}
 		};
 		synapseJavascriptClient.getEntityBundleForVersion(entityId, version, mask, callback);
@@ -432,11 +429,9 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.showErrorMessage(caught.getMessage());
-				view.setLoadingVisible(false);
 			}
 			@Override
 			public void onSuccess(Boolean isContent) {
-				view.setLoadingVisible(false);
 				if (isContent) {
 					visibleTabCount++;
 				}

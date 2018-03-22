@@ -40,6 +40,7 @@ import com.google.inject.Inject;
 public class MultipartUploaderImpl implements MultipartUploader {
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file.";
 	public static final String BINARY_CONTENT_TYPE = "application/octet-stream";
+	public static final String EMPTY_FILE_ERROR_MESSAGE = "The selected file is empty: ";
 	//if any parts fail to upload, then it will restart the upload from the beginning up to 10 times, with a 3 second delay between attempts.
 	public static final int RETRY_DELAY = 3000;
 	
@@ -96,6 +97,14 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		this.view = view;
 		isCanceled = false;
 		isDebugLevelLogging = DisplayUtils.isInTestWebsite(cookies);
+		
+		//SWC-3779: check for empty file
+		long fileSize = (long)synapseJsniUtils.getFileSize(blob);
+		if (fileSize <= 0) {
+			handler.uploadFailed(EMPTY_FILE_ERROR_MESSAGE + fileName);
+			return;	
+		}
+		
 		uploadLog = new StringBuilder();
 		log(gwt.getUserAgent() + "\n" + gwt.getAppVersion() + "\nDirectly uploading " + fileName + " - calculating MD5\n");
 		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {

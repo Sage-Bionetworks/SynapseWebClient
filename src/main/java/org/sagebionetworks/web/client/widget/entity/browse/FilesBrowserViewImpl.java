@@ -42,7 +42,10 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	
 	@Override
 	public void setEntityClickedHandler(CallbackP<String> callback) {
-		entityTreeBrowser.setEntityClickedHandler(callback);
+		entityTreeBrowser.setEntityClickedHandler(entityId -> {
+			entityTreeBrowser.setLoadingVisible(true);
+			callback.invoke(entityId);
+		});
 	}
 	
 	@Override
