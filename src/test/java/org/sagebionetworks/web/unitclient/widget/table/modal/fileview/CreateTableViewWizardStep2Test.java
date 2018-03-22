@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
+import static org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.*;
@@ -225,17 +226,25 @@ public class CreateTableViewWizardStep2Test {
 		wizardCallback.onCanceled();
 		
 		//verify attempt to clean up
+		verify(mockJsClient).deleteEntityById(eq(ENTITY_ID), eq(true), any(AsyncCallback.class));
+		verify(mockJsniUtils).consoleLog(DELETE_PLACEHOLDER_SUCCESS_MESSAGE + ENTITY_ID);
+	}
+	
+	@Test
+	public void testOnCancelFailedToCleanup(){
+		String errorMessage = "failed to clean up placeholder entity";
 		
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockJsClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockWizardPresenter).addCallback(wizardCallbackCaptor.capture());
+		ModalWizardWidget.WizardCallback wizardCallback = wizardCallbackCaptor.getValue();
+		widget.configure(tableEntity, TableType.table);
 		
-//		onPrimary().onComplete(null);
-//		InOrder inOrder = inOrder(mockView);
-//		inOrder.verify(mockView).setJobTrackerVisible(true);
-//		inOrder.verify(mockView).setJobTrackerVisible(false);
-//		
-//		verify(mockWizardPresenter, atLeastOnce()).setLoading(true);
-//		verify(mockEditor).validate();
-//		verify(mockWizardPresenter).onFinished();
-//		verify(mockJsClient, never()).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
+		//simulate user cancels
+		wizardCallback.onCanceled();
+		
+		//verify attempt to clean up
+		verify(mockJsClient).deleteEntityById(eq(ENTITY_ID), eq(true), any(AsyncCallback.class));
+		verify(mockJsniUtils).consoleError(DELETE_PLACEHOLDER_FAILURE_MESSAGE + ENTITY_ID + ": " + errorMessage);
 	}
 	
 	private AsynchronousProgressHandler onPrimary() {

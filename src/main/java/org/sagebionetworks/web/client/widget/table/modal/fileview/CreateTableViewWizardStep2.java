@@ -36,6 +36,8 @@ import com.google.inject.Inject;
  *
  */
 public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
+	public static final String DELETE_PLACEHOLDER_FAILURE_MESSAGE = "Unable to delete table/view ";
+	public static final String DELETE_PLACEHOLDER_SUCCESS_MESSAGE = "User cancelled creation of table/view.  Deleted placeholder: ";
 	public static final String SCHEMA_UPDATE_CANCELLED = "Schema update cancelled";
 	public static final String FINISH = "Finish";
 	ColumnModelsEditorWidget editor;
@@ -161,11 +163,11 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		jsClient.deleteEntityById(entityId, true, new AsyncCallback<Void>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				jsniUtils.consoleError("Unable to delete table/view: " + caught.getMessage());
+				jsniUtils.consoleError(DELETE_PLACEHOLDER_FAILURE_MESSAGE + entityId + ": " + caught.getMessage());
 			}
 			@Override
 			public void onSuccess(Void result) {
-				jsniUtils.consoleLog("User cancelled creation of table/view.  Deleted placeholder: " + entityId);
+				jsniUtils.consoleLog(DELETE_PLACEHOLDER_SUCCESS_MESSAGE + entityId);
 			}
 		});
 	}
