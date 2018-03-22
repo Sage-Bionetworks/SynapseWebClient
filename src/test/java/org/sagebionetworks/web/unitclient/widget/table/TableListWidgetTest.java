@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.table;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -26,13 +27,12 @@ import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -56,6 +56,9 @@ public class TableListWidgetTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
+	CallbackP<String> mockTableClickedCallback;
+	
 	List<EntityHeader> searchResults;
 	
 	
@@ -91,6 +94,7 @@ public class TableListWidgetTest {
 	@Test
 	public void testConfigureUnderPageSize(){
 		widget.configure(parentBundle);
+		verify(mockView, times(2)).hideLoading();
 		verify(mockView).resetSortUI();
 		verify(mockLoadMoreWidgetContainer).setIsMore(false);
 	}
@@ -111,5 +115,15 @@ public class TableListWidgetTest {
 		AsyncMockStubber.callFailureWith(th).when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		widget.configure(parentBundle);
 		verify(mockSynAlert).handleException(th);
+	}
+	
+	@Test
+	public void testOnTableClicked() {
+		widget.setTableClickedCallback(mockTableClickedCallback);
+		widget.onTableClicked(ENTITY_ID);
+		
+		verify(mockView).showLoading();
+		verify(mockView).clearTableWidgets();
+		verify(mockTableClickedCallback).invoke(ENTITY_ID);
 	}
 }

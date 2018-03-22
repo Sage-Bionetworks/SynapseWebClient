@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Hr;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -47,6 +48,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	Tree entityTree;
 	@UiField
 	Table entityTreeHeader;
+	@UiField
+	Hr hrUnderTableHeaders;
 	Div entityTreeContainer = new Div();
 	private Widget widget;
 
@@ -283,6 +286,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		} else {
 			mainContainer.add(entityTreeContainer);
 		}
+		entityTreeHeader.setVisible(!isShown);
+		hrUnderTableHeaders.setVisible(!isShown);
 	}
 
 	@Override

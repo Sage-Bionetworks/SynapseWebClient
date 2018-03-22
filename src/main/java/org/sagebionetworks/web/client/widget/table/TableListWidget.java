@@ -80,6 +80,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	public void loadData() {
 		query = createQuery(parentBundle.getEntity().getId());
 		view.clearTableWidgets();
+		view.hideLoading();
 		query.setNextPageToken(null);
 		loadMore();
 	}
@@ -120,6 +121,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	}
 	
 	private void setResults(List<EntityHeader> results) {
+		view.hideLoading();
 		for (EntityHeader header : results) {
 			view.addTableListItem(header);
 		}
@@ -142,6 +144,8 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	@Override
 	public void onTableClicked(String entityId) {
 		if (onTableClickCallback != null) {
+			view.showLoading();
+			view.clearTableWidgets();
 			onTableClickCallback.invoke(entityId);
 		}
 	}
