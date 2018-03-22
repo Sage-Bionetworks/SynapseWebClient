@@ -328,7 +328,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 		
 	private boolean validateFileName(String filename) {
-		boolean valid = filename.matches(VALID_ENTITY_NAME_REGEX);
+		boolean valid = filename.matches(VALID_ENTITY_NAME_REGEX) && (filename.trim().length() == filename.length());
 		if (!valid) {
 			String message = WebConstants.INVALID_ENTITY_NAME_MESSAGE;
 			uploadError(message, new Exception(message));
