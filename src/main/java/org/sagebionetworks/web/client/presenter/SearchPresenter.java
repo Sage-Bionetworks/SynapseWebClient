@@ -36,9 +36,6 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class SearchPresenter extends AbstractActivity implements SearchView.Presenter, Presenter<Search> {
-	
-	//private final List<String> FACETS_DEFAULT = Arrays.asList(new String[] {"node_type","disease","species","tissue","platform","num_samples","created_by","modified_by","created_on","modified_on","acl","reference"});
-	private Search place;
 	private SearchView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
@@ -87,7 +84,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 
 	@Override
 	public void setPlace(Search place) {
-		this.place = place;
 		view.setPresenter(this);
 		String queryTerm = place.getSearchTerm();
 		if (queryTerm == null) queryTerm = "";

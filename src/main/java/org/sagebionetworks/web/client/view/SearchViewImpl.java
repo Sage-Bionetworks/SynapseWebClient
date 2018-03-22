@@ -74,6 +74,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	static {
 		facetToDisplay = new HashMap<String, String>();
 		facetToDisplay.put("node_type", "Type");
+		facetToDisplay.put("modified_by", "Last Modified By");
 	}
 	
 	public interface SearchViewImplUiBinder extends
@@ -252,13 +253,15 @@ public class SearchViewImpl extends Composite implements SearchView {
 				Window.scrollTo(0, 0);
 				presenter.removeFacet(facet.getKey(), facet.getValue());						
 			});
-			if ("created_by".equalsIgnoreCase(facet.getKey())) {
+			if ("created_by".equalsIgnoreCase(facet.getKey()) || "modified_by".equalsIgnoreCase(facet.getKey())) {
+				String buttonText = "created_by".equalsIgnoreCase(facet.getKey()) ? "Created by " : "Last modified by ";
 				UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
 				createdByBadge.configure(facet.getValue());
 				createdByBadge.setSize(BadgeSize.SMALLER);
 				createdByBadge.setCustomClickHandler(event -> {
 					btn.click();
 				});
+				btn.add(new Text(buttonText));
 				btn.add(createdByBadge);
 			} else {
 				btn.add(new Text(text));
@@ -509,6 +512,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 			lc = new FlowPanel();
 			String displayName = facetToDisplay.containsKey(facet.getName()) ? formatFacetName(facetToDisplay.get(facet.getName())) : formatFacetName(facet.getName());
 			//special case.  if this is the created_by facet, then add a UserBadge
+			boolean isModifiedByFacet = "modified_by".equalsIgnoreCase(facet.getName());
 			boolean isCreatedByFacet = "created_by".equalsIgnoreCase(facet.getName());
 			lc.add(new HTML("<h6 style=\"margin-top: 15px;\">" + displayName + "</h6>"));
 			FlowPanel flowPanel = new FlowPanel();
@@ -534,7 +538,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 						presenter.addFacet(facet.getName(), constraint.getValue());				
 					}
 				};
-				if (isCreatedByFacet) {
+				if (isCreatedByFacet || isModifiedByFacet) {
 					stub = "";
 					UserBadge badge = ginInjector.getUserBadgeWidget();
 					badge.configure(getSearchUserId(constraint.getValue()));
@@ -543,7 +547,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 					valueContainer.add(widget);
 				}
 				Anchor a = new Anchor(stub + " (" + constraint.getCount() + ")");
-				if (!stub.equalsIgnoreCase(constraint.getValue()) && !isCreatedByFacet) {
+				if (!stub.equalsIgnoreCase(constraint.getValue()) && !isCreatedByFacet && !isModifiedByFacet) {
 					valueContainer.add(DisplayUtils.addTooltip(a, constraint.getValue(), Placement.RIGHT));
 				} else {
 					valueContainer.add(a);
