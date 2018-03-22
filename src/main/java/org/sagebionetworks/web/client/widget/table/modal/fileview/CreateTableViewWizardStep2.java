@@ -144,7 +144,6 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		presenter.setPrimaryButtonText(FINISH);
 		
 		((ModalWizardWidget)presenter).addCallback(new ModalWizardWidget.WizardCallback() {
-			
 			@Override
 			public void onFinished() {
 			}

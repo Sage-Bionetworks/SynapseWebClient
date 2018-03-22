@@ -15,7 +15,7 @@ import com.google.inject.Inject;
  * @author jhill
  *
  */
-public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardView.Presenter, ModalPage.ModalPresenter, IsWidget {
+public class ModalWizardWidgetImpl implements ModalWizardWidget,  ModalWizardView.Presenter, IsWidget {
 
 	List<WizardCallback> callbacks;
 	ModalPage currentPage;
