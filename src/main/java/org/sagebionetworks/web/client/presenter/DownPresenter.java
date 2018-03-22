@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.status.StackStatus;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.place.Down;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DownView;
 
@@ -25,18 +25,19 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 	GWTWrapper gwt;
 	GlobalApplicationState globalAppState;
 	Callback updateTimerCallback;
-	SynapseJavascriptClient jsClient;
+	StackConfigServiceAsync stackConfigService;
 	boolean isCheckingStatus = false;
 	@Inject
 	public DownPresenter(
 			final DownView view,
 			final GWTWrapper gwt,
 			GlobalApplicationState globalAppState,
-			SynapseJavascriptClient jsClient) {
+			StackConfigServiceAsync stackConfigService) {
 		this.view = view;
 		this.gwt = gwt;
 		this.globalAppState = globalAppState;
-		this.jsClient = jsClient;
+		this.stackConfigService = stackConfigService;
+		fixServiceEntryPoint(stackConfigService);
 		updateTimerCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -57,7 +58,7 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 	public void checkForRepoDown() {
 		isCheckingStatus = true;
 		view.setTimerVisible(false);
-		jsClient.getStackStatus(new AsyncCallback<StackStatus>() {
+		stackConfigService.getCurrentStatus(new AsyncCallback<StackStatus>() {
 			@Override
 			public void onSuccess(StackStatus status) {
 				switch(status.getStatus()) {
