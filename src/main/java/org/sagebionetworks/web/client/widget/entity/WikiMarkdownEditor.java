@@ -149,6 +149,7 @@ public class WikiMarkdownEditor implements IsWidget, WikiMarkdownEditorView.Pres
 		view.setTitle(currentPage.getTitle());
 		globalApplicationState.setIsEditing(true);
 		view.showEditorModal();
+		editor.setCursorPos(0);
 		editor.setMarkdownFocus();
 	}
 

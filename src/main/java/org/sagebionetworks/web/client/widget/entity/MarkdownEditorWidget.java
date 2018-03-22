@@ -567,4 +567,8 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 	public void setMarkdownFocus() {
 		view.setMarkdownFocus();
 	}
+	
+	public void setCursorPos(int pos) {
+		view.setCursorPos(pos);
+	}
 }
