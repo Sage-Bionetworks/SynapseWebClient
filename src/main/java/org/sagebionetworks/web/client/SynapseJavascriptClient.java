@@ -72,7 +72,6 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.request.ReferenceList;
-import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
@@ -240,7 +239,6 @@ public class SynapseJavascriptClient {
 		}
 		return authServiceUrl;
 	}
-
 	
 	private String getFileServiceUrl() {
 		if (fileServiceUrl == null) {
@@ -858,10 +856,6 @@ public class SynapseJavascriptClient {
 			url = url + "?" + SKIP_TRASH_CAN_PARAM + "=true";
 		}
 		doDelete(url, callback);
-	}
-	public void getStackStatus(AsyncCallback<StackStatus> callback) {
-		String url = getRepoServiceUrl() + STACK_STATUS;
-		doGet(url, OBJECT_TYPE.StackStatus, callback);
 	}
 	
 	public void updateV2WikiPage(WikiPageKey key, V2WikiPage toUpdate, AsyncCallback<V2WikiPage> callback){

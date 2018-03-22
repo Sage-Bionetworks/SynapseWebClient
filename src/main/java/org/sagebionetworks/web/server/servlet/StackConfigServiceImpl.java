@@ -3,6 +3,7 @@ package org.sagebionetworks.web.server.servlet;
 import java.util.HashMap;
 
 import org.sagebionetworks.StackConfiguration;
+import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.web.client.StackConfigService;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalPropertiesHolder;
@@ -35,6 +36,16 @@ public class StackConfigServiceImpl extends SynapseClientBase implements StackCo
 			SynapseVersionInfo versionInfo = synapseClient.getVersionInfo();
 			return PortalVersionHolder.getVersionInfo() + ","
 					+ versionInfo.getVersion();
+		} catch (Exception e) {
+			throw new UnknownErrorException(e.getMessage());
+		}
+	}
+	
+	@Override
+	public StackStatus getCurrentStatus() throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
+		try {
+			return synapseClient.getCurrentStackStatus();
 		} catch (Exception e) {
 			throw new UnknownErrorException(e.getMessage());
 		}
