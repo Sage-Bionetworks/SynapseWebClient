@@ -11,8 +11,9 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.LoginView;
-import org.sagebionetworks.web.client.widget.login.AcceptTermsOfUseCallback;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -23,75 +24,55 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class LoginPresenter extends AbstractActivity implements LoginView.Presenter, Presenter<LoginPlace> {
-
-	private LoginPlace loginPlace;
 	private LoginView view;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	
+	private SynapseAlert synAlert;
 	@Inject
-	public LoginPresenter(LoginView view, AuthenticationController authenticationController, GlobalApplicationState globalApplicationState){
+	public LoginPresenter(LoginView view, 
+			AuthenticationController authenticationController, 
+			GlobalApplicationState globalApplicationState,
+			SynapseAlert synAlert){
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
+		this.synAlert = synAlert;
+		view.setSynAlert(synAlert);
 		view.setPresenter(this);
 	} 
 
-	private AcceptTermsOfUseCallback getAcceptTermsOfUseCallback() {
-		return new AcceptTermsOfUseCallback() {
-			public void accepted() {
-				view.showLoggingInLoader();
-				authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
+	private Callback getAcceptTermsOfUseCallback() {
+		return () -> {
+			synAlert.clear();
+			view.showLoggingInLoader();
+			authenticationController.signTermsOfUse(true, new AsyncCallback<Void> () {
+				@Override
+				public void onFailure(Throwable caught) {
+					synAlert.handleException(caught);
+					view.showLogin();
+				}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						view.showErrorMessage("An error occurred. Please try logging in again.");
-						view.showLogin();
-					}
+				@Override
+				public void onSuccess(Void result) {
+					// Have to get the UserSessionData again, 
+					// since it won't contain the UserProfile if the terms haven't been signed
+					synAlert.clear();
+					authenticationController.revalidateSession(authenticationController.getCurrentUserSessionToken(), new AsyncCallback<UserSessionData>() {
+						@Override
+						public void onFailure(
+								Throwable caught) {
+							synAlert.handleException(caught);
+							view.showLogin();
+						}
 
-					@Override
-					public void onSuccess(Void result) {
-						// Have to get the UserSessionData again, 
-						// since it won't contain the UserProfile if the terms haven't been signed
-						authenticationController.revalidateSession(authenticationController.getCurrentUserSessionToken(), new AsyncCallback<UserSessionData>() {
-
-							@Override
-							public void onFailure(
-									Throwable caught) {
-								view.showErrorMessage("An error occurred. Please try logging in again.");
-								view.showLogin();
-							}
-
-							@Override
-							public void onSuccess(UserSessionData result) {
-								// Signed ToU. Check for temp username, passing record, and then forward
-								userAuthenticated();
-							}	
-							
-						});
-					}
-					
-				});
-			}
-
-			@Override
-			public void rejected() {
-				authenticationController.signTermsOfUse(false, new AsyncCallback<Void> () {
-
-					@Override
-					public void onFailure(Throwable caught) {
-						view.showErrorMessage("An error occurred. Please try logging in again.");
-						view.showLogin();
-					}
-
-					@Override
-					public void onSuccess(Void result) {
-						authenticationController.logoutUser();
-						goToLastPlace();
-					}
-					
-				});
-			}
+						@Override
+						public void onSuccess(UserSessionData result) {
+							// Signed ToU. Check for temp username, passing record, and then forward
+							userAuthenticated();
+						}	
+					});
+				}
+			});
 		};
 	}
 	@Override
@@ -101,7 +82,6 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	
 	@Override
 	public void setPlace(final LoginPlace place) {
-		this.loginPlace = place;
 		view.setPresenter(this);
 		view.clear();
 		showView(place);
@@ -187,15 +167,15 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	 */
 	
 	
-	public void showTermsOfUse(final AcceptTermsOfUseCallback callback) {
+	public void showTermsOfUse(final Callback callback) {
+		synAlert.clear();
 		authenticationController.getTermsOfUse(new AsyncCallback<String>() {
 			public void onSuccess(String termsOfUseContents) {
 				view.hideLoggingInLoader();
 				view.showTermsOfUse(termsOfUseContents, callback);		
 			}
 			public void onFailure(Throwable t) {
-				if(!DisplayUtils.checkForRepoDown(t, globalApplicationState.getPlaceChanger(), view)) 
-					view.showErrorMessage("An error occurred. Please try logging in again.");
+				synAlert.handleException(t);
 				view.showLogin();									
 			}
 		});
@@ -218,7 +198,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 		view.showLoggingInLoader();
 		if(token != null) {
 			final String sessionToken = token;
-			
+			synAlert.clear();
 			AsyncCallback<UserSessionData> callback = new AsyncCallback<UserSessionData>() {	
 				@Override
 				public void onSuccess(UserSessionData result) {
@@ -231,11 +211,7 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 				}
 				@Override
 				public void onFailure(Throwable caught) {
-					if(DisplayUtils.checkForRepoDown(caught, globalApplicationState.getPlaceChanger(), view)) {
-						view.showLogin();
-						return;
-					}
-					view.showErrorMessage("An error occurred. Please try logging in again.");
+					synAlert.handleException(caught);
 					view.showLogin();
 				}
 			};

@@ -15,7 +15,8 @@
 	</ui:style>
 	<g:HTMLPanel>
         <div class="clear"></div>
-		    	<div class="container margin-top-15"> 		
+		    	<div class="container margin-top-15">
+		    		<bh:Div ui:field="synAlertContainer"/>
 				<g:HTMLPanel ui:field="loginView" visible="true">
 					<!-- LoginView -->				
 					<div class="panel padding-10 col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8">
