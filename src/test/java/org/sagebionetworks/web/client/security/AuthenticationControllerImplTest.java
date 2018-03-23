@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Down;
+import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -64,6 +65,8 @@ public class AuthenticationControllerImplTest {
 	SessionTokenDetector mockSessionTokenDetector;
 	@Mock
 	SynapseJavascriptClient mockJsClient;
+	@Mock
+	Header mockHeader;
 	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	HashMap<String, String> serverProperties;
@@ -85,6 +88,7 @@ public class AuthenticationControllerImplTest {
 		serverProperties = new HashMap<String, String>();
 		AsyncMockStubber.callSuccessWith(serverProperties).when(mockStackConfigService).getSynapseProperties(any(AsyncCallback.class));
 		when(mockGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
+		when(mockGinInjector.getHeader()).thenReturn(mockHeader);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockGinInjector.getSessionTokenDetector()).thenReturn(mockSessionTokenDetector);
 	}
@@ -92,6 +96,7 @@ public class AuthenticationControllerImplTest {
 	@Test
 	public void testReloadUserSessionData() {
 		authenticationController.reloadUserSessionData();
+		verify(mockHeader).refresh();
 		//look for user session data in local cache
 		verify(mockClientCache).get(AuthenticationControllerImpl.USER_SESSION_DATA_CACHE_KEY);
 		
@@ -204,8 +209,8 @@ public class AuthenticationControllerImplTest {
 		verify(mockStackConfigService).getSynapseProperties(any(AsyncCallback.class));
 		verify(mockClientCache).put(eq(propKey), eq(propValue), anyLong());
 		verify(mockSessionTokenDetector).initializeSessionTokenState();
+		verify(mockHeader).refresh();
 	}
-	
 	
 	@Test
 	public void testStoreLoginReceipt() {
@@ -260,6 +265,7 @@ public class AuthenticationControllerImplTest {
 		
 		verify(loginCallback).onSuccess(any(UserSessionData.class));
 		verify(mockSessionTokenDetector).initializeSessionTokenState();
+		verify(mockHeader).refresh();
 	}
 	
 	@Test
