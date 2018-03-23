@@ -2,7 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.docker;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
@@ -17,27 +16,24 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
-import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidget;
 import org.sagebionetworks.web.client.widget.docker.DockerRepoListWidgetView;
-import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
-import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -60,6 +56,10 @@ public class DockerRepoListWidgetTest {
 	EntityChildrenResponse mockResults;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Captor
+	ArgumentCaptor<CallbackP<String>> callbackPCaptor;
+	@Mock
+	CallbackP<String> mockCallbackP;
 	
 	List<EntityHeader> searchResults;
 	
@@ -206,11 +206,28 @@ public class DockerRepoListWidgetTest {
 		when(mockResults.getNextPageToken()).thenReturn("not null");
 		dockerRepoListWidget.configure(projectId);
 		dockerRepoListWidget.loadMore();
+		verify(mockView).setLoadingVisible(false);
 		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockMembersContainer, times(2)).setIsMore(true);
 		when(mockResults.getNextPageToken()).thenReturn(null);
 		dockerRepoListWidget.loadMore();
 		verify(mockSynapseJavascriptClient, times(2)).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		verify(mockMembersContainer).setIsMore(false);
+	}
+	
+	@Test
+	public void testEntityClickHandler() {
+		String entityId = "syn9992";
+		dockerRepoListWidget.setEntityClickedHandler(mockCallbackP);
+		verify(mockView).setEntityClickedHandler(callbackPCaptor.capture());
+		verify(mockView, never()).setLoadingVisible(true);
+		
+		//simulate click
+		CallbackP<String> callbackP = callbackPCaptor.getValue();
+		callbackP.invoke(entityId);
+		
+		verify(mockView).clear();
+		verify(mockView).setLoadingVisible(true);
+		verify(mockCallbackP).invoke(entityId);
 	}
 }

@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
@@ -28,7 +29,7 @@ public class DockerRepoListWidget {
 	private EntityChildrenRequest query;
 	private LoadMoreWidgetContainer membersContainer;
 	private SynapseJavascriptClient jsClient;
-
+	
 	@Inject
 	public DockerRepoListWidget(
 			DockerRepoListWidgetView view,
@@ -61,6 +62,7 @@ public class DockerRepoListWidget {
 	public void configure(String projectId) {
 		this.query = createDockerRepoEntityQuery(projectId);
 		view.clear();
+		view.setLoadingVisible(false);
 		query.setNextPageToken(null);
 		membersContainer.setIsMore(true);
 	}
@@ -111,5 +113,13 @@ public class DockerRepoListWidget {
 		types.add(EntityType.dockerrepo);
 		newQuery.setIncludeTypes(types);
 		return newQuery;
+	}
+	
+	public void setEntityClickedHandler(CallbackP<String> entityClickedHandler) {
+		view.setEntityClickedHandler(entityId -> {
+			view.clear();
+			view.setLoadingVisible(true);
+			entityClickedHandler.invoke(entityId);
+		});
 	}
 }
