@@ -284,6 +284,25 @@
 					<port>8989</port>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>com.github.warmuuh</groupId>
+				<artifactId>libsass-maven-plugin</artifactId>
+				<version>0.2.9-libsass_3.4.7</version>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<inputPath>${webappDirectory}/sass/</inputPath>
+					<outputPath>${webappDirectory}</outputPath>
+					<outputStyle>compressed</outputStyle>
+					<includePath>${basedir}/src/main/sass/plugins/</includePath>
+				</configuration>
+			</plugin>
 		</plugins>
 	</build>
 	<dependencies>
