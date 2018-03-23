@@ -251,6 +251,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.view.clear();
 		resetSynAlertWidgets();
 		showView(place);
+		view.setPresenter(this);
 	}
 	
 	private void resetSynAlertWidgets() {

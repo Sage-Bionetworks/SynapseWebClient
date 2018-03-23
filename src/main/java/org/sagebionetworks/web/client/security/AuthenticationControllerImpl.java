@@ -117,6 +117,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		sessionStorage.clear();
 		currentUser = null;
 		ginInjector.getSessionTokenDetector().initializeSessionTokenState();
+		ginInjector.getHeader().refresh();
 	}
 
 	public void initSynapsePropertiesFromServer() {
@@ -151,6 +152,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				currentUser = userSessionData;
 				localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
 				ginInjector.getSessionTokenDetector().initializeSessionTokenState();
+				ginInjector.getHeader().refresh();
 				callback.onSuccess(currentUser);
 			}
 			
@@ -270,6 +272,7 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				@Override
 				public void onSuccess(UserSessionData result) {
 					// still valid (and call has updated expiration)
+					ginInjector.getHeader().refresh();
 				}
 				
 				@Override
