@@ -1,27 +1,32 @@
 /***************
 Synapse color scheme
 ****************/
-.colored { color:#1e7098;}
-.link { color:#1e7098;}
-.link, .link:visited, .link:hover {  color:#1e7098; }
-.link:hover { text-decoration: underline; cursor:pointer;}
-a {color:#1e7098;text-decoration:none;}
-a:visited{color:#1e7098; text-decoration:none;}
-a:hover{color:#1e7098; text-decoration:underline;}
-a:focus{color:#1e7098; text-decoration:underline;}
-.synapse-yellow, #body .synapse-yellow {color:#68b2bb;}
-.synapse-blue, #body .synapse-blue {color:#1e7098;}
-.synapse-purple, #body .synapse-purple {color:#7772b4;}
-.synapse-green, #body .synapse-green {color:#0ea862;}
+$synapse-green: #0ea862;
+$synapse-blue: #1e7098;
+$synapse-purple: #7772b4;
+$synapse-yellow: #68b2bb;
 
-.synapse-yellow-bg, #body .synapse-yellow-bg {background-color:#68b2bb;}
-.synapse-blue-bg, #body .synapse-blue-bg {background-color:#1e7098;}
-.synapse-purple-bg, #body .synapse-purple-bg {background-color:#7772b4;}
-.synapse-green-bg, #body .synapse-green-bg {background-color:#0ea862;}
+.colored { color:$synapse-blue;}
+.link { color:$synapse-blue;}
+.link, .link:visited, .link:hover {  color:$synapse-blue; }
+.link:hover { text-decoration: underline; cursor:pointer;}
+a {color:$synapse-blue;text-decoration:none;}
+a:visited{color:$synapse-blue; text-decoration:none;}
+a:hover{color:$synapse-blue; text-decoration:underline;}
+a:focus{color:$synapse-blue; text-decoration:underline;}
+.synapse-yellow, #body .synapse-yellow {color:$synapse-yellow;}
+.synapse-blue, #body .synapse-blue {color:$synapse-blue;}
+.synapse-purple, #body .synapse-purple {color:$synapse-purple;}
+.synapse-green, #body .synapse-green {color:$synapse-green;}
+
+.synapse-yellow-bg, #body .synapse-yellow-bg {background-color:$synapse-yellow;}
+.synapse-blue-bg, #body .synapse-blue-bg {background-color:$synapse-blue;}
+.synapse-purple-bg, #body .synapse-purple-bg {background-color:$synapse-purple;}
+.synapse-green-bg, #body .synapse-green-bg {background-color:$synapse-green;}
 
 .pagination>li>a, .pagination>li>span
 {
-	color: #1e7098;
+	color: $synapse-blue;
 }
 
 /**
@@ -51,7 +56,7 @@ end sticky footer
 }
 
 .btn-link {
-	color: #1e7098;
+	color: $synapse-blue;
 }
 
 /* Bootstrap overrides */
@@ -2032,7 +2037,7 @@ div.input-group > input.search-textbox {
 }
 
 .text-primary, #rootPanel .text-primary {
-	color: #1e7098;
+	color: $synapse-blue;
 }
 
 .text-warning, #rootPanel .text-warning {
