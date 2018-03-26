@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
+import org.sagebionetworks.client.exceptions.SynapseServiceUnavailable;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
@@ -84,7 +85,7 @@ public abstract class OAuth2Servlet extends HttpServlet {
 			OAuthUrlResponse respone = client.getOAuth2AuthenticationUrl(request);
 			resp.sendRedirect(respone.getAuthorizationUrl());
 		} catch (SynapseServerException e) {
-			if (e.getStatusCode()==HttpStatus.SERVICE_UNAVAILABLE.value()) {
+			if (e instanceof SynapseServiceUnavailable) {
 				resp.sendRedirect(new URL(requestURL.getProtocol(), requestURL.getHost(), requestURL.getPort(), "/#!Down:0").toString());
 			} else {
 				sendRedirectToError(requestURL, e, resp);

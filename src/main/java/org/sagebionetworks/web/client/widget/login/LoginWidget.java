@@ -16,6 +16,7 @@ import com.google.inject.Inject;
 
 public class LoginWidget implements LoginWidgetView.Presenter {
 
+	public static final String PLEASE_TRY_AGAIN = ". Please try again.";
 	private LoginWidgetView view;
 	private AuthenticationController authenticationController;	
 	private UserListener listener;	
@@ -47,7 +48,8 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	}
 	
 	@Override
-	public void setUsernameAndPassword(final String username, final String password) {		
+	public void setUsernameAndPassword(final String username, final String password) {
+		synAlert.clear();
 		authenticationController.loginUser(username, password, new AsyncCallback<UserSessionData>() {
 			@Override
 			public void onSuccess(UserSessionData userSessionData) {
@@ -67,7 +69,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			public void onFailure(Throwable caught) {
 				view.clear();
 				if (caught instanceof NotFoundException || caught instanceof UnauthorizedException) {
-					view.showAuthenticationFailed();
+					synAlert.showError(caught.getMessage() + PLEASE_TRY_AGAIN);
 				} else {
 					synAlert.handleException(caught);	
 				}
