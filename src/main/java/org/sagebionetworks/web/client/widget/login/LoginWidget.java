@@ -16,7 +16,7 @@ import com.google.inject.Inject;
 
 public class LoginWidget implements LoginWidgetView.Presenter {
 
-	public static final String PLEASE_TRY_AGAIN = " Please try again.";
+	public static final String PLEASE_TRY_AGAIN = ". Please try again.";
 	private LoginWidgetView view;
 	private AuthenticationController authenticationController;	
 	private UserListener listener;	

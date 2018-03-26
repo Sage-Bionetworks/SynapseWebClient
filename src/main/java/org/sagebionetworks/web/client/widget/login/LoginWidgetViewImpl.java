@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.login;
 
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -46,7 +47,7 @@ public class LoginWidgetViewImpl extends Composite implements
 	@UiField
 	org.gwtbootstrap3.client.ui.Button googleSignInButton;
 	@UiField
-	Div synAlertContainer;
+	Row synAlertContainer;
 	
 	PasswordTextBox password = null;
 	TextBox username = null;
