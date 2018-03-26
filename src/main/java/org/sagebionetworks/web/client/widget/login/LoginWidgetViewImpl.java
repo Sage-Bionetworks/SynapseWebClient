@@ -39,8 +39,6 @@ public class LoginWidgetViewImpl extends Composite implements
 	@UiField
 	FlowPanel synapseLoginFieldsContainer;
 	
-	@UiField
-	SpanElement messageLabel;
 	Button signInBtn;
 	Anchor forgotPasswordLink;
 	@UiField
@@ -142,12 +140,6 @@ public class LoginWidgetViewImpl extends Composite implements
 	}
 
 	@Override
-	public void showAuthenticationFailed() {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Invalid username or password.</h4> <span class=\"text-warning\">Please try again.</span>");
-		clear();
-	}
-
-	@Override
 	public void clearUsername() {
 		username.setValue("");	
 	}
@@ -165,7 +157,6 @@ public class LoginWidgetViewImpl extends Composite implements
 	private void loginUser() {
 		signInBtn.setEnabled(false);
 		signInBtn.setText(DisplayConstants.SIGNING_IN);
-		messageLabel.setInnerHTML(""); 
 		presenter.setUsernameAndPassword(username.getValue(), password.getValue());
 	}
 

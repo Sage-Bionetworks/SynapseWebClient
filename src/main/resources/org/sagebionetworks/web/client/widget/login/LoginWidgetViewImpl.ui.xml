@@ -15,7 +15,6 @@
 				<h4 class="form-signin-heading">Sign in with a Synapse account</h4>
 				<g:FlowPanel ui:field="synapseLoginFieldsContainer" />
 				<bh:Div ui:field="synAlertContainer" />
-				<span ui:field="messageLabel" />
 			</div>
 			<g:Button ui:field="registerBtn" styleName="btn btn-default" />
 		</div>

@@ -141,7 +141,8 @@ public class LoginWidgetTest {
 		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
 		verify(mockView).clear();
 		verify(mockView, never()).clearUsername();
-		verify(mockView).showAuthenticationFailed();
+		verify(mockSynAlert).clear();
+		verify(mockSynAlert).showError(notFoundMessage + LoginWidget.PLEASE_TRY_AGAIN);
 	}
 	
 	@Test
@@ -156,7 +157,8 @@ public class LoginWidgetTest {
 		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
 		verify(mockView).clear();
 		verify(mockView, never()).clearUsername();
-		verify(mockView).showAuthenticationFailed();
+		verify(mockSynAlert).clear();
+		verify(mockSynAlert).showError(notFoundMessage + LoginWidget.PLEASE_TRY_AGAIN);
 	}
 
 }

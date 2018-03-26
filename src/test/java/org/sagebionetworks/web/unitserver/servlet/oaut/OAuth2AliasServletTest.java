@@ -20,6 +20,7 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseServiceUnavailable;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -112,7 +113,7 @@ public class OAuth2AliasServletTest {
 	
 	@Test
 	public void testDoGetErrorSynapseDown() throws Exception {
-		SynapseServerException exception = new SynapseServerException(HttpStatus.SC_SERVICE_UNAVAILABLE);
+		SynapseServiceUnavailable exception = new SynapseServiceUnavailable("error message");
 		when(mockClient.getOAuth2AuthenticationUrl(any(OAuthUrlRequest.class))).thenThrow(exception);
 		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.ORCID.name());
 		
