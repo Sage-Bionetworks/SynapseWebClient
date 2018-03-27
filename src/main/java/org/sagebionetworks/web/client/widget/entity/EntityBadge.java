@@ -55,7 +55,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private LazyLoadHelper lazyLoadHelper;
 	private DateTimeUtils dateTimeUtils;
 	private PopupUtilsView popupUtils;
-	private EntityBundle entityBundle;
 	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
@@ -96,19 +95,16 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	}
 	
 	public void getEntityBundle() {
-		if (entityBundle == null) {
-			int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL | THREAD_COUNT | RESTRICTION_INFORMATION;
-			jsClient.getEntityBundle(entityHeader.getId(), partsMask, new AsyncCallback<EntityBundle>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					view.setError(caught.getMessage());
-				}
-				public void onSuccess(EntityBundle eb) {
-					entityBundle = eb;
-					setEntityBundle(eb);
-				};
-			});
-		}
+		int partsMask = ENTITY | ANNOTATIONS | ROOT_WIKI_ID | FILE_HANDLES | PERMISSIONS | BENEFACTOR_ACL | THREAD_COUNT | RESTRICTION_INFORMATION;
+		jsClient.getEntityBundle(entityHeader.getId(), partsMask, new AsyncCallback<EntityBundle>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setError(caught.getMessage());
+			}
+			public void onSuccess(EntityBundle eb) {
+				setEntityBundle(eb);
+			};
+		});
 	}
 	
 	public void configure(EntityHeader header) {

@@ -227,10 +227,6 @@ public class EntityBadgeTest {
 		verify(mockFileDownloadButton).configure(any(EntityBundle.class));
 		verify(mockFileDownloadButton).hideClientHelp();
 		verify(mockView).setFileDownloadButton(any(Widget.class));
-		
-		//verify calling getEntityBundle() again does not cause another service call:
-		widget.getEntityBundle();
-		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 	}
 	
 	@Test
