@@ -17,15 +17,16 @@ public interface FileHistoryWidgetView extends IsWidget, SynapseView{
 		void updateVersionInfo(String newLabel, String newComment);
 		void deleteVersion(Long versionNumber);
 		void onEditVersionInfoClicked();
+		void onMore();
 	}
 	
 	void setEntityBundle(Entity entity, boolean autoShowFileHistory);
 	void setPresenter(Presenter presenter);
-	void setPaginationWidget(Widget widget);
 	void clearVersions();
 	void addVersion(VersionInfo version, boolean canEdit, boolean isVersionSelected);
 	void setEditVersionInfoButtonVisible(boolean isVisible);
 	void showEditVersionInfo(String oldLabel, String oldComment);
 	void showEditVersionInfoError(String error);
 	void hideEditVersionInfo();
+	void setMoreButtonVisible(boolean visible);
 }
