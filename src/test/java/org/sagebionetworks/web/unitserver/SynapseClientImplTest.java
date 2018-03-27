@@ -2193,4 +2193,22 @@ public class SynapseClientImplTest {
 		//and verify that no evaluations are returned for a different entity id
 		assertFalse(synapseClient.isChallenge("syn987"));
 	}
+	
+	@Test
+	public void testParseCsv() throws RestServiceException {
+		char comma = ',';
+		assertTrue(synapseClient.parseCsv(null, comma).isEmpty());
+		assertTrue(synapseClient.parseCsv("", comma).isEmpty());
+		
+		// test csv, contains delimiter inside a quoted cell, and escaped quotes inside a cell
+		String csv = "a, \"b1, b2\", \"c1 \\\"c2\\\"\"\r\n d,e,f";
+		ArrayList<String[]> parsed = synapseClient.parseCsv(csv, comma);
+		// spot check
+		// 2 rows
+		assertEquals(2, parsed.size());
+		// 3 columns in 1st row
+		assertEquals(3, parsed.get(0).length);
+		assertEquals("b1, b2", parsed.get(0)[1]);
+		assertEquals("c1 \"c2\"", parsed.get(0)[2]);
+	}
 }

@@ -2248,6 +2248,10 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	@Override
 	public ArrayList<String[]> parseCsv(String csvPreviewText, char delimiter) throws RestServiceException {
 		ArrayList<String[]> results = new ArrayList<>();
+		if(csvPreviewText == null || csvPreviewText.isEmpty()) {
+			return results;
+		}
+
 		try (CSVReader reader = new CSVReader(new StringReader(csvPreviewText), delimiter)) {
 			String[] row = null;
 			while ((row = reader.readNext()) != null) {

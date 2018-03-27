@@ -291,11 +291,9 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 									else if (PreviewFileType.CSV == previewType) {
 										parseCsv(responseText, ',');
 									}
-										
 									else if (PreviewFileType.TAB == previewType) {
 										parseCsv(responseText, '\t');
 									}
-										
 									else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType) {
 										view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
 									}
