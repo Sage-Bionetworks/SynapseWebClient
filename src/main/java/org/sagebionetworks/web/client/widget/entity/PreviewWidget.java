@@ -12,6 +12,7 @@ import static org.sagebionetworks.web.client.ContentTypeUtils.isTextType;
 import static org.sagebionetworks.web.client.ContentTypeUtils.isWebRecognizedCodeFileName;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -288,11 +289,11 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 										view.setCodePreview(codePreview, getLanguage(extension));
 									} 
 									else if (PreviewFileType.CSV == previewType) {
-										view.setTablePreview(responseText, ",");
+										parseCsv(responseText, ',');
 									}
 										
 									else if (PreviewFileType.TAB == previewType) {
-										view.setTablePreview(responseText, "\\t");
+										parseCsv(responseText, '\t');
 									}
 										
 									else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType) {
@@ -308,7 +309,19 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				}
 		}
 	}
-
+	
+	public void parseCsv(String csvPreviewText, char delimiter) {
+		synapseClient.parseCsv(csvPreviewText, delimiter, new AsyncCallback<ArrayList<String[]>>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.addSynapseAlertWidget(synapseAlert.asWidget());
+				synapseAlert.handleException(caught);
+			}
+			public void onSuccess(ArrayList<String[]> rows) {
+				view.setTablePreview(rows);
+			};
+		});
+	}
 	public String getLanguage(String extension) {
 		if (extension.equals("cwl")) {
 			return "yaml";

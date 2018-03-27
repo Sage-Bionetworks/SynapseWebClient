@@ -1,18 +1,16 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.sagebionetworks.web.client.ClientProperties;
+import java.util.ArrayList;
+
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
-import com.google.gwt.core.client.JsArray;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -27,15 +25,12 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	private boolean isCode;
 	private Dialog previewDialog;
 	private Widget dialogContent;
-	private ResourceLoader resourceLoader;
 	
 	@Inject
 	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, 
-			final Dialog previewDialog,
-			ResourceLoader resourceLoader) {
+			final Dialog previewDialog) {
 		this.synapseJSNIUtils = synapseJsniUtils;
 		this.previewDialog = previewDialog;
-		this.resourceLoader = resourceLoader;
 		previewDialog.configure("", null, "Close", new Dialog.Callback() {
 			@Override
 			public void onDefault() {
@@ -144,39 +139,20 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
-	public void setTablePreview(String text, String delimiter) {
+	public void setTablePreview(ArrayList<String[]> rows) {
 		clear();
-		// parse text
-		resourceLoader.requires(ClientProperties.PAPA_PARSE_JS, new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void arg0) {
-				 JsArray<JsArray> parsedCsv = _parseCsv(text, delimiter);
-				 add(new HTMLPanel(getTableHtml(parsedCsv)));
-			}
-			
-			@Override
-			public void onFailure(Throwable ex) {
-				synapseJSNIUtils.consoleError(ex.getMessage());
-			}
-		});
+		add(new HTMLPanel(getTableHtml(rows)));
 	}
 	
-	private static native JsArray<JsArray> _parseCsv(String csvText, String delim) /*-{
-		return $wnd.Papa.parse(csvText,  
-			{
-				delimiter: delim 
-			}).data;
-	}-*/;
-	
-	private String getTableHtml(JsArray<JsArray> parsedCsv) {
+	private String getTableHtml(ArrayList<String[]> rows) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<table class=\"previewtable\" style=\"overflow:auto;display:block\">");
-		for (int i = 0; i < parsedCsv.length(); i++) {
+		for (String[] row : rows) {
 			sb.append("<tr>");
-			JsArray cells = parsedCsv.get(i);
-			for (int j = 0; j < cells.length(); j++) {
+			for (int j = 0; j < row.length; j++) {
 				sb.append("<td>");
-				sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(cells.get(j).toString()));
+				String value = row[j] == null ? "" : row[j];
+				sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(value));
 				sb.append("</td>");
 			}
 			sb.append("</tr>");
