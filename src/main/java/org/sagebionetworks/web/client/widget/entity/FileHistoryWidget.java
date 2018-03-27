@@ -157,8 +157,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 				public void onSuccess(PaginatedResults<VersionInfo> result) {
 					PaginatedResults<VersionInfo> paginatedResults;
 					paginatedResults = result;
-					boolean isResults = paginatedResults.getResults().size() > 0;
-					view.setMoreButtonVisible(isResults);
+					view.setMoreButtonVisible(paginatedResults.getResults().size() == VERSION_LIMIT);
 					if (currentOffset == 0) {
 						//we know the current version based on this
 						Long currentVersion = paginatedResults.getResults().get(0).getVersionNumber();
@@ -166,7 +165,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 						view.setEntityBundle(bundle.getEntity(), !isCurrentVersion);
 						view.setEditVersionInfoButtonVisible(isCurrentVersion && canEdit);
 					}
-					if (versionNumber == null && currentOffset == 0 && isResults) {
+					if (versionNumber == null && currentOffset == 0 && paginatedResults.getResults().size() > 0) {
 						versionNumber = paginatedResults.getResults().get(0).getVersionNumber();
 					}
 					for (VersionInfo versionInfo : paginatedResults.getResults()) {
