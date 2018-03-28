@@ -47,14 +47,20 @@ public class LazyLoadHelper {
 		});
 	}
 	
+	private void clearAttachCallback() {
+		view.setOnAttachCallback(() -> {});	
+	}
+	
 	public void checkForInViewAndLoadData() {
 		if (!view.isAttached()) {
 			//Done, view has been detached and widget was never in the viewport
 			lazyLoadCallbackQueue.unsubscribe(invokeCheckForInViewAndLoadData);
+			clearAttachCallback();
 			return;
 		} else if (view.isInViewport()) {
 			//try to load data!
 			lazyLoadCallbackQueue.unsubscribe(invokeCheckForInViewAndLoadData);
+			clearAttachCallback();
 			inViewportCallback.invoke();
 		}
 	}

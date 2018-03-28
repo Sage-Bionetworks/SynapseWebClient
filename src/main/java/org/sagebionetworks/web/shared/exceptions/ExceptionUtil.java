@@ -12,8 +12,10 @@ import org.sagebionetworks.client.exceptions.SynapseLockedException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseResultNotReadyException;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
+import org.sagebionetworks.client.exceptions.SynapseServiceUnavailable;
 import org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException;
 import org.sagebionetworks.client.exceptions.SynapseUnauthorizedException;
+import org.sagebionetworks.client.exceptions.UnknownSynapseServerException;
 
 public class ExceptionUtil {
 
@@ -46,12 +48,12 @@ public class ExceptionUtil {
 			return new ConflictingUpdateException(ex.getMessage());
 		} else if (ex instanceof SynapseResultNotReadyException) {
 			return new ResultNotReadyException(((SynapseResultNotReadyException) ex).getJobStatus());
-		} else if (ex instanceof SynapseServerException) {
-			SynapseServerException sse = (SynapseServerException)ex;
+		} else if (ex instanceof SynapseServiceUnavailable) {
+			return new SynapseDownException(ex.getMessage());
+		} else if (ex instanceof UnknownSynapseServerException) {
+			UnknownSynapseServerException sse = (UnknownSynapseServerException)ex;
 			if (sse.getStatusCode()==HttpStatus.SC_CONFLICT) {
 				return new ConflictException(ex.getMessage());
-			} else if (sse.getStatusCode()==HttpStatus.SC_SERVICE_UNAVAILABLE) {
-				return new SynapseDownException(ex.getMessage());
 			}
 		} else if (ex instanceof JSONException) {
 			return new BadRequestException("The Synapse web client is calling a Synapse backend service that's not available!");

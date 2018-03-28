@@ -19,6 +19,7 @@ import org.mockito.Mockito;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
+import org.sagebionetworks.client.exceptions.UnknownSynapseServerException;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -109,7 +110,7 @@ public class UserProfileAttachmentServletTest {
 	public void testGetUserProfileSynapseException() throws ServletException, IOException, SynapseException{
 		int statusCode = 404;
 		String errorMessage = "a custom error";
-		when(mockClient.getUserProfilePictureUrl(Matchers.anyString())).thenThrow(new SynapseServerException(statusCode, errorMessage));
+		when(mockClient.getUserProfilePictureUrl(Matchers.anyString())).thenThrow(new UnknownSynapseServerException(statusCode, errorMessage));
 		preview = "false";
 		servlet.setPreviewTimeoutMs(1);
 		// setup the parameters

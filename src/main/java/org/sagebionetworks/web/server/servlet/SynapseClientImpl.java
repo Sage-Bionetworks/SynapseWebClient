@@ -2,6 +2,7 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.StringReader;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -132,6 +133,8 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
 import com.google.gwt.thirdparty.guava.common.base.Suppliers;
+
+import au.com.bytecode.opencsv.CSVReader;
 
 public class SynapseClientImpl extends SynapseClientBase implements
 		SynapseClient, TokenProvider {
@@ -2240,5 +2243,23 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
+	}
+	
+	@Override
+	public ArrayList<String[]> parseCsv(String csvPreviewText, char delimiter) throws RestServiceException {
+		ArrayList<String[]> results = new ArrayList<>();
+		if(csvPreviewText == null || csvPreviewText.isEmpty()) {
+			return results;
+		}
+
+		try (CSVReader reader = new CSVReader(new StringReader(csvPreviewText), delimiter)) {
+			String[] row = null;
+			while ((row = reader.readNext()) != null) {
+				results.add(row);
+			}
+		} catch (IOException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		}
+		return results;
 	}
 }

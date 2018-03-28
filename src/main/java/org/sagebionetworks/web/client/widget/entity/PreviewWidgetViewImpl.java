@@ -1,23 +1,18 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
+
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
-import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
-import com.google.gwt.user.client.ui.Frame;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -30,6 +25,7 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	private boolean isCode;
 	private Dialog previewDialog;
 	private Widget dialogContent;
+	
 	@Inject
 	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, 
 			final Dialog previewDialog) {
@@ -143,21 +139,20 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	}
 	
 	@Override
-	public void setTablePreview(String text, String delimiter) {
+	public void setTablePreview(ArrayList<String[]> rows) {
 		clear();
-		add(new HTMLPanel(getTableHtml(text, delimiter)));
+		add(new HTMLPanel(getTableHtml(rows)));
 	}
 	
-	private String getTableHtml(String text, String delimiter) {
+	private String getTableHtml(ArrayList<String[]> rows) {
 		StringBuilder sb = new StringBuilder();
 		sb.append("<table class=\"previewtable\" style=\"overflow:auto;display:block\">");
-		String[] lines = text.split("[\r\n]");
-		for (int i = 0; i < lines.length; i++) {
+		for (String[] row : rows) {
 			sb.append("<tr>");
-			String[] cells = lines[i].split(delimiter + "(?=(?:[^\"]*\"[^\"]*\")*(?![^\"]*\"))");
-			for (int j = 0; j < cells.length; j++) {
+			for (int j = 0; j < row.length; j++) {
 				sb.append("<td>");
-				sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(cells[j]));
+				String value = row[j] == null ? "" : row[j];
+				sb.append(SafeHtmlUtils.htmlEscapeAllowEntities(value));
 				sb.append("</td>");
 			}
 			sb.append("</tr>");

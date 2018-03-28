@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.login;
 
+import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -39,8 +40,6 @@ public class LoginWidgetViewImpl extends Composite implements
 	@UiField
 	FlowPanel synapseLoginFieldsContainer;
 	
-	@UiField
-	SpanElement messageLabel;
 	Button signInBtn;
 	Anchor forgotPasswordLink;
 	@UiField
@@ -48,7 +47,7 @@ public class LoginWidgetViewImpl extends Composite implements
 	@UiField
 	org.gwtbootstrap3.client.ui.Button googleSignInButton;
 	@UiField
-	Div synAlertContainer;
+	Row synAlertContainer;
 	
 	PasswordTextBox password = null;
 	TextBox username = null;
@@ -142,12 +141,6 @@ public class LoginWidgetViewImpl extends Composite implements
 	}
 
 	@Override
-	public void showAuthenticationFailed() {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Invalid username or password.</h4> <span class=\"text-warning\">Please try again.</span>");
-		clear();
-	}
-
-	@Override
 	public void clearUsername() {
 		username.setValue("");	
 	}
@@ -165,7 +158,6 @@ public class LoginWidgetViewImpl extends Composite implements
 	private void loginUser() {
 		signInBtn.setEnabled(false);
 		signInBtn.setText(DisplayConstants.SIGNING_IN);
-		messageLabel.setInnerHTML(""); 
 		presenter.setUsernameAndPassword(username.getValue(), password.getValue());
 	}
 

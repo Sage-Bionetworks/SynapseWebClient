@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import java.util.ArrayList;
+
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -19,11 +21,9 @@ public interface PreviewWidgetView extends IsWidget{
 	void showLoading();
 	
 	/**
-	 * text must not be escaped (a regular expression will be used to split it into cells)
 	 * @param text
-	 * @param delimiter
 	 */
-	public void setTablePreview(String text, String delimiter);
+	public void setTablePreview(ArrayList<String[]> rows);
 	
 	void addSynapseAlertWidget(IsWidget w);
 	public void clear();

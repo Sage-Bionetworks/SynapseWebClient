@@ -11,6 +11,7 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
+import org.sagebionetworks.client.exceptions.UnknownSynapseServerException;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
@@ -67,7 +68,7 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 		}catch (SynapseForbiddenException e) {
 			resp.setStatus(HttpStatus.FORBIDDEN.value());
 			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
-		}catch (SynapseServerException e) {
+		}catch (UnknownSynapseServerException e) {
 			resp.setStatus(e.getStatusCode());
 			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
 		}catch (SynapseException e) {
