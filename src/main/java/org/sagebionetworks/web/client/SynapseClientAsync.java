@@ -299,4 +299,5 @@ public interface SynapseClientAsync {
 	 * @param callback
 	 */
 	void createExternalObjectStoreFileHandle(ExternalObjectStoreFileHandle fileHandle, AsyncCallback<String> callback);
+	void parseCsv(String csvPreviewText, char delimiter, AsyncCallback<ArrayList<String[]>> callback);
 }

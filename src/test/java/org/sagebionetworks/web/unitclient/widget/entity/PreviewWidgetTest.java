@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -99,6 +99,9 @@ public class PreviewWidgetTest {
 	NbConvertPreviewWidget mockNbConvertPreviewWidget;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
+	@Mock
+	ArrayList<String[]> mockParseResults;
+	
 	FileHandle mainFileHandle;
 	String zipTestString = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
 	Map<String, String> descriptor;
@@ -134,6 +137,7 @@ public class PreviewWidgetTest {
 		AsyncMockStubber.callSuccessWith(testBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(testBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		
+		AsyncMockStubber.callSuccessWith(mockParseResults).when(mockSynapseClient).parseCsv(anyString(), anyChar(), any(AsyncCallback.class));
 		// create empty wiki descriptor
 		descriptor = new HashMap<String, String>();
 	}
@@ -316,7 +320,7 @@ public class PreviewWidgetTest {
 		previewWidget.asWidget();
 		verify(mockView, times(0)).setTextPreview(anyString());
 		verify(mockView, times(0)).setCodePreview(anyString(), anyString());
-		verify(mockView, times(0)).setTablePreview(anyString(), anyString());
+		verify(mockView, times(0)).setTablePreview(any());
 		verify(mockView, times(0)).setImagePreview(anyString());
 		verify(mockView, times(0)).setPreviewWidget(any(Widget.class));
 	}
@@ -442,5 +446,39 @@ public class PreviewWidgetTest {
 		
 		verify(mockNbConvertPreviewWidget).configure(TEST_ENTITY_ID, mainFileHandle);
 		verify(mockView).setPreviewWidget(mockNbConvertPreviewWidget);
+	}
+	
+	@Test
+	public void testParseCsv() {
+		String csvPreviewText = "a, \"b1, b2\"";
+		char delimiter = ',';
+		previewWidget.parseCsv(csvPreviewText, delimiter);
+		
+		verify(mockSynapseClient).parseCsv(eq(csvPreviewText), eq(delimiter), any(AsyncCallback.class));
+		verify(mockView).setTablePreview(mockParseResults);
+	}
+	
+	@Test
+	public void testParseTab() {
+		String tabPreviewText = "a\t \"b1\t b2\"";
+		char delimiter = '\t';
+		previewWidget.parseCsv(tabPreviewText, delimiter);
+		
+		verify(mockSynapseClient).parseCsv(eq(tabPreviewText), eq(delimiter), any(AsyncCallback.class));
+		verify(mockView).setTablePreview(mockParseResults);
+	}
+	
+	@Test
+	public void testParseCsvFailure() {
+		Exception ex = new Exception();
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).parseCsv(anyString(), anyChar(), any(AsyncCallback.class));
+		
+		String csvPreviewText = "a, \"b1, b2\"";
+		char delimiter = ',';
+		previewWidget.parseCsv(csvPreviewText, delimiter);
+		
+		verify(mockSynapseClient).parseCsv(eq(csvPreviewText), eq(delimiter), any(AsyncCallback.class));
+		verify(mockView).addSynapseAlertWidget(any(Widget.class));
+		verify(mockSynapseAlert).handleException(ex);
 	}
 }

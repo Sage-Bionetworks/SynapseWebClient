@@ -312,4 +312,6 @@ public interface SynapseClient extends RemoteService{
 	String createExternalObjectStoreFileHandle(ExternalObjectStoreFileHandle fileHandle) throws RestServiceException;
 
 	void removeEmail(String email) throws RestServiceException;
+
+	ArrayList<String[]> parseCsv(String csvPreviewText, char delimiter) throws RestServiceException;
 }

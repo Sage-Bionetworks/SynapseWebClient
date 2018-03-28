@@ -54,7 +54,5 @@ public class ClientProperties {
 	
 	public static final WebResource DIFF_LIB_JS = new WebResource("js/diff/difflib.js", ResourceType.JAVASCRIPT);
 	public static final WebResource DIFF_VIEW_JS = new WebResource("js/diff/diffview.js", ResourceType.JAVASCRIPT);
-	public static final WebResource PAPA_PARSE_JS = new WebResource("js/papaparse-4.3.7.min.js", ResourceType.JAVASCRIPT);
-	
 }
 
