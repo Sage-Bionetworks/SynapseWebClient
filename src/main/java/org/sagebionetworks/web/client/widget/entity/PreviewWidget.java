@@ -60,7 +60,7 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 	public static final int VIDEO_WIDTH = 320;
 	public static final int VIDEO_HEIGHT = 180;
 	public enum PreviewFileType {
-		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML, PDF, IPYNB, VIDEO
+		PLAINTEXT, CODE, ZIP, CSV, IMAGE, NONE, TAB, HTML, PDF, IPYNB, VIDEO, MARKDOWN
 	}
 
 	PreviewWidgetView view;
@@ -141,6 +141,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 				return PreviewFileType.PDF;
 			} else if (isRecognizedCodeFileName(fileName) || isWebRecognizedCodeFileName(fileName)) {
 				return PreviewFileType.CODE;
+			} else if (fileName != null && (fileName.toLowerCase().endsWith(".md") || fileName.toLowerCase().endsWith(".rmd"))) {
+				return PreviewFileType.MARKDOWN;
 			}
 		} 
 		return PreviewFileType.NONE;
@@ -282,20 +284,28 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 									if (responseText.length() > MAX_LENGTH) {
 										responseText = responseText.substring(0, MAX_LENGTH) + "...";
 									}
-									
-									if (PreviewFileType.CODE == previewType) {
-										String codePreview = SafeHtmlUtils.htmlEscapeAllowEntities(responseText);
-										String extension = ContentTypeUtils.getExtension(fileHandleToShow.getFileName());
-										view.setCodePreview(codePreview, getLanguage(extension));
-									} 
-									else if (PreviewFileType.CSV == previewType) {
-										parseCsv(responseText, ',');
-									}
-									else if (PreviewFileType.TAB == previewType) {
-										parseCsv(responseText, '\t');
-									}
-									else if (PreviewFileType.PLAINTEXT == previewType || PreviewFileType.ZIP == previewType) {
-										view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+									switch(previewType) {
+										case CODE :
+											String codePreview = SafeHtmlUtils.htmlEscapeAllowEntities(responseText);
+											String extension = ContentTypeUtils.getExtension(fileHandleToShow.getFileName());
+											view.setCodePreview(codePreview, getLanguage(extension));
+											break;
+										case MARKDOWN :
+											MarkdownWidget markdownWidget = ginInjector.getMarkdownWidget();
+											markdownWidget.configure(responseText);
+											view.setPreviewWidget(markdownWidget);
+											break;
+										case CSV :
+											parseCsv(responseText, ',');
+											break;
+										case TAB :
+											parseCsv(responseText, '\t');
+											break;
+										case PLAINTEXT :
+										case ZIP :
+											view.setTextPreview(SafeHtmlUtils.htmlEscapeAllowEntities(responseText));
+											break;
+										default :
 									}
 								}
 							}
