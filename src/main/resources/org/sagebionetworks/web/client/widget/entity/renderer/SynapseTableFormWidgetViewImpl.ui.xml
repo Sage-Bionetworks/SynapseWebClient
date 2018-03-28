@@ -10,7 +10,7 @@
 			</b:PanelHeader>
 			<b:PanelBody>
 			    <bh:Div ui:field="rowWidgetContainer"/>
-			    <b:Button ui:field="submitButton" type="PRIMARY" text="Submit" dataLoadingText="Submitting..."/>
+			    <b:Button ui:field="submitButton" type="PRIMARY" text="Submit"/>
 			</b:PanelBody>
 			<b:PanelFooter>
 				<bh:Span text="Powered by" addStyleNames="margin-right-5" />
