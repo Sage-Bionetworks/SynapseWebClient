@@ -67,11 +67,7 @@ public class SynapseTableFormWidgetViewImpl implements SynapseTableFormWidgetVie
 	
 	@Override
 	public void setSubmitButtonLoading(boolean isLoading) {
-		if (isLoading) {
-			this.submitButton.state().loading();
-		} else {
-			this.submitButton.state().reset();
-		}
+		submitButton.setEnabled(!isLoading);
 	}
 	@Override
 	public void setFormUIVisible(boolean visible) {
