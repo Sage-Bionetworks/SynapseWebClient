@@ -142,7 +142,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.refresh();
 		view.setSearchVisible(true);
 		view.setProjectFavoriteWidget(favWidget);
-		if (authenticationController.isLoggedIn()) {
+		if (authenticationController.isLoggedIn() && userSessionData.getProfile() != null) {
 			String userName = userSessionData.getProfile().getUserName();
 			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
 		} else {

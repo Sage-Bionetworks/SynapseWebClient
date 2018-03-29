@@ -122,7 +122,7 @@ public class Portal implements EntryPoint {
 	public void delayLoadOfZxcvbn() {
 		Timer timer = new Timer() { 
 		    public void run() {
-		    	ScriptInjector.fromUrl("//cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.3.0/zxcvbn.js")
+		    	ScriptInjector.fromUrl("//cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js")
 		    		.setWindow(ScriptInjector.TOP_WINDOW)
 		    		.inject();
 		    }

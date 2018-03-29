@@ -40,6 +40,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget.PreviewFileType;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
@@ -101,9 +102,11 @@ public class PreviewWidgetTest {
 	ArgumentCaptor<String> stringCaptor;
 	@Mock
 	ArrayList<String[]> mockParseResults;
+	@Mock
+	MarkdownWidget mockMarkdownWidget;
 	
 	FileHandle mainFileHandle;
-	String zipTestString = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
+	String fileContent = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
 	Map<String, String> descriptor;
 	public static final String TEST_ENTITY_ID = "syn20923";
 	public static final String TEST_ENTITY_MAIN_FILE_CREATED_BY = "8992983";
@@ -127,10 +130,11 @@ public class PreviewWidgetTest {
 		when(mockPortalGinInjector.getPDFPreviewWidget()).thenReturn(mockPDFPreviewWidget);
 		when(mockPortalGinInjector.getHtmlPreviewWidget()).thenReturn(mockHtmlPreviewWidget);
 		when(mockPortalGinInjector.getNbConvertPreviewWidget()).thenReturn(mockNbConvertPreviewWidget);
+		when(mockPortalGinInjector.getMarkdownWidget()).thenReturn(mockMarkdownWidget);
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://fakebaseurl/");
 		mockResponse = mock(Response.class);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
-		when(mockResponse.getText()).thenReturn(zipTestString);
+		when(mockResponse.getText()).thenReturn(fileContent);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(true);
 		
@@ -446,6 +450,28 @@ public class PreviewWidgetTest {
 		
 		verify(mockNbConvertPreviewWidget).configure(TEST_ENTITY_ID, mainFileHandle);
 		verify(mockView).setPreviewWidget(mockNbConvertPreviewWidget);
+	}
+	
+	@Test
+	public void testGetRmd() {
+		mainFileHandle.setContentType(APPLICATION_OCTET_STREAM);
+		mainFileHandle.setFileName("test.Rmd");
+		
+		previewWidget.configure(testBundle);
+		
+		verify(mockMarkdownWidget).configure(fileContent);
+		verify(mockView).setPreviewWidget(mockMarkdownWidget);
+	}
+	
+	@Test
+	public void testGetMarkdown() {
+		mainFileHandle.setContentType(APPLICATION_OCTET_STREAM);
+		mainFileHandle.setFileName("test.MD");
+		
+		previewWidget.configure(testBundle);
+		
+		verify(mockMarkdownWidget).configure(fileContent);
+		verify(mockView).setPreviewWidget(mockMarkdownWidget);
 	}
 	
 	@Test
