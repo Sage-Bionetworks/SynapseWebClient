@@ -16,6 +16,13 @@
 			 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5 margin-right-10"/>
 			</b:Heading>
 			<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="moveup-5"/>
+			<bh:Div ui:field="versionInfoUI" visible="false">
+				<bh:Span addStyleNames="boldText" text="Version:"/>
+				<bh:Span addStyleNames="margin-left-5" ui:field="version"/>
+				<bh:Span addStyleNames="margin-left-5">
+					<bh:Text>(</bh:Text><b:Anchor ui:field="currentVersionLink" text="Go to the current version"/><bh:Text>)</bh:Text>
+				</bh:Span>
+			</bh:Div>
 			<g:HTMLPanel ui:field="fileNameContainer">
 				<span class="boldText">Download file as:</span>
 				<span ui:field="fileName"/>

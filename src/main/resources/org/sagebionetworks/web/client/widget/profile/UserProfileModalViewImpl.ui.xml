@@ -26,7 +26,7 @@
 		<b:ModalFooter>
 			<b:Button ui:field="defaultButton" type="LINK" >Cancel</b:Button>
 			<b:Button ui:field="primaryButton" type="PRIMARY"
-				dataLoadingText="Saving...">Save</b:Button>
+				dataLoadingText="Processing...">Save</b:Button>
 		</b:ModalFooter>
 	</b:Modal>
 

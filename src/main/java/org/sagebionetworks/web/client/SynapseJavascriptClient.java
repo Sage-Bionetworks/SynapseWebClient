@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
@@ -38,6 +39,7 @@ import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.MembershipInvitation;
 import org.sagebionetworks.repo.model.MembershipInvtnSignedToken;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.PaginatedIds;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.ProjectHeader;
@@ -52,6 +54,8 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.auth.LoginRequest;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
@@ -68,12 +72,12 @@ import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
+import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
-import org.sagebionetworks.repo.model.status.StackStatus;
+import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
-import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -85,7 +89,9 @@ import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
@@ -116,6 +122,7 @@ import com.google.inject.Inject;
  */
 public class SynapseJavascriptClient {
 	public static final String TYPE_FILTER_PARAMETER = "&typeFilter=";
+	public static final String CHALLENGE = "/challenge";
 	public static final String WIKI = "/wiki/";
 	public static final String WIKI2 = "/wiki2/";
 	public static final String WIKIKEY = "/wikikey";
@@ -143,7 +150,10 @@ public class SynapseJavascriptClient {
 	private static final String PROFILE_IMAGE = "/image";
 	private static final String PROFILE_IMAGE_PREVIEW = PROFILE_IMAGE+"/preview";
 	private static final String REDIRECT_PARAMETER = "redirect=";
-	
+	public static final String OBJECT = "/object";
+	public static final String ETAG = "etag";
+	public static final String GENERATED_PATH = "/generated";
+	public static final String GENERATED_BY_SUFFIX = "/generatedBy";
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	private static final String LOG = "/log";
@@ -186,10 +196,25 @@ public class SynapseJavascriptClient {
 	private static final String ASCENDING_PARAM = "ascending=";
 	
 	public static final String COLUMN = "/column";
+	public static final String COLUMN_BATCH = COLUMN + "/batch";
 	public static final String COLUMN_VIEW_DEFAULT = COLUMN + "/tableview/defaults/";
+	public static final String TABLE = "/table";
+	public static final String ROW_ID = "/row";
+	public static final String ROW_VERSION = "/version";
+	public static final String TABLE_QUERY = TABLE + "/query";
+	public static final String TABLE_QUERY_NEXTPAGE = TABLE_QUERY + "/nextPage";
+	public static final String TABLE_DOWNLOAD_CSV = TABLE + "/download/csv";
+	public static final String TABLE_UPLOAD_CSV = TABLE + "/upload/csv";
+	public static final String TABLE_UPLOAD_CSV_PREVIEW = TABLE + "/upload/csv/preview";
+	public static final String TABLE_APPEND = TABLE + "/append";
+	public static final String TABLE_TRANSACTION = TABLE+"/transaction";
+	public static final String ASYNCHRONOUS_JOB = "/asynchronous/job";
+	public static final String FILE = "/file";
+	public static final String FILE_BULK = FILE+"/bulk";
+	public static final String ACTIVITY_URI_PATH = "/activity";
+	
 	public static final String ASYNC_START = "/async/start";
 	public static final String ASYNC_GET = "/async/get/";
-	public static final String TABLE_QUERY = "/table/query";
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	
@@ -222,7 +247,6 @@ public class SynapseJavascriptClient {
 		}
 		return authServiceUrl;
 	}
-
 	
 	private String getFileServiceUrl() {
 		if (fileServiceUrl == null) {
@@ -311,6 +335,12 @@ public class SynapseJavascriptClient {
 								responseObject = null;
 							} else if (OBJECT_TYPE.String.equals(responseType)) {
 								responseObject = response.getText();
+							} else if (OBJECT_TYPE.AsyncResponse.equals(responseType) && statusCode == 202) {
+								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
+								//SWC-4114: remove requestBody, attempted construction can result in a json object adapter exception in PartialRow
+								jsonObject.put("requestBody", (String)null);
+								responseObject = new AsynchronousJobStatus(jsonObject);
+								throw new ResultNotReadyException((AsynchronousJobStatus)responseObject);
 							} else {
 								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
 								responseObject = jsFactory.newInstance(responseType, jsonObject);
@@ -320,6 +350,8 @@ public class SynapseJavascriptClient {
 							onError(null, e);
 						} catch (ResultNotReadyException e) {
 							onError(request, e);
+						} catch (Exception e) {
+							onError(null, e);
 						}
 					} else {
 						// Status code could be 0 if the preflight request failed, or if the network connection is down.
@@ -607,6 +639,18 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.PaginatedResultsEntityHeader, paginatedResultsCallback);
 	}
 	
+	public void getChallenges(String userId, Integer limit, Integer offset, AsyncCallback<List<Challenge>> callback) {
+		String url = getRepoServiceUrl() + 
+				CHALLENGE+"?participantId="+userId;
+		if  (limit!=null) {
+			url+=	"&"+LIMIT_PARAMETER+limit;
+		}
+		if  (offset!=null) {
+			url+="&"+OFFSET_PARAMETER+offset;
+		}
+		doGet(url, OBJECT_TYPE.ChallengePagedResults, callback);
+	}
+	
 	public void getUserBundle(Long principalId, int mask, AsyncCallback<UserBundle> callback) {
 		String url = getRepoServiceUrl() + USER + "/" + principalId + BUNDLE_MASK_PATH + mask;
 		doGet(url, OBJECT_TYPE.UserBundle, callback);
@@ -780,6 +824,10 @@ public class SynapseJavascriptClient {
 			ref.setTargetId(entityId);
 			list.add(ref);
 		}
+		getEntityHeaderBatchFromReferences(list, callback);
+	}
+	
+	public void getEntityHeaderBatchFromReferences(List<Reference> list, AsyncCallback<ArrayList<EntityHeader>> callback) {
 		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/header";
 		ReferenceList refList = new ReferenceList();
 		refList.setReferences(list);
@@ -820,10 +868,6 @@ public class SynapseJavascriptClient {
 			url = url + "?" + SKIP_TRASH_CAN_PARAM + "=true";
 		}
 		doDelete(url, callback);
-	}
-	public void getStackStatus(AsyncCallback<StackStatus> callback) {
-		String url = getRepoServiceUrl() + STACK_STATUS;
-		doGet(url, OBJECT_TYPE.StackStatus, callback);
 	}
 	
 	public void updateV2WikiPage(WikiPageKey key, V2WikiPage toUpdate, AsyncCallback<V2WikiPage> callback){
@@ -905,17 +949,6 @@ public class SynapseJavascriptClient {
 		return getRepoServiceUrl() + TEAM + "/" + teamId + ICON + "?" + REDIRECT_PARAMETER +"true";
 	}
 	
-	public void startTableQueryJob(QueryBundleRequest request, AsyncCallback<String> callback) {
-		String entityId = request.getEntityId();
-		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + TABLE_QUERY + ASYNC_START;
-		doPost(url, request, OBJECT_TYPE.AsyncJobId, callback);
-	}
-	
-	public void getTableQueryJobResults(String entityId, String jobId, AsyncCallback<AsynchronousResponseBody> callback) {
-		String url = getRepoServiceUrl() + ENTITY + "/" + entityId + TABLE_QUERY + ASYNC_GET + jobId;
-		doGet(url, OBJECT_TYPE.QueryResultBundle, callback);
-	}
-	
 	public void login(LoginRequest loginRequest, AsyncCallback<LoginResponse> callback) {
 		String url = getAuthServiceUrl() + "/login";
 		doPost(url, loginRequest, OBJECT_TYPE.LoginResponse, callback);
@@ -952,6 +985,44 @@ public class SynapseJavascriptClient {
 		url += '?' + OFFSET_PARAMETER + offset + '&' + LIMIT_PARAMETER + limit + "&sort=" + sortBy.name() + "&sortDirection="
 				+ sortDir.name();
 		doGet(url, OBJECT_TYPE.PaginatedResultProjectHeader, projectHeadersCallback);
+	}
+	
+	private String getEndpoint(AsynchType type) {
+		String endpoint;
+		if (AsynchType.BulkFileDownload.equals(type)) {
+			endpoint = getFileServiceUrl();
+		} else {
+			endpoint = getRepoServiceUrl();
+		}
+		return endpoint;
+	}
+	public void getAsynchJobResults(AsynchType type, String jobId, AsynchronousRequestBody request, AsyncCallback<AsynchronousResponseBody> callback) {
+		String url = type.getResultUrl(jobId, request);
+		doGet(getEndpoint(type) + url, OBJECT_TYPE.AsyncResponse, callback);
+	}
+
+	public void startAsynchJob(AsynchType type, AsynchronousRequestBody request, AsyncCallback<String> callback) {
+		String url = type.getStartUrl(request);
+		doPost(getEndpoint(type) + url, request, OBJECT_TYPE.AsyncJobId, callback);
+	}
+	
+	public void getEtag(String objectId, ObjectType objectType, AsyncCallback<Etag> callback) {
+		String url =  getRepoServiceUrl() + OBJECT+"/"+objectId+"/"+objectType.name()+"/"+ETAG;
+		doGet(url, OBJECT_TYPE.Etag, callback);
+	}
+	
+	public void getEntitiesGeneratedBy(String activityId, Integer limit, Integer offset, AsyncCallback<ArrayList<Reference>> callback) {
+		String url = getRepoServiceUrl() + ACTIVITY_URI_PATH + "/" + activityId + GENERATED_PATH + "?" + OFFSET_PARAMETER + offset + "&" + LIMIT_PARAMETER + limit;
+		doGet(url, OBJECT_TYPE.PaginatedResultReference, callback);
+	}
+	
+	public void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback) {
+		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId;
+		if (versionNumber != null) {
+			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
+		}
+		url += GENERATED_BY_SUFFIX;
+		doGet(url, OBJECT_TYPE.Activity, callback);
 	}
 }
 

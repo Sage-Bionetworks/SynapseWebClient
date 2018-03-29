@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.status.StackStatus;
-import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.place.Down;
-import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.DownView;
 
@@ -25,70 +25,72 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 	GWTWrapper gwt;
 	GlobalApplicationState globalAppState;
 	Callback updateTimerCallback;
-	SynapseJavascriptClient jsClient;
+	StackConfigServiceAsync stackConfigService;
+	boolean isCheckingStatus = false;
 	@Inject
 	public DownPresenter(
 			final DownView view,
 			final GWTWrapper gwt,
 			GlobalApplicationState globalAppState,
-			SynapseJavascriptClient jsClient) {
+			StackConfigServiceAsync stackConfigService) {
 		this.view = view;
 		this.gwt = gwt;
 		this.globalAppState = globalAppState;
-		this.jsClient = jsClient;
+		this.stackConfigService = stackConfigService;
+		fixServiceEntryPoint(stackConfigService);
 		updateTimerCallback = new Callback() {
 			@Override
 			public void invoke() {
-				timeToNextRefresh -= SECOND_MS;
-				if (timeToNextRefresh <= 1) {
-					checkForRepoDown();
-				} else {
+				if (!isCheckingStatus && view.isAttached()) {
+					timeToNextRefresh -= SECOND_MS;
 					view.updateTimeToNextRefresh(timeToNextRefresh/1000);
-					view.setTimerVisible(true);
-					if (view.isAttached()) {
-						gwt.scheduleExecution(updateTimerCallback, SECOND_MS);
+					if (timeToNextRefresh <= 1) {
+						checkForRepoDown();
+					} else {
+						view.setTimerVisible(true);
 					}
 				}
 			}
 		};
+		gwt.scheduleFixedDelay(updateTimerCallback, SECOND_MS);
 	}
 	
 	public void checkForRepoDown() {
+		isCheckingStatus = true;
 		view.setTimerVisible(false);
-		jsClient.getStackStatus(new AsyncCallback<StackStatus>() {
+		stackConfigService.getCurrentStatus(new AsyncCallback<StackStatus>() {
 			@Override
 			public void onSuccess(StackStatus status) {
 				switch(status.getStatus()) {
-				case READ_WRITE :
-					//it's up!
-					repoIsUp();
-					break;
-				case READ_ONLY :
-				case DOWN :
-					//it's down, report the message and check again later
-					view.setMessage(status.getCurrentMessage());
-					scheduleRepoDownCheck();
+					case READ_WRITE :
+						//it's up!
+						repoIsUp();
+						break;
+					case READ_ONLY :
+					case DOWN :
+						//it's down, report the message and check again later
+						view.setMessage(status.getCurrentMessage());
 				}
+				reset();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setMessage(caught.getMessage());
-				scheduleRepoDownCheck();
+				reset();
 			}
 			
 			private void repoIsUp() {
 				// note: if last place is not set then it will go to a default place.
 				globalAppState.gotoLastPlace();
 			}
+			
+			private void reset() {
+				isCheckingStatus = false;
+				timeToNextRefresh = DELAY_MS;
+			}
 		});
 	}
-	
-	public void scheduleRepoDownCheck() {
-		timeToNextRefresh = DELAY_MS;
-		gwt.scheduleExecution(updateTimerCallback, SECOND_MS);
-	}
-	
 	 
 	
 	@Override
@@ -99,7 +101,7 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 	@Override
 	public void setPlace(Down place) {
 		view.init();
+		timeToNextRefresh = DELAY_MS;
 		checkForRepoDown();
 	}
-	
 }

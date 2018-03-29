@@ -17,10 +17,7 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
-import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
-import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -32,7 +29,7 @@ import com.google.inject.Inject;
  *
  * @author jayhodgson
  */
-public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWidget, PageChangeListener {
+public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWidget {
 	
 	private FileHistoryWidgetView view;
 	private EntityBundle bundle;
@@ -42,13 +39,15 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	public static final Integer VERSION_LIMIT = 100;
 	public PreflightController preflightController;
 	
-	private BasicPaginationWidget paginationWidget;
 	private boolean canEdit;
 	private Long versionNumber;
+	int currentOffset;
+	
 	@Inject
 	public FileHistoryWidget(FileHistoryWidgetView view,
-			 SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController,
-			 BasicPaginationWidget paginationWidget,
+			 SynapseClientAsync synapseClient, 
+			 GlobalApplicationState globalApplicationState, 
+			 AuthenticationController authenticationController,
 			 PreflightController preflightController) {
 		super();
 		this.synapseClient = synapseClient;
@@ -56,21 +55,15 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.paginationWidget = paginationWidget;
 		this.preflightController = preflightController;
-		view.setPaginationWidget(paginationWidget.asWidget());
 		this.view.setPresenter(this);
 	}
 	
-	public void setEntityBundle(EntityBundle bundle, Long versionNumber, boolean isCurrentVersion) {
+	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
 		this.bundle = bundle;
 		this.versionNumber = versionNumber;
 		this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-		view.setEntityBundle(bundle.getEntity(), !isCurrentVersion);
-		view.setEditVersionInfoButtonVisible(isCurrentVersion && canEdit);
-		
-		//initialize versions
-		onPageChange(WebConstants.ZERO_OFFSET);
+		refreshFileHistory();
 	}
 
 	@Override
@@ -146,7 +139,9 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	}
 	
 	public void refreshFileHistory() {
-		onPageChange(WebConstants.ZERO_OFFSET);
+		view.clearVersions();
+		currentOffset = 0;
+		onMore();
 	}
 	
 	public void gotoCurrentVersion() {
@@ -155,22 +150,28 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		globalApplicationState.getPlaceChanger().goTo(synapse);
 	}
 	
-	@Override
-	public void onPageChange(final Long newOffset) {
-		view.clearVersions();
-		synapseClient.getEntityVersions(bundle.getEntity().getId(), newOffset.intValue(), VERSION_LIMIT,
+	public void onMore() {
+		synapseClient.getEntityVersions(bundle.getEntity().getId(), currentOffset, VERSION_LIMIT,
 			new AsyncCallback<PaginatedResults<VersionInfo>>() {
 				@Override
 				public void onSuccess(PaginatedResults<VersionInfo> result) {
 					PaginatedResults<VersionInfo> paginatedResults;
 					paginatedResults = result;
-					paginationWidget.configure(VERSION_LIMIT.longValue(), newOffset, paginatedResults.getTotalNumberOfResults(), FileHistoryWidget.this);
-					if (versionNumber == null && newOffset == 0 && paginatedResults.getResults().size() > 0) {
+					view.setMoreButtonVisible(paginatedResults.getResults().size() == VERSION_LIMIT);
+					if (currentOffset == 0) {
+						//we know the current version based on this
+						Long currentVersion = paginatedResults.getResults().get(0).getVersionNumber();
+						boolean isCurrentVersion = versionNumber == null || currentVersion.equals(versionNumber);
+						view.setEntityBundle(bundle.getEntity(), !isCurrentVersion);
+						view.setEditVersionInfoButtonVisible(isCurrentVersion && canEdit);
+					}
+					if (versionNumber == null && currentOffset == 0 && paginatedResults.getResults().size() > 0) {
 						versionNumber = paginatedResults.getResults().get(0).getVersionNumber();
 					}
 					for (VersionInfo versionInfo : paginatedResults.getResults()) {
 						view.addVersion(versionInfo, canEdit, versionInfo.getVersionNumber().equals(versionNumber));
 					}
+					currentOffset += VERSION_LIMIT;
 				}
 
 				@Override

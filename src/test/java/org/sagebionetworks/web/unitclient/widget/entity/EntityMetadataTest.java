@@ -137,7 +137,7 @@ public class EntityMetadataTest {
 		bundle.setDoi(mockDoi);
 		Long versionNumber = null;
 		widget.configure(bundle, versionNumber, mockActionMenuWidget);
-		verify(mockFileHistoryWidget, never()).setEntityBundle(bundle, versionNumber, isCurrentVersion);
+		verify(mockFileHistoryWidget, never()).setEntityBundle(bundle, versionNumber);
 		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 	}
@@ -159,7 +159,7 @@ public class EntityMetadataTest {
 		bundle.setDoi(mockDoi);
 		Long versionNumber = null;
 		widget.configure(bundle, versionNumber, mockActionMenuWidget);
-		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber, isCurrentVersion);
+		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 	}
@@ -182,7 +182,7 @@ public class EntityMetadataTest {
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
 		widget.configure(bundle, versionNumber, mockActionMenuWidget);
-		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber, isCurrentVersion);
+		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 	}

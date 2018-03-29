@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.wizard;
 
 import org.gwtbootstrap3.client.ui.ModalSize;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 
 import com.google.gwt.user.client.ui.IsWidget;
 /**
@@ -9,7 +10,7 @@ import com.google.gwt.user.client.ui.IsWidget;
  * @author jhill
  *
  */
-public interface ModalWizardWidget extends IsWidget {
+public interface ModalWizardWidget extends IsWidget, ModalPresenter {
 	
 	/**
 	 * Configure this widget before using it.

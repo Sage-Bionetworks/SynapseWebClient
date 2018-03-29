@@ -15,7 +15,7 @@
 		<maven.compiler.source>1.8</maven.compiler.source>
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
-		<synapse.version>218.0-2-gfd148a7a76</synapse.version>
+		<synapse.version>221.0</synapse.version>
 		<gwtVersion>2.8.1</gwtVersion>
 		<org.springframework.version>4.3.3.RELEASE</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
@@ -282,6 +282,25 @@
 				<version>2.2</version>
 				<configuration>
 					<port>8989</port>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.github.warmuuh</groupId>
+				<artifactId>libsass-maven-plugin</artifactId>
+				<version>0.2.9-libsass_3.4.7</version>
+				<executions>
+					<execution>
+						<phase>prepare-package</phase>
+						<goals>
+							<goal>compile</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<inputPath>${webappDirectory}/sass/</inputPath>
+					<outputPath>${webappDirectory}</outputPath>
+					<outputStyle>compressed</outputStyle>
+					<includePath>${basedir}/src/main/sass/plugins/</includePath>
 				</configuration>
 			</plugin>
 		</plugins>

@@ -19,7 +19,6 @@ import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.Hyperlink;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -41,12 +40,11 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	@UiField
 	TBody previousVersionsTable;
 	@UiField
-	SimplePanel paginationWidgetContainer;
-	@UiField
 	Hyperlink currentVersionLink;
 	@UiField
 	Button editInfoButton;
-	
+	@UiField
+	Button moreButton;
 	PromptTwoValuesModalView editVersionInfoModal;
 	
 	private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
@@ -68,6 +66,9 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 			public void onClick(ClickEvent event) {
 				presenter.onEditVersionInfoClicked();
 			}
+		});
+		moreButton.addClickHandler(event -> {
+			presenter.onMore();
 		});
 	}
 	
@@ -140,8 +141,8 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	}
 	
 	@Override
-	public void setPaginationWidget(Widget widget) {
-		paginationWidgetContainer.setWidget(widget);
+	public void setMoreButtonVisible(boolean visible) {
+		moreButton.setVisible(visible);
 	}
 	
 	@Override

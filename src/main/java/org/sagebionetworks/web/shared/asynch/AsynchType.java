@@ -1,4 +1,14 @@
 package org.sagebionetworks.web.shared.asynch;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.ASYNC_GET;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.ASYNC_START;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.FILE_BULK;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_APPEND;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_DOWNLOAD_CSV;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_QUERY;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_QUERY_NEXTPAGE;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_TRANSACTION;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_UPLOAD_CSV;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_UPLOAD_CSV_PREVIEW;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
@@ -7,6 +17,7 @@ import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
 import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
 import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;
 import org.sagebionetworks.repo.model.table.DownloadFromTableResult;
+import org.sagebionetworks.repo.model.table.HasEntityId;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryNextPageToken;
 import org.sagebionetworks.repo.model.table.QueryResult;
@@ -26,22 +37,24 @@ import com.google.gwt.user.client.rpc.IsSerializable;
  * @author John
  *
  */
+
 public enum AsynchType implements IsSerializable{
-	
-	TableAppendRowSet(AppendableRowSetRequest.class, RowReferenceSetResults.class),
-	TableQuery(QueryBundleRequest.class, QueryResultBundle.class),
-	TableQueryNextPage(QueryNextPageToken.class, QueryResult.class), // no references
-	TableCSVUpload(UploadToTableRequest.class, UploadToTableResult.class), // no references
-	TableCSVUploadPreview(UploadToTablePreviewRequest.class, UploadToTablePreviewResult.class),
-	TableCSVDownload(DownloadFromTableRequest.class, DownloadFromTableResult.class),
-	BulkFileDownload(BulkFileDownloadRequest.class,BulkFileDownloadResponse.class), // no references
-	TableTransaction(TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class);
-	
+	TableAppendRowSet(TABLE_APPEND, AppendableRowSetRequest.class, RowReferenceSetResults.class),
+	TableQuery(TABLE_QUERY, QueryBundleRequest.class, QueryResultBundle.class),
+	TableQueryNextPage(TABLE_QUERY_NEXTPAGE, QueryNextPageToken.class, QueryResult.class),
+	TableCSVUpload(TABLE_UPLOAD_CSV, UploadToTableRequest.class, UploadToTableResult.class),
+	TableCSVUploadPreview(TABLE_UPLOAD_CSV_PREVIEW, UploadToTablePreviewRequest.class, UploadToTablePreviewResult.class),
+	TableCSVDownload(TABLE_DOWNLOAD_CSV, DownloadFromTableRequest.class, DownloadFromTableResult.class),
+	BulkFileDownload(FILE_BULK, BulkFileDownloadRequest.class,BulkFileDownloadResponse.class),
+	TableTransaction(TABLE_TRANSACTION, TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class);
+	String prefix;
 	Class<? extends AsynchronousRequestBody> requestClass;
 	Class<? extends AsynchronousResponseBody> responseClass;
 
-	private AsynchType(Class<? extends AsynchronousRequestBody> requestClass,
+	private AsynchType(String prefix, 
+			Class<? extends AsynchronousRequestBody> requestClass,
 			Class<? extends AsynchronousResponseBody> responseClass) {
+		this.prefix = prefix;
 		this.requestClass = requestClass;
 		this.responseClass = responseClass;
 	}
@@ -62,4 +75,51 @@ public enum AsynchType implements IsSerializable{
 		return responseClass;
 	}
 	
+	public String getPrefix() {
+		return prefix;
+	}
+	
+	/*
+	 * extracts the entityId from the request body 
+	 * throws an exception if the request has an entityId field but the entityId is null
+	 * If the request body does not have an entityId field, returns null.
+	 */
+	private String getEntityIdFromRequest(AsynchronousRequestBody request) {
+		if (request instanceof UploadToTableRequest && ((UploadToTableRequest) request).getTableId() != null) {
+			return ((UploadToTableRequest) request).getTableId();
+		} else if (request instanceof HasEntityId && ((HasEntityId) request).getEntityId() != null) {
+			return ((HasEntityId) request).getEntityId();
+		} else if ((request instanceof UploadToTableRequest && ((UploadToTableRequest) request).getTableId() == null) ||
+					(request instanceof HasEntityId && ((HasEntityId) request).getEntityId() == null)) {
+			throw new IllegalArgumentException("entityId cannot be null");
+		} else {
+			return null;
+		}
+	}
+	
+	/**
+	 * Get the URL used to get the results for this job type.
+	 * @param token
+	 * @param request
+	 * @return
+	 */
+	public String getResultUrl(String token, AsynchronousRequestBody request){
+		return getResultUrl(token, getEntityIdFromRequest(request));
+	}
+
+	public String getResultUrl(String token, String entityId){
+		if (entityId != null) {
+			return "/entity/" + entityId + prefix + ASYNC_GET + token;
+		}
+		return prefix+ASYNC_GET + token;
+	}
+	
+	public String getStartUrl(AsynchronousRequestBody request){
+		String entityId = getEntityIdFromRequest(request);
+		if (entityId != null) {
+			return "/entity/" + entityId + prefix + ASYNC_START;
+		} else {
+			return prefix + ASYNC_START;
+		}
+	}
 }

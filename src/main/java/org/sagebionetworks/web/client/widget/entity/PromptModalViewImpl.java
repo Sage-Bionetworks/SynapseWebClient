@@ -14,6 +14,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -42,7 +43,8 @@ public class PromptModalViewImpl implements PromptModalView {
 	@UiField
 	Button defaultButton;
 	Widget widget;
-
+	HandlerRegistration primaryButtonHandlerRegistration;
+	
 	@Inject
 	public PromptModalViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
@@ -60,6 +62,14 @@ public class PromptModalViewImpl implements PromptModalView {
 			}
 		});
 		primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
+		this.nameField.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
+					primaryButton.click();
+				}
+			}
+		});
 	}
 	
 	@Override
@@ -80,18 +90,13 @@ public class PromptModalViewImpl implements PromptModalView {
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		this.primaryButton.addClickHandler(new ClickHandler() {
+		if (primaryButtonHandlerRegistration != null) {
+			primaryButtonHandlerRegistration.removeHandler();
+		}
+		primaryButtonHandlerRegistration = this.primaryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
 				presenter.onPrimary();
-			}
-		});
-		this.nameField.addKeyDownHandler(new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
-					presenter.onPrimary();
-				}
 			}
 		});
 	}

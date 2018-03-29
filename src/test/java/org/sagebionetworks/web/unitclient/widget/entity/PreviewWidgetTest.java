@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -40,6 +40,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidget.PreviewFileType;
 import org.sagebionetworks.web.client.widget.entity.PreviewWidgetView;
@@ -99,8 +100,13 @@ public class PreviewWidgetTest {
 	NbConvertPreviewWidget mockNbConvertPreviewWidget;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
+	@Mock
+	ArrayList<String[]> mockParseResults;
+	@Mock
+	MarkdownWidget mockMarkdownWidget;
+	
 	FileHandle mainFileHandle;
-	String zipTestString = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
+	String fileContent = "base.jar\ntarget/\ntarget/directory/\ntarget/directory/test.txt\n";
 	Map<String, String> descriptor;
 	public static final String TEST_ENTITY_ID = "syn20923";
 	public static final String TEST_ENTITY_MAIN_FILE_CREATED_BY = "8992983";
@@ -124,16 +130,18 @@ public class PreviewWidgetTest {
 		when(mockPortalGinInjector.getPDFPreviewWidget()).thenReturn(mockPDFPreviewWidget);
 		when(mockPortalGinInjector.getHtmlPreviewWidget()).thenReturn(mockHtmlPreviewWidget);
 		when(mockPortalGinInjector.getNbConvertPreviewWidget()).thenReturn(mockNbConvertPreviewWidget);
+		when(mockPortalGinInjector.getMarkdownWidget()).thenReturn(mockMarkdownWidget);
 		when(mockSynapseJSNIUtils.getBaseFileHandleUrl()).thenReturn("http://fakebaseurl/");
 		mockResponse = mock(Response.class);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
-		when(mockResponse.getText()).thenReturn(zipTestString);
+		when(mockResponse.getText()).thenReturn(fileContent);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		when(mockSynapseAlert.isUserLoggedIn()).thenReturn(true);
 		
 		AsyncMockStubber.callSuccessWith(testBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(testBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		
+		AsyncMockStubber.callSuccessWith(mockParseResults).when(mockSynapseClient).parseCsv(anyString(), anyChar(), any(AsyncCallback.class));
 		// create empty wiki descriptor
 		descriptor = new HashMap<String, String>();
 	}
@@ -316,7 +324,7 @@ public class PreviewWidgetTest {
 		previewWidget.asWidget();
 		verify(mockView, times(0)).setTextPreview(anyString());
 		verify(mockView, times(0)).setCodePreview(anyString(), anyString());
-		verify(mockView, times(0)).setTablePreview(anyString(), anyString());
+		verify(mockView, times(0)).setTablePreview(any());
 		verify(mockView, times(0)).setImagePreview(anyString());
 		verify(mockView, times(0)).setPreviewWidget(any(Widget.class));
 	}
@@ -442,5 +450,61 @@ public class PreviewWidgetTest {
 		
 		verify(mockNbConvertPreviewWidget).configure(TEST_ENTITY_ID, mainFileHandle);
 		verify(mockView).setPreviewWidget(mockNbConvertPreviewWidget);
+	}
+	
+	@Test
+	public void testGetRmd() {
+		mainFileHandle.setContentType(APPLICATION_OCTET_STREAM);
+		mainFileHandle.setFileName("test.Rmd");
+		
+		previewWidget.configure(testBundle);
+		
+		verify(mockMarkdownWidget).configure(fileContent);
+		verify(mockView).setPreviewWidget(mockMarkdownWidget);
+	}
+	
+	@Test
+	public void testGetMarkdown() {
+		mainFileHandle.setContentType(APPLICATION_OCTET_STREAM);
+		mainFileHandle.setFileName("test.MD");
+		
+		previewWidget.configure(testBundle);
+		
+		verify(mockMarkdownWidget).configure(fileContent);
+		verify(mockView).setPreviewWidget(mockMarkdownWidget);
+	}
+	
+	@Test
+	public void testParseCsv() {
+		String csvPreviewText = "a, \"b1, b2\"";
+		char delimiter = ',';
+		previewWidget.parseCsv(csvPreviewText, delimiter);
+		
+		verify(mockSynapseClient).parseCsv(eq(csvPreviewText), eq(delimiter), any(AsyncCallback.class));
+		verify(mockView).setTablePreview(mockParseResults);
+	}
+	
+	@Test
+	public void testParseTab() {
+		String tabPreviewText = "a\t \"b1\t b2\"";
+		char delimiter = '\t';
+		previewWidget.parseCsv(tabPreviewText, delimiter);
+		
+		verify(mockSynapseClient).parseCsv(eq(tabPreviewText), eq(delimiter), any(AsyncCallback.class));
+		verify(mockView).setTablePreview(mockParseResults);
+	}
+	
+	@Test
+	public void testParseCsvFailure() {
+		Exception ex = new Exception();
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).parseCsv(anyString(), anyChar(), any(AsyncCallback.class));
+		
+		String csvPreviewText = "a, \"b1, b2\"";
+		char delimiter = ',';
+		previewWidget.parseCsv(csvPreviewText, delimiter);
+		
+		verify(mockSynapseClient).parseCsv(eq(csvPreviewText), eq(delimiter), any(AsyncCallback.class));
+		verify(mockView).addSynapseAlertWidget(any(Widget.class));
+		verify(mockSynapseAlert).handleException(ex);
 	}
 }

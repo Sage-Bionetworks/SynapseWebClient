@@ -22,6 +22,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.junit.*;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
@@ -41,15 +42,21 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.RestrictionInformationRequest;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.asynch.AsynchJobState;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
+import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
+import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
+import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -516,13 +523,30 @@ public class SynapseJavascriptClientTest {
 	}
 	
 	@Test
-	public void testStartTableQueryJob() throws RequestException, JSONObjectAdapterException {
+	public void testAsyncTableTransaction() throws RequestException, JSONObjectAdapterException {
+		String tableId = "syn3889291";
+		String jobId = "99994";
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		TableUpdateTransactionRequest request = new TableUpdateTransactionRequest();
+		request.setEntityId(tableId);
+		client.getAsynchJobResults(AsynchType.TableTransaction, jobId, request, mockAsyncCallback);
+		
+		//verify url and method
+		String url = REPO_ENDPOINT + ENTITY + "/" + tableId + TABLE_TRANSACTION + ASYNC_GET + jobId;
+		verify(mockRequestBuilder).configure(GET, url);
+		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
+	}
+	
+	@Test
+	public void testStartAsynchJob() throws RequestException, JSONObjectAdapterException {
 		QueryBundleRequest request = new QueryBundleRequest();
 		request.setEntityId("syn292");
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
 		
-		client.startTableQueryJob(request, mockAsyncCallback);
+		client.startAsynchJob(AsynchType.TableQuery, request, mockAsyncCallback);
 		//verify url and method
 		String url = REPO_ENDPOINT + ENTITY + "/syn292" + TABLE_QUERY + ASYNC_START;
 		verify(mockRequestBuilder).configure(POST, url);
@@ -532,15 +556,67 @@ public class SynapseJavascriptClientTest {
 	}
 	
 	@Test
-	public void testGetTableQueryJobResults() throws RequestException, JSONObjectAdapterException {
+	public void testAsyncGetTableQueryJobResults() throws RequestException, JSONObjectAdapterException {
 		String entityId = "syn387453";
 		String jobId = "99992";
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		QueryBundleRequest request = new QueryBundleRequest();
+		request.setEntityId(entityId);
+		client.getAsynchJobResults(AsynchType.TableQuery, jobId, request, mockAsyncCallback);
 		
-		client.getTableQueryJobResults(entityId, jobId, mockAsyncCallback);
 		//verify url and method
 		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + TABLE_QUERY + ASYNC_GET + jobId;
+		verify(mockRequestBuilder).configure(GET, url);
+		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
+		
+		// response status code is OK, but if we request a query result but it responds with a job status, then a ResultNotReadyException should be thrown
+		AsynchronousJobStatus jobStatus = new AsynchronousJobStatus();
+		jobStatus.setJobState(AsynchJobState.PROCESSING);
+		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+		jobStatus.writeToJSONObject(adapter);
+		
+		verify(mockRequestBuilder).sendRequest(eq((String)null), requestCallbackCaptor.capture());
+		RequestCallback requestCallback = requestCallbackCaptor.getValue();
+		when(mockResponse.getStatusCode()).thenReturn(SC_ACCEPTED);
+		when(mockResponse.getText()).thenReturn(adapter.toJSONString());
+		requestCallback.onResponseReceived(mockRequest, mockResponse);
+		
+		verify(mockAsyncCallback).onFailure(throwableCaptor.capture());
+		Throwable th = throwableCaptor.getValue();
+		assertTrue(th instanceof ResultNotReadyException);
+		assertEquals(jobStatus, ((ResultNotReadyException)th).getStatus());
+	}
+	
+	@Test
+	public void testAsyncBulkFileDownload() throws RequestException, JSONObjectAdapterException {
+		String jobId = "99993";
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		BulkFileDownloadRequest request = new BulkFileDownloadRequest();
+		request.setRequestedFiles(new ArrayList<>());
+		client.getAsynchJobResults(AsynchType.BulkFileDownload, jobId, request, mockAsyncCallback);
+		
+		//verify url and method
+		String url = FILE_ENDPOINT + FILE_BULK + ASYNC_GET + jobId;
+		verify(mockRequestBuilder).configure(GET, url);
+		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
+		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
+	}
+	
+	@Test
+	public void testAsyncCSVDownload() throws RequestException, JSONObjectAdapterException {
+		String tableId = "syn388378";
+		String jobId = "99994";
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+		when(mockAuthController.getCurrentUserSessionToken()).thenReturn(USER_SESSION_TOKEN);
+		DownloadFromTableRequest request = new DownloadFromTableRequest();
+		request.setEntityId(tableId);
+		client.getAsynchJobResults(AsynchType.TableCSVDownload, jobId, request, mockAsyncCallback);
+		
+		//verify url and method
+		String url = REPO_ENDPOINT + ENTITY + "/" + tableId + TABLE_DOWNLOAD_CSV + ASYNC_GET + jobId;
 		verify(mockRequestBuilder).configure(GET, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
@@ -553,22 +629,8 @@ public class SynapseJavascriptClientTest {
 		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
 		resultBundle.writeToJSONObject(adapter);
 		
-		QueryResultBundle newResultBundleInstance = (QueryResultBundle) synapseJsFactory.newInstance(OBJECT_TYPE.QueryResultBundle, adapter);
+		QueryResultBundle newResultBundleInstance = (QueryResultBundle) synapseJsFactory.newInstance(OBJECT_TYPE.AsyncResponse, adapter);
 		
 		assertEquals(resultBundle, newResultBundleInstance);
-	}
-	@Test
-	public void testGetTableQueryJobResultsNotReady() throws RequestException, JSONObjectAdapterException, ResultNotReadyException {
-		// response status code is OK, but if we request a query result but it responds with a job status, then a ResultNotReadyException should be thrown
-		AsynchronousJobStatus jobStatus = new AsynchronousJobStatus();
-		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-		jobStatus.writeToJSONObject(adapter);
-		
-		try {
-			synapseJsFactory.newInstance(OBJECT_TYPE.QueryResultBundle, adapter);
-			fail("expected result not ready exception");
-		} catch (ResultNotReadyException ex) {
-			assertEquals(jobStatus, ex.getStatus());
-		}
 	}
 }

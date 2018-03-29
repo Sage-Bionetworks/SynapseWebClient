@@ -29,8 +29,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.internal.util.reflection.Whitebox;
+import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
@@ -68,7 +68,6 @@ import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
-import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
@@ -336,32 +335,6 @@ public class ChallengeClientImplTest {
 		PaginatedResults<Evaluation> evaluations = synapseClient.getAvailableEvaluations();
 		verify(mockSynapse).getAvailableEvaluationsPaginated(anyInt(),anyInt());
 		assertEquals(testResults.getResults(), evaluations.getResults());
-	}
-	
-	@Test
-	public void testGetChallenges() throws SynapseException, RestServiceException {
-		setupListChallengesForParticipant();
-		ChallengePagedResults results = synapseClient.getChallenges("userid", 10, 0);
-		verify(mockSynapse).listChallengesForParticipant(anyString(), anyLong(), anyLong());
-		verify(mockSynapse).getEntityHeaderBatch(anyList());
-		
-		assertTrue(results.getTotalNumberOfResults() == 1);
-		assertEquals(TEST_CHALLENGE_PROJECT_NAME, results.getResults().get(0).getProjectName());
-		assertEquals(testChallenge, results.getResults().get(0).getChallenge());
-	}
-	
-	@Test
-	public void testGetChallengesWithNoChallenges() throws SynapseException, RestServiceException {
-		org.sagebionetworks.repo.model.ChallengePagedResults results = new org.sagebionetworks.repo.model.ChallengePagedResults();
-		results.setResults(new ArrayList<Challenge>());
-		results.setTotalNumberOfResults(0L);
-		when(mockSynapse.listChallengesForParticipant(anyString(), anyLong(), anyLong())).thenReturn(results);
-		
-		ChallengePagedResults challengeResults = synapseClient.getChallenges("userid", 10, 0);
-		verify(mockSynapse).listChallengesForParticipant(anyString(), anyLong(), anyLong());
-		verify(mockSynapse, never()).getEntityHeaderBatch(anyList());
-		
-		assertTrue(challengeResults.getTotalNumberOfResults() == 0);
 	}
 	
 	@Test (expected=NotFoundException.class)

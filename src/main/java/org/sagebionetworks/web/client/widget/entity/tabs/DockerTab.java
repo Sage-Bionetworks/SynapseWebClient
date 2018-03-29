@@ -60,6 +60,7 @@ public class DockerTab implements DockerTabView.Presenter{
 		if (view == null) {
 			this.view = ginInjector.getDockerTabView();
 			this.dockerRepoListWidget = ginInjector.getDockerRepoListWidget();
+			dockerRepoListWidget.setEntityClickedHandler(entitySelectedCallback);
 			this.breadcrumb = ginInjector.getBreadcrumb();
 			this.synAlert = ginInjector.getStuAlert();
 			view.setPresenter(this);

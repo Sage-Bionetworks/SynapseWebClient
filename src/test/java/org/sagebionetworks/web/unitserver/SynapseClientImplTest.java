@@ -865,15 +865,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testUpdateV2WikiOrderHint() throws Exception {
-		V2WikiOrderHint orderHint = new V2WikiOrderHint();
-		when(mockSynapse.updateV2WikiOrderHint(any(V2WikiOrderHint.class)))
-				.thenReturn(orderHint);
-		synapseClient.updateV2WikiOrderHint(orderHint);
-		verify(mockSynapse).updateV2WikiOrderHint(any(V2WikiOrderHint.class));
-	}
-
-	@Test
 	public void testGetV2WikiHistory() throws Exception {
 		PaginatedResults<V2WikiHistorySnapshot> historyResults = new PaginatedResults<V2WikiHistorySnapshot>();
 		when(
@@ -2201,5 +2192,23 @@ public class SynapseClientImplTest {
 		
 		//and verify that no evaluations are returned for a different entity id
 		assertFalse(synapseClient.isChallenge("syn987"));
+	}
+	
+	@Test
+	public void testParseCsv() throws RestServiceException {
+		char comma = ',';
+		assertTrue(synapseClient.parseCsv(null, comma).isEmpty());
+		assertTrue(synapseClient.parseCsv("", comma).isEmpty());
+		
+		// test csv, contains delimiter inside a quoted cell, and escaped quotes inside a cell
+		String csv = "a, \"b1, b2\", \"c1 \\\"c2\\\"\"\r\n d,e,f";
+		ArrayList<String[]> parsed = synapseClient.parseCsv(csv, comma);
+		// spot check
+		// 2 rows
+		assertEquals(2, parsed.size());
+		// 3 columns in 1st row
+		assertEquals(3, parsed.get(0).length);
+		assertEquals("b1, b2", parsed.get(0)[1]);
+		assertEquals("c1 \"c2\"", parsed.get(0)[2]);
 	}
 }

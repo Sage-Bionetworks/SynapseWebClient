@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.ChallengePagedResults;
 import org.sagebionetworks.repo.model.Count;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -19,13 +20,15 @@ import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.Preview;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.RestrictionInformationResponse;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsyncJobId;
-import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBodyInstanceFactory;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
@@ -38,12 +41,12 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
-import org.sagebionetworks.repo.model.status.StackStatus;
+import org.sagebionetworks.repo.model.provenance.Activity;
+import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
@@ -69,6 +72,7 @@ public class SynapseJavascriptFactory {
 		Count,
 		PaginatedResultsEntityHeader,
 		PaginatedResultProjectHeader,
+		PaginatedResultReference,
 		V2WikiPage,
 		V2WikiOrderHint,
 		DockerRepository,
@@ -90,17 +94,19 @@ public class SynapseJavascriptFactory {
 		SubscriberPagedResults,
 		SubscriberCount,
 		BatchFileResult,
-		StackStatus,
 		UserProfile,
 		FileHandleResults,
+		AsyncResponse,
 		JSON,
 		MembershipInvitation,
 		InviteeVerificationSignedToken,
 		ListWrapperColumnModel,
 		PaginatedTeamIds,
-		QueryResultBundle,
 		AsyncJobId,
 		LoginResponse,
+		ChallengePagedResults,
+		Etag,
+		Activity,
 		None,
 		String
 	}
@@ -117,7 +123,14 @@ public class SynapseJavascriptFactory {
 			Entity entity = EntityInstanceFactory.singleton().newInstance(concreteType);
 			entity.initializeFromJSONObject(json);
 			return entity;
-		} 
+		}
+		if (OBJECT_TYPE.AsyncResponse.equals(type)) {
+			String concreteType = json.getString("concreteType");
+			AsynchronousResponseBodyInstanceFactory asyncResponseFactory = AsynchronousResponseBodyInstanceFactory.singleton();
+			AsynchronousResponseBody response = asyncResponseFactory.newInstance(concreteType);
+			response.initializeFromJSONObject(json);
+			return response;
+		}
 		switch (type) {
 		case EntityBundle :
 			return new EntityBundle(json);
@@ -179,12 +192,12 @@ public class SynapseJavascriptFactory {
 			return new SubscriberCount(json).getCount();
 		case BatchFileResult :
 			return new BatchFileResult(json);
-		case StackStatus :
-			return new StackStatus(json);
 		case UserProfile :
 			return new UserProfile(json);
 		case FileHandleResults :
 			return new FileHandleResults(json).getList();
+		case ChallengePagedResults:
+			return new ChallengePagedResults(json).getResults();
 		case JSON :
 			return json;
 		case PaginatedResultsEntityHeader :
@@ -205,6 +218,15 @@ public class SynapseJavascriptFactory {
 				projectHeaderList.add(new ProjectHeader(jsonObject));
 			}
 			return projectHeaderList;
+		case PaginatedResultReference : 
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<Reference> referenceList = new ArrayList<>();
+			JSONArrayAdapter referenceResultsJsonArray = json.getJSONArray("results");
+			for (int i = 0; i < referenceResultsJsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = referenceResultsJsonArray.getJSONObject(i);
+				referenceList.add(new Reference(jsonObject));
+			}
+			return referenceList;
 		case ListWrapperColumnModel :
 			List<ColumnModel> columnModelList = new ArrayList<>();
 			JSONArrayAdapter columnModelJsonList = json.getJSONArray("list");
@@ -237,17 +259,14 @@ public class SynapseJavascriptFactory {
 			return new InviteeVerificationSignedToken(json);
 		case PaginatedTeamIds:
 			return new PaginatedTeamIds(json);
-		case QueryResultBundle:
-			try {
-				AsynchronousJobStatus status = new AsynchronousJobStatus(json); 
-				throw new ResultNotReadyException(status);
-			} catch (JSONObjectAdapterException e) {
-				return new QueryResultBundle(json);				
-			}
 		case AsyncJobId:
 			return new AsyncJobId(json).getToken();
 		case LoginResponse:
 			return new LoginResponse(json);
+		case Etag:
+			return new Etag(json);
+		case Activity:
+			return new Activity(json);
 		default:
 			throw new IllegalArgumentException("No match found for : "+ type);
 		}

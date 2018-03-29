@@ -3,10 +3,8 @@ package org.sagebionetworks.web.server.servlet;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.sagebionetworks.client.SynapseClient;
@@ -18,16 +16,18 @@ import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.ChallengeTeam;
-import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.PaginatedIds;
-import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMember;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.ChallengeClient;
-import org.sagebionetworks.web.shared.*;
+import org.sagebionetworks.web.shared.ChallengeTeamBundle;
+import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
+import org.sagebionetworks.web.shared.NotificationTokenType;
+import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.shared.UserProfilePagedResults;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -391,41 +391,6 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			synapseClient.deleteChallenge(challengeId);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
-	public ChallengePagedResults getChallenges(String userId, Integer limit, Integer offset)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			org.sagebionetworks.repo.model.ChallengePagedResults pagedResults = synapseClient.listChallengesForParticipant(userId, limit.longValue(), offset.longValue());
-			List<Challenge> challenges = pagedResults.getResults();
-			List<ChallengeBundle> results = new ArrayList<ChallengeBundle>(pagedResults.getResults().size());
-			if (pagedResults.getResults().size() > 0) {
-				//gather all project ids
-				List<Reference> references = new ArrayList<Reference>();
-				for (Challenge challenge : challenges) {
-					Reference ref = new Reference();
-					ref.setTargetId(challenge.getProjectId());
-					references.add(ref);
-				}
-				org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> headers = synapseClient.getEntityHeaderBatch(references);
-				List<EntityHeader> projectHeaders = headers.getResults();
-				
-				Map<String, String> projectNameLookup = new HashMap<String, String>();
-				for (EntityHeader projectHeader : projectHeaders) {
-					projectNameLookup.put(projectHeader.getId(), projectHeader.getName());
-				}
-				
-				for (Challenge challenge : challenges) {
-					results.add(new ChallengeBundle(challenge, projectNameLookup.get(challenge.getProjectId())));
-				}
-			}
-			ChallengePagedResults challengeBundles = new ChallengePagedResults(results, pagedResults.getTotalNumberOfResults());
-			return challengeBundles;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

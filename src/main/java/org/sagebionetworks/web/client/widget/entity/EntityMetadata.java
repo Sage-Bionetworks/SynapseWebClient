@@ -84,7 +84,7 @@ public class EntityMetadata implements Presenter {
 		
 		boolean isCurrentVersion = versionNumber == null;
 		if (bundle.getEntity() instanceof FileEntity) {
-			fileHistoryWidget.setEntityBundle(bundle, versionNumber, isCurrentVersion);
+			fileHistoryWidget.setEntityBundle(bundle, versionNumber);
 			view.setFileHistoryWidget(fileHistoryWidget);
 			view.setRestrictionPanelVisible(true);
 		} else {

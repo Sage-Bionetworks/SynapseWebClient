@@ -2,12 +2,14 @@ package org.sagebionetworks.web.unitclient.widget.lazyload;
 
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.*;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -27,6 +29,8 @@ public class LazyLoadHelperTest {
 	LazyLoadCallbackQueue mockLazyLoadCallbackQueue;
 	@Mock
 	GWTWrapper mockGWT;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
 		
 	@Before
 	public void setUp() throws Exception {
@@ -38,9 +42,8 @@ public class LazyLoadHelperTest {
 	}
 
 	private void simulateAttachEvent() {
-		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockView).setOnAttachCallback(captor.capture());
-		captor.getValue().invoke();
+		verify(mockView).setOnAttachCallback(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
 	}
 	
 	@Test
@@ -71,6 +74,11 @@ public class LazyLoadHelperTest {
 		callback.invoke();
 		
 		verify(mockInViewportCallback).invoke();
+		
+		//verify calling attach again does not cause viewport callback to invoke a second time (only load the data once)
+		verify(mockView, times(2)).setOnAttachCallback(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		verify(mockInViewportCallback).invoke(); //still only called once, from above
 	}
 
 	/**

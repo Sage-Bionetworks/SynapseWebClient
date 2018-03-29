@@ -88,9 +88,8 @@ public class AddFolderDialogWidget implements AddFolderDialogWidgetView.Presente
 		jsClient.deleteEntityById(currentFolderEntityId, skipTrashCan, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void na) {
-				//folder is deleted when folder creation is canceled.  refresh the tree for updated information
+				//folder is deleted when folder creation is canceled.
 				view.hide();
-				globalAppState.refreshPage();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
