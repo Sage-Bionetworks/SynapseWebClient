@@ -292,4 +292,23 @@ public class HeaderTest {
 		verify(mockView).setSearchVisible(true);
 		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);
 	}
+	
+	@Test
+	public void testRefreshNullProfile() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		String userId = "10001";
+		String userName = "testuser";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUserSessionData);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
+		when(mockUserProfile.getUserName()).thenReturn(userName);
+		when(mockUserSessionData.getProfile()).thenReturn(null);
+		
+		header.refresh();
+		
+		verify(mockView).setUser(mockUserSessionData);
+		verify(mockView).refresh();
+		verify(mockView).setSearchVisible(true);
+		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);
+	}
 }
