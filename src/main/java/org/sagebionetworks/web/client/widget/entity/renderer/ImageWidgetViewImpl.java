@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Style.Visibility;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -30,6 +31,8 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 	private Image image;
 	IsWidget synAlert;
 	Presenter p;
+	String styles = "";
+	
 	@Inject
 	public ImageWidgetViewImpl(GlobalApplicationState globalApplicationState, ClientCache clientCache) {
 		this.globalApplicationState = globalApplicationState;
@@ -139,6 +142,7 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 							image.setHeight(scaledImageHeight + "px");
 						}
 					}
+					updateImageStyles();
 				} catch (Throwable e) {
 					remove(image);
 					p.handleLoadingError(DisplayConstants.IMAGE_FAILED_TO_LOAD + e.getMessage());
@@ -156,8 +160,13 @@ public class ImageWidgetViewImpl extends FlowPanel implements ImageWidgetView {
 	}
 	
 	public void addStyleName(String style) {
-		if (image != null) {
-			image.addStyleName(style);
+		styles += " " + style;
+		updateImageStyles();
+	}
+	
+	private void updateImageStyles() {
+		if (image != null && !styles.isEmpty()) {
+			image.addStyleName(styles);
 		}
 	}
 
