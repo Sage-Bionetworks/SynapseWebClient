@@ -25,6 +25,12 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 		return date;  
 	}
 	
+	public static Date getDaysFromNow(int days) {
+		Date date = new Date();
+		CalendarUtil.addDaysToDate(date, days);
+		return date;  
+	}
+	
 	public static Date getWeekFromNow() {
 		Date date = new Date();
 		CalendarUtil.addDaysToDate(date, 7);
@@ -54,7 +60,13 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 	
 	@Override
 	public String getRelativeTime(Date toFormat) {
-		return _getRelativeTime(iso8601Format.format(toFormat));
+		if (toFormat.before(getDaysFromNow(-1))) {
+			//older than a day, show a long date (show in UTC if user wants)
+			return getLongFriendlyDate(toFormat);
+		} else {
+			//0 < x < 24h
+			return _getRelativeTime(iso8601Format.format(toFormat));
+		}
 	}
 	@Override
 	public String getCalendarTime(Date toFormat) {
