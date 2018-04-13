@@ -64,7 +64,7 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 			//older than a day, show a long date (show in UTC if user wants)
 			return getLongFriendlyDate(toFormat);
 		} else {
-			//0 < x < 24h
+			//posted in the last 24 hours
 			return _getRelativeTime(iso8601Format.format(toFormat));
 		}
 	}
