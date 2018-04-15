@@ -302,6 +302,7 @@
 					<outputPath>${webappDirectory}</outputPath>
 					<outputStyle>compressed</outputStyle>
 					<includePath>${basedir}/src/main/sass/plugins/</includePath>
+					<sourceMapOutputPath>${webappDirectory}</sourceMapOutputPath>
 				</configuration>
 			</plugin>
 		</plugins>
