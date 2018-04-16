@@ -119,7 +119,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	EditProjectMetadataModalWidget editProjectMetadataModalWidget;
 	
 	EntityBundle entityBundle;
-	String wikiPageId, parentWikiPageId;
+	String wikiPageId;
 	Entity entity;
 	UserEntityPermissions permissions;
 	String enityTypeDisplay;
@@ -673,14 +673,13 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureAddWikiSubpage(){
-		if(isWikiableConfig(entityBundle.getEntity(), currentArea) && entityBundle.getEntity() instanceof Project){
+		if(entityBundle.getEntity() instanceof Project && isWikiableConfig(entityBundle.getEntity(), currentArea) && wikiPageId != null){
 			actionMenu.setActionVisible(Action.ADD_WIKI_SUBPAGE, permissions.getCanEdit());
 			actionMenu.setActionListener(Action.ADD_WIKI_SUBPAGE, this);
 		}else{
 			actionMenu.setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
 		}
 	}
-
 	
 	private void configureMove(){
 		if(isMovableType(entityBundle.getEntity()) ){
