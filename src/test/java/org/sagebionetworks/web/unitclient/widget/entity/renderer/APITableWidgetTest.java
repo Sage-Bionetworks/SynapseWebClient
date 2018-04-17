@@ -25,6 +25,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -97,6 +98,9 @@ public class APITableWidgetTest {
 	ElementWrapper userBadgeDiv2;
 	@Mock
 	GWTWrapper mockGWT;
+	@Captor
+	ArgumentCaptor<String> stringCaptor;
+	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
@@ -158,18 +162,43 @@ public class APITableWidgetTest {
 	}
 	
 	@Test
-	public void testConfigureWithTableConfig() {
+	public void testConfigureWithTableConfigValidColumnName() {
+		List<APITableColumnConfig> columnConfigs = new ArrayList<>();
+		APITableColumnConfig columnConfig = new APITableColumnConfig();
+		String columnName = "valid_column_name";
+		columnConfig.setInputColumnNames(Collections.singleton(columnName));
+		columnConfig.setSort(COLUMN_SORT_TYPE.NONE);
+		columnConfigs.add(columnConfig);
+		APITableConfigEditor.updateDescriptorWithColumnConfigs(descriptor, columnConfigs);
+		String uri = ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX + "select+*+from+evaluation_1";
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, uri);
+		
+		widget.configure(testWikiKey, descriptor, null, null);
+		
+		//verify selects column name only
+		verify(mockSynapseJavascriptClient).getJSON(stringCaptor.capture(), any(AsyncCallback.class));
+		String actualUri = stringCaptor.getValue();
+		assertTrue(actualUri.contains(columnName));
+		assertFalse(actualUri.contains("*"));
+	}
+	
+	@Test
+	public void testConfigureWithTableConfigInvalidColumnName() {
 		List<APITableColumnConfig> columnConfigs = new ArrayList<>();
 		APITableColumnConfig columnConfig = new APITableColumnConfig();
 		columnConfig.setInputColumnNames(Collections.singleton("invalid-name"));
 		columnConfig.setSort(COLUMN_SORT_TYPE.NONE);
 		columnConfigs.add(columnConfig);
 		APITableConfigEditor.updateDescriptorWithColumnConfigs(descriptor, columnConfigs);
-		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, "/repo/v1/evaluation/submission/query?query=select+*+from+evaluation_1");
+		String uri = ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX + "select+*+from+evaluation_1";
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, uri);
 		
 		widget.configure(testWikiKey, descriptor, null, null);
 		
-		
+		//verify selects *
+		verify(mockSynapseJavascriptClient).getJSON(stringCaptor.capture(), any(AsyncCallback.class));
+		String actualUri = stringCaptor.getValue();
+		assertTrue(actualUri.contains(uri));
 	}
 	
 	@Test
