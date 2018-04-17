@@ -1,14 +1,12 @@
 package org.sagebionetworks.web.client.widget.login;
 
 import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -138,6 +136,10 @@ public class LoginWidgetViewImpl extends Composite implements
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+	@Override
+	public void clearSynAlert() {
+		synAlertContainer.clear();
 	}
 
 	@Override

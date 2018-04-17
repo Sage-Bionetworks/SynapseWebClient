@@ -23,6 +23,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -61,6 +62,8 @@ public class LoginWidgetTest {
 	ArgumentCaptor<Place> placeCaptor;
 	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
+	PortalGinInjector mockGinInjector;
 	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
@@ -68,7 +71,8 @@ public class LoginWidgetTest {
 		when(mockSynapseJSNIUtils.getLocationPath()).thenReturn("/Portal.html");
 		when(mockSynapseJSNIUtils.getLocationQueryString()).thenReturn("?foo=bar");
 
-		loginWidget = new LoginWidget(mockView, mockAuthController, mockGlobalApplicationState, mockSynAlert);
+		loginWidget = new LoginWidget(mockView, mockAuthController, mockGlobalApplicationState, mockGinInjector);
+		when(mockGinInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		loginWidget.setUserListener(mockUserListener);
 		UserSessionData usd = new UserSessionData();
 		UserProfile p = new UserProfile();
@@ -78,7 +82,6 @@ public class LoginWidgetTest {
 		when(mockSession.getAcceptsTermsOfUse()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
 		verify(mockView).setPresenter(loginWidget);
-		verify(mockView).setSynAlert(mockSynAlert);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}
 	
@@ -97,6 +100,7 @@ public class LoginWidgetTest {
 		verify(mockUserListener).userChanged(any(UserSessionData.class));
 		verify(mockView).clear();
 		verify(mockView).clearUsername();
+		verify(mockView).clearSynAlert();
 	}
 	
 	@Test
@@ -123,6 +127,7 @@ public class LoginWidgetTest {
 		loginWidget.setUsernameAndPassword(u, p);
 		verify(mockAuthController).loginUser(anyString(), anyString(), (AsyncCallback<UserSessionData>) any());
 		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
+		verify(mockView).setSynAlert(mockSynAlert);
 		verify(mockSynAlert).handleException(ex);
 		verify(mockView).clear();
 		verify(mockView, never()).clearUsername();
@@ -141,7 +146,7 @@ public class LoginWidgetTest {
 		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
 		verify(mockView).clear();
 		verify(mockView, never()).clearUsername();
-		verify(mockSynAlert).clear();
+		verify(mockView).setSynAlert(mockSynAlert);
 		verify(mockSynAlert).showError(notFoundMessage + LoginWidget.PLEASE_TRY_AGAIN);
 	}
 	
@@ -157,7 +162,7 @@ public class LoginWidgetTest {
 		verify(mockUserListener, never()).userChanged(any(UserSessionData.class));
 		verify(mockView).clear();
 		verify(mockView, never()).clearUsername();
-		verify(mockSynAlert).clear();
+		verify(mockView).setSynAlert(mockSynAlert);
 		verify(mockSynAlert).showError(notFoundMessage + LoginWidget.PLEASE_TRY_AGAIN);
 	}
 
