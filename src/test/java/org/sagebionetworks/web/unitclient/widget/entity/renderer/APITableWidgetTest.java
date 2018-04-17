@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -46,6 +47,7 @@ import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
@@ -153,6 +155,21 @@ public class APITableWidgetTest {
 		verify(mockView).clear();
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
+	}
+	
+	@Test
+	public void testConfigureWithTableConfig() {
+		List<APITableColumnConfig> columnConfigs = new ArrayList<>();
+		APITableColumnConfig columnConfig = new APITableColumnConfig();
+		columnConfig.setInputColumnNames(Collections.singleton("invalid-name"));
+		columnConfig.setSort(COLUMN_SORT_TYPE.NONE);
+		columnConfigs.add(columnConfig);
+		APITableConfigEditor.updateDescriptorWithColumnConfigs(descriptor, columnConfigs);
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, "/repo/v1/evaluation/submission/query?query=select+*+from+evaluation_1");
+		
+		widget.configure(testWikiKey, descriptor, null, null);
+		
+		
 	}
 	
 	@Test
