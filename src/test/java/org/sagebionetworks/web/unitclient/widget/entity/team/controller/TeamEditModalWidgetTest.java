@@ -21,6 +21,7 @@ import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -30,6 +31,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidget;
 import org.sagebionetworks.web.client.widget.team.controller.TeamEditModalWidgetView;
+import org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
@@ -72,6 +74,10 @@ public class TeamEditModalWidgetTest {
 	private AccessControlList acl;
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	CroppedImageUploadViewImpl mockImageUploadView;
 	
 	@Before
 	public void setup() {
@@ -88,9 +94,10 @@ public class TeamEditModalWidgetTest {
 		mockRefreshCallback = mock(Callback.class);
 		mockFileUpload = mock(FileUpload.class);
 		mockFileMeta = mock(FileMetadata.class);
+		when(mockPortalGinInjector.getCroppedImageUploadView()).thenReturn(mockImageUploadView);
 		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)).thenReturn(AUTHENTICATED_USERS_GROUP_ID.toString());
 		presenter = new TeamEditModalWidget(mockSynAlert, mockView, mockSynapseClient,
-				mockUploader, mockJSNIUtils, mockAuthenticationController, mockGlobalApplicationState);
+				mockUploader, mockJSNIUtils, mockAuthenticationController, mockGlobalApplicationState, mockPortalGinInjector);
 		AsyncMockStubber.callSuccessWith(acl).when(mockSynapseClient).getTeamAcl(eq(TEAM_ID.toString()), any(AsyncCallback.class));
 		when(mockTeam.getIcon()).thenReturn(oldIcon);
 		presenter.setRefreshCallback(mockRefreshCallback);
@@ -138,6 +145,7 @@ public class TeamEditModalWidgetTest {
 		verify(mockView).setUploadWidget(mockUploader.asWidget());
 		verify(mockView).setAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setPresenter(presenter);
+		verify(mockUploader).setView(mockImageUploadView);
 	}
 	
 	@Test
