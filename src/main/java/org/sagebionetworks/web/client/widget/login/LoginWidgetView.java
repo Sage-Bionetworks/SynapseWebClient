@@ -23,6 +23,7 @@ public interface LoginWidgetView extends IsWidget {
 	}
 
 	void clearUsername();
+	void clearSynAlert();
 	
 	void setSynAlert(IsWidget w);
 	public void clear();

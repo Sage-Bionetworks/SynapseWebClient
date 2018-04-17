@@ -2,13 +2,13 @@ package org.sagebionetworks.web.client.widget.login;
 
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,21 +21,19 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	private AuthenticationController authenticationController;	
 	private UserListener listener;	
 	private GlobalApplicationState globalApplicationState;
-	private SynapseAlert synAlert;
-	
+	PortalGinInjector ginInjector;
 	public static final String LOGIN_PLACE  = "LoginPlace";
 	
 	@Inject
 	public LoginWidget(LoginWidgetView view, 
 			AuthenticationController controller, 
 			GlobalApplicationState globalApplicationState, 
-			SynapseAlert synAlert) {
+			PortalGinInjector ginInjector) {
 		this.view = view;
 		view.setPresenter(this);
 		this.authenticationController = controller;	
 		this.globalApplicationState = globalApplicationState;
-		this.synAlert = synAlert;
-		view.setSynAlert(synAlert);
+		this.ginInjector = ginInjector;
 	}
 
 	public Widget asWidget() {
@@ -49,7 +47,6 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	
 	@Override
 	public void setUsernameAndPassword(final String username, final String password) {
-		synAlert.clear();
 		authenticationController.loginUser(username, password, new AsyncCallback<UserSessionData>() {
 			@Override
 			public void onSuccess(UserSessionData userSessionData) {
@@ -68,6 +65,8 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.clear();
+				SynapseAlert synAlert = ginInjector.getSynapseAlertWidget();
+				view.setSynAlert(synAlert);
 				if (caught instanceof NotFoundException || caught instanceof UnauthorizedException) {
 					synAlert.showError(caught.getMessage() + PLEASE_TRY_AGAIN);
 				} else {
@@ -80,6 +79,7 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	public void clear() {
 		view.clear();
 		view.clearUsername();
+		view.clearSynAlert();
 	}
 
 	// needed?
