@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -16,6 +15,7 @@ import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
@@ -33,7 +33,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	public static final String SYNAPSE_ORG = "@synapse.org";
 	public static final String GET_SATISFACTION_SUPPORT_SITE = "http://support.sagebase.org";
 	public static final String WWW_SYNAPSE_ORG = "www.synapse.org";
-
+	CopyTextModal copyTextModal;
 	public static enum MenuItems {
 		DATASETS, TOOLS, NETWORKS, PEOPLE, PROJECTS
 	}
@@ -208,5 +208,15 @@ public class Header implements HeaderView.Presenter, IsWidget {
 				}
 			});
 		}
+	}
+	
+	@Override
+	public void onEmailSupportClick() {
+		if (copyTextModal == null) {
+			copyTextModal = portalGinInjector.getCopyTextModal();
+			copyTextModal.setTitle("Contact Us");
+			copyTextModal.setText("synapseinfo@sagebionetworks.org");
+		}
+		copyTextModal.show();
 	}
 }

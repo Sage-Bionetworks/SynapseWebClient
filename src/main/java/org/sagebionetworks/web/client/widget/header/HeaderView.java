@@ -35,6 +35,7 @@ public interface HeaderView extends IsWidget {
 		void onRegisterClick();
 		void onFavoriteClick();
 		void onLogoClick();
+		void onEmailSupportClick();
 	}
 	public void showLargeLogo();
 	public void showSmallLogo();
