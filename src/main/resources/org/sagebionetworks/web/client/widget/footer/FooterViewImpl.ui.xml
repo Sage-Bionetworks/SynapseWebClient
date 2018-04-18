@@ -30,10 +30,10 @@
 					<t:Table width="100%">
 						<t:TableRow>
 							<t:TableData paddingRight="2" >
-								<b:Anchor ui:field="copyrightYear" href="http://sagebase.org/" addStyleNames="margin-top-5 margin-bottom-5 color-white" />
+								<b:Anchor ui:field="copyrightYear" href="http://sagebionetworks.org/" addStyleNames="margin-top-5 margin-bottom-5 color-white" />
 							</t:TableData>
 							<t:TableData paddingRight="2" addStyleNames="text-align-center">
-								<b:Anchor href="mailto:synapseInfo@sagebase.org" text="Contact us" addStyleNames="color-white margin-left-10"/>	
+								<b:Anchor href="mailto:synapseInfo@sagebionetworks.org" text="Contact us" addStyleNames="color-white margin-left-10"/>	
 							</t:TableData>
 							<t:TableData paddingRight="2" addStyleNames="text-align-center">
 								<b:Anchor ui:field="reportAbuseLink" text="Report abuse" addStyleNames="color-white margin-left-10" />
