@@ -135,9 +135,7 @@ public class LoginWidgetViewImpl extends Composite implements
 	@Override
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
-		Div div = new Div();
-		div.add(w);
-		synAlertContainer.add(div);
+		synAlertContainer.add(w);
 	}
 
 	@Override
