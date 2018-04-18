@@ -24,8 +24,6 @@ import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.Scheduler;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -92,7 +90,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Alert stagingAlert;
 	@UiField
-	Button helpButton;
+	AnchorListItem documentationLink;
 	
 	private Presenter presenter;
 	private SearchBox searchBox;
@@ -198,61 +196,35 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	}
 
 	public void initClickHandlers() {
-		goToStandardSite.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.setTestWebsite(false, cookies);
-				globalAppState.refreshPage();
-			}
+		documentationLink.addClickHandler(event -> {
+			event.preventDefault();
+			DisplayUtils.newWindow(WebConstants.DOCS_BASE_URL, "", "");
 		});
-		trashLink.addClickHandler(new ClickHandler() {
-    		@Override
-			public void onClick(ClickEvent event) {
+		goToStandardSite.addClickHandler(event -> {
+			DisplayUtils.setTestWebsite(false, cookies);
+			globalAppState.refreshPage();
+		});
+		trashLink.addClickHandler(event -> {
     			presenter.onTrashClick();
-			}
-    	});
-		logoutLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onLogoutClick();
-			}
 		});
-		dashboardButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onDashboardClick();
-			}
+		logoutLink.addClickHandler(event -> {
+			presenter.onLogoutClick();
 		});
-		loginLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onLoginClick();
-			}
+		dashboardButton.addClickHandler(event -> {
+			presenter.onDashboardClick();
 		});
-		registerLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRegisterClick();
-			}
+		loginLink.addClickHandler(event -> {
+			presenter.onLoginClick();
+		});
+		registerLink.addClickHandler(event -> {
+			presenter.onRegisterClick();
 		});
 		
-		headerFavButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onFavoriteClick();
-			}
+		headerFavButton.addClickHandler(event -> {
+			presenter.onFavoriteClick();
 		});
-		synapseLogo.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onLogoClick();
-			}
-		});
-		helpButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(WebConstants.DOCS_BASE_URL, "", "");
-			}
+		synapseLogo.addClickHandler(event -> {
+			presenter.onLogoClick();
 		});
 	}
 
