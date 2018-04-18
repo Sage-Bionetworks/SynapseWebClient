@@ -23,10 +23,10 @@
 					<b:DropDown addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
 						<b:Button ui:field="helpMenu" dataToggle="DROPDOWN" size="EXTRA_SMALL" height="28px" >Support</b:Button>
 						<b:DropDownMenu ui:field="helpDropdownMenu" addStyleNames="dropdown-menu-right">
-							<b:AnchorListItem ui:field="documentationLink" icon="EXTERNAL_LINK" iconFixedWidth="true" href="http://docs.synapse.org">Documentation</b:AnchorListItem>
+							<b:AnchorListItem ui:field="documentationLink" icon="EXTERNAL_LINK" iconFixedWidth="true" iconPosition="RIGHT" href="http://docs.synapse.org">Documentation</b:AnchorListItem>
 							<b:AnchorListItem href="#!SynapseForum:default">Help Forum</b:AnchorListItem>
 							<b:AnchorListItem addStyleNames="submit-feedback-command">Submit Feedback</b:AnchorListItem>
-							<b:AnchorListItem ui:field="emailSynapseSupportLink">Email Synapse Support</b:AnchorListItem>
+							<b:AnchorListItem ui:field="emailSynapseSupportLink" icon="ENVELOPE_O" href="mailto:synapseinfo@sagebionetworks.org" iconFixedWidth="true" iconPosition="RIGHT">Contact Us</b:AnchorListItem>
 						</b:DropDownMenu>
 					</b:DropDown>
 					<b:Tooltip placement="BOTTOM" title="Favorites">

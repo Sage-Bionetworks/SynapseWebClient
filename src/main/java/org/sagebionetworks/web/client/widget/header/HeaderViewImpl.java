@@ -90,8 +90,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Alert stagingAlert;
 	@UiField
-	AnchorListItem emailSynapseSupportLink;
-	@UiField
 	AnchorListItem documentationLink;
 	
 	private Presenter presenter;
@@ -201,9 +199,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		documentationLink.addClickHandler(event -> {
 			event.preventDefault();
 			DisplayUtils.newWindow(WebConstants.DOCS_BASE_URL, "", "");
-		});
-		emailSynapseSupportLink.addClickHandler(event -> {
-			presenter.onEmailSupportClick();
 		});
 		goToStandardSite.addClickHandler(event -> {
 			DisplayUtils.setTestWebsite(false, cookies);
