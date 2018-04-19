@@ -31,15 +31,14 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			GlobalApplicationState globalApplicationState, 
 			SynapseAlert synAlert) {
 		this.view = view;
-		view.setPresenter(this);
 		this.authenticationController = controller;	
 		this.globalApplicationState = globalApplicationState;
 		this.synAlert = synAlert;
 		view.setSynAlert(synAlert);
+		view.setPresenter(this);
 	}
 
 	public Widget asWidget() {
-		view.setPresenter(this);
 		return view.asWidget();
 	}
 	

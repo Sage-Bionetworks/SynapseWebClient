@@ -1346,6 +1346,16 @@ public class EntityActionControllerImplTest {
 	}
 	
 	@Test
+	public void testConfigurWikiSubpageProjectNoRootPage(){
+		entityBundle.setEntity(new Project());
+		currentEntityArea = EntityArea.WIKI;
+		wikiPageId = null;
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionVisible(Action.ADD_WIKI_SUBPAGE, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.ADD_WIKI_SUBPAGE, true);
+	}
+	
+	@Test
 	public void testConfigureWikiSubpageFolder(){
 		entityBundle.setEntity(new Folder());
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);

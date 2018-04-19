@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -48,7 +47,6 @@ public class LoginWidgetViewImpl extends Composite implements
 	org.gwtbootstrap3.client.ui.Button googleSignInButton;
 	@UiField
 	Row synAlertContainer;
-	
 	PasswordTextBox password = null;
 	TextBox username = null;
 	

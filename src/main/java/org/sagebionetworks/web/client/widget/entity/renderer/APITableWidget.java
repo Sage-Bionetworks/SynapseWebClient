@@ -36,6 +36,7 @@ import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.TableUnavilableException;
 
+import com.google.gwt.regexp.shared.RegExp;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -54,6 +55,8 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 	AuthenticationController authenticationController;
 	SynapseAlert synAlert;
 	private GWTWrapper gwt;
+	
+	private static final RegExp WORD_PATTERN = RegExp.compile("^\\w*$");
 	
 	public static Set<String> userColumnNames = new HashSet<String>();
 	public static Set<String> dateColumnNames = new HashSet<String>();
@@ -141,7 +144,9 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 		if (isSubmissionQueryService(fullUri) && tableConfig.getColumnConfigs() != null && tableConfig.getColumnConfigs().size() > 0) {
 			// look for '*' in query.  if found, replace with columns defined in the table config
 			if (fullUri.contains("*")) {
-				fullUri = fullUri.replace("*", getSelectColumns(tableConfig.getColumnConfigs()));
+				if (isValidColumnNames(tableConfig.getColumnConfigs())) {
+					fullUri = fullUri.replace("*", getSelectColumns(tableConfig.getColumnConfigs()));	
+				}
 			}
 		}
 
@@ -227,6 +232,17 @@ public class APITableWidget implements APITableWidgetView.Presenter, WidgetRende
 				}
 			}
 		});
+	}
+	
+	public boolean isValidColumnNames(List<APITableColumnConfig> configs) {
+		for (APITableColumnConfig config : configs) {
+			for (String columnName : config.getInputColumnNames()) {
+				if (WORD_PATTERN.exec(columnName) == null) {
+					return false;
+				}
+			}
+		}
+		return true;
 	}
 	
 	public String getSelectColumns(List<APITableColumnConfig> configs) {
