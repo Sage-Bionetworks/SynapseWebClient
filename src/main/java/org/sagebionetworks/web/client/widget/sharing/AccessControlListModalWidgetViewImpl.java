@@ -104,6 +104,7 @@ public class AccessControlListModalWidgetViewImpl implements
 	public void setTitle(String title) {
 		modalTitleContainer.clear();
 		Heading h = new Heading(HeadingSize.H4);
+		h.addStyleName("displayInline");
 		h.setText(title);
 		modalTitleContainer.add(h);	
 	}
