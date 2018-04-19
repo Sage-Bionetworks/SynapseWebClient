@@ -3,6 +3,8 @@ package org.sagebionetworks.web.client.widget.sharing;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
+import org.gwtbootstrap3.client.ui.constants.HeadingSize;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -35,7 +37,7 @@ public class AccessControlListModalWidgetViewImpl implements
 	@UiField
 	Button defaultButton;
 	@UiField
-	Heading modalTitle;
+	Span modalTitleContainer;
 	Modal modal;
 
 	@Inject
@@ -100,6 +102,9 @@ public class AccessControlListModalWidgetViewImpl implements
 	
 	@Override
 	public void setTitle(String title) {
-		modalTitle.setText(title);	
+		modalTitleContainer.clear();
+		Heading h = new Heading(HeadingSize.H4);
+		h.setText(title);
+		modalTitleContainer.add(h);	
 	}
 }
