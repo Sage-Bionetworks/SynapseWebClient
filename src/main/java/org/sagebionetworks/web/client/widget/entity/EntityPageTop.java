@@ -155,10 +155,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		Synapse place = event.getPlace();
 		if (entity.getId().equals(place.getEntityId())) {
 			area = place.getArea();
-			clearAreaTokens();
-			initialAreaToken = place.getAreaToken();
-			initAreaToken();
-			//reconfigure the tools menus and the current area with the new token
+			setCurrentAreaToken(place.getAreaToken());
+			//reconfigure the tools menus and the current area with the new place information
 			boolean isCurrentVersion = place.getVersionNumber() == null;
 			entityActionController.configure(entityActionMenu, getCurrentAreaEntityBundle(), isCurrentVersion, null, area, entityUpdateHandler);
 			pushTabUrlToBrowserHistory = true;
@@ -552,24 +550,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				area = EntityArea.FILES;
 			}
 		}
-		// set area token
-		switch (area) {
-		case WIKI:
-			wikiAreaToken = initialAreaToken;
-			break;
-		case TABLES:
-			tablesAreaToken = initialAreaToken;
-			break;
-		case DISCUSSION:
-			discussionAreaToken = initialAreaToken;
-			break;
-		case DOCKER:
-			if (DisplayUtils.isInTestWebsite(cookies)) {
-				dockerAreaToken = initialAreaToken;
-			}
-			break;
-		default:
-		}
+		setCurrentAreaToken(initialAreaToken);
 
 		if (projectBundle != null) {
 			String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
@@ -584,7 +565,30 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		discussionTab.asTab().setContentStale(true);
 		dockerTab.asTab().setContentStale(true);
 	}
-
+	public void setCurrentAreaToken(String token) {
+		// set area token
+		switch (area) {
+			case WIKI:
+				wikiAreaToken = token;
+				wikiTab.asTab().setContentStale(true);
+				break;
+			case TABLES:
+				tablesAreaToken = token;
+				tablesTab.asTab().setContentStale(true);
+				break;
+			case DISCUSSION:
+				discussionAreaToken = token;
+				discussionTab.asTab().setContentStale(true);
+				break;
+			case DOCKER:
+				if (DisplayUtils.isInTestWebsite(cookies)) {
+					dockerAreaToken = token;
+					dockerTab.asTab().setContentStale(true);
+				}
+				break;
+			default:
+		}
+	}
 	public void clearState() {
 		view.clear();
 		wikiTab.clear();
