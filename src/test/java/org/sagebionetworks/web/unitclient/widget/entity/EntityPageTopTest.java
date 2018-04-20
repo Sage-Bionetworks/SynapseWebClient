@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -798,5 +799,37 @@ public class EntityPageTopTest {
 		Synapse synPlace = (Synapse)placeCaptor.getValue();
 		assertEquals(targetEntityId, synPlace.getEntityId());
 		assertEquals(targetVersion, synPlace.getVersionNumber());
+	}
+	
+	@Test
+	public void testOnChangeSynapsePlaceDifferentEntityId(){
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		when(mockEntityBundle.getEntity()).thenReturn(mockProjectEntity);
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		Synapse newPlace = new Synapse("syn99");
+		
+		pageTop.onChangeSynapsePlace(new ChangeSynapsePlaceEvent(newPlace));
+
+		verify(mockPlaceChanger).goTo(newPlace);
+	}
+	
+	@Test
+	public void testOnChangeSynapsePlaceSameEntityId(){
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		when(mockEntityBundle.getEntity()).thenReturn(mockProjectEntity);
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		Synapse newPlace = new Synapse(projectEntityId, null, EntityArea.DISCUSSION, null);
+		
+		pageTop.onChangeSynapsePlace(new ChangeSynapsePlaceEvent(newPlace));
+
+		verify(mockPlaceChanger, never()).goTo(newPlace);
+		//reconfigures tools menu with the correct area
+		verify(mockEntityActionController).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), eq(EntityArea.DISCUSSION), any(EntityUpdatedHandler.class));
+		//configured the discussion tab
+		verify(mockDiscussionTab).configure(projectEntityId, projectName, areaToken, canModerate, mockActionMenuWidget);
 	}
 }

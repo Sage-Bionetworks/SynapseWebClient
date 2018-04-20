@@ -156,36 +156,11 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		if (entity.getId().equals(place.getEntityId())) {
 			area = place.getArea();
 			setCurrentAreaToken(place.getAreaToken());
-			//reconfigure the tools menus and the current area with the new place information
-			boolean isCurrentVersion = place.getVersionNumber() == null;
-			entityActionController.configure(entityActionMenu, getCurrentAreaEntityBundle(), isCurrentVersion, null, area, entityUpdateHandler);
 			pushTabUrlToBrowserHistory = true;
 			reconfigureCurrentArea();
 		} else {
 			placeChanger.goTo(place);
 		}
-	}
-	
-	public EntityBundle getCurrentAreaEntityBundle() {
-		EntityBundle bundle = null;
-		switch (area) {
-			case FILES:
-				bundle = filesEntityBundle;
-				break;
-			case TABLES:
-				bundle = tablesEntityBundle;
-				break;
-			case DOCKER:
-				bundle = dockerEntityBundle;
-				break;
-			case WIKI:
-			case DISCUSSION:
-			case ADMIN:
-			default:
-				bundle = projectBundle;
-				break;
-		}
-		return bundle;
 	}
 	
 	public CallbackP<String> getEntitySelectedCallback(final EntityArea newArea) {
