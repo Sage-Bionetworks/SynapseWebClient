@@ -59,6 +59,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -137,6 +138,8 @@ public class EntityPageTopTest {
 	Link mockLinkEntity;
 	@Mock
 	Reference mockLinkReference;
+	@Mock
+	EventBus mockEventBus;
 	@Captor
 	ArgumentCaptor<WikiPageWidget.Callback> wikiCallbackCaptor; 
 	@Captor
@@ -174,7 +177,8 @@ public class EntityPageTopTest {
 				mockActionMenuWidget,
 				mockCookies, 
 				mockSynapseJavascriptClient,
-				mockGlobalApplicationState);
+				mockGlobalApplicationState,
+				mockEventBus);
 		pageTop.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));

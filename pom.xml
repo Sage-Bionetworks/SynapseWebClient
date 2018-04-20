@@ -309,6 +309,11 @@
 	</build>
 	<dependencies>
 		<dependency>
+			<groupId>com.google.gwt.eventbinder</groupId>
+			<artifactId>eventbinder</artifactId>
+			<version>1.1.0</version>
+		</dependency>
+		<dependency>
 			<groupId>org.gwtbootstrap3</groupId>
 			<artifactId>gwtbootstrap3</artifactId>
 			<version>${gwtbootstrap3.version}</version>

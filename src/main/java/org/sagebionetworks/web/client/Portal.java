@@ -18,6 +18,7 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.
@@ -28,7 +29,6 @@ public class Portal implements EntryPoint {
 	public static final int CODE_LOAD_DELAY = 5000;
 	//  We are using gin to create all of our objects
 	private static final PortalGinInjector ginjector = GWT.create(PortalGinInjector.class);
-	
 	private SimplePanel appWidget = new SimplePanel();
 	public final static native void _consoleError(String message) /*-{
 		console.error(message);
