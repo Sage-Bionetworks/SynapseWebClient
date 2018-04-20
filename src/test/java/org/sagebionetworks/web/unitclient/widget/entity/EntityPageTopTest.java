@@ -63,6 +63,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public class EntityPageTopTest {
 
@@ -144,6 +145,8 @@ public class EntityPageTopTest {
 	ArgumentCaptor<WikiPageWidget.Callback> wikiCallbackCaptor; 
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
+	@Mock
+	EventBinder mockEventBinder;
 	EntityPageTop pageTop;
 	String projectEntityId = "syn123";
 	String projectName = "fooooo";
@@ -161,6 +164,7 @@ public class EntityPageTopTest {
 		when(mockDiscussionTab.asTab()).thenReturn(mockDiscussionInnerTab);
 		when(mockDockerTab.asTab()).thenReturn(mockDockerInnerTab);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
 		pageTop = new EntityPageTop(mockView, 
 				mockSynapseClientAsync, 
 				mockTabs,
@@ -232,6 +236,7 @@ public class EntityPageTopTest {
 		verify(mockTabs).addTab(mockDockerInnerTab);
 		
 		verify(mockProjectActionMenuWidget).setToolsButtonIcon(EntityPageTop.PROJECT_SETTINGS, IconType.GEAR);
+		verify(mockEventBinder).bindEventHandlers(pageTop, mockEventBus);
 	}
 	
 	@Test
@@ -287,7 +292,7 @@ public class EntityPageTopTest {
 		//Once to show the active tab, and once after configuration so that the place is pushed into the history.
 		verify(mockTabs, times(2)).showTab(mockWikiInnerTab, false);
 		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
-		verify(mockWikiInnerTab).setContentStale(true);
+		verify(mockWikiInnerTab, atLeastOnce()).setContentStale(true);
 		verify(mockWikiInnerTab).setContentStale(false);
 		verify(mockView).scrollToTop();
 		
