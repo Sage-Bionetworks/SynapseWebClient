@@ -18,7 +18,6 @@ import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.web.bindery.event.shared.binder.EventBinder;
 
 /**
  * Entry point classes define <code>onModuleLoad()</code>.

@@ -7,7 +7,6 @@ import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
@@ -44,7 +43,7 @@ public class ButtonLinkWidgetViewImpl extends Div implements ButtonLinkWidgetVie
 		}
 	};
 	@Inject
-	public ButtonLinkWidgetViewImpl(GlobalApplicationState globalAppState, GWTWrapper gwt, EventBus bus) {
+	public ButtonLinkWidgetViewImpl(GlobalApplicationState globalAppState, EventBus bus) {
 		if (appPlaceHistoryMapper == null) {
 			appPlaceHistoryMapper = globalAppState.getAppPlaceHistoryMapper();
 			eventBus = bus;
