@@ -43,6 +43,16 @@ a:focus{color:$synapse-blue; text-decoration:underline;}
 	color: $synapse-blue;
 }
 
+body {
+	overflow-y: auto
+}
+/* Prevent body from scrolling when modal is open
+http://stackoverflow.com/questions/9538868/prevent-body-from-scrolling-when-a-modal-is-opened
+*/
+body.modal-open {
+	overflow: hidden;
+}
+
 /**
 sticky footer
 **/
@@ -1815,13 +1825,6 @@ Looks for any child element under .modal-fullscreen that has a class that contai
 
 .gwt-TreeItem-selected [class*="link"] {
 	text-decoration: underline;
-}
-
-/* Prevent body from scrolling when modal is open
-http://stackoverflow.com/questions/9538868/prevent-body-from-scrolling-when-a-modal-is-opened
-*/
-body.modal-open {
-    overflow: hidden;
 }
 
 .my-dashboard-header-button [class*="user-badge"] {
