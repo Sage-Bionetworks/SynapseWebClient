@@ -433,7 +433,7 @@ public class TableEntityWidget implements IsWidget,
 		// Pass this along to the input widget.
 		this.queryInputWidget.queryExecutionFinished(wasSuccessful, resultsEditable);
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, wasSuccessful && canEditResults && resultsEditable);
-		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, wasSuccessful && canEdit);
+		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, wasSuccessful);
 	
 		// Set this as the query if it was successful
 		if (wasSuccessful) {
