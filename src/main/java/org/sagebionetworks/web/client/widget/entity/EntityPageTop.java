@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -49,11 +50,12 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventHandler;
 
 public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 	public static final String PROJECT_SETTINGS = "Project Settings";
@@ -107,7 +109,8 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 			ActionMenuWidget entityActionMenu,
 			CookieProvider cookies,
 			SynapseJavascriptClient synapseJavascriptClient,
-			GlobalApplicationState globalAppState) {
+			GlobalApplicationState globalAppState,
+			EventBus eventBus) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -139,22 +142,45 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		view.setEntityActionMenu(entityActionMenu.asWidget());
 		
 		projectMetadata.setAnnotationsTitleText("Project Annotations");
+		
+		view.getEventBinder().bindEventHandlers(this, eventBus);
 	}
 
+	/**
+	 * Event fired by ButtonLinkWidget.
+	 * @param event
+	 */
+	@EventHandler
+	public void onChangeSynapsePlace(ChangeSynapsePlaceEvent event) {
+		Synapse place = event.getPlace();
+		if (entity.getId().equals(place.getEntityId())) {
+			area = place.getArea();
+			setCurrentAreaToken(place.getAreaToken());
+			pushTabUrlToBrowserHistory = true;
+			reconfigureCurrentArea();
+		} else {
+			placeChanger.goTo(place);
+		}
+	}
+	
 	public CallbackP<String> getEntitySelectedCallback(final EntityArea newArea) {
 		return newEntityId -> {
 			area = newArea;
 			// always the current version from tab entity click
 			Long version = null;
 			// SWC-4023: clear out the initial area tokens when a new entity is selected
-			tablesAreaToken = null;
-			dockerAreaToken = null;
-			discussionAreaToken = null;
-			wikiAreaToken = null;
+			clearAreaTokens();
 			// SWC-3919: on tab entity click, push tab url to browser history
 			pushTabUrlToBrowserHistory = true;
 			configureEntity(newEntityId, version);
 		};
+	}
+	
+	private void clearAreaTokens() {
+		tablesAreaToken = null;
+		dockerAreaToken = null;
+		discussionAreaToken = null;
+		wikiAreaToken = null;
 	}
 
 	private void initTabs() {
@@ -499,24 +525,7 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 				area = EntityArea.FILES;
 			}
 		}
-		// set area token
-		switch (area) {
-		case WIKI:
-			wikiAreaToken = initialAreaToken;
-			break;
-		case TABLES:
-			tablesAreaToken = initialAreaToken;
-			break;
-		case DISCUSSION:
-			discussionAreaToken = initialAreaToken;
-			break;
-		case DOCKER:
-			if (DisplayUtils.isInTestWebsite(cookies)) {
-				dockerAreaToken = initialAreaToken;
-			}
-			break;
-		default:
-		}
+		setCurrentAreaToken(initialAreaToken);
 
 		if (projectBundle != null) {
 			String wikiId = getWikiPageId(wikiAreaToken, projectBundle.getRootWikiId());
@@ -531,7 +540,30 @@ public class EntityPageTop implements SynapseWidgetPresenter, IsWidget  {
 		discussionTab.asTab().setContentStale(true);
 		dockerTab.asTab().setContentStale(true);
 	}
-
+	public void setCurrentAreaToken(String token) {
+		// set area token
+		switch (area) {
+			case WIKI:
+				wikiAreaToken = token;
+				wikiTab.asTab().setContentStale(true);
+				break;
+			case TABLES:
+				tablesAreaToken = token;
+				tablesTab.asTab().setContentStale(true);
+				break;
+			case DISCUSSION:
+				discussionAreaToken = token;
+				discussionTab.asTab().setContentStale(true);
+				break;
+			case DOCKER:
+				if (DisplayUtils.isInTestWebsite(cookies)) {
+					dockerAreaToken = token;
+					dockerTab.asTab().setContentStale(true);
+				}
+				break;
+			default:
+		}
+	}
 	public void clearState() {
 		view.clear();
 		wikiTab.clear();

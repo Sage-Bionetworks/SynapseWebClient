@@ -5,12 +5,14 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public class EntityPageTopViewImpl extends Composite implements EntityPageTopView {
 
@@ -84,5 +86,14 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public void scrollToTop() {
 		DisplayUtils.scrollToTop();
+	}
+	
+	/** Event binder code **/
+	interface EBinder extends EventBinder<EntityPageTop> {};
+	private final EBinder eventBinder = GWT.create(EBinder.class);
+	
+	@Override
+	public EventBinder<EntityPageTop> getEventBinder() {
+		return eventBinder;
 	}
 }
