@@ -37,6 +37,7 @@
 	<inherits name="org.gwtvisualizationwrappers.CytoscapeJs"/>
 	<inherits name="org.gwtvisualizationwrappers.Biodalliance13"/>
 	<inherits name="org.gwtbootstrap3.extras.notify.Notify"/>
+	<inherits name='com.google.web.bindery.event.EventBinder'/>
 	
 	<!-- Commented out unused gwt bootstrap extra modules.  
 	Note that importing will cause the associated render-blocking css to loaded.

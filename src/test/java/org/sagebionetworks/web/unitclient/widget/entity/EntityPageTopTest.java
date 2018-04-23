@@ -38,6 +38,7 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -59,9 +60,11 @@ import org.sagebionetworks.web.client.widget.entity.tabs.Tabs;
 import org.sagebionetworks.web.client.widget.entity.tabs.WikiTab;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public class EntityPageTopTest {
 
@@ -137,10 +140,14 @@ public class EntityPageTopTest {
 	Link mockLinkEntity;
 	@Mock
 	Reference mockLinkReference;
+	@Mock
+	EventBus mockEventBus;
 	@Captor
 	ArgumentCaptor<WikiPageWidget.Callback> wikiCallbackCaptor; 
 	@Captor
 	ArgumentCaptor<Place> placeCaptor;
+	@Mock
+	EventBinder mockEventBinder;
 	EntityPageTop pageTop;
 	String projectEntityId = "syn123";
 	String projectName = "fooooo";
@@ -158,6 +165,7 @@ public class EntityPageTopTest {
 		when(mockDiscussionTab.asTab()).thenReturn(mockDiscussionInnerTab);
 		when(mockDockerTab.asTab()).thenReturn(mockDockerInnerTab);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
 		pageTop = new EntityPageTop(mockView, 
 				mockSynapseClientAsync, 
 				mockTabs,
@@ -174,7 +182,8 @@ public class EntityPageTopTest {
 				mockActionMenuWidget,
 				mockCookies, 
 				mockSynapseJavascriptClient,
-				mockGlobalApplicationState);
+				mockGlobalApplicationState,
+				mockEventBus);
 		pageTop.setEntityUpdatedHandler(mockEntityUpdatedHandler);
 		AsyncMockStubber.callSuccessWith(mockProjectBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
@@ -228,6 +237,7 @@ public class EntityPageTopTest {
 		verify(mockTabs).addTab(mockDockerInnerTab);
 		
 		verify(mockProjectActionMenuWidget).setToolsButtonIcon(EntityPageTop.PROJECT_SETTINGS, IconType.GEAR);
+		verify(mockEventBinder).bindEventHandlers(pageTop, mockEventBus);
 	}
 	
 	@Test
@@ -283,7 +293,7 @@ public class EntityPageTopTest {
 		//Once to show the active tab, and once after configuration so that the place is pushed into the history.
 		verify(mockTabs, times(2)).showTab(mockWikiInnerTab, false);
 		verify(mockProjectMetadata).configure(mockProjectBundle, null, mockProjectActionMenuWidget);
-		verify(mockWikiInnerTab).setContentStale(true);
+		verify(mockWikiInnerTab, atLeastOnce()).setContentStale(true);
 		verify(mockWikiInnerTab).setContentStale(false);
 		verify(mockView).scrollToTop();
 		
@@ -789,5 +799,37 @@ public class EntityPageTopTest {
 		Synapse synPlace = (Synapse)placeCaptor.getValue();
 		assertEquals(targetEntityId, synPlace.getEntityId());
 		assertEquals(targetVersion, synPlace.getVersionNumber());
+	}
+	
+	@Test
+	public void testOnChangeSynapsePlaceDifferentEntityId(){
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		when(mockEntityBundle.getEntity()).thenReturn(mockProjectEntity);
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		Synapse newPlace = new Synapse("syn99");
+		
+		pageTop.onChangeSynapsePlace(new ChangeSynapsePlaceEvent(newPlace));
+
+		verify(mockPlaceChanger).goTo(newPlace);
+	}
+	
+	@Test
+	public void testOnChangeSynapsePlaceSameEntityId(){
+		Synapse.EntityArea area = null;
+		String areaToken = null;
+		Long versionNumber = null;
+		when(mockEntityBundle.getEntity()).thenReturn(mockProjectEntity);
+		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
+		Synapse newPlace = new Synapse(projectEntityId, null, EntityArea.DISCUSSION, null);
+		
+		pageTop.onChangeSynapsePlace(new ChangeSynapsePlaceEvent(newPlace));
+
+		verify(mockPlaceChanger, never()).goTo(newPlace);
+		//reconfigures tools menu with the correct area
+		verify(mockEntityActionController).configure(eq(mockActionMenuWidget), eq(mockProjectBundle), eq(true), eq(areaToken), eq(EntityArea.DISCUSSION), any(EntityUpdatedHandler.class));
+		//configured the discussion tab
+		verify(mockDiscussionTab).configure(projectEntityId, projectName, areaToken, canModerate, mockActionMenuWidget);
 	}
 }
