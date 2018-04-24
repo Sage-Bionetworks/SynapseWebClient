@@ -35,8 +35,7 @@ public class WikiSubpagesWidget implements IsWidget {
 	private WikiPageKey wikiKey; 
 	private String ownerObjectName;
 	private Place ownerObjectLink;
-	private FlowPanel wikiSubpagesContainer;
-	private FlowPanel wikiPageContainer;
+
 	private boolean canEdit;
 	private ActionMenuWidget actionMenu;
 	
@@ -66,6 +65,7 @@ public class WikiSubpagesWidget implements IsWidget {
 		this.isEmbeddedInOwnerPage = embeddedInOwnerPage;
 		this.actionMenu = actionMenu;
 		view.clear();
+		view.hideSubpages();
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
@@ -87,11 +87,6 @@ public class WikiSubpagesWidget implements IsWidget {
 		}
 	}
 	
-	public void setContainers(FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
-		this.wikiPageContainer = wikiPageContainer;
-		this.wikiSubpagesContainer = wikiSubpagesContainer;
-	}
-	
 	public static Place getLinkPlace(String entityId, Long entityVersion, String wikiId, boolean isEmbeddedInOwnerPage) {
 		if (isEmbeddedInOwnerPage)
 			return new Synapse(entityId, entityVersion, Synapse.EntityArea.WIKI, wikiId);
@@ -109,7 +104,6 @@ public class WikiSubpagesWidget implements IsWidget {
 	
 	public void refreshTableOfContents() {
 		view.clear();
-		
 		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onSuccess(final List<V2WikiHeader> wikiHeaders) {
@@ -119,14 +113,14 @@ public class WikiSubpagesWidget implements IsWidget {
 					public void onSuccess(V2WikiOrderHint result) {
 						// "Sort" stuff'
 						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, result);
-						view.configure(wikiHeaders, wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
+						view.configure(wikiHeaders, ownerObjectName,
 										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
 						view.setEditOrderButtonVisible(canEdit);
 					}
 					@Override
 					public void onFailure(Throwable caught) {
 						// Failed to get order hint. Just ignore it.
-						view.configure(wikiHeaders, wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
+						view.configure(wikiHeaders, ownerObjectName,
 								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
 						view.setEditOrderButtonVisible(canEdit);
 					}

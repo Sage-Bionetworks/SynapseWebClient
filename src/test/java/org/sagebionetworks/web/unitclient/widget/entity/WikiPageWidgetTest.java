@@ -52,6 +52,7 @@ import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -91,6 +92,8 @@ public class WikiPageWidgetTest {
 	ActionMenuWidget mockActionMenuWidget;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	EventBus mockEventBus;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
 	WikiPageWidget presenter;
@@ -102,7 +105,7 @@ public class WikiPageWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		presenter = new WikiPageWidget(mockView, mockSynapseClient, mockStuAlert, mockHistoryWidget, mockMarkdownWidget,
 				mockSubpages, mockInjector, mockSessionStorage, mockAuthController, adapterFactory, mockDateTimeUtils,
-				mockSynapseJavascriptClient, mockCookies);
+				mockSynapseJavascriptClient, mockCookies, mockEventBus);
 		testPage = new WikiPage();
 		testPage.setId(WIKI_PAGE_ID);
 		testPage.setMarkdown("my test markdown");
@@ -143,7 +146,6 @@ public class WikiPageWidgetTest {
 		
 		presenter.showSubpages(mockActionMenuWidget);
 		verify(mockView).setWikiSubpagesWidget(mockSubpages);
-		verify(mockView).setWikiSubpagesContainers(any(WikiSubpagesWidget.class));
 		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), any(CallbackP.class), any(ActionMenuWidget.class));
 		
 		verify(mockHistoryWidget, never()).configure(any(WikiPageKey.class), anyBoolean(), any(ActionHandler.class));

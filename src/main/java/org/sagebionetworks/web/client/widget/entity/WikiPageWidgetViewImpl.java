@@ -17,9 +17,11 @@ import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.entity.EntityPageTopViewImpl.EBinder;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -30,6 +32,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 /**
  * Lightweight widget used to show a wiki page (has a markdown widget and pagebrowser)
@@ -38,6 +41,10 @@ import com.google.inject.Inject;
  *
  */
 public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetView {
+	private static final String WELL="well";
+	private static final String COL_MD_3="col-md-3";
+	private static final String COL_MD_9="col-md-9";
+	private static final String COL_XS_12="col-xs-12";
 
 	public interface Binder extends UiBinder<Widget, WikiPageWidgetViewImpl> {}
 	
@@ -228,8 +235,24 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	 */
 	
 	@Override
-	public void setWikiSubpagesContainers(WikiSubpagesWidget wikiSubpages) {
-		wikiSubpages.setContainers(wikiSubpagesPanel, wikiPagePanel);
+	public void expandWikiSubpages() {
+		wikiPagePanel.setStyleName("");
+		wikiPagePanel.addStyleName(COL_XS_12);
+		wikiPagePanel.addStyleName(COL_MD_9);
+		
+		wikiSubpagesPanel.setStyleName("");
+		wikiSubpagesPanel.addStyleName(COL_XS_12);
+		wikiSubpagesPanel.addStyleName(WELL);
+		wikiSubpagesPanel.addStyleName(COL_MD_3);
+	}
+	
+	@Override
+	public void collapseWikiSubpages() {
+		wikiPagePanel.setStyleName("");
+		wikiPagePanel.addStyleName(COL_XS_12);
+		
+		wikiSubpagesPanel.setStyleName("");
+		wikiSubpagesPanel.addStyleName(COL_XS_12);
 	}
 	
 	@Override
@@ -313,5 +336,15 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public void setWikiHistoryDiffToolButtonVisible(boolean visible, WikiPageKey key) {
 		this.key = key;
 		wikiCompareButton.setVisible(visible);
+	}
+	
+
+	/** Event binder code **/
+	interface EBinder extends EventBinder<WikiPageWidget> {};
+	private final EBinder eventBinder = GWT.create(EBinder.class);
+	
+	@Override
+	public EventBinder<WikiPageWidget> getEventBinder() {
+		return eventBinder;
 	}
 }

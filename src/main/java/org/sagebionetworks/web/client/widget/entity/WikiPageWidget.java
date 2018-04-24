@@ -18,6 +18,10 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
+import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
+import org.sagebionetworks.web.client.events.WikiSubpagesExpandEvent;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -29,9 +33,11 @@ import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventHandler;
 
 /**
  * Lightweight widget used to show a wiki page (has a markdown widget and pagebrowser)
@@ -83,7 +89,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 			AdapterFactory adapterFactory,
 			DateTimeUtils dateTimeUtils,
 			SynapseJavascriptClient jsClient,
-			CookieProvider cookies
+			CookieProvider cookies,
+			EventBus eventBus
 			) {
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -103,6 +110,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		view.setSynapseAlertWidget(stuAlert.asWidget());
 		view.setWikiHistoryWidget(historyWidget);
 		view.setMarkdownWidget(markdownWidget);
+
+		view.getEventBinder().bindEventHandlers(this, eventBus);
 	}
 	
 	public void clear(){
@@ -110,6 +119,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		view.setLoadingVisible(false);
 		markdownWidget.clear();
 		wikiSubpages.clearState();
+		view.collapseWikiSubpages();
 		view.setWikiHeadingText("");
 	}
 
@@ -252,7 +262,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	public void configureWikiSubpagesWidget(ActionMenuWidget actionMenu) {
 		//check configuration of wikiKey
-		view.setWikiSubpagesContainers(wikiSubpages);
 		wikiSubpages.configure(wikiKey, null, true, new CallbackP<WikiPageKey>() {
 			@Override
 			public void invoke(WikiPageKey param) {
@@ -442,5 +451,15 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	@Override
 	public void showWikiHistory() {
 		configureHistoryWidget(canEdit);
+	}
+	
+	@EventHandler
+	public void onWikiSubpagesCollapseEvent(WikiSubpagesCollapseEvent event) {
+		view.collapseWikiSubpages();
+	}
+	
+	@EventHandler
+	public void onWikiSubpagesExpandEvent(WikiSubpagesExpandEvent event) {
+		view.expandWikiSubpages();
 	}
 }
