@@ -28,7 +28,9 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	void hideSubpages();
 	void showSubpages();
 	void setEditOrderButtonVisible(boolean visible);
-	
+	boolean contains(String wikiPageKey);
+	void setPage(String wikiPageKey);
+
 	// List<String> getCurrentOrderHintIdList();
 	
 	/**

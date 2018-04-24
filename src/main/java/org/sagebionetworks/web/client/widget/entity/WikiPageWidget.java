@@ -18,10 +18,8 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.ChangeSynapsePlaceEvent;
 import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
 import org.sagebionetworks.web.client.events.WikiSubpagesExpandEvent;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -118,7 +116,6 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		view.clear();
 		view.setLoadingVisible(false);
 		markdownWidget.clear();
-		wikiSubpages.clearState();
 		view.collapseWikiSubpages();
 		view.setWikiHeadingText("");
 	}
@@ -262,7 +259,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 	
 	public void configureWikiSubpagesWidget(ActionMenuWidget actionMenu) {
 		//check configuration of wikiKey
-		wikiSubpages.configure(wikiKey, null, true, new CallbackP<WikiPageKey>() {
+		wikiSubpages.configure(wikiKey, true, new CallbackP<WikiPageKey>() {
 			@Override
 			public void invoke(WikiPageKey param) {
 				view.setLoadingVisible(true);

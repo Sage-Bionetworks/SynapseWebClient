@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -63,7 +64,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		//this widget shows nothing if it doesn't have any pages!
 		if (wikiHeaders.size() <=1 )
 			return;
-		
+
 		//only show the tree if the root has children
 		navTree.configure(wikiHeaders, ownerObjectName, ownerObjectLink, curWikiKey, isEmbeddedInOwnerPage, wikiPageCallback);
 		
@@ -193,5 +194,15 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		if (editOrderButton != null) {
 			editOrderButton.setVisible(visible);
 		}
+	}
+	
+	@Override
+	public boolean contains(String wikiPageKey) {
+		return navTree.contains(wikiPageKey);
+	}
+	
+	@Override
+	public void setPage(String wikiPageKey) {
+		navTree.setPage(wikiPageKey);
 	}
 }

@@ -146,7 +146,7 @@ public class WikiPageWidgetTest {
 		
 		presenter.showSubpages(mockActionMenuWidget);
 		verify(mockView).setWikiSubpagesWidget(mockSubpages);
-		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), any(CallbackP.class), any(ActionMenuWidget.class));
+		verify(mockSubpages).configure(any(WikiPageKey.class), anyBoolean(), any(CallbackP.class), any(ActionMenuWidget.class));
 		
 		verify(mockHistoryWidget, never()).configure(any(WikiPageKey.class), anyBoolean(), any(ActionHandler.class));
 		presenter.showWikiHistory();
@@ -240,7 +240,7 @@ public class WikiPageWidgetTest {
 		
 		presenter.configure(new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null), canEdit, null);
 		presenter.showSubpages(mockActionMenuWidget);
-		verify(mockSubpages).configure(any(WikiPageKey.class), any(Callback.class), anyBoolean(), callbackPCaptor.capture(), any(ActionMenuWidget.class));
+		verify(mockSubpages).configure(any(WikiPageKey.class), anyBoolean(), callbackPCaptor.capture(), any(ActionMenuWidget.class));
 		// invoke subpage clicked
 		callbackPCaptor.getValue().invoke(wikiPageKey);
 		verify(mockSynapseJavascriptClient, times(2)).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
