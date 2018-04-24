@@ -55,6 +55,7 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 /**
  * Unit test for the preview widget.
@@ -94,6 +95,8 @@ public class WikiPageWidgetTest {
 	CookieProvider mockCookies;
 	@Mock
 	EventBus mockEventBus;
+	@Mock
+	EventBinder<WikiPageWidget> mockEventBinder;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
 	WikiPageWidget presenter;
@@ -103,6 +106,7 @@ public class WikiPageWidgetTest {
 	@Before
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
+		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
 		presenter = new WikiPageWidget(mockView, mockSynapseClient, mockStuAlert, mockHistoryWidget, mockMarkdownWidget,
 				mockSubpages, mockInjector, mockSessionStorage, mockAuthController, adapterFactory, mockDateTimeUtils,
 				mockSynapseJavascriptClient, mockCookies, mockEventBus);
@@ -224,7 +228,7 @@ public class WikiPageWidgetTest {
 		verify(mockView).clear();
 		verify(mockView).setLoadingVisible(false);
 		verify(mockMarkdownWidget).clear();
-		verify(mockSubpages).clearState();
+		verify(mockView).setWikiSubpagesWidgetVisible(false);
 		verify(mockView).setWikiHeadingText("");
 	}
 
