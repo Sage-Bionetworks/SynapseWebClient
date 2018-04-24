@@ -1,16 +1,21 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -20,6 +25,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -35,21 +41,21 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.COLUMN_SORT_TYPE;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableConfig;
+import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererNone;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererSynapseID;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableInitializedColumnRenderer;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableWidgetView;
 import org.sagebionetworks.web.client.widget.entity.renderer.CancelControlWidget;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.client.widget.team.UserTeamBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -64,15 +70,14 @@ public class APITableWidgetTest {
 	private static final String TESTSERVICE_PATH = "/testservice";
 	APITableWidget widget;
 	APITableWidgetView mockView;
-	SynapseClientAsync mockSynapseClient;
-	JSONObjectAdapter mockJSONObjectAdapter;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	PortalGinInjector mockGinInjector;
 	APITableColumnRendererSynapseID synapseIDColumnRenderer;
 	APITableColumnRendererNone noneColumnRenderer;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
 	
-	String testJSON = "{totalNumberOfResults=10,results={}}";
 	Map<String, String> descriptor;
 	JSONObjectAdapter testReturnJSONObject;
 	WikiPageKey testWikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
@@ -84,7 +89,7 @@ public class APITableWidgetTest {
 	@Mock
 	CancelControlWidget mockCancelControlWidget;
 	@Mock
-	UserBadge mockUserBadge;
+	UserTeamBadge mockUserTeamBadge;
 	@Mock
 	ElementWrapper cancelControlDiv;
 	@Mock
@@ -93,19 +98,20 @@ public class APITableWidgetTest {
 	ElementWrapper userBadgeDiv2;
 	@Mock
 	GWTWrapper mockGWT;
+	@Captor
+	ArgumentCaptor<String> stringCaptor;
+	
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(APITableWidgetView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockJSONObjectAdapter = mock(JSONObjectAdapter.class);
 		mockGinInjector = mock(PortalGinInjector.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		noneColumnRenderer = new APITableColumnRendererNone();
 		synapseIDColumnRenderer = new APITableColumnRendererSynapseID();
 		when(mockGinInjector.getCancelControlWidget()).thenReturn(mockCancelControlWidget);
-		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
+		when(mockGinInjector.getUserTeamBadgeWidget()).thenReturn(mockUserTeamBadge);
 		
 		testReturnJSONObject = new JSONObjectAdapterImpl();
 		testReturnJSONObject.put("totalNumberOfResults", 100);
@@ -118,13 +124,12 @@ public class APITableWidgetTest {
 		results.put(0, result2);
 		results.put(0, result1);
 		testReturnJSONObject.put("results", results);
-		when(mockJSONObjectAdapter.createNew(anyString())).thenReturn(testReturnJSONObject);
 		
 		when(mockGinInjector.getAPITableColumnRendererNone()).thenReturn(noneColumnRenderer);
 		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(synapseIDColumnRenderer);
 		
-		AsyncMockStubber.callSuccessWith(testJSON).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
-		widget = new APITableWidget(mockView, mockSynapseClient, mockJSONObjectAdapter, mockGinInjector, mockGlobalApplicationState, mockAuthenticationController, mockSynAlert, mockGWT);
+		AsyncMockStubber.callSuccessWith(testReturnJSONObject).when(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
+		widget = new APITableWidget(mockView, mockSynapseJavascriptClient, mockGinInjector, mockGlobalApplicationState, mockAuthenticationController, mockSynAlert, mockGWT);
 		descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, TESTSERVICE_PATH);
 		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PAGING_KEY, "true");
@@ -150,10 +155,50 @@ public class APITableWidgetTest {
 	@Test
 	public void testConfigure() {
 		widget.configure(testWikiKey, descriptor, null, null);
-		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
 		verify(mockView).clear();
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
+	}
+	
+	@Test
+	public void testConfigureWithTableConfigValidColumnName() {
+		List<APITableColumnConfig> columnConfigs = new ArrayList<>();
+		APITableColumnConfig columnConfig = new APITableColumnConfig();
+		String columnName = "valid_column_name";
+		columnConfig.setInputColumnNames(Collections.singleton(columnName));
+		columnConfig.setSort(COLUMN_SORT_TYPE.NONE);
+		columnConfigs.add(columnConfig);
+		APITableConfigEditor.updateDescriptorWithColumnConfigs(descriptor, columnConfigs);
+		String uri = ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX + "select+*+from+evaluation_1";
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, uri);
+		
+		widget.configure(testWikiKey, descriptor, null, null);
+		
+		//verify selects column name only
+		verify(mockSynapseJavascriptClient).getJSON(stringCaptor.capture(), any(AsyncCallback.class));
+		String actualUri = stringCaptor.getValue();
+		assertTrue(actualUri.contains(columnName));
+		assertFalse(actualUri.contains("*"));
+	}
+	
+	@Test
+	public void testConfigureWithTableConfigInvalidColumnName() {
+		List<APITableColumnConfig> columnConfigs = new ArrayList<>();
+		APITableColumnConfig columnConfig = new APITableColumnConfig();
+		columnConfig.setInputColumnNames(Collections.singleton("invalid-name"));
+		columnConfig.setSort(COLUMN_SORT_TYPE.NONE);
+		columnConfigs.add(columnConfig);
+		APITableConfigEditor.updateDescriptorWithColumnConfigs(descriptor, columnConfigs);
+		String uri = ClientProperties.EVALUATION_QUERY_SERVICE_PREFIX + "select+*+from+evaluation_1";
+		descriptor.put(WidgetConstants.API_TABLE_WIDGET_PATH_KEY, uri);
+		
+		widget.configure(testWikiKey, descriptor, null, null);
+		
+		//verify selects *
+		verify(mockSynapseJavascriptClient).getJSON(stringCaptor.capture(), any(AsyncCallback.class));
+		String actualUri = stringCaptor.getValue();
+		assertTrue(actualUri.contains(uri));
 	}
 	
 	@Test
@@ -186,9 +231,19 @@ public class APITableWidgetTest {
 		when(mockGinInjector.getAPITableColumnRendererSynapseID()).thenReturn(failColumnRenderer);
 		widget.configure(testWikiKey, descriptor, null, null);
 		
-		verify(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
 		verify(mockView).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 		verify(mockView).configurePager(anyInt(), anyInt(), anyInt());
+	}
+	
+	@Test
+	public void testEmptyResultsEmptyColumnConfiguration() throws JSONObjectAdapterException {
+		//SWC-4022: if no results, and no column configuration, then show nothing (unknown table structure).
+		testReturnJSONObject.put("results", new JSONArrayAdapterImpl());
+		
+		widget.configure(testWikiKey, descriptor, null, null);
+		
+		verify(mockView, never()).configure(any(Map.class), any(String[].class), any(APITableInitializedColumnRenderer[].class), any(APITableConfig.class));
 	}
 	
 	//test removing uri causes error to be shown
@@ -205,7 +260,7 @@ public class APITableWidgetTest {
 	public void testServiceCallFailure() throws JSONObjectAdapterException {
 		String errorMessage = "service response error message";
 		Exception ex = new Exception(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
 		widget.configure(testWikiKey, descriptor, null, null);
 		verify(mockSynAlert).handleException(ex);
 		verify(mockView).showError(any(Widget.class));
@@ -213,7 +268,7 @@ public class APITableWidgetTest {
 	
 	@Test
 	public void testTableUnavailableFailure() throws JSONObjectAdapterException {
-		AsyncMockStubber.callFailureWith(new TableUnavilableException()).when(mockSynapseClient).getJSONEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new TableUnavilableException()).when(mockSynapseJavascriptClient).getJSON(anyString(), any(AsyncCallback.class));
 		widget.configure(testWikiKey, descriptor, null, null);
 		verify(mockView).showTableUnavailable();
 	}
@@ -273,7 +328,7 @@ public class APITableWidgetTest {
 		widget.configure(testWikiKey, descriptor, null, null);
 		
 		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
-		verify(mockSynapseClient).getJSONEntity(arg.capture(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getJSON(arg.capture(), any(AsyncCallback.class));
 		
 		assertTrue(arg.getValue().endsWith(testUserId));
 	}
@@ -290,7 +345,7 @@ public class APITableWidgetTest {
 		widget.configure(testWikiKey, descriptor, null, null);
 		
 		ArgumentCaptor<String> arg = ArgumentCaptor.forClass(String.class);
-		verify(mockSynapseClient).getJSONEntity(arg.capture(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getJSON(arg.capture(), any(AsyncCallback.class));
 		
 		assertTrue(arg.getValue().endsWith(testUserId));
 	}
@@ -349,7 +404,9 @@ public class APITableWidgetTest {
 	
 	@Test
 	public void testCreateRenderersNull() throws JSONObjectAdapterException {
-		String[] columnNames = widget.getColumnNamesArray(getTestColumnNameSet());
+		Set<String> testSet = getTestColumnNameSet();
+		Map<String, List<String>> dataMap = widget.createColumnDataMap(testSet.iterator());
+		String[] columnNames = widget.getColumnNamesArray(dataMap);
 		APITableConfig newConfig = new APITableConfig(descriptor);
 		newConfig.setColumnConfigs(null);
 		widget.createRenderers(columnNames, newConfig, mockGinInjector);
@@ -359,7 +416,9 @@ public class APITableWidgetTest {
 
 	@Test
 	public void testCreateRenderersEmpty() throws JSONObjectAdapterException {
-		String[] columnNames = widget.getColumnNamesArray(getTestColumnNameSet());
+		Set<String> testSet = getTestColumnNameSet();
+		Map<String, List<String>> dataMap = widget.createColumnDataMap(testSet.iterator());
+		String[] columnNames = widget.getColumnNamesArray(dataMap);
 		APITableConfig newConfig = new APITableConfig(descriptor);
 		newConfig.setColumnConfigs(new ArrayList());
 		widget.createRenderers(columnNames, newConfig, mockGinInjector);
@@ -588,13 +647,19 @@ public class APITableWidgetTest {
 		
 		widget.injectWidgets();
 		verify(mockGinInjector, times(cancelRequestDivs.size())).getCancelControlWidget();
-		verify(mockGinInjector, times(userBadgeDivs.size())).getUserBadgeWidget();
+		verify(mockGinInjector, times(userBadgeDivs.size())).getUserTeamBadgeWidget();
 		
 		verify(cancelControlDiv).removeAllChildren();
 		verify(userBadgeDiv1).removeAllChildren();
 		verify(userBadgeDiv2).removeAllChildren();
 		
 		verify(mockCancelControlWidget, times(cancelRequestDivs.size())).configure(anyString());
-		verify(mockUserBadge, times(userBadgeDivs.size())).configure(anyString());
+		verify(mockUserTeamBadge, times(userBadgeDivs.size())).configure(anyString());
+	}
+	
+	@Test
+	public void testGetSelectColumns() {
+		String selectColumns = widget.getSelectColumns(getTableConfig().getColumnConfigs());
+		assertEquals(col1Name+","+col2Name, selectColumns);
 	}
 }

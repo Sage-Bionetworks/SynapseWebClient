@@ -29,6 +29,7 @@ import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesView;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetColumnResultValuesWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -54,7 +55,8 @@ public class FacetColumnResultValuesWidgetTest {
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
-	UserBadge mockUserBadge;
+	UserIdCellRendererImpl mockUserBadge;
+	
 	@Mock
 	EntityIdCellRendererImpl mockEntityIdCellRenderer;
 	public static final String VALUE = "column value";
@@ -84,7 +86,7 @@ public class FacetColumnResultValuesWidgetTest {
 		when(valueCount.getValue()).thenReturn(VALUE);
 		when(valueCount.getCount()).thenReturn(DEFAULT_COUNT);
 		when(valueCount.getIsSelected()).thenReturn(DEFAULT_SELECTED);
-		when(mockPortalGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
+		when(mockPortalGinInjector.getUserIdCellRenderer()).thenReturn(mockUserBadge);
 		when(mockPortalGinInjector.getEntityIdCellRenderer()).thenReturn(mockEntityIdCellRenderer);
 	}
 
@@ -126,8 +128,8 @@ public class FacetColumnResultValuesWidgetTest {
 		facetValues.add(valueCount);
 		widget.configure(mockFacet, ColumnType.USERID, mockOnFacetRequest);
 		verify(mockView).setColumnName(COLUMN_NAME);
-		verify(mockPortalGinInjector).getUserBadgeWidget();
-		verify(mockUserBadge).configure(VALUE);
+		verify(mockPortalGinInjector).getUserIdCellRenderer();
+		verify(mockUserBadge).setValue(eq(VALUE), any(ClickHandler.class));
 		verify(mockView).addValue(eq(DEFAULT_SELECTED), any(Widget.class), eq(DEFAULT_COUNT), eq(VALUE));
 		verify(mockView).setShowAllButtonVisible(false);
 	}
@@ -139,7 +141,7 @@ public class FacetColumnResultValuesWidgetTest {
 		widget.configure(mockFacet, ColumnType.ENTITYID, mockOnFacetRequest);
 		verify(mockView).setColumnName(COLUMN_NAME);
 		verify(mockPortalGinInjector).getEntityIdCellRenderer();
-		verify(mockEntityIdCellRenderer).setValue(eq(VALUE), any(ClickHandler.class));
+		verify(mockEntityIdCellRenderer).setValue(eq(VALUE), any(ClickHandler.class), eq(true));
 		verify(mockView).addValue(eq(DEFAULT_SELECTED), any(Widget.class), eq(DEFAULT_COUNT), eq(VALUE));
 		verify(mockView).setShowAllButtonVisible(false);
 	}
@@ -157,6 +159,21 @@ public class FacetColumnResultValuesWidgetTest {
 		verify(mockView, times(numberOfFacets - FacetColumnResultValuesWidget.MAX_VISIBLE_FACET_VALUES)).addValueToOverflow(anyBoolean(), any(Widget.class), anyLong(), anyString());
 		verify(mockView).setShowAllButtonText(FacetColumnResultValuesWidget.SHOW_ALL + numberOfFacets);
 		verify(mockView).setShowAllButtonVisible(true);
+	}
+	
+	@Test
+	public void testSelectedFacetInOverflow() {
+		int numberOfFacets = FacetColumnResultValuesWidget.MAX_VISIBLE_FACET_VALUES + 20;
+		for (int i = 0; i < numberOfFacets; i++) {
+			FacetColumnResultValueCount valuesCount = Mockito.mock(FacetColumnResultValueCount.class);
+			//the FacetColumnResultValuesWidget.MAX_VISIBLE_FACET_VALUES facet is selected (boundary case)
+			when(valuesCount.getIsSelected()).thenReturn(i==FacetColumnResultValuesWidget.MAX_VISIBLE_FACET_VALUES);
+			facetValues.add(valuesCount);
+		}
+		widget.configure(mockFacet, ColumnType.INTEGER, mockOnFacetRequest);
+		verify(mockView).setColumnName(COLUMN_NAME);
+		verify(mockView, times(numberOfFacets)).addValue(anyBoolean(), any(Widget.class), anyLong(), anyString());
+		verify(mockView).setShowAllButtonVisible(false);
 	}
 	
 	@Test

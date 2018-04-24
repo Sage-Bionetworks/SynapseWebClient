@@ -1,18 +1,15 @@
 package org.sagebionetworks.web.client.widget.docker;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -21,34 +18,19 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	@UiField
 	ListGroup dockerList;
 	@UiField
-	Button addExternalRepo;
-	@UiField
-	SimplePanel addExternalRepoModalPanel;
-	@UiField
 	SimplePanel synAlertContainer;
 	@UiField
 	Div membersContainer;
+	@UiField
+	LoadingSpinner loadingUI;
 
+	CallbackP<String> entityClickedHandler;
 	Widget widget;
-	Presenter presenter;
-
 	public interface Binder extends UiBinder<Widget, DockerRepoListWidgetViewImpl> {}
 
 	@Inject
 	public DockerRepoListWidgetViewImpl(Binder binder) {
 		this.widget = binder.createAndBindUi(this);
-		addExternalRepo.addClickHandler(new ClickHandler() {
-
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onClickAddExternalRepo();
-			}
-		});
-	}
-
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
 	}
 
 	@Override
@@ -57,28 +39,13 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	}
 
 	@Override
-	public void addRepo(final EntityBundle bundle) {
-		dockerList.add(new DockerRepoListGroupItem(HeadingSize.H4, (DockerRepository) bundle.getEntity(), new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRepoClicked(bundle);
-			}
-		}));
+	public void addRepo(DockerRepository entity) {
+		dockerList.add(new DockerRepoListGroupItem(HeadingSize.H4, entity, entityClickedHandler));
 	}
 
 	@Override
 	public void clear() {
 		dockerList.clear();
-	}
-
-	@Override
-	public void setAddExternalRepoButtonVisible(boolean visibile) {
-		addExternalRepo.setVisible(visibile);
-	}
-
-	@Override
-	public void addExternalRepoModal(IsWidget addExternalRepoModel) {
-		this.addExternalRepoModalPanel.add(addExternalRepoModel);
 	}
 
 	@Override
@@ -95,5 +62,13 @@ public class DockerRepoListWidgetViewImpl implements DockerRepoListWidgetView {
 	public void setMembersContainer(LoadMoreWidgetContainer membersContainerW) {
 		membersContainer.clear();
 		membersContainer.add(membersContainerW.asWidget());
+	}
+	@Override
+	public void setEntityClickedHandler(CallbackP<String> entityClickedHandler) {
+		this.entityClickedHandler = entityClickedHandler;
+	}
+	@Override
+	public void setLoadingVisible(boolean visible) {
+		loadingUI.setVisible(visible);
 	}
 }

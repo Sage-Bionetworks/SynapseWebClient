@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import static org.sagebionetworks.repo.model.EntityType.*;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -10,28 +11,29 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 
 public enum EntityFilter {
-	ALL(EntityType.project, EntityType.folder, EntityType.file, EntityType.link),
-	CONTAINER(EntityType.project, EntityType.folder),
-	PROJECT(EntityType.project),
-	FOLDER(EntityType.folder),
-	FILE(EntityType.file),
-	ALL_BUT_LINK(EntityType.project, EntityType.folder, EntityType.file);
+	ALL(project, folder, file, link),
+	CONTAINER(project, folder),
+	PROJECT(project),
+	FOLDER(folder),
+	FILE(file),
+	ALL_BUT_LINK(project, folder, file),
+	PROJECT_OR_TABLE(project, table, entityview);
 	
 	// when browsing (in the entity tree browser), only these types should be shown.
-	private String[] entityQueryValues;
 	private Set<String> entityTypeClassNamesSet;
+	private List<EntityType> entityTypes;
 	
 	private EntityFilter(EntityType... values) {
-		entityQueryValues = new String[values.length];
-		entityTypeClassNamesSet = new HashSet<String>(entityQueryValues.length);
+		entityTypes = new ArrayList<EntityType>();
+		entityTypeClassNamesSet = new HashSet<String>(values.length);
 		for (int i = 0; i < values.length; i++) {
-			entityQueryValues[i] = values[i].name();
-			entityTypeClassNamesSet.add(EntityTypeUtils.getEntityClassNameForEntityType(entityQueryValues[i]));
+			entityTypes.add(values[i]);
+			entityTypeClassNamesSet.add(EntityTypeUtils.getEntityClassNameForEntityType(values[i].name()));
 		}
 	}
 	
-	public String[] getEntityQueryValues() {
-		return entityQueryValues;
+	public List<EntityType> getEntityQueryValues() {
+		return entityTypes;
 	}
 	
 	public List<EntityHeader> filterForBrowsing(List<EntityHeader> headers) {

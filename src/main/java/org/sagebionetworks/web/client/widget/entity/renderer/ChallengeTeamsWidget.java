@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,8 +12,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialog;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
+import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
 import org.sagebionetworks.web.shared.ChallengeTeamBundle;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -29,7 +31,7 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 	private ChallengeClientAsync challengeClient;
 	private String challengeId;
 	private Callback widgetRefreshRequired;
-	private DetailedPaginationWidget paginationWidget;
+	private BasicPaginationWidget paginationWidget;
 	public static final Long DEFAULT_TEAM_LIMIT = 50L;
 	public static final Long DEFAULT_OFFSET = 0L;
 	private AuthenticationController authController;
@@ -38,13 +40,14 @@ public class ChallengeTeamsWidget implements ChallengeTeamsView.Presenter, Widge
 	@Inject
 	public ChallengeTeamsWidget(ChallengeTeamsView view, 
 			EditRegisteredTeamDialog dialog, 
-			DetailedPaginationWidget paginationWidget, 
+			BasicPaginationWidget paginationWidget, 
 			ChallengeClientAsync challengeClient,
 			AuthenticationController authController) {
 		this.view = view;
 		this.dialog = dialog;
 		this.paginationWidget = paginationWidget;
 		this.challengeClient = challengeClient;
+		fixServiceEntryPoint(challengeClient);
 		this.authController = authController;
 		view.setPaginationWidget(paginationWidget.asWidget());
 		view.setEditRegisteredTeamDialog(dialog.asWidget());

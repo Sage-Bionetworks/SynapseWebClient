@@ -4,8 +4,6 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
-		<g:SimplePanel ui:field="header" />
-		
 		<bh:Div addStyleNames="margin-top-30 margin-left-35 min-height-400 margin-right-10">
 			<b:Row>
 				<b:Column size="XS_12">
@@ -23,7 +21,5 @@
 				</b:Column>
 			</b:Row>
 		</bh:Div>
-		<bh:Div addStyleNames="clear" />
-		<g:SimplePanel ui:field="footer" />
 	</bh:Div>
 </ui:UiBinder> 

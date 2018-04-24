@@ -24,12 +24,14 @@ import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
+import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -61,8 +63,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	private static final int HIT_DESCRIPTION_LENGTH_CHAR = 270;
 	private static final int FACET_NAME_LENGTH_CHAR = 21;
-	private static final int MAX_PAGES_IN_PAGINATION = 10;
-	private static final int MAX_RESULTS_PER_PAGE = 10;
 	private static final int MINUTE_IN_SEC = 60;
 	private static final int HOUR_IN_SEC = MINUTE_IN_SEC * 60;
 	private static final int DAY_IN_SEC = HOUR_IN_SEC * 24;
@@ -74,16 +74,12 @@ public class SearchViewImpl extends Composite implements SearchView {
 	static {
 		facetToDisplay = new HashMap<String, String>();
 		facetToDisplay.put("node_type", "Type");
+		facetToDisplay.put("modified_by", "Last Modified By");
 	}
 	
 	public interface SearchViewImplUiBinder extends
 			UiBinder<Widget, SearchViewImpl> {
 	}
-
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
 	@UiField
 	SimplePanel resultsPanel;
 	@UiField
@@ -103,22 +99,25 @@ public class SearchViewImpl extends Composite implements SearchView {
 	Button searchButton;
 	private List<Button> facetButtons;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private Footer footerWidget;
 	private PortalGinInjector ginInjector;
-	
+	DateTimeUtils dateTimeUtils;
+	private MarkdownIt markdownIt;
+	public static final String BUTTON_HEIGHT = "38px";
 	@Inject
-	public SearchViewImpl(SearchViewImplUiBinder binder, Header headerWidget,
-			Footer footerWidget,
-			SynapseJSNIUtils synapseJSNIUtils, PortalGinInjector ginInjector) {
+	public SearchViewImpl(SearchViewImplUiBinder binder, 
+			Header headerWidget,
+			SynapseJSNIUtils synapseJSNIUtils, 
+			PortalGinInjector ginInjector,
+			DateTimeUtils dateTimeUtils,
+			MarkdownIt markdownIt) {
 		initWidget(binder.createAndBindUi(this));
 		
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.ginInjector = ginInjector;
+		this.dateTimeUtils = dateTimeUtils;
+		this.markdownIt = markdownIt;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		searchButton.addClickHandler(new ClickHandler() {				
 			@Override
 			public void onClick(ClickEvent event) {					
@@ -138,11 +137,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		headerWidget.setSearchVisible(false);		
 		Window.scrollTo(0, 0); // scroll user to top of page
@@ -185,6 +180,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 			searchResultsPanel = new HTMLPanel(new SafeHtmlBuilder().appendHtmlConstant("<h4>" + DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART1)
 			.appendEscaped(searchTerm)
 			.appendHtmlConstant(DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART2 + "</h4>").toSafeHtml());
+			facetPanel.clear();
 		} else { 
 			searchResultsPanel = new SimplePanel();
 		}
@@ -199,8 +195,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		HTML totalFound = new HTML(searchResults.getFound() + " results found");
 		totalFound.setStyleName("small-italic margin-10");
 		currentFacets.add(totalFound);
-
-		currentFacets.setWidth("513px");
+		
 		for(final KeyValue facet : presenter.getAppliedFacets()) {
 			// Don't display the !link node_type facet
 			if("link".equals(facet.getValue()) && "node_type".equals(facet.getKey()))
@@ -220,7 +215,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 						presenter.removeFacet(facet.getKey(), facet.getValue());						
 					}
 				});
-				btn.addStyleName("margin-right-2");
+				btn.setHeight(BUTTON_HEIGHT);
+				btn.addStyleName("margin-right-5 margin-top-5");
 				btn.setPull(Pull.LEFT);
 				currentFacets.add(btn);
 				facetButtons.add(0, btn);				
@@ -239,7 +235,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 					String formattedDateString;
 					try{
 						long valueInMiliseconds = Long.parseLong(valueAsString) * 1000;
-						formattedDateString = valueInMiliseconds == 0 ? "any time": DisplayUtils.converDateaToSimpleString(new Date(valueInMiliseconds));
+						formattedDateString = valueInMiliseconds == 0 ? "any time": dateTimeUtils.convertDateToSimpleString(new Date(valueInMiliseconds));
 					}catch (NumberFormatException e){
 						formattedDateString = valueAsString;
 					}
@@ -249,18 +245,29 @@ public class SearchViewImpl extends Composite implements SearchView {
 			}
 			facetNames.append(text);
 			facetNames.append(" ");
-			Button btn = new Button(text, IconType.TIMES, new ClickHandler() {				
-				@Override
-				public void onClick(ClickEvent event) {
-					// disable all buttons to allow only one click
-					for(Button btn : facetButtons) {
-						btn.setEnabled(false);
-					}
-					Window.scrollTo(0, 0);
-					presenter.removeFacet(facet.getKey(), facet.getValue());						
+			Button btn = new Button("", IconType.TIMES, event -> {				
+				// disable all buttons to allow only one click
+				for(Button facetButton : facetButtons) {
+					facetButton.setEnabled(false);
 				}
+				Window.scrollTo(0, 0);
+				presenter.removeFacet(facet.getKey(), facet.getValue());						
 			});
-			btn.addStyleName("margin-right-2");
+			if ("created_by".equalsIgnoreCase(facet.getKey()) || "modified_by".equalsIgnoreCase(facet.getKey())) {
+				String buttonText = "created_by".equalsIgnoreCase(facet.getKey()) ? "Created by " : "Last modified by ";
+				UserBadge createdByBadge = ginInjector.getUserBadgeWidget();
+				createdByBadge.configure(facet.getValue());
+				createdByBadge.setSize(BadgeSize.SMALLER);
+				createdByBadge.setCustomClickHandler(event -> {
+					btn.click();
+				});
+				btn.add(new Text(buttonText));
+				btn.add(createdByBadge);
+			} else {
+				btn.add(new Text(text));
+			}
+			btn.setHeight(BUTTON_HEIGHT);
+			btn.addStyleName("margin-right-5 margin-top-5");
 			btn.setPull(Pull.LEFT);
 			currentFacets.add(btn);
 			facetButtons.add(btn);
@@ -328,7 +335,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	@Override
 	public void clear() {
-		resultsPanel.clear();
 		narrowResultsPanel.setVisible(false);
 		currentFacetsPanel.setVisible(false);
 	}
@@ -365,17 +371,15 @@ public class SearchViewImpl extends Composite implements SearchView {
 		inlineHtml.addStyleName("hitattribution");
 		attributionPanel.add(inlineHtml);
 		Widget createdByBadgeWidget = createdByBadge.asWidget();
-		createdByBadgeWidget.addStyleName("movedown-7");
 		attributionPanel.add(createdByBadgeWidget);
 		
-		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getCreated_on()*1000)) + ", Updated by ");
+		inlineHtml = new InlineHTML(" on " + dateTimeUtils.convertDateToSimpleString(new Date(hit.getCreated_on()*1000)) + ", Updated by ");
 		inlineHtml.addStyleName("hitattribution");
 		
 		attributionPanel.add(inlineHtml);
 		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
-		modifiedByBadgeWidget.addStyleName("movedown-7");
 		attributionPanel.add(modifiedByBadgeWidget);
-		inlineHtml = new InlineHTML(" on " + DisplayUtils.converDateaToSimpleString(new Date(hit.getModified_on()*1000)));
+		inlineHtml = new InlineHTML(" on " + dateTimeUtils.convertDateToSimpleString(new Date(hit.getModified_on()*1000)));
 		inlineHtml.addStyleName("hitattribution");
 		
 		attributionPanel.add(inlineHtml);
@@ -398,8 +402,10 @@ public class SearchViewImpl extends Composite implements SearchView {
 			resultBuilder.append(getPathHtml(hit.getPath())).appendHtmlConstant("<br/>\n");
 		}
 		if(null != hit.getDescription()) {
+			String description = markdownIt.markdown2Html(hit.getDescription(), "");
+			description = new HTML(description).getText().replace("<Synapse widget>", "").replace("|", "").replace("#", "");
 			resultBuilder.appendHtmlConstant("<span class=\"hitdescription\">")
-			.appendEscaped(DisplayUtils.stubStr(hit.getDescription(), HIT_DESCRIPTION_LENGTH_CHAR))
+			.appendEscaped(DisplayUtils.stubStr(description, HIT_DESCRIPTION_LENGTH_CHAR))
 			.appendHtmlConstant("</span><br>\n");
 		}
 		hitPanel.add(new HTMLPanel(resultBuilder.toSafeHtml()));
@@ -447,7 +453,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 		
 		// determine time diffs
 		long curTimeInSec = System.currentTimeMillis() / 1000;
-		long beginingOfTime = 0;
 		long anHourAgo = curTimeInSec - HOUR_IN_SEC;
 		long aDayAgo = curTimeInSec - DAY_IN_SEC;
 		long aWeekAgo = curTimeInSec - WEEK_IN_SEC;
@@ -455,7 +460,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		long aYearAgo = curTimeInSec - YEAR_IN_SEC;
 		
 		int row = -1;
-		table.setWidget(++row, 0, createTimeFacet(facet, beginingOfTime, "Any Time"));
+		table.setWidget(++row, 0, createRemoveFacet(facet, "Any Time"));
 		//if(anHourAgo <= max)
 			table.setWidget(++row, 0, createTimeFacet(facet, anHourAgo, "Past Hour"));
 		//if(aDayAgo <= max)
@@ -489,6 +494,16 @@ public class SearchViewImpl extends Composite implements SearchView {
 		});
 		return a;
 	}
+	
+	private Anchor createRemoveFacet(final Facet facet, final String title) {
+		Anchor a;
+		a = new Anchor(title);
+		a.addClickHandler( event -> {
+			Window.scrollTo(0, 0);
+			presenter.removeFacetAndRefresh(facet.getName());
+		});
+		return a;
+	}
 
 
 	private FlowPanel createLiteralFacet(final Facet facet) {
@@ -497,6 +512,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 			lc = new FlowPanel();
 			String displayName = facetToDisplay.containsKey(facet.getName()) ? formatFacetName(facetToDisplay.get(facet.getName())) : formatFacetName(facet.getName());
 			//special case.  if this is the created_by facet, then add a UserBadge
+			boolean isModifiedByFacet = "modified_by".equalsIgnoreCase(facet.getName());
 			boolean isCreatedByFacet = "created_by".equalsIgnoreCase(facet.getName());
 			lc.add(new HTML("<h6 style=\"margin-top: 15px;\">" + displayName + "</h6>"));
 			FlowPanel flowPanel = new FlowPanel();
@@ -522,17 +538,16 @@ public class SearchViewImpl extends Composite implements SearchView {
 						presenter.addFacet(facet.getName(), constraint.getValue());				
 					}
 				};
-				if (isCreatedByFacet) {
+				if (isCreatedByFacet || isModifiedByFacet) {
 					stub = "";
 					UserBadge badge = ginInjector.getUserBadgeWidget();
 					badge.configure(getSearchUserId(constraint.getValue()));
 					badge.setCustomClickHandler(clickHandler);
 					Widget widget = badge.asWidget();
-					widget.addStyleName("movedown-7");
 					valueContainer.add(widget);
 				}
 				Anchor a = new Anchor(stub + " (" + constraint.getCount() + ")");
-				if (!stub.equalsIgnoreCase(constraint.getValue()) && !isCreatedByFacet) {
+				if (!stub.equalsIgnoreCase(constraint.getValue()) && !isCreatedByFacet && !isModifiedByFacet) {
 					valueContainer.add(DisplayUtils.addTooltip(a, constraint.getValue(), Placement.RIGHT));
 				} else {
 					valueContainer.add(a);

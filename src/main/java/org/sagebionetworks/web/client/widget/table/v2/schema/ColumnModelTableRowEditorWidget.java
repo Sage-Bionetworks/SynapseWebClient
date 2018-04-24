@@ -18,4 +18,6 @@ public interface ColumnModelTableRowEditorWidget extends RowOfWidgets, ColumnMod
 	public boolean validate();
 	
 	public void setToBeDefaultFileViewColumn();
+	
+	public void setCanHaveDefault(boolean canHaveDefault);
 }

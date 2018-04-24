@@ -27,7 +27,6 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.ListBox;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -42,7 +41,6 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	private PortalGinInjector portalGinInjector;
 	private TextBox searchField;
 	private SimplePanel memberSearchContainer;
-	private SimplePanel synAlertContainer;
 	private SimplePanel loadMoreWidgetContainer;
 	private LoadMoreWidgetContainer loadMoreWidget;
 	private Div membersPanel;
@@ -51,7 +49,6 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			PortalGinInjector portalGinInjector) {
 		this.portalGinInjector = portalGinInjector;
 		memberSearchContainer = new SimplePanel();
-		synAlertContainer = new SimplePanel();
 		membersPanel = new Div();
 		membersPanel.addStyleName("light-border padding-10");
 		Div membersTitle = new Div();
@@ -63,19 +60,12 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		configureSearchBox();
 		add(memberSearchContainer);
 		add(membersPanel);
-		add(synAlertContainer);
 	}
 	@Override
 	public void setMembersContainer(LoadMoreWidgetContainer loadMoreWidget) {
 		this.loadMoreWidget = loadMoreWidget;
 		loadMoreWidgetContainer.clear();
 		loadMoreWidgetContainer.add(loadMoreWidget);
-	}
-	
-	@Override
-	public void setSynAlert(IsWidget widget) {
-		synAlertContainer.clear();
-		synAlertContainer.add(widget);
 	}
 	@Override
 	public void setPresenter(Presenter presenter) {
@@ -86,7 +76,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 		memberSearchContainer.clear();
 		SimplePanel container;
 		Row horizontalTable = new Row();
-		
+		horizontalTable.addStyleName("margin-bottom-5");
 	    searchField = new TextBox();
 	    searchField.setWidth("300px");
 	    searchField.addStyleName("form-control");
@@ -134,7 +124,7 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 			final UserProfile member = teamMember.getUserProfile();
 			UserBadge userBadge = portalGinInjector.getUserBadgeWidget();
 			userBadge.configure(member);
-			userBadge.setSize(BadgeSize.LARGE);
+			userBadge.setSize(BadgeSize.LARGER);
 			Widget userBadgeView = userBadge.asWidget();
 			left.add(userBadgeView);
 			
@@ -199,5 +189,10 @@ public class MemberListWidgetViewImpl extends FlowPanel implements	MemberListWid
 	@Override
 	public void showInfo(String message) {
 		DisplayUtils.showInfo(message, "");
+	}
+	
+	@Override
+	public void showErrorMessage(String message) {
+		DisplayUtils.showErrorMessage(message);
 	}
 }

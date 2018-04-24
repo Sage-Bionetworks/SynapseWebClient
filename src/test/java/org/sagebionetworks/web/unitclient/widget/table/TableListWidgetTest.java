@@ -1,14 +1,14 @@
 package org.sagebionetworks.web.unitclient.widget.table;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,30 +16,23 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldCondition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.entity.query.Operator;
-import org.sagebionetworks.repo.model.entity.query.Sort;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.entity.Direction;
+import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
-import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
+import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.TableListWidget;
 import org.sagebionetworks.web.client.widget.table.TableListWidgetView;
-import org.sagebionetworks.web.client.widget.table.modal.CreateTableModalWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
-import org.sagebionetworks.web.client.widget.table.modal.upload.UploadTableModalWidget;
-import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget.WizardCallback;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -47,12 +40,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 public class TableListWidgetTest {
 
 	private static final String ENTITY_ID = "syn123";
-	private PreflightController mockPreflightController;
 	private TableListWidgetView mockView;
-	private SynapseClientAsync mockSynapseClient;
-	private PaginationWidget mockpaginationWidget;
-	private CreateTableModalWidget mockcreateTableModalWidget;
-	private UploadTableModalWidget mockUploadTableModalWidget;
 	private TableListWidget widget;
 	private EntityBundle parentBundle;
 	private UserEntityPermissions permissions;
@@ -60,6 +48,20 @@ public class TableListWidgetTest {
 	CreateTableViewWizard mockCreateTableViewWizard;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	LoadMoreWidgetContainer mockLoadMoreWidgetContainer;
+	@Mock
+	EntityChildrenResponse mockResults;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	SynapseAlert mockSynAlert;
+	@Mock
+	CallbackP<String> mockTableClickedCallback;
+	
+	List<EntityHeader> searchResults;
+	
+	
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -71,150 +73,57 @@ public class TableListWidgetTest {
 		parentBundle.setEntity(project);
 		parentBundle.setPermissions(permissions);
 		mockView = Mockito.mock(TableListWidgetView.class);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockpaginationWidget = Mockito.mock(PaginationWidget.class);
-		mockcreateTableModalWidget = Mockito.mock(CreateTableModalWidget.class);
-		mockUploadTableModalWidget = Mockito.mock(UploadTableModalWidget.class);
-		mockPreflightController = Mockito.mock(PreflightController.class);
-		widget = new TableListWidget(mockPreflightController, mockView, mockSynapseClient, mockcreateTableModalWidget, mockpaginationWidget, mockUploadTableModalWidget, mockCookies, mockCreateTableViewWizard);
+		widget = new TableListWidget(mockView, mockSynapseJavascriptClient, mockLoadMoreWidgetContainer, mockSynAlert);
+		AsyncMockStubber.callSuccessWith(mockResults).when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
+		searchResults = new ArrayList<EntityHeader>();
+		when(mockResults.getPage()).thenReturn(searchResults);
+		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
 	}
 	
 	@Test
 	public void testCreateQuery(){
 		String parentId = ENTITY_ID;
-		EntityQuery query = widget.createQuery(parentId, EntityFieldName.name.name(), SortDirection.ASC);
-		assertNotNull(query);
-		assertNotNull(query.getConditions());
-		assertEquals(2, (query.getConditions().size()));
-		EntityFieldCondition expectedCondition = EntityQueryUtils.buildCondition(EntityFieldName.parentId, Operator.EQUALS, parentId);
-		assertEquals(expectedCondition, query.getConditions().get(0));
-		EntityFieldCondition expectedTypeCondition = EntityQueryUtils.buildCondition(
-				EntityFieldName.nodeType, Operator.IN, EntityType.table.name(), EntityType.entityview.name());
-		assertEquals(expectedTypeCondition, query.getConditions().get(1));
-		assertNull(query.getFilterByType());
-		assertEquals(TableListWidget.OFFSET_ZERO, query.getOffset());
-		assertEquals(TableListWidget.PAGE_SIZE, query.getLimit());
-		Sort sort = new Sort();
-		sort.setColumnName(EntityFieldName.name.name());
-		sort.setDirection(SortDirection.ASC);
-		assertEquals(sort, query.getSort());
+		EntityChildrenRequest query = widget.createQuery(parentId);
+		assertEquals(parentId, query.getParentId());
+		assertTrue(query.getIncludeTypes().contains(EntityType.entityview));
+		assertTrue(query.getIncludeTypes().contains(EntityType.table));
+		assertEquals(SortBy.CREATED_ON, query.getSortBy());
+		assertEquals(Direction.DESC, query.getSortDirection());
 	}
 	
 	@Test
 	public void testConfigureUnderPageSize(){
-		EntityQueryResults results = new EntityQueryResults();
-		results.setTotalEntityCount(TableListWidget.PAGE_SIZE-1);
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
 		widget.configure(parentBundle);
+		verify(mockView, times(2)).hideLoading();
 		verify(mockView).resetSortUI();
-		verify(mockView).showPaginationVisible(false);
+		verify(mockLoadMoreWidgetContainer).setIsMore(false);
 	}
 	
 	@Test
 	public void testConfigureOverPageSize(){
-		EntityQueryResults results = new EntityQueryResults();
-		results.setTotalEntityCount(TableListWidget.PAGE_SIZE+1);
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		when(mockResults.getNextPageToken()).thenReturn("ismore");
 		widget.configure(parentBundle);
-		verify(mockView).showPaginationVisible(true);
-	}
-	
-	@Test
-	public void testConfigureCanEdit(){
-		EntityQueryResults results = new EntityQueryResults();
-		results.setTotalEntityCount(TableListWidget.PAGE_SIZE+1);
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
-		widget.configure(parentBundle);
-		verify(mockView).setAddTableVisible(true);
-		verify(mockView).setUploadTableVisible(true);
-		verify(mockView).setAddFileViewVisible(true);
-	}
-	
-	@Test
-	public void testConfigureCannotEdit(){
-		parentBundle.getPermissions().setCanEdit(false);
-		EntityQueryResults results = new EntityQueryResults();
-		results.setTotalEntityCount(TableListWidget.PAGE_SIZE+1);
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
-		widget.configure(parentBundle);
-		verify(mockView).setAddTableVisible(false);
-		verify(mockView).setUploadTableVisible(false);
-		verify(mockView).setAddFileViewVisible(false);
+		verify(mockView).resetSortUI();
+		verify(mockLoadMoreWidgetContainer).setIsMore(true);
 	}
 	
 	@Test
 	public void testConfigureFailure(){
 		parentBundle.getPermissions().setCanEdit(false);
 		String error = "an error";
-		AsyncMockStubber.callFailureWith(new Throwable(error)).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class), any(AsyncCallback.class));
+		Throwable th = new Throwable(error);
+		AsyncMockStubber.callFailureWith(th).when(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), any(AsyncCallback.class));
 		widget.configure(parentBundle);
-		verify(mockView).showErrorMessage(error);
+		verify(mockSynAlert).handleException(th);
 	}
 	
 	@Test
-	public void testUploadTableCSVPreflightFailed(){
-		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkCreateEntityAndUpload(any(EntityBundle.class), anyString(), any(Callback.class));
-		widget.configure(parentBundle);
-		widget.onUploadTable();
-		// Failure should not proceed to upload
-		verify(mockUploadTableModalWidget, never()).showModal(any(WizardCallback.class));
-	}
-	
-	@Test
-	public void testUploadTableCSVPreflightPassed(){
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntityAndUpload(any(EntityBundle.class), anyString(), any(Callback.class));
-		widget.configure(parentBundle);
-		widget.onUploadTable();
-		// proceed to upload
-		verify(mockUploadTableModalWidget).showModal(any(WizardCallback.class));
-	}
-	
-	@Test
-	public void testAddTableCSVPreflightFailed(){
-		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
-		widget.configure(parentBundle);
-		widget.onAddTable();
-		// Failure should not proceed to create
-		verify(mockcreateTableModalWidget, never()).showCreateModal();
-	}
-	
-	@Test
-	public void testCreateTableCSVPreflightPassed(){
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
-		widget.configure(parentBundle);
-		widget.onAddTable();
-		// proceed to create
-		verify(mockcreateTableModalWidget).showCreateModal();
-	}
-	
-	@Test
-	public void testCreateTableWizardPreflightPassed(){
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
-		widget.configure(parentBundle);
-		widget.onAddTable();
-		// proceed to create
-		verify(mockCreateTableViewWizard).configure(ENTITY_ID, TableType.table);
-		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
-	}
-
-	
-	@Test
-	public void testAddFileViewPreflightFailed(){
-		AsyncMockStubber.callNoInvovke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
-		widget.configure(parentBundle);
-		widget.onAddFileView();
-		// Failure should not proceed to create
-		verify(mockCreateTableViewWizard, never()).showModal(any(WizardCallback.class));
-	}
-	
-	@Test
-	public void testAddFileViewPreflightPassed(){
-		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
-		widget.configure(parentBundle);
-		widget.onAddFileView();
-		// proceed to create
-		verify(mockCreateTableViewWizard).configure(ENTITY_ID, TableType.view);
-		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
+	public void testOnTableClicked() {
+		widget.setTableClickedCallback(mockTableClickedCallback);
+		widget.onTableClicked(ENTITY_ID);
+		
+		verify(mockView).showLoading();
+		verify(mockView).clearTableWidgets();
+		verify(mockTableClickedCallback).invoke(ENTITY_ID);
 	}
 }

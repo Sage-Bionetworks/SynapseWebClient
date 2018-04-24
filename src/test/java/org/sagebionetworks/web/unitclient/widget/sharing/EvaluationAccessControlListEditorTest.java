@@ -20,22 +20,24 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Matchers;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.UserEvaluationPermissions;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListEditorView;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListEditor;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -53,7 +55,6 @@ public class EvaluationAccessControlListEditorTest {
 	private static AdapterFactory adapterFactory = new AdapterFactoryImpl(); // alt: GwtAdapterFactory
 	
 	// Mock components
-	private SynapseClientAsync mockSynapseClient;
 	private ChallengeClientAsync mockChallengeClient;
 	private AuthenticationController mockAuthenticationController;
 	private AccessControlListEditorView mockACLEView;
@@ -76,10 +77,16 @@ public class EvaluationAccessControlListEditorTest {
 	private static UserGroupHeaderResponsePage userGroupHeaderRP;
 	GlobalApplicationState mockGlobalApplicationState;
 	EvaluationAccessControlListEditor.HasChangesHandler mockHasChangesHandler;
-	
+	@Mock
+	PublicPrincipalIds mockPublicPrincipalIds;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	SynapseAlert mockSynAlert;
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		// set up test Synapse objects
 		evaluation = new Evaluation();
 		evaluation.setId(EVALUATION_ID);
@@ -88,9 +95,7 @@ public class EvaluationAccessControlListEditorTest {
 		acl = createACL(EVALUATION_ID);
 		uep = createUEP();
 		userGroupHeaderRP = AccessControlListEditorTest.createUGHRP();
-		
 		// set up mocks
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
 		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
 		mockACLEView = mock(AccessControlListEditorView.class);
@@ -98,23 +103,25 @@ public class EvaluationAccessControlListEditorTest {
 		
 		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID, TEST_ANONYMOUS_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn(TEST_PUBLIC_PRINCIPAL_ID + "");
+		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
+		when(mockPublicPrincipalIds.getPublicAclPrincipalId()).thenReturn(TEST_PUBLIC_PRINCIPAL_ID);
 		AsyncMockStubber.callSuccessWith(acl.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockChallengeClient).getEvaluationAcl(anyString(), any(AsyncCallback.class));
 		
 		AsyncMockStubber.callSuccessWith(uep.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockChallengeClient).getUserEvaluationPermissions(anyString(), any(AsyncCallback.class));
 		
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
-		AsyncMockStubber.callSuccessWith(userGroupHeaderRP).when(mockSynapseClient).getUserGroupHeadersById(Matchers.<ArrayList<String>>any(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(userGroupHeaderRP).when(mockSynapseJavascriptClient).getUserGroupHeadersById(Matchers.<ArrayList<String>>any(), any(AsyncCallback.class));
 
 		mockPushToSynapseCallback = mock(Callback.class);
 		
 		// instantiate the ACLEditor
 		acle = new EvaluationAccessControlListEditor(mockACLEView,
-				mockSynapseClient,
+				mockSynapseJavascriptClient,
 				mockAuthenticationController,
 				mockGlobalApplicationState,
 				new JSONObjectAdapterImpl(),
-				mockChallengeClient
+				mockChallengeClient,
+				mockSynAlert
 		);
 		
 		mockHasChangesHandler = mock(EvaluationAccessControlListEditor.HasChangesHandler.class);
@@ -273,7 +280,7 @@ public class EvaluationAccessControlListEditorTest {
 		acle.setAccess(ADMIN_ID, PermissionLevel.CAN_VIEW);
 		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 		
-		verify(mockACLEView).showErrorMessage(anyString());
+		verify(mockSynAlert).showError(anyString());
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -298,6 +305,6 @@ public class EvaluationAccessControlListEditorTest {
 		acle.removeAccess(USER2_ID);
 		acle.pushChangesToSynapse(mockPushToSynapseCallback);
 
-		verify(mockACLEView).showErrorMessage(anyString());
+		verify(mockSynAlert).showError(anyString());
 	}
 }

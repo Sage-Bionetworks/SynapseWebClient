@@ -1,10 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.provenance;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -32,21 +35,20 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
-import org.sagebionetworks.repo.model.request.ReferenceList;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.repo.model.provenance.UsedURL;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
+import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget.ActivityProcessItem;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -66,16 +68,14 @@ public class ProvenanceWidgetTest {
 	ProvenanceWidget provenanceWidget;
 	ProvenanceWidgetView mockView;
 	AuthenticationController mockAuthController;
-	AdapterFactory adapterFactory;
-	SynapseClientAsync mockSynapseClient;
 	ClientCache mockClientCache;
 	GlobalApplicationState mockGlobalAppState;
 	
 	FileEntity outputEntity;
 	String entity456Id = "syn456";
-	PaginatedResults<EntityHeader> referenceHeaders;
+	ArrayList<EntityHeader> referenceHeaders;
 	
-	ReferenceList referenceList;
+	ArrayList<Reference> referenceList;
 	Exception someException = new Exception();
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	JsoProvider jsoProvider;
@@ -84,19 +84,29 @@ public class ProvenanceWidgetTest {
 	UserProfile modifiedByUserProfile;
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() throws Exception {
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(ProvenanceWidgetView.class);
 		mockAuthController = mock(AuthenticationController.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		adapterFactory = new AdapterFactoryImpl();
 		jsoProvider = new JsoProviderTestImpl();
 		when(mockSynapseJSNIUtils.nChartlayout(any(NChartLayersArray.class), any(NChartCharacters.class))).thenReturn(jsoProvider.newLayoutResult());
 		mockClientCache = mock(ClientCache.class);
 		mockGlobalAppState = mock(GlobalApplicationState.class);
-		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockAuthController, adapterFactory, mockSynapseJSNIUtils, jsoProvider, mockClientCache);
+		provenanceWidget = new ProvenanceWidget(mockView, 
+				mockGlobalAppState, 
+				mockAuthController, 
+				mockSynapseJSNIUtils, 
+				jsoProvider, 
+				mockClientCache, 
+				mockDateTimeUtils,
+				mockSynapseJavascriptClient);
 		verify(mockView).setPresenter(provenanceWidget);
 		
 		outputEntity = new FileEntity();
@@ -121,25 +131,24 @@ public class ProvenanceWidgetTest {
 		Set<Used> used = new HashSet<Used>();
 		used.add(ue);
 		act.setUsed(used);
-		referenceList = new ReferenceList();
-		referenceList.setReferences(new ArrayList<Reference>(Arrays.asList(new Reference[] { ref123, ref456 })));
-		referenceHeaders = new PaginatedResults<EntityHeader>();
-		referenceHeaders.setResults(new ArrayList<EntityHeader>(Arrays.asList(new EntityHeader[] { header456, header123 })));
+		referenceList = new ArrayList<Reference>(Arrays.asList(new Reference[] { ref123, ref456 }));
+		referenceHeaders = new ArrayList<EntityHeader>(Arrays.asList(new EntityHeader[] { header456, header123 }));
 		
-		PaginatedResults<Reference> generatedBy = new PaginatedResults<Reference>();
-		generatedBy.setResults(Arrays.asList(new Reference[] { ref123 }));		
-		
-		AsyncMockStubber.callSuccessWith(outputEntity).when(mockSynapseClient).getEntity(eq(outputEntity.getId()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(act).when(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(referenceHeaders).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));		
-		AsyncMockStubber.callSuccessWith(generatedBy).when(mockSynapseClient).getEntitiesGeneratedBy(eq(act.getId()), anyInt(), anyInt(), any(AsyncCallback.class));
+		ArrayList<Reference> generatedBy = new ArrayList<Reference>(Arrays.asList(new Reference[] { ref123 }));		
+		ArrayList<EntityHeader> outputEntityList = new ArrayList<EntityHeader>();
+		outputEntityList.add(header123);
+		AsyncMockStubber.callSuccessWith(outputEntity).when(mockSynapseJavascriptClient).getEntity(eq(outputEntity.getId()), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(act).when(mockSynapseJavascriptClient).getActivityForEntityVersion(anyString(), anyLong(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(outputEntityList).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(referenceHeaders).when(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));		
+		AsyncMockStubber.callSuccessWith(generatedBy).when(mockSynapseJavascriptClient).getEntitiesGeneratedBy(eq(act.getId()), anyInt(), anyInt(), any(AsyncCallback.class));
 		
 		descriptor = new HashMap<String, String>();
 		String depth = "1";
 		String showExpand = "true";
 		String displayHeight = "500";
 		descriptor.put(WidgetConstants.PROV_WIDGET_DEPTH_KEY, depth);
-		descriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, outputEntity.getId());
+		descriptor.put(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY, entity456Id);
 		descriptor.put(WidgetConstants.PROV_WIDGET_EXPAND_KEY, showExpand);
 		descriptor.put(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY, displayHeight);		
 		descriptor.put(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY, Boolean.toString(true));
@@ -147,7 +156,7 @@ public class ProvenanceWidgetTest {
 		modifiedByUserProfile = new UserProfile();
 		modifiedByUserProfile.setUserName("007");
 		modifiedByUserProfile.setFirstName("James");
-		AsyncMockStubber.callSuccessWith("").when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("").when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
 
 	}
 	
@@ -191,10 +200,10 @@ public class ProvenanceWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuildTreeFailGetActivity() throws Exception {
-		AsyncMockStubber.callFailureWith(someException).when(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(someException).when(mockSynapseJavascriptClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
 		
 		provenanceWidget.configure(null, descriptor, null, null);	
-		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));		
+		verify(mockSynapseJavascriptClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));		
 		ProvGraph graph = captureGraph();
 		
 		assertNotNull(graph);
@@ -218,11 +227,11 @@ public class ProvenanceWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuildTreeFailGetActivity404() throws Exception {
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseJavascriptClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
 		
 		provenanceWidget.configure(null, descriptor, null, null);	
-		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
-		verify(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 		ProvGraph graph = captureGraph();
 		
 		assertNotNull(graph);
@@ -246,11 +255,11 @@ public class ProvenanceWidgetTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testBuildTreeFailHeaderBatch() throws Exception {
-		AsyncMockStubber.callFailureWith(someException).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(someException).when(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 		
 		provenanceWidget.configure(null, descriptor, null, null);	
-		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
-		verify(mockSynapseClient).getEntityHeaderBatch(eq(referenceList), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(eq(referenceList), any(AsyncCallback.class));
 		ProvGraph graph = captureGraph();
 
 		verifySuccessGraphStructure(graph);
@@ -261,10 +270,10 @@ public class ProvenanceWidgetTest {
 	public void testFindOldVersionsNotFoundException() throws Exception {
 		SynapseJSNIUtils mockJsniUtils = mock(SynapseJSNIUtils.class);
 		when(mockJsniUtils.nChartlayout(any(NChartLayersArray.class), any(NChartCharacters.class))).thenReturn(jsoProvider.newLayoutResult());
-		provenanceWidget = new ProvenanceWidget(mockView, mockSynapseClient, mockGlobalAppState, mockAuthController, adapterFactory, mockJsniUtils, jsoProvider, mockClientCache);
+		provenanceWidget = new ProvenanceWidget(mockView, mockGlobalAppState, mockAuthController, mockJsniUtils, jsoProvider, mockClientCache, mockDateTimeUtils, mockSynapseJavascriptClient);
 		
 		String message = "entity syn999 was not found";
-		AsyncMockStubber.callFailureWith(new NotFoundException(message)).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException(message)).when(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 		// create graph
 		provenanceWidget.configure(null, descriptor, null, null);	
 		
@@ -280,7 +289,7 @@ public class ProvenanceWidgetTest {
 		provenanceWidget.configure(null, descriptor, null, null);	
 		ProvGraph graph = verifyBuildGraphCalls();					
 		
-		reset(mockSynapseClient);
+		reset(mockSynapseJavascriptClient);
 		
 		// current version of each reference
 		EntityHeader header123 = new EntityHeader();
@@ -289,10 +298,9 @@ public class ProvenanceWidgetTest {
 		EntityHeader header456 = new EntityHeader();
 		header456.setId(entity456Id);
 		header456.setVersionNumber(2L); // v2 is newer than in Before method
-		PaginatedResults<EntityHeader> currentVersionBatch = new PaginatedResults<EntityHeader>();
-		currentVersionBatch.setResults(new ArrayList<EntityHeader>(Arrays.asList(new EntityHeader[] { header456, header123 })));		
+		ArrayList<EntityHeader> currentVersionBatch = new ArrayList<EntityHeader>(Arrays.asList(new EntityHeader[] { header456, header123 }));		
 		// new mocks for batch call
-		AsyncMockStubber.callSuccessWith(currentVersionBatch).when(mockSynapseClient).getEntityHeaderBatch(any(ReferenceList.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(currentVersionBatch).when(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
 
 		provenanceWidget.findOldVersions();
 		
@@ -306,8 +314,8 @@ public class ProvenanceWidgetTest {
 	}
 
 	private ProvGraph verifyBuildGraphCalls() throws Exception {
-		verify(mockSynapseClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
-		verify(mockSynapseClient).getEntityHeaderBatch(eq(referenceList), any(AsyncCallback.class));		
+		verify(mockSynapseJavascriptClient).getActivityForEntityVersion(eq(outputEntity.getId()), eq(outputEntity.getVersionNumber()), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(eq(referenceList), any(AsyncCallback.class));
 		return captureGraph();
 	}
 
@@ -318,6 +326,35 @@ public class ProvenanceWidgetTest {
 		return graph;
 	}
 
+	@Test
+	public void testCleanupCycles() {
+		ActivityProcessItem item = provenanceWidget.new ActivityProcessItem(act, 1);
+		item.getActivity().setUsed(null);
+		Set<Reference> references = new HashSet<Reference>();
+		// verify no error when used is not set, or is empty
+		provenanceWidget.cleanupCycles(item, references);
+		Set<Used> usedSet = new HashSet<Used>();
+		item.getActivity().setUsed(usedSet);
+		provenanceWidget.cleanupCycles(item, references);
+		
+		//verify that if in references, then should be removed from the used set.
+		Reference ref = new Reference();
+		UsedEntity usedEntity = new UsedEntity();
+		usedEntity.setReference(ref);
+		usedSet.add(usedEntity);
+		
+		provenanceWidget.cleanupCycles(item, references);
+		assertTrue(usedSet.contains(usedEntity));
+		references.add(ref);
+		provenanceWidget.cleanupCycles(item, references);
+		assertFalse(usedSet.contains(usedEntity));
+		
+		// used urls are ignored
+		UsedURL usedURL = new UsedURL();
+		usedSet.add(usedURL);
+		provenanceWidget.cleanupCycles(item, references);
+		assertTrue(usedSet.contains(usedURL));
+	}
 }
 
 

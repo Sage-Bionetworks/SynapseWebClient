@@ -1,31 +1,25 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
-import org.sagebionetworks.repo.model.Folder;
-import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.entity.query.Condition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.Direction;
+import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.entity.query.Operator;
-import org.sagebionetworks.repo.model.entity.query.Sort;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -40,17 +34,14 @@ import com.google.inject.Inject;
 
 public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		SynapseWidgetPresenter {
-	public static final long OFFSET_ZERO = 0;
-
 	private EntityTreeBrowserView view;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	AdapterFactory adapterFactory;
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	private PortalGinInjector ginInjector;
 	private String currentSelection;
-	private final int MAX_FOLDER_LIMIT = 100;
 	EntitySelectedHandler entitySelectedHandler;
 	CallbackP<String> entityClickedHandler;
 	EntityFilter filter = EntityFilter.ALL;
@@ -58,13 +49,13 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, 
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient synapseClient,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			IconsImageBundle iconsImageBundle, 
 			AdapterFactory adapterFactory) {
 		this.view = view;
-		this.synapseClient = synapseClient;
+		this.jsClient = synapseClient;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.adapterFactory = adapterFactory;
@@ -73,13 +64,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		view.setPresenter(this);
 	}
 	
-	public void clearState() {
-		view.clear();
-		// remove handlers
-		entitySelectedHandler = null;
-		entityClickedHandler = null;
-	}
-
 	public void clear() {
 		view.clear();
 	}
@@ -93,7 +77,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public void configure(String searchId) {
 		view.clear();
 		view.setLoadingVisible(true);
-		getChildren(searchId, null, 0);
+		getChildren(searchId, null, null);
 	}
 	
 	public void configure(List<EntityHeader> headers) {
@@ -105,12 +89,12 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	
 	public void addHeaders(List<EntityHeader> headers) {
 		headers = filter.filterForBrowsing(headers);
-		EntityQueryResults results = getEntityQueryResultsFromHeaders(headers);
-		for (EntityQueryResult wrappedHeader : results.getEntities()) {
-			view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(wrappedHeader, true,
-					isExpandable(wrappedHeader)));
+		for (EntityHeader header : headers) {
+			view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(header, true,
+					isExpandable(header)));
 		}
 	}
+	
 	public void setLoadingVisible(boolean visible) {
 		view.setLoadingVisible(visible);
 	}
@@ -142,23 +126,21 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 
 	@Override
 	public void getChildren(final String parentId,
-			final EntityTreeItem parent, final long offset) {
-		EntityQuery childrenQuery = createGetChildrenQuery(parentId, offset);
-		childrenQuery.setLimit((long) MAX_FOLDER_LIMIT);
+			final EntityTreeItem parent, String nextPageToken) {
+		EntityChildrenRequest request = createGetEntityChildrenRequest(parentId, nextPageToken);
 		// ask for the folder children, then the files
-		synapseClient.executeEntityQuery(childrenQuery,
-				new AsyncCallback<EntityQueryResults>() {
+		jsClient.getEntityChildren(request,
+				new AsyncCallback<EntityChildrenResponse>() {
 					@Override
-					public void onSuccess(EntityQueryResults results) {
-						if (!results.getEntities().isEmpty()) {
-							addResultsToParent(parent, results);
+					public void onSuccess(EntityChildrenResponse results) {
+						if (!results.getPage().isEmpty()) {
+							addResultsToParent(parent, results.getPage());
 							// More total entities than able to be displayed, so
 							// must add a "More Folders" button
-							if (results.getTotalEntityCount() > offset
-									+ results.getEntities().size()) {
+							if (results.getNextPageToken() != null) {
 								final MoreTreeItem moreItem = ginInjector
 										.getMoreTreeWidget();
-								addMoreButton(moreItem, parentId, parent, offset);
+								addMoreButton(moreItem, parentId, parent, results.getNextPageToken());
 							}
 						}
 						if (parent == null) {
@@ -168,8 +150,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 							} else {
 								view.hideEmptyUI();
 							}
-						} else {
-							parent.showTypeIcon();
 						}
 					}
 
@@ -188,11 +168,11 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	 */
 	@Override
 	public void addMoreButton(MoreTreeItem moreItem, String parentId,
-			EntityTreeItem parent, long offset) {
+			EntityTreeItem parent, String nextPageToken) {
 		if (parent == null) {
-			view.placeRootMoreTreeItem(moreItem, parentId, offset + MAX_FOLDER_LIMIT);
+			view.placeRootMoreTreeItem(moreItem, parentId, nextPageToken);
 		} else {
-			view.placeChildMoreTreeItem(moreItem, parent, offset + MAX_FOLDER_LIMIT);
+			view.placeChildMoreTreeItem(moreItem, parent, nextPageToken);
 		}
 	}
 
@@ -212,19 +192,14 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		makeSelectable();
 	}
 	
-	public void setEntityClickedHandler(CallbackP<String> callback) {
-		entityClickedHandler = callback;
-	}
-	
 	public EntitySelectedHandler getEntitySelectedHandler() {
 		return entitySelectedHandler;
 	}
 
-	@Override
-	public int getMaxLimit() {
-		return MAX_FOLDER_LIMIT;
+	public void setEntityClickedHandler(CallbackP<String> entityClickedHandler) {
+		this.entityClickedHandler = entityClickedHandler;
 	}
-
+	
 	/**
 	 * Rather than linking to the Entity Page, a clicked entity in the tree will
 	 * become selected.
@@ -245,8 +220,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 			// We have not already fetched children for this entity.
 			alreadyFetchedEntityChildren.add(target);
 			target.asTreeItem().removeItems();
-			target.showLoadingIcon();
-			getChildren(target.getHeader().getId(), target, 0);
+			getChildren(target.getHeader().getId(), target, null);
 		}
 	}
 
@@ -261,52 +235,49 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		}
 	}
 
-	public EntityQuery createGetChildrenQuery(String parentId, long offset) {
-		EntityQuery newQuery = new EntityQuery();
-		Sort sort = new Sort();
-		sort.setColumnName(EntityFieldName.name.name());
-		sort.setDirection(SortDirection.ASC);
-		newQuery.setSort(sort);
-		Condition parentCondition = EntityQueryUtils.buildCondition(
-				EntityFieldName.parentId, Operator.EQUALS, parentId);
-		Condition typeCondition = EntityQueryUtils.buildCondition(
-				EntityFieldName.nodeType, Operator.IN, filter.getEntityQueryValues());
-		newQuery.setConditions(Arrays.asList(parentCondition, typeCondition));
-		newQuery.setLimit((long) MAX_FOLDER_LIMIT);
-		newQuery.setOffset(offset);
-		return newQuery;
+	public EntityChildrenRequest createGetEntityChildrenRequest(String parentId, String nextPageToken) {
+		EntityChildrenRequest request = new EntityChildrenRequest();
+		request.setNextPageToken(nextPageToken);
+		request.setParentId(parentId);
+		request.setSortBy(SortBy.NAME);
+		request.setSortDirection(Direction.ASC);
+		request.setIncludeTypes(filter.getEntityQueryValues());
+		
+		return request;
 	}
 
-	public EntityTreeItem makeTreeItemFromQueryResult(EntityQueryResult header,
+	public EntityTreeItem makeTreeItemFromQueryResult(EntityHeader header,
 			boolean isRootItem, boolean isExpandable) {
 		final EntityTreeItem childItem = ginInjector.getEntityTreeItemWidget();
 		childItem.configure(header, isRootItem, isExpandable);
 		if (entityClickedHandler != null) {
-			childItem.setEntityClickedHandler(entityClickedHandler);
+			childItem.setClickHandler(event -> {
+				entityClickedHandler.invoke(header.getId());
+			});
 		}
 		return childItem;
 	}
 
-	public void addResultsToParent(final EntityTreeItem parent,	EntityQueryResults results) {
+	public void addResultsToParent(final EntityTreeItem parent,	List<EntityHeader> results) {
 		if (parent == null) {
-			for (EntityQueryResult header : results.getEntities()) {
+			for (EntityHeader header : results) {
 				boolean isExpandable = isExpandable(header);
 				view.appendRootEntityTreeItem(makeTreeItemFromQueryResult(header, true, isExpandable));
 			}
 		} else {
-			for (EntityQueryResult header : results.getEntities()) {
+			for (EntityHeader header : results) {
 				boolean isExpandable = isExpandable(header);
 				view.appendChildEntityTreeItem(makeTreeItemFromQueryResult(header, false, isExpandable), parent);
 			}
 		}
 	}
 	
-	public boolean isExpandable(EntityQueryResult header) {
+	public boolean isExpandable(EntityHeader header) {
 		if (filter.equals(EntityFilter.PROJECT)) {
 			return false;
 		}
-		String entityType = header.getEntityType();
-		return entityType.equals(EntityType.folder.name()) || entityType.equals(EntityType.project.name());	
+		String entityType = header.getType();
+		return entityType.equals(EntityTypeUtils.getEntityClassNameForEntityType(EntityType.folder.name())) || entityType.equals(EntityTypeUtils.getEntityClassNameForEntityType(EntityType.project.name()));	
 	}
 	
 	public void setEntityFilter(EntityFilter filter) {

@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpageNavigationTree.SubpageNavTreeNode;
 
@@ -11,9 +12,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -54,20 +53,17 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 
 	private void addTreeItemsRecursive(UnorderedListPanel ul, final SubpageNavTreeNode root) {
 		String styleName = presenter.isCurrentPage(root) ? "active" : "";
-		HorizontalPanel w = new HorizontalPanel();
+		Div w = new Div();
 		w.setWidth("100%");
-		w.setHeight("25px");
-		FocusPanel anchorContainer = new FocusPanel();
-		anchorContainer.addStyleName("imageButton");
 		Anchor l = new Anchor(root.getPageTitle());
 		l.addStyleName("subpage-link " + styleName);
-		anchorContainer.add(l);
-		w.add(anchorContainer);
+		l.setHref("#!Synapse:" + ((Synapse)root.getTargetPlace()).toToken());
+		w.add(l);
 		
 		ul.add(w, styleName);
 		if (!root.getChildren().isEmpty()) {
 			UnorderedListPanel subList = new UnorderedListPanel();
-			subList.addStyleName("nav");
+			subList.addStyleName("nav wiki-tree-nav");
 			final Div subListContainer = new Div();
 			subListContainer.add(subList);
 			ul.add(subListContainer);
@@ -98,31 +94,25 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 				}
 			}; 
 			expandAnchor.addClickHandler(expandClickHandler);
-			FlowPanel iconContainer = new FlowPanel();
-			iconContainer.add(collapseAnchor);
-			iconContainer.add(expandAnchor);
-			w.add(iconContainer);
+			w.add(collapseAnchor);
+			w.add(expandAnchor);
 			if (root.isCollapsed()) {
 				collapseClickHandler.onClick(null);
 			} else {
 				expandClickHandler.onClick(null);
 			}
-			anchorContainer.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					expandClickHandler.onClick(null);
-					presenter.reloadWiki(root);
-				}
+			l.addClickHandler(event -> {
+				event.preventDefault();
+				expandClickHandler.onClick(null);
+				presenter.reloadWiki(root);
 			});
 			for (SubpageNavTreeNode child : root.getChildren()) {
 				addTreeItemsRecursive(subList, child);
 			}
 		} else {
-			anchorContainer.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.reloadWiki(root);
-				}
+			l.addClickHandler(event -> {
+				event.preventDefault();
+				presenter.reloadWiki(root);
 			});
 		}
 	}

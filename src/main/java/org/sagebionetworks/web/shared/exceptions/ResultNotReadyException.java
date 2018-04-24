@@ -24,6 +24,9 @@ public class ResultNotReadyException extends RestServiceException  {
 	public ResultNotReadyException(AsynchronousJobStatus status) {
 		super(status.getProgressMessage());
 		this.status = status;
+		// request body and response body may not run into problems during serialization, clear them out
+		status.setRequestBody(null);
+		status.setResponseBody(null);
 	}
 
 	/**

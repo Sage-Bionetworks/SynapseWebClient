@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -19,6 +19,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	private SynapseJSNIUtils synapseJsniUtils;
 	private int count;
 	private FileMetadata[] fileMetaArr;
+	private JavaScriptObject fileList;
 	
 	@Inject
 	public FileHandleUploadWidgetImpl(FileHandleUploadView view, MultipartUploader multipartUploader,
@@ -68,46 +69,34 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	public FileMetadata[] getSelectedFileMetadata() {
 		String inputId = view.getInputId();
 		FileMetadata[] results = null;
-		String[] fileNames = synapseJsniUtils.getMultipleUploadFileNames(inputId);
+		fileList = synapseJsniUtils.getFileList(inputId);
+		String[] fileNames = synapseJsniUtils.getMultipleUploadFileNames(fileList);
 		if(fileNames != null){
 			results = new FileMetadata[fileNames.length];
 			for(int i=0; i<fileNames.length; i++){
 				String name = fileNames[i];
-				String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(inputId, i), name);
-				double fileSize = synapseJsniUtils.getFileSize(inputId, i);
+				String contentType = org.sagebionetworks.web.client.ContentTypeUtils.fixDefaultContentType(synapseJsniUtils.getContentType(fileList, i), name);
+				double fileSize = synapseJsniUtils.getFileSize(synapseJsniUtils.getFileBlob(i, fileList));
 				results[i] = new FileMetadata(name, contentType, fileSize);
 			}
 		}
 		return results;
 	}
 	
-	private String fixDefaultContentType(String type, String fileName) {
-		String contentType = type;
-		String lowercaseFilename = fileName.toLowerCase();
-		if (type == null || type.trim().length() == 0) {
-			if (ContentTypeUtils.isRecognizedCodeFileName(fileName)) {
-				contentType = ContentTypeUtils.PLAIN_TEXT;
-			}
-			else if (lowercaseFilename.endsWith(".tsv") || lowercaseFilename.endsWith(".tab")) {
-				contentType = WebConstants.TEXT_TAB_SEPARATED_VALUES;
-			}
-			else if (lowercaseFilename.endsWith(".csv")) {
-				contentType = WebConstants.TEXT_COMMA_SEPARATED_VALUES;
-			}
-			else if (lowercaseFilename.endsWith(".txt")) {
-				contentType = ContentTypeUtils.PLAIN_TEXT;
-			}
-		}
-		return contentType;
-	}
-
 	@Override
 	public void onFileSelected() {
 		fileMetaArr = getSelectedFileMetadata();
 		if (fileMetaArr != null) {
 			FileMetadata fileMeta = fileMetaArr[0];
 			boolean isValidUpload = validator == null || validator.isValid(fileMeta);
-			if (isValidUpload) {
+			boolean isValidFilename = AbstractFileValidator.isValidFilename(fileMeta.getFileName());
+			if (!isValidFilename) {
+				view.showError(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+				if (validator != null && validator.getInvalidFileCallback() != null) {
+					validator.getInvalidFileCallback().invoke();
+				}
+			}
+			else if (isValidUpload) {
 				if (startedUploadingCallback != null) {
 					startedUploadingCallback.invoke();
 				}
@@ -141,7 +130,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	
 	private void beginMultiFileUpload() {
 		count = 0;
-		doMultipartUpload(fileMetaArr[count]);
+		doMultipartUpload();
 	}
 	
 	private void uploadNext() {
@@ -149,7 +138,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 		if (count != fileMetaArr.length) {
 			int progress = count * 100 / fileMetaArr.length;
 			view.updateProgress(progress, progress + "%");
-			doMultipartUpload(fileMetaArr[count]);
+			doMultipartUpload();
 		} else {
 			// Set the view at 100%
 			view.updateProgress(100, "100%");
@@ -159,13 +148,12 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 	}
 	
 	
-	private void doMultipartUpload(final FileMetadata fileMeta) {
+	private void doMultipartUpload() {
 		// The uploader does the real work
+		JavaScriptObject blob = synapseJsniUtils.getFileBlob(count, fileList);
+		FileMetadata fileMetadata = fileMetaArr[count];
 		
-		String fileInputId = view.getInputId();
-		String name = fileMeta.getFileName();
-
-		multipartUploader.uploadFile(name, fileInputId, count,
+		multipartUploader.uploadFile(fileMetadata.getFileName(), fileMetadata.getContentType(), blob,
 			new ProgressingFileUploadHandler() {
 				@Override
 				public void uploadSuccess(String fileHandleId) {
@@ -187,7 +175,7 @@ public class FileHandleUploadWidgetImpl implements FileHandleUploadWidget,  File
 					int totalProgress = count * 100 / fileMetaArr.length + (int)(currentProgress * 100 / fileMetaArr.length);
 					view.updateProgress(totalProgress, totalProgress + "%");
 				}
-		}, null);
+		}, null, view);
 	}
 
 }

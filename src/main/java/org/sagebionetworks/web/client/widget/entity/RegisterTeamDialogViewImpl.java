@@ -13,6 +13,7 @@ import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ChangeEvent;
 import com.google.gwt.event.dom.client.ChangeHandler;
@@ -47,6 +48,8 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	Paragraph noTeamsFoundUI;
 	@UiField
 	Div teamSelectComboUI;
+	@UiField
+	Button refreshTeamsButton;
 	
 	Modal modal;
 	@Inject
@@ -77,6 +80,9 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 			public void onChange(ChangeEvent event) {
 				presenter.teamSelected(teamComboBox.getSelectedIndex());
 			}
+		});
+		refreshTeamsButton.addClickHandler(event -> {
+			presenter.refreshRegistratableTeams();
 		});
 	}
 	
@@ -129,8 +135,8 @@ public class RegisterTeamDialogViewImpl implements RegisterTeamDialogView {
 	}
 	
 	@Override
-	public void showConfirmDialog(String message, ConfirmCallback callback) {
-		Bootbox.confirm(message, callback);
+	public void showConfirmDialog(String message, Callback callback) {
+		DisplayUtils.confirm(message, callback);
 	}
 	
 	@Override

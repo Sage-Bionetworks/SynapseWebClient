@@ -4,24 +4,15 @@ import org.sagebionetworks.web.client.SynapseView;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public interface EntityPageTopView extends IsWidget, SynapseView {
-
-	/**
-	 * Set the presenter.
-	 * @param presenter
-	 */
-	void setPresenter(Presenter presenter);
-
 	void setProjectMetadata(Widget w);
 	void setTabs(Widget w);
-	void setActionMenu(Widget w);
-	void setProjectInformationVisible(boolean isVisible);
+	void setProjectActionMenu(Widget w);
+	void setEntityActionMenu(Widget w);
+	void setProjectLoadingVisible(boolean visible);
+	void scrollToTop();
 	
-	/**
-	 * Presenter interface
-	 */
-	public interface Presenter {
-		void fireEntityUpdatedEvent();
-	}
+	EventBinder<EntityPageTop> getEventBinder();
 }

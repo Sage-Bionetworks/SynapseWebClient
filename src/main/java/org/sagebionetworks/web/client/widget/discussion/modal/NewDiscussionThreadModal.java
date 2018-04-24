@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -46,12 +48,11 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
+		fixServiceEntryPoint(discussionForumClient);
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
 		this.authController = authController;
 		this.storage = sessionStorage;
-		markdownEditor.hideUploadRelatedCommands();
-		markdownEditor.showExternalImageButton();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(NEW_THREAD_MODAL_TITLE);
@@ -73,6 +74,8 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	}
 	
 	private void checkForSavedThread() {
+		markdownEditor.hideUploadRelatedCommands();
+		markdownEditor.showExternalImageButton();
 		if (storage.getItem(titleKey) == null || storage.getItem(messageKey) == null) {
 			markdownEditor.configure(DEFAULT_MARKDOWN);			
 		} else {

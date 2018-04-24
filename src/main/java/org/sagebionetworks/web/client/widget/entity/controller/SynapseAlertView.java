@@ -51,7 +51,7 @@ public interface SynapseAlertView extends IsWidget {
 	void setLoginWidget(Widget w);
 	
 	void reload();
-	
+	void setRetryButtonVisible(boolean visible);
 	/**
 	 * Presenter interface
 	 */

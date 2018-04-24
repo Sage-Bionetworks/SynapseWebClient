@@ -11,7 +11,7 @@
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button type="DANGER" pull="LEFT" ui:field="unregisterButton">Unregister Team</b:Button>
-			<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+			<b:Button type="LINK" dataDismiss="MODAL">Cancel</b:Button>
 			<b:Button ui:field="okButton" type="PRIMARY">Update</b:Button>
 		</b:ModalFooter>
 	</b:Modal>

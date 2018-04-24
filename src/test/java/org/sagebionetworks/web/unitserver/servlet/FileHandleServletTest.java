@@ -1,7 +1,11 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,7 +13,6 @@ import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
@@ -21,15 +24,13 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
+import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.table.RowReference;
-import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
@@ -38,10 +39,6 @@ import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.WebConstants;
-
-import com.google.gwt.user.client.rpc.RpcTokenException;
-import com.google.gwt.util.tools.shared.Md5Utils;
-import com.google.gwt.util.tools.shared.StringUtils;
 
 public class FileHandleServletTest {
 
@@ -167,8 +164,6 @@ public class FileHandleServletTest {
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
 		
 		setupFileEntity();
-		String xsrfToken = StringUtils.toHexString(Md5Utils.getMd5Digest(sessionToken.getBytes()));
-		when(mockRequest.getParameter(WebConstants.XSRF_TOKEN_KEY)).thenReturn(xsrfToken);
 		when(mockRequest.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("true");
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
 		when(mockRequest.getCookies()).thenReturn(cookies);
@@ -181,26 +176,6 @@ public class FileHandleServletTest {
 		verify(mockSynapse).setRepositoryEndpoint(repoServiceUrl);
 		verify(mockSynapse).setFileEndpoint(anyString());
 		verify(mockSynapse).setSessionToken(sessionToken);
-	}
-	
-	@Test (expected=RpcTokenException.class)
-	public void testDoGetLoggedInFileEntityInvalidXsrfToken() throws Exception {
-		String sessionToken = "fake";
-		String invalidXsrfToken = "wrong";
-		//set up general synapse client configuration test
-		String authBaseUrl = "authbase";
-		String repoServiceUrl = "repourl";
-		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
-		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
-		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
-		
-		setupFileEntity();
-		
-		when(mockRequest.getParameter(WebConstants.XSRF_TOKEN_KEY)).thenReturn(invalidXsrfToken);
-		when(mockRequest.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("true");
-		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
-		when(mockRequest.getCookies()).thenReturn(cookies);
-		servlet.doGet(mockRequest, mockResponse);
 	}
 	
 	@Test

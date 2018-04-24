@@ -10,6 +10,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mockito;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -42,13 +43,13 @@ public class AccountPresenterTest {
 		
 		verify(mockView).setPresenter(presenter);
 		place = Mockito.mock(Account.class);
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).addEmail(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).addEmail(any(EmailValidationSignedToken.class), any(AsyncCallback.class));
 	}	
 	
 	@Test
-	public void testValidateToken() {
-		presenter.validateToken("any token");
-		verify(mockSynapseClient).addEmail(anyString(), any(AsyncCallback.class));
+	public void testAddEmail() {
+		presenter.addEmail(new EmailValidationSignedToken());
+		verify(mockSynapseClient).addEmail(any(EmailValidationSignedToken.class), any(AsyncCallback.class));
 		//notify user of success
 		verify(mockView).showInfo(anyString(), anyString());
 		//and go to the settings page
@@ -56,11 +57,11 @@ public class AccountPresenterTest {
 	}	
 	
 	@Test
-	public void testValidateTokenFailure() {
-		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).addEmail(anyString(), any(AsyncCallback.class));
-		presenter.validateToken("any token");
-		verify(mockSynapseClient).addEmail(anyString(), any(AsyncCallback.class));
-		
+	public void testAddEmailFailure() {
+		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseClient).addEmail(any(EmailValidationSignedToken.class), any(AsyncCallback.class));
+		presenter.addEmail(new EmailValidationSignedToken());
+		verify(mockSynapseClient).addEmail(any(EmailValidationSignedToken.class), any(AsyncCallback.class));
+
 		verify(mockView).showErrorInPage(anyString(), anyString());
 	}	
 }

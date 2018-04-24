@@ -2,15 +2,18 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.shared.event.AlertCloseEvent;
-import org.gwtbootstrap3.client.shared.event.AlertCloseHandler;
-import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableRow;
-import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
 
+import com.google.gwt.event.dom.client.ClickEvent;
+import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.ScrollEvent;
+import com.google.gwt.event.dom.client.ScrollHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -27,7 +30,8 @@ import com.google.inject.Inject;
 public class TablePageViewImpl implements TablePageView {
 	
 	public interface Binder extends UiBinder<Widget, TablePageViewImpl> {}
-	
+	@UiField
+	Div loadingUI;
 	@UiField
 	TableRow header;
 	@UiField
@@ -42,12 +46,55 @@ public class TablePageViewImpl implements TablePageView {
 	ScrollPanel facetsWidgetContainer;
 	@UiField
 	Div tablePanel;
-	Widget widget;
+	Div widget;
 	Presenter presenter;
-	
+	@UiField
+	Button clearFacetsButton;
+	@UiField
+	ScrollPanel topScrollBar;
+	@UiField
+	ScrollPanel tableScrollPanel;
+	@UiField
+	Div topScrollDiv;
+	@UiField
+	Div tableDiv;
 	@Inject
-	public TablePageViewImpl(Binder binder){
-		widget = binder.createAndBindUi(this);
+	public TablePageViewImpl(
+			Binder binder, 
+			final GWTWrapper gwt){
+		widget = (Div)binder.createAndBindUi(this);
+		
+		clearFacetsButton.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				presenter.onClearFacets();
+			}
+		});
+		gwt.scheduleExecution(new Callback() {
+			@Override
+			public void invoke() {
+				if (tableScrollPanel.isAttached() && tableScrollPanel.isVisible()) {
+					// match width
+					topScrollDiv.setWidth(tableDiv.getElement().getScrollWidth() + "px");
+					boolean isScrollBarShowing = tableDiv.getElement().getScrollWidth() > tableDiv.getElement().getClientWidth();
+					topScrollBar.setVisible(isScrollBarShowing && tableScrollPanel.getOffsetHeight() > 600);
+					gwt.scheduleExecution(this, 400);
+				}
+			}
+		}, 400);
+
+		tableScrollPanel.addScrollHandler(new ScrollHandler() {
+			@Override
+			public void onScroll(ScrollEvent event) {
+				topScrollBar.setHorizontalScrollPosition(tableScrollPanel.getHorizontalScrollPosition());
+			}
+		});
+		topScrollBar.addScrollHandler(new ScrollHandler() {
+			@Override
+			public void onScroll(ScrollEvent event) {
+				tableScrollPanel.setHorizontalScrollPosition(topScrollBar.getHorizontalScrollPosition());
+			}
+		});
 	}
 	
 	@Override
@@ -82,7 +129,7 @@ public class TablePageViewImpl implements TablePageView {
 	}
 
 	@Override
-	public void setPaginationWidget(PaginationWidget paginationWidget) {
+	public void setPaginationWidget(IsWidget paginationWidget) {
 		this.paginationPanel.add(paginationWidget);
 	}
 
@@ -105,5 +152,25 @@ public class TablePageViewImpl implements TablePageView {
 	@Override
 	public void setFacetsVisible(boolean visible) {
 		facetsWidgetContainer.setVisible(visible);
+	}
+	@Override
+	public void setTableVisible(boolean visible) {
+		tablePanel.setVisible(visible);
+	}
+	@Override
+	public void hideLoading() {
+		loadingUI.setVisible(false);
+		if (!facetsWidgetContainer.isAttached()) {
+			widget.add(facetsWidgetContainer);
+		}
+		if (!tablePanel.isAttached()) {
+			widget.add(tablePanel);
+		}
+	}
+	@Override
+	public void showLoading() {
+		loadingUI.setVisible(true);
+		tablePanel.removeFromParent();
+		facetsWidgetContainer.removeFromParent();
 	}
 }

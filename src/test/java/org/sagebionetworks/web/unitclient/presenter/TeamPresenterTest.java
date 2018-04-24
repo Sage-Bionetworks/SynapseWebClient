@@ -1,17 +1,13 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static junit.framework.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.Team;
@@ -24,7 +20,9 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.presenter.TeamPresenter;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.TeamView;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
@@ -72,11 +70,17 @@ public class TeamPresenterTest {
 	String newDesc = "newDesc";
 	boolean newPublicJoin = false;
 	String newIcon = "newIcon";
-	String xsrfToken = "98208";
 	@Mock
 	GoogleMap mockGoogleMap;
 	@Mock
 	CookieProvider mockCookies;
+	@Mock
+	IsACTMemberAsyncHandler mockIsACTMemberAsyncHandler;
+	
+	@Captor
+	ArgumentCaptor<CallbackP<Boolean>> callbackPcaptor;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
 	
 	@Before
 	public void setup() {
@@ -97,7 +101,8 @@ public class TeamPresenterTest {
 		presenter = new TeamPresenter(mockView, mockAuthenticationController, mockGlobalAppState, 
 				mockSynClient, mockSynAlert, mockLeaveModal, mockDeleteModal, mockEditModal, 
 				mockInviteModal, mockJoinWidget, mockMemberListWidget, 
-				mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget, mockGoogleMap, mockCookies);
+				mockOpenMembershipRequestsWidget, mockOpenUserInvitationsWidget, mockGoogleMap, mockCookies,
+				mockIsACTMemberAsyncHandler);
 		mockTeam = mock(Team.class);
 		when(mockTeam.getName()).thenReturn(teamName);
 		mockTeamBundle = mock(TeamBundle.class);
@@ -114,9 +119,12 @@ public class TeamPresenterTest {
 		when(mockTeam.getCanPublicJoin()).thenReturn(canPublicJoin);
 		when(mockTeam.getId()).thenReturn(teamId);
 		when(mockTeam.getIcon()).thenReturn(teamIcon);
-		
-		when(mockAuthenticationController.getCurrentXsrfToken()).thenReturn(xsrfToken);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
+	}
+	
+	private void setIsACT(boolean isACT) {
+		verify(mockIsACTMemberAsyncHandler).isACTActionAvailable(callbackPcaptor.capture());
+		callbackPcaptor.getValue().invoke(isACT);
 	}
 	
 	@Test
@@ -156,16 +164,28 @@ public class TeamPresenterTest {
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
 		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
-		verify(mockView).setMediaObjectPanel(mockTeam, xsrfToken);
+		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
-		verify(mockOpenMembershipRequestsWidget).configure(eq(teamId), any(Callback.class));
-		verify(mockOpenUserInvitationsWidget).configure(eq(teamId), any(Callback.class));
+		verify(mockOpenMembershipRequestsWidget).setVisible(true);
 		verify(mockView).showAdminMenuItems();
 		verify(mockView).setTeamEmailAddress(anyString());
 		//never
 		verify(mockJoinWidget, never()).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
+	}
+	
+	@Test
+	public void testIsACT() {
+		presenter.refresh(teamId);
+		setIsACT(true);
+		verify(mockView).setManageAccessVisible(true);
+	}
+	@Test
+	public void testIsNotACT() {
+		presenter.refresh(teamId);
+		setIsACT(false);
+		verify(mockView).setManageAccessVisible(false);
 	}
 	
 	@Test
@@ -180,11 +200,11 @@ public class TeamPresenterTest {
 		//once
 		verify(mockView).setPublicJoinVisible(false);
 		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
-		verify(mockView).setMediaObjectPanel(mockTeam, xsrfToken);
+		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockJoinWidget).configure(eq(teamId), anyBoolean(), eq(mockTeamMembershipStatus), 
 				any(Callback.class), anyString(), anyString(), anyString(), anyString(), anyBoolean());
-		
+		verify(mockOpenMembershipRequestsWidget).setVisible(false);
 		//never
 		verify(mockView, never()).showMemberMenuItems();
 		verify(mockOpenMembershipRequestsWidget, never()).configure(eq(teamId), any(Callback.class));
@@ -202,7 +222,7 @@ public class TeamPresenterTest {
 		//once
 		verify(mockView).setPublicJoinVisible(canPublicJoin);
 		verify(mockView).setTotalMemberCount(totalMembershipCount.toString());
-		verify(mockView).setMediaObjectPanel(mockTeam, xsrfToken);
+		verify(mockView).setMediaObjectPanel(mockTeam);
 		verify(mockMemberListWidget).configure(eq(teamId), eq(isAdmin), any(Callback.class));
 		verify(mockView).showMemberMenuItems();
 		
@@ -221,16 +241,52 @@ public class TeamPresenterTest {
 		verify(mockGoogleMap).setHeight(anyString());
 		verify(mockGoogleMap).configure(teamId);
 		verify(mockView).showMapModal();
+		verify(mockOpenMembershipRequestsWidget).setVisible(false);
 	}
 
 	@Test
 	public void testGetTeamEmail() {
+		boolean canSendEmail = true;
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		assertEquals("basic@synapse.org", presenter.getTeamEmail("basic"));
-		assertEquals("StandardCaseHere@synapse.org", presenter.getTeamEmail("Standard Case Here"));
-		assertEquals("unlikelycase@synapse.org", presenter.getTeamEmail(" \n\r unlikely\t case "));
-		assertEquals("Another_UnlikelyCase@synapse.org", presenter.getTeamEmail(" %^$##* Another_Unlikely\t &*#$)(!!@~Case "));
+		assertEquals("basic@synapse.org", presenter.getTeamEmail("basic", canSendEmail));
+		assertEquals("StandardCaseHere@synapse.org", presenter.getTeamEmail("Standard Case Here", canSendEmail));
+		assertEquals("unlikelycase@synapse.org", presenter.getTeamEmail(" \n\r unlikely\t case ", canSendEmail));
+		assertEquals("Another_UnlikelyCase@synapse.org", presenter.getTeamEmail(" %^$##* Another_Unlikely\t &*#$)(!!@~Case ", canSendEmail));
+		
+		canSendEmail = false;
+		assertEquals("", presenter.getTeamEmail("basic", canSendEmail));
+		
+		canSendEmail = true;
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		assertEquals("", presenter.getTeamEmail("basic"));
+		assertEquals("", presenter.getTeamEmail("basic", canSendEmail));
 	}
+	
+	@Test
+	public void testRefreshOpenMembershipRequests() {
+		presenter.refreshOpenMembershipRequests();
+		verify(mockOpenMembershipRequestsWidget).clear();
+		verify(mockOpenMembershipRequestsWidget).configure(anyString(), callbackCaptor.capture());
+		Callback callback = callbackCaptor.getValue();
+		callback.invoke();
+		// reconfigured widget, and refreshed
+		verify(mockOpenMembershipRequestsWidget, times(2)).configure(anyString(), eq(callback));
+		verify(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		// never reconfigures open invites (no need to refresh)
+		verify(mockOpenUserInvitationsWidget, never()).configure(anyString(), eq(callback));
+	}
+	
+	@Test
+	public void testRefreshOpenUserInvitations() {
+		presenter.refreshOpenUserInvitations();
+		verify(mockOpenUserInvitationsWidget).clear();
+		verify(mockOpenUserInvitationsWidget).configure(anyString(), callbackCaptor.capture());
+		Callback callback = callbackCaptor.getValue();
+		callback.invoke();
+		// reconfigured widget, and refreshed
+		verify(mockOpenUserInvitationsWidget, times(2)).configure(anyString(), eq(callback));
+		verify(mockSynClient).getTeamBundle(anyString(), anyString(), anyBoolean(), any(AsyncCallback.class));
+		// never reconfigures open membership requests (no need to refresh)
+		verify(mockOpenMembershipRequestsWidget, never()).configure(anyString(), eq(callback));
+	}
+
 }

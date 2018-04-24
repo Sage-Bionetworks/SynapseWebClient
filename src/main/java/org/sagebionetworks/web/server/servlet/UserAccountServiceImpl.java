@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
@@ -93,17 +94,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-
-	@Override
-	public LoginResponse initiateSession(LoginRequest loginRequest) throws RestServiceException {
-		validateService();
-		SynapseClient synapseClient = createAnonymousSynapseClient();
-		try {
-			return synapseClient.login(loginRequest);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
 	
 	@Override 
 	public UserSessionData getUserSessionData(String sessionToken) throws RestServiceException {
@@ -129,21 +119,19 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 	
 	@Override
-	public void createUserStep1(String email, String portalEndpoint) throws RestServiceException {
+	public void createUserStep1(NewUser newUser, String portalEndpoint) throws RestServiceException {
 		validateService();
 
 		SynapseClient client = createAnonymousSynapseClient();
-		NewUser user = new NewUser();
-		user.setEmail(email);
 		try {
-			client.newAccountEmailValidation(user, portalEndpoint);
+			client.newAccountEmailValidation(newUser, portalEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
+
 	@Override
-	public String createUserStep2(String userName, String fName, String lName, String password, String emailValidationToken) throws RestServiceException {
+	public String createUserStep2(String userName, String fName, String lName, String password, EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException {
 		validateService();
 
 		SynapseClient client = createAnonymousSynapseClient();
@@ -153,7 +141,7 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			accountSetup.setLastName(lName);
 			accountSetup.setUsername(userName);
 			accountSetup.setPassword(password);
-			accountSetup.setEmailValidationToken(emailValidationToken);
+			accountSetup.setEmailValidationSignedToken(emailValidationSignedToken);
 			Session s = client.createNewAccount(accountSetup);
 			return s.getSessionToken();
 		} catch (SynapseException e) {

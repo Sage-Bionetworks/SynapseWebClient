@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
@@ -14,10 +14,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -26,14 +25,16 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditorView;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -56,6 +57,12 @@ public class WikiMarkdownEditorTest {
 	
 	@Mock
 	MarkdownEditorWidget mockMarkdownEditorWidget;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	WikiPage mockWikiPage;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -65,7 +72,7 @@ public class WikiMarkdownEditorTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		presenter = new WikiMarkdownEditor(mockView, mockMarkdownEditorWidget, mockSynapseClient, mockGlobalApplicationState);
+		presenter = new WikiMarkdownEditor(mockView, mockMarkdownEditorWidget, mockSynapseClient, mockGlobalApplicationState, mockSynapseJavascriptClient, mockPortalGinInjector);
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		mockDescriptorUpdatedHandler = mock(CallbackP.class);
 		initialMarkdown = "Hello Markdown";
@@ -82,12 +89,10 @@ public class WikiMarkdownEditorTest {
 		fileHandleIds.add(fileHandleId2);
 		testPage.setAttachmentFileHandleIds(fileHandleIds);
 		
-		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		WikiPage fakeWiki = new WikiPage();
-		fakeWiki.setMarkdown("Fake wiki");
-		AsyncMockStubber.callSuccessWith(fakeWiki).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
-		
-		AsyncMockStubber.callSuccessWith(fakeWiki).when(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testPage).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		when(mockWikiPage.getMarkdown()).thenReturn("Fake wiki");
+		AsyncMockStubber.callSuccessWith(mockWikiPage).when(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockWikiPage).when(mockSynapseClient).updateV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
 		presenter.configure(wikiPageKey, mockDescriptorUpdatedHandler);
 	}
@@ -103,32 +108,10 @@ public class WikiMarkdownEditorTest {
 		verify(mockView).setTitleEditorVisible(false);
 		verify(mockGlobalApplicationState).setIsEditing(true);
 		verify(mockView).showEditorModal();
-	}
-	
-	@Test
-	public void testDeleteConfirmedCallback() {
-		boolean isConfirmed = true;
-
-		presenter.deleteClicked();
-		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
-		verify(mockView).confirm(anyString(), captor.capture());
-		//confirm deletion
-		captor.getValue().callback(isConfirmed);
-		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		verify(mockView).hideEditorModal();
-		verify(mockPlaceChanger).goTo(isA(Synapse.class));
-	}
-	
-	@Test
-	public void testDeleteCancelCallback() {
-		boolean isConfirmed = false;
-		
-		presenter.deleteClicked();
-		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
-		verify(mockView).confirm(anyString(), captor.capture());
-		//confirm deletion cancelled
-		captor.getValue().callback(isConfirmed);
-		verify(mockSynapseClient, Mockito.never()).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
+		// SWC-4121: order is important - we must set the cursor position to the start index before focus so that the browser will auto-scroll to the top
+		InOrder inOrder = Mockito.inOrder(mockMarkdownEditorWidget);
+		inOrder.verify(mockMarkdownEditorWidget).setCursorPos(0);
+		inOrder.verify(mockMarkdownEditorWidget).setMarkdownFocus();
 	}
 	
 	@Test
@@ -176,6 +159,22 @@ public class WikiMarkdownEditorTest {
 		List<String> currentFileHandleIds = presenter.getWikiPage().getAttachmentFileHandleIds();
 		assertTrue(currentFileHandleIds.size() == 1);
 		assertTrue(currentFileHandleIds.contains(fileHandleId1));
+	}
+	
+	@Test
+	public void testCreateNewWiki() {
+		String newWikiPageId = "73897493";
+		when(mockWikiPage.getId()).thenReturn(newWikiPageId);
+		NotFoundException notFoundEx = new NotFoundException();
+		AsyncMockStubber.callFailureWith(notFoundEx).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
+		wikiPageKey.setWikiPageId(null);
+		presenter.configure(wikiPageKey, null);
+		
+		//verify that it attempted to create a new wiki page
+		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class), any(AsyncCallback.class));
+		
+		// verify wiki page key was updated
+		assertEquals(newWikiPageId, wikiPageKey.getWikiPageId());
 	}
 	
 	

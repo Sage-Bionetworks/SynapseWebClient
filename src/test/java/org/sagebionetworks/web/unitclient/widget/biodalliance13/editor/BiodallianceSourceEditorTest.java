@@ -10,21 +10,20 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
-
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource;
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceSource.SourceType;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditor;
 import org.sagebionetworks.web.client.widget.biodalliance13.editor.BiodallianceSourceEditorView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
@@ -38,7 +37,8 @@ public class BiodallianceSourceEditorTest {
 	SynapseClientAsync mockSynapseClient;
 	EntityFinder mockEntityFinder, mockIndexEntityFinder;
 	BiodallianceSource mockSource;
-	
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	EntityBundle mockEntityBundle;
 	FileEntity selectedFile;
 	
@@ -58,6 +58,7 @@ public class BiodallianceSourceEditorTest {
 	
 	@Before
 	public void setup() throws Exception {
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(BiodallianceSourceEditorView.class); 
 		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockEntityFinder = mock(EntityFinder.class);
@@ -69,8 +70,8 @@ public class BiodallianceSourceEditorTest {
 		selectedFile.setDataFileHandleId(dataFileHandleId);
 		when(mockEntityBundle.getEntity()).thenReturn(selectedFile);
 		
-		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockEntityBundle).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		
 		when(mockSource.getSourceType()).thenReturn(SourceType.VCF);
 		when(mockSource.getSourceName()).thenReturn(sourceName);
@@ -82,7 +83,7 @@ public class BiodallianceSourceEditorTest {
 		when(mockSource.getHeightPx()).thenReturn(heightPx);
 		
 		when(mockView.getHeight()).thenReturn(viewHeight);
-		editor = new BiodallianceSourceEditor(mockView, mockSynapseClient, mockEntityFinder, mockIndexEntityFinder, mockSource);
+		editor = new BiodallianceSourceEditor(mockView, mockEntityFinder, mockIndexEntityFinder, mockSource, mockSynapseJavascriptClient);
 	}
 
 	@Test
@@ -185,7 +186,7 @@ public class BiodallianceSourceEditorTest {
 		editor.entitySelected(ref);
 		
 		verify(mockSource).setEntity(null, null);
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockSource).setEntity(selectedEntityId, currentEntityVersion);
 		verify(mockSource).setSourceType(SourceType.BIGWIG);
 		verify(mockView).setEntityFinderText(selectedEntityId+"."+currentEntityVersion);
@@ -198,10 +199,10 @@ public class BiodallianceSourceEditorTest {
 		String selectedEntityId = "syn111";
 		ref.setTargetId(selectedEntityId);
 		String errorMessage = "lookup failed.";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		editor.entitySelected(ref);
 		
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockEntityFinder).showError(errorMessage);
 	}
 	
@@ -240,7 +241,7 @@ public class BiodallianceSourceEditorTest {
 		editor.entitySelected(ref);
 		
 		verify(mockSource).setEntity(null, null);
-		verify(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		verify(mockSource).setEntity(selectedEntityId, selectedVersion);
 		verify(mockSource).setSourceType(SourceType.BED);
 		verify(mockView).setEntityFinderText(selectedEntityId+"."+selectedVersion);
@@ -255,10 +256,10 @@ public class BiodallianceSourceEditorTest {
 		ref.setTargetId(selectedEntityId);
 		ref.setTargetVersionNumber(40L);
 		String errorMessage = "lookup failed.";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		editor.entitySelected(ref);
 		
-		verify(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		verify(mockEntityFinder).showError(errorMessage);
 	}
 
@@ -280,7 +281,7 @@ public class BiodallianceSourceEditorTest {
 		editor.indexEntitySelected(ref);
 		
 		verify(mockSource).setIndexEntity(null, null);
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockSource).setIndexEntity(selectedEntityId, currentEntityVersion);
 		verify(mockView).setIndexEntityFinderText(selectedEntityId+"."+currentEntityVersion);
 		verify(mockIndexEntityFinder).hide();
@@ -292,10 +293,10 @@ public class BiodallianceSourceEditorTest {
 		String selectedEntityId = "syn111";
 		ref.setTargetId(selectedEntityId);
 		String errorMessage = "lookup failed.";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		editor.indexEntitySelected(ref);
 		
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockIndexEntityFinder).showError(errorMessage);
 	}
 	
@@ -334,7 +335,7 @@ public class BiodallianceSourceEditorTest {
 		editor.indexEntitySelected(ref);
 		
 		verify(mockSource).setIndexEntity(null, null);
-		verify(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		verify(mockSource).setIndexEntity(selectedEntityId, selectedVersion);
 		verify(mockView).setIndexEntityFinderText(selectedEntityId+"."+selectedVersion);
 		verify(mockIndexEntityFinder).hide();
@@ -348,10 +349,10 @@ public class BiodallianceSourceEditorTest {
 		ref.setTargetId(selectedEntityId);
 		ref.setTargetVersionNumber(40L);
 		String errorMessage = "lookup failed.";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		editor.indexEntitySelected(ref);
 		
-		verify(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		verify(mockIndexEntityFinder).showError(errorMessage);
 	}
 	

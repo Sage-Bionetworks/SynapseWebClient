@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.unitclient;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -15,7 +17,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,13 +29,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.web.client.ClientLogger;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.GlobalApplicationStateView;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -54,8 +57,8 @@ import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class GlobalApplicationStateImplTest {
-	
-	SynapseClientAsync mockSynapseClient;
+	@Mock
+	StackConfigServiceAsync mockStackConfigService;
 	CookieProvider mockCookieProvider;
 	PlaceController mockPlaceController;
 	EventBus mockEventBus;
@@ -63,13 +66,16 @@ public class GlobalApplicationStateImplTest {
 	JiraURLHelper mockJiraURLHelper;
 	AppPlaceHistoryMapper mockAppPlaceHistoryMapper;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	ClientLogger mockLogger;
 	GlobalApplicationStateView mockView;
 	HashMap<String, String> testProps;
 	@Mock
 	ClientCache mockLocalStorage;
 	@Mock
 	GWTWrapper mockGWT;
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -77,16 +83,14 @@ public class GlobalApplicationStateImplTest {
 		mockPlaceController = Mockito.mock(PlaceController.class);
 		mockEventBus = Mockito.mock(EventBus.class);
 		mockJiraURLHelper = Mockito.mock(JiraURLHelper.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockAppPlaceHistoryMapper = mock(AppPlaceHistoryMapper.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockLogger = mock(ClientLogger.class);
 		mockView = mock(GlobalApplicationStateView.class);
-		AsyncMockStubber.callSuccessWith("v1").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("v1").when(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
 		testProps = new HashMap<String, String>();
-		AsyncMockStubber.callSuccessWith(testProps).when(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(testProps).when(mockStackConfigService).getSynapseProperties(any(AsyncCallback.class));
 		
-		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockSynapseClient, mockSynapseJSNIUtils, mockLogger, mockLocalStorage, mockGWT);
+		globalApplicationState = new GlobalApplicationStateImpl(mockView, mockCookieProvider,mockJiraURLHelper, mockEventBus, mockStackConfigService, mockSynapseJSNIUtils, mockLocalStorage, mockGWT, mockDateTimeUtils, mockJsClient);
 		globalApplicationState.setPlaceController(mockPlaceController);
 		globalApplicationState.setAppPlaceHistoryMapper(mockAppPlaceHistoryMapper);
 	}
@@ -107,28 +111,29 @@ public class GlobalApplicationStateImplTest {
 		changer.goTo(newPlace);
 		// Since this is not the current place it should actaully go there.
 		verify(mockPlaceController).goTo(newPlace);
-		
 	}
+	
+	@Test
+	public void testGoToNewPlaceError(){
+		Synapse currentPlace = new Synapse("syn123");
+		// Start with the current place 
+		when(mockPlaceController.getWhere()).thenReturn(currentPlace);
+		PlaceChanger changer = globalApplicationState.getPlaceChanger();
+		assertNotNull(changer);
+		Synapse newPlace = new Synapse("syn456");
+		String errorMessage = "error on goto";
+		doThrow(new RuntimeException(errorMessage)).when(mockPlaceController).goTo(any(Place.class));
+		changer.goTo(newPlace);
+		verify(mockSynapseJSNIUtils).consoleError(errorMessage);
+	}
+
 	
 	@Test
 	public void testUncaughtJSExceptions() {
 		Throwable t = new RuntimeException("uncaught");
 		globalApplicationState.handleUncaughtException(t);
 		verify(mockSynapseJSNIUtils).consoleError(anyString());
-		verify(mockLogger).errorToRepositoryServices(anyString(), eq(t));
-	}
-	
-	@Test
-	public void testUncaughtJSExceptionsFailedServiceLog() {
-		Throwable t = new RuntimeException("uncaught");
-		//when we try to log the error to the repository services, 
-		//make sure we still send the error to the console, 
-		//and that calling does not throw any other uncaught exception.
-		doThrow(new NullPointerException()).when(mockLogger).errorToRepositoryServices(anyString(), any(Throwable.class));
-		globalApplicationState.handleUncaughtException(t);
-		verify(mockLogger).errorToRepositoryServices(anyString(), eq(t));
-		//called twice.  Once for the uncaught exception, and once to inform that the repo call method failed
-		verify(mockSynapseJSNIUtils, times(2)).consoleError(anyString());
+		verify(mockJsClient).logError(anyString(), eq(t));
 	}
 	
 	@Test
@@ -136,7 +141,7 @@ public class GlobalApplicationStateImplTest {
 		Throwable actualException = new Exception("I am dead, Horatio");
 		Set<Throwable> causes = new LinkedHashSet<Throwable>();
 		causes.add(actualException);
-		UmbrellaException umbrellaException = new UmbrellaException(causes);
+		com.google.web.bindery.event.shared.UmbrellaException umbrellaException = new com.google.web.bindery.event.shared.UmbrellaException(causes);
 		Set<Throwable> umbrellaUmbrellaCauses = new HashSet<Throwable>();
 		umbrellaUmbrellaCauses.add(umbrellaException);
 		UmbrellaException umbrellaUmbrellaException = new UmbrellaException(umbrellaUmbrellaCauses);
@@ -162,7 +167,6 @@ public class GlobalApplicationStateImplTest {
 		changer.goTo(currenPlace);
 		// Since we are already there then just reload the page by firing an event
 		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
-		
 	}
 
 	@SuppressWarnings("unchecked")
@@ -174,7 +178,7 @@ public class GlobalApplicationStateImplTest {
 		});
 		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
 		globalApplicationState.checkVersionCompatibility(callback);
-		verify(mockSynapseClient, times(2)).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockStackConfigService, times(2)).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView, never()).showVersionOutOfDateGlobalMessage();
 		//verify callback was given the correct version
 		ArgumentCaptor<VersionState> captor = ArgumentCaptor.forClass(VersionState.class);
@@ -182,22 +186,34 @@ public class GlobalApplicationStateImplTest {
 		assertEquals("v1", captor.getValue().getVersion());
 		
 		// simulate change repo version
-		reset(mockSynapseClient);
-		AsyncMockStubber.callSuccessWith("v2").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		reset(mockStackConfigService);
+		AsyncMockStubber.callSuccessWith("v2").when(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
 		callback = mock(AsyncCallback.class);
 		globalApplicationState.checkVersionCompatibility(callback);
-		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView).showVersionOutOfDateGlobalMessage();
 		//verify callback was given the currently loaded version (not the current version)
 		captor = ArgumentCaptor.forClass(VersionState.class);
 		verify(callback).onSuccess(captor.capture());
 		assertEquals("v1", captor.getValue().getVersion());
 		
-		AsyncMockStubber.callSuccessWith("v3").when(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith("v3").when(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
 		globalApplicationState.checkVersionCompatibility(callback);
 		//showVersionOutOfDateGlobalMessage() has still only been called once, despite detecting another version change
 		verify(mockView).showVersionOutOfDateGlobalMessage();
 		
+	}
+	
+	@Test
+	public void testCheckVersionCompatibilityFailure() {
+		Exception ex = new Exception("couldn't get version");
+		AsyncMockStubber.callFailureWith(ex).when(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
+		globalApplicationState.initSynapseProperties(() -> {});
+		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
+		globalApplicationState.checkVersionCompatibility(callback);
+		verify(mockStackConfigService, times(2)).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockView).showGetVersionError(ex.getMessage());
+		verify(callback).onFailure(ex);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -210,10 +226,10 @@ public class GlobalApplicationStateImplTest {
 			public void invoke() {}
 		});
 		
-		reset(mockSynapseClient);
+		reset(mockStackConfigService);
 		globalApplicationState.checkVersionCompatibility(callback);
 		
-		verify(mockSynapseClient, never()).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockStackConfigService, never()).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView, never()).showVersionOutOfDateGlobalMessage();
 		//verify callback was given the correct version
 		ArgumentCaptor<VersionState> captor = ArgumentCaptor.forClass(VersionState.class);
@@ -230,14 +246,14 @@ public class GlobalApplicationStateImplTest {
 		globalApplicationState.initSynapseProperties(mockCallback);
 		
 		verify(mockView).initGlobalViewProperties();
-		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		verify(mockStackConfigService).getSynapseProperties(any(AsyncCallback.class));
 		verify(mockLocalStorage).put(eq(key), eq(value), anyLong());
 		verify(mockLocalStorage).put(eq(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY), eq(Boolean.TRUE.toString()), anyLong());
 		when(mockLocalStorage.get(key)).thenReturn(value);
 		assertEquals(value, globalApplicationState.getSynapseProperty(key));
 		assertNull(globalApplicationState.getSynapseProperty("foo"));
 		//also sets synapse versions on app load
-		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
 		assertEquals("v1", globalApplicationState.getSynapseVersion());
 		verify(mockCallback).invoke();
 	}
@@ -248,8 +264,8 @@ public class GlobalApplicationStateImplTest {
 		when(mockLocalStorage.get(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY)).thenReturn(Boolean.TRUE.toString());
 		globalApplicationState.initSynapseProperties(mockCallback);
 		
-		verify(mockSynapseClient, never()).getSynapseProperties(any(AsyncCallback.class));
-		verify(mockSynapseClient).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockStackConfigService, never()).getSynapseProperties(any(AsyncCallback.class));
+		verify(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
 		assertEquals("v1", globalApplicationState.getSynapseVersion());
 		verify(mockCallback).invoke();
 		
@@ -262,7 +278,7 @@ public class GlobalApplicationStateImplTest {
 		testProps.put(key, value);
 		deferredCallback.getValue().invoke();
 		//local synapse properties are updated
-		verify(mockSynapseClient).getSynapseProperties(any(AsyncCallback.class));
+		verify(mockStackConfigService).getSynapseProperties(any(AsyncCallback.class));
 		verify(mockLocalStorage).put(eq(key), eq(value), anyLong());
 	}
 	
@@ -305,12 +321,6 @@ public class GlobalApplicationStateImplTest {
 	}
 	
 	@Test
-	public void testClearCurrentPlace() {
-		globalApplicationState.clearCurrentPlace();
-		verify(mockCookieProvider).removeCookie(CookieKeys.CURRENT_PLACE);
-	}
-	
-	@Test
 	public void testPushCurrentPlace(){
 		String newToken = "/some/new/token";
 		Place mockPlace = mock(Place.class);
@@ -318,16 +328,13 @@ public class GlobalApplicationStateImplTest {
 		globalApplicationState.pushCurrentPlace(mockPlace);
 		//should have set the last place (to the current), and the current place (as requested)
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
-		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
 		verify(mockGWT).newItem(newToken, false);
 		
 		//if I push the same place again, it should not push the history state again
-		when(mockCookieProvider.getCookie(CookieKeys.CURRENT_PLACE)).thenReturn("current place is set");
 		when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
 		globalApplicationState.pushCurrentPlace(mockPlace);
 		//verify that these were still only called once
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
-		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
 		verify(mockGWT).newItem(newToken, false);
 	}
 	
@@ -339,17 +346,26 @@ public class GlobalApplicationStateImplTest {
 		globalApplicationState.replaceCurrentPlace(mockPlace);
 		//should have set the last place (to the current), and the current place (as requested)
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
-		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
 		verify(mockGWT).replaceItem(newToken, false);
 		
 		//if I push the same place again, it should not push the history state again
-		when(mockCookieProvider.getCookie(CookieKeys.CURRENT_PLACE)).thenReturn("current place is set");
 		when(mockAppPlaceHistoryMapper.getPlace(anyString())).thenReturn(mockPlace);
 		globalApplicationState.replaceCurrentPlace(mockPlace);
 		//verify that these were still only called once
 		verify(mockCookieProvider).setCookie(eq(CookieKeys.LAST_PLACE), anyString(), any(Date.class));
-		verify(mockCookieProvider).setCookie(eq(CookieKeys.CURRENT_PLACE), anyString(), any(Date.class));
 		verify(mockGWT).replaceItem(newToken, false);
+	}
+	
+	@Test
+	public void testReplaceCurrentPlaceFailure(){
+		String error = "failure to push current place!";
+		doThrow(new RuntimeException(error)).when(mockGWT).replaceItem(anyString(), anyBoolean());
+		String newToken = "/some/new/token";
+		Place mockPlace = mock(Place.class);
+		when(mockAppPlaceHistoryMapper.getToken(mockPlace)).thenReturn(newToken);
+		globalApplicationState.replaceCurrentPlace(mockPlace);
+		verify(mockGWT).replaceItem(newToken, false);
+		verify(mockSynapseJSNIUtils).consoleError(error);
 	}
 
 	@Test
@@ -392,5 +408,26 @@ public class GlobalApplicationStateImplTest {
 		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
 		verify(mockAppPlaceHistoryMapper).getPlace(captor.capture());
 		assertEquals(GlobalApplicationStateImpl.DEFAULT_REFRESH_PLACE, captor.getValue());
+	}
+	
+	@Test
+	public void testSetShowLocalTime() {
+		globalApplicationState.setShowUTCTime(false);
+		verify(mockDateTimeUtils).setShowUTCTime(false);
+		verify(mockCookieProvider).setCookie(eq(CookieKeys.SHOW_DATETIME_IN_UTC), eq(Boolean.FALSE.toString()), any(Date.class));
+	}
+	
+	@Test
+	public void testIsShowingUTCTime() {
+		when(mockDateTimeUtils.isShowingUTCTime()).thenReturn(false);
+		assertFalse(globalApplicationState.isShowingUTCTime());
+		verify(mockDateTimeUtils).isShowingUTCTime();
+	}
+	
+	@Test
+	public void testSetShowUTCTime() {
+		globalApplicationState.setShowUTCTime(true);
+		verify(mockDateTimeUtils).setShowUTCTime(true);
+		verify(mockCookieProvider).setCookie(eq(CookieKeys.SHOW_DATETIME_IN_UTC), eq(Boolean.TRUE.toString()), any(Date.class));
 	}
 }

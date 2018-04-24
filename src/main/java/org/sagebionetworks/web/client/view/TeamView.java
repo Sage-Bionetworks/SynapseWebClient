@@ -23,6 +23,7 @@ public interface TeamView extends IsWidget, SynapseView {
 		void showInviteModal();
 		void clear();
 		void onShowMap();
+		void onManageAccess();
 	}
 
 	void setSynAlertWidget(Widget asWidget);
@@ -38,11 +39,13 @@ public interface TeamView extends IsWidget, SynapseView {
 	void setMemberListWidget(Widget asWidget);
 	void setPublicJoinVisible(Boolean canPublicJoin);
 	void setTotalMemberCount(String string);
-	void setMediaObjectPanel(Team team, String xsrfToken);
+	void setMediaObjectPanel(Team team);
 	void setTeamEmailAddress(String teamEmail);
 	void setMap(Widget w);
 	void showMapModal();
 	void setShowMapVisible(boolean visible);
+	void setManageAccessVisible(boolean visible);
+	void setCommandsVisible(boolean visible);
 	int getClientHeight();
 	
 }

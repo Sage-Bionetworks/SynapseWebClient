@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.client.widget.refresh;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
-import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 
@@ -15,7 +15,7 @@ import com.google.inject.Inject;
 public class ReplyCountAlert implements RefreshAlertView.Presenter, SynapseWidgetPresenter {
 	
 	private RefreshAlertView view;
-	private DiscussionForumClientAsync discussionForumClient;
+	SynapseJavascriptClient jsClient;
 	private GWTWrapper gwt;
 	private GlobalApplicationState globalAppState;
 	private SynapseJSNIUtils utils;
@@ -26,15 +26,15 @@ public class ReplyCountAlert implements RefreshAlertView.Presenter, SynapseWidge
 	public static final int DELAY = 70000; // check every 70 seconds (until detached, configuration cleared, or a change has been detected)
 	@Inject
 	public ReplyCountAlert(RefreshAlertView view, 
-			DiscussionForumClientAsync discussionForumClient, 
 			GWTWrapper gwt,
 			GlobalApplicationState globalAppState,
-			SynapseJSNIUtils utils) {
+			SynapseJSNIUtils utils,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
-		this.discussionForumClient = discussionForumClient;
 		this.gwt = gwt;
 		this.globalAppState = globalAppState;
 		this.utils = utils;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		invokeCheck = new Callback() {
 			@Override
@@ -79,7 +79,7 @@ public class ReplyCountAlert implements RefreshAlertView.Presenter, SynapseWidge
 	
 	private void checkCount() {
 		if (view.isAttached() && threadId != null) {
-			discussionForumClient.getReplyCountForThread(threadId, DiscussionFilter.NO_FILTER, new AsyncCallback<Long>() {
+			jsClient.getReplyCountForThread(threadId, DiscussionFilter.NO_FILTER, new AsyncCallback<Long>() {
 				@Override
 				public void onSuccess(Long result) {
 					if (count == null) {

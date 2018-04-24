@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -66,6 +67,9 @@ public class DiscussionThreadListWidgetTest {
 	DiscussionThreadBundle mockDiscussionThreadBundle;
 	@Mock
 	LoadMoreWidgetContainer mockThreadsContainer;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	
 	List<DiscussionThreadBundle> discussionThreadBundleList = new ArrayList<DiscussionThreadBundle>();
 	DiscussionThreadListWidget discussionThreadListWidget;
 	Set<String> moderatorIds;
@@ -76,7 +80,7 @@ public class DiscussionThreadListWidgetTest {
 		when(mockGinInjector.createThreadListItemWidget()).thenReturn(mockDiscussionThreadWidget);
 		when(mockGinInjector.getDiscussionThreadCountAlert()).thenReturn(mockDiscussionThreadCountAlert);
 		discussionThreadListWidget = new DiscussionThreadListWidget(mockView,
-				mockGinInjector, mockDiscussionForumClient, mockSynAlert, mockThreadsContainer,mockSynapseJSNIUtils);
+				mockGinInjector, mockDiscussionForumClient, mockSynAlert, mockThreadsContainer,mockSynapseJSNIUtils, mockSynapseJavascriptClient);
 		moderatorIds = new HashSet<String>();
 	}
 
@@ -149,12 +153,12 @@ public class DiscussionThreadListWidgetTest {
 		
 		// test scroll to thread
 		AsyncMockStubber.callSuccessWith(mockDiscussionThreadBundle)
-			.when(mockDiscussionForumClient).getThread(anyString(), any(AsyncCallback.class));
+			.when(mockSynapseJavascriptClient).getThread(anyString(), any(AsyncCallback.class));
 		discussionThreadListWidget.scrollToThread("invalidid");
 		verify(mockView, never()).scrollIntoView(any(Widget.class));
 		discussionThreadListWidget.scrollToThread(threadId);
 		verify(mockView).scrollIntoView(any(Widget.class));
-		verify(mockDiscussionForumClient).getThread(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getThread(anyString(), any(AsyncCallback.class));
 		verify(mockDiscussionThreadWidget).configure(mockDiscussionThreadBundle);
 	}
 
@@ -195,10 +199,10 @@ public class DiscussionThreadListWidgetTest {
 		// test scroll to thread, rpc failure
 		String error = "unable to refresh thread data";
 		AsyncMockStubber.callFailureWith(new Exception(error))
-			.when(mockDiscussionForumClient).getThread(anyString(), any(AsyncCallback.class));
+			.when(mockSynapseJavascriptClient).getThread(anyString(), any(AsyncCallback.class));
 		discussionThreadListWidget.scrollToThread(threadId);
 		verify(mockView).scrollIntoView(any(Widget.class));
-		verify(mockDiscussionForumClient).getThread(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getThread(anyString(), any(AsyncCallback.class));
 		verify(mockDiscussionThreadWidget, never()).configure(mockDiscussionThreadBundle);
 		verify(mockSynapseJSNIUtils).consoleError(error);
 	}

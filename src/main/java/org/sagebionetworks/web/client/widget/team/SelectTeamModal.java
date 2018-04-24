@@ -1,9 +1,10 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider.GroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -12,15 +13,16 @@ public class SelectTeamModal implements SelectTeamModalView.Presenter {
 	private SelectTeamModalView view;
 	private CallbackP<String> teamIdSelectedCallback; 
 	SynapseSuggestBox teamSuggestBox;
-	GroupSuggestionProvider provider;
+	UserGroupSuggestionProvider provider;
 	
 	@Inject
 	public SelectTeamModal(SelectTeamModalView view, 
 			SynapseSuggestBox teamSuggestBox,
-			GroupSuggestionProvider provider) {
+			UserGroupSuggestionProvider provider) {
 		this.view = view;
 		this.teamSuggestBox = teamSuggestBox;
 		teamSuggestBox.setSuggestionProvider(provider);
+		teamSuggestBox.setTypeFilter(TypeFilter.TEAMS_ONLY);
 		view.setSuggestWidget(teamSuggestBox.asWidget());
 		view.setPresenter(this);
 	}
@@ -44,7 +46,7 @@ public class SelectTeamModal implements SelectTeamModalView.Presenter {
 
 	@Override
 	public void onSelectTeam() {
-		GroupSuggestion suggestion = (GroupSuggestion)teamSuggestBox.getSelectedSuggestion();
+		UserGroupSuggestion suggestion = (UserGroupSuggestion)teamSuggestBox.getSelectedSuggestion();
 		if (suggestion != null && teamIdSelectedCallback != null) {
 			teamIdSelectedCallback.invoke(suggestion.getId());
 		}	

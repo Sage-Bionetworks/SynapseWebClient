@@ -5,13 +5,8 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	
-	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
-	
-	<b:Row>
-		<bh:Span ui:field="loading" addStyleNames="center-block center min-height-400">
-			<g:Image resource='{sageImageBundle.loading31}' />
-			<bh:Text> Loading...</bh:Text>
-		</bh:Span>
+	<b:Row addStyleNames="filesTabContent">
+		<w:LoadingSpinner ui:field="loading" size="31px" addStyleNames="center-block center min-height-400"/>
 		<g:SimplePanel ui:field="refreshAlertContainer"/>
 		<g:SimplePanel ui:field="synapseAlertContainer"/>
 		<bh:Div addStyleNames="margin-left-15 margin-right-15">
@@ -34,9 +29,10 @@
 			    			<bh:Text>Preview</bh:Text>
 			    			<w:HelpWidget helpMarkdown="Preview shows a portion of the file content. Content is only visible when the user is logged in and has satisfied all conditions for use." 
 								href="http://docs.synapse.org/articles/access_controls.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
+							<b:Anchor addStyleNames="lightGreyText" icon="ARROWS_ALT" ui:field="expandPreviewLink" pull="RIGHT" />
 			    		</bh:Div>
-			    		<g:ScrollPanel height="210px">
-			    			<bh:Div ui:field="filePreviewContainerHighlightBox" />
+			    		<g:ScrollPanel height="200px" addStyleNames="light-border whiteBackground">
+			    			<bh:Div ui:field="filePreviewWidgetContainer"/>
 			    		</g:ScrollPanel>
 			    	</g:FlowPanel>
 				</b:Column>
@@ -46,8 +42,9 @@
 			    			<bh:Text>Provenance</bh:Text>
 			    			<w:HelpWidget helpMarkdown="Provenance tracks the relationship between data, code and analytical results" 
 								href="http://docs.synapse.org/articles/provenance.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
+							<b:Anchor addStyleNames="lightGreyText" icon="ARROWS_ALT" ui:field="expandProvenanceLink" pull="RIGHT" />
 			    		</bh:Div>
-			    		<bh:Div ui:field="fileProvenanceContainerHighlightBox" />
+			    		<bh:Div ui:field="fileProvenanceGraphContainer" addStyleNames="light-border whiteBackground"/>
 			    	</g:FlowPanel>
 				</b:Column>
 				<b:Column size="MD_12" ui:field="discussionContainer">

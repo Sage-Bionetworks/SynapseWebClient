@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.users.RegisterAccountPresenter;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.event.shared.EventBus;
@@ -32,9 +31,7 @@ public class RegisterAccountPresenterTest {
 	RegisterWidget mockRegisterWidget;
 	@Mock
 	Header mockHeader;
-	@Mock
-	Footer mockFooter;
-	
+
 	@Mock
 	EventBus mockEventBus;
 	@Mock
@@ -43,7 +40,7 @@ public class RegisterAccountPresenterTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockRegisterWidget, mockHeader, mockFooter );			
+		registerAccountPresenter = new RegisterAccountPresenter(mockView, mockRegisterWidget, mockHeader);			
 	}
 	
 	@Test
@@ -59,11 +56,8 @@ public class RegisterAccountPresenterTest {
 		registerAccountPresenter.setPlace(mockPlace);
 		
 		verify(mockRegisterWidget).setEmail(email);
-		verify(mockRegisterWidget).configure(false);
 		verify(mockView).setRegisterWidget(any(Widget.class));
 		verify(mockHeader).configure(false);
 		verify(mockHeader).refresh();
-		verify(mockView).setFooterWidget(any(Widget.class));
-		verify(mockView).setHeaderWidget(any(Widget.class));
 	}
 }

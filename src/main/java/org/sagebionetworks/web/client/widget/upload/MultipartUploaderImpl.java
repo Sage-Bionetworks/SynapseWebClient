@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.upload;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Collections;
 import java.util.Date;
 
@@ -11,7 +13,7 @@ import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.PartPresignedUrl;
 import org.sagebionetworks.repo.model.file.PartUtils;
-import org.sagebionetworks.repo.model.util.ContentTypeUtils;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.MultipartFileUploadClientAsync;
@@ -20,8 +22,9 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.xhr.client.ReadyStateChangeHandler;
@@ -37,6 +40,7 @@ import com.google.inject.Inject;
 public class MultipartUploaderImpl implements MultipartUploader {
 	public static final String PLEASE_SELECT_A_FILE = "Please select a file.";
 	public static final String BINARY_CONTENT_TYPE = "application/octet-stream";
+	public static final String EMPTY_FILE_ERROR_MESSAGE = "The selected file is empty: ";
 	//if any parts fail to upload, then it will restart the upload from the beginning up to 10 times, with a 3 second delay between attempts.
 	public static final int RETRY_DELAY = 3000;
 	
@@ -48,10 +52,6 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	
 	//string builder to capture upload information.  sends to output if any errors occur during direct upload.
 	private StringBuilder uploadLog;
-	//Id linked to the file input element in the dom.
-	private String fileInputId;
-	//File index in the file input element (if multi-select this could be non-zero)
-	int fileIndex;
 	//This class will create a multipart upload request (containing information specific to the file that the user wants to upload).
 	private MultipartUploadRequest request;
 	//Get the upload status of all parts from the backend.  Will be refreshed from the server on each attempt.
@@ -69,6 +69,9 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	private String uploadSpeed;
 	//in alpha mode, upload log is sent to the js console
 	private boolean isDebugLevelLogging = false;
+	JavaScriptObject blob;
+	HasAttachHandlers view;
+	boolean isCanceled;
 	
 	@Inject
 	public MultipartUploaderImpl(GWTWrapper gwt,
@@ -79,39 +82,39 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		this.gwt = gwt;
 		this.synapseJsniUtils = synapseJsniUtils;
 		this.multipartFileUploadClient = multipartFileUploadClient;
+		fixServiceEntryPoint(multipartFileUploadClient);
 		this.percentFormat = gwt.getNumberFormat("##");;
 		this.cookies = cookies;
 	}
 	
 	@Override
-	public void uploadSelectedFile(String fileInputId,ProgressingFileUploadHandler handler, Long storageLocationId) {
-		// First get the name of the file
-		String[] names = synapseJsniUtils.getMultipleUploadFileNames(fileInputId);
-		if(names == null || names.length < 1){
-			handler.uploadFailed(PLEASE_SELECT_A_FILE);
-			return;
-		}
-		int index = 0;
-		String fileName = names[0];
-		uploadFile(fileName, fileInputId, index, handler, storageLocationId);
-	}
-	
-	@Override
-	public void uploadFile(final String fileName, final String fileInputId, final int fileIndex, ProgressingFileUploadHandler handler, final Long storageLocationId) {
+	public void uploadFile(final String fileName, final String contentType, final JavaScriptObject blob, ProgressingFileUploadHandler handler, final Long storageLocationId, HasAttachHandlers view) {
 		//initialize attempt count. 
 		this.request = null;
 		this.totalPartCount = 0;
-		this.fileInputId = fileInputId;
-		this.fileIndex = fileIndex;
 		this.handler = handler;
+		this.blob = blob;
+		this.view = view;
+		isCanceled = false;
 		isDebugLevelLogging = DisplayUtils.isInTestWebsite(cookies);
+		
+		//SWC-3779: check for empty file
+		long fileSize = (long)synapseJsniUtils.getFileSize(blob);
+		if (fileSize <= 0) {
+			handler.uploadFailed(EMPTY_FILE_ERROR_MESSAGE + fileName);
+			return;	
+		}
+		
 		uploadLog = new StringBuilder();
 		log(gwt.getUserAgent() + "\n" + gwt.getAppVersion() + "\nDirectly uploading " + fileName + " - calculating MD5\n");
-		synapseJsniUtils.getFileMd5(fileInputId, fileIndex, new MD5Callback() {
+		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
 			@Override
 			public void setMD5(String md5) {
-				String contentType = fixDefaultContentType(synapseJsniUtils.getContentType(fileInputId, fileIndex), fileName);
-				long fileSize = (long)synapseJsniUtils.getFileSize(fileInputId, fileIndex);
+				if (md5 == null) {
+					handler.uploadFailed(DisplayConstants.MD5_CALCULATION_ERROR);
+					return;
+				}
+				long fileSize = (long)synapseJsniUtils.getFileSize(blob);
 				long partSizeBytes = PartUtils.choosePartSize(fileSize);
 				long numberOfParts = PartUtils.calculateNumberOfParts(
 						fileSize, partSizeBytes);
@@ -205,7 +208,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 				if (isStillUploading()) {
 					PartPresignedUrl url = batchPresignedUploadUrlResponse.getPartPresignedUrls().get(0);
 					String urlString = url.getUploadPresignedUrl();
-					XMLHttpRequest xhr = gwt.createXMLHttpRequest();
+					final XMLHttpRequest xhr = gwt.createXMLHttpRequest();
 					if (xhr != null) {
 						xhr.setOnReadyStateChange(new ReadyStateChangeHandler() {
 							@Override
@@ -231,20 +234,26 @@ public class MultipartUploaderImpl implements MultipartUploader {
 						@Override
 						public void updateProgress(double loaded, double total) {
 							//0 < currentPartProgress < 1.  We need to add this to the chunks that have already been uploaded. And divide by the total chunk count.
-							double currentPartProgress = loaded / total;
-							double currentProgress = (((double)(completedPartCount)) + currentPartProgress)/((double)totalPartCount);
-							String progressText = percentFormat.format(currentProgress*100.0) + "%";
-							// update uploadSpeed every couple of seconds
-							long msElapsed = (new Date().getTime() - startTime);
-							if (msElapsed > 0 && (msElapsed > nextProgressPoint)) {
-								double totalBytesTransfered = (request.getPartSizeBytes() * completedPartCount) + loaded;
-								uploadSpeed = "("+DisplayUtils.getFriendlySize(totalBytesTransfered / (msElapsed / 1000), true) + "/s)";
-								nextProgressPoint += 2000;
+							if (!isStillUploading()) {
+								if (xhr != null) {
+									xhr.abort();
+								}
+							} else {
+								double currentPartProgress = loaded / total;
+								double currentProgress = (((double)(completedPartCount)) + currentPartProgress)/((double)totalPartCount);
+								String progressText = percentFormat.format(currentProgress*100.0) + "%";
+								// update uploadSpeed every couple of seconds
+								long msElapsed = (new Date().getTime() - startTime);
+								if (msElapsed > 0 && (msElapsed > nextProgressPoint)) {
+									double totalBytesTransfered = (request.getPartSizeBytes() * completedPartCount) + loaded;
+									uploadSpeed = "("+DisplayUtils.getFriendlySize(totalBytesTransfered / (msElapsed / 1000), true) + "/s)";
+									nextProgressPoint += 2000;
+								}
+								handler.updateProgress(currentProgress, progressText, uploadSpeed);
 							}
-							handler.updateProgress(currentProgress, progressText, uploadSpeed);
 						}
 					};
-					synapseJsniUtils.uploadFileChunk(BINARY_CONTENT_TYPE, fileIndex, fileInputId, range.getStart(), range.getEnd(), urlString, xhr, progressCallback);
+					synapseJsniUtils.uploadFileChunk(BINARY_CONTENT_TYPE, blob, range.getStart(), range.getEnd(), urlString, xhr, progressCallback);
 				}
 			}
 		});
@@ -254,7 +263,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	 * @return True if user is still looking at the upload UI.
 	 */
 	public boolean isStillUploading() {
-		return synapseJsniUtils.isElementExists(fileInputId);
+		return view.isAttached() && !isCanceled;
 	}
 	
 	/**
@@ -318,7 +327,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	public void addCurrentPartToMultipartUpload() {
 		//calculate the md5 of this file part
 		if (isStillUploading()) {
-			synapseJsniUtils.getFilePartMd5(fileInputId, currentPartNumber-1, request.getPartSizeBytes(), fileIndex, new MD5Callback() {
+			synapseJsniUtils.getFilePartMd5(blob, currentPartNumber-1, request.getPartSizeBytes(), new MD5Callback() {
 				@Override
 				public void setMD5(String partMd5) {
 					log("partNumber="+currentPartNumber + " partNumberMd5="+partMd5);
@@ -363,23 +372,8 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		uploadLog = new StringBuilder();
 	}
 
-	public static String fixDefaultContentType(String type, String fileName) {
-		String contentType = type;
-		String lowercaseFilename = fileName.toLowerCase();
-		if (type == null || type.trim().length() == 0) {
-			if (ContentTypeUtils.isRecognizedCodeFileName(fileName)) {
-				contentType = ContentTypeUtils.PLAIN_TEXT;
-			}
-			else if (lowercaseFilename.endsWith(".tsv") || lowercaseFilename.endsWith(".tab")) {
-				contentType = WebConstants.TEXT_TAB_SEPARATED_VALUES;
-			}
-			else if (lowercaseFilename.endsWith(".csv")) {
-				contentType = WebConstants.TEXT_COMMA_SEPARATED_VALUES;
-			}
-			else if (lowercaseFilename.endsWith(".txt")) {
-				contentType = ContentTypeUtils.PLAIN_TEXT;
-			}
-		}
-		return contentType;
+	@Override
+	public void cancelUpload() {
+		isCanceled = true;
 	}
 }

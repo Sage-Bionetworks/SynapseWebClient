@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.PERMISSIONS;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.List;
 
@@ -10,12 +11,13 @@ import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiOrderHint;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.shared.PaginatedResults;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
@@ -26,7 +28,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget {
+public class WikiSubpagesWidget implements IsWidget {
 	
 	private WikiSubpagesView view;
 	private SynapseClientAsync synapseClient;
@@ -35,34 +37,40 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 	private Place ownerObjectLink;
 	private FlowPanel wikiSubpagesContainer;
 	private FlowPanel wikiPageContainer;
-	private V2WikiOrderHint subpageOrderHint;
 	private boolean canEdit;
+	private ActionMenuWidget actionMenu;
 	
 	//true if wiki is embedded in it's owner page.  false if it should be shown as a stand-alone wiki 
 	private boolean isEmbeddedInOwnerPage;
 	private CallbackP<WikiPageKey> reloadWikiPageCallback;
-	
+	private SynapseJavascriptClient jsClient;
 	@Inject
 	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient,
-							AuthenticationController authenticationController) {
+							AuthenticationController authenticationController,
+							SynapseJavascriptClient jsClient) {
 		this.view = view;		
 		this.synapseClient = synapseClient;
-		view.setPresenter(this);
+		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 	}
 
-	@Override
-	public void configure(final WikiPageKey wikiKey, Callback widgetRefreshRequired, 
-			boolean embeddedInOwnerPage, CallbackP<WikiPageKey> reloadWikiPageCallback) {
+	public void configure(
+			final WikiPageKey wikiKey, 
+			Callback widgetRefreshRequired, 
+			boolean embeddedInOwnerPage, 
+			CallbackP<WikiPageKey> reloadWikiPageCallback,
+			ActionMenuWidget actionMenu) {
 		canEdit = false;
 		this.reloadWikiPageCallback = reloadWikiPageCallback;
 		this.wikiKey = wikiKey;
 		this.isEmbeddedInOwnerPage = embeddedInOwnerPage;
+		this.actionMenu = actionMenu;
 		view.clear();
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
 			int mask = ENTITY | PERMISSIONS;
-			synapseClient.getEntityBundle(wikiKey.getOwnerObjectId(), mask, new AsyncCallback<EntityBundle>() {
+			jsClient.getEntityBundle(wikiKey.getOwnerObjectId(), mask, new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onSuccess(EntityBundle bundle) {
 					ownerObjectName = bundle.getEntity().getName();
@@ -79,7 +87,6 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 		}
 	}
 	
-	@Override
 	public void setContainers(FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
 		this.wikiPageContainer = wikiPageContainer;
 		this.wikiSubpagesContainer = wikiSubpagesContainer;
@@ -97,7 +104,6 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 	}
 
 	public Widget asWidget() {
-		view.setPresenter(this);
 		return view.asWidget();
 	}
 	
@@ -112,17 +118,16 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 					@Override
 					public void onSuccess(V2WikiOrderHint result) {
 						// "Sort" stuff'
-						subpageOrderHint = result;
-						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, subpageOrderHint);
+						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, result);
 						view.configure(wikiHeaders, wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
-										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback(), reloadWikiPageCallback);
+										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
 						view.setEditOrderButtonVisible(canEdit);
 					}
 					@Override
 					public void onFailure(Throwable caught) {
 						// Failed to get order hint. Just ignore it.
 						view.configure(wikiHeaders, wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
-								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, getUpdateOrderHintCallback(), reloadWikiPageCallback);
+								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
 						view.setEditOrderButtonVisible(canEdit);
 					}
 				});
@@ -139,28 +144,5 @@ public class WikiSubpagesWidget implements WikiSubpagesView.Presenter, IsWidget 
 				}
 			}
 		});
-	}
-
-	private UpdateOrderHintCallback getUpdateOrderHintCallback() {
-		return new UpdateOrderHintCallback() {
-			@Override
-			public void updateOrderHint(List<String> newOrderHintIdList) {
-					subpageOrderHint.setIdList(newOrderHintIdList);
-					synapseClient.updateV2WikiOrderHint(subpageOrderHint, new AsyncCallback<V2WikiOrderHint>() {
-						@Override
-						public void onSuccess(V2WikiOrderHint result) {
-							refreshTableOfContents();
-						}
-						@Override
-						public void onFailure(Throwable caught) {
-							view.showErrorMessage(caught.getMessage());
-						}
-					});
-				}
-		};
-	}
-
-	public interface UpdateOrderHintCallback {
-		void updateOrderHint(List<String> newOrderHintIdList);
 	}
 }

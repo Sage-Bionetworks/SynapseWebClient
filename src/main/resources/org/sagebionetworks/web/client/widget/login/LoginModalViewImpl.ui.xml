@@ -6,7 +6,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<!-- Dialog for gathering user credentials -->
-	<b:Modal closable="true"
+	<b:Modal addStyleNames="loginModal" closable="true"
 		dataBackdrop="STATIC" dataKeyboard="false">
 		<b:ModalBody>
 		    <bh:Text ui:field="instructions"></bh:Text>
@@ -26,7 +26,7 @@
 		</b:ModalBody>
 		<b:ModalFooter>
 		    <b:Button ui:field="primaryButton" type="PRIMARY" dataLoadingText="Processing..." >Login</b:Button>
-			<b:Button ui:field="defaultButton" type="DEFAULT"
+			<b:Button ui:field="defaultButton" type="LINK"
 				dataDismiss="MODAL">Cancel</b:Button>
 		</b:ModalFooter>
 	</b:Modal>

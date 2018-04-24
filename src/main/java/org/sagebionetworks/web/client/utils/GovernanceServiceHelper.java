@@ -5,10 +5,11 @@ import java.util.Collection;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.AccessRequirement;
-import org.sagebionetworks.repo.model.PostMessageContentAccessApproval;
+import org.sagebionetworks.repo.model.LockAccessRequirement;
+import org.sagebionetworks.repo.model.ManagedACTAccessRequirement;
 import org.sagebionetworks.repo.model.PostMessageContentAccessRequirement;
-import org.sagebionetworks.repo.model.SelfSignAccessApproval;
-import org.sagebionetworks.repo.model.TermsOfUseAccessApproval;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirement;
+import org.sagebionetworks.repo.model.SelfSignAccessRequirementInterface;
 import org.sagebionetworks.repo.model.TermsOfUseAccessRequirement;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 
@@ -16,21 +17,12 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class GovernanceServiceHelper {
 	
+	public static final String LOCK_ACCESS_REQUIREMENT_TEXT = "Access restricted pending review by Synapse Access and Compliance Team.";
+
 	public static AccessApproval getAccessApproval(
 			String principalId, 
 			AccessRequirement ar) {
-		SelfSignAccessApproval approval;
-		
-		if (ar instanceof TermsOfUseAccessRequirement) {
-			//Terms of Use
-			approval = new TermsOfUseAccessApproval();
-		} else if (ar instanceof PostMessageContentAccessRequirement) {
-			//Post Message
-			approval = new PostMessageContentAccessApproval();
-		} else {
-			throw new IllegalArgumentException("Unexpected access requirement type "+ar.getClass());
-		}
-
+		AccessApproval approval = new AccessApproval();
 		approval.setAccessorId(principalId);
 		approval.setRequirementId(ar.getId());
 		return approval;
@@ -75,8 +67,8 @@ public class GovernanceServiceHelper {
 	 */
 	public static APPROVAL_TYPE accessRequirementApprovalType(AccessRequirement ar) {
 		if (ar==null) return APPROVAL_TYPE.NONE;
-		if (ar instanceof TermsOfUseAccessRequirement) return APPROVAL_TYPE.USER_AGREEMENT;
-		if (ar instanceof ACTAccessRequirement) return APPROVAL_TYPE.ACT_APPROVAL;
+		if (ar instanceof TermsOfUseAccessRequirement || ar instanceof SelfSignAccessRequirement) return APPROVAL_TYPE.USER_AGREEMENT;
+		if (ar instanceof ACTAccessRequirement || ar instanceof LockAccessRequirement) return APPROVAL_TYPE.ACT_APPROVAL;
 		if (ar instanceof PostMessageContentAccessRequirement) return APPROVAL_TYPE.POST_MESSAGE;
 		throw new IllegalArgumentException("Unexpected access requirement type "+ar.getClass());
 	}
@@ -93,9 +85,9 @@ public class GovernanceServiceHelper {
 		RESTRICTION_LEVEL ans = RESTRICTION_LEVEL.OPEN;
 		if (allARs==null) return ans;
 		for (AccessRequirement ar : allARs) {
-			if (ar instanceof TermsOfUseAccessRequirement) {
+			if (ar instanceof SelfSignAccessRequirementInterface) {
 				if (ans==RESTRICTION_LEVEL.OPEN) ans=RESTRICTION_LEVEL.RESTRICTED;
-			} else if (ar instanceof ACTAccessRequirement) {
+			} else if (ar instanceof ACTAccessRequirement || ar instanceof LockAccessRequirement) {
 				ans=RESTRICTION_LEVEL.CONTROLLED;
 			} 
 		}
@@ -104,20 +96,24 @@ public class GovernanceServiceHelper {
 	
 	public static RESTRICTION_LEVEL getRestrictionLevel(AccessRequirement ar) {
 		RESTRICTION_LEVEL ans = RESTRICTION_LEVEL.OPEN;
-		if (ar instanceof TermsOfUseAccessRequirement) {
+		if (ar instanceof SelfSignAccessRequirementInterface) {
 			if (ans==RESTRICTION_LEVEL.OPEN) ans=RESTRICTION_LEVEL.RESTRICTED;
-		} else if (ar instanceof ACTAccessRequirement) {
+		} else if (ar instanceof ACTAccessRequirement || ar instanceof LockAccessRequirement) {
 			ans=RESTRICTION_LEVEL.CONTROLLED;
 		}
 		return ans;
 	}
 	
 	public static String getAccessRequirementText(AccessRequirement ar) {
-		if (ar==null) return "";
+		if (ar==null || ar instanceof ManagedACTAccessRequirement || ar instanceof SelfSignAccessRequirement) return "";
 		if (ar instanceof TermsOfUseAccessRequirement) {
 			return ((TermsOfUseAccessRequirement)ar).getTermsOfUse();
 		} else if (ar instanceof ACTAccessRequirement) {
 			return ((ACTAccessRequirement)ar).getActContactInfo();
+		} else if (ar instanceof LockAccessRequirement) {
+			return LOCK_ACCESS_REQUIREMENT_TEXT;
+		} else if (ar instanceof PostMessageContentAccessRequirement) {
+			return ((PostMessageContentAccessRequirement)ar).getUrl();
 		} else {
 			throw new RuntimeException("Unexpected class "+ar.getClass().getName());
 		}

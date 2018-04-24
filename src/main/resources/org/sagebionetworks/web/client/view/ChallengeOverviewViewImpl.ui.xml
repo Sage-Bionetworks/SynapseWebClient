@@ -14,7 +14,6 @@
 	</ui:style>
 
 	<g:HTMLPanel>
-		<g:SimplePanel ui:field="header" />
 		<div class="container">
 			<ul class="breadcrumbs">
 				<li>
@@ -24,7 +23,5 @@
 			<g:SimplePanel ui:field="content" />
 		</div>
 		<div class="clear"></div>
-		<g:SimplePanel ui:field="footer" />
-
 	</g:HTMLPanel>
 </ui:UiBinder> 

@@ -1,19 +1,28 @@
 package org.sagebionetworks.web.client.widget.entity;
-
+import static org.sagebionetworks.web.client.DisplayUtils.*;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
+import org.gwtbootstrap3.client.ui.constants.Emphasis;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -22,7 +31,6 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HTML;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
@@ -30,11 +38,9 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
-
-	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
-	SageImageBundle sageImageBundle;
 	Widget modifiedByWidget;
+	Presenter presenter;
 	public interface Binder extends UiBinder<Widget, EntityBadgeViewImpl> {	}
 	
 	@UiField
@@ -50,57 +56,47 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	Label modifiedOnField;
 	
-	ClickHandler nonDefaultClickHandler;
-	
-	@UiField
-	Tooltip annotationsField;
 	@UiField
 	Label sizeField;
 	@UiField
 	TextBox md5Field;
 	@UiField
-	Icon publicIcon;
-	@UiField
-	Icon privateIcon;
-	@UiField
-	Icon sharingSetIcon;
-	@UiField
-	Icon wikiIcon;
-	@UiField
-	Icon annotationsIcon;
-	@UiField
-	Tooltip errorField;
-	@UiField
-	Icon errorIcon;
-	@UiField
 	Span fileDownloadButtonContainer;
+	
 	@UiField
-	Icon discussionIcon;
-	@UiField
-	Tooltip discussion;
+	Div nameContainer;
+	
 	Callback onAttachCallback;
+	Anchor entityAnchor;
+	public static PlaceChanger placeChanger = null;
+	HandlerRegistration clickHandlerRegistration;
+	public static final String ENTITY_ID_ATTRIBUTE = "data-entity-id";
+	
+	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
+		event.preventDefault();
+		Widget panel = (Widget)event.getSource();
+		String entityId = panel.getElement().getAttribute(ENTITY_ID_ATTRIBUTE);
+		placeChanger.goTo(new Synapse(entityId));
+	};
+	
 	@Inject
 	public EntityBadgeViewImpl(final Binder uiBinder,
 			final SynapseJSNIUtils synapseJSNIUtils,
-			SageImageBundle sageImageBundle, 
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			GlobalApplicationState globalAppState) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.sageImageBundle = sageImageBundle;
 		initWidget(uiBinder.createAndBindUi(this));
-		idField.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				idField.selectAll();
-			}
-		});
-		md5Field.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				md5Field.selectAll();
-			}
-		});
+		placeChanger = globalAppState.getPlaceChanger();
+		idField.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
+		md5Field.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
+		
 	}
 
+	@Override
+	public void setPresenter(Presenter p) {
+		this.presenter = p;
+	}
+	
 	@Override
 	public void setOnAttachCallback(Callback onAttachCallback) {
 		this.onAttachCallback = onAttachCallback;
@@ -115,31 +111,19 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}
 	
 	@Override
-	public void setEntity(final EntityQueryResult entityHeader) {
+	public void setEntity(final EntityHeader entityHeader) {
 		clear();
 		if(entityHeader == null)  throw new IllegalArgumentException("Entity is required");
 		
 		if(entityHeader != null) {
-			final Anchor anchor = new Anchor();
-			anchor.setText(entityHeader.getName());
-			anchor.addStyleName("link");
-			
-			anchor.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					entityClicked(entityHeader, event);
-				}
-			});
-			
-			ClickHandler clickHandler = new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					anchor.fireEvent(event);
-				}
-			};
+			entityAnchor = new Anchor();
+			clickHandlerRegistration = entityAnchor.addClickHandler(STANDARD_CLICKHANDLER);
+			entityAnchor.setText(entityHeader.getName());
+			entityAnchor.addStyleName("link");
+			entityAnchor.setHref("#!Synapse:" + entityHeader.getId());
+			entityAnchor.getElement().setAttribute(ENTITY_ID_ATTRIBUTE, entityHeader.getId());
 			iconContainer.setWidget(icon);
-			iconContainer.addClickHandler(clickHandler);
-			entityContainer.add(anchor);
+			entityContainer.add(entityAnchor);
 			idField.setText(entityHeader.getId());
 		} 		
 	}
@@ -154,44 +138,20 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		entityContainer.add(new HTML(DisplayConstants.ERROR_LOADING));		
 	}
 	
-	@Override
-	public void showLoading() {
-		clear();
-		entityContainer.add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-	}
-
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;		
-	}
-	
-	@Override
 	public void clear() {
 		iconContainer.clear();
 		entityContainer.clear();
 	}
 	
 	@Override
-	public void showLoadingIcon() {
-		iconContainer.setWidget(new Image(sageImageBundle.loading16()));
-	}
-	
-	@Override
-	public void hideLoadingIcon() {
-		iconContainer.setWidget(icon);
-	}
-	
-	@Override
-	public void setClickHandler(ClickHandler handler) {
-		nonDefaultClickHandler = handler;
+	public void addClickHandler(final ClickHandler handler) {
+		if (clickHandlerRegistration != null) {
+			clickHandlerRegistration.removeHandler();	
+		}
+		clickHandlerRegistration = entityAnchor.addClickHandler(event -> {
+			event.preventDefault();
+			handler.onClick(event);
+		});
 	}
 	
 	@Override
@@ -203,13 +163,6 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@Override
 	public void setModifiedOn(String modifiedOnString) {
 		modifiedOnField.setText(modifiedOnString);
-	}
-	private void entityClicked(EntityQueryResult entityHeader, ClickEvent event) {
-		if (nonDefaultClickHandler == null) {
-			presenter.entityClicked(entityHeader);
-		} else {
-			nonDefaultClickHandler.onClick(event);
-		}
 	}
 	
 	@Override
@@ -225,22 +178,22 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	
 	@Override
 	public void setAnnotations(String html) {
-		annotationsField.setHtml(SafeHtmlUtils.fromTrustedString(html));
-		annotationsField.reconfigure();
-	}
-	@Override
-	public void showAnnotationsIcon() {
-		annotationsIcon.setVisible(true);
+		Icon icon = new Icon(IconType.TAGS);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		Tooltip tooltip = new Tooltip(icon);
+		tooltip.setHtml(SafeHtmlUtils.fromTrustedString(html));
+		nameContainer.add(tooltip);
 	}
 	
 	@Override
 	public void setError(String error) {
-		errorField.setTitle(error);
-		errorField.reconfigure();
-	}
-	@Override
-	public void showErrorIcon() {
-		errorIcon.setVisible(true);
+		Icon icon = new Icon(IconType.EXCLAMATION_CIRCLE);
+		icon.setFixedWidth(true);
+		icon.setEmphasis(Emphasis.DANGER);
+		icon.setPull(Pull.RIGHT);
+		Tooltip tooltip = new Tooltip(icon, error);
+		nameContainer.add(tooltip);
 	}
 	
 	@Override
@@ -254,21 +207,32 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 
 	@Override
 	public void showHasWikiIcon() {
-		wikiIcon.setVisible(true);
+		Icon icon = new Icon(IconType.NEWSPAPER_O);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		nameContainer.add(new Tooltip(icon, "Has a wiki"));
 	}
 	@Override
 	public void showPrivateIcon() {
-		privateIcon.setVisible(true);
+		Icon icon = new Icon(IconType.LOCK);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		nameContainer.add(new Tooltip(icon, "Private"));
 	}
 	@Override
 	public void showPublicIcon() {
-		publicIcon.setVisible(true);
+		Icon icon = new Icon(IconType.GLOBE);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		nameContainer.add(new Tooltip(icon, "Public"));
 	}
 	@Override
 	public void showSharingSetIcon() {
-		sharingSetIcon.setVisible(true);
+		Icon icon = new Icon(IconType.CHECK);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		nameContainer.add(new Tooltip(icon, "Sharing Settings have been set"));
 	}
-
 	@Override
 	public boolean isInViewport() {
 		return DisplayUtils.isInViewport(this);
@@ -280,11 +244,26 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	}
 
 	@Override
-	public void setDiscussionThreadIconVisible(boolean visible){
-		discussionIcon.setVisible(visible);
+	public void showDiscussionThreadIcon(){
+		Icon icon = new Icon(IconType.COMMENT);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		nameContainer.add(new Tooltip(icon, "Has been mentioned in discussion"));
 	}
-	/*
-	 * Private Methods
-	 */
+	
+	@Override
+	public void showUnlinkIcon() {
+		Icon icon = new Icon(IconType.CHAIN_BROKEN);
+		icon.setFixedWidth(true);
+		icon.setPull(Pull.RIGHT);
+		icon.setEmphasis(Emphasis.DANGER);
+		icon.addStyleName("imageButton");
+		icon.addClickHandler(event -> {
+			presenter.onUnlink();
+		});
+		
+		nameContainer.add(new Tooltip(icon, "Remove this link"));
+	}
+	
 
 }

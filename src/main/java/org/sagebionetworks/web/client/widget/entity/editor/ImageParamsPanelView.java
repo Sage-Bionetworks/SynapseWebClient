@@ -9,6 +9,11 @@ public interface ImageParamsPanelView extends IsWidget {
 	void setCenterButtonActive();
 	void setRightButtonActive();
 	void setPresenter(Presenter presenter);
+	void setScale(Integer scale);
+	Integer getScale();
+	void setAltText(String altText);
+	String getAltText();
+	
 	/**
 	 * Presenter interface
 	 */

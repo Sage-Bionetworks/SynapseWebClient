@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.entity.annotation;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -69,10 +69,12 @@ public class AnnotationTransformerImplTest {
 		List<Long> list = new ArrayList<Long>();
 		list.add(4L);
 		list.add(8L);
+		list.add(null);
 		List<String> stringList = transformer.numbersToStrings(list);
-		assertEquals(2, stringList.size());
+		assertEquals(3, stringList.size());
 		assertEquals("4", stringList.get(0));
 		assertEquals("8", stringList.get(1));
+		assertEquals(null, stringList.get(2));
 		
 		//empty
 		assertTrue(transformer.numbersToStrings(new ArrayList<Long>()).isEmpty());
@@ -91,6 +93,7 @@ public class AnnotationTransformerImplTest {
 		Date d = new Date();
 		Long datetime = d.getTime();
 		assertEquals(datetime.toString(), transformer.datesToStrings(Collections.singletonList(d)).get(0));
+		assertNull(transformer.datesToStrings(Collections.singletonList(null)).get(0));
 	}
 
 	@Test
@@ -283,6 +286,43 @@ public class AnnotationTransformerImplTest {
 		assertEquals(stringValue, stringAnnotationsAfter.get(stringKey).get(0));
 		assertEquals(longValue, longAnnotationsAfter.get(longKey).get(0));
 		assertEquals(dateValue, dateAnnotationsAfter.get(dateKey).get(0));
+	}
+	
+	@Test
+	public void testUpdateAnnotationsFromListNulls() throws DuplicateKeyException {
+		//update annotations
+		String stringKey = "string";
+		String nullStringValue = null;
+		String dateKey = "date";
+		String doubleKey = "double";
+		String longKey = "long";
+		
+		List<Annotation> annotationsList = new ArrayList<Annotation>();
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.DATE, dateKey, Collections.singletonList(nullStringValue)));
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.DOUBLE, doubleKey, Collections.singletonList(nullStringValue)));
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.LONG, longKey, Collections.singletonList(nullStringValue)));
+		annotationsList.add(new Annotation(ANNOTATION_TYPE.STRING, stringKey, Collections.singletonList(nullStringValue)));
+		
+		String idBefore = initializedAnnotations.getId();
+		
+		transformer.updateAnnotationsFromList(initializedAnnotations, annotationsList);
+		
+		assertEquals(idBefore, initializedAnnotations.getId());
+		
+		Map<String, List<Double>> doubleAnnotationsAfter = initializedAnnotations.getDoubleAnnotations();
+		Map<String, List<String>> stringAnnotationsAfter = initializedAnnotations.getStringAnnotations();
+		Map<String, List<Long>> longAnnotationsAfter = initializedAnnotations.getLongAnnotations();
+		Map<String, List<Date>> dateAnnotationsAfter = initializedAnnotations.getDateAnnotations();
+		
+		assertTrue(doubleAnnotationsAfter.containsKey(doubleKey));
+		assertTrue(stringAnnotationsAfter.containsKey(stringKey));
+		assertTrue(longAnnotationsAfter.containsKey(longKey));
+		assertTrue(dateAnnotationsAfter.containsKey(dateKey));
+		
+		assertNull(doubleAnnotationsAfter.get(doubleKey).get(0));
+		assertNull(stringAnnotationsAfter.get(stringKey).get(0));
+		assertNull(longAnnotationsAfter.get(longKey).get(0));
+		assertNull(dateAnnotationsAfter.get(dateKey).get(0));
 	}
 	
 	@Test (expected=DuplicateKeyException.class)

@@ -6,7 +6,7 @@ public class DisplayConstants {
 	 * Text constants
 	 */
 	public static final String UPLOAD_SUCCESS = "Upload Success";
-	public static final String DEFAULT_PAGE_TITLE = "Sage Synapse: Contribute to the Cure";
+	public static final String DEFAULT_PAGE_TITLE = "Synapse | Sage Bionetworks";
 	public static final String DEFAULT_PAGE_DESCRIPTION = "Synapse is a collaborative compute space that allows scientists to share and analyze data together.";
 	public static final String NO_FILES_SELECTED_FOR_UPLOAD_MESSAGE = "No files were selected for upload.";
 	public static final String CREDENTIALS_REQUIRED_MESSAGE = "Credentials are required to upload to this external site.";
@@ -41,9 +41,9 @@ public class DisplayConstants {
 	public static final String PRIVATE_ACL_DESCRIPTION = "Restricted to those people selected in the Share Settings window";
 	
 	public static final String MENU_PERMISSION_LEVEL_CAN_VIEW = "Can view";
-	public static final String MENU_PERMISSION_LEVEL_CAN_MODERATE = "Can moderate";
+	public static final String MENU_PERMISSION_LEVEL_CAN_DOWNLOAD = "Can download";
 	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT = "Can edit";
-	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE = "Edit & Delete";
+	public static final String MENU_PERMISSION_LEVEL_CAN_EDIT_DELETE = "Can edit & delete";
 	public static final String MENU_PERMISSION_LEVEL_CAN_ADMINISTER = "Administrator";
 	public static final String MENU_PERMISSION_LEVEL_CAN_SUBMIT = "Can submit";
 	public static final String MENU_PERMISSION_LEVEL_CAN_SCORE = "Can score";
@@ -103,9 +103,11 @@ public class DisplayConstants {
 	public static final String NO_ENTITY_SELECTED = "Please select an entity and try again.";
 	public static final String NO_EVALUATION_SELECTED = "Please select an evaluation and try again.";
 	public static final String NO_USER_SELECTED = "Please select a user and try again.";
+	public static final String NO_USER_OR_TEAM_SELECTED = "Please select a user or team and try again.";
 	public static final String TEXT_LINK_SAVED = "Link saved.";
 	public static final String ERROR_UPDATE_FAILED = "Update failed. Please try again.";
 	public static final String EMPTY = "Empty";
+	public static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
 	public static final String ERROR_GENERIC_NOTIFY = "An error occurred. Please report the problem to synapseInfo@sagebase.org";
 	public static final String ERROR_CANT_MOVE_HERE = "Sorry, you cannot move this item to the requested spot.";
 	public static final String TEXT_NO_COLUMNS = "No Columns.";
@@ -117,6 +119,7 @@ public class DisplayConstants {
 	public static final String WARNING_PROJECT_NAME_EXISTS = "Sorry, a project with that name already exists. Please try another name.";
 	public static final String WARNING_TEAM_NAME_EXISTS = "Sorry, a team with that name already exists. Please try another name.";
 	public static final String ERROR_FAILURE_PRIVLEDGES = "Sorry, you do not have sufficient privileges for access.";
+	public static final String NETWORK_ERROR = "Network error";
 	public static final String ERROR_RESPONSE_UNAVAILABLE = "The web page is not available. Please check your Internet connection.";
 	public static final String TITLE_UNAUTHORIZED = "Unauthorized";
 	public static final String NOTE = "Note";
@@ -275,11 +278,17 @@ public class DisplayConstants {
 	public static final String UPLOAD_DESTINATION = "All uploaded files will be stored in ";
 	public static final String DOWNLOAD_CREDENTIALS_REQUIRED = "Sign in to download from ";
 	public static final String SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT = "Successfully linked the external account to your Synapse profile.";
+	public static final String INVALID_EMAIL = "Email address is not valid.";
+	public static final String MD5_CALCULATION_ERROR = "Unable to upload. Please select a set of accessible Files to upload.  Uploading a Folder is not supported.";
 
 	// Button styles
 	public static final String PRIMARY_BUTTON_STYLE = "btn-primary";
+	public static final String LINK_BUTTON_STYLE = "btn-link";
 	public static final String DEFAULT_BUTTON_STYLE = "btn-default";
 	public static final String DANGER_BUTTON_STYLE = "btn-danger";
 	public static final int DELAY_UNTIL_IN_VIEW = 1200;
+	public static final String FINISH = "Finish";
+	public static final String NEXT = "Next";
+	public static final String SUBMIT = "Submit";
 }
 

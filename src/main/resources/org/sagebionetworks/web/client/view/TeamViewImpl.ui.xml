@@ -7,9 +7,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<g:HTMLPanel>
-	    <div class="color-line"></div>
-		<g:SimplePanel ui:field="header" />
-		<div class="separator separator-header-page"></div>
+	    <div class="separator margin-top-3"></div>
 	    <div class="margin-top-left-10 margin-right-15">
 	        <b:Row>
 	            <b:Column size="MD_9">
@@ -23,7 +21,8 @@
 								<b:AnchorListItem icon="PLUS_SQUARE_O" iconFixedWidth="true" ui:field="inviteMemberItem" visible="false" text="Invite User" />
 								<b:AnchorListItem icon="EDIT" iconFixedWidth="true" ui:field="editTeamItem" visible="false" text="Edit Team" />
 								<b:AnchorListItem icon="TIMES_CIRCLE" iconFixedWidth="true" ui:field="deleteTeamItem" visible="false" text="Delete Team" />
-								<b:AnchorListItem icon="ARROW_RIGHT" iconFixedWidth="true" ui:field="leaveTeamItem" visible="false" text="Leave Team" /> 
+								<b:AnchorListItem icon="ARROW_RIGHT" iconFixedWidth="true" ui:field="leaveTeamItem" visible="false" text="Leave Team" />
+								<b:AnchorListItem icon="FLAG" iconFixedWidth="true" ui:field="manageAccessItem" text="(ACT) Manage Access Requirements" visible="false"/> 
 				    		</b:DropDownMenu>
 		    		    </b:ButtonGroup>
 					</b:ButtonToolBar>
@@ -39,9 +38,11 @@
 	        <g:SimplePanel ui:field="synAlertPanel"/>
 	    	<div class="row">
 		    	<g:HTMLPanel ui:field="mainContainer" styleName="col-md-12">
-		    	    <bh:Span addStyleNames="boldText margin-right-5" visible="false">Total members: </bh:Span>
-		    	    <bh:Span ui:field="totalMemberCountField" visible="false"/>
-		    	    <bh:Span ui:field="publicJoinField" visible="false" addStyleNames="boldText margin-right-5">Can be joined without team manager authorization </bh:Span>
+		    		<bh:Div>
+			    		<bh:Span addStyleNames="boldText margin-right-5" text="Total members: " />
+			    	    <bh:Span ui:field="totalMemberCountField" />
+		    		</bh:Div>
+		    	    <bh:Span ui:field="publicJoinField" visible="false" addStyleNames="boldText margin-right-5" text="Can be joined without team manager authorization " />
 		    	    <g:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15" readOnly="true" />
 		    	    <b:Anchor ui:field="showMapLink" text="Show map" icon="MAP_MARKER" visible="false"/>
 		    	    <b:Modal ui:field="mapModal" closable="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen" >
@@ -61,9 +62,7 @@
 		   	</div>
 		   	<div>
 		   	</div>
-		    <div class="clear"></div>
         </div>
-		<g:SimplePanel ui:field="footer" />
 		
 	</g:HTMLPanel>
 </ui:UiBinder> 

@@ -8,15 +8,29 @@
 		<bh:Div addStyleNames="form-horizontal">
 			<b:FieldSet>
 				<b:FormGroup>
-					<b:FormLabel for="url" addStyleNames="col-xs-2">URL</b:FormLabel>
+					<b:FormLabel addStyleNames="col-xs-2" text="URL" />
 					<g:FlowPanel addStyleNames="col-xs-10">
-						<b:TextBox ui:field="urlField" name="url" b:id="url" />
+						<b:TextBox ui:field="urlField" />
 					</g:FlowPanel>
 				</b:FormGroup>
 				<b:FormGroup>
-					<b:FormLabel for="linktext" addStyleNames="col-xs-2">Button Text</b:FormLabel>
+					<b:FormLabel addStyleNames="col-xs-2" text="Button Text" />
 					<g:FlowPanel addStyleNames="col-xs-10">
-						<b:TextBox ui:field="nameField" name="linktext" b:id="linktext" />
+						<b:TextBox ui:field="nameField" />
+					</g:FlowPanel>
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel addStyleNames="col-xs-2" text="Button Style" />
+					<g:FlowPanel addStyleNames="col-xs-10">
+						<b:Radio ui:field="defaultButtonStyle" name="buttonStyle" text="Light" />
+						<b:Radio ui:field="infoButtonStyle" name="buttonStyle" text="Dark" />
+					</g:FlowPanel>
+				</b:FormGroup>
+				<bh:Hr />
+				<b:FormGroup>
+					<b:FormLabel addStyleNames="col-xs-2" text="Preview" />
+					<g:FlowPanel addStyleNames="col-xs-10">
+						<b:Button ui:field="previewButton"/>
 					</g:FlowPanel>
 				</b:FormGroup>
 			</b:FieldSet>

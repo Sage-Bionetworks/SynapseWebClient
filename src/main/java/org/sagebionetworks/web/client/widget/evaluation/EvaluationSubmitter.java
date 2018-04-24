@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.evaluation;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -23,7 +25,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -46,7 +48,7 @@ public class EvaluationSubmitter implements Presenter {
 	public static final String NO_COMMITS_SELECTED_MSG = "Please select a commit to submit.";
 	public static final String ZERO_COMMITS_ERROR = "This repo does not have any commit. Please add commits to repo before submit to challenge.";
 	private EvaluationSubmitterView view;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private ChallengeClientAsync challengeClient;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
@@ -71,7 +73,7 @@ public class EvaluationSubmitter implements Presenter {
 	
 	@Inject
 	public EvaluationSubmitter(EvaluationSubmitterView view,
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			ChallengeClientAsync challengeClient,
@@ -80,10 +82,11 @@ public class EvaluationSubmitter implements Presenter {
 			DockerCommitListWidget dockerCommitList) {
 		this.view = view;
 		this.view.setPresenter(this);
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.challengeClient = challengeClient;
+		fixServiceEntryPoint(challengeClient);
 		this.gwt = gwt;
 		this.dockerCommitList = dockerCommitList;
 		this.challengeListSynAlert = ginInjector.getSynapseAlertWidget();
@@ -115,6 +118,7 @@ public class EvaluationSubmitter implements Presenter {
 		contributorSynAlert.clear();
 		dockerCommitSynAlert.clear();
 		view.resetNextButton();
+		view.resetSubmitButton();
 		view.setContributorsLoading(false);
 		this.submissionEntity = submissionEntity;
 		this.evaluationIds = evaluationIds;
@@ -153,13 +157,14 @@ public class EvaluationSubmitter implements Presenter {
 	@Override
 	public void onIndividualSubmissionOptionClicked() {
 		isIndividualSubmission = true;
+		view.setIndividualSubmissionActive();
 		view.hideTeamsUI();
 	}
 	
 	@Override
 	public void onTeamSubmissionOptionClicked() {
 		isIndividualSubmission = false;
-		
+		view.setTeamSubmissionActive();
 		if (teams.isEmpty()) {
 			view.showEmptyTeams();
 		} else {
@@ -221,7 +226,7 @@ public class EvaluationSubmitter implements Presenter {
 			@Override
 			public void onSuccess(Challenge result) {
 				challenge = result;
-				getAvailableTeams();
+				refreshRegisteredTeams();
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -237,15 +242,9 @@ public class EvaluationSubmitter implements Presenter {
 		});
 	}
 	
-	public void getAvailableTeams() {
-		challengeClient.getSubmissionTeams(authenticationController.getCurrentUserPrincipalId(), challenge.getId(), getTeamsCallback());
-	}
-	
 	@Override
-	public void teamAdded() {
-		//when a team is added, ideally we would just refresh the teams list.  
-		//But the bootstrap Select adds additional components to the DOM that it does not clean up, so hide the second page for now (user will retry and see newly registered team).
-		view.hideModal2();
+	public void refreshRegisteredTeams() {
+		challengeClient.getSubmissionTeams(authenticationController.getCurrentUserPrincipalId(), challenge.getId(), getTeamsCallback());
 	}
 	
 	@Override
@@ -271,9 +270,11 @@ public class EvaluationSubmitter implements Presenter {
 				teams = results;
 				if (!teams.isEmpty()) {
 					onTeamSelected(0);
+					onTeamSubmissionOptionClicked();
+				} else {
+					onIndividualSubmissionOptionClicked();
 				}
-				onIndividualSubmissionOptionClicked();
-				view.setIsIndividualSubmissionActive(true);
+				
 				view.hideModal1();
 				view.showModal2();
 			}
@@ -290,6 +291,7 @@ public class EvaluationSubmitter implements Presenter {
 	@Override
 	public void onDoneClicked() {
 		view.hideModal1();
+		view.setSubmitButtonLoading();
 		if (!isIndividualSubmission) {
 			//team submission
 			if (selectedTeam == null) {
@@ -368,7 +370,7 @@ public class EvaluationSubmitter implements Presenter {
 	
 	public void lookupEtagAndCreateSubmission(final String id, final Long ver) {
 		//look up entity for the current etag
-		synapseClient.getEntity(id, new AsyncCallback<Entity>() {
+		jsClient.getEntity(id, new AsyncCallback<Entity>() {
 			public void onSuccess(Entity result) {
 				Entity entity;
 				entity = result;

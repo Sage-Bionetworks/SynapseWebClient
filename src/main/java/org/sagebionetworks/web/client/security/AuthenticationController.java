@@ -65,5 +65,5 @@ public interface AuthenticationController {
 	
 	public void updateCachedProfile(UserProfile updatedProfile);
 	
-	public String getCurrentXsrfToken();
+	void checkForUserChange();
 }

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.team.controller;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Set;
 
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -9,16 +11,15 @@ import org.sagebionetworks.repo.model.util.ModelConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
-import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
-import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -35,7 +36,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	Team team;
 	AccessControlList teamACL;
 	SynapseClientAsync synapseClient;
-	FileHandleUploadWidget uploader;
+	ImageUploadWidget uploader;
 	String uploadedFileHandleId;
 	String baseImageURL;
 	Long authenticatedUserGroupId;
@@ -46,29 +47,29 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 			SynapseAlert synAlert,
 			final TeamEditModalWidgetView view, 
 			SynapseClientAsync synapseClient,
-			final FileHandleUploadWidget uploader, 
+			final ImageUploadWidget uploader, 
 			SynapseJSNIUtils jsniUtils,
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState) {
+			GlobalApplicationState globalApplicationState,
+			PortalGinInjector ginInjector) {
 		this.synAlert = synAlert;
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.uploader = uploader;
+		uploader.setView(ginInjector.getCroppedImageUploadView());
 		this.baseImageURL = jsniUtils.getBaseFileHandleUrl();
 		this.authController = authenticationController;
 		authenticatedUserGroupId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));
-		uploader.configure("Browse...", new CallbackP<FileUpload>() {
+		uploader.configure(new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {
 				uploader.setUploadedFileText(fileUpload.getFileMeta().getFileName());
 				view.hideLoading();
 				uploadedFileHandleId = fileUpload.getFileHandleId();
-				view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, uploadedFileHandleId, authController.getCurrentXsrfToken()));
+				view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, uploadedFileHandleId));
 			}
 		});
-		ImageFileValidator imageValidator = new ImageFileValidator();
-		imageValidator.setMaxSize(UserProfileEditorWidgetImpl.MAX_IMAGE_SIZE);
-		uploader.setValidation(imageValidator);
 		uploader.setUploadingCallback(new Callback() {
 			@Override
 			public void invoke() {
@@ -98,8 +99,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 			team.setName(newName);
 			team.setDescription(newDescription);
 			team.setCanPublicJoin(canPublicJoin);
-			if (uploadedFileHandleId != null)
-				team.setIcon(uploadedFileHandleId);
+			team.setIcon(uploadedFileHandleId);
 			updateACLFromView();
 			synapseClient.updateTeam(team, teamACL, new AsyncCallback<Team>() {
 				@Override
@@ -120,6 +120,12 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	}
 	
 	@Override
+	public void onRemovePicture() {
+		uploadedFileHandleId = null;
+		view.setDefaultIconVisible();
+	}
+	
+	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
@@ -132,7 +138,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		view.clear();
 		view.configure(team);
 		if (team.getIcon() != null)
-			view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, team.getIcon(), authController.getCurrentXsrfToken()));
+			view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, team.getIcon()));
 		else
 			view.setDefaultIconVisible();
 		
@@ -146,7 +152,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	}
 	
 	public void configureAndShow(Team team) {
-		uploadedFileHandleId = null;
+		uploadedFileHandleId = team.getIcon();
 		this.team = team;
 		//get the messaging parameter, and show
 		synapseClient.getTeamAcl(team.getId(), new AsyncCallback<AccessControlList>() {

@@ -1,24 +1,18 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_CANCEL;
-import static org.sagebionetworks.web.client.DisplayConstants.DEFAULT_BUTTON_STYLE;
-
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.IconStack;
 import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
-import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -44,7 +38,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@UiField
 	Div refreshAlertContainer;
 	@UiField
-	HTMLPanel loadingMessage;
+	LoadingSpinner loadingMessage;
 	@UiField
 	Icon deleteIcon;
 	@UiField
@@ -78,7 +72,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	@UiField
 	Span subscribersContainer;
 	
-	String threadLinkHref;
 	private Widget widget;
 	private SingleDiscussionThreadWidget presenter;
 
@@ -189,17 +182,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 	}
 
 	@Override
-	public void showConfirm(String deleteConfirmMessage, String dialogTitle, String buttonName, String buttonStyle, final SimpleCallback deleteCallback) {
-		DialogOptions options = DialogOptions.newOptions(deleteConfirmMessage);
-		options.setCloseButton(false);
-		options.setTitle(dialogTitle);
-		options.addButton(BUTTON_CANCEL, DEFAULT_BUTTON_STYLE);
-		options.addButton(buttonName, buttonStyle, deleteCallback);
-		
-		Bootbox.dialog(options);
-	}
-
-	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
@@ -224,10 +206,6 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 		DisplayUtils.showInfo(title, message);
 	}
 
-	@Override
-	public void setThreadLink(String link){
-		threadLinkHref = link;
-	}
 	@Override
 	public void setSubscribeButtonWidget(Widget widget) {
 		subscribeButtonContainer.clear();

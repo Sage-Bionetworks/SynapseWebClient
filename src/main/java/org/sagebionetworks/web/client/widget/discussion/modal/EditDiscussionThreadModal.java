@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion.modal;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -38,10 +40,9 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
+		fixServiceEntryPoint(discussionForumClient);
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
-		markdownEditor.hideUploadRelatedCommands();
-		markdownEditor.showExternalImageButton();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(EDIT_THREAD_MODAL_TITLE);
@@ -59,6 +60,8 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 	public void show() {
 		view.clear();
 		view.setThreadTitle(title);
+		markdownEditor.hideUploadRelatedCommands();
+		markdownEditor.showExternalImageButton();
 		markdownEditor.configure(message);
 		view.showDialog();
 	}

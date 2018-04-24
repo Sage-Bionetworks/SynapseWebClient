@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -20,8 +20,11 @@ public class ModifiedCreatedByWidgetViewImpl implements ModifiedCreatedByWidgetV
 	@UiField
 	Span modifiedOnText;
 	@UiField
-	HTMLPanel container;
-	
+	Div container;
+	@UiField
+	Span createdByUI;
+	@UiField
+	Span modifiedByUI;
 	public interface ModifiedCreatedByWidgetViewImplUiBinder extends UiBinder<Widget, ModifiedCreatedByWidgetViewImpl> {}
 
 	private Widget widget;
@@ -61,5 +64,13 @@ public class ModifiedCreatedByWidgetViewImpl implements ModifiedCreatedByWidgetV
 	@Override
 	public void setVisible(boolean isVisible) {
 		container.setVisible(isVisible);
+	}
+	@Override
+	public void setCreatedByUIVisible(boolean visible) {
+		createdByUI.setVisible(visible);
+	}
+	@Override
+	public void setModifiedByUIVisible(boolean visible) {
+		modifiedByUI.setVisible(visible);
 	}
 }

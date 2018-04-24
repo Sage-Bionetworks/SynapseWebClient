@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.RegisterTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -85,7 +86,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@UiField
 	Paragraph teamIneligibleHtml;
 	@UiField
-	Div contributorsLoadingUI;
+	LoadingSpinner contributorsLoadingUI;
 	@UiField
 	Div teamsUI;
 	@UiField
@@ -227,6 +228,16 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	public void resetNextButton() {
 		nextButton.state().reset();
 	}
+	
+	@Override
+	public void resetSubmitButton() {
+		okButton.state().reset();
+	}
+	
+	@Override
+	public void setSubmitButtonLoading() {
+		okButton.state().loading();
+	}
 
 	@Override
 	public void showRegisterTeamDialog(String challengeId) {
@@ -237,7 +248,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		dialog.configure(challengeId, new Callback() {
 			@Override
 			public void invoke() {
-				presenter.teamAdded();
+				presenter.refreshRegisteredTeams();
 			}
 		});
 	}
@@ -270,6 +281,8 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	@Override
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
+		resetNextButton();
+		resetSubmitButton();
 	}
 
 	@Override
@@ -332,7 +345,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		Div row = getContributorRow(principalId, false);
 		//also add the reason
 		Span span = new Span();
-		span.addStyleName("greyText-imp margin-left-5 moveup-4");
+		span.addStyleName("greyText-imp margin-left-5");
 		span.setText(reason);
 		row.add(span);
 		
@@ -347,7 +360,7 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 	private Div getContributorRow(String principalId, boolean selectCheckbox) {
 		Div row = new Div();
 		InlineCheckBox cb = new InlineCheckBox();
-		cb.addStyleName("moveup-18");
+		cb.addStyleName("moveup-10");
 		cb.setValue(selectCheckbox);
 		cb.setEnabled(false);
 		row.add(cb);
@@ -384,9 +397,16 @@ public class EvaluationSubmitterViewImpl implements EvaluationSubmitterView {
 		}
 	}
 	@Override
-	public void setIsIndividualSubmissionActive(boolean isActive) {
-		isIndividualRadioButton.setValue(isActive, true);	
+	public void setIndividualSubmissionActive() {
+		isIndividualRadioButton.setValue(true, true);
+		isTeamRadioButton.setValue(false, true);
 	}
+	@Override
+	public void setTeamSubmissionActive() {
+		isIndividualRadioButton.setValue(false, true);
+		isTeamRadioButton.setValue(true, true);
+	}
+
 	@Override
 	public void hideTeamsUI() {
 		teamsUI.setVisible(false);

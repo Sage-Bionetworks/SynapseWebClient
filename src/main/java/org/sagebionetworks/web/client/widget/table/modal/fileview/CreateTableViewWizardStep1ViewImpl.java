@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -20,13 +21,24 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	SimplePanel scopeContainer;
 	@UiField
 	FormGroup scopeUI;
-	
+	@UiField
+	Div viewOptionsContainer;
 	Widget widget;
-	
+	Presenter p;
+	FileViewOptions viewOptions;
 	@Inject
-	public CreateTableViewWizardStep1ViewImpl(Binder binder){
+	public CreateTableViewWizardStep1ViewImpl(Binder binder, FileViewOptions viewOptions){
 		widget = binder.createAndBindUi(this);
+		viewOptionsContainer.add(viewOptions);
+		viewOptions.addClickHandler(event -> {
+			if (viewOptions.isIncludeTables()) {
+				p.onSelectFilesAndTablesView();
+			} else {
+				p.onSelectFilesOnlyView();
+			}
+		});
 	}
+
 	@Override
 	public Widget asWidget() {
 		return widget;
@@ -51,5 +63,14 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	@Override
 	public void setScopeWidgetVisible(boolean visible) {
 		scopeUI.setVisible(visible);
+	}
+	
+	@Override
+	public void setFileViewTypeSelectionVisible(boolean visible) {
+		viewOptionsContainer.setVisible(visible);
+	}
+	@Override
+	public void setPresenter(Presenter presenter) {
+		p = presenter;
 	}
 }

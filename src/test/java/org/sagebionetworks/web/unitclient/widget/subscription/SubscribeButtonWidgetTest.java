@@ -8,6 +8,8 @@ import java.util.Collections;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.subscription.Subscription;
@@ -26,6 +28,8 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SubscriptionView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscribeButtonWidgetView;
 import org.sagebionetworks.web.client.widget.subscription.TopicWidget;
@@ -59,6 +63,10 @@ public class SubscribeButtonWidgetTest {
 	SubscribeButtonWidget widget;
 	@Mock
 	Subscription mockSubscription;
+	@Mock
+	ActionMenuWidget mockActionMenuWidget;
+	@Captor
+	ArgumentCaptor<ActionMenuWidget.ActionListener> actionListenerCaptor;
 	private static final String TEST_OBJECT_ID = "3";
 	private static final String TEST_SUBSCRIPTION_ID = "8837";
 	@Before
@@ -126,31 +134,36 @@ public class SubscribeButtonWidgetTest {
 	@Test
 	public void testAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		widget.configure(SubscriptionObjectType.THREAD, "123");
+		widget.configure(SubscriptionObjectType.THREAD, "123", mockActionMenuWidget);
 		//show the follow button.  on click, send to the login place
 		verify(mockView).showFollowButton();
+		verify(mockActionMenuWidget).setActionListener(eq(Action.FOLLOW), actionListenerCaptor.capture());
 		
 		//simulate click
-		widget.onSubscribe();
+		actionListenerCaptor.getValue().onAction(Action.FOLLOW);
 		verify(mockView).showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
 		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
 	@Test
 	public void testConfigureSubscribed() {
-		widget.configure(SubscriptionObjectType.THREAD, "123");
+		widget.configure(SubscriptionObjectType.THREAD, "123", mockActionMenuWidget);
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
 		verify(mockView).showUnfollowButton();
+		verify(mockActionMenuWidget).setActionListener(eq(Action.FOLLOW), any(ActionMenuWidget.ActionListener.class));
+		verify(mockActionMenuWidget).setActionText(Action.FOLLOW, "Unfollow Thread");
 	}
 	
 	@Test
 	public void testConfigureUnsubscribed() {
 		when(mockSubscriptionPagedResults.getTotalNumberOfResults()).thenReturn(0L);
-		widget.configure(SubscriptionObjectType.THREAD, "123");
+		widget.configure(SubscriptionObjectType.FORUM, "123", mockActionMenuWidget);
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
 		verify(mockView).showFollowButton();
+		verify(mockActionMenuWidget).setActionListener(eq(Action.FOLLOW), any(ActionMenuWidget.ActionListener.class));
+		verify(mockActionMenuWidget).setActionText(Action.FOLLOW, "Follow Forum");
 	}
 	
 	@Test
@@ -158,7 +171,7 @@ public class SubscribeButtonWidgetTest {
 		Exception ex = new Exception("error");
 		AsyncMockStubber.callFailureWith(ex).when(mockSubscriptionClient)
 			.listSubscription(any(SubscriptionRequest.class), any(AsyncCallback.class));
-		widget.configure(SubscriptionObjectType.THREAD, "123");
+		widget.configure(SubscriptionObjectType.THREAD, "123", mockActionMenuWidget);
 		verify(mockView).clear();
 		verify(mockSynAlert).clear();
 		verify(mockSynAlert).handleException(ex);

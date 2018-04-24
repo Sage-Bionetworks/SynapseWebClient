@@ -5,9 +5,12 @@ import java.util.List;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
+import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -70,12 +73,6 @@ public interface GlobalApplicationState {
 	public Place getCurrentPlace();
 	
 	/**
-	 * Sets the last visited place (should only used in the AppActivityMapper) 
-	 * @param lastPlace
-	 */
-	public void setCurrentPlace(Place currentPlace);
-	
-	/**
 	 * Sets the App Place History Mapper
 	 * @param appPlaceHistoryMapper
 	 */
@@ -103,8 +100,6 @@ public interface GlobalApplicationState {
 	String getSynapseProperty(String key);
 	
 	void clearLastPlace();
-	void clearCurrentPlace();
-	
 	
 	public boolean isWikiBasedEntity(String entityId);
 
@@ -126,4 +121,11 @@ public interface GlobalApplicationState {
 
 	void replaceCurrentPlace(Place targetPlace);
 
+	void setShowUTCTime(boolean showUTC);
+	boolean isShowingUTCTime();
+	
+	PublicPrincipalIds getPublicPrincipalIds();
+	void initializeDropZone();
+	void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback);
+	void clearDropZoneHandler();
 }

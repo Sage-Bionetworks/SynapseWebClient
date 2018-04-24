@@ -6,6 +6,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
@@ -19,17 +21,21 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.EntityChildrenRequest;
+import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.entity.query.Condition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldCondition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
+import org.sagebionetworks.repo.model.entity.Direction;
+import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -37,192 +43,184 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsTreeItem;
 
 public class EntityTreeBrowserTest {
+	@Mock
 	EntityTreeBrowserView mockView;
-	SynapseClientAsync mockSynapseClient;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	IconsImageBundle mockIconsImageBundle;
+	@Mock
 	PortalGinInjector mockInjector;
 	AdapterFactory adapterFactory;
 	EntityTreeBrowser entityTreeBrowser;
-	EntityQueryResults searchResults;
+	@Mock
+	EntityChildrenResponse mockResults;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	CallbackP<String> mockEntityClickedCallback;
+	List<EntityHeader> searchResults;
+	@Mock
 	EntityTreeItem mockEntityTreeItem;
+	@Mock
 	MoreTreeItem mockMoreTreeItem;
+	@Mock
 	IsTreeItem mockLoadingItem;
+	@Captor
+	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
+	@Mock
+	EntityHeader mockEntityHeader;
 	String parentId;
 
 	@Before
 	public void before() throws JSONObjectAdapterException {
-		mockView = mock(EntityTreeBrowserView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockIconsImageBundle = mock(IconsImageBundle.class);
-		mockInjector = mock(PortalGinInjector.class);
-		mockEntityTreeItem = mock(EntityTreeItem.class);
-		mockMoreTreeItem = mock(MoreTreeItem.class);
-		mockLoadingItem = mock(IsTreeItem.class);
+		MockitoAnnotations.initMocks(this);
 		adapterFactory = new AdapterFactoryImpl();
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
-				mockSynapseClient, mockAuthenticationController,  mockGlobalApplicationState,
+				mockSynapseJavascriptClient, mockAuthenticationController,  mockGlobalApplicationState,
 				mockIconsImageBundle, adapterFactory);
 		verify(mockView).setPresenter(entityTreeBrowser);
 		reset(mockView);
 		parentId = "testParentId";
-		searchResults = new EntityQueryResults();
-		List<EntityQueryResult> entities = new ArrayList<EntityQueryResult>();
-		searchResults.setEntities(entities);
+		searchResults = new ArrayList<EntityHeader>();
+		when(mockResults.getPage()).thenReturn(searchResults);
+
 		when(mockInjector.getEntityTreeItemWidget()).thenReturn(
 				mockEntityTreeItem);
-		EntityQueryResult header = new EntityQueryResult();
+		EntityHeader header = new EntityHeader();
 		header.setId(parentId);
-		header.setEntityType("folder");
+		header.setType(Folder.class.getName());
+		
 		when(mockEntityTreeItem.getHeader()).thenReturn(header);
 //		when(mockView.appendLoading(any(EntityTreeItem.class))).thenReturn(mockLoadingItem);
 //		when(mockView.insertLoading(any(EntityTreeItem.class), Mockito.anyInt())).thenReturn(mockLoadingItem);
 		Mockito.when(mockInjector.getMoreTreeWidget()).thenReturn(mockMoreTreeItem);
 		AsyncMockStubber
-				.callSuccessWith(searchResults)
-				.when(mockSynapseClient)
-				.executeEntityQuery(any(EntityQuery.class),
+				.callSuccessWith(mockResults)
+				.when(mockSynapseJavascriptClient)
+				.getEntityChildren(any(EntityChildrenRequest.class),
 						any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testGetChildren() {
-		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
-		entityTreeBrowser.getChildren("123", null, 0);
-		ArgumentCaptor<EntityQuery> captor = ArgumentCaptor
-				.forClass(EntityQuery.class);
-		verify(mockSynapseClient).executeEntityQuery(
-				captor.capture(), any(AsyncCallback.class));
-		List<EntityQuery> queries = captor.getAllValues();
-		assertTrue(queries.size() == 1);
-		List<Condition> conditions = queries.get(0).getConditions();
-		assertTrue(conditions.size() == 2);
-		EntityFieldCondition parentCondition = (EntityFieldCondition)conditions.get(0);
-		EntityFieldCondition typeCondition = (EntityFieldCondition)conditions.get(1);
-		assertTrue(parentCondition.getLeftHandSide().equals(EntityFieldName.parentId));
-		assertTrue(typeCondition.getLeftHandSide().equals(EntityFieldName.nodeType));
+		String childEntityId = "syn98765";
+		searchResults.add(mockEntityHeader);
+		when(mockEntityHeader.getId()).thenReturn(childEntityId);
+		when(mockEntityHeader.getType()).thenReturn(FileEntity.class.getName());
+		
+		entityTreeBrowser.setEntityClickedHandler(mockEntityClickedCallback);
+		entityTreeBrowser.getChildren("123", null, null);
+		
+		ArgumentCaptor<EntityChildrenRequest> captor = ArgumentCaptor
+				.forClass(EntityChildrenRequest.class);
+		verify(mockSynapseJavascriptClient).getEntityChildren(captor.capture(), any(AsyncCallback.class));
+		EntityChildrenRequest request = captor.getValue();
+		assertEquals("123", request.getParentId());
+		assertNull(request.getNextPageToken());
+		verify(mockEntityTreeItem).setClickHandler(clickHandlerCaptor.capture());
+		verify(mockEntityClickedCallback, never()).invoke(anyString());
+		clickHandlerCaptor.getValue().onClick(null);
+		verify(mockEntityClickedCallback).invoke(childEntityId);
 	}
 
 	@Test
 	public void testCreateGetChildrenQuery() {
 		String parentId = "9";
-		EntityQuery query = entityTreeBrowser.createGetChildrenQuery(parentId,
-				0);
+		EntityChildrenRequest query = entityTreeBrowser.createGetEntityChildrenRequest(parentId, null);
 
 		// verify sort
-		assertEquals(EntityFieldName.name.name(), query.getSort()
-				.getColumnName());
-		assertEquals(SortDirection.ASC, query.getSort().getDirection());
-		List<Condition> conditions = query.getConditions();
-		assertEquals(2, conditions.size());
+		assertEquals(SortBy.NAME, query.getSortBy());
+		assertEquals(Direction.ASC, query.getSortDirection());
 	}
 
 	@Test
 	public void testGetFolderChildrenRaceCondition() {
-		mockSynapseClient = mock(SynapseClientAsync.class);
+		mockSynapseJavascriptClient = mock(SynapseJavascriptClient.class);
 		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
-				mockSynapseClient, mockAuthenticationController, mockGlobalApplicationState,
+				mockSynapseJavascriptClient, mockAuthenticationController, mockGlobalApplicationState,
 				mockIconsImageBundle, adapterFactory);
-		entityTreeBrowser.getChildren("123", null, 0);
+		entityTreeBrowser.getChildren("123", null, null);
 		// capture the servlet call
 		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor
 				.forClass(AsyncCallback.class);
-		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
-				captor.capture());
+		verify(mockSynapseJavascriptClient).getEntityChildren(any(EntityChildrenRequest.class), captor.capture());
 		// before invoking asynccallback.success, set the current entity id to
 		// something else (simulating that the user
 		// has selected a different folder while this was still processing)
-		captor.getValue().onSuccess(searchResults);
+		captor.getValue().onSuccess(mockResults);
 		verify(mockCallback, never()).onSuccess(anyList());
 	}
 
 	@Test
 	public void testMoreButtonRootLevel() {
-		long maxLim = entityTreeBrowser.getMaxLimit();
-		setQueryResults(4 * maxLim, 0, maxLim);
-		entityTreeBrowser.getChildren(parentId, null, 0);
+		setQueryResults(100);
+		String nextPageToken = "abc";
+		when(mockResults.getNextPageToken()).thenReturn(nextPageToken);
+		entityTreeBrowser.getChildren(parentId, null, null);
 		// Creates the limited number of entity items
 		// 100 links, and 100 files
-		verify(mockView, times((int) entityTreeBrowser.getMaxLimit()))
+		verify(mockView, times(100))
 				.appendRootEntityTreeItem(any(EntityTreeItem.class));
 		verify(mockView).placeRootMoreTreeItem(
-				any(MoreTreeItem.class), Mockito.eq(parentId),
-				Mockito.eq(maxLim));
+				any(MoreTreeItem.class), eq(parentId), eq(nextPageToken));
 	}
 
 	// Taken care of by expandTreeItemOnOpen
 	@Test
 	public void testMoreButtonChildLevel() {
-		long maxLim = entityTreeBrowser.getMaxLimit();
-		setQueryResults(4 * maxLim, 0, maxLim);
-		entityTreeBrowser.getChildren(parentId, mockEntityTreeItem, 0);
+		setQueryResults(1);
+		String nextPageToken = "abc";
+		when(mockResults.getNextPageToken()).thenReturn(nextPageToken);
+		entityTreeBrowser.getChildren(parentId, mockEntityTreeItem, null);
 		// Creates the limited number of entity items
-		verify(mockView, times((int) maxLim)).appendChildEntityTreeItem(
-				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem));
+		verify(mockView).appendChildEntityTreeItem(any(EntityTreeItem.class), eq(mockEntityTreeItem));
 		// Calls once for folders, once for files.
-		verify(mockView).placeChildMoreTreeItem(any(MoreTreeItem.class), Mockito.eq(mockEntityTreeItem),
-				Mockito.eq(maxLim));
+		verify(mockView).placeChildMoreTreeItem(any(MoreTreeItem.class), Mockito.eq(mockEntityTreeItem), anyString());
 	}
 
 	@Test
 	public void testGetMoreButtonRequery() {
-		long maxLim = entityTreeBrowser.getMaxLimit();
-		setQueryResults(4 * maxLim, 0, maxLim);
-		entityTreeBrowser.getChildren(parentId, mockEntityTreeItem, 0);
+		setQueryResults(20);
+		String nextPageToken = "abc";
+		when(mockResults.getNextPageToken()).thenReturn(nextPageToken);
+		entityTreeBrowser.getChildren(parentId, mockEntityTreeItem, null);
 		// Adds the limited number of entity items
-		verify(mockView, times((int) maxLim)).appendChildEntityTreeItem(
+		verify(mockView, times(20)).appendChildEntityTreeItem(
 				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem));
 		// Calls once for folders, once for files.
 		verify(mockView).placeChildMoreTreeItem(
 				any(MoreTreeItem.class), Mockito.eq(mockEntityTreeItem),
-				Mockito.eq(maxLim));
-		setQueryResults(2 * maxLim, maxLim, 2 * maxLim);
-		// Verified that the more button is created with offset maxLim, so
-		// directly the moreButton should call getFolderChildren with that
-		// offset
-		entityTreeBrowser.getChildren(parentId, mockEntityTreeItem,
-				maxLim);
-		// Adds the rest of the entity items
-		verify(mockView, times((int) (2 * maxLim))).appendChildEntityTreeItem(
-				any(EntityTreeItem.class), Mockito.eq(mockEntityTreeItem));
-		// Does not create any more "More (Entity)" buttons, which still should
-		// be at 2 times.
-		verify(mockView).placeChildMoreTreeItem(
-				any(MoreTreeItem.class), Mockito.eq(mockEntityTreeItem),
-				Mockito.eq(maxLim));
+				eq(nextPageToken));
 	}
 
 	// Used to create test query results
-	private void setQueryResults(long totalEntries, long startIndex,
-			long endIndex) {
-		List<EntityQueryResult> entities = new ArrayList<EntityQueryResult>();
+	private void setQueryResults(long totalEntries) {
 		for (int i = 0; i < totalEntries; i++) {
-			EntityQueryResult res = new EntityQueryResult();
-			res.setParentId(parentId);
+			EntityHeader res = new EntityHeader();
 			res.setId("testResultId" + i);
-			res.setEntityType("folder");
-			entities.add(res);
+			res.setType(Folder.class.getName());
+			searchResults.add(res);
 		}
-		searchResults.setEntities(entities.subList((int) startIndex,
-				(int) endIndex));
-		searchResults.setTotalEntityCount(totalEntries);
 	}
 	
 	@Test
@@ -249,10 +247,6 @@ public class EntityTreeBrowserTest {
 		//verify firing a selection event
 		entityTreeBrowser.fireEntitySelectedEvent();
 		verify(handler).onSelection(any(EntitySelectedEvent.class));
-		//verify clearing the state clears the selection handler
-		entityTreeBrowser.clearState();
-		assertNull(entityTreeBrowser.getEntitySelectedHandler());
-		entityTreeBrowser.fireEntitySelectedEvent();
 	}
 	
 	private EntityHeader createEntityHeader(String id, String name, String type, Long versionNumber) {
@@ -302,12 +296,12 @@ public class EntityTreeBrowserTest {
 	
 	@Test
 	public void testIsExpandable() {
-		EntityQueryResult result = new EntityQueryResult();
-		result.setEntityType("folder");
+		EntityHeader result = new EntityHeader();
+		result.setType(Folder.class.getName());
 		assertTrue(entityTreeBrowser.isExpandable(result));
-		result.setEntityType("project");
+		result.setType(Project.class.getName());
 		assertTrue(entityTreeBrowser.isExpandable(result));
-		result.setEntityType("file");
+		result.setType(FileEntity.class.getName());
 		assertFalse(entityTreeBrowser.isExpandable(result));
 	}
 	

@@ -1,5 +1,9 @@
 package org.sagebionetworks.web.client;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.client.cookie.CookieKeys.LAST_PLACE;
+import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -8,22 +12,28 @@ import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.event.shared.UmbrellaException;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.rpc.ServiceDefTarget;
+import com.google.gwt.user.client.ui.RootPanel;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
@@ -34,7 +44,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private PlaceController placeController;
 	private CookieProvider cookieProvider;
 	private AppPlaceHistoryMapper appPlaceHistoryMapper;
-	private SynapseClientAsync synapseClient;
+	private StackConfigServiceAsync stackConfigService;
 	private PlaceChanger placeChanger;
 	private JiraURLHelper jiraUrlHelper;
 	private EventBus eventBus;
@@ -42,31 +52,38 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private boolean isEditing;
 	Set<String> wikiBasedEntites;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private ClientLogger logger;
 	private GlobalApplicationStateView view;
 	private String synapseVersion;
 	private ClientCache localStorage;
 	private GWTWrapper gwt;
 	private boolean isShowingVersionAlert;
+	private DateTimeUtils dateTimeUtils;
+	private PublicPrincipalIds publicPrincipalIds;
+	private SynapseJavascriptClient jsClient;
+	private CallbackP<JavaScriptObject> fileListCallback;
+	boolean isDragDropInitialized = false;
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
 			CookieProvider cookieProvider,
 			JiraURLHelper jiraUrlHelper, 
 			EventBus eventBus, 
-			SynapseClientAsync synapseClient, 
+			StackConfigServiceAsync stackConfigService, 
 			SynapseJSNIUtils synapseJSNIUtils, 
-			ClientLogger logger,
 			ClientCache localStorage, 
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			DateTimeUtils dateTimeUtils,
+			SynapseJavascriptClient jsClient) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
-		this.synapseClient = synapseClient;
+		this.stackConfigService = stackConfigService;
+		fixServiceEntryPoint(stackConfigService);
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.logger = logger;
 		this.localStorage = localStorage;
+		this.dateTimeUtils = dateTimeUtils;
 		this.gwt = gwt;
 		this.view = view;
+		this.jsClient = jsClient;
 		isEditing = false;
 		isShowingVersionAlert = false;
 		initUncaughtExceptionHandler();
@@ -82,8 +99,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	public void handleUncaughtException(Throwable e) {
 		try {
-			Throwable unwrapped = unwrap(e);
-			logger.errorToRepositoryServices(UNCAUGHT_JS_EXCEPTION, unwrapped);
+			GWT.debugger();
+			jsClient.logError(UNCAUGHT_JS_EXCEPTION, unwrap(e));
 		} catch (Throwable t) {
 			synapseJSNIUtils.consoleError("Unable to log uncaught exception to server: " + t.getMessage());
 		} finally {
@@ -94,6 +111,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public static Throwable unwrap(Throwable e) {
 		if (e instanceof UmbrellaException) {
 			UmbrellaException ue = (UmbrellaException) e;
+			if (ue.getCauses().size() > 0) {
+				return unwrap(ue.getCauses().iterator().next());
+			}
+		} else if (e instanceof com.google.web.bindery.event.shared.UmbrellaException) {
+			com.google.web.bindery.event.shared.UmbrellaException ue = (com.google.web.bindery.event.shared.UmbrellaException)e;
 			if (ue.getCauses().size() > 0) {
 				return unwrap(ue.getCauses().iterator().next());
 			}
@@ -109,7 +131,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 				public void goTo(Place place) {
 					// If we are not already on this page, go there.
 					if(!placeController.getWhere().equals(place)){
-						placeController.goTo(place);
+						try {
+							placeController.goTo(place);
+						} catch (Exception e) {
+							synapseJSNIUtils.consoleError(e.getMessage());
+						}
 					}else{
 						// We are already on this page but we want to force it to reload.
 						eventBus.fireEvent(new PlaceChangeEvent(place));
@@ -137,17 +163,13 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	@Override
 	public Place getLastPlace(Place defaultPlace) {
-		String historyValue = cookieProvider.getCookie(CookieKeys.LAST_PLACE);
+		String historyValue = cookieProvider.getCookie(LAST_PLACE);
 		return getPlaceFromHistoryValue(historyValue, fixIfNull(defaultPlace));
 	}
 	
 	@Override
 	public void clearLastPlace() {
-		cookieProvider.removeCookie(CookieKeys.LAST_PLACE);
-	}
-	@Override
-	public void clearCurrentPlace() {
-		cookieProvider.removeCookie(CookieKeys.CURRENT_PLACE);
+		cookieProvider.removeCookie(LAST_PLACE);
 	}
 	
 	@Override
@@ -168,19 +190,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void setLastPlace(Place lastPlace) {
 		Date expires = new Date(System.currentTimeMillis() + (1000*60*60*2)); // store for 2 hours (we don't want to lose this state while a user registers for Synapse)
-		cookieProvider.setCookie(CookieKeys.LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace), expires);
+		cookieProvider.setCookie(LAST_PLACE, appPlaceHistoryMapper.getToken(lastPlace), expires);
 	}
 
 	@Override
 	public Place getCurrentPlace() {
-		String historyValue = cookieProvider.getCookie(CookieKeys.CURRENT_PLACE);
-		return getPlaceFromHistoryValue(historyValue, AppActivityMapper.getDefaultPlace());		
-	}
-
-	@Override
-	public void setCurrentPlace(Place currentPlace) {		
-		Date expires = new Date(System.currentTimeMillis() + 300000); // store for 5 minutes
-		cookieProvider.setCookie(CookieKeys.CURRENT_PLACE, appPlaceHistoryMapper.getToken(currentPlace), expires);
+		//get the current place based on the current browser window history token
+		String token = gwt.getCurrentHistoryToken();
+		return appPlaceHistoryMapper.getPlace(token);
 	}
 
 	@Override
@@ -217,7 +234,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void checkVersionCompatibility(final AsyncCallback<VersionState> callback) {
 		//have we checked recently?
 		String cachedVersion = localStorage.get(RECENTLY_CHECKED_SYNAPSE_VERSION);
-		if (cachedVersion != null) {
+		if (synapseVersion != null && cachedVersion != null) {
 			if (callback != null) {
 				callback.onSuccess(new VersionState(synapseVersion, false));
 			}
@@ -226,9 +243,12 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		// don't check for the next minute
 		localStorage.put(RECENTLY_CHECKED_SYNAPSE_VERSION, Boolean.TRUE.toString(), new Date(System.currentTimeMillis() + 1000*60).getTime());
 		
-		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
+		stackConfigService.getSynapseVersions(new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String versions) {
+				if (synapseVersion == null) {
+					synapseVersion = versions;
+				}
 				boolean isVersionChange = false;
 				//synapse version is set on app load
 				if(!synapseVersion.equals(versions)) {
@@ -245,6 +265,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				view.showGetVersionError(caught.getMessage());
 				if (callback != null) {
 					callback.onFailure(caught);	
 				}
@@ -270,31 +291,33 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			gwt.scheduleDeferred(new Callback() {
 				@Override
 				public void invoke() {
-					initSynapsePropertiesFromServer(new Callback() {
-						public void invoke() {}
-					});
+					initSynapsePropertiesFromServer();
 				}
 			});
 		} else {
-			initSynapsePropertiesFromServer(c);
+			initSynapsePropertiesFromServer();
 		}
 		initWikiEntitiesAndVersions(c);
 		view.initGlobalViewProperties();
+		String showInUTC = cookieProvider.getCookie(SHOW_DATETIME_IN_UTC);
+		if (showInUTC != null) {
+			setShowUTCTime(Boolean.parseBoolean(showInUTC));
+		}
 	}
 	
-	public void initSynapsePropertiesFromServer(final Callback c) {
-		synapseClient.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
+	public void initSynapsePropertiesFromServer() {
+		stackConfigService.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
 				for (String key : properties.keySet()) {
-					localStorage.put(key, properties.get(key), DateUtils.getYearFromNow().getTime());
+					localStorage.put(key, properties.get(key), DateTimeUtilsImpl.getYearFromNow().getTime());
 				}
-				localStorage.put(PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateUtils.getWeekFromNow().getTime());
+				localStorage.put(PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateTimeUtilsImpl.getWeekFromNow().getTime());
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				c.invoke();
+				synapseJSNIUtils.consoleError(caught.getMessage());
 			}
 		});
 	}
@@ -305,7 +328,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 	
 	public void initSynapseVersions(final Callback c) {
-		synapseClient.getSynapseVersions(new AsyncCallback<String>() {			
+		stackConfigService.getSynapseVersions(new AsyncCallback<String>() {			
 			@Override
 			public void onSuccess(String versions) {
 				synapseVersion = versions;
@@ -361,17 +384,20 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	
 	private void setCurrentPlaceInHistory(Place targetPlace, boolean pushState) {
 		//only push this place into the history if it is a place change
-		if (targetPlace != null && !(targetPlace.equals(getCurrentPlace()))) {
-			setLastPlace(getCurrentPlace());
-			setCurrentPlace(targetPlace);
-			String token = appPlaceHistoryMapper.getToken(targetPlace);
-			if (pushState) {
-				gwt.newItem(token, false);
-			} else {
-				gwt.replaceItem(token, false);
-			}
-			
-			recordPlaceVisit(targetPlace);
+		try {
+			if (targetPlace != null && !(targetPlace.equals(getCurrentPlace()))) {
+				setLastPlace(getCurrentPlace());
+				String token = appPlaceHistoryMapper.getToken(targetPlace);
+				if (pushState) {
+					gwt.newItem(token, false);
+				} else {
+					gwt.replaceItem(token, false);
+				}
+				
+				recordPlaceVisit(targetPlace);
+			}	
+		} catch(Throwable t) {
+			synapseJSNIUtils.consoleError(t.getMessage());
 		}
 	}
 	
@@ -403,5 +429,118 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		}
 		Place currentPlace = appPlaceHistoryMapper.getPlace(place); 
 		getPlaceChanger().goTo(currentPlace);
+	}
+	
+	@Override
+	public void setShowUTCTime(boolean showUTC) {
+		Date yearFromNow = new Date();
+		CalendarUtil.addMonthsToDate(yearFromNow, 12);
+		cookieProvider.setCookie(SHOW_DATETIME_IN_UTC, Boolean.toString(showUTC), yearFromNow);
+		dateTimeUtils.setShowUTCTime(showUTC);
+	}
+	
+	@Override
+	public boolean isShowingUTCTime() {
+		return dateTimeUtils.isShowingUTCTime();
+	}
+	
+	private static Integer timezoneOffsetMs = null;
+	/**
+	 * 
+	 * @return the time difference between UTC time and local time, in milliseconds
+	 */
+	public static Integer getTimezoneOffsetMs() {
+		if (timezoneOffsetMs == null) {
+			timezoneOffsetMs = new Date().getTimezoneOffset() * 60 * 1000;
+		}
+		return timezoneOffsetMs;
+	}
+	
+	@Override
+	public PublicPrincipalIds getPublicPrincipalIds() {
+		if (publicPrincipalIds == null) {
+			publicPrincipalIds = new PublicPrincipalIds();
+			publicPrincipalIds.setPublicAclPrincipalId(Long.parseLong(getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
+			publicPrincipalIds.setAnonymousUserId(Long.parseLong(getSynapseProperty(WebConstants.ANONYMOUS_USER_PRINCIPAL_ID)));
+			publicPrincipalIds.setAuthenticatedAclPrincipalId(Long.parseLong(getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)));	
+		}
+		return publicPrincipalIds;
+	}
+	
+	public boolean isDragAndDropListenerSet() {
+		return fileListCallback != null;
+	}
+	
+	public void onDrop(JavaScriptObject fileList) {
+		if (isDragAndDropListenerSet()) {
+			fileListCallback.invoke(fileList);
+		}
+	}
+	
+	@Override
+	public void initializeDropZone() {
+		if (!isDragDropInitialized) {
+			isDragDropInitialized = true;
+			Element dropZoneElement = RootPanel.get("dropzone").getElement();
+			Element rootPanelElement = RootPanel.get("rootPanel").getElement();
+			_initializeDragDrop(this, dropZoneElement, rootPanelElement);
+		}
+	}
+	
+	private final static native void _initializeDragDrop(
+			GlobalApplicationStateImpl globalAppState,
+			Element dropZone,
+			Element rootPanel
+			) /*-{
+		try {
+			function showDropZone() {
+				dropZone.style.display = "block";
+			}
+			
+			function hideDropZone() {
+				dropZone.style.display = "none";
+			}
+			
+			$wnd.addEventListener('dragenter', function(e) {
+				if (globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::isDragAndDropListenerSet()()) {
+					showDropZone();
+				}
+			});
+			
+			function allowDrag(e) {
+				e.dataTransfer.dropEffect = 'copy';
+				e.preventDefault();
+			}
+	
+			function handleDrop(e) {
+				e.preventDefault();
+				hideDropZone();
+				globalAppState.@org.sagebionetworks.web.client.GlobalApplicationStateImpl::onDrop(Lcom/google/gwt/core/client/JavaScriptObject;)(e.dataTransfer.files);
+			}
+	
+			dropZone.addEventListener('dragenter', allowDrag);
+			dropZone.addEventListener('dragover', allowDrag);
+	
+			dropZone.addEventListener('drop', handleDrop);
+			
+			//if files are dropped into the root panel, then ignore the event (do not open file contents if user does not have the upload dialog open).
+			rootPanel.addEventListener('drop', function(e) {
+				e.preventDefault();
+			});
+			rootPanel.addEventListener('dragenter', allowDrag);
+			rootPanel.addEventListener('dragover', allowDrag);
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+	
+	@Override
+	public void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback) {
+		this.fileListCallback = fileListCallback;
+	}
+	
+	@Override
+	public void clearDropZoneHandler() {
+		fileListCallback = null;
 	}
 }

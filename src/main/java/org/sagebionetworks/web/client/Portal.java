@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.client;
-
 import org.sagebionetworks.web.client.mvp.AppActivityMapper;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.footer.Footer;
+import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.activity.shared.ActivityManager;
 import com.google.gwt.core.client.EntryPoint;
@@ -26,15 +27,16 @@ public class Portal implements EntryPoint {
 	//If there's a failure to load the code from the server, how long (in ms) should we wait before trying again...
 	public static final int CODE_LOAD_DELAY = 5000;
 	//  We are using gin to create all of our objects
-	private final PortalGinInjector ginjector = GWT.create(PortalGinInjector.class);
-	private final AppLoadingView loading = GWT.create(AppLoadingView.class);
-
+	private static final PortalGinInjector ginjector = GWT.create(PortalGinInjector.class);
 	private SimplePanel appWidget = new SimplePanel();
-
 	public final static native void _consoleError(String message) /*-{
 		console.error(message);
 	}-*/;
 
+	public static PortalGinInjector getInjector() {
+		return ginjector;
+	}
+	
 	/**
 	 * This is the entry point method.
 	 */
@@ -47,8 +49,6 @@ public class Portal implements EntryPoint {
 			Window.Location.replace(fullUrl);
 			Window.Location.reload();
 		} else {
-			// Show a loading dialog while we downlaod code
-			loading.showWidget();
 			// This is a split point where the browser can download the first large code file.
 			GWT.runAsync(new RunAsyncCallback() {
 				@Override
@@ -61,11 +61,14 @@ public class Portal implements EntryPoint {
 				@Override
 				public void onSuccess() {
 					try {
+						// load the previous session, if there is one
+						ginjector.getAuthenticationController().reloadUserSessionData();
+
 						EventBus eventBus = ginjector.getEventBus();
 						PlaceController placeController = new PlaceController(eventBus);
 
 						// Start ActivityManager for the main widget with our ActivityMapper
-						AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), loading);
+						AppActivityMapper activityMapper = new AppActivityMapper(ginjector, new SynapseJSNIUtilsImpl(), null);
 						ActivityManager activityManager = new ActivityManager(activityMapper, eventBus);
 						activityManager.setDisplay(appWidget);
 						
@@ -73,12 +76,16 @@ public class Portal implements EntryPoint {
 						appWidget.addStyleName("rootPanel");
 
 						// Start PlaceHistoryHandler with our PlaceHistoryMapper
-						AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);		
+						AppPlaceHistoryMapper historyMapper = GWT.create(AppPlaceHistoryMapper.class);
 						final PlaceHistoryHandler historyHandler = new PlaceHistoryHandler(historyMapper);		
 						historyHandler.register(placeController, eventBus, AppActivityMapper.getDefaultPlace());						
+						Header header = ginjector.getHeader();
+						RootPanel.get("headerPanel").add(header);
+						Footer footer = ginjector.getFooter();
+						RootPanel.get("footerPanel").add(footer);
 						
 						RootPanel.get("rootPanel").add(appWidget);
-
+						RootPanel.get("initialLoadingUI").setVisible(false);
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
@@ -92,14 +99,13 @@ public class Portal implements EntryPoint {
 								
 								// start version timer
 								ginjector.getVersionTimer().start();
-								
-								// load the previous session, if there is one
-								ginjector.getAuthenticationController().reloadUserSessionData();
+								// start timer to check for user logout (session expired, or user explicitly logged out)
+								ginjector.getSessionTokenDetector().start();
 								
 								// Goes to place represented on URL or default place
 								historyHandler.handleCurrentHistory();
-								loading.hide();
 								delayLoadOfZxcvbn();
+								globalApplicationState.initializeDropZone();
 							}
 						});
 						
@@ -109,14 +115,13 @@ public class Portal implements EntryPoint {
 					}
 				}
 			});
-			
 		}
 	}
 	
 	public void delayLoadOfZxcvbn() {
 		Timer timer = new Timer() { 
 		    public void run() {
-		    	ScriptInjector.fromUrl("//cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.3.0/zxcvbn.js")
+		    	ScriptInjector.fromUrl("//cdnjs.cloudflare.com/ajax/libs/zxcvbn/4.4.2/zxcvbn.js")
 		    		.setWindow(ScriptInjector.TOP_WINDOW)
 		    		.inject();
 		    }

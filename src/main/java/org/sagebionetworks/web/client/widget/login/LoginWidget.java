@@ -1,15 +1,14 @@
 package org.sagebionetworks.web.client.widget.login;
 
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.shared.exceptions.LockedException;
-import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
-import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -17,25 +16,29 @@ import com.google.inject.Inject;
 
 public class LoginWidget implements LoginWidgetView.Presenter {
 
+	public static final String PLEASE_TRY_AGAIN = ". Please try again.";
 	private LoginWidgetView view;
 	private AuthenticationController authenticationController;	
 	private UserListener listener;	
 	private GlobalApplicationState globalApplicationState;
-	private SynapseJSNIUtils synapseJsniUtils;
+	private SynapseAlert synAlert;
 	
 	public static final String LOGIN_PLACE  = "LoginPlace";
 	
 	@Inject
-	public LoginWidget(LoginWidgetView view, AuthenticationController controller, GlobalApplicationState globalApplicationState, SynapseJSNIUtils synapseJsniUtils) {
+	public LoginWidget(LoginWidgetView view, 
+			AuthenticationController controller, 
+			GlobalApplicationState globalApplicationState, 
+			SynapseAlert synAlert) {
 		this.view = view;
-		view.setPresenter(this);
 		this.authenticationController = controller;	
 		this.globalApplicationState = globalApplicationState;
-		this.synapseJsniUtils = synapseJsniUtils;
+		this.synAlert = synAlert;
+		view.setSynAlert(synAlert);
+		view.setPresenter(this);
 	}
 
 	public Widget asWidget() {
-		view.setPresenter(this);
 		return view.asWidget();
 	}
 	
@@ -44,7 +47,8 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 	}
 	
 	@Override
-	public void setUsernameAndPassword(final String username, final String password) {		
+	public void setUsernameAndPassword(final String username, final String password) {
+		synAlert.clear();
 		authenticationController.loginUser(username, password, new AsyncCallback<UserSessionData>() {
 			@Override
 			public void onSuccess(UserSessionData userSessionData) {
@@ -63,15 +67,10 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.clear();
-				if(caught instanceof ReadOnlyModeException) {
-					view.showError(DisplayConstants.LOGIN_READ_ONLY_MODE);
-				} else if(caught instanceof SynapseDownException) {
-					view.showError(DisplayConstants.LOGIN_DOWN_MODE);
-				} else if(caught instanceof LockedException) {
-					view.showError(caught.getMessage());
+				if (caught instanceof NotFoundException || caught instanceof UnauthorizedException) {
+					synAlert.showError(caught.getMessage() + PLEASE_TRY_AGAIN);
 				} else {
-					synapseJsniUtils.consoleError(caught.getMessage());
-					view.showAuthenticationFailed();
+					synAlert.handleException(caught);	
 				}
 			}
 		});

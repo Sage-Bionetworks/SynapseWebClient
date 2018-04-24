@@ -5,11 +5,13 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.Act
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 
 public class ActionButton extends Button implements ActionView {
 
 	Action action;
-
+	HandlerRegistration handlerRegistration;
+	
 	@Override
 	public void setAction(Action action) {
 		this.action = action;
@@ -22,7 +24,11 @@ public class ActionButton extends Button implements ActionView {
 
 	@Override
 	public void addActionListener(final ActionListener listener) {
-		this.addClickHandler(new ClickHandler() {
+		// clean up
+		if (handlerRegistration != null) {
+			handlerRegistration.removeHandler();
+		}
+		handlerRegistration = this.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
 				listener.onAction(action);

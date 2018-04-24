@@ -6,9 +6,7 @@
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:e="urn:import:org.sagebionetworks.web.client.widget.entity">
   
-  <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
- 	
-  	<bh:Div visible="false" addStyleNames="margin-top-10 margin-left-15 margin-right-15">
+  	<bh:Div addStyleNames="margin-top-10 margin-left-15 margin-right-15">
   		<bh:Div ui:field="loginAlert">
   			<b:Alert type="INFO">
 	  			<bh:Strong text="Please login to access this resource." />
@@ -18,21 +16,9 @@
   		
   		<b:Alert ui:field="alert" type="DANGER" addStyleNames="margin-bottom-0-imp">
   			<bh:Strong ui:field="alertText"></bh:Strong>
+  			<b:Button ui:field="reloadButton" text="Retry" visible="false" icon="REFRESH" size="EXTRA_SMALL" addStyleNames="margin-left-15"/>
   		</b:Alert>
-  		<b:Modal ui:field="jiraDialog" title="Synapse Error" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
-			<b:ModalBody>
-				<b:FieldSet>
-					<b:FormGroup>
-						<b:FormLabel for="userReportField">Describe the problem (optional)</b:FormLabel>
-						<b:TextArea ui:field="userReportField" name="userReportField" b:id="userReportField" height="250px" placeholder="Steps to reproduce the error" />
-					</b:FormGroup>
-				</b:FieldSet>
-			</b:ModalBody>
-			<b:ModalFooter>
-			    <b:Button ui:field="okButton" type="PRIMARY" text="Send Error Report" />
-			    <b:Button ui:field="cancelButton" type="DEFAULT" text="Don't Send" />
-			</b:ModalFooter>
-		</b:Modal>
+  		<bh:Div ui:field="jiraDialogContainer"/>
 	</bh:Div>
 
 </ui:UiBinder>

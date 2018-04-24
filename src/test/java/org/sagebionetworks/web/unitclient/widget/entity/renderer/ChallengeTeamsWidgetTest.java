@@ -25,7 +25,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EditRegisteredTeamDialog;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsView;
 import org.sagebionetworks.web.client.widget.entity.renderer.ChallengeTeamsWidget;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
 import org.sagebionetworks.web.shared.ChallengeTeamBundle;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -39,7 +39,7 @@ public class ChallengeTeamsWidgetTest {
 	
 	ChallengeTeamsView mockView;
 	EditRegisteredTeamDialog mockEditRegisterTeamDialog;
-	DetailedPaginationWidget mockPaginationWidget;
+	BasicPaginationWidget mockPaginationWidget;
 	ChallengeClientAsync mockChallengeClient;
 	
 	AuthenticationController mockAuthenticationController;
@@ -57,7 +57,7 @@ public class ChallengeTeamsWidgetTest {
 	@Before
 	public void before() throws RestServiceException, JSONObjectAdapterException {
 		mockView = mock(ChallengeTeamsView.class);
-		mockPaginationWidget = mock(DetailedPaginationWidget.class);
+		mockPaginationWidget = mock(BasicPaginationWidget.class);
 		mockChallengeClient = mock(ChallengeClientAsync.class);
 		mockEditRegisterTeamDialog = mock(EditRegisteredTeamDialog.class);
 		mockAuthenticationController = mock(AuthenticationController.class);

@@ -15,10 +15,11 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidget;
 import org.sagebionetworks.web.client.widget.discussion.DiscussionThreadListItemWidgetView;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
@@ -33,8 +34,6 @@ public class DiscussionThreadListItemWidgetTest {
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
-	SynapseJSNIUtils mockJsniUtils;
-	@Mock
 	UserBadge mockUserBadge;
 	@Mock
 	UserBadge mockAuthorWidget;
@@ -44,19 +43,24 @@ public class DiscussionThreadListItemWidgetTest {
 	CallbackP<DiscussionThreadBundle> mockThreadIdClickedCallback;
 	@Mock
 	DiscussionThreadBundle mockThreadBundle;
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
 	DiscussionThreadListItemWidget discussionThreadWidget;
 	private String title = "title";
 	private Long numberOfViews = 2L;
-
+	public static final String THREAD_ID = "83473";
+	public static final String PROJECT_ID = "1111";
+	
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
-		discussionThreadWidget = new DiscussionThreadListItemWidget(mockView,
-				mockAuthorWidget, mockGinInjector, mockJsniUtils);
+		discussionThreadWidget = new DiscussionThreadListItemWidget(mockView, mockAuthorWidget, mockGinInjector, mockDateTimeUtils);
 		when(mockThreadBundle.getTitle()).thenReturn(title);
 		when(mockThreadBundle.getActiveAuthors()).thenReturn(Arrays.asList("123"));
 		when(mockThreadBundle.getNumberOfViews()).thenReturn(numberOfViews);
+		when(mockThreadBundle.getProjectId()).thenReturn(PROJECT_ID);
+		when(mockThreadBundle.getId()).thenReturn(THREAD_ID);
 	}
 
 	@Test
@@ -74,10 +78,11 @@ public class DiscussionThreadListItemWidgetTest {
 		verify(mockView).setNumberOfViews("2");
 		verify(mockView).setLastActivity(anyString());
 		verify(mockGinInjector).getUserBadgeWidget();
-		verify(mockJsniUtils).getRelativeTime(any(Date.class));
+		verify(mockDateTimeUtils).getRelativeTime(any(Date.class));
 		verify(mockAuthorWidget).configure(anyString());
 		verify(mockAuthorWidget).setSize(any(BadgeSize.class));
 		verify(mockView).setPinnedIconVisible(false);
+		verify(mockView).setThreadUrl(TopicUtils.buildThreadLink(PROJECT_ID, THREAD_ID));
 		reset(mockView);
 	}
 

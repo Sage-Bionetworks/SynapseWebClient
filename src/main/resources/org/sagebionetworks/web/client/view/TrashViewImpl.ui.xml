@@ -6,8 +6,6 @@
 	xmlns:bb="urn:import:org.gwtbootstrap3.client.ui">
 	
 	<g:HTMLPanel>
-		<g:SimplePanel ui:field="header" />
-		
 		<div class="row margin-top-left-10 margin-right-15 margin-bottom-20">
 			<div class="well col-md-offset-1 col-md-10 col-sm-offset-2 col-sm-8">
 				<h2 style="display: inline;" >Trash Can</h2>
@@ -33,8 +31,6 @@
 					<bb:Button ui:field="deleteSelectedButton" styleName="btn left">Delete Selected</bb:Button>	
 			</div>
         </div>
-		
-		<g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>
 
 </ui:UiBinder>

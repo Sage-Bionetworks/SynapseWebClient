@@ -3,12 +3,17 @@ package org.sagebionetworks.web.client;
 
 import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 import static org.sagebionetworks.web.client.ClientProperties.GB;
-import static org.sagebionetworks.web.client.ClientProperties.IMAGE_CONTENT_TYPES_SET;
 import static org.sagebionetworks.web.client.ClientProperties.KB;
 import static org.sagebionetworks.web.client.ClientProperties.MB;
 import static org.sagebionetworks.web.client.ClientProperties.STYLE_DISPLAY_INLINE;
-import static org.sagebionetworks.web.client.ClientProperties.TABLE_CONTENT_TYPES_SET;
 import static org.sagebionetworks.web.client.ClientProperties.TB;
+import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_CANCEL;
+import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_DELETE;
+import static org.sagebionetworks.web.client.DisplayConstants.CONFIRM_DELETE_DIALOG_TITLE;
+import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYLE;
+import static org.sagebionetworks.web.client.DisplayConstants.LINK_BUTTON_STYLE;
+import static org.sagebionetworks.web.client.DisplayConstants.OK;
+import static org.sagebionetworks.web.client.DisplayConstants.PRIMARY_BUTTON_STYLE;
 
 import java.util.Date;
 import java.util.List;
@@ -28,13 +33,13 @@ import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.Trigger;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
+import org.gwtbootstrap3.extras.bootbox.client.options.DialogOptions;
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
-import org.sagebionetworks.gwt.client.schema.adapter.DateUtils;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -43,10 +48,9 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
-import org.sagebionetworks.schema.FORMAT;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.Home;
@@ -59,6 +63,7 @@ import org.sagebionetworks.web.client.place.TeamSearch;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FitImage;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.WidgetSelectionState;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -73,14 +78,14 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
+import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.safehtml.shared.SafeHtml;
@@ -92,21 +97,46 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AbstractImagePrototype;
 import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.Focusable;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextArea;
+import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 
 public class DisplayUtils {
-	private static DateTimeFormat prettyFormat = null; 
 	private static Logger displayUtilsLogger = Logger.getLogger(DisplayUtils.class.getName());
 	public static PublicPrincipalIds publicPrincipalIds = null;
 	public static enum MessagePopup {  
         INFO,
         WARNING,
         QUESTION
+	}
+	
+	public static final ClickHandler TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER = event -> {
+		TextBox source = (TextBox)event.getSource();
+		source.selectAll();
+	};
+	public static final ClickHandler DO_NOTHING_CLICKHANDLER = event -> {
+		event.preventDefault();
+	};
+	
+	/**
+	 * This key down handler prevents the user from tabbing forward off of the given Focusable widget.
+	 * User can still shift-tab to go back.
+	 * @param lastWidget
+	 * @return
+	 */
+	public static KeyDownHandler getPreventTabHandler(Focusable lastWidget) {
+		return event -> {
+			if (KeyCodes.KEY_TAB == event.getNativeKeyCode() && !event.isShiftKeyDown()) {
+				event.preventDefault();
+				lastWidget.setFocus(true);
+			}
+		};
 	}
 	
 	public static NotifySettings getDefaultSettings() {
@@ -208,18 +238,24 @@ public class DisplayUtils {
 	 * @param sageImageBundle
 	 * @return
 	 */
-	public static Div getLoadingWidget(SageImageBundle sageImageBundle) {
-		Div cp = new Div();
-		cp.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading31()))));		
-		return cp;
+	public static IsWidget getLoadingWidget() {
+		LoadingSpinner spinner = new LoadingSpinner();
+		spinner.setSize(31);
+		return spinner;
 	}
 	
-	public static String getLoadingHtml(SageImageBundle sageImageBundle) {
-		return getLoadingHtml(sageImageBundle, DisplayConstants.LOADING);
+	public static IsWidget getSmallLoadingWidget() {
+		LoadingSpinner spinner = new LoadingSpinner();
+		spinner.setSize(16);
+		return spinner;
 	}
-
-	public static String getLoadingHtml(SageImageBundle sageImageBundle, String message) {
-		return DisplayUtils.getIconHtml(sageImageBundle.loading16()) + "&nbsp;" + message + "...";
+	
+	public static IsWidget getLoadingWidget(String message) {
+		Div div = new Div();
+		div.addStyleName("center center-block");
+		div.add(getSmallLoadingWidget());
+		div.add(new Text(" " + message + "..."));
+		return div;
 	}
 
 
@@ -254,17 +290,19 @@ public class DisplayUtils {
 		if (timeout != null) {
 			settings.setDelay(timeout);	
 		}
+		settings.setZIndex(2001);
 		notify(title, message, settings);
 	}
 	
 	public static void showErrorMessage(String message) {
-		showPopup("", message, MessagePopup.WARNING, null, null);
+		if (message != null && !"0".equals(message.trim())) {
+			showPopup("", message, MessagePopup.WARNING, null, null);
+		}
 	}
 	
 	public static void showErrorMessage(String title, String message) {
 		showPopup(title, message, MessagePopup.WARNING, null, null);
 	}
-
 
 	/**
 	 * @param t
@@ -374,7 +412,59 @@ public class DisplayUtils {
 		});
 	}
 	
-	public static void showPopup(String title, String message,
+	public static void confirmDelete(
+			String trustedHtmlMessage,
+			Callback yesCallback
+			) {
+		
+		DialogOptions options = DialogOptions.newOptions(trustedHtmlMessage);
+		options.setCloseButton(false);
+		options.setTitle(CONFIRM_DELETE_DIALOG_TITLE);
+		options.addButton(BUTTON_CANCEL, LINK_BUTTON_STYLE);
+		options.addButton(BUTTON_DELETE, DANGER_BUTTON_STYLE, () -> {
+			if (yesCallback != null)
+				yesCallback.invoke();
+		});
+		Bootbox.dialog(options);
+		focusOnBootboxButton(LINK_BUTTON_STYLE);
+	}
+
+	public static void confirm(
+			String trustedHtmlMessage,
+			Callback okCallback
+			) {
+		confirm(trustedHtmlMessage, null, okCallback);
+	}
+	
+	public static void confirm(
+			String trustedHtmlMessage,
+			Callback cancelCallback,
+			Callback okCallback
+			) {
+		
+		DialogOptions options = DialogOptions.newOptions(trustedHtmlMessage);
+		options.setCloseButton(false);
+		options.addButton(BUTTON_CANCEL, LINK_BUTTON_STYLE, () -> {
+			if (cancelCallback != null) {
+				cancelCallback.invoke();
+			}
+		});
+		options.addButton(OK, PRIMARY_BUTTON_STYLE, () -> {
+			if (okCallback != null) {
+				okCallback.invoke();
+			}
+		});
+		Bootbox.dialog(options);
+		focusOnBootboxButton(PRIMARY_BUTTON_STYLE);
+	}
+	
+    public static native void focusOnBootboxButton(String buttonStyle) /*-{
+    		$wnd.jQuery(".bootbox ." + buttonStyle).focus();
+	}-*/;
+
+	
+	public static void showPopup(String title, 
+			String message,
 			DisplayUtils.MessagePopup iconStyle,
 			final Callback primaryButtonCallback,
 			final Callback secondaryButtonCallback) {
@@ -383,18 +473,7 @@ public class DisplayUtils {
 		boolean isSecondaryButton = secondaryButtonCallback != null;
 		
 		if (isSecondaryButton) {
-			Bootbox.confirm(popupHtml.asString(), new ConfirmCallback() {
-				@Override
-				public void callback(boolean isConfirmed) {
-					if (isConfirmed) {
-						if (primaryButtonCallback != null)
-							primaryButtonCallback.invoke();
-					} else {
-						if (secondaryButtonCallback != null)
-							secondaryButtonCallback.invoke();
-					}
-				}
-			});
+			confirm(popupHtml.asString(), secondaryButtonCallback, primaryButtonCallback);
 		} else {
 			Bootbox.alert(popupHtml.asString(), new SimpleCallback() {
 				@Override
@@ -409,11 +488,11 @@ public class DisplayUtils {
 	public static SafeHtml getPopupSafeHtml(String title, String message, DisplayUtils.MessagePopup iconStyle) {
 		String iconHtml = "";
 		if (MessagePopup.INFO.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-info-sign font-size-32 col-xs-1");
+			iconHtml = getFontAwesomeIcon("info-circle font-size-32 col-xs-1");
 		else if (MessagePopup.WARNING.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-exclamation-sign font-size-32 col-xs-1");
+			iconHtml = getFontAwesomeIcon("exclamation-circle font-size-32 col-xs-1");
 		else if (MessagePopup.QUESTION.equals(iconStyle))
-			iconHtml = getIcon("glyphicon-question-sign font-size-32 col-xs-1");
+			iconHtml = getFontAwesomeIcon("question-circle font-size-32 col-xs-1");
 		SafeHtmlBuilder builder = new SafeHtmlBuilder();
 		if (DisplayUtils.isDefined(title)) {
 			builder.appendHtmlConstant("<h5>");
@@ -509,30 +588,6 @@ public class DisplayUtils {
 	
 	public static String uppercaseFirstLetter(String display) {
 		return display.substring(0, 1).toUpperCase() + display.substring(1);		
-	}
-		
-	/**
-	 * YYYY-MM-DD HH:mm:ss
-	 * @param toFormat
-	 * @return
-	 */
-	public static String convertDataToPrettyString(Date toFormat) {
-		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		if (prettyFormat == null) {
-			prettyFormat = DateTimeFormat.getFormat("yyyy-MM-dd HH:mm:ss");
-		}
-		return prettyFormat.format(toFormat);
-	}
-	
-	
-	/**
-	 * Converts a date to just a date.
-     * @return  yyyy-MM-dd
-	 * @return
-	 */
-	public static String converDateaToSimpleString(Date toFormat) {
-		if(toFormat == null) throw new IllegalArgumentException("Date cannot be null");
-		return DateUtils.convertDateToString(FORMAT.DATE, toFormat);
 	}
 	
 	public static String getTeamHistoryToken(String teamId) {
@@ -706,7 +761,7 @@ public class DisplayUtils {
 		return t;
 	}
 	
-	public static String getVersionDisplay(Versionable versionable) {		
+	public static String getVersionDisplay(VersionableEntity versionable) {		
 		String version = "";
 		if(versionable == null || versionable.getVersionNumber() == null) return version;
 
@@ -757,23 +812,6 @@ public class DisplayUtils {
 			cookies.removeCookie(cookieKey);
 		}
 	}
-
-		
-	
-	/**
-	 * Create the URL to a version of a wiki's attachments.
-	 * @param baseFileHandleUrl
-	 * @param wikiKey
-	 * @param fileName
-	 * @param preview
-	 * @param wikiVersion
-	 * @return
-	 */
-	public static String createVersionOfWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, 
-			boolean preview, Long wikiVersion, String xsrfToken) {
-		String attachmentUrl = createWikiAttachmentUrl(baseFileHandleUrl, wikiKey, fileName, preview, xsrfToken);
-		return attachmentUrl + "&" + WebConstants.WIKI_VERSION_PARAM_KEY + "=" + wikiVersion.toString();
-	}
 	
 	/**
 		 * Create the url to a wiki filehandle.
@@ -783,7 +821,7 @@ public class DisplayUtils {
 		 * @param fileName
 		 * @return
 		 */
-	public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview, String xsrfToken){
+	public static String createWikiAttachmentUrl(String baseFileHandleUrl, WikiPageKey wikiKey, String fileName, boolean preview){
 		//direct approach not working.  have the filehandleservlet redirect us to the temporary wiki attachment url instead
 //		String attachmentPathName = preview ? "attachmentpreview" : "attachment";
 //		return repoServicesUrl 
@@ -797,14 +835,13 @@ public class DisplayUtils {
 		return baseFileHandleUrl + "?" +
 				WebConstants.WIKI_OWNER_ID_PARAM_KEY + "=" + wikiKey.getOwnerObjectId() + "&" +
 				WebConstants.WIKI_OWNER_TYPE_PARAM_KEY + "=" + wikiKey.getOwnerObjectType() + "&"+
-				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken + "&" +
 				WebConstants.WIKI_FILENAME_PARAM_KEY + "=" + fileName + "&" +
 					WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) +
 					wikiIdParam;
 	}
 		
-	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, String xsrfToken){
-		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false, xsrfToken);
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview){
+		return createFileEntityUrl(baseFileHandleUrl, entityId, versionNumber, preview, false);
 	}
 	
 	public static String getParamForNoCaching() {
@@ -817,13 +854,12 @@ public class DisplayUtils {
 	 * @param entityid
 	 * @return
 	 */
-	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy, String xsrfToken){
+	public static String createFileEntityUrl(String baseFileHandleUrl, String entityId, Long versionNumber, boolean preview, boolean proxy){
 		String versionParam = versionNumber == null ? "" : "&" + WebConstants.ENTITY_VERSION_PARAM_KEY + "=" + versionNumber.toString();
 		return baseFileHandleUrl + "?" +
 				WebConstants.ENTITY_PARAM_KEY + "=" + entityId + "&" +
 				WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY + "=" + Boolean.toString(preview) + "&" +
-				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) + "&" + 
-				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken +
+				WebConstants.PROXY_PARAM_KEY + "=" + Boolean.toString(proxy) + 
 				versionParam;
 	}
 	
@@ -833,10 +869,9 @@ public class DisplayUtils {
 	 * @param teamId
 	 * @return
 	 */
-	public static String createTeamIconUrl(String baseFileHandleUrl, String teamId, String xsrfToken){
+	public static String createTeamIconUrl(String baseFileHandleUrl, String teamId){
 		return baseFileHandleUrl + "?" +
-				WebConstants.TEAM_PARAM_KEY + "=" + teamId + "&" +
-				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
+				WebConstants.TEAM_PARAM_KEY + "=" + teamId;
 	}
 	
 	/**
@@ -845,10 +880,9 @@ public class DisplayUtils {
 	 * @param rawFileHandleId
 	 * @return
 	 */
-	public static String createRawFileHandleUrl(String baseFileHandleUrl, String rawFileHandleId, String xsrfToken){
+	public static String createRawFileHandleUrl(String baseFileHandleUrl, String rawFileHandleId){
 		return baseFileHandleUrl + "?" +
-				WebConstants.RAW_FILE_HANDLE_PARAM + "=" + rawFileHandleId + "&" +
-				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
+				WebConstants.RAW_FILE_HANDLE_PARAM + "=" + rawFileHandleId;
 	}
 
 	public static String createEntityVersionString(Reference ref) {
@@ -881,32 +915,6 @@ public class DisplayUtils {
 		return ref;		
 	}
 		
-	public static boolean isRecognizedImageContentType(String contentType) {
-		String lowerContentType = contentType.toLowerCase();
-		return IMAGE_CONTENT_TYPES_SET.contains(lowerContentType);
-	}
-	
-	public static boolean isRecognizedTableContentType(String contentType) {
-		String lowerContentType = contentType.toLowerCase();
-		return TABLE_CONTENT_TYPES_SET.contains(lowerContentType);
-	}
-	
-	public static boolean isTextType(String contentType) {
-		return contentType.toLowerCase().startsWith("text/");
-	}
-	
-	public static boolean isCSV(String contentType) {
-		return contentType != null && contentType.toLowerCase().startsWith("text/csv");
-	}
-	
-	public static boolean isTAB(String contentType) {
-		return contentType != null && contentType.toLowerCase().startsWith(WebConstants.TEXT_TAB_SEPARATED_VALUES);
-	}
-	
-	public static boolean isHTML(String contentType) {
-		return contentType != null && contentType.toLowerCase().startsWith("text/html");
-	}
-	
 	/**
 	 * Return a preview filehandle associated with this bundle (or null if unavailable)
 	 * @param bundle
@@ -1230,7 +1238,7 @@ public class DisplayUtils {
 		int docViewTop = Window.getScrollTop();
 		int docViewBottom = docViewTop + Window.getClientHeight() + paddingBottom;
 		int elemTop = widget.getAbsoluteTop();
-		int elemBottom = elemTop + widget.getOffsetHeight();
-		return ((elemBottom <= docViewBottom) && (elemTop >= docViewTop));
+//		int elemBottom = elemTop + widget.getOffsetHeight();
+		return docViewBottom >= elemTop;
 	}
 }

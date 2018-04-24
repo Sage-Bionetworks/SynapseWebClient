@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.ListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 
 import com.google.gwt.core.shared.GWT;
@@ -34,6 +35,7 @@ public class TabViewImpl implements TabView {
 	Presenter presenter;
 	Widget widget;
 	ClickHandler tabClickedHandler;
+	Anchor anchor;
 	
 	@Inject
 	public TabViewImpl(HelpWidget helpWidget) {
@@ -44,6 +46,7 @@ public class TabViewImpl implements TabView {
 		tabClickedHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				event.preventDefault();
 				presenter.onTabClicked();
 			}
 		};
@@ -66,14 +69,23 @@ public class TabViewImpl implements TabView {
 		helpWidget.setHref(helpLink);
 		helpWidget.setPlacement(Placement.BOTTOM);
 		tabItem.clear();
-		FocusPanel panel = new FocusPanel();
-		panel.add(new InlineHTML(tabTitle));
-		panel.addClickHandler(tabClickedHandler);
-		panel.addStyleName("margin-right-5 displayInline");
-		tabItem.add(panel);
+		anchor = new Anchor();
+		anchor.add(new InlineHTML(tabTitle));
+		anchor.addStyleName("textDecorationNone");
+		
+		FocusPanel fp = new FocusPanel();
+		fp.addClickHandler(tabClickedHandler);
+		fp.setTabIndex(-1);
+		fp.addStyleName("margin-right-5 displayInline");
+		fp.add(anchor);
+		tabItem.add(fp);
 		tabItem.add(helpWidget.asWidget());
 	}
 	
+	@Override
+	public void updateHref(Synapse place) {
+		anchor.setHref("#!Synapse:" + place.toToken());
+	}
 	@Override
 	public Widget getTabListItem() {
 		return tabListItem;
@@ -87,6 +99,10 @@ public class TabViewImpl implements TabView {
 	@Override
 	public void setTabListItemVisible(boolean visible) {
 		tabListItem.setVisible(visible);
+	}
+	@Override
+	public boolean isTabListItemVisible() {
+		return tabListItem.isVisible();
 	}
 	
 	@Override

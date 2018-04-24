@@ -10,7 +10,9 @@ import java.util.logging.Logger;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.mvp.AppPlaceHistoryMapper;
+import org.sagebionetworks.web.server.servlet.AliasRedirectorServlet;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
+import org.sagebionetworks.web.server.servlet.DataAccessClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionForumClientImpl;
 import org.sagebionetworks.web.server.servlet.DiscussionMessageServlet;
 import org.sagebionetworks.web.server.servlet.DockerClientImpl;
@@ -22,12 +24,9 @@ import org.sagebionetworks.web.server.servlet.JiraClientImpl;
 import org.sagebionetworks.web.server.servlet.JiraJavaClient;
 import org.sagebionetworks.web.server.servlet.JiraJavaClientImpl;
 import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
-import org.sagebionetworks.web.server.servlet.LicenseServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
 import org.sagebionetworks.web.server.servlet.MultipartFileUploadClientImpl;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
-import org.sagebionetworks.web.server.servlet.SearchServiceImpl;
-import org.sagebionetworks.web.server.servlet.SimpleSearchService;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SubscriptionClientImpl;
@@ -37,7 +36,6 @@ import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
-import org.sagebionetworks.web.server.servlet.filter.ProjectSearchRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.RegisterAccountFilter;
 import org.sagebionetworks.web.server.servlet.filter.TimingFilter;
@@ -90,6 +88,10 @@ public class PortalServletModule extends ServletModule {
 		bind(ChallengeClientImpl.class).in(Singleton.class);
 		serve("/Portal/challengeclient").with(ChallengeClientImpl.class);
 		
+		// Setup the Challenge service
+		bind(DataAccessClientImpl.class).in(Singleton.class);
+		serve("/Portal/dataaccessclient").with(DataAccessClientImpl.class);
+		
 		// Subscription service
 		bind(SubscriptionClientImpl.class).in(Singleton.class);
 		serve("/Portal/subscriptionclient").with(SubscriptionClientImpl.class);
@@ -97,17 +99,9 @@ public class PortalServletModule extends ServletModule {
 		bind(UserProfileClientImpl.class).in(Singleton.class);
 		serve("/Portal/userprofileclient").with(UserProfileClientImpl.class);
 		
-		// Setup the Search service
-		bind(SearchServiceImpl.class).in(Singleton.class);
-		serve("/Portal/searchclient").with(SearchServiceImpl.class);
-	
 		// setup the layout service
 		bind(LayoutServiceImpl.class).in(Singleton.class);
 		serve("/Portal/layout").with(LayoutServiceImpl.class);
-		
-		// Setup the License service mapping
-		bind(LicenseServiceImpl.class).in(Singleton.class);
-		serve("/Portal/license").with(LicenseServiceImpl.class);
 		
 		// Setup the User Account service mapping
 		bind(UserAccountServiceImpl.class).in(Singleton.class);
@@ -117,10 +111,6 @@ public class PortalServletModule extends ServletModule {
 		bind(StackConfigServiceImpl.class).in(Singleton.class);
 		serve("/Portal/stackConfig").with(StackConfigServiceImpl.class);
 		
-		// setup the Simple Search servlet
-		bind(SimpleSearchService.class).in(Singleton.class);
-		serve("/Portal/simplesearch").with(SimpleSearchService.class);
-
 		// Setup the File Uploader JNLP mapping
 		bind(FileUploaderJnlp.class).in(Singleton.class);
 		serve("/Portal/fileUploaderJnlp").with(FileUploaderJnlp.class);
@@ -136,6 +126,10 @@ public class PortalServletModule extends ServletModule {
 		// Slack handler
 		bind(SlackServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.SLACK_SERVLET).with(SlackServlet.class);
+
+		// Alias resolution
+		bind(AliasRedirectorServlet.class).in(Singleton.class);
+		serve("/Portal/"+WebConstants.ALIAS_REDIRECTOR_SERVLET).with(AliasRedirectorServlet.class);
 
 
 		// Multipart file upload
@@ -187,15 +181,8 @@ public class PortalServletModule extends ServletModule {
 		// Bind the properties from the config file
 		bindPropertiesFromFile("ServerConstants.properties");
 		
-		// Bind the ConlumnConfig to singleton
-		bind(ColumnConfigProvider.class).in(Singleton.class);
-		
 		// JSONObjectAdapter
 		bind(JSONObjectAdapter.class).to(JSONObjectAdapterImpl.class);
-		
-		//search by public project name
-		bind(ProjectSearchRedirectFilter.class).in(Singleton.class);
-		filter(ProjectSearchRedirectFilter.PROJECT+"*").through(ProjectSearchRedirectFilter.class);
 		
 		handleGWTPlaces();
 		

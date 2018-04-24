@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
@@ -17,6 +17,7 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
+import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -65,8 +66,10 @@ public class UserAccountServiceImplTest {
 	@Test
 	public void testCreateUserStep1() throws Exception {
 		String email = "test@jayhodgson.com";
+		NewUser newUser = new NewUser();
+		newUser.setEmail(email);
 		String endpoint = "http://127.0.0.1:8080/Portal.html?gwt.codesvr=127.0.0.1:9321";
-		userAccountService.createUserStep1(email, endpoint);
+		userAccountService.createUserStep1(newUser, endpoint);
 		verify(mockSynapse).newAccountEmailValidation(any(NewUser.class), eq(endpoint));
 	}
 
@@ -76,15 +79,15 @@ public class UserAccountServiceImplTest {
 		String fName = "ralph";
 		String lName = "wiggum";
 		String pw = "password";
-		String emailValidationToken = "firstname=&lastname=&email=choochoo%40aol.com&timestamp=2014-09-02T23%3A45%3A57.788%2B0000&domain=SYNAPSE&mac=1hBX";
+		EmailValidationSignedToken emailValidationSignedToken = new EmailValidationSignedToken();
 		AccountSetupInfo testASI = new AccountSetupInfo();
 		testASI.setUsername(username);
 		testASI.setFirstName(fName);
 		testASI.setLastName(lName);
 		testASI.setPassword(pw);
-		testASI.setEmailValidationToken(emailValidationToken);
+		testASI.setEmailValidationSignedToken(emailValidationSignedToken);
 
-		String returnSessionToken = userAccountService.createUserStep2(username, fName, lName, pw, emailValidationToken);
+		String returnSessionToken = userAccountService.createUserStep2(username, fName, lName, pw, emailValidationSignedToken);
 		assertEquals(testSessionToken, returnSessionToken);
 		ArgumentCaptor<AccountSetupInfo> arg = ArgumentCaptor.forClass(AccountSetupInfo.class);
 		verify(mockSynapse).createNewAccount(arg.capture());

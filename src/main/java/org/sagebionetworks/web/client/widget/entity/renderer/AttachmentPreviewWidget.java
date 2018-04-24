@@ -10,7 +10,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class AttachmentPreviewWidget implements AttachmentPreviewWidgetView.Presenter, WidgetRendererPresenter {
+public class AttachmentPreviewWidget implements WidgetRendererPresenter {
 	
 	private AttachmentPreviewWidgetView view;
 	private Map<String,String> descriptor;
@@ -18,7 +18,6 @@ public class AttachmentPreviewWidget implements AttachmentPreviewWidgetView.Pres
 	@Inject
 	public AttachmentPreviewWidget(AttachmentPreviewWidgetView view) {
 		this.view = view;
-		view.setPresenter(this);
 	}
 	
 	@Override
@@ -37,8 +36,4 @@ public class AttachmentPreviewWidget implements AttachmentPreviewWidgetView.Pres
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
-		/*
-	 * Private Methods
-	 */
 }

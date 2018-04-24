@@ -119,6 +119,10 @@ public class HelpWidget implements IsWidget {
 		widget.addStyleName(styleNames);
 	}
 	
+	public void setAddMoreInfoStyleNames(String styleNames) {
+		moreInfoText.addClassName(styleNames);
+	}
+	
 	public void setPull(Pull pull) {
 		widget.addStyleName(pull.getCssName());
 	}
@@ -133,5 +137,9 @@ public class HelpWidget implements IsWidget {
 	
 	public Popover getHelpPopover() {
 		return helpPopover;
+	}
+	
+	public void focus() {
+		anchor.setFocus(true);
 	}
 }

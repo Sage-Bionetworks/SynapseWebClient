@@ -13,11 +13,14 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView;
@@ -37,9 +40,11 @@ public class FavoriteWidgetTest {
 	EntityHeader fav;
 	List<EntityHeader> favs;
 	
-	
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Before
 	public void before() throws JSONObjectAdapterException {
+		MockitoAnnotations.initMocks(this);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
@@ -49,7 +54,12 @@ public class FavoriteWidgetTest {
 		fav.setId("syn456");
 		favs.add(fav);
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(favs);
-		favoriteWidget = new FavoriteWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController);
+		favoriteWidget = new FavoriteWidget(
+				mockView, 
+				mockSynapseClient, 
+				mockGlobalApplicationState, 
+				mockAuthenticationController,
+				mockSynapseJavascriptClient);
 		favoriteWidget.configure(entityId);
 		reset(mockView);
 	}
@@ -62,7 +72,7 @@ public class FavoriteWidgetTest {
 		favs.add(newFav);
 		PaginatedResults<EntityHeader> favorites = new PaginatedResults<EntityHeader>();
 		List<EntityHeader> results = new ArrayList<EntityHeader>();
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(results).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(new EntityHeader()).when(mockSynapseClient).addFavorite(anyString(), any(AsyncCallback.class));
 				
 		favoriteWidget.setIsFavorite(true);
@@ -71,7 +81,7 @@ public class FavoriteWidgetTest {
 		verify(mockView).setFavoriteVisible(false);
 		verify(mockView).setFavoriteVisible(true);
 		verify(mockSynapseClient).addFavorite(eq(entityId), any(AsyncCallback.class));
-		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		verify(mockGlobalApplicationState).setFavorites(results);
 		verify(mockView).setLoadingVisible(false);
 	}
@@ -80,7 +90,7 @@ public class FavoriteWidgetTest {
 	@Test
 	public void testSetIsFavoriteUnset() throws Exception {
 		List<EntityHeader> results = new ArrayList<EntityHeader>();
-		AsyncMockStubber.callSuccessWith(results).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(results).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).removeFavorite(anyString(), any(AsyncCallback.class));
 				
 		favoriteWidget.setIsFavorite(false);
@@ -89,7 +99,7 @@ public class FavoriteWidgetTest {
 		verify(mockView).setNotFavoriteVisible(false);
 		verify(mockView).setNotFavoriteVisible(true);
 		verify(mockSynapseClient).removeFavorite(eq(entityId), any(AsyncCallback.class));
-		verify(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		verify(mockGlobalApplicationState).setFavorites(results);
 		verify(mockView).setLoadingVisible(false);
 	}

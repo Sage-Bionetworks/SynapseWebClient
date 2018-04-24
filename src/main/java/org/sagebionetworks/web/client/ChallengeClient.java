@@ -11,7 +11,6 @@ import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.ChallengeTeam;
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.ChallengeTeamPagedResults;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.UserProfilePagedResults;
@@ -53,7 +52,6 @@ public interface ChallengeClient extends RemoteService {
 	ChallengeTeamPagedResults getChallengeTeams(String userId, String challengeId, Integer limit, Integer offset) throws RestServiceException;
 	UserProfilePagedResults getChallengeParticipants(boolean affiliated, String challengeId, Integer limit, Integer offset) throws RestServiceException;
 	Challenge getChallengeForProject(String projectId) throws RestServiceException;
-	ChallengePagedResults getChallenges(String userId, Integer limit, Integer offset) throws RestServiceException;
 	List<Team> getRegistratableTeams(String userId, String challengeId) throws RestServiceException;
 	Set<String> getChallengeEvaluationIds(String challengeId) throws RestServiceException;
 	TeamSubmissionEligibility getTeamSubmissionEligibility(String evaluationId, String teamId) throws RestServiceException;

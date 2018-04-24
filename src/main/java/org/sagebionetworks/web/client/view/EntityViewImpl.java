@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.Heading;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -17,17 +18,13 @@ public class EntityViewImpl implements EntityView {
 	public interface EntityViewImplUiBinder extends UiBinder<Widget, EntityViewImpl> {}
 
 	@UiField
-	SimplePanel headerPanel;
-	@UiField
-	SimplePanel footerPanel;
-	@UiField
 	SimplePanel entityPageTopPanel;
 	@UiField
 	SimplePanel openInvitesPanel;
 	@UiField
 	SimplePanel synAlertContainer;
 	@UiField
-	HTMLPanel loadingUI;
+	LoadingSpinner loadingUI;
 	@UiField
 	Heading accessDependentMessage;
 	
@@ -39,18 +36,6 @@ public class EntityViewImpl implements EntityView {
 		Window.scrollTo(0, 0); // scroll user to top of page
 		// TODO : need to dynamically set the header widget
 		//headerWidget.setMenuItemActive(MenuItems.PROJECTS);
-	}
-
-	@Override
-	public void setHeaderWidget(IsWidget headerWidget) {
-		headerPanel.clear();
-		headerPanel.setWidget(headerWidget);
-	}
-	
-	@Override
-	public void setFooterWidget(IsWidget footerWidget) {
-		footerPanel.clear();
-		footerPanel.setWidget(footerWidget);
 	}
 
 	@Override

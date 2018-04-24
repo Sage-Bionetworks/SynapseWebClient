@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
@@ -8,10 +10,9 @@ import org.sagebionetworks.web.client.SubscriptionClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
+import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -25,7 +26,7 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 	PortalGinInjector ginInjector;
 	AuthenticationController authController;
 	public static final Long LIMIT = 10L;
-	DetailedPaginationWidget paginationWidget;
+	BasicPaginationWidget paginationWidget;
 	
 	@Inject
 	public SubscriptionListWidget(SubscriptionListWidgetView view, 
@@ -33,14 +34,14 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 			PortalGinInjector ginInjector,
 			SynapseAlert synAlert,
 			AuthenticationController authController,
-			DetailedPaginationWidget paginationWidget) {
+			BasicPaginationWidget paginationWidget) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.subscribeClient = subscribeClient;
+		fixServiceEntryPoint(subscribeClient);
 		this.authController = authController;
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
-		
 		view.setSynAlert(synAlert.asWidget());
 		view.setPagination(paginationWidget.asWidget());
 		view.setPresenter(this);

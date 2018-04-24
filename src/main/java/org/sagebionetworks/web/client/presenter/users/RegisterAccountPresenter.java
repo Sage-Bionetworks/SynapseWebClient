@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.presenter.Presenter;
 import org.sagebionetworks.web.client.view.users.RegisterAccountView;
 import org.sagebionetworks.web.client.view.users.RegisterWidget;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.activity.shared.AbstractActivity;
@@ -19,15 +18,13 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	
 	private RegisterWidget registerWidget;
 	private Header headerWidget;
-	private Footer footerWidget;
 	
 	@Inject
 	public RegisterAccountPresenter(RegisterAccountView view,
 			RegisterWidget registerWidget,
-			Header headerWidget, Footer footerWidget) {
+			Header headerWidget) {
 		this.view = view;
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.registerWidget = registerWidget;
 	}
 
@@ -38,13 +35,9 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	}
 	
 	public void init() {
-		boolean isInline = false;
-		registerWidget.configure(isInline);
 		view.setRegisterWidget(registerWidget.asWidget());
 		headerWidget.configure(false);
 		headerWidget.refresh();
-		view.setFooterWidget(footerWidget.asWidget());
-		view.setHeaderWidget(headerWidget.asWidget());
 	}
 
 	@Override

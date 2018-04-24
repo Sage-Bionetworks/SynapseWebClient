@@ -13,7 +13,8 @@ import org.sagebionetworks.repo.model.table.FacetColumnValuesRequest;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.UserIdCellRendererImpl;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -55,6 +56,15 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 		this.onFacetRequest = onFacetRequest;
 		view.setColumnName(facet.getColumnName());
 		int i = 0;
+		int max = MAX_VISIBLE_FACET_VALUES;
+		for (int j = MAX_VISIBLE_FACET_VALUES; j < facet.getFacetValues().size(); j++) {
+			//if any facet is selected beyond the max visible count, then show them all
+			if (facet.getFacetValues().get(j).getIsSelected()) {
+				max = Integer.MAX_VALUE;
+				break;
+			}
+		}
+		
 		for (FacetColumnResultValueCount valueCount : facet.getFacetValues()) {
 			if (valueCount.getIsSelected()) {
 				facetValues.add(valueCount.getValue());
@@ -72,14 +82,14 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 				displayWidget = view.getSpanWithText(valueCount.getValue());
 			}
 			
-			if (i < MAX_VISIBLE_FACET_VALUES) {
+			if (i < max) {
 				view.addValue(valueCount.getIsSelected(), displayWidget, valueCount.getCount(), valueCount.getValue());	
 			} else {
 				view.addValueToOverflow(valueCount.getIsSelected(), displayWidget, valueCount.getCount(), valueCount.getValue());
 			}
 			i++;
 		}
-		if (facet.getFacetValues().size() > MAX_VISIBLE_FACET_VALUES) {
+		if (facet.getFacetValues().size() > max) {
 			view.setShowAllButtonText(SHOW_ALL + facet.getFacetValues().size());
 			view.setShowAllButtonVisible(true);
 		} else {
@@ -88,15 +98,15 @@ public class FacetColumnResultValuesWidget implements IsWidget, FacetColumnResul
 	}
 	
 	public Widget getUserBadge(String userId) {
-		UserBadge userBadge = ginInjector.getUserBadgeWidget();
-		userBadge.configure(userId);
-		userBadge.setCustomClickHandler(doNothingClickHandler);
+		UserIdCellRendererImpl userBadge = ginInjector.getUserIdCellRenderer();
+		userBadge.setValue(userId, doNothingClickHandler);
 		return userBadge.asWidget();
 	}
 	
 	public Widget getEntityBadge(String entityId) {
 		EntityIdCellRendererImpl entityBadge = ginInjector.getEntityIdCellRenderer();
-		entityBadge.setValue(entityId, doNothingClickHandler);
+		boolean hideIfLoadError = true;
+		entityBadge.setValue(entityId, doNothingClickHandler, hideIfLoadError);
 		return entityBadge.asWidget();
 	}
 	

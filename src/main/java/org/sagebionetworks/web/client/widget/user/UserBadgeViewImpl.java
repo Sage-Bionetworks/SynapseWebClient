@@ -1,20 +1,24 @@
 package org.sagebionetworks.web.client.widget.user;
 
+import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
+import static org.sagebionetworks.web.client.DisplayUtils.isDefined;
+import static org.sagebionetworks.web.client.DisplayUtils.newWindow;
+
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.base.HasHref;
+import org.gwtbootstrap3.client.ui.constants.Emphasis;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.view.bootstrap.table.Table;
-import org.sagebionetworks.web.client.view.bootstrap.table.TableData;
+import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.place.Profile;
 
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.ErrorEvent;
 import com.google.gwt.event.dom.client.ErrorHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -26,76 +30,61 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public interface Binder extends UiBinder<Widget, UserBadgeViewImpl> {	}
 	
 	@UiField
-	TableData loadingUI;
+	FocusPanel pictureFocusPanel;
 	@UiField
-	FocusPanel defaultUserPicture;
+	Span defaultUserPicture;
 	@UiField
 	Image userPicture;
 	@UiField
 	Anchor usernameLink;
 	@UiField
-	Paragraph description;
-	@UiField
-	Paragraph errorLoadingUI;
-	@UiField
 	Strong defaultUserPictureLetter;
 	@UiField
 	Icon squareIcon;
 	@UiField
-	Table userBadgeTable;
-	
+	Span otherWidgets;
+	@UiField
+	Span pictureSpan;
 	private Presenter presenter;
 	Widget widget;
-	Callback onAttachCallback;
-	ClickHandler badgeClicked;
+	
+	HandlerRegistration handlerRegistration, pictureHandlerRegistration;
+	
+	public static final String USER_ID_ATTRIBUTE = "data-profile-user-id";
+	public static PlaceChanger placeChanger = null;
+	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
+		event.preventDefault();
+		Widget panel = (Widget)event.getSource();
+		String userId = panel.getElement().getAttribute(USER_ID_ATTRIBUTE);
+		placeChanger.goTo(new Profile(userId));
+	};
+	
+	public static final ClickHandler NEW_WINDOW_CLICKHANDLER = event -> {
+		event.preventDefault();
+		Widget panel = (Widget)event.getSource();
+		String userId = panel.getElement().getAttribute(USER_ID_ATTRIBUTE);
+		newWindow("#!Profile:" + userId, "_blank", "");
+	};
 	
 	@Inject
-	public UserBadgeViewImpl(Binder uiBinder) {
+	public UserBadgeViewImpl(Binder uiBinder, GlobalApplicationState globalAppState) {
 		widget = uiBinder.createAndBindUi(this);
-		badgeClicked = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.badgeClicked(event);
-			}
-		};
-		userPicture.addClickHandler(badgeClicked);
-		defaultUserPicture.addClickHandler(badgeClicked);
-		
+		placeChanger = globalAppState.getPlaceChanger();
+		pictureSpan.setHeight((BadgeSize.LARGE.pictureHeightPx() + 4) + "px");
+		handlerRegistration = usernameLink.addClickHandler(STANDARD_CLICKHANDLER);
+		pictureHandlerRegistration = pictureFocusPanel.addClickHandler(STANDARD_CLICKHANDLER);
 		userPicture.addErrorHandler(new ErrorHandler() {
 			@Override
 			public void onError(ErrorEvent event) {
 				presenter.onImageLoadError();
 			}
 		});
-		widget.addAttachHandler(new AttachEvent.Handler() {
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					onAttach();
-				}
-			}
-		});
 	}
 	
 	@Override
-	public boolean isAttached() {
-		return widget.isAttached();
-	}
-	
-	@Override
-	public boolean isInViewport() {
-		return DisplayUtils.isInViewport(widget, 600);
-	}
-	
-	@Override
-	public void setOnAttachCallback(Callback onAttachCallback) {
-		this.onAttachCallback = onAttachCallback;
-	}
-	
-	private void onAttach() {
-		if (onAttachCallback != null) {
-			onAttachCallback.invoke();
-		}
+	public void setUserId(String userId) {
+		pictureFocusPanel.getElement().setAttribute(USER_ID_ATTRIBUTE, userId);
+		usernameLink.getElement().setAttribute(USER_ID_ATTRIBUTE, userId);
 	}
 	
 	@Override
@@ -108,17 +97,41 @@ public class UserBadgeViewImpl implements UserBadgeView {
 		defaultUserPictureLetter.setText(letter);
 	}
 	public void clear() {
-		loadingUI.setVisible(false);
+		otherWidgets.clear();
 		defaultUserPicture.setVisible(false);
 		userPicture.setVisible(false);
-		description.setVisible(false);
-		errorLoadingUI.setVisible(false);
 	}
 	
 	@Override
 	public void showAnonymousUserPicture() {
 		userPicture.setVisible(false);
 		defaultUserPicture.setVisible(true);
+	}
+	
+	public void setClickHandler(ClickHandler clickHandler) {
+		handlerRegistration.removeHandler();
+		pictureHandlerRegistration.removeHandler();
+		handlerRegistration = usernameLink.addClickHandler(clickHandler);
+		pictureHandlerRegistration = pictureFocusPanel.addClickHandler(clickHandler);
+	}
+	
+	@Override
+	public void setCustomClickHandler(final ClickHandler clickHandler) {
+		setClickHandler(event -> {
+			event.preventDefault();
+			clickHandler.onClick(event);
+		});
+	}
+	
+	@Override
+	public void doNothingOnClick() {
+		handlerRegistration.removeHandler();
+		handlerRegistration = usernameLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
+	}
+	
+	@Override
+	public void setOpenInNewWindow() {
+		setClickHandler(NEW_WINDOW_CLICKHANDLER);
 	}
 	
 	@Override
@@ -130,30 +143,35 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	
 	@Override
 	public void setSize(BadgeSize size) {
-		if (DisplayUtils.isDefined(size.getDefaultPictureStyle())) {
+		if (isDefined(size.getDefaultPictureStyle())) {
 			defaultUserPicture.addStyleName(size.getDefaultPictureStyle());	
 		}
 		usernameLink.setStyleName(size.textStyle());
-		userPicture.setHeight(size.pictureHeight());
+		int pictureHeightPx = size.pictureHeightPx();
+		userPicture.setHeight(pictureHeightPx + "px");
 		usernameLink.setVisible(size.isTextVisible());
+		pictureSpan.setHeight((pictureHeightPx + 6) + "px");
 	}
 
 	@Override
 	public void setDisplayName(String displayName, String shortDisplayName) {
-		loadingUI.setVisible(false);
+		otherWidgets.clear();
 		usernameLink.setText(shortDisplayName);
 	}
 	
 	@Override
 	public void showLoadError(String error) {
-		loadingUI.setVisible(false);
-		errorLoadingUI.setText("Error loading profile: " + error);
-		errorLoadingUI.setVisible(true);	
+		otherWidgets.clear();
+		Paragraph errorParagraph = new Paragraph();
+		errorParagraph.setEmphasis(Emphasis.DANGER);
+		errorParagraph.setText("Error loading profile: " + error);
+		otherWidgets.add(errorParagraph);
 	}
 	
 	@Override
 	public void showLoading() {
-		loadingUI.setVisible(true);
+		otherWidgets.clear();
+		otherWidgets.add(new Text("Loading..."));
 	}
 
 	@Override
@@ -174,8 +192,10 @@ public class UserBadgeViewImpl implements UserBadgeView {
 
 	@Override
 	public void showDescription(String descriptionText) {
-		description.setText(descriptionText);
-		description.setVisible(true);
+		otherWidgets.clear();
+		Paragraph descriptionParagraph = new Paragraph();
+		descriptionParagraph.setText(descriptionText);
+		otherWidgets.add(descriptionParagraph);
 	}
 
 	@Override
@@ -188,32 +208,11 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	}
 	
 	@Override
-	public void clearHref() {
-		usernameLink.setHref(HasHref.EMPTY_HREF);
-		usernameLink.addClickHandler(badgeClicked);
-	}
-	
-	@Override
-	public void openNewWindow(String url) {
-		DisplayUtils.newWindow(url, "_blank", "");
-		
-	}
-	
-	@Override
-	public void setOpenNewWindow(String target) {
-		usernameLink.setTarget(target);
-	}
-	
-	@Override
 	public void setStyleNames(String style) {
-		userBadgeTable.setStyleName(style);
+		widget.addStyleName(style);
 	}
 	@Override
 	public void setHeight(String height) {
 		widget.setHeight(height);
 	}
-	/*
-	 * Private Methods
-	 */
-
 }

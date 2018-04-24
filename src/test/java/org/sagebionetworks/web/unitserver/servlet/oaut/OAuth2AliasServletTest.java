@@ -6,18 +6,24 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.http.HttpStatus;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.*;
 
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
+import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
+import org.sagebionetworks.client.exceptions.SynapseServiceUnavailable;
+import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.repo.model.auth.Session;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlResponse;
@@ -86,5 +92,39 @@ public class OAuth2AliasServletTest {
 		servlet.doGet(mockRequest, mockResponse);
 		verify(mockResponse).sendRedirect(startsWith("/#!Error:"));
 	}
+	
+	@Test
+	public void testDoGetError() throws Exception {
+		String errorMessage = "An error from the service call";
+		ArgumentCaptor<OAuthValidationRequest> argument = ArgumentCaptor.forClass(OAuthValidationRequest.class);
+		when(mockClient.bindOAuthProvidersUserId(argument.capture())).thenThrow(new SynapseNotFoundException(errorMessage));
+		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.ORCID.name());
+		String authCode = "authCode";
+		when(mockRequest.getParameter(WebConstants.OAUTH2_CODE)).thenReturn(authCode);
+		
+		servlet.doGet(mockRequest, mockResponse);
+		
+		//redirects to an error place
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockResponse).sendRedirect(captor.capture());
+		String v = captor.getValue();
+		assertTrue(v.contains("#!Error:"));
+	}
+	
+	@Test
+	public void testDoGetErrorSynapseDown() throws Exception {
+		SynapseServiceUnavailable exception = new SynapseServiceUnavailable("error message");
+		when(mockClient.getOAuth2AuthenticationUrl(any(OAuthUrlRequest.class))).thenThrow(exception);
+		when(mockRequest.getParameter(WebConstants.OAUTH2_PROVIDER)).thenReturn(OAuthProvider.ORCID.name());
+		
+		servlet.doGet(mockRequest, mockResponse);
+		
+		//redirects to an error place
+		ArgumentCaptor<String> captor = ArgumentCaptor.forClass(String.class);
+		verify(mockResponse).sendRedirect(captor.capture());
+		String v = captor.getValue();
+		assertTrue(v.contains("#!Down:0"));
+	}
+
 	
 }

@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.view;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.place.PeopleSearch;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -21,11 +20,6 @@ import com.google.inject.Inject;
 
 public class PeopleSearchViewImpl extends Composite implements PeopleSearchView {
 	public interface PeopleSearchViewImplUiBinder extends UiBinder<Widget, PeopleSearchViewImpl> {}
-	
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
 	@UiField
 	SimplePanel searchBoxPanel;
 	@UiField
@@ -36,34 +30,22 @@ public class PeopleSearchViewImpl extends Composite implements PeopleSearchView 
 	Button searchButton;
 	@UiField
 	TextBox searchField;
-	
-	
 	private Header headerWidget;
-	private Footer footerWidget;
 	private Presenter presenter;
-	
 	
 	@Inject
 	public PeopleSearchViewImpl(PeopleSearchViewImplUiBinder binder,
-			Header headerWidget, 
-			Footer footerWidget) {
+			Header headerWidget) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		configureSearchBox();
 	}
 
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

@@ -3,6 +3,9 @@ package org.sagebionetworks.web.unitclient.widget.upload;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
 
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.logical.shared.HasAttachHandlers;
+
 /**
  * Test helper for MultipartUploader.
  * @author John
@@ -14,18 +17,7 @@ public class MultipartUploaderStub implements MultipartUploader {
 	String error;
 	String[] progressText;
 	String[] uploadSpeed;
-
-	@Override
-	public void uploadSelectedFile(String fileInputId, ProgressingFileUploadHandler handler, Long storageLocationId) {
-		respond(handler);
-	}
-
-	@Override
-	public void uploadFile(String fileName, String fileInputId, int fileIndex,
-			ProgressingFileUploadHandler handler, Long storageLocationId) {
-		respond(handler);
-	}
-	
+	boolean isCanceled = false;
 	/**
 	 * Respond to the handler.
 	 * @param handler
@@ -59,5 +51,19 @@ public class MultipartUploaderStub implements MultipartUploader {
 	
 	public void setUploadSpeed(String...uploadSpeed) {
 		this.uploadSpeed = uploadSpeed;
+	}
+
+	@Override
+	public void uploadFile(String fileName, String contentType, JavaScriptObject blob, ProgressingFileUploadHandler handler, Long storageLocationId, HasAttachHandlers view) {
+		respond(handler);	
+	}
+	
+	@Override
+	public void cancelUpload() {
+		isCanceled = true;
+	}
+	
+	public boolean isCanceled() {
+		return isCanceled;
 	}
 }

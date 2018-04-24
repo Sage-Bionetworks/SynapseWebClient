@@ -24,7 +24,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
@@ -33,11 +33,8 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -61,15 +58,9 @@ public class VerificationSubmissionWidgetTest {
 	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
-	MarkdownWidget mockMarkdownWidget;
-	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
 	SynapseAlert mockSynapseAlert;
 	@Mock
 	FileHandleList mockFileHandleList;
-	@Mock
-	SynapseJSNIUtils mockSynapseJSNIUtils;
 	@Mock
 	PromptModalView mockPromptModalView;
 	@Mock
@@ -82,8 +73,7 @@ public class VerificationSubmissionWidgetTest {
 	GWTWrapper mockGWT;
 	@Mock
 	HashMap<String,WikiPageKey> mockWikiPageMap;
-	@Mock
-	AuthenticationController mockAuthenticationController;
+	
 	PromptModalView.Presenter reasonPromptCallback;
 	
 	VerificationSubmissionWidget widget;
@@ -98,14 +88,12 @@ public class VerificationSubmissionWidgetTest {
 	List<String> submissionEmails = Collections.singletonList("doc@spacemail.org");
 	List<AttachmentMetadata> submissionAttachments;
 	List<String> fileHandleIds;
-	String xsrfToken = "lkjhgfdcvbn";
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getVerificationSubmissionModalViewImpl()).thenReturn(mockView);
 		when(mockGinInjector.getVerificationSubmissionRowViewImpl()).thenReturn(mockRowView);
-		when(mockAuthenticationController.getCurrentXsrfToken()).thenReturn(xsrfToken);
-		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockMarkdownWidget, mockSynapseClient, mockSynapseAlert, mockFileHandleList, mockSynapseJSNIUtils, mockPromptModalView, mockGlobalApplicationState, mockGWT, mockAuthenticationController);
+		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockSynapseAlert, mockFileHandleList, mockPromptModalView, mockGlobalApplicationState, mockGWT);
 		
 		ArgumentCaptor<PromptModalView.Presenter> captor = ArgumentCaptor.forClass(PromptModalView.Presenter.class);
 		verify(mockPromptModalView).setPresenter(captor.capture());
@@ -129,7 +117,7 @@ public class VerificationSubmissionWidgetTest {
 		submissionAttachments.add(meta);
 		when(mockSubmission.getAttachments()).thenReturn(submissionAttachments);
 		
-		when(mockFileHandleList.configure(any(CallbackP.class))).thenReturn(mockFileHandleList);
+		when(mockFileHandleList.configure()).thenReturn(mockFileHandleList);
 		when(mockFileHandleList.setUploadButtonText(anyString())).thenReturn(mockFileHandleList);
 		when(mockFileHandleList.setCanDelete(anyBoolean())).thenReturn(mockFileHandleList);
 		when(mockFileHandleList.setCanUpload(anyBoolean())).thenReturn(mockFileHandleList);
@@ -140,7 +128,6 @@ public class VerificationSubmissionWidgetTest {
 		fileHandleIds = new ArrayList<String>();
 		when(mockFileHandleList.getFileHandleIds()).thenReturn(fileHandleIds);
 		
-		AsyncMockStubber.callSuccessWith(mockWikiPageMap).when(mockSynapseClient).getPageNameToWikiKeyMap(any(AsyncCallback.class));
 		when(mockView.getOrganization()).thenReturn(submissionCompany);
 		when(mockView.getFirstName()).thenReturn(submissionFirstName);
 		when(mockView.getLastName()).thenReturn(submissionLastName);
@@ -174,7 +161,6 @@ public class VerificationSubmissionWidgetTest {
 		assertFalse(widget.isNewSubmission());
 		verify(mockGinInjector).getVerificationSubmissionModalViewImpl();
 		verify(mockView).setFileHandleList(any(Widget.class));
-		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setPromptModal(any(Widget.class));
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockView).setPresenter(widget);
@@ -192,7 +178,6 @@ public class VerificationSubmissionWidgetTest {
 		assertTrue(widget.isNewSubmission());
 		verify(mockGinInjector).getVerificationSubmissionModalViewImpl();
 		verify(mockView).setFileHandleList(any(Widget.class));
-		verify(mockView).setWikiPage(any(Widget.class));
 		verify(mockView).setPromptModal(any(Widget.class));
 		verify(mockView).setSynAlert(any(Widget.class));
 		verify(mockView).setPresenter(widget);
@@ -206,32 +191,12 @@ public class VerificationSubmissionWidgetTest {
 		widget.configure(mockSubmission, isACTMember, isModal);
 		verify(mockGinInjector).getVerificationSubmissionRowViewImpl();
 		verify(mockRowView).setFileHandleList(any(Widget.class));
-		verify(mockRowView).setWikiPage(any(Widget.class));
 		verify(mockRowView).setPromptModal(any(Widget.class));
 		verify(mockRowView).setSynAlert(any(Widget.class));
 		verify(mockRowView).setPresenter(widget);
 		
 		widget.asWidget();
 		verify(mockRowView).asWidget();
-	}
-
-	@Test
-	public void testGetVerificationSubmissionHandleUrlOpen() {
-		configureWithMockSubmission();
-		
-		String fileHandleId = "8888";
-		widget.getVerificationSubmissionHandleUrlAndOpen(fileHandleId);
-		verify(mockSynapseJSNIUtils).getFileHandleAssociationUrl(submissionId, FileHandleAssociateType.VerificationSubmission, fileHandleId, xsrfToken);
-		verify(mockView).openWindow(anyString());
-	}
-	
-	@Test
-	public void testRawFileHandleUrlAndOpen() {
-		configureWithMockSubmission();
-		String fileHandleId = "982";
-		widget.getRawFileHandleUrlAndOpen(fileHandleId);
-		verify(mockSynapseJSNIUtils).getBaseFileHandleUrl();
-		verify(mockView).openWindow(anyString());
 	}
 
 	private UserProfile getPopulatedProfile() {
@@ -273,10 +238,9 @@ public class VerificationSubmissionWidgetTest {
 		widget.configure(profile, orcId, isModal, submissionAttachments);
 		widget.show();
 		verify(mockView).clear();
-		verify(mockView).setWikiPageVisible(true);
 		verify(mockView).setCancelButtonVisible(true);
 		verify(mockView).setSubmitButtonVisible(true);
-		verify(mockFileHandleList).configure(any(CallbackP.class));
+		verify(mockFileHandleList).configure();
 		verify(mockFileHandleList).setUploadButtonText(anyString());
 		verify(mockFileHandleList).setCanDelete(true);
 		verify(mockFileHandleList).setCanUpload(true);
@@ -305,7 +269,6 @@ public class VerificationSubmissionWidgetTest {
 		setCurrentMockState(VerificationStateEnum.SUBMITTED, null);
 		
 		widget.show();
-		verify(mockView).setWikiPageVisible(false);
 		verify(mockView).setFirstName(submissionFirstName);
 		verify(mockView).setLastName(submissionLastName);
 		verify(mockView).setLocation(submissionLocation);
@@ -319,10 +282,10 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockView).setApproveButtonVisible(false);
 		verify(mockView).setRejectButtonVisible(false);
 		
-		verify(mockFileHandleList).configure(any(CallbackP.class));
+		verify(mockFileHandleList).configure();
 		verify(mockFileHandleList).setCanDelete(false);
 		verify(mockFileHandleList).setCanUpload(false);
-		verify(mockFileHandleList, times(submissionAttachments.size())).addFileLink(anyString(), anyString());
+		verify(mockFileHandleList, times(submissionAttachments.size())).addFileLink(any(FileHandleAssociation.class));
 		verify(mockFileHandleList).refreshLinkUI();
 		verify(mockView).setState(VerificationStateEnum.SUBMITTED);
 		verify(mockView).show();
@@ -381,15 +344,6 @@ public class VerificationSubmissionWidgetTest {
 		verify(mockView).setCloseButtonVisible(true);
 	}
 
-	@Test
-	public void testLoadWikiHelpContent() {
-		configureWithMockSubmission();
-		WikiPageKey mockKey = mock(WikiPageKey.class);
-		widget.loadWikiHelpContent(mockKey);
-		verify(mockMarkdownWidget).loadMarkdownFromWikiPage(mockKey, false);
-		verify(mockView).setWikiPageVisible(true);
-	}
-	
 	@Test
 	public void testUpdateVerificationState() {
 		configureWithMockSubmission();

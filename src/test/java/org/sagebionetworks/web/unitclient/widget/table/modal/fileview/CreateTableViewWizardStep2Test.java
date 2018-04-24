@@ -1,8 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
-import static org.junit.Assert.*;
+import static org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,13 +30,17 @@ import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2View;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage.ModalPresenter;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
@@ -45,7 +57,7 @@ public class CreateTableViewWizardStep2Test {
 	@Mock
 	ColumnModelsEditorWidget mockEditor;
 	@Mock
-	ModalPresenter mockWizardPresenter;
+	ModalWizardWidget mockWizardPresenter;
 	String parentId;
 	CreateTableViewWizardStep2 widget;
 	@Mock
@@ -54,7 +66,11 @@ public class CreateTableViewWizardStep2Test {
 	TableEntity tableEntity;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	List<ColumnModel> mockDefaultColumnModels;
+	@Mock
+	List<ColumnModel> mockDefaultProjectColumnModels;
+	
 	@Mock
 	JobTrackingWidget mockJobTrackingWidget;
 	@Mock
@@ -64,7 +80,7 @@ public class CreateTableViewWizardStep2Test {
 	@Mock
 	TableUpdateRequest mockTableUpdateRequest;
 	@Mock
-	FileViewDefaultColumns mockFileViewDefaultColumns;
+	ViewDefaultColumns mockFileViewDefaultColumns;
 	@Captor
 	ArgumentCaptor<ViewScope> viewScopeCaptor;
 	@Mock
@@ -77,18 +93,30 @@ public class CreateTableViewWizardStep2Test {
 	List<ColumnModel> mockAnnotationColumnsPage1;
 	@Mock
 	List<ColumnModel> mockAnnotationColumnsPage2;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
+	@Mock
+	SynapseJSNIUtils mockJsniUtils;
+	@Captor
+	ArgumentCaptor<ModalWizardWidget.WizardCallback> wizardCallbackCaptor;
+	
 	public static final String NEXT_PAGE_TOKEN = "nextPageToken";
+	public static final String ENTITY_ID = "syn109234";
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-	
-		widget = new CreateTableViewWizardStep2(mockView, mockEditor, mockSynapseClient, mockJobTrackingWidget, mockFileViewDefaultColumns);
+		when(tableEntity.getId()).thenReturn(ENTITY_ID);
+		when(viewEntity.getId()).thenReturn(ENTITY_ID);
+		
+		widget = new CreateTableViewWizardStep2(mockView, mockEditor, mockSynapseClient, mockJobTrackingWidget, mockFileViewDefaultColumns, mockJsClient, mockJsniUtils);
+		
 		widget.setModalPresenter(mockWizardPresenter);
 		parentId = "syn123";
 		when(mockEditor.validate()).thenReturn(true);
 		when(mockTableSchemaChangeRequest.getChanges()).thenReturn(Collections.singletonList(mockTableUpdateRequest));
 		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), anyList(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockDefaultColumnModels).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(eq(ViewType.file), anyBoolean())).thenReturn(mockDefaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(eq(ViewType.project), anyBoolean())).thenReturn(mockDefaultProjectColumnModels);
 		when(viewEntity.getScopeIds()).thenReturn(mockViewScopeIds);
 		when(mockColumnModelPage1.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN);
 		when(mockColumnModelPage1.getResults()).thenReturn(mockAnnotationColumnsPage1);
@@ -111,31 +139,60 @@ public class CreateTableViewWizardStep2Test {
 		verify(mockView).setJobTracker(any(Widget.class));
 		verify(mockView).setEditor(any(Widget.class));
 		
-		widget.configure(viewEntity, TableType.view);
-		verify(mockEditor).configure(TableType.view, new ArrayList<ColumnModel>());
+		widget.configure(viewEntity, TableType.fileview);
+		verify(mockEditor).configure(TableType.fileview, new ArrayList<ColumnModel>());
 		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
 		verify(mockEditor).setAddAnnotationColumnsButtonVisible(true);
 		verify(mockEditor).addColumns(mockDefaultColumnModels);
 	}
 	
 	@Test
+	public void testConfigureProjectView() {
+		verify(mockView).setJobTracker(any(Widget.class));
+		verify(mockView).setEditor(any(Widget.class));
+		
+		widget.configure(viewEntity, TableType.projectview);
+		verify(mockEditor).configure(TableType.projectview, new ArrayList<ColumnModel>());
+		verify(mockEditor).setAddDefaultViewColumnsButtonVisible(true);
+		verify(mockEditor).setAddAnnotationColumnsButtonVisible(true);
+		verify(mockEditor).addColumns(mockDefaultProjectColumnModels);
+	}
+	
+	@Test
 	public void testGetPossibleColumnModelsForViewScope() {
 		// test is set up so that rpc successfully returns 2 pages, and then stops.
-		widget.configure(viewEntity, TableType.view);
+		widget.configure(viewEntity, TableType.fileview);
 
 		String firstPageToken = null;
 		widget.getPossibleColumnModelsForViewScope(firstPageToken);
 		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(viewScopeCaptor.capture(), eq(firstPageToken), any(AsyncCallback.class));
 		//verify scope
-		assertEquals(mockViewScopeIds, viewScopeCaptor.getValue().getScope());
+		ViewScope viewScope = viewScopeCaptor.getValue();
+		assertEquals(mockViewScopeIds, viewScope.getScope());
+		assertEquals(ViewType.file, viewScope.getViewType());
+		
 		verify(mockEditor).addColumns(mockAnnotationColumnsPage1);
 		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(any(ViewScope.class), eq(NEXT_PAGE_TOKEN), any(AsyncCallback.class));
 		verify(mockEditor).addColumns(mockAnnotationColumnsPage2);
 	}
 	
 	@Test
+	public void testGetPossibleColumnModelsForProjectViewScope() {
+		// test is set up so that rpc successfully returns 2 pages, and then stops.
+		widget.configure(viewEntity, TableType.projectview);
+
+		String firstPageToken = null;
+		widget.getPossibleColumnModelsForViewScope(firstPageToken);
+		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(viewScopeCaptor.capture(), eq(firstPageToken), any(AsyncCallback.class));
+		//verify scope
+		ViewScope viewScope = viewScopeCaptor.getValue();
+		assertEquals(mockViewScopeIds, viewScope.getScope());
+		assertEquals(ViewType.project, viewScope.getViewType());
+	}
+	
+	@Test
 	public void testGetPossibleColumnModelsForViewScopeFailure() {
-		widget.configure(viewEntity, TableType.view);
+		widget.configure(viewEntity, TableType.fileview);
 		String error = "error message getting annotation column models";
 		Exception ex = new Exception(error);
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getPossibleColumnModelsForViewScope(any(ViewScope.class), anyString(), any(AsyncCallback.class));
@@ -145,28 +202,49 @@ public class CreateTableViewWizardStep2Test {
 		verify(mockWizardPresenter).setErrorMessage(error);
 	}
 
-	
-	@Test
-	public void testConfigureViewFailure() {
-		String error = "error message getting default column models";
-		Exception ex = new Exception(error);
-		AsyncMockStubber.callFailureWith(ex).when(mockFileViewDefaultColumns).getDefaultColumns(anyBoolean(), any(AsyncCallback.class));
-		widget.configure(viewEntity, TableType.view);
-		verify(mockWizardPresenter).setErrorMessage(error);
-	}
-
 	@Test
 	public void testAsWidget(){
 		widget.asWidget();
 		verify(mockEditor).asWidget();
 	}
 	
-
 	@Test
 	public void testOnPrimaryInvalid(){
 		when(mockEditor.validate()).thenReturn(false);
 		widget.onPrimary();
 		verify(mockWizardPresenter).setErrorMessage(ColumnModelsWidget.SEE_THE_ERROR_S_ABOVE);
+	}
+	
+	@Test
+	public void testOnCancelSuccessfulCleanup(){
+		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockWizardPresenter).addCallback(wizardCallbackCaptor.capture());
+		ModalWizardWidget.WizardCallback wizardCallback = wizardCallbackCaptor.getValue();
+		widget.configure(tableEntity, TableType.table);
+		
+		//simulate user cancels
+		wizardCallback.onCanceled();
+		
+		//verify attempt to clean up
+		verify(mockJsClient).deleteEntityById(eq(ENTITY_ID), eq(true), any(AsyncCallback.class));
+		verify(mockJsniUtils).consoleLog(DELETE_PLACEHOLDER_SUCCESS_MESSAGE + ENTITY_ID);
+	}
+	
+	@Test
+	public void testOnCancelFailedToCleanup(){
+		String errorMessage = "failed to clean up placeholder entity";
+		
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockJsClient).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
+		verify(mockWizardPresenter).addCallback(wizardCallbackCaptor.capture());
+		ModalWizardWidget.WizardCallback wizardCallback = wizardCallbackCaptor.getValue();
+		widget.configure(tableEntity, TableType.table);
+		
+		//simulate user cancels
+		wizardCallback.onCanceled();
+		
+		//verify attempt to clean up
+		verify(mockJsClient).deleteEntityById(eq(ENTITY_ID), eq(true), any(AsyncCallback.class));
+		verify(mockJsniUtils).consoleError(DELETE_PLACEHOLDER_FAILURE_MESSAGE + ENTITY_ID + ": " + errorMessage);
 	}
 	
 	private AsynchronousProgressHandler onPrimary() {
@@ -177,6 +255,7 @@ public class CreateTableViewWizardStep2Test {
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(ColumnModelsWidget.UPDATING_SCHEMA), eq(isDeterminate), eq(AsynchType.TableTransaction), eq(mockTableSchemaChangeRequest), captor.capture());
 		return captor.getValue();
 	}
+	
 	@Test
 	public void testOnPrimary(){
 		onPrimary().onComplete(null);
@@ -187,6 +266,7 @@ public class CreateTableViewWizardStep2Test {
 		verify(mockWizardPresenter, atLeastOnce()).setLoading(true);
 		verify(mockEditor).validate();
 		verify(mockWizardPresenter).onFinished();
+		verify(mockJsClient, never()).deleteEntityById(anyString(), anyBoolean(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -214,7 +294,6 @@ public class CreateTableViewWizardStep2Test {
 		verify(mockEditor).validate();
 		verify(mockWizardPresenter).setErrorMessage(errorMessage);
 	}
-	
 	
 	@Test
 	public void testOnPrimaryFailure(){

@@ -11,19 +11,14 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
 import org.sagebionetworks.repo.model.provenance.UsedURL;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ActivityType;
 import org.sagebionetworks.web.shared.provenance.ActivityTypeUtil;
@@ -33,8 +28,6 @@ import org.sagebionetworks.web.shared.provenance.ExternalGraphNode;
 import org.sagebionetworks.web.shared.provenance.ProvGraph;
 import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class ProvUtils {
 
@@ -47,7 +40,6 @@ public class ProvUtils {
 			Map<Reference, EntityHeader> refToHeader, boolean showExpand,
 			Set<Reference> startRefs, Set<Reference> noExpandNode) {
 		ProvGraph graph = new ProvGraph();
-		Integer sequence = 0;
 		Set<ProvGraphNode> nodeHasExpandNode = new HashSet<ProvGraphNode>();
 		
 		// maps for local building retrieval
@@ -162,9 +154,9 @@ public class ProvUtils {
 		return allRefs;
 	}
 	
-	public static Map<Reference, EntityHeader> mapReferencesToHeaders(PaginatedResults<EntityHeader> headers) {
+	public static Map<Reference, EntityHeader> mapReferencesToHeaders(ArrayList<EntityHeader> headers) {
 		Map<Reference, EntityHeader> refToHeader = new HashMap<Reference, EntityHeader>();
-		for(EntityHeader header : headers.getResults()) {
+		for(EntityHeader header : headers) {
 			Reference equivalentRef = new Reference();
 			equivalentRef.setTargetId(header.getId());
 			equivalentRef.setTargetVersionNumber(header.getVersionNumber());
@@ -172,26 +164,20 @@ public class ProvUtils {
 		}
 		return refToHeader;
 	}
-
-	public static KeyValueDisplay<String> entityToKeyValueDisplay(Entity entity, String modifiedBy) {
-		return entityToKeyValueDisplay(entity, modifiedBy, true);
-	}
 	
-	public static KeyValueDisplay<String> entityToKeyValueDisplay(Entity entity, String modifiedBy, boolean includeName) {
+	public static KeyValueDisplay<String> entityToKeyValueDisplay(Entity entity, String modifiedBy, DateTimeUtils dateTimeUtils) {
 		Map<String,String> map = new HashMap<String, String>();
 		List<String> order = new ArrayList<String>();
 		
 		order.add("ID");
 		map.put("ID", entity.getId());
 		
-		if (includeName) {
-			order.add("Name");
-			map.put("Name", entity.getName());
-		}
+		order.add("Name");
+		map.put("Name", entity.getName());
 		
-		if(entity instanceof Versionable) {
+		if(entity instanceof VersionableEntity) {
 			order.add("Version");
-			map.put("Version", DisplayUtils.getVersionDisplay((Versionable)entity));
+			map.put("Version", DisplayUtils.getVersionDisplay((VersionableEntity)entity));
 		}
 		order.add("Modified By");
 		map.put("Modified By", modifiedBy);
@@ -199,7 +185,7 @@ public class ProvUtils {
 		order.add("Modified On");
 
 		if (entity.getModifiedOn() != null)
-			map.put("Modified On", DisplayUtils.convertDataToPrettyString(entity.getModifiedOn()));
+			map.put("Modified On", dateTimeUtils.getLongFriendlyDate(entity.getModifiedOn()));
 		
 		order.add("Description");
 		map.put("Description", entity.getDescription());		
@@ -207,7 +193,7 @@ public class ProvUtils {
 		return new KeyValueDisplay<String>(map, order);
 	}
 	
-	public static KeyValueDisplay<String> activityToKeyValueDisplay(Activity activity, String modifiedBy) {
+	public static KeyValueDisplay<String> activityToKeyValueDisplay(Activity activity, String modifiedBy, DateTimeUtils dateTimeUtils) {
 		Map<String,String> map = new HashMap<String, String>();
 		List<String> order = new ArrayList<String>();
 			
@@ -221,7 +207,7 @@ public class ProvUtils {
 		map.put("Modified By", modifiedBy);
 		
 		order.add("Modified On");
-		map.put("Modified On", DisplayUtils.convertDataToPrettyString(activity.getModifiedOn()));		
+		map.put("Modified On", dateTimeUtils.getLongFriendlyDate(activity.getModifiedOn()));		
 		
 		order.add("Description");
 		map.put("Description", activity.getDescription());				
@@ -240,93 +226,6 @@ public class ProvUtils {
 		map.put("URL", externalNode.getUrl());
 		
 		return new KeyValueDisplay<String>(map, order);
-	}
-	
-	/**
-	 * Returns a KeyValueDisplay to the callback for the given ProvGraphNode nodeId (NOTE: nodeId is not entity id!)
-	 * @param nodeId ProvGraphNode id
-	 * @param callback
-	 * @param synapseClient
-	 * @param nodeModelCreator
-	 * @param idToNode mapping from id to ProvGraphNode
-	 */
-	public static void getInfo(String nodeId,			
-			SynapseClientAsync synapseClient,
-			AdapterFactory adapterFactory,
-			ClientCache clientCache,
-			Map<String, ProvGraphNode> idToNode,
-			final AsyncCallback<KeyValueDisplay<String>> callback) {
-		if(callback == null) return;
-		if(nodeId == null) callback.onFailure(null);
-				
-		ProvGraphNode node = idToNode.get(nodeId);
-		if(node == null) callback.onFailure(null);
-		if(node instanceof EntityGraphNode) {
-			getInfoEntityTreeNode(synapseClient, adapterFactory, clientCache, callback, (EntityGraphNode)node);
-		} else if(node instanceof ActivityGraphNode) { 
-			getInfoActivityTreeNode(synapseClient, adapterFactory, clientCache, callback, (ActivityGraphNode)node);
-		} else if(node instanceof ExternalGraphNode) {
-			callback.onSuccess(ProvUtils.externalNodeToKeyValueDisplay((ExternalGraphNode) node));
-		}
-	}
-	
-	
-	/*
-	 * Private Methods
-	 */
-	private static void getInfoActivityTreeNode(
-			final SynapseClientAsync synapseClient,
-			final AdapterFactory adapterFactory,
-			final ClientCache clientCache,
-			final AsyncCallback<KeyValueDisplay<String>> callback,
-			ActivityGraphNode atNode) {
-		synapseClient.getActivity(atNode.getActivityId(), new AsyncCallback<Activity>() {
-			@Override
-			public void onSuccess(final Activity activity) {
-				UserBadge.getUserProfile(activity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
-					@Override
-					public void onSuccess(UserProfile profile) {
-						callback.onSuccess(ProvUtils.activityToKeyValueDisplay(activity, DisplayUtils.getDisplayName(profile)));		
-					}
-					
-					@Override
-					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);
-					}
-				});
-			}		
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
-	}
-
-	private static void getInfoEntityTreeNode(final SynapseClientAsync synapseClient,
-			final AdapterFactory adapterFactory,
-			final ClientCache clientCache,
-			final AsyncCallback<KeyValueDisplay<String>> callback,
-			EntityGraphNode etNode) {
-		synapseClient.getEntityForVersion(etNode.getEntityId(), etNode.getVersionNumber(), new AsyncCallback<Entity>() {
-			@Override
-			public void onSuccess(Entity result) {
-				final Entity entity = result;
-				UserBadge.getUserProfile(entity.getModifiedBy(), adapterFactory, synapseClient, clientCache, new AsyncCallback<UserProfile>() {
-					@Override
-					public void onSuccess(UserProfile profile) {
-						callback.onSuccess(ProvUtils.entityToKeyValueDisplay(entity, DisplayUtils.getDisplayName(profile)));		
-					}
-					@Override
-					public void onFailure(Throwable caught) {
-						callback.onFailure(caught);
-					}
-				});
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				callback.onFailure(caught);
-			}
-		});
 	}
 }
 

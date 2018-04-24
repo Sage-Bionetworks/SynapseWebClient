@@ -21,5 +21,4 @@ public interface NewAccountView extends IsWidget, SynapseView {
 		void completeRegistration(String userName, String fName, String lName, String password);
 		void passwordChanged(String password);
 	}
-
 }

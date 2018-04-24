@@ -5,9 +5,8 @@ import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.quiz.PassingRecord;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.download.CertificateWidget;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -29,12 +28,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class QuizViewImpl extends Composite implements QuizView {
-	
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
-
 	@UiField
 	HTMLPanel quizContainer;
 	@UiField
@@ -66,7 +59,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	Anchor tryAgainLink;
 	
 	@UiField
-	SpanElement loadingUI;
+	LoadingSpinner loadingUI;
 	
 	@UiField
 	SimplePanel synAlertPanel;
@@ -74,23 +67,17 @@ public class QuizViewImpl extends Composite implements QuizView {
 	private Presenter presenter;
 	private CertificateWidget certificateWidget;
 	private Header headerWidget;
-	private Footer footerWidget;
 	public interface Binder extends UiBinder<Widget, QuizViewImpl> {}
 	
 	@Inject
 	public QuizViewImpl(Binder uiBinder,
 			Header headerWidget, 
-			Footer footerWidget,
-			SageImageBundle sageImageBundle, 
 			CertificateWidget certificateWidget,
 			PortalGinInjector ginInjector) {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.certificateWidget = certificateWidget;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		successContainer.setWidget(certificateWidget.asWidget());
 		tryAgainLink.addClickHandler(new ClickHandler() {
 			@Override
@@ -115,12 +102,8 @@ public class QuizViewImpl extends Composite implements QuizView {
 	@Override
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
-		header.clear();
 		headerWidget.configure(false);
 		headerWidget.refresh();
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}
 	
@@ -131,7 +114,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 
 	@Override
 	public void showLoading() {
-		DisplayUtils.show(loadingUI);
+		loadingUI.setVisible(true);
 	}
 
 	@Override
@@ -217,6 +200,6 @@ public class QuizViewImpl extends Composite implements QuizView {
 
 	@Override
 	public void hideLoading() {
-		DisplayUtils.hide(loadingUI);
+		loadingUI.setVisible(false);
 	}
 }

@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.getTableType;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -55,6 +59,8 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 	EntityContainerListWidget viewScopeWidget, editScopeWidget;
 	SynapseAlert synAlert;
 	EntityView currentView;
+	ViewType currentViewType;
+	
 	/**
 	 * New presenter with its view.
 	 * @param view
@@ -66,6 +72,7 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 			EntityContainerListWidget editScopeWidget,
 			SynapseAlert synAlert){
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.view = view;
 		this.viewScopeWidget = viewScopeWidget;
 		this.editScopeWidget = editScopeWidget;
@@ -84,12 +91,22 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 		boolean isVisible = bundle.getEntity() instanceof EntityView;
 		if (isVisible) {
 			currentView = (EntityView) bundle.getEntity();
-			viewScopeWidget.configure(currentView.getScopeIds(), false);
+			viewScopeWidget.configure(currentView.getScopeIds(), false, getTableType(currentView));
 			view.setEditButtonVisible(isEditable);
 		}
 		view.setVisible(isVisible);
 	}
 
+	@Override
+	public void onSelectFilesAndTablesView() {
+		currentViewType = ViewType.file_and_table;
+	}
+	
+	@Override
+	public void onSelectFilesOnlyView() {
+		currentViewType = ViewType.file;
+	}
+	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
@@ -101,6 +118,7 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 		synAlert.clear();
 		view.setLoading(true);
 		currentView.setScopeIds(editScopeWidget.getEntityIds());
+		currentView.setType(currentViewType);
 		synapseClient.updateEntity(currentView, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity entity) {
@@ -119,7 +137,16 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 	@Override
 	public void onEdit() {
 		// configure edit list, and show modal
-		editScopeWidget.configure(currentView.getScopeIds(), true);
+		editScopeWidget.configure(currentView.getScopeIds(), true, getTableType(currentView));
+		
+		currentViewType = currentView.getType();
+		boolean isFileView = ViewType.file.equals(currentViewType) || ViewType.file_and_table.equals(currentViewType);
+		view.setFileViewTypeSelectionVisible(isFileView);
+		if (isFileView) {
+			boolean isIncludeTables = ViewType.file_and_table.equals(currentViewType);
+			view.setIsIncludeTables(isIncludeTables);	
+		}
+		
 		view.showModal();
 	}
 }

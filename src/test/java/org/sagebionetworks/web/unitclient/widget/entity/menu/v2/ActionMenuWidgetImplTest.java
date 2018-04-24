@@ -1,15 +1,20 @@
 package org.sagebionetworks.web.unitclient.widget.entity.menu.v2;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
-
-import static org.mockito.Mockito.*;
-
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
@@ -18,21 +23,22 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionView;
 
 public class ActionMenuWidgetImplTest {
 	
+	@Mock
 	ActionView mockRename;
+	@Mock
 	ActionView mockDelete;
+	@Mock
 	ActionMenuWidgetView mockView;
+	@Mock
 	ActionListener mockActionListener;
 	
 	@Before
 	public void before(){
-		mockRename = Mockito.mock(ActionView.class);
+		MockitoAnnotations.initMocks(this);
 		when(mockRename.getAction()).thenReturn(Action.CHANGE_ENTITY_NAME);
-		mockDelete = Mockito.mock(ActionView.class);
 		when(mockDelete.getAction()).thenReturn(Action.DELETE_ENTITY);
 		List<ActionView> actionView = Arrays.asList(mockRename, mockDelete);
-		mockView = Mockito.mock(ActionMenuWidgetView.class);
 		when(mockView.listActionViews()).thenReturn(actionView);
-		mockActionListener = Mockito.mock(ActionListener.class);
 	}
 	
 	@Test
@@ -101,14 +107,6 @@ public class ActionMenuWidgetImplTest {
 		widget.setActionVisible(Action.DELETE_ENTITY, true);
 		verify(mockDelete).setVisible(true);
 		verify(mockRename, never()).setVisible(true);
-	}
-
-	@Test
-	public void testActionEnabled(){
-		ActionMenuWidgetImpl widget = new ActionMenuWidgetImpl(mockView);
-		widget.setActionEnabled(Action.DELETE_ENTITY, true);
-		verify(mockDelete).setEnabled(true);
-		verify(mockRename, never()).setEnabled(anyBoolean());
 	}
 	
 	@Test

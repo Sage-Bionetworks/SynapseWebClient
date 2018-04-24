@@ -3,9 +3,10 @@ package org.sagebionetworks.web.client.widget.entity.download;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
 
+import com.google.gwt.event.logical.shared.HasAttachHandlers;
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface UploaderView extends IsWidget, SynapseView {
+public interface UploaderView extends IsWidget, SynapseView, HasAttachHandlers {
 
 	/**
 	 * Set the presenter.
@@ -25,12 +26,13 @@ public interface UploaderView extends IsWidget, SynapseView {
 	void setShowCancelButton(boolean showCancel);
 	void showUploaderUI();
 	void triggerUpload();
-	
+	void setExternalUrl(String url);
 	void showErrorMessage(String title, String details);
 	
 	void showUploadingToSynapseStorage();
 	void showUploadingBanner(String banner);
 	void showUploadingToExternalStorage(String host, String banner);
+	void showUploadingToS3DirectStorage(String endpoint, String banner);
 	void setUploaderLinkNameVisible(boolean visible);
 	/**
 	 * SFTP requires username and password, so prompt for it in the upload form.
@@ -43,8 +45,11 @@ public interface UploaderView extends IsWidget, SynapseView {
 	 */
 	String getExternalPassword();
 	
-	void enableUpload();
+	String getS3DirectAccessKey();
+	String getS3DirectSecretKey();
 	
+	void enableUpload();
+	void setSelectedFilenames(String fileNames);
 	/**
 	 * Presenter interface
 	 */
@@ -67,8 +72,6 @@ public interface UploaderView extends IsWidget, SynapseView {
 		void cancelClicked();
 		
 		void disableMultipleFileUploads();
-		String getSelectedFilesText();
-
 		Long getStorageLocationId();
 	}
 }

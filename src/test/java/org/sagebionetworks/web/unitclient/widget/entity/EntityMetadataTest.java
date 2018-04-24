@@ -23,6 +23,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
@@ -30,18 +31,20 @@ import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.DoiWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
-import org.sagebionetworks.web.client.widget.entity.RestrictionWidget;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 
 public class EntityMetadataTest {
 	@Mock
@@ -55,7 +58,7 @@ public class EntityMetadataTest {
 	@Mock
 	DoiWidget mockDoiWidget;
 	@Mock
-	RestrictionWidget mockRestrictionWidget;
+	RestrictionWidget mockRestrictionWidgetV2;
 	@Mock
 	FileHistoryWidget mockFileHistoryWidget;
 	@Mock
@@ -64,7 +67,10 @@ public class EntityMetadataTest {
 	SynapseClientAsync mockSynapseClient;
 	@Mock
 	SynapseJSNIUtils mockJSNI;
-	
+	@Mock
+	CookieProvider mockCookies;
+	@Mock
+	ActionMenuWidget mockActionMenuWidget;
 	String entityId = "syn123";
 	String entityName = "testEntity";
 	Entity en = new Folder();
@@ -73,9 +79,21 @@ public class EntityMetadataTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new EntityMetadata(mockView, mockDoiWidget, mockAnnotationsWidget, mockRestrictionWidget, 
-				mockFileHistoryWidget, mockSynapseClient, mockJSNI);
+		widget = new EntityMetadata(mockView, mockDoiWidget, mockAnnotationsWidget, 
+				mockFileHistoryWidget, mockSynapseClient, mockJSNI, mockRestrictionWidgetV2, mockCookies);
 		when(mockInjector.getFileHistoryWidget()).thenReturn(mockFileHistoryWidget);
+	}
+	
+	@Test
+	public void testConstruction() {
+		verify(mockView).setDoiWidget(any(IsWidget.class));
+		verify(mockView).setAnnotationsRendererWidget(any(IsWidget.class));
+		verify(mockView).setFileHistoryWidget(any(IsWidget.class));
+		verify(mockView).setRestrictionWidgetV2(any(IsWidget.class));
+		verify(mockRestrictionWidgetV2).setShowChangeLink(true);
+		verify(mockRestrictionWidgetV2).setShowIfProject(false);
+		verify(mockRestrictionWidgetV2).setShowFlagLink(true);
+		verify(mockView).setRestrictionWidgetV2Visible(true);
 	}
 	
 	@Test
@@ -86,7 +104,6 @@ public class EntityMetadataTest {
 		boolean isCurrentVersion = true;
 		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
 		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
-		when(mockRestrictionWidget.asWidget()).thenReturn(null);
 		Project project = new Project();
 		project.setName(entityName);
 		project.setId(entityId);
@@ -95,15 +112,14 @@ public class EntityMetadataTest {
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
 		en.setId(entityId);
-		widget.setEntityBundle(bundle, null);
-		verify(mockView).setDetailedMetadataVisible(true);
+		widget.configure(bundle, null, mockActionMenuWidget);
 		verify(mockView).setRestrictionPanelVisible(false);
 		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
-		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
-				Mockito.anyBoolean(), any(Callback.class));
+		verify(mockRestrictionWidgetV2).configure(project, canChangePermissions);
+		verify(mockView, never()).setRestrictionWidgetV2Visible(false);
 	}
-
+	
 	@Test
 	public void testSetEntityBundleDockerRepo() {
 		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
@@ -120,14 +136,10 @@ public class EntityMetadataTest {
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
 		Long versionNumber = null;
-		widget.setEntityBundle(bundle, versionNumber);
-		verify(mockView).setDetailedMetadataVisible(true);
+		widget.configure(bundle, versionNumber, mockActionMenuWidget);
 		verify(mockFileHistoryWidget, never()).setEntityBundle(bundle, versionNumber);
-		verify(mockFileHistoryWidget, never()).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
-		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
-				Mockito.anyBoolean(), any(Callback.class));
 	}
 	
 	@Test
@@ -146,14 +158,10 @@ public class EntityMetadataTest {
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
 		Long versionNumber = null;
-		widget.setEntityBundle(bundle, versionNumber);
-		verify(mockView).setDetailedMetadataVisible(true);
+		widget.configure(bundle, versionNumber, mockActionMenuWidget);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
-		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
-		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
-				Mockito.anyBoolean(), any(Callback.class));
 	}
 	
 	@Test
@@ -173,14 +181,18 @@ public class EntityMetadataTest {
 		bundle.setEntity(fileEntity);
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
-		widget.setEntityBundle(bundle, versionNumber);
-		verify(mockView).setDetailedMetadataVisible(true);
+		widget.configure(bundle, versionNumber, mockActionMenuWidget);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
-		verify(mockFileHistoryWidget).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
 		verify(mockDoiWidget).configure(mockDoi, entityId);
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
-		verify(mockRestrictionWidget).configure(Mockito.eq(bundle), Mockito.anyBoolean(), Mockito.anyBoolean(),
-				Mockito.anyBoolean(), any(Callback.class));
+	}
+	
+	@Test
+	public void testSetDetailedMetadataVisible() {
+		widget.setVisible(true);
+		verify(mockView).setDetailedMetadataVisible(true);
+		widget.setVisible(false);
+		verify(mockView).setDetailedMetadataVisible(false);
 	}
 	
 	@Test
@@ -221,6 +233,23 @@ public class EntityMetadataTest {
 		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		widget.configureStorageLocation(en);
 		verify(mockView).setUploadDestinationText("testUrl.com");
+		verify(mockView).setUploadDestinationPanelVisible(false);
+		verify(mockView).setUploadDestinationPanelVisible(true);
+	}
+	
+	@Test
+	public void testConfigureStorageLocationExternalObjectStore() {
+		String endpointUrl = "https://externalobjectstore";
+		String bucket = "mybucket";
+		List<UploadDestination> uploadDestinations = new ArrayList<UploadDestination>();
+		ExternalObjectStoreUploadDestination exS3Destination = new ExternalObjectStoreUploadDestination();
+		exS3Destination.setUploadType(UploadType.S3);
+		exS3Destination.setEndpointUrl(endpointUrl);
+		exS3Destination.setBucket(bucket);
+		uploadDestinations.add(exS3Destination);
+		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		widget.configureStorageLocation(en);
+		verify(mockView).setUploadDestinationText(endpointUrl + "/" + bucket);
 		verify(mockView).setUploadDestinationPanelVisible(false);
 		verify(mockView).setUploadDestinationPanelVisible(true);
 	}

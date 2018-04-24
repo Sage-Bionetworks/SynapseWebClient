@@ -8,20 +8,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
-import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.provenance.Used;
 import org.sagebionetworks.repo.model.provenance.UsedEntity;
-import org.sagebionetworks.repo.model.request.ReferenceList;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JsoProvider;
@@ -31,8 +28,6 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartUtil;
-import org.sagebionetworks.web.shared.KeyValueDisplay;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
@@ -54,14 +49,12 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	private ProvenanceWidgetView view;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;	
-	private SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	private Map<String, ProvGraphNode> idToNode = new HashMap<String, ProvGraphNode>();
-	private AdapterFactory adapterFactory;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private Map<String, String> descriptor;
 	private JsoProvider jsoProvider;
 	
-
 	private interface ProcessCallback {
 		public void onComplete();
 	}
@@ -76,26 +69,27 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	Stack<ProcessItem> toProcess;
 	ProcessCallback doneCallback;
 	Set<Reference> noExpandNode;
-	Stack<String> lookupVersion;
+	List<String> lookupVersion;
 	ProvGraph currentGraph;
 	ClientCache clientCache;
-	
+	DateTimeUtils dateTimeUtils;
 	@Inject
-	public ProvenanceWidget(ProvenanceWidgetView view, SynapseClientAsync synapseClient,
+	public ProvenanceWidget(ProvenanceWidgetView view, 
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController, 
-			AdapterFactory adapterFactory,
 			SynapseJSNIUtils synapseJSNIUtils,
 			JsoProvider jsoProvider, 
-			ClientCache clientCache) {
+			ClientCache clientCache,
+			DateTimeUtils dateTimeUtils,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
-		this.synapseClient = synapseClient;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.adapterFactory = adapterFactory;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.jsoProvider = jsoProvider;
 		this.clientCache = clientCache;
+		this.dateTimeUtils = dateTimeUtils;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 	}
 
@@ -111,7 +105,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		descriptor = widgetDescriptor;		
 
 		// parse referenced entities and put into start refs
-		lookupVersion = new Stack<String>();
+		lookupVersion = new ArrayList<String>();
 		startRefs = new HashSet<Reference>();		
 		String entityListStr = null;
 		if(descriptor.containsKey(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY)) entityListStr = descriptor.get(WidgetConstants.PROV_WIDGET_ENTITY_LIST_KEY);
@@ -128,7 +122,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 						} else {
 							startRefs.add(ref);							
 						}
-					}					 											
+					}
 				}
 			}
 		}
@@ -139,9 +133,13 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		
 		// Set max depth (default 1), undefined (false) and expand (false)		
 		maxDepth = descriptor.containsKey(WidgetConstants.PROV_WIDGET_DEPTH_KEY) ? Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DEPTH_KEY)) : 1; 
-		showUndefinedAndErrorActivity = descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY) != null ? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY)) : false;
+		showUndefinedAndErrorActivity = descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY) != null ? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_UNDEFINED_KEY)) : true;
 		showExpand = descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY) != null ? Boolean.parseBoolean(descriptor.get(WidgetConstants.PROV_WIDGET_EXPAND_KEY)) : false;
-		if(descriptor.containsKey(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY)) setHeight(Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY)));
+		if(descriptor.containsKey(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY)) {
+			setHeight(Integer.parseInt(descriptor.get(WidgetConstants.PROV_WIDGET_DISPLAY_HEIGHT_KEY)));
+		} else {
+			setHeight(330);
+		}
 		
 		// do not create expand nodes for these (generally for previously expanded/discovered nodes without an activity)
 		noExpandNode = new HashSet<Reference>();		
@@ -152,7 +150,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			public void onSuccess(Void result) {
 				// load stack with starting nodes at depth 0
 				toProcess = new Stack<ProvenanceWidget.ProcessItem>();
-				for(Reference ref : startRefs) {			
+				for(Reference ref : startRefs) {
 					toProcess.push(new ReferenceProcessItem(ref, 0));
 				}
 				
@@ -177,11 +175,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	public void setHeight(int height) {
 		view.setHeight(height);
 	}
-			
-	@Override
-	public void getInfo(String nodeId, final AsyncCallback<KeyValueDisplay<String>> callback) {
-		ProvUtils.getInfo(nodeId, synapseClient, adapterFactory, clientCache, idToNode, callback);
-	}
 	
 	@SuppressWarnings("unchecked")
 	public void clearState() {
@@ -200,7 +193,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		maxDepth = 1;
 		Reference ref = new Reference();
 		ref.setTargetId(node.getEntityId());
-		ref.setTargetVersionNumber(node.getVersionNumber());		
+		ref.setTargetVersionNumber(node.getVersionNumber());
 		toProcess.push(new ReferenceProcessItem(ref, 0));
 		processNext();		
 	}
@@ -215,26 +208,23 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	 * @param doneCallback
 	 */
 	private void lookupVersion(final AsyncCallback<Void> doneCallback) {
-		if(lookupVersion.size() == 0) {
-			doneCallback.onSuccess(null);
-			return;
-		}
-		String nextEntityId = lookupVersion.pop();
-		synapseClient.getEntity(nextEntityId, new AsyncCallback<Entity>() {
-			@Override
-			public void onSuccess(Entity result) {
-				Entity entity = result;
-				Reference ref = new Reference();
-				ref.setTargetId(entity.getId());
-				if(entity instanceof Versionable) {
-					ref.setTargetVersionNumber(((Versionable) entity).getVersionNumber());
-				}
-				startRefs.add(ref);
-				lookupVersion(doneCallback);			
-			}
+		// single call to look up the latest version
+		jsClient.getEntityHeaderBatch(lookupVersion, new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				doneCallback.onFailure(caught);
+			}
+			@Override
+			public void onSuccess(ArrayList<EntityHeader> headers) {
+				for (EntityHeader header : headers) {
+					Reference ref = new Reference();
+					ref.setTargetId(header.getId());
+					if (header.getVersionNumber() != null) {
+						ref.setTargetVersionNumber(header.getVersionNumber());
+					}
+					startRefs.add(ref);
+				}
+				doneCallback.onSuccess(null);
 			}
 		});
 	}
@@ -242,7 +232,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	/**
 	 * Process the next ProcessItem in the stack until we're done
 	 */
-	private void processNext() {	
+	private void processNext() {
 		if(toProcess.size() == 0) {
 			doneCallback.onComplete();
 			return;
@@ -250,7 +240,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		
 		ProcessItem next = toProcess.pop();
 		if(next instanceof ReferenceProcessItem) {
-			processUsed((ReferenceProcessItem) next);
+			processUsed((ReferenceProcessItem) next);	
 		} else if(next instanceof ActivityProcessItem) {
 			processActivity((ActivityProcessItem) next);
 		}
@@ -271,7 +261,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		}
 				
 		// lookup generatedBy activity for ref
-		synapseClient.getActivityForEntityVersion(item.getReference().getTargetId(), item.getReference().getTargetVersionNumber(), new AsyncCallback<Activity>() {
+		jsClient.getActivityForEntityVersion(item.getReference().getTargetId(), item.getReference().getTargetVersionNumber(), new AsyncCallback<Activity>() {
 			@Override
 			public void onSuccess(Activity activity) {
 				addActivityToStack(activity);
@@ -309,6 +299,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			return;
 		}
 		
+		cleanupCycles(item, references);
+		
 		// add activity to processedActivites
 		processedActivities.put(item.getActivity().getId(), item.getActivity());
 		
@@ -319,15 +311,14 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		}
 
 		// Lookup entities generated by this activity
-		synapseClient.getEntitiesGeneratedBy(item.getActivity().getId(), Integer.MAX_VALUE, 0, new AsyncCallback<PaginatedResults<Reference>>() {
+		jsClient.getEntitiesGeneratedBy(item.getActivity().getId(), Integer.MAX_VALUE, 0, new AsyncCallback<ArrayList<Reference>>() {
 			@Override
-			public void onSuccess(PaginatedResults<Reference> result) {
-				PaginatedResults<Reference> generated = result;
+			public void onSuccess(ArrayList<Reference> results) {
 				// add references to generatedByActivityId & references
-				if(generated != null && generated.getResults() != null) {
-					for(Reference ref : generated.getResults()) {
+				if(results != null) {
+					for(Reference ref : results) {
 						generatedByActivityId.put(ref, item.getActivity().getId());
-						references.add(ref);
+						references.add(ref);	
 					}
 				} 		
 				addUsedToStack();
@@ -356,13 +347,33 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			}
 		});
 	}
-		
+	
+	public void cleanupCycles(ActivityProcessItem item, Set<Reference> references) {
+		if (item.getActivity().getUsed() != null) {
+			// SWC-3568 : avoid cycle that results in stack overflow during the creation of the graph.
+			List<Used> previouslyProcessed = new ArrayList<Used>();
+			Set<Used> used = item.getActivity().getUsed();
+			for(Used u : used) {
+				if(u instanceof UsedEntity) { // ignore UsedUrl, nothing to process
+					UsedEntity ue = (UsedEntity) u;
+					if(ue.getReference() != null && references.contains(ue.getReference())) {
+						previouslyProcessed.add(u);
+					}
+				}
+			}
+			// remove from used (to avoid cycle)
+			used.removeAll(previouslyProcessed);
+		}
+	}
+	
 	private void lookupReferencesThenBuildGraph() {			
-		ReferenceList list = new ReferenceList();
-		list.setReferences(new ArrayList<Reference>(references));		
-		synapseClient.getEntityHeaderBatch(list, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+		if (references.isEmpty()) {
+			view.clear();
+			return;
+		}
+		jsClient.getEntityHeaderBatchFromReferences(new ArrayList<Reference>(references), new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
-			public void onSuccess(PaginatedResults<EntityHeader> headers) {					
+			public void onSuccess(ArrayList<EntityHeader> headers) {
 				refToHeader = ProvUtils.mapReferencesToHeaders(headers);
 				buildGraphLayoutSendToView();
 			}
@@ -374,7 +385,6 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		});
 	}
 
-	
 	private void buildGraphLayoutSendToView() {
 		// make sure that any references that were not returned in the header list are incorporated in the map
 		for(Reference ref : references) {
@@ -388,15 +398,14 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		
 		// build the tree, layout and render
 		idToNode = new HashMap<String, ProvGraphNode>();
-
 		ProvGraph graph = ProvUtils.buildProvGraph(generatedByActivityId, processedActivities, idToNode, refToHeader, showExpand, startRefs, noExpandNode);					
+		currentGraph = graph;
 		
 		NChartCharacters characters = NChartUtil.createNChartCharacters(jsoProvider, graph.getNodes());
 		NChartLayersArray layerArray = NChartUtil.createLayers(jsoProvider, graph);
 		LayoutResult layoutResult = synapseJSNIUtils.nChartlayout(layerArray, characters);
 		NChartUtil.fillPositions(layoutResult, graph);
 		NChartUtil.repositionExpandNodes(graph);
-		currentGraph = graph;
 		view.setGraph(graph);
 	}
 	
@@ -431,7 +440,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		
 	}
 	
-	private class ReferenceProcessItem extends ProcessItem {
+	public class ReferenceProcessItem extends ProcessItem {
 		Reference reference;
 
 		public ReferenceProcessItem(Reference reference, int depth) {
@@ -449,7 +458,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		}
 	}
 
-	private class ActivityProcessItem extends ProcessItem {
+	public class ActivityProcessItem extends ProcessItem {
 		Activity activity;
 
 		public ActivityProcessItem(Activity activity, int depth) {
@@ -491,13 +500,11 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		}
 		
 		// batch request all entity ids to get current version. Notify view of non current versions
-		ReferenceList referenceList = new ReferenceList();
-		referenceList.setReferences(new ArrayList<Reference>(entityIds));		
-		synapseClient.getEntityHeaderBatch(referenceList, new AsyncCallback<PaginatedResults<EntityHeader>>() {
+		jsClient.getEntityHeaderBatchFromReferences(new ArrayList<Reference>(entityIds), new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
-			public void onSuccess(PaginatedResults<EntityHeader> currentVersions) {
+			public void onSuccess(ArrayList<EntityHeader> currentVersions) {
 				Map<String,Long> entityToCurrentVersion = new HashMap<String, Long>();
-				for(EntityHeader header : currentVersions.getResults()) {
+				for(EntityHeader header : currentVersions) {
 					entityToCurrentVersion.put(header.getId(), header.getVersionNumber());
 				}
 				

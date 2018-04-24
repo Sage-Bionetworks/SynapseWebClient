@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -27,7 +29,8 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	SimplePanel rowEditorModalPanel;
 	@UiField
 	SimplePanel synapseAlertContainer;
-
+	@UiField
+	Div scrollTarget;
 	Widget widget;
 
 	Presenter presenter;
@@ -41,12 +44,7 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	public void setPresenter(Presenter presenterin) {
 		this.presenter = presenterin;
 	}
-
-	@Override
-	public void setTableVisible(boolean visible) {
-		tablePanel.setVisible(visible);
-	}
-
+	
 	@Override
 	public void setPageWidget(TablePageWidget pageWidget) {
 		tablePanel.add(pageWidget);
@@ -69,7 +67,8 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 
 	@Override
 	public void setProgressWidget(JobTrackingWidget progressWidget) {
-		this.progressPanel.add(progressWidget);
+		progressPanel.clear();
+		progressPanel.add(progressWidget);
 	}
 
 	@Override
@@ -79,5 +78,9 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	@Override
 	public void setSynapseAlertWidget(Widget w) {
 		synapseAlertContainer.setWidget(w);
+	}
+	@Override
+	public void scrollTableIntoView() {
+		scrollTarget.getElement().scrollIntoView();
 	}
 }

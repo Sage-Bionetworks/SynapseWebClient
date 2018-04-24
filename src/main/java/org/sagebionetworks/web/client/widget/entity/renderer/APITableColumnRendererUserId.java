@@ -7,8 +7,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfig;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -19,9 +21,12 @@ public class APITableColumnRendererUserId implements APITableColumnRenderer {
 	private Map<String, List<String>> outputColumnData;
 	GWTWrapper gwt;
 	public final static String USER_WIDGET_DIV_PREFIX = "user-widget-";
+	SynapseJavascriptClient jsClient;
 	@Inject
-	public APITableColumnRendererUserId(GWTWrapper gwt) {
+	public APITableColumnRendererUserId(GWTWrapper gwt,
+			SynapseJavascriptClient jsClient) {
 		this.gwt = gwt;
+		this.jsClient = jsClient;
 	}
 	
 	@Override

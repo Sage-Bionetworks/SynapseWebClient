@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.unitshared.users;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -35,7 +37,7 @@ public class AclUtilsTest {
 	@Test
 	public void testGetPermissionLevel() {
 		assertEquals(PermissionLevel.CAN_VIEW, AclUtils.getPermissionLevel(getReadAccessTypeSet()));
-		assertEquals(PermissionLevel.CAN_MODERATE, AclUtils.getPermissionLevel(getModeratorAccessTypeSet()));
+		assertEquals(PermissionLevel.CAN_DOWNLOAD, AclUtils.getPermissionLevel(getDownloadAccessTypeSet()));
 		assertEquals(PermissionLevel.CAN_SUBMIT_EVALUATION, AclUtils.getPermissionLevel(getParticipateAccessTypeSet()));
 		assertEquals(PermissionLevel.CAN_SCORE_EVALUATION, AclUtils.getPermissionLevel(getScoreAccessTypeSet()));
 		assertEquals(PermissionLevel.CAN_EDIT, AclUtils.getPermissionLevel(getEditAccessTypeSet()));
@@ -45,11 +47,11 @@ public class AclUtilsTest {
 		assertEquals(PermissionLevel.CAN_MESSAGE_TEAM, AclUtils.getPermissionLevel(ModelConstants.TEAM_MESSENGER_PERMISSIONS));
 		assertEquals(PermissionLevel.CAN_ADMINISTER_TEAM, AclUtils.getPermissionLevel(ModelConstants.TEAM_ADMIN_PERMISSIONS));
 	}
-
 	
 	@Test
 	public void testGetACCESS_TYPEs() {
 		assertEquals(getReadAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_VIEW));
+		assertEquals(getDownloadAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_DOWNLOAD));
 		assertEquals(getParticipateAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_SUBMIT_EVALUATION));
 		assertEquals(getScoreAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_SCORE_EVALUATION));
 		assertEquals(getEditAccessTypeSet(), AclUtils.getACCESS_TYPEs(PermissionLevel.CAN_EDIT));
@@ -61,12 +63,15 @@ public class AclUtilsTest {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testGetPermissionLevels() {		
-		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_VIEW, PermissionLevel.CAN_MODERATE, PermissionLevel.CAN_SUBMIT_EVALUATION, PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_EDIT, 
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_VIEW, PermissionLevel.CAN_DOWNLOAD, PermissionLevel.CAN_SUBMIT_EVALUATION, PermissionLevel.CAN_SCORE_EVALUATION, PermissionLevel.CAN_EDIT, 
 				PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER, PermissionLevel.CAN_ADMINISTER_EVALUATION,
 				PermissionLevel.CAN_MESSAGE_TEAM, PermissionLevel.CAN_ADMINISTER_TEAM})), 
 				AclUtils.getPermisionLevels(ACCESS_TYPE.READ));
-		
-		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_MODERATE, PermissionLevel.CAN_ADMINISTER })), 
+
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_DOWNLOAD, PermissionLevel.CAN_EDIT, PermissionLevel.CAN_EDIT_DELETE, PermissionLevel.CAN_ADMINISTER })), 
+				AclUtils.getPermisionLevels(ACCESS_TYPE.DOWNLOAD));
+
+		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_ADMINISTER })), 
 				AclUtils.getPermisionLevels(ACCESS_TYPE.MODERATE));
 		
 		assertEquals(new HashSet<PermissionLevel>(Arrays.asList(new PermissionLevel[] { PermissionLevel.CAN_SUBMIT_EVALUATION, PermissionLevel.CAN_ADMINISTER_EVALUATION })), 
@@ -108,14 +113,14 @@ public class AclUtilsTest {
 		set.add(ACCESS_TYPE.READ);
 		return set;
 	}
-	
-	private Set<ACCESS_TYPE> getModeratorAccessTypeSet() {
+	private Set<ACCESS_TYPE> getDownloadAccessTypeSet() {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.READ);
-		set.add(ACCESS_TYPE.MODERATE);
+		set.add(ACCESS_TYPE.DOWNLOAD);
 		return set;
 	}
 
+	
 	private Set<ACCESS_TYPE> getParticipateAccessTypeSet() {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.READ);
@@ -136,6 +141,7 @@ public class AclUtilsTest {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.CREATE);
 		set.add(ACCESS_TYPE.READ);
+		set.add(ACCESS_TYPE.DOWNLOAD);
 		set.add(ACCESS_TYPE.UPDATE);
 		return set;
 	}
@@ -144,6 +150,7 @@ public class AclUtilsTest {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.CREATE);
 		set.add(ACCESS_TYPE.READ);
+		set.add(ACCESS_TYPE.DOWNLOAD);
 		set.add(ACCESS_TYPE.UPDATE);
 		set.add(ACCESS_TYPE.DELETE);
 		return set;
@@ -153,6 +160,7 @@ public class AclUtilsTest {
 		Set<ACCESS_TYPE> set = new HashSet<ACCESS_TYPE>();		
 		set.add(ACCESS_TYPE.CREATE);
 		set.add(ACCESS_TYPE.READ);
+		set.add(ACCESS_TYPE.DOWNLOAD);
 		set.add(ACCESS_TYPE.UPDATE);
 		set.add(ACCESS_TYPE.DELETE);
 		set.add(ACCESS_TYPE.CHANGE_PERMISSIONS);

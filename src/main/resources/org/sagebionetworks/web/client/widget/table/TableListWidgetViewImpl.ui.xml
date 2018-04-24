@@ -3,8 +3,10 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
-	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<g:HTMLPanel>
+		<bh:Div ui:field="synAlertContainer" />
 		<b:Row addStyleNames="margin-bottom-5">
 			<b:Column size="XS_12 SM_1 MD_3" push="SM_11 MD_9">
 				<b:ButtonGroup pull="RIGHT">
@@ -17,27 +19,9 @@
 					</b:DropDownMenu>
 				</b:ButtonGroup>
 			</b:Column>
-			<b:Column size="XS_12 SM_11 MD_9" pull="SM_1 MD_3">
-				<b:ButtonToolBar>
-					<b:Button ui:field="addTable" icon="PLUS">Add Table</b:Button>
-					<b:Button ui:field="uploadTable" icon="UPLOAD">Upload Table</b:Button>
-					<b:Button ui:field="addFileView" visible="false" />
-			</b:ButtonToolBar>
-			</b:Column>
 		</b:Row>
-		
+		<w:LoadingSpinner size="40px" ui:field="loadingUI" addStyleNames="center-block center" visible="false"/>
 		<b:ListGroup ui:field="tablesList" />
-		<b:Row >
-			<b:Column size="XS_2" offset="XS_5">
-				<g:SimplePanel ui:field="paginationPanel" visible="false"/>
-			</b:Column>
-		</b:Row>
-		
-		<!-- Slot for the create table model dialog -->
-		<g:SimplePanel ui:field="createTableModalPanel" />
-		<!-- Slot for the upload table model dialog -->
-		<g:SimplePanel ui:field="uploadTableModalPanel" />
-		<!-- Slot for the create file view wizard -->
-		<g:SimplePanel ui:field="fileViewWizardContainer" />
+		<bh:Div ui:field="loadMoreWidgetContainer"/>
 	</g:HTMLPanel>
 </ui:UiBinder>

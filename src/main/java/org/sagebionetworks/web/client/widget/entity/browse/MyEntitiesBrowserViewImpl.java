@@ -6,14 +6,10 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 
 import com.google.gwt.dom.client.LIElement;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Anchor;
@@ -73,35 +69,25 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 		myProjectsContainer.setWidget(myProjectsContainerWrapper.asWidget());
 		myFavoritesContainer.setWidget(favoritesTreeBrowser.asWidget());
 		currentContextContainer.setWidget(currentContextTreeBrowser.asWidget());
-		myProjectsContainerWrapper.configure(new Callback() {
-			@Override
-			public void invoke() {
-				presenter.loadMoreUserUpdateable();
-			}
+		myProjectsContainerWrapper.configure(() -> {
+			presenter.loadMoreUserUpdateable();
 		});
-		myProjectsLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setTabSelected(myProjectsLink, myProjectsListItem, myProjectsTabContents);
-			}
+		myProjectsLink.addClickHandler(event -> {
+			setTabSelected(myProjectsLink, myProjectsListItem, myProjectsTabContents);
 		});
 		
-		myFavoritesLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setTabSelected(myFavoritesLink, myFavoritesListItem, myFavoritesTabContents);
-			}
+		myFavoritesLink.addClickHandler(event -> {
+			setTabSelected(myFavoritesLink, myFavoritesListItem, myFavoritesTabContents);
 		});
 		
-		currentContextLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				setTabSelected(currentContextLink, currentContextListItem, currentContextTabContents);
-			}
+		currentContextLink.addClickHandler(event -> {
+			setTabSelected(currentContextLink, currentContextListItem, currentContextTabContents);
 		});
 		
 		setTabSelected(myProjectsLink, myProjectsListItem, myProjectsTabContents);
+		initSelectedHandlers();
 	}
+	
 	@Override
 	public void setIsMoreUpdatableEntities(boolean isMore) {
 		myProjectsContainerWrapper.setIsMore(isMore);	
@@ -124,8 +110,6 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 
 	@Override 
 	public void setPresenter(Presenter presenter) {		
-		// create a new handler for this presenter
-		createSelectedHandlers();
 		this.presenter = presenter;
 	}
 		
@@ -152,7 +136,9 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 	
 	@Override
 	public void clear() {
-		myTreeBrowser.clearState();
+		myTreeBrowser.clear();
+		favoritesTreeBrowser.clear();
+		currentContextTreeBrowser.clear();
 	}
 
 	@Override
@@ -168,32 +154,22 @@ public class MyEntitiesBrowserViewImpl implements MyEntitiesBrowserView {
 	/*
 	 * Private Methods
 	 */
-	private void createSelectedHandlers() {
-		EntitySelectedHandler mySelectedHandler = new EntitySelectedHandler() {			
-			@Override
-			public void onSelection(EntitySelectedEvent event) {
-				presenter.entitySelected(myTreeBrowser.getSelected());
-			}
+	private void initSelectedHandlers() {
+		EntitySelectedHandler mySelectedHandler = event -> {
+			presenter.entitySelected(myTreeBrowser.getSelected());
 		};
 		myTreeBrowser.setEntitySelectedHandler(mySelectedHandler);
 
-		EntitySelectedHandler favoritesSelectedHandler = new EntitySelectedHandler() {			
-			@Override
-			public void onSelection(EntitySelectedEvent event) {
-				presenter.entitySelected(favoritesTreeBrowser.getSelected());
-			}
+		EntitySelectedHandler favoritesSelectedHandler = event -> {			
+			presenter.entitySelected(favoritesTreeBrowser.getSelected());
 		};
 		favoritesTreeBrowser.setEntitySelectedHandler(favoritesSelectedHandler);
 		
-		EntitySelectedHandler currentContextSelectedHandler = new EntitySelectedHandler() {			
-			@Override
-			public void onSelection(EntitySelectedEvent event) {
-				presenter.entitySelected(currentContextTreeBrowser.getSelected());
-			}
+		EntitySelectedHandler currentContextSelectedHandler = event -> {			
+			presenter.entitySelected(currentContextTreeBrowser.getSelected());
 		};
 		currentContextTreeBrowser.setEntitySelectedHandler(currentContextSelectedHandler);
 	}
-	
 	
 
 	/**

@@ -24,14 +24,14 @@ public class CookieKeys {
 	 * Last Place in the app
 	 */
 	public static String LAST_PLACE = "org.sagebionetworks.synapse.place.last.place";
-	
-	/**
-	 * Current Place in the app
-	 */
-	public static String CURRENT_PLACE = "org.sagebionetworks.synapse.place.current.place";
 
 	/**
 	 * LinkedIn requestToken key
 	 */
 	public static String LINKEDIN = "org.sagebionetworks.synapse.linkedin";
+	
+	/**
+	 * Showing UTC?
+	 */
+	public static String SHOW_DATETIME_IN_UTC = "org.sagebionetworks.synapse.datetime.utc";
 }

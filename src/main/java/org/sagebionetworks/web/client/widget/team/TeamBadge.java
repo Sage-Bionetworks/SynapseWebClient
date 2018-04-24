@@ -2,60 +2,80 @@ package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandler;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresenter, HasNotificationUI {
+public class TeamBadge implements SynapseWidgetPresenter, HasNotificationUI, IsWidget {
 	
 	private TeamBadgeView view;
-	private SynapseClientAsync synapseClient;
+	TeamAsyncHandler teamAsyncHandler;
 	private Integer maxNameLength;
-	private AuthenticationController authController;
 	private String teamName;
+	private ClickHandler customClickHandler = null;
+	private SynapseJavascriptClient jsClient;
+	String publicAclPrincipalId, authenticatedAclPrincipalId;
+	public static final String PUBLIC_GROUP_NAME = "Anyone on the web";
+	public static final String AUTHENTICATED_USERS_GROUP_NAME = "All registered Synapse users";
 	
 	@Inject
-	public TeamBadge(final TeamBadgeView view, SynapseClientAsync synapseClient, AuthenticationController authController) {
+	public TeamBadge(TeamBadgeView view, 
+			TeamAsyncHandler teamAsyncHandler,
+			SynapseJavascriptClient jsClient,
+			GlobalApplicationState globalApplicationState) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		this.authController = authController;
-		view.setPresenter(this);
+		this.teamAsyncHandler = teamAsyncHandler;
+		this.jsClient = jsClient;
+		publicAclPrincipalId = globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID);
+		authenticatedAclPrincipalId = globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID);
 	}
 	
 	public void setMaxNameLength(Integer maxLength) {
 		this.maxNameLength = maxLength;
 	}
+	public void configure(String teamId, ClickHandler customClickHandler) {
+		this.customClickHandler = customClickHandler;
+		configure(teamId);
+	}
 	
-	public void configure(final String teamId) {
+	public void configure(String teamId) {
 		if (teamId != null && teamId.trim().length() > 0) {
-			view.showLoading();
-			synapseClient.getTeam(teamId, new AsyncCallback<Team>() {
-				@Override
-				public void onSuccess(Team team) {
-					configure(team);
-				}
-				@Override
-				public void onFailure(Throwable caught) {
-					if (teamName != null) {
-						view.setTeamWithoutLink(teamName, teamId);
-					} else {
-						view.showLoadError(teamId);
+			if (teamId.equals(publicAclPrincipalId)) {
+				view.setTeamWithoutLink(PUBLIC_GROUP_NAME, true);
+			} else if (teamId.equals(authenticatedAclPrincipalId)) {
+				view.setTeamWithoutLink(AUTHENTICATED_USERS_GROUP_NAME, true);
+			} else {
+				view.showLoading();
+				teamAsyncHandler.getTeam(teamId, new AsyncCallback<Team>() {
+					@Override
+					public void onSuccess(Team team) {
+						configure(team);
 					}
-				}
-			});
+					@Override
+					public void onFailure(Throwable caught) {
+						if (teamName != null) {
+							view.setTeamWithoutLink(teamName, false);
+						} else {
+							view.showLoadError(teamId);
+						}
+					}
+				});
+			};
 		}
 		
 	}
 	
 	public void configure(Team team) {
-		view.setTeam(team, maxNameLength, authController.getCurrentXsrfToken());
+		String teamIconUrl = jsClient.getTeamIconUrl(team.getId());
+		view.setTeam(team, maxNameLength, teamIconUrl, customClickHandler);
 	}
 	
 	/**
@@ -76,9 +96,21 @@ public class TeamBadge implements TeamBadgeView.Presenter, SynapseWidgetPresente
 		return view.asWidget();
 	}
 	
+	public void setVisible(boolean visible) {
+		view.setVisible(visible);
+	}
+	
 	@Override
 	public void setNotificationValue(String value) {
 		view.setRequestCount(value);
 	}
-
+	
+	public void addStyleName(String style) {
+		view.addStyleName(style);
+	}
+	
+	public void setOpenNewWindow(boolean isNewWindow) {
+		String target = isNewWindow ? "_blank" : "";
+		view.setTarget(target);
+	}
 }

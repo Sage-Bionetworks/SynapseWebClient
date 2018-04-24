@@ -92,18 +92,18 @@ public class WidgetConstants {
 	public static final String TEAM_MEMBERS_FRIENDLY_NAME ="Team Members";
 	
 	public static final String TEAM_MEMBER_COUNT_CONTENT_TYPE = "teammembercount";
+	public static final String PLOT_CONTENT_TYPE = "plot";
+	public static final String PLOT_FRIENDLY_NAME = "Plot";
 	
 	public static final String WIDGET_START_MARKDOWN = "${";
 	public static final String WIDGET_END_MARKDOWN =  "}";
 	
 	public static final String TOC_CONTENT_TYPE = "toc";
+	public static final String IS_TOC_KEY = "isTOC";
 	public static final String WIKI_SUBPAGES_CONTENT_TYPE = "wikipages";
 	
 	public static final String NO_AUTO_WIKI_SUBPAGES = "nowikipages";
 
-	//has editor, but no renderer
-	public static final String PROJECT_BACKGROUND_CONTENT_TYPE = "projectbackground";
-	
 	public static final String WIKI_FILES_PREVIEW_CONTENT_TYPE = "wikifilepreview";
 	
 	/**
@@ -112,6 +112,7 @@ public class WidgetConstants {
 	public static final String IMAGE_WIDGET_FILE_NAME_KEY = "fileName";
 	public static final String IMAGE_WIDGET_SCALE_KEY = "scale";
 	public static final String IMAGE_WIDGET_ALIGNMENT_KEY = "align";
+	public static final String IMAGE_WIDGET_ALT_TEXT_KEY = "altText";
 	public static final String IMAGE_WIDGET_SYNAPSE_ID_KEY = "synapseId";
 	public static final String IMAGE_WIDGET_RESPONSIVE_KEY = "responsive";
 	
@@ -143,6 +144,8 @@ public class WidgetConstants {
 	public static final String FLOAT_RIGHT = "Right";
 	public static final String FLOAT_CENTER = "Center";
 	
+	public static final String SUBMIT_TO_CHALLENGE = "Submit To Challenge";
+	
 	@Deprecated
 	public static final String PROV_WIDGET_ENTITY_ID_KEY = "entityId";
 	public static final String PROV_WIDGET_ENTITY_LIST_KEY = "entityList";
@@ -172,6 +175,7 @@ public class WidgetConstants {
 	public static final String USER_TEAM_BADGE_WIDGET_USERNAME_KEY = "username";
 	public static final String USER_TEAM_BADGE_WIDGET_IS_INDIVIDUAL_KEY = "isUser";
 	
+	public static final String ALIAS_KEY = "alias";
 	public static final String BIODALLIANCE13_CONTENT_TYPE = "biodalliance13";
 	public static final String BIODALLIANCE_FRIENDLY_NAME = "Genome Browser";
 	public static final String BIODALLIANCE_SPECIES_KEY = "species";
@@ -219,4 +223,16 @@ public class WidgetConstants {
 	public static final String TABLE_LIMIT_KEY = "limit";
 	public static final String TABLE_OFFSET_KEY = "offset";
 	public static final String TABLE_QUERY_KEY = "query";
+	public static final String FILL_COLUMN_NAME = "fill";
+	public static final String QUERY_VISIBLE = "showquery";
+	
+	public static final String TITLE = "title";
+	public static final String X_AXIS_TITLE = "xtitle";
+	public static final String X_AXIS_TYPE = "xaxistype";
+	public static final String Y_AXIS_TITLE = "ytitle";
+	public static final String Y_AXIS_TYPE = "yaxistype";
+	public static final String SHOW_LEGEND = "showlegend";
+	public static final String IS_HORIZONTAL = "horizontal";
+	public static final String TYPE = "type";
+	public static final String BAR_MODE = "barmode";
 }

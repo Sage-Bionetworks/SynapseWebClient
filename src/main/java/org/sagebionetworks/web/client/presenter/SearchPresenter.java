@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -34,9 +36,6 @@ import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.inject.Inject;
 
 public class SearchPresenter extends AbstractActivity implements SearchView.Presenter, Presenter<Search> {
-	
-	//private final List<String> FACETS_DEFAULT = Arrays.asList(new String[] {"node_type","disease","species","tissue","platform","num_samples","created_by","modified_by","created_on","modified_on","acl","reference"});
-	private Search place;
 	private SearchView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
@@ -61,6 +60,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.jsonObjectAdapter = jsonObjectAdapter;
 		this.synAlert = synAlert;
 		this.loadMoreWidgetContainer = loadMoreWidgetContainer;
@@ -84,11 +84,9 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 
 	@Override
 	public void setPlace(Search place) {
-		this.place = place;
 		view.setPresenter(this);
 		String queryTerm = place.getSearchTerm();
 		if (queryTerm == null) queryTerm = "";
-
 		currentSearch = checkForJson(queryTerm);
 		if (place.getStart() != null)
 			currentSearch.setStart(place.getStart());
@@ -98,6 +96,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	@Override
     public String mayStop() {
         view.clear();
+        loadMoreWidgetContainer.clear();
         return null;
     }
 
@@ -140,20 +139,39 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	}
 
 	private void executeNewSearch() {
-		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-		
-		try {
-			currentSearch.writeToJSONObject(adapter);
-		} catch (JSONObjectAdapterException e) {
-			view.showErrorMessage(DisplayConstants.ERROR_GENERIC);
-		}
-		setSearchTerm(adapter.toJSONString());
+		currentSearch.setStart(0L);
+		view.clear();
+		loadMoreWidgetContainer.clear();
+		Search searchPlace = new Search(getCurrentSearchJSON());
+		globalApplicationState.pushCurrentPlace(searchPlace);
+		executeSearch();
 	}
 
 	@Override
 	public void addTimeFacet(String facetName, String facetValue, String displayValue) {
 		timeValueToDisplay.put(createTimeValueKey(facetName, facetValue), displayValue);
+		// time facets allow a single facet value only.
+		removeFacet(facetName);
 		addFacet(facetName, facetValue);
+	}
+	
+	@Override
+	public void removeFacetAndRefresh(String facetName) {
+		removeFacet(facetName);
+		executeNewSearch();
+	}
+	
+	public void removeFacet(String facetName) {
+		List<KeyValue> bq = currentSearch.getBooleanQuery();
+		if(bq != null) {
+			List<KeyValue> newBq = new ArrayList<KeyValue>();
+			for(KeyValue kv : bq) {
+				if(!kv.getKey().equals(facetName)) {
+					newBq.add(kv);
+				}
+			}
+			currentSearch.setBooleanQuery(newBq);
+		}
 	}
 	
 	@Override
@@ -174,7 +192,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		}
 		
 		// set to first page
-		currentSearch.setStart(0L);
 		executeNewSearch();
 	}
 
@@ -197,12 +214,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	@Override
 	public List<String> getFacetDisplayOrder() {
 		return SearchQueryUtils.FACETS_DISPLAY_ORDER;
-	}
-
-	@Override
-	public void setStart(int newStart) {
-		currentSearch.setStart(new Long(newStart));
-		executeNewSearch();
 	}
 	
 	@Override
@@ -291,7 +302,9 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 				Long limit = currentSearch.getSize() == null ? 10L : currentSearch.getSize();
 				currentSearch.setStart(currentResult.getStart() + limit);
 				loadMoreWidgetContainer.add(view.getResults(currentResult, searchTerm));
-				loadMoreWidgetContainer.setIsMore(!currentResult.getHits().isEmpty());
+				List<Hit> hits = currentResult.getHits();
+				boolean isMore = limit.equals(new Long(hits.size()));
+				loadMoreWidgetContainer.setIsMore(isMore);
 			}
 			
 			@Override
@@ -301,6 +314,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 				synAlert.handleException(caught);
 			}
 		};
+		loadMoreWidgetContainer.setIsProcessing(true);
 		synapseClient.search(currentSearch, callback);
 	}
 

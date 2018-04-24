@@ -1,9 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity.act;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
+import org.sagebionetworks.repo.model.dataaccess.AccessorChange;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -17,9 +20,9 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 	UserBadgeListView view;
 	PortalGinInjector ginInjector;
 	boolean isToolbarVisible, changingSelection;
-	List<UserBadgeItem> users;	
+	List<UserBadgeItem> users;
 	Callback selectionChangedCallback;
-	
+	Set<String> userIds; 
 	@Inject
 	public UserBadgeList (
 			UserBadgeListView view, 
@@ -29,6 +32,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 		users = new ArrayList<UserBadgeItem>();
+		userIds = new HashSet<>();
 		selectionChangedCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -55,14 +59,28 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		return this;
 	}
 	
-	public void addUserBadge(String userId) {
-		UserBadgeItem item = ginInjector.getUserBadgeItem();
-		item.configure(userId);
-		item.setSelectionChangedCallback(selectionChangedCallback);
-		users.add(item);
-		view.addUserBadge(item.asWidget());
-		boolean toolbarVisible = isToolbarVisible && users.size() > 0;
-		view.setToolbarVisible(toolbarVisible);
+	public void addAccessorChange(AccessorChange change) {
+		addAccessorChange(change, false);
+	}
+	
+	public void addSubmitterAccessorChange(AccessorChange change) {
+		addAccessorChange(change, true);
+	}
+	
+	private void addAccessorChange(AccessorChange change, boolean hideSelect) {
+		if (!userIds.contains(change.getUserId())) {
+			UserBadgeItem item = ginInjector.getUserBadgeItem();
+			item.configure(change);
+			item.setSelectionChangedCallback(selectionChangedCallback);
+			users.add(item);
+			view.addUserBadge(item.asWidget());
+			boolean toolbarVisible = isToolbarVisible && users.size() > 0;
+			view.setToolbarVisible(toolbarVisible);
+			if (hideSelect) {
+				item.setSelectVisible(false);
+			}
+			userIds.add(change.getUserId());
+		}
 	}
 	
 	public void refreshListUI() {
@@ -85,6 +103,7 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		while(it.hasNext()){
 			UserBadgeItem row = it.next();
 			if(row.isSelected()){
+				userIds.remove(row.getUserId());
 				it.remove();
 			}
 		}
@@ -142,12 +161,14 @@ public class UserBadgeList implements UserBadgeListView.Presenter, IsWidget {
 		return view.asWidget();
 	}
 
-	@Override
-	public List<String> getUserIds() {
-		List<String> userIds = new ArrayList<String>();
+	public List<AccessorChange> getAccessorChanges() {
+		List<AccessorChange> accessorChanges = new ArrayList<AccessorChange>();
 		for (UserBadgeItem item : users) {
-			userIds.add(item.getUserId());
+			AccessorChange change = new AccessorChange();
+			change.setUserId(item.getUserId());
+			change.setType(item.getAccessType());
+			accessorChanges.add(change);
 		}
-		return userIds;
+		return accessorChanges;
 	}
 }

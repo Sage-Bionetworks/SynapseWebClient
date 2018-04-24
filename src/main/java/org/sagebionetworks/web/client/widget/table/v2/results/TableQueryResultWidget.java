@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.DEFAULT_LIMIT;
 import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.DEFAULT_OFFSET;
 
@@ -20,8 +21,9 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
-import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -40,7 +42,16 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	public static final String VERIFYING_ETAG_MESSAGE = "Verifying that the recent changes have propagated through the system...";
 	public static final String RUNNING_QUERY_MESSAGE = "Running query...";
 	public static final String QUERY_CANCELED = "Query canceled";
-	// Mask to get all parts of a query.
+	/**
+	 * Masks for requesting what should be included in the query bundle.
+	 */
+	public static final long BUNDLE_MASK_QUERY_RESULTS = 0x1;
+	public static final long BUNDLE_MASK_QUERY_COUNT = 0x2;
+	public static final long BUNDLE_MASK_QUERY_SELECT_COLUMNS = 0x4;
+	public static final long BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE = 0x8;
+	public static final long BUNDLE_MASK_QUERY_COLUMN_MODELS = 0x10;
+	public static final long BUNDLE_MASK_QUERY_FACETS = 0x20;
+
 	private static final Long ALL_PARTS_MASK = new Long(255);
 	SynapseClientAsync synapseClient;
 	TableQueryResultView view;
@@ -50,13 +61,16 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	QueryResultEditorWidget queryResultEditor;
 	Query startingQuery;
 	boolean isEditable;
-	boolean isView;
+	TableType tableType;
 	QueryResultsListener queryListener;
-	JobTrackingWidget progressWidget;
 	SynapseAlert synapseAlert;
 	CallbackP<FacetColumnRequest> facetChangedHandler;
+	Callback resetFacetsHandler;
 	ClientCache clientCache;
 	GWTWrapper gwt;
+	int currentJobIndex = 0;
+	QueryResultBundle cachedFullQueryResultBundle = null;
+	boolean facetsVisible = true;
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, 
 			SynapseClientAsync synapseClient, 
@@ -65,17 +79,25 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			ClientCache clientCache,
 			GWTWrapper gwt) {
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.pageViewerWidget = ginInjector.createNewTablePageWidget();
-		this.progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
 		this.synapseAlert = synapseAlert;
 		this.clientCache = clientCache;
 		this.gwt = gwt;
 		this.view.setPageWidget(this.pageViewerWidget);
 		this.view.setPresenter(this);
-		this.view.setProgressWidget(this.progressWidget);
 		this.view.setSynapseAlertWidget(synapseAlert.asWidget());
+		resetFacetsHandler = new Callback() {
+			@Override
+			public void invoke() {
+				startingQuery.setSelectedFacets(null);
+				cachedFullQueryResultBundle = null;
+				startingQuery.setOffset(0L);
+				runQuery();
+			}
+		};
 		facetChangedHandler = new CallbackP<FacetColumnRequest>() {
 			@Override
 			public void invoke(FacetColumnRequest request) {
@@ -91,6 +113,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 					}
 				}
 				selectedFacets.add(request);
+				cachedFullQueryResultBundle = null;
+				startingQuery.setOffset(0L);
 				runQuery();
 			}
 		};
@@ -103,49 +127,73 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param is table a file view?
 	 * @param listener Listener for query start and finish events.
 	 */
-	public void configure(Query query, boolean isEditable, boolean isView, QueryResultsListener listener){
+	public void configure(Query query, boolean isEditable, TableType tableType, QueryResultsListener listener){
 		this.isEditable = isEditable;
-		this.isView = isView;
+		this.tableType = tableType;
 		this.startingQuery = query;
 		this.queryListener = listener;
+		cachedFullQueryResultBundle = null;
 		runQuery();
 	}
-
+	
 	private void runQuery() {
+		currentJobIndex++;
+		runQuery(currentJobIndex);
+	}
+	
+	private void runQuery(final int jobIndex) {
 		this.view.setErrorVisible(false);
 		fireStartEvent();
-		this.view.setTableVisible(false);
+		pageViewerWidget.setTableVisible(false);
 		this.view.setProgressWidgetVisible(true);
 		String entityId = QueryBundleUtils.getTableId(this.startingQuery);
 		String viewEtag = clientCache.get(entityId + QueryResultEditorWidget.VIEW_RECENTLY_CHANGED_KEY);
 		if (viewEtag == null) {
 			// run the job
 			QueryBundleRequest qbr = new QueryBundleRequest();
-			qbr.setPartMask(ALL_PARTS_MASK);
+			long partMask = BUNDLE_MASK_QUERY_RESULTS;
+			// do not ask for query count
+			if (cachedFullQueryResultBundle == null) {
+				partMask = partMask | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS;
+				if (facetsVisible) {
+					partMask = partMask | BUNDLE_MASK_QUERY_FACETS;
+				}
+			} else {
+				// we can release the old query result
+				cachedFullQueryResultBundle.setQueryResult(null);
+			}
+			qbr.setPartMask(partMask);
 			qbr.setQuery(this.startingQuery);
 			qbr.setEntityId(entityId);
-			this.progressWidget.startAndTrackJob(RUNNING_QUERY_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
+			AsynchronousProgressWidget progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
+			this.view.setProgressWidget(progressWidget);
+			progressWidget.startAndTrackJob(RUNNING_QUERY_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
 				
 				@Override
 				public void onFailure(Throwable failure) {
-					showError(failure);
+					if (currentJobIndex == jobIndex) {
+						showError(failure);	
+					}
 				}
 				
 				@Override
 				public void onComplete(AsynchronousResponseBody response) {
-					setQueryResults((QueryResultBundle) response);
+					if (currentJobIndex == jobIndex) {
+						setQueryResults((QueryResultBundle) response);
+					}
 				}
 				
 				@Override
 				public void onCancel() {
-					showError(QUERY_CANCELED);
+					if (currentJobIndex == jobIndex) {
+						showError(QUERY_CANCELED);
+					}
 				}
 			});
 		} else {
 			verifyOldEtagIsNotInView(entityId, viewEtag);
 		}
 	}
-	
 	/**
 	 * Look for the given etag in the given file view.  If it is still there, wait a few seconds and try again.  
 	 * If the etag is not in the view, then remove the clientCache key and run the query (since this indicates that the user change was propagated to the replicated layer)
@@ -157,13 +205,15 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		QueryBundleRequest qbr = new QueryBundleRequest();
 		qbr.setPartMask(ALL_PARTS_MASK);
 		Query query = new Query();
-		query.setSql("select etag from " + fileViewEntityId + " where etag='"+oldEtag+"'");
+		query.setSql("select * from " + fileViewEntityId + " where ROW_ETAG='"+oldEtag+"'");
 		query.setOffset(DEFAULT_OFFSET);
 		query.setLimit(DEFAULT_LIMIT);
 		query.setIsConsistent(true);
 		qbr.setQuery(query);
 		qbr.setEntityId(fileViewEntityId);
-		this.progressWidget.startAndTrackJob(VERIFYING_ETAG_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
+		AsynchronousProgressWidget progressWidget = ginInjector.creatNewAsynchronousProgressWidget();
+		this.view.setProgressWidget(progressWidget);
+		progressWidget.startAndTrackJob(VERIFYING_ETAG_MESSAGE, false, AsynchType.TableQuery, qbr, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				showError(failure);
@@ -198,6 +248,14 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param bundle
 	 */
 	private void setQueryResults(final QueryResultBundle bundle){
+		if (cachedFullQueryResultBundle != null) {
+			bundle.setColumnModels(cachedFullQueryResultBundle.getColumnModels());
+			bundle.setFacets(cachedFullQueryResultBundle.getFacets());
+			bundle.setSelectColumns(cachedFullQueryResultBundle.getSelectColumns());
+		} else {
+			cachedFullQueryResultBundle = bundle;
+		}
+		
 		// Get the sort info
 		this.synapseClient.getSortFromTableQuery(this.startingQuery.getSql(), new AsyncCallback<List<SortItem>>() {
 			
@@ -219,8 +277,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		this.view.setErrorVisible(false);
 		this.view.setProgressWidgetVisible(false);
 		// configure the page widget
-		this.pageViewerWidget.configure(bundle, this.startingQuery, sortItems, false, isView, null, this, facetChangedHandler);
-		this.view.setTableVisible(true);
+		this.pageViewerWidget.configure(bundle, this.startingQuery, sortItems, false, tableType, null, this, facetChangedHandler, resetFacetsHandler);
+		pageViewerWidget.setTableVisible(true);
 		fireFinishEvent(true, isQueryResultEditable());
 	}
 
@@ -280,7 +338,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	}
 	
 	private void setupErrorState() {
-		this.view.setTableVisible(false);
+		pageViewerWidget.setTableVisible(false);
 		this.view.setProgressWidgetVisible(false);
 		fireFinishEvent(false, false);
 		this.view.setErrorVisible(true);
@@ -297,9 +355,10 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			this.queryResultEditor = ginInjector.createNewQueryResultEditorWidget();
 			view.setEditorWidget(this.queryResultEditor);
 		}
-		this.queryResultEditor.showEditor(bundle, isView, new Callback() {
+		this.queryResultEditor.showEditor(bundle, tableType, new Callback() {
 			@Override
 			public void invoke() {
+				cachedFullQueryResultBundle = null;
 				runQuery();
 			}
 		});
@@ -321,6 +380,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 		if(this.queryListener != null){
 			this.queryListener.onStartingNewQuery(this.startingQuery);
 		}
+		view.scrollTableIntoView();
 		runQuery();
 	}
 	
@@ -344,6 +404,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	}
 	
 	public void setFacetsVisible(boolean visible) {
+		facetsVisible = visible;
 		pageViewerWidget.setFacetsVisible(visible);
 	}
 	

@@ -11,12 +11,7 @@
 			<t:Table width="100%">
 				<t:TableRow>
 					<t:TableData>
-						<g:FocusPanel ui:field="showThread" addStyleNames="imageButton">
-							<bh:Div>
-								<b:Icon ui:field="pinnedIcon" type="THUMB_TACK" size="LARGE" addStyleNames="margin-right-10 lightGreyText moveup-2" visible="false"/>
-								<bh:Span ui:field="threadTitle" addStyleNames="lead margin-right-10"></bh:Span>
-							</bh:Div>
-						</g:FocusPanel>
+						<b:Anchor ui:field="threadLink" iconFixedWidth="true" iconSize="LARGE" addStyleNames="lead margin-right-10 textDecorationNone"/>
 					</t:TableData>
 					<t:TableData width="60px" addStyleNames="visible-lg">
 						<bh:Span ui:field="threadAuthor"></bh:Span>

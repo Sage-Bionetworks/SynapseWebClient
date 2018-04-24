@@ -39,4 +39,8 @@ public class ValidationUtils {
 		MatchResult matchResult = regEx.exec(url);
 		return (matchResult != null && url.equals(matchResult.getGroup(0))); 
 	}
+	
+	public static boolean isTrue(Boolean b) {
+		return b != null && b.booleanValue();
+	}
 }

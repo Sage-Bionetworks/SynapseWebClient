@@ -19,10 +19,14 @@ public interface ScopeWidgetView extends IsWidget {
 	void hideModal();
 	void setEditButtonVisible(boolean visible);
 	void setLoading(boolean loading);
+	void setFileViewTypeSelectionVisible(boolean visible);
+	void setIsIncludeTables(boolean value);
 	
 	public interface Presenter {
 		void onSave();
 		void onEdit();
+		void onSelectFilesOnlyView();
+		void onSelectFilesAndTablesView();
 	}
 	void setPresenter(Presenter presenter);
 }

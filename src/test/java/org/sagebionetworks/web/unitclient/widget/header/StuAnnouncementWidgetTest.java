@@ -1,18 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.header;
-
-import static junit.framework.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
-import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -21,6 +10,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionFilter;
@@ -67,6 +57,8 @@ public class StuAnnouncementWidgetTest {
 	String stuAnnouncementsProjectId = "syn0001";
 	@Mock
 	DiscussionThreadBundle mockDiscussionThreadBundle;
+	@Captor
+	ArgumentCaptor<String> stringCaptor;
 	
 	@Before
 	public void setup(){
@@ -162,7 +154,8 @@ public class StuAnnouncementWidgetTest {
 				anyLong(), any(DiscussionThreadOrder.class), anyBoolean(),
 				any(DiscussionFilter.class), any(AsyncCallback.class));
 		verify(mockView, never()).show(anyString());
-		verify(mockSynapseJSNIUtils).consoleError(errorMessage);
+		verify(mockSynapseJSNIUtils).consoleError(stringCaptor.capture());
+		assertTrue(stringCaptor.getValue().contains(errorMessage));
 	}
 	
 	@Test

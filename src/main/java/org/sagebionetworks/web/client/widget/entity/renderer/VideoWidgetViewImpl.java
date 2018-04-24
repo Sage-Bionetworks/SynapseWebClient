@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -13,7 +12,6 @@ import com.google.inject.Inject;
 
 public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
 
-	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
 	
 	@Inject
@@ -22,7 +20,7 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
 	}
 
 	@Override
-	public void configure(String mp4SynapseId, String oggSynapseId, String webmSynapseId, String width, String height, String xsrfToken) {
+	public void configure(String mp4SynapseId, String oggSynapseId, String webmSynapseId, String width, String height) {
 		this.clear();
 		
 		StringBuilder builder = new StringBuilder();
@@ -40,19 +38,19 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
 		builder.append("\" controls>");
 		if (mp4SynapseId != null) {
 			builder.append("<source src=\"");
-			builder.append(DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), mp4SynapseId, null, false, xsrfToken));
+			builder.append(DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), mp4SynapseId, null, false));
 			builder.append("\" type=\"video/mp4\">");
 		}
 		
 		if (oggSynapseId != null) {
 			builder.append("<source src=\"");
-			builder.append(DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), oggSynapseId, null, false, xsrfToken));
+			builder.append(DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), oggSynapseId, null, false));
 			builder.append("\" type=\"video/ogg\">");
 		}
 		
 		if (webmSynapseId != null) {
 			builder.append("<source src=\"");
-			builder.append(DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), webmSynapseId, null, false, xsrfToken));
+			builder.append(DisplayUtils.createFileEntityUrl(synapseJsniUtils.getBaseFileHandleUrl(), webmSynapseId, null, false));
 			builder.append("\" type=\"video/webm\">");
 		}
 		
@@ -60,6 +58,18 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
 		builder.append("Your browser does not support the video tag. </video>");
 		
 		add(new HTML(builder.toString()));
+	}
+	@Override
+	public void configure(String iframeTargetUrl) {
+		clear();
+		
+		StringBuilder sb = new StringBuilder();
+		sb.append("<iframe width=\"560\" height=\"315\" frameborder=\"0\" allowfullscreen=\"true\" src=\"");
+		sb.append(SafeHtmlUtils.htmlEscape(iframeTargetUrl));
+		
+		sb.append("\" />");
+		add(new HTML(sb.toString()));
+		
 	}
 
 	public void showError(String error) {
@@ -71,15 +81,4 @@ public class VideoWidgetViewImpl extends FlowPanel implements VideoWidgetView {
 	public Widget asWidget() {
 		return this;
 	}	
-
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
-
-
-	/*
-	 * Private Methods
-	 */
-
 }

@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.FormLabel;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Input;
 import org.gwtbootstrap3.client.ui.NavTabs;
 import org.gwtbootstrap3.client.ui.Progress;
@@ -20,11 +21,14 @@ import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.ColumnSize;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.InputType;
 import org.gwtbootstrap3.client.ui.constants.ProgressBarType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EventHandlerUtils;
@@ -101,7 +105,7 @@ public class UploaderViewImpl extends FlowPanel implements
 
 	// external link panel
 	
-	private HTML spinningProgressContainer;
+	private Div spinningProgressContainer;
 	private Input fileUploadInput;
 	private Heading fileUploadLabel = new Heading(HeadingSize.H5);
 	private Italic uploadSpeedLabel = new Italic();
@@ -111,15 +115,20 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	private HandlerRegistration messageHandler;
 	FormGroup externalNameFormGroup;
+	AwsLoginView awsLoginView;
+	TabListItem externalTab;
+	
 	@Inject
 	public UploaderViewImpl(SynapseJSNIUtils synapseJSNIUtils, 
 			SageImageBundle sageImageBundle,
 			SharingAndDataUseConditionWidget sharingDataUseWidget,
-			PortalGinInjector ginInjector) {
+			PortalGinInjector ginInjector,
+			AwsLoginView awsLoginView) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.sageImageBundle = sageImageBundle;
 		this.sharingDataUseWidget = sharingDataUseWidget;
 		this.ginInjector = ginInjector;
+		this.awsLoginView = awsLoginView;
 		
 		this.progressContainer = new Progress();
 		progressContainer.setMarginTop(10);
@@ -128,13 +137,13 @@ public class UploaderViewImpl extends FlowPanel implements
 		progressContainer.add(progressBar);
 		uploadSpeedLabel.addStyleName("margin-left-5");
 		progressContainer.add(uploadSpeedLabel);
-		
+		this.addStyleName("uploader");
 		this.formPanel = new FormPanel();
 		this.externalLinkFormPanel = new Form();
 		
-		spinningProgressContainer = new HTML();
+		spinningProgressContainer = new Div();
 		
-		chooseFileBtn = new Button("Choose File");
+		chooseFileBtn = new Button("Browse...");
 		chooseFileBtn.setType(ButtonType.INFO);
 		chooseFileBtn.setSize(ButtonSize.LARGE);		
 		uploadBtn = new Button();
@@ -142,7 +151,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		uploadBtn.setPull(Pull.RIGHT);
 		
 		cancelBtn = new Button(DisplayConstants.BUTTON_CANCEL);
-		cancelBtn.setType(ButtonType.DEFAULT);
+		cancelBtn.setType(ButtonType.LINK);
 		cancelBtn.setPull(Pull.RIGHT);
 		cancelBtn.setMarginRight(5);
 
@@ -170,6 +179,9 @@ public class UploaderViewImpl extends FlowPanel implements
 					formFieldsPanel.setVisible(false);
 					fileUploadLabel.setVisible(false);
 					uploadBtn.setEnabled(false);
+					//SWC-1730: disable clicking on external tab
+					externalTab.setEnabled(false);
+					
 					initializeProgress();
 					presenter.handleUploads();	
 				}
@@ -236,6 +248,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		fileUploadInput.setValue(null);
 		fileUploadLabel.setText("");
 		uploadSpeedLabel.setHTML("");
+		awsLoginView.clear();
 	}
 	
 	@Override
@@ -282,7 +295,7 @@ public class UploaderViewImpl extends FlowPanel implements
 
 	@Override
 	public void showLoading() {
-		spinningProgressContainer = new HTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_INITIALIZING));
+		spinningProgressContainer.add(DisplayUtils.getLoadingWidget(DisplayConstants.LABEL_INITIALIZING));
 		spinningProgressContainer.addStyleName("margin-top-10");
 	}
 
@@ -309,6 +322,11 @@ public class UploaderViewImpl extends FlowPanel implements
 			externalPassword.setVisible(false);
 			externalPassword.getElement().setAttribute("placeholder", "Password");
 		}
+		awsLoginView.clear();
+		awsLoginView.setVisible(false);
+
+		//SWC-1730: enable clicking on external tab
+		externalTab.setEnabled(true);
 	}
 	
 	@Override
@@ -344,7 +362,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		resetProgress();
 		progressContainer.setVisible(false);
 		uploadSpeedLabel.setHTML("");
-		spinningProgressContainer.setHTML("");
+		spinningProgressContainer.clear();
 		spinningProgressContainer.setVisible(false);
 	}
 	private void resetProgress() {
@@ -358,7 +376,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		initMessageHandler();
 		showSpinningProgress();
 		formPanel.setAction(actionUrl);
-		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_UPLOADING));
+		spinningProgressContainer.add(DisplayUtils.getLoadingWidget(DisplayConstants.LABEL_UPLOADING));
 		formPanel.submit();	
 	}
 	
@@ -417,6 +435,7 @@ public class UploaderViewImpl extends FlowPanel implements
 					configureUploadButtonForExternal();
 				}
 			});
+			externalTab = tab;
 			
 			container.add(tabs);
 			container.add(tabContent);
@@ -462,7 +481,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	private void initializeProgress() {
 		showSpinningProgress();
-		spinningProgressContainer.setHTML(DisplayUtils.getLoadingHtml(sageImageBundle, DisplayConstants.LABEL_INITIALIZING));
+		spinningProgressContainer.add(DisplayUtils.getLoadingWidget(DisplayConstants.LABEL_INITIALIZING));
 	}
 	
 	@Override
@@ -484,6 +503,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		formPanel.setEncoding(FormPanel.ENCODING_MULTIPART);
 		formPanel.setMethod(FormPanel.METHOD_POST);
 		FlowPanel fileInputPanel = new FlowPanel();
+		fileInputPanel.addStyleName("uploadContainer center");
 		fileUploadInput = new Input(InputType.FILE);
 		fileUploadInput.setId(FILE_FIELD_ID);
 		fileUploadInput.setName("uploads[]");
@@ -492,7 +512,6 @@ public class UploaderViewImpl extends FlowPanel implements
 		fileUploadInput.addValueChangeHandler(new ValueChangeHandler<String>() {
 			@Override
 			public void onValueChange(ValueChangeEvent<String> event) {
-				fileUploadLabel.setText(presenter.getSelectedFilesText());
 				uploadBtn.click();
 			}
 		});
@@ -504,6 +523,13 @@ public class UploaderViewImpl extends FlowPanel implements
 			}
 		});
 		fileInputPanel.add(fileUploadInput);
+		Span icon = new Span();
+		icon.add(new Icon(IconType.CLOUD_UPLOAD));
+		icon.addStyleName("margin-right-5 font-size-30 lightGreyText movedown-6");
+		fileInputPanel.add(icon);
+		Span dropText = new Span("Drop files to upload, or");
+		dropText.addStyleName("margin-right-5 font-size-20 movedown-2");
+		fileInputPanel.add(dropText);
 		fileInputPanel.add(chooseFileBtn);
 		fileInputPanel.add(fileUploadLabel);
 		enableMultipleFileUploads(true);
@@ -517,10 +543,13 @@ public class UploaderViewImpl extends FlowPanel implements
 		externalPassword.setStyleName("form-control margin-bottom-5");
 		externalUsername.setVisible(false);
 		externalPassword.setVisible(false);
+		awsLoginView.setVisible(false);
 		
 		formFieldsPanel.add(externalUsername);
 		formFieldsPanel.add(externalPassword);
+		formFieldsPanel.add(awsLoginView);
 		formFieldsPanel.add(fileInputPanel);
+		
 		configureUploadButton(); // upload tab first by default
 		
 		formPanel.setWidget(formFieldsPanel);
@@ -536,6 +565,27 @@ public class UploaderViewImpl extends FlowPanel implements
 		uploadPanel.add(row);
 	}
 
+	@Override
+	public void showUploadingToS3DirectStorage(String endpoint, String banner) {
+		awsLoginView.clear();
+		uploadDestinationContainer.clear();
+		String escapedEndpoint = SafeHtmlUtils.htmlEscape(endpoint);
+		awsLoginView.setEndpoint(escapedEndpoint);
+		if (banner != null)
+			uploadDestinationContainer.add(new HTML(SafeHtmlUtils.htmlEscape(banner)));
+		awsLoginView.setVisible(true);
+	}
+	
+	@Override
+	public String getS3DirectAccessKey() {
+		return awsLoginView.getAccessKey();
+	}
+	
+	@Override
+	public String getS3DirectSecretKey() {
+		return awsLoginView.getSecretKey();
+	}
+	
 	@Override
 	public void showUploadingToExternalStorage(String host, String banner) {
 		uploadDestinationContainer.clear();
@@ -612,4 +662,13 @@ public class UploaderViewImpl extends FlowPanel implements
 		externalNameFormGroup.setVisible(visible);
 	}
 
+	@Override
+	public void setExternalUrl(String url) {
+		pathField.setValue(url);
+	}
+	
+	@Override
+	public void setSelectedFilenames(String fileNames) {
+		fileUploadLabel.setText(fileNames);
+	}
 }

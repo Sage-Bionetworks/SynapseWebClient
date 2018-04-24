@@ -1,51 +1,105 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
+import java.util.List;
+
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityType;
-import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.VersionInfo;
+import org.sagebionetworks.repo.model.file.ExternalFileHandle;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
+import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.shared.PaginatedResults;
 
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPresenter {
+public class FileTitleBar implements SynapseWidgetPresenter {
 	
 	private FileTitleBarView view;
-	private AuthenticationController authenticationController;
-	private EntityUpdatedHandler entityUpdatedHandler;
 	private EntityBundle entityBundle;
 	private GlobalApplicationState globalAppState;
 	private FileDownloadButton fileDownloadButton;
+	private SynapseClientAsync synapseClient;
+	
 	@Inject
 	public FileTitleBar(FileTitleBarView view, 
-			AuthenticationController authenticationController,
 			GlobalApplicationState globalAppState,
-			FileDownloadButton fileDownloadButton) {
+			FileDownloadButton fileDownloadButton,
+			SynapseClientAsync synapseClient) {
 		this.view = view;
-		this.authenticationController = authenticationController;
 		this.globalAppState = globalAppState;
 		this.fileDownloadButton = fileDownloadButton;
-		view.setPresenter(this);
+		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		view.setFileDownloadButton(fileDownloadButton.asWidget());
 	}	
 	
 	public void configure(EntityBundle bundle) {
-		view.setPresenter(this);
 		this.entityBundle = bundle;
-
-		// Get EntityType
-		EntityType entityType = EntityTypeUtils.getEntityTypeForClass(bundle.getEntity().getClass());
-		view.createTitlebar(bundle, entityType, authenticationController);
+		
+		view.setVersionUIVisible(false);
+		view.setExternalUrlUIVisible(false);
+		view.setExternalObjectStoreUIVisible(false);
+		view.setFileSize("");
+		
+		view.createTitlebar(bundle.getEntity());
 		fileDownloadButton.configure(bundle);
+		
+		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
+		boolean isFilenamePanelVisible = fileHandle != null;
+		view.setFilenameContainerVisible(isFilenamePanelVisible);
+		view.setEntityName(bundle.getEntity().getName());
+		view.setVersion(((FileEntity)entityBundle.getEntity()).getVersionNumber());
+		getLatestVersion();
+		if (isFilenamePanelVisible) {
+			if (fileHandle.getContentMd5() != null) {
+				view.setMd5(fileHandle.getContentMd5());
+			}
+			if (fileHandle.getContentSize() != null) {
+				view.setFileSize("| "+DisplayUtils.getFriendlySize(fileHandle.getContentSize().doubleValue(), true));
+			}
+			view.setFilename(entityBundle.getFileName());
+			//don't ask for the size if it's external, just display that this is external data
+			if (fileHandle instanceof ExternalFileHandle) {
+				configureExternalFile((ExternalFileHandle)fileHandle);
+			} else if (fileHandle instanceof S3FileHandleInterface){
+				configureS3File((S3FileHandleInterface)fileHandle);
+			} else if (fileHandle instanceof ExternalObjectStoreFileHandle) {
+				configureExternalObjectStore((ExternalObjectStoreFileHandle)fileHandle);
+			}
+		}
 	}
+	
+	public void getLatestVersion() {
+		// determine if we should show report the version (only shows if we're looking at an older version of the file).
+		synapseClient.getEntityVersions(entityBundle.getEntity().getId(), 0, 1,
+			new AsyncCallback<PaginatedResults<VersionInfo>>() {
+				@Override
+				public void onSuccess(PaginatedResults<VersionInfo> result) {
+					List<VersionInfo> versions =  result.getResults();
+					if (!versions.isEmpty()) {
+						Long currentVersionNumber = versions.get(0).getVersionNumber();
+						Long viewingVersionNumber = ((FileEntity)entityBundle.getEntity()).getVersionNumber();
+						view.setVersionUIVisible(!currentVersionNumber.equals(viewingVersionNumber));
+					}
+				}
+
+				@Override
+				public void onFailure(Throwable caught) {
+					view.showErrorMessage(caught.getMessage());
+				}
+			});
+	}
+	
 	
 	/**
 	 * For unit testing. call asWidget with the new Entity for the view to be in sync.
@@ -58,7 +112,6 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 	public void clearState() {
 		view.clear();
 		// remove handlers
-		entityUpdatedHandler = null;		
 		this.entityBundle = null;		
 	}
 
@@ -70,51 +123,39 @@ public class FileTitleBar implements FileTitleBarView.Presenter, SynapseWidgetPr
 		return view.asWidget();
 	}
     
-	@Override
-	public void fireEntityUpdatedEvent(EntityUpdatedEvent event) {
-		if (entityUpdatedHandler != null)
-			entityUpdatedHandler.onPersistSuccess(event);
-	}
-	
 	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		this.entityUpdatedHandler = handler;
 		fileDownloadButton.setEntityUpdatedHandler(handler);
 	}
 
-	@Override
-	public boolean isUserLoggedIn() {
-		return authenticationController.isLoggedIn();
-	}
-
-	
 	public static boolean isDataPossiblyWithin(FileEntity fileEntity) {
 		String dataFileHandleId = fileEntity.getDataFileHandleId();
 		return (dataFileHandleId != null && dataFileHandleId.length() > 0);
 	}
-
-	@Override
-	public void setS3Description() {
-		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
-		if (fileHandle instanceof S3FileHandleInterface){
-			S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
-			Long synapseStorageLocationId = Long.valueOf(globalAppState.getSynapseProperty("org.sagebionetworks.portal.synapse_storage_id"));
-			// Uploads to Synapse Storage often do not get their storage location field back-filled,
-			// so null also indicates a Synapse-Stored file
-			if (s3FileHandle.getStorageLocationId() == null || 
-					synapseStorageLocationId.equals(s3FileHandle.getStorageLocationId())) {
-				view.setFileLocation("| Synapse Storage");				
-			} else {
-				String description = "| s3://" + s3FileHandle.getBucketName() + "/";
-				if (s3FileHandle.getKey() != null) {
-					description += s3FileHandle.getKey();
-				};
-				view.setFileLocation(description);
-			}
-		}
+	public void configureExternalFile(ExternalFileHandle externalFileHandle) {
+		view.setExternalUrlUIVisible(true);
+		view.setExternalUrl(externalFileHandle.getExternalURL());
+		view.setFileLocation("| External Storage");
 	}
 
-
-	/*
-	 * Private Methods
-	 */
+	public void configureS3File(S3FileHandleInterface s3FileHandle) {
+		Long synapseStorageLocationId = Long.valueOf(globalAppState.getSynapseProperty("org.sagebionetworks.portal.synapse_storage_id"));
+		// Uploads to Synapse Storage often do not get their storage location field back-filled,
+		// so null also indicates a Synapse-Stored file
+		if (s3FileHandle.getStorageLocationId() == null || 
+				synapseStorageLocationId.equals(s3FileHandle.getStorageLocationId())) {
+			view.setFileLocation("| Synapse Storage");				
+		} else {
+			String description = "| s3://" + s3FileHandle.getBucketName() + "/";
+			if (s3FileHandle.getKey() != null) {
+				description += s3FileHandle.getKey();
+			};
+			view.setFileLocation(description);
+		}
+	}
+	
+	public void configureExternalObjectStore(ExternalObjectStoreFileHandle externalFileHandle) {
+		view.setExternalObjectStoreUIVisible(true);
+		view.setExternalObjectStoreInfo(externalFileHandle.getEndpointUrl(), externalFileHandle.getBucket(), externalFileHandle.getFileKey());
+		view.setFileLocation("| External Object Store");
+	}
 }

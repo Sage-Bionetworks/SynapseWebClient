@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryExecutionListener;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryInputListener;
 
@@ -24,9 +27,11 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	String startQuery;
 	
 	@Inject
-	public QueryInputWidget(QueryInputView view, SynapseClientAsync synapseClient){
+	public QueryInputWidget(QueryInputView view, 
+			SynapseClientAsync synapseClient){
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.view.setPresenter(this);
 	}
 
@@ -147,5 +152,18 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	
 	public void setShowQueryVisible(boolean visible) {
 		view.setShowQueryVisible(visible);
+	}
+	
+	public void setDownloadFilesVisible(boolean visible) {
+		view.setDownloadFilesVisible(visible);
+	}
+
+	@Override
+	public void onDownloadFiles() {
+		queryInputListener.onShowDownloadFiles();
+	}
+	
+	public void setVisible(boolean visible) {
+		view.asWidget().setVisible(visible);
 	}
 }

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -10,6 +12,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
@@ -32,6 +35,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 	DiscussionForumClientAsync discussionForumClientAsync;
 	SynapseJSNIUtils jsniUtils;
 	SynapseAlert synAlert;
+	SynapseJavascriptClient jsClient;
 	private Long offset;
 	private DiscussionThreadOrder order;
 	private Boolean ascending;
@@ -52,14 +56,17 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 			DiscussionForumClientAsync discussionForumClientAsync,
 			SynapseAlert synAlert,
 			LoadMoreWidgetContainer loadMoreWidgetContainer,
-			SynapseJSNIUtils jsniUtils
+			SynapseJSNIUtils jsniUtils,
+			SynapseJavascriptClient jsClient
 			) {
 		this.view = view;
 		this.ginInjector = ginInjector;
 		this.discussionForumClientAsync = discussionForumClientAsync;
+		fixServiceEntryPoint(discussionForumClientAsync);
 		this.synAlert = synAlert;
 		this.threadsContainer = loadMoreWidgetContainer;
 		this.jsniUtils = jsniUtils;
+		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		order = DEFAULT_ORDER;
@@ -187,7 +194,7 @@ public class DiscussionThreadListWidget implements DiscussionThreadListWidgetVie
 		if (threadId2Widget.containsKey(threadId)) {
 			//update thread data and scroll into view
 			final DiscussionThreadListItemWidget threadListItemWidget = threadId2Widget.get(threadId);
-			discussionForumClientAsync.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>() {
+			jsClient.getThread(threadId, new AsyncCallback<DiscussionThreadBundle>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					// unable to update thread data

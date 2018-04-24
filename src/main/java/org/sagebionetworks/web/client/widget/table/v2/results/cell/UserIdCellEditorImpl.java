@@ -2,7 +2,7 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -31,15 +31,15 @@ public class UserIdCellEditorImpl implements UserIdCellEditor{
 		view.setSynapseSuggestBoxWidget(peopleSuggestWidget.asWidget());
 		peopleSuggestWidget.setPlaceholderText("Enter ID or name...");
 		peopleSuggestWidget.setSuggestionProvider(provider);
-		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<SynapseSuggestion>() {
+		peopleSuggestWidget.addItemSelectedHandler(new CallbackP<UserGroupSuggestion>() {
 			@Override
-			public void invoke(SynapseSuggestion suggestion) {
+			public void invoke(UserGroupSuggestion suggestion) {
 				onUserSelected(suggestion);
 			}
 		});
 	}
 	
-	public void onUserSelected(SynapseSuggestion suggestion) {
+	public void onUserSelected(UserGroupSuggestion suggestion) {
 		setValue(suggestion.getId());
 	}
 	

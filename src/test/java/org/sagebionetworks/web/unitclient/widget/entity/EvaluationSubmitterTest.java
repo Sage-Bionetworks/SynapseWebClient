@@ -15,7 +15,8 @@ import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter.*;
+import static org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter.NO_COMMITS_SELECTED_MSG;
+import static org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter.ZERO_COMMITS_ERROR;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -31,7 +32,6 @@ import org.sagebionetworks.evaluation.model.MemberSubmissionEligibility;
 import org.sagebionetworks.evaluation.model.Submission;
 import org.sagebionetworks.evaluation.model.SubmissionEligibility;
 import org.sagebionetworks.evaluation.model.TeamSubmissionEligibility;
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
@@ -50,13 +50,13 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.docker.DockerCommitListWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitterView;
-import org.sagebionetworks.web.shared.AccessRequirementsTransport;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
@@ -76,8 +76,6 @@ public class EvaluationSubmitterTest {
 	@Mock
 	AuthenticationController mockAuthenticationController;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
 	ChallengeClientAsync mockChallengeClient;
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
@@ -93,11 +91,12 @@ public class EvaluationSubmitterTest {
 	DockerCommitListWidget mockDockerCommitListWidget;
 	@Mock
 	DockerCommit mockCommit;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	JSONObjectAdapter jSONObjectAdapter = new JSONObjectAdapterImpl();
 	FileEntity entity;
 	EntityBundle bundle;
 	PaginatedResults<TermsOfUseAccessRequirement> requirements;
-	AccessRequirementsTransport art;
 	Submission returnSubmission;
 	Evaluation e1;
 	TeamSubmissionEligibility testTeamSubmissionEligibility;
@@ -110,7 +109,7 @@ public class EvaluationSubmitterTest {
 	public void setup() throws RestServiceException, JSONObjectAdapterException{	
 		MockitoAnnotations.initMocks(this);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
-		submitter = new EvaluationSubmitter(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockChallengeClient, mockGWTWrapper, mockInjector, mockDockerCommitListWidget);
+		submitter = new EvaluationSubmitter(mockView, mockSynapseJavascriptClient, mockGlobalApplicationState, mockAuthenticationController, mockChallengeClient, mockGWTWrapper, mockInjector, mockDockerCommitListWidget);
 		verify(mockView).setChallengesSynAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setTeamSelectSynAlertWidget(mockSynAlert.asWidget());
 		verify(mockView).setContributorsSynAlertWidget(mockSynAlert.asWidget());
@@ -149,7 +148,7 @@ public class EvaluationSubmitterTest {
 		bundle = new EntityBundle();
 		bundle.setEntity(entity);
 		
-		AsyncMockStubber.callSuccessWith(entity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entity).when(mockSynapseJavascriptClient).getEntity(anyString(), any(AsyncCallback.class));
 
 		requirements = new PaginatedResults<TermsOfUseAccessRequirement>();
 		requirements.setTotalNumberOfResults(0);
@@ -179,6 +178,7 @@ public class EvaluationSubmitterTest {
 	public void testSubmitToEvaluation() throws RestServiceException, JSONObjectAdapterException{
 		requirements.setTotalNumberOfResults(0);
 		submitter.configure(entity, null);
+		verify(mockView).resetSubmitButton();
 		submitter.onNextClicked(null, null, e1);
 		//should invoke submission directly without terms of use
 		verify(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), eq(HOST_PAGE_URL), any(AsyncCallback.class));
@@ -221,7 +221,6 @@ public class EvaluationSubmitterTest {
 		reset(mockView);
 		
 		AsyncMockStubber.callFailureWith(new Exception("unhandled exception")).when(mockChallengeClient).createIndividualSubmission(any(Submission.class), anyString(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(art).when(mockSynapseClient).getUnmetAccessRequirements(anyString(), any(ACCESS_TYPE.class), any(AsyncCallback.class));
 
 		submitter.onNextClicked(null, null, e1);
 		//Should invoke once directly without terms of use
@@ -315,13 +314,17 @@ public class EvaluationSubmitterTest {
 		verify(mockView).hideModal1();
 		verify(mockView).showModal2();
 		
-		//individual submission is selected by default
-		assertTrue(submitter.getIsIndividualSubmission());
-		verify(mockView).setIsIndividualSubmissionActive(true);
-		verify(mockView, never()).showTeamsUI(anyList());
-		submitter.onTeamSubmissionOptionClicked();
-		verify(mockView).showTeamsUI(eq(submissionTeams));
+		//team submission is selected by default if there's a registered team
 		assertFalse(submitter.getIsIndividualSubmission());
+		verify(mockView).setTeamSubmissionActive();
+		verify(mockView).showTeamsUI(anyList());
+		
+		submitter.onIndividualSubmissionOptionClicked();
+		verify(mockView).showTeamsUI(eq(submissionTeams));
+		assertTrue(submitter.getIsIndividualSubmission());
+		
+		submitter.onTeamSubmissionOptionClicked();
+		verify(mockView, times(2)).showTeamsUI(eq(submissionTeams));
 		
 		//try selecting invalid indexes
 		submitter.onTeamSelected(-1);
@@ -346,6 +349,7 @@ public class EvaluationSubmitterTest {
 		submitter.getContributorList(new Evaluation(), new Team());
 
 		submitter.onDoneClicked();
+		verify(mockView).setSubmitButtonLoading();
 		verify(mockChallengeClient).createTeamSubmission(any(Submission.class), anyString(), anyString(), eq(HOST_PAGE_URL), any(AsyncCallback.class));
 	}
 	
@@ -480,6 +484,7 @@ public class EvaluationSubmitterTest {
 		// contributorSynAlert.clear();
 		verify(mockSynAlert, times(4)).clear();
 		verify(mockView).resetNextButton();
+		verify(mockView).resetSubmitButton();
 		verify(mockView).setContributorsLoading(false);
 		ArgumentCaptor<Callback> emptyCallbackCaptor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockDockerCommitListWidget).setEmptyListCallback(emptyCallbackCaptor.capture());
@@ -523,6 +528,7 @@ public class EvaluationSubmitterTest {
 
 		ArgumentCaptor<Submission> captor = ArgumentCaptor.forClass(Submission.class);
 		submitter.onDoneClicked();
+		verify(mockView).setSubmitButtonLoading();
 		verify(mockChallengeClient).createTeamSubmission(captor.capture(), anyString(), anyString(), eq(HOST_PAGE_URL), any(AsyncCallback.class));
 		assertNotNull(captor.getValue().getDockerDigest());
 	}

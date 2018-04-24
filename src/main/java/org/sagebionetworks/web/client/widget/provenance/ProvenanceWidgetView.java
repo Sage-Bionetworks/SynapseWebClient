@@ -28,12 +28,6 @@ public interface ProvenanceWidgetView extends IsWidget, SynapseView {
 	 */
 	public interface Presenter {
 		
-		/**
-		 * Asks the presenter to load info on the passed id
-		 * @param nodeId
-		 */
-		void getInfo(String nodeId, AsyncCallback<KeyValueDisplay<String>> callback);
-
 		void expand(ExpandGraphNode node);
 
 		void findOldVersions();
@@ -44,8 +38,6 @@ public interface ProvenanceWidgetView extends IsWidget, SynapseView {
 
 	public void setHeight(int height);
 	
-	public void setBlockCloseFullscreen(boolean blockClose);
-
 	public void markOldVersions(List<String> notCurrentNodeIds);
 	
 }

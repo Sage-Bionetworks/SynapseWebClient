@@ -4,8 +4,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.widget.footer.Footer;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -20,11 +19,6 @@ import com.google.inject.Inject;
 public class SignedTokenViewImpl implements SignedTokenView {
 
 	public interface SignedTokenViewImplUiBinder extends UiBinder<Widget, SignedTokenViewImpl> {}
-	
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
 	
 	@UiField
 	SimplePanel synapseAlertContainer;
@@ -46,25 +40,20 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	SimplePanel unsubscribeUserBadgeContainer;
 	
 	@UiField
-	Span loadingUI;
+	LoadingSpinner loadingUI;
 	private Presenter presenter;
 	private Header headerWidget;
-	private Footer footerWidget;
 	
 	Widget widget;
 	
 	@Inject
 	public SignedTokenViewImpl(
 			SignedTokenViewImplUiBinder binder,
-			Header headerWidget, 
-			Footer footerWidget) {		
+			Header headerWidget) {		
 		widget = binder.createAndBindUi(this);
 		
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		ClickHandler okClickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -90,11 +79,7 @@ public class SignedTokenViewImpl implements SignedTokenView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

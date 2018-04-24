@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +11,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.JiraClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 
+import com.google.gwt.http.client.URL;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -42,6 +45,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	private static final String FLAG_ISSUE_SUMMARY = "Request for ACT to review data";
 	private static final String ACCESS_RESTRCTION_ISSUE_SUMMARY = "Request for ACT to add data restriction";
 	private static final String ACCESS_REQUEST_ISSUE_SUMMARY = "Request for ACT to grant access to data";
+	private static final String ACCESS_REQUEST_REVOKE_ISSUE_SUMMARY = "Request for ACT to revoke access to data";
 	private static final String REPORT_ABUSE_REQUEST_ISSUE_SUMMARY = "Request for ACT to review abusive content";
 	
 	private static final String DEFAULT_FLAG_DESCRIPTION = "By creating this issue, I wish to alert "+
@@ -55,6 +59,10 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 	private static final String DEFAULT_REPORT_ABUSE_DESCRIPTION = "By creating this issue, I wish to alert "+
 			"the Synapse team that the page above is in violation (for example: abusive or harmful content, spam, inappropriate ads).\n"
 			+ "Please provide additional information about the issue that you’re reporting:\n\n";
+	
+	private static final String DEFAULT_REVOKE_ACCESS_DESCRIPTION = "By creating this issue, I request that the Synapse Access "+
+			"and Compliance Team revoke access to this dataset.\n"
+			+ "Please provide the list of Synapse users who should no longer have access:\n\n\n\n\n\n\n\n";
 	
 	/**
 	 * properties used in the interface to Jira for Governance
@@ -97,6 +105,7 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 			AuthenticationController authenticationController
 			) {
 		this.jiraClient = jiraClient;
+		fixServiceEntryPoint(jiraClient);
 		this.gwt = gwt;
 		this.authenticationController = authenticationController;
 		jiraProjectId = constants.jiraProjectId();
@@ -225,6 +234,23 @@ public class JiraURLHelperImpl implements JiraURLHelper {
 				userEmailAddress,
 				null,
 				null);
+	}
+	
+	@Override
+	public String createRevokeAccessIssue(String principalId,
+			String userDisplayName,
+			String userEmailAddress,
+			String accessRequirementId) {
+		return createIssueURL(jiraProjectId, 
+				flag_issue_type, 
+				ACCESS_REQUEST_REVOKE_ISSUE_SUMMARY, 
+				default_issue_reporter, 
+				URL.encodeQueryString(DEFAULT_REVOKE_ACCESS_DESCRIPTION + "(https://www.synapse.org/#!ACTDataAccessSubmissions:AR_ID=" + accessRequirementId + ")"),
+				principalId, 
+				userDisplayName, 
+				userEmailAddress,
+				null,
+				accessRequirementId);
 	}
 	
 	@Override

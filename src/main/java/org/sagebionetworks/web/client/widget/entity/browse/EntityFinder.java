@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import static org.sagebionetworks.web.client.widget.entity.browse.EntityFilter.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,6 +13,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -35,30 +38,34 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	private SelectedHandler<List<Reference>> selectedMultiHandler;
 	private EntityFilter filter;
 	private SynapseAlert synAlert;
+	private SynapseJavascriptClient jsClient;
 	@Inject
 	public EntityFinder(EntityFinderView view,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
 			AuthenticationController authenticationController,
 			ClientCache cache,
-			SynapseAlert synAlert) {
+			SynapseAlert synAlert,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.cache = cache;
 		this.synAlert = synAlert;
+		this.jsClient = jsClient;
+		this.selectedEntities = new ArrayList<Reference>();
 		view.setPresenter(this);
 		view.setSynAlert(synAlert.asWidget());
 	}	
 
-	@SuppressWarnings("unchecked")
 	public void clearState() {
 		view.clear();
 	}
 
 	public void configure(boolean showVersions, SelectedHandler<Reference> handler) {
-		configure(EntityFilter.ALL, showVersions, handler);
+		configure(ALL, showVersions, handler);
 	}
 	
 
@@ -66,19 +73,16 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		this.filter = filter;
 		this.showVersions = showVersions;
 		this.selectedHandler = handler;
-		this.selectedEntities = new ArrayList<Reference>();
+		selectedEntities.clear();
+		view.setMultiVisible(false);
 	}
 	
-	public void configureMulti(boolean showVersions, SelectedHandler<List<Reference>> handler) {
-		configureMulti(EntityFilter.ALL, showVersions, handler);
-	}
-	
-
 	public void configureMulti(EntityFilter filter, boolean showVersions, SelectedHandler<List<Reference>> handler) {
 		this.filter = filter;
 		this.showVersions = showVersions;
 		this.selectedMultiHandler = handler;
-		this.selectedEntities = new ArrayList<Reference>();
+		selectedEntities.clear();
+		view.setMultiVisible(true);
 	}
 	
 	@Override
@@ -108,28 +112,38 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		if (selectedEntities == null || selectedEntities.isEmpty()) {
 			synAlert.showError(DisplayConstants.PLEASE_MAKE_SELECTION);
 		} else {
-			// fetch the entity for a type check
-			ReferenceList rl = new ReferenceList();
-			rl.setReferences(selectedEntities);
-			lookupEntity(rl, new AsyncCallback<List<EntityHeader>>() {
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-				}
-
-				@Override
-				public void onSuccess(List<EntityHeader> result) {
-					if (validateEntityTypeAgainstFilter(result)) {
-						if (selectedHandler != null) {
-							selectedHandler.onSelected(selectedEntities.get(0));
-						}
-						if (selectedMultiHandler != null) {
-							selectedMultiHandler.onSelected(selectedEntities);
+			if (!ALL.equals(filter)) {
+				// fetch the entity for a type check
+				ReferenceList rl = new ReferenceList();
+				rl.setReferences(selectedEntities);
+				lookupEntity(rl, new AsyncCallback<List<EntityHeader>>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						synAlert.handleException(caught);
+					}
+	
+					@Override
+					public void onSuccess(List<EntityHeader> result) {
+						if (validateEntityTypeAgainstFilter(result)) {
+							fireEntitiesSelected();
 						}
 					}
-				}
-			});
+				});
+			} else {
+				// skip type check if ALL
+				fireEntitiesSelected();
+			}
 		}
+	}
+	
+	private void fireEntitiesSelected() {
+		if (selectedHandler != null) {
+			selectedHandler.onSelected(selectedEntities.get(0));
+		}
+		if (selectedMultiHandler != null) {
+			selectedMultiHandler.onSelected(selectedEntities);
+		}
+
 	}
 
 	public boolean validateEntityTypeAgainstFilter(List<EntityHeader> list) {
@@ -146,21 +160,17 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 	
 	@Override
 	public void lookupEntity(ReferenceList rl, final AsyncCallback<List<EntityHeader>> callback) {
-		synapseClient.getEntityHeaderBatch(rl, new AsyncCallback<PaginatedResults<EntityHeader>>() {
-
+		jsClient.getEntityHeaderBatchFromReferences(rl.getReferences(), new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
 				callback.onFailure(caught);
 			}
-
 			@Override
-			public void onSuccess(PaginatedResults<EntityHeader> result) {
-				callback.onSuccess(result.getResults());
+			public void onSuccess(ArrayList<EntityHeader> result) {
+				callback.onSuccess(result);
 			}
-			
 		});
-		
 	}
 
 	@Override

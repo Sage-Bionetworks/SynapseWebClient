@@ -39,9 +39,6 @@ import org.sagebionetworks.schema.adapter.org.json.EntityFactory;
 import org.sagebionetworks.util.SerializationUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.user.client.rpc.RpcTokenException;
-import com.google.gwt.util.tools.shared.Md5Utils;
-import com.google.gwt.util.tools.shared.StringUtils;
 import com.google.inject.Inject;
 
 /**
@@ -111,18 +108,6 @@ public class FileHandleServlet extends HttpServlet {
 		super.service(arg0, arg1);
 	}
 
-	public static void validateXsrfToken(String xsrfToken, String sessionToken) {
-		if (sessionToken != null) {
-			//validate token for xsrf
-			String expectedToken = StringUtils.toHexString(
-		        Md5Utils.getMd5Digest(sessionToken.getBytes()));
-		    
-		    if (!expectedToken.equals(xsrfToken)) {
-		      throw new RpcTokenException("Invalid XSRF token");
-		    }
-		}
-	}
-	
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -134,8 +119,6 @@ public class FileHandleServlet extends HttpServlet {
 
 		String token = getSessionToken(request);
 		SynapseClient client = createNewClient(token);
-		String xsrfToken = request.getParameter(WebConstants.XSRF_TOKEN_KEY);
-		validateXsrfToken(xsrfToken, token);
 		boolean isProxy = false;
 		String proxy = request.getParameter(WebConstants.PROXY_PARAM_KEY);
 		if (proxy != null)

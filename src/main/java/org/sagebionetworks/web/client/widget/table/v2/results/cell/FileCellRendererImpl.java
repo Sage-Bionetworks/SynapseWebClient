@@ -6,16 +6,17 @@ import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.table.CellAddress;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FileCellRendererImpl implements FileCellRenderer {
 	
+	public static final String FILE_SYNAPSE_ID_UNAVAILABLE = "File Synapse ID is unavailable in the row.";
 	public static final String UNABLE_TO_LOAD_FILE_DATA = "Unable to load file data";
 	FileCellRendererView view;
 	String fileHandleId;
@@ -37,7 +38,7 @@ public class FileCellRendererImpl implements FileCellRenderer {
 	}
 
 	@Override
-	public void setValue(final String value) {
+	public void setValue(String value) {
 		fileHandleId = StringUtils.trimWithEmptyAsNull(value);
 		if(fileHandleId == null){
 			view.setLoadingVisible(false);
@@ -45,21 +46,31 @@ public class FileCellRendererImpl implements FileCellRenderer {
 			view.setLoadingVisible(true);
 			association = new FileHandleAssociation();
 			association.setFileHandleId(fileHandleId);
-			if (address.isView()) {
-				association.setAssociateObjectType(FileHandleAssociateType.FileEntity);
-				association.setAssociateObjectId(address.getRowId().toString());
-			} else {
+			if (TableType.table.equals(address.getTableType())) {
 				association.setAssociateObjectType(FileHandleAssociateType.TableEntity);
 				association.setAssociateObjectId(address.getTableId());
+			} else {
+				association.setAssociateObjectType(FileHandleAssociateType.FileEntity);
+				if (address.getRowId() != null) {
+					association.setAssociateObjectId(address.getRowId().toString());
+				} else {
+					view.setLoadingVisible(false);
+					view.setErrorText(FILE_SYNAPSE_ID_UNAVAILABLE);
+					return;
+				}
 			}
-			fileHandleAsynHandler.getFileHandle(association, new AsyncCallback<FileResult>() {
+			fileHandleAsynHandler.getFileResult(association, new AsyncCallback<FileResult>() {
 				
 				@Override
 				public void onSuccess(FileResult result) {
 					if(view.isAttached() && result != null){
 						view.setLoadingVisible(false);
 						if (result.getFileHandle() != null) {
-							view.setAnchor(result.getFileHandle().getFileName(), createAnchorHref());	
+							view.setAnchor(result.getFileHandle().getFileName(), createAnchorHref());
+							Long contentSize = result.getFileHandle().getContentSize();
+							if (contentSize != null) {
+								view.setTooltip(contentSize);	
+							}
 						} else if (result.getFailureCode() != null) {
 							//failed
 							view.setErrorText(UNABLE_TO_LOAD_FILE_DATA + ": " + result.getFailureCode().toString());
@@ -98,10 +109,6 @@ public class FileCellRendererImpl implements FileCellRenderer {
 		builder.append(WebConstants.FILE_HANDLE_ID_PARAM_KEY);
 		builder.append("=");
 		builder.append(association.getFileHandleId());
-		builder.append("&");
-		builder.append(WebConstants.XSRF_TOKEN_KEY);
-		builder.append("=");
-		builder.append(authController.getCurrentXsrfToken());
 		return builder.toString();
 	}
 

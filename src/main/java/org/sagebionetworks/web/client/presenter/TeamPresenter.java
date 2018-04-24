@@ -1,14 +1,20 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
+import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.TeamMembershipStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.TeamView;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.team.InviteWidget;
@@ -45,8 +51,8 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	private OpenMembershipRequestsWidget openMembershipRequestsWidget;
 	private OpenUserInvitationsWidget openUserInvitationsWidget;
 	private GoogleMap map;
-	private CookieProvider cookies;
 	private String currentTeamId;
+	private IsACTMemberAsyncHandler isACTMemberAsyncHandler; 
 	
 	@Inject
 	public TeamPresenter(TeamView view,
@@ -61,11 +67,13 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 			OpenMembershipRequestsWidget openMembershipRequestsWidget,
 			OpenUserInvitationsWidget openUserInvitationsWidget,
 			GoogleMap map,
-			CookieProvider cookies) {
+			CookieProvider cookies,
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.synAlert = synAlert;
 		this.leaveTeamWidget = leaveTeamWidget;
 		this.deleteTeamWidget = deleteTeamWidget;
@@ -76,7 +84,7 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.openMembershipRequestsWidget = openMembershipRequestsWidget;
 		this.openUserInvitationsWidget = openUserInvitationsWidget;
 		this.map = map;
-		this.cookies = cookies;
+		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setLeaveTeamWidget(leaveTeamWidget.asWidget());
@@ -119,8 +127,6 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	public void clear() {
 		memberListWidget.clear();
 		joinTeamWidget.clear();
-		openMembershipRequestsWidget.clear();
-		openUserInvitationsWidget.clear();
 		view.clear();
 	}
 	
@@ -130,14 +136,17 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
         return null;
     }
 	
-
 	@Override
 	public void goTo(Place place) {
 		globalApplicationState.getPlaceChanger().goTo(place);
 	}
 	
 	private void refresh() {
-		refresh(team.getId());
+		openMembershipRequestsWidget.setVisible(false);
+		openUserInvitationsWidget.setVisible(false);
+		refresh(currentTeamId);
+		refreshOpenMembershipRequests();
+		refreshOpenUserInvitations();
 	}
 	
 	@Override
@@ -145,10 +154,18 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		this.currentTeamId = teamId;
 		clear();
 		synAlert.clear();
+		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
+			@Override
+			public void invoke(Boolean isACT) {
+				view.setManageAccessVisible(isACT);
+				if (isACT) {
+					view.setCommandsVisible(true);
+				}
+			}
+		});
 		synapseClient.getTeamBundle(authenticationController.getCurrentUserPrincipalId(), teamId, authenticationController.isLoggedIn(), new AsyncCallback<TeamBundle>() {
 			@Override
 			public void onSuccess(TeamBundle result) {
-				view.clear();
 				team = result.getTeam();
 				TeamMembershipStatus teamMembershipStatus = result.getTeamMembershipStatus();
 				boolean isAdmin = result.isUserAdmin();
@@ -161,19 +178,20 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 				boolean canPublicJoin = team.getCanPublicJoin() == null ? false : team.getCanPublicJoin();
 				view.setPublicJoinVisible(canPublicJoin);
 				view.setTotalMemberCount(result.getTotalMemberCount().toString());
-				view.setMediaObjectPanel(team, authenticationController.getCurrentXsrfToken());
-				view.setTeamEmailAddress(getTeamEmail(team.getName()));
+				view.setMediaObjectPanel(team);
+				boolean canSendEmail = teamMembershipStatus != null && teamMembershipStatus.getCanSendEmail();
+				view.setTeamEmailAddress(getTeamEmail(team.getName(), canSendEmail));
 				memberListWidget.configure(teamId, isAdmin, refreshCallback);				
+				openMembershipRequestsWidget.setVisible(isAdmin);
 				
 				if (teamMembershipStatus == null || !teamMembershipStatus.getIsMember()) {
 					//not a member, add Join widget
 					joinTeamWidget.configure(teamId, false, teamMembershipStatus,
 							refreshCallback, null, null, null, null, false);
 				} else {
+					view.setCommandsVisible(true);
 					view.showMemberMenuItems();
 					if (isAdmin) {
-						openMembershipRequestsWidget.configure(teamId, refreshCallback);
-						openUserInvitationsWidget.configure(teamId, refreshCallback);
 						view.showAdminMenuItems();
 					}
 				}
@@ -185,6 +203,33 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		});
 	}
 	
+	public void refreshOpenMembershipRequests() {
+		openMembershipRequestsWidget.clear();
+		
+		Callback refreshOpenMembershipRequestsCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refresh(currentTeamId);
+				openMembershipRequestsWidget.configure(currentTeamId, this);
+			}
+		};
+		openMembershipRequestsWidget.configure(currentTeamId, refreshOpenMembershipRequestsCallback);
+	}
+	
+	public void refreshOpenUserInvitations() {
+		openUserInvitationsWidget.clear();
+
+		Callback refreshOpenUserInvitationsCallback = new Callback() {
+			@Override
+			public void invoke() {
+				refresh(currentTeamId);
+				openUserInvitationsWidget.configure(currentTeamId, this);
+			}
+		};
+		openUserInvitationsWidget.configure(currentTeamId, refreshOpenUserInvitationsCallback);
+	}
+
+	
 	@Override
 	public void onShowMap() {
 		map.setHeight((view.getClientHeight() - 200) + "px");
@@ -192,8 +237,8 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 		view.showMapModal();
 	}
 	
-	public String getTeamEmail(String teamName) {
-		if (authenticationController.isLoggedIn()) {
+	public String getTeamEmail(String teamName, boolean canSendEmail) {
+		if (authenticationController.isLoggedIn() && canSendEmail) {
 			//strip out any non-word character.  Not a (letter, number, underscore)
 			return teamName.replaceAll("\\W", "") + "@synapse.org";
 		} else {
@@ -202,8 +247,9 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	}
 	
 	private void showView(org.sagebionetworks.web.client.place.Team place) {
-		String teamId = place.getTeamId();
-		refresh(teamId);
+		currentTeamId = place.getTeamId();
+		//full refresh
+		refresh();
 	}
 	
 	@Override
@@ -236,6 +282,11 @@ public class TeamPresenter extends AbstractActivity implements TeamView.Presente
 	//testing only
 	public void setTeam(Team team) {
 		this.team = team;
+	}
+	@Override
+	public void onManageAccess() {
+		AccessRequirementsPlace place = new AccessRequirementsPlace(AccessRequirementsPlace.ID_PARAM + "=" + team.getId() + "&" + AccessRequirementsPlace.TYPE_PARAM + "=" + RestrictableObjectType.TEAM.toString());
+		goTo(place);
 	}
 }
 

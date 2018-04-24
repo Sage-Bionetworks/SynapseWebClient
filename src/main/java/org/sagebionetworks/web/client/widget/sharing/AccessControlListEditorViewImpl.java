@@ -3,40 +3,45 @@ package org.sagebionetworks.web.client.widget.sharing;
 import java.util.Map;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.ButtonType;
+import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.HelpWidget;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class AccessControlListEditorViewImpl extends FlowPanel implements AccessControlListEditorView {
 	
-	public static final String CREATE_ACL_HELP_TEXT = "By default the sharing settings are inhereted from the parent folder or project.  If you want to have different settings on a specific file folder or table you need to create local sharing settings then modify them.";
-
-	public static final String DELETE_ACL_HELP_TEXT = "If a file or folder has sharing settings that are different from its parent folder or project you can delete the setting thereby inherting the sharing settings of the parent folder or project.";
+	public static final String CREATE_ACL_HELP_TEXT = "By default the sharing settings are inherited from the parent folder or project. If you want to have different settings on a specific file, folder, or table you need to create local sharing settings and then modify them.";
 
 	private static final String CANNOT_MODIFY_ACL_TEXT = "You do not have sufficient privileges to modify the sharing settings.";
 	
 	private Presenter presenter;
 	private Map<PermissionLevel, String> permissionDisplay;
-	private SageImageBundle sageImageBundle;
-	private Long publicAclPrincipalId;
+	private Long publicAclPrincipalId, authenticatedPrincipalId;
 	private Boolean isPubliclyVisible;
 	private boolean showEditColumns;
 	private PermissionLevel defaultPermissionLevel;
@@ -47,28 +52,35 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	private PermissionLevel[] permList;	// To enforce order.
 	private Button deleteAclButton = new Button(DisplayConstants.BUTTON_PERMISSIONS_DELETE_ACL);
-	private HelpWidget deleteAclHelpWidget = new HelpWidget();
-	
+	private HelpWidget helpWidget = new HelpWidget();
+	private IsWidget synAlertWidget;
+	private PortalGinInjector ginInjector;
 	@Inject
-	public AccessControlListEditorViewImpl(SageImageBundle sageImageBundle,
-					SharingPermissionsGrid permissionsGrid, AclAddPeoplePanel addPeoplePanel) {
-		this.sageImageBundle = sageImageBundle;
-		this.permissionsGrid = permissionsGrid;
-		this.addPeoplePanel = addPeoplePanel;
+	public AccessControlListEditorViewImpl(PortalGinInjector ginInjector) {
+		this.ginInjector = ginInjector;
 		
-		// 'Delete ACL' HelpWidget
-		deleteAclHelpWidget.setHelpMarkdown(DELETE_ACL_HELP_TEXT);
-		deleteAclHelpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html");
-		deleteAclHelpWidget.setAddStyleNames("margin-left-5");
+		helpWidget.setHelpMarkdown("Learn more about managing access controls and permissions in Synapse.");
+		helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html");
+		helpWidget.setAddStyleNames("margin-left-5");
+		
 		// 'Delete ACL' button
-		deleteAclButton.setType(ButtonType.DANGER);
+		deleteAclButton.addStyleName("text-danger");
 		deleteAclButton.setSize(ButtonSize.SMALL);
-		deleteAclButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent ce) {
-				presenter.deleteAcl();					
-			}
+		deleteAclButton.addClickHandler( event -> {
+			presenter.deleteAcl();			
 		});
+	}
+	public AclAddPeoplePanel getAclAddPeoplePanel() {
+		if (addPeoplePanel == null) {
+			addPeoplePanel = ginInjector.getAclAddPeoplePanel();
+		}
+		return addPeoplePanel;
+	}
+	public SharingPermissionsGrid getSharingPermissionsGrid() {
+		if (permissionsGrid == null) {
+			permissionsGrid = ginInjector.getSharingPermissionsGrid();
+		}
+		return permissionsGrid;
 	}
 	
 	public void setPermissionsToDisplay(PermissionLevel[] permList, Map<PermissionLevel, String> permissionsDisplay) {
@@ -83,12 +95,10 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	
 	@Override
 	public void addAclEntry(AclEntry aclEntry) {
-		if (permissionsGrid == null)
-			throw new IllegalStateException("Permissions window has not been built yet");
 		if (!aclEntry.isIndividual()) {
-			permissionsGrid.insert(aclEntry, 0, permList, permissionDisplay, true); // insert groups first
+			getSharingPermissionsGrid().insert(aclEntry, 0, permList, permissionDisplay, true); // insert groups first
 		} else {
-			permissionsGrid.add(aclEntry, permList, permissionDisplay);
+			getSharingPermissionsGrid().add(aclEntry, permList, permissionDisplay);
 		}
 	}
 	
@@ -97,25 +107,34 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		this.publicAclPrincipalId = publicAclPrincipalId;
 	}
 	@Override
+	public void setAuthenticatedAclPrinciapalId(Long authenticatedPrincipalId) {
+		this.authenticatedPrincipalId = authenticatedPrincipalId;
+	}
+	@Override
 	public void setPublicPrivateButtonVisible(boolean isVisible) {
-		addPeoplePanel.setPublicPrivateButtonVisible(isVisible);
+		getAclAddPeoplePanel().setPublicPrivateButtonVisible(isVisible);
 	}
 	@Override
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible) {
 		this.isPubliclyVisible = isPubliclyVisible;
 		if (isPubliclyVisible != null) {
-			addPeoplePanel.setMakePublicButtonDisplay(isPubliclyVisible);
+			getAclAddPeoplePanel().setMakePublicButtonDisplay(isPubliclyVisible);
+		}
+	}
+	@Override
+	public void setSynAlert(IsWidget w) {
+		this.synAlertWidget = w;
+	}
+	@Override
+	public void clear() {
+		super.clear();
+		if (permissionsGrid != null) {
+			permissionsGrid.clear();
 		}
 	}
 	
 	@Override
-	public void clear() {
-		super.clear();
-		permissionsGrid.clear();
-	}
-	
-	@Override
-	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean canChangePermission, PermissionLevel defaultPermissionLevel) {		
+	public void buildWindow(boolean isProject, boolean isInherited, String aclEntityId, boolean canEnableInheritance, boolean canChangePermission, PermissionLevel defaultPermissionLevel) {		
 		clear();
 		this.defaultPermissionLevel = defaultPermissionLevel;
 		// Display Permissions grid.
@@ -129,7 +148,32 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 					}
 				};
 		}
-		
+		Div div = new Div();
+		div.setMarginBottom(20);
+		add(div);
+		if (!isInherited) {
+			if (isProject) {
+				div.add(new Text("The sharing settings shown below apply to this project and are inherited by all project contents unless local sharing settings have been set."));
+				if (canChangePermission) {
+					add(new Heading(HeadingSize.H5, "Manage Sharing Settings"));	
+				}
+			} else {
+				div.add(new HTML("The local sharing settings shown below are <strong>not</strong> being inherited from a parent resource."));
+				if (canChangePermission) {
+					add(new Heading(HeadingSize.H5, "Manage Local Sharing Settings"));
+				}
+			}
+		} else {
+			//is inherited
+			div.add(new Span("The sharing settings shown below are currently being inherited from&nbsp;"));
+			EntityIdCellRendererImpl entityRenderer = ginInjector.getEntityIdCellRenderer();
+			ClickHandler customClickHandler = event -> {
+				DisplayUtils.newWindow("#!Synapse:" + aclEntityId, "", "");
+			};
+			entityRenderer.setValue(aclEntityId, customClickHandler, false);
+			div.add(entityRenderer);
+			div.add(new Span("&nbsp;and cannot be modified here."));
+		}
 		SetAccessCallback setAccessCallback = new SetAccessCallback() {
 			@Override
 			public void invoke(Long principalId, PermissionLevel permissionLevel) {
@@ -137,8 +181,8 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 			}
 		};
 		
-		permissionsGrid.configure(removeUserCallback, setAccessCallback);
-		add(permissionsGrid.asWidget());
+		getSharingPermissionsGrid().configure(removeUserCallback, setAccessCallback);
+		add(getSharingPermissionsGrid().asWidget());
 		
 		if (!canChangePermission) {
 			// Inform user of restricted privileges.
@@ -148,7 +192,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		} else {
 			if(isInherited) {
 				// Notify user of inherited sharing settings.
-				Label readOnly = new Label(DisplayConstants.PERMISSIONS_INHERITED_TEXT);
+				Label readOnly = new Label(CREATE_ACL_HELP_TEXT);
 				readOnly.addStyleName("margin-bottom-10");
 				add(readOnly);
 				
@@ -164,16 +208,12 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 				createAclButton.setType(ButtonType.SUCCESS);
 				createAclButton.setSize(ButtonSize.SMALL);
 				add(createAclButton);
-				HelpWidget helpWidget = new HelpWidget();
-				helpWidget.setHelpMarkdown(CREATE_ACL_HELP_TEXT);
-				helpWidget.setHref(WebConstants.DOCS_URL + "access_controls.html");
-				helpWidget.setAddStyleNames("margin-left-5");
-				add(helpWidget.asWidget());
+				add(helpWidget);
 			} else {
 				// Configure AddPeopleToAclPanel.
-				CallbackP<SynapseSuggestion> addPersonCallback = new CallbackP<SynapseSuggestion>() {
+				CallbackP<UserGroupSuggestion> addPersonCallback = new CallbackP<UserGroupSuggestion>() {
 					@Override
-					public void invoke(SynapseSuggestion param) {
+					public void invoke(UserGroupSuggestion param) {
 						addPersonToAcl(param);
 					}
 				};
@@ -187,45 +227,49 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 						} else {
 							if (publicAclPrincipalId != null) {
 								presenter.setAccess(publicAclPrincipalId, PermissionLevel.CAN_VIEW);
+								presenter.setAccess(authenticatedPrincipalId, PermissionLevel.CAN_DOWNLOAD);
 							}
 						}
 					}
 				};
 				
-				addPeoplePanel.configure(permList, addPersonCallback, makePublicCallback, isPubliclyVisible);
-				add(addPeoplePanel.asWidget());
+				getAclAddPeoplePanel().configure(permList, addPersonCallback, makePublicCallback, isPubliclyVisible);
+				add(getAclAddPeoplePanel().asWidget());
 				if (canEnableInheritance) {
+					Label deleteInfoLabel = new Label("The sharing settings will be inherited from the parent folder or project if local sharing settings are deleted.");
+					deleteInfoLabel.addStyleName("margin-bottom-10");
+					add(deleteInfoLabel);
 					add(deleteAclButton);
-					add(deleteAclHelpWidget.asWidget());	
+					add(helpWidget);	
 				}
 			}
 		}
+		add(synAlertWidget);
 	}
 	
 	@Override
 	public Boolean isNotifyPeople(){
-		return addPeoplePanel.getNotifyPeopleCheckBox().getValue();
+		return getAclAddPeoplePanel().getNotifyPeopleCheckBox().getValue();
 	}
 	
 	@Override
 	public void setNotifyCheckboxVisible(boolean isVisible) {
-		addPeoplePanel.getNotifyPeopleCheckBox().setVisible(isVisible);
+		getAclAddPeoplePanel().getNotifyPeopleCheckBox().setVisible(isVisible);
 	}
 	@Override
 	public void setDeleteLocalACLButtonVisible(boolean isVisible) {
 		deleteAclButton.setVisible(isVisible);
-		deleteAclHelpWidget.setVisible(isVisible);
 	}
 	@Override
 	public void setIsNotifyPeople(Boolean value) {
 		if (value != null)
-			addPeoplePanel.getNotifyPeopleCheckBox().setValue(value);
+			getAclAddPeoplePanel().getNotifyPeopleCheckBox().setValue(value);
 	}
 	
 	@Override
 	public void showLoading() {
 		this.clear();
-		this.add(new HTML(SafeHtmlUtils.fromSafeConstant(DisplayUtils.getIconHtml(sageImageBundle.loading16()) + " Loading...")));
+		this.add(new LoadingSpinner());
 	}
 
 	@Override
@@ -248,11 +292,6 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		DisplayUtils.showInfo(title, message);
 	}
 	
-	@Override
-	public void showInfoError(String title, String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-	
 	/*
 	 * Private Methods
 	 */	
@@ -261,15 +300,15 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		showErrorMessage(message);
 	}
 	
-	private void addPersonToAcl(SynapseSuggestion suggestion) {
+	private void addPersonToAcl(UserGroupSuggestion suggestion) {
 		if(suggestion != null) {
-			SynapseSuggestion selectedUser = suggestion;
+			UserGroupSuggestion selectedUser = suggestion;
 			String principalIdStr = selectedUser.getId();
 			Long principalId = (Long.parseLong(principalIdStr));
 			
 			presenter.setAccess(principalId, defaultPermissionLevel);
 			// clear selections
-			addPeoplePanel.getSuggestBox().clear();
+			getAclAddPeoplePanel().getSuggestBox().clear();
 		} else {
 			showAddMessage("Please select a user or team to grant permission to.");
 		}

@@ -7,10 +7,12 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.ModalSize;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -25,6 +27,8 @@ public class ModalWizardViewImpl implements ModalWizardView {
 	@UiField
 	Button primaryButton;
 	@UiField
+	Button defaultButton;
+	@UiField
 	Text instructions;
 	@UiField
 	SimplePanel bodyPanel;
@@ -35,21 +39,22 @@ public class ModalWizardViewImpl implements ModalWizardView {
 	@UiField
 	Span helpContainer;
 	Modal modal;
-	
+	Presenter presenter;
 	@Inject
 	public ModalWizardViewImpl(Binder binder){
 		modal = binder.createAndBindUi(this);
+		primaryButton.addClickHandler(event -> {
+			presenter.onPrimary();
+		});
+		primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
+		defaultButton.addClickHandler(event -> {
+			presenter.onCancel();
+		});
 	}
 
 	@Override
-	public void setPresenter(final Presenter presenter) {
-		primaryButton.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onPrimary();
-			}
-		});	
+	public void setPresenter(Presenter presenter) {
+		this.presenter = presenter;
 	}
 
 	@Override
@@ -86,11 +91,7 @@ public class ModalWizardViewImpl implements ModalWizardView {
 
 	@Override
 	public void setLoading(boolean loading) {
-		if(!loading){
-			this.primaryButton.state().reset();
-		}else{
-			this.primaryButton.state().loading();
-		}
+		primaryButton.setEnabled(!loading);
 	}
 
 	@Override

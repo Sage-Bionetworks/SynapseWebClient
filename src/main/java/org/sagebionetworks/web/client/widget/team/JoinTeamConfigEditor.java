@@ -4,13 +4,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.repo.model.UserGroupHeader;
+import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
-import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider;
-import org.sagebionetworks.web.client.widget.search.GroupSuggestionProvider.GroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
@@ -24,20 +26,22 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 	private JoinTeamConfigEditorView view;
 	private Map<String, String> descriptor;
 	private SynapseSuggestBox teamSuggestBox;
-	private SynapseClientAsync synClient;
-	private GroupSuggestionProvider provider;
+	private SynapseJavascriptClient jsClient;
+	private UserGroupSuggestionProvider provider;
 	private SynapseJSNIUtils jsniUtils;
 
 	@Inject
 	public JoinTeamConfigEditor(JoinTeamConfigEditorView view,
 			SynapseSuggestBox teamSuggestBox,
-			GroupSuggestionProvider provider, SynapseClientAsync synClient,
+			UserGroupSuggestionProvider provider, 
+			SynapseJavascriptClient jsClient,
 			SynapseJSNIUtils jsniUtils) {
 		this.provider = provider;
-		this.synClient = synClient;
+		this.jsClient = jsClient;
 		this.teamSuggestBox = teamSuggestBox;
 		this.jsniUtils = jsniUtils;
 		teamSuggestBox.setSuggestionProvider(provider);
+		teamSuggestBox.setTypeFilter(TypeFilter.TEAMS_ONLY);
 		this.view = view;
 		this.view.setSuggestWidget(teamSuggestBox);
 	}
@@ -53,14 +57,19 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 			Map<String, String> widgetDescriptor, DialogCallback window) {
 		this.descriptor = widgetDescriptor;
 		if (descriptor.containsKey(WidgetConstants.TEAM_ID_KEY)) {
-			synClient.getTeam(descriptor.get(WidgetConstants.TEAM_ID_KEY), new AsyncCallback<Team>() {
+			jsClient.getTeam(descriptor.get(WidgetConstants.TEAM_ID_KEY), new AsyncCallback<Team>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					jsniUtils.consoleError(caught.getMessage());
 				}
 				@Override
 				public void onSuccess(Team team) {
-					teamSuggestBox.setSelectedSuggestion(provider.new GroupSuggestion(team, team.getName()));
+					UserGroupHeader ugh = new UserGroupHeader();
+					ugh.setDisplayName(team.getName());
+					ugh.setIsIndividual(false);
+					ugh.setOwnerId(team.getId());
+					UserGroupSuggestion suggestion = new UserGroupSuggestion(ugh, team.getName(), teamSuggestBox.getWidth());
+					teamSuggestBox.setSelectedSuggestion(suggestion);
 					teamSuggestBox.setText(team.getName());
 				}
 				
@@ -105,7 +114,7 @@ public class JoinTeamConfigEditor implements WidgetEditorPresenter, JoinTeamConf
 
 	@Override
 	public void updateDescriptorFromView() throws IllegalArgumentException {
-		GroupSuggestion suggestion = (GroupSuggestion)teamSuggestBox.getSelectedSuggestion();
+		UserGroupSuggestion suggestion = (UserGroupSuggestion)teamSuggestBox.getSelectedSuggestion();
 		if (suggestion != null) {
 			descriptor.put(WidgetConstants.TEAM_ID_KEY, suggestion.getId());
 		}

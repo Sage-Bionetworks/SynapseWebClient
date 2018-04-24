@@ -1,5 +1,26 @@
 package org.sagebionetworks.web.unitclient.widget.entity.act;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anySetOf;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.APPROVED_USER;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.APPROVE_BUT_FAIL_TO_EMAIL;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.EMAIL_SENT;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.MESSAGE_BLANK;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.NO_EMAIL_MESSAGE;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.NO_USER_SELECTED;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.QUERY_CANCELLED;
+import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.REVOKED_USER;
+
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -7,16 +28,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import static org.mockito.Mockito.*;
-
-import static org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal.*;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-
-import org.sagebionetworks.repo.model.ACTAccessApproval;
 import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessApproval;
 import org.sagebionetworks.repo.model.Entity;
@@ -26,6 +37,7 @@ import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
+import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
@@ -35,7 +47,7 @@ import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModal;
 import org.sagebionetworks.web.client.widget.entity.act.ApproveUserAccessModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
-import org.sagebionetworks.web.client.widget.search.SynapseSuggestion;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -57,11 +69,13 @@ public class ApproveUserAccessModalTest {
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
+	DataAccessClientAsync mockDataAccessClient;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
 	JobTrackingWidget mockProgressWidget;
 	@Mock
-	SynapseSuggestion mockUser;
+	UserGroupSuggestion mockUser;
 	@Mock
 	EntityBundle mockEntityBundle;
 	@Mock
@@ -104,7 +118,7 @@ public class ApproveUserAccessModalTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockGlobalApplicationState, mockProgressWidget);
+		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockGlobalApplicationState, mockProgressWidget, mockDataAccessClient);
 		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn("syn7444807");
 		
 		message = "Message";
@@ -265,7 +279,7 @@ public class ApproveUserAccessModalTest {
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
-		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
+		verify(mockSynapseClient).createAccessApproval(any(AccessApproval.class), aaCaptor.capture());
 		aaCaptor.getValue().onFailure(ex);
 		verify(mockSynAlert).handleException(ex);
 	}
@@ -283,7 +297,7 @@ public class ApproveUserAccessModalTest {
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
-		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
+		verify(mockSynapseClient).createAccessApproval(any(AccessApproval.class), aaCaptor.capture());
 		aaCaptor.getValue().onSuccess(mockAccessApproval);
 		verify(mockSynapseClient).sendMessage(anySetOf(String.class), anyString(), anyString(), anyString(), sCaptor.capture());
 	}
@@ -302,7 +316,7 @@ public class ApproveUserAccessModalTest {
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
-		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
+		verify(mockSynapseClient).createAccessApproval(any(AccessApproval.class), aaCaptor.capture());
 		aaCaptor.getValue().onSuccess(mockAccessApproval);
 		
 		verify(mockSynapseClient).sendMessage(anySetOf(String.class), anyString(), anyString(), anyString(), sCaptor.capture());
@@ -326,7 +340,7 @@ public class ApproveUserAccessModalTest {
 		verify(mockView).getAccessRequirement();
 		verify(mockView).setApproveProcessing(true);
 		
-		verify(mockSynapseClient).createAccessApproval(any(ACTAccessApproval.class), aaCaptor.capture());
+		verify(mockSynapseClient).createAccessApproval(any(AccessApproval.class), aaCaptor.capture());
 		aaCaptor.getValue().onSuccess(mockAccessApproval);
 		
 		verify(mockSynapseClient).sendMessage(anySetOf(String.class), anyString(), anyString(), anyString(), sCaptor.capture());

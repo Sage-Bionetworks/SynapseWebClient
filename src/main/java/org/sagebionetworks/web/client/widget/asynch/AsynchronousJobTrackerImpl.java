@@ -3,7 +3,7 @@ package org.sagebionetworks.web.client.widget.asynch;
 import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.asynch.TimerProvider.FireHandler;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
@@ -19,8 +19,6 @@ import com.google.inject.Inject;
  * 
  */
 public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
-
-	private SynapseClientAsync synapseClient;
 	private TimerProvider timerProvider;
 	private int waitTimeMS;
 	private AsynchType type;
@@ -28,13 +26,15 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	private UpdatingAsynchProgressHandler handler;
 	private OneTimeReference<AsynchronousProgressHandler> oneTimeReference;
 	private boolean isCanceled;
-
+	private SynapseJavascriptClient jsClient;
+	
 	@Inject
-	public AsynchronousJobTrackerImpl(SynapseClientAsync synapseClient,
-			TimerProvider timerProvider) {
+	public AsynchronousJobTrackerImpl(
+			TimerProvider timerProvider,
+			SynapseJavascriptClient jsClient) {
 		super();
-		this.synapseClient = synapseClient;
 		this.timerProvider = timerProvider;
+		this.jsClient = jsClient;
 	}
 
 	/**
@@ -54,25 +54,26 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 		 */
 		this.oneTimeReference = new OneTimeReference<AsynchronousProgressHandler>(
 				handler);
-		// Start the job.
-		synapseClient.startAsynchJob(type, requestBody, 
-				new AsyncCallback<String>() {
-					@Override
-					public void onSuccess(String jobId) {
-						// nothing to do if canceled.
-						if (!isCanceled) {
-							// Track the job.
-							trackJob(jobId, requestBody, waitTimeMS);
-						}
-					}
+		
+		AsyncCallback<String> callback = new AsyncCallback<String>() {
+			@Override
+			public void onSuccess(String jobId) {
+				// nothing to do if canceled.
+				if (!isCanceled) {
+					// Track the job.
+					trackJob(jobId, requestBody, waitTimeMS);
+				}
+			}
 
-					@Override
-					public void onFailure(Throwable caught) {
-						if (!isCanceled) {
-							oneTimeOnFailure(caught);
-						}
-					}
-				});
+			@Override
+			public void onFailure(Throwable caught) {
+				if (!isCanceled) {
+					oneTimeOnFailure(caught);
+				}
+			}
+		};
+		// Start the job.
+		jsClient.startAsynchJob(type, requestBody, callback);
 	}
 
 	/**
@@ -106,7 +107,7 @@ public class AsynchronousJobTrackerImpl implements AsynchronousJobTracker {
 	 */
 	private void checkAndWait(AsynchronousRequestBody requestBody) {
 		// Get the current status
-		synapseClient.getAsynchJobResults(this.type, this.jobId, requestBody,
+		jsClient.getAsynchJobResults(this.type, this.jobId, requestBody,
 				new AsyncCallback<AsynchronousResponseBody>() {
 					@Override
 					public void onSuccess(AsynchronousResponseBody response) {

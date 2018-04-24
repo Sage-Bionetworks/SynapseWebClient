@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.download;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 
@@ -24,6 +26,7 @@ public class DownloadFilePageImpl implements DownloadFilePage {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.gwtWrapper = gwtWrapper;
 	}
 

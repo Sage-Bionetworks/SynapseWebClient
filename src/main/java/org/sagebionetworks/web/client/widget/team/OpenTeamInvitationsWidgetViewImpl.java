@@ -1,54 +1,50 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
+import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.ColumnSize;
+import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
 
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.uibinder.client.UiBinder;
+import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
+import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements OpenTeamInvitationsWidgetView {
+public class OpenTeamInvitationsWidgetViewImpl implements OpenTeamInvitationsWidgetView {
 	
-	private SageImageBundle sageImageBundle;
+	public interface Binder extends UiBinder<Widget, OpenTeamInvitationsWidgetViewImpl> {}
+
+	@UiField
+	Div mainContainer;
+	@UiField
+	Div synAlertContainer;
+	@UiField
+	Row singleRow;
+	Widget widget;
 	private OpenTeamInvitationsWidgetView.Presenter presenter;
 	private PortalGinInjector ginInjector;
-	private FlowPanel mainContainer;
-	private Row singleRow;
 	@Inject
-	public OpenTeamInvitationsWidgetViewImpl(SageImageBundle sageImageBundle, PortalGinInjector ginInjector) {
+	public OpenTeamInvitationsWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
+		widget = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
-		this.sageImageBundle = sageImageBundle;
-		mainContainer = new FlowPanel();
 		mainContainer.addStyleName("highlight-box");
 		mainContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_TEAM_INVITATIONS);
-		add(mainContainer);
 		singleRow = new Row();
 		mainContainer.add(singleRow);
 	}
 	
-	@Override
-	public void showLoading() {
-		clear();
-		add(DisplayUtils.getLoadingWidget(sageImageBundle));
-	}
-
-	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
-
-	}
-
-	@Override
-	public void showErrorMessage(String message) {
-		DisplayUtils.showErrorMessage(message);
-	}
-
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -61,20 +57,46 @@ public class OpenTeamInvitationsWidgetViewImpl extends FlowPanel implements Open
 	}
 	
 	@Override
-	public void addTeamInvite(Team team, String inviteMessage, Widget joinButtonWidget) {
+	public void addTeamInvite(Team team, String inviteMessage, String createdOn, final String inviteId, Widget joinButtonWidget) {
 		mainContainer.setVisible(true);
 		FlowPanel lc = new FlowPanel();
 		BigTeamBadge teamRenderer = ginInjector.getBigTeamBadgeWidget();
 		teamRenderer.configure(team, inviteMessage);
-		Column teamBadgeColumn = new Column(ColumnSize.XS_8, ColumnSize.SM_9, ColumnSize.MD_10);
+		Column teamBadgeColumn = new Column(ColumnSize.XS_12, ColumnSize.SM_7, ColumnSize.MD_8);
 		teamBadgeColumn.addStyleName("margin-top-15");
 		teamBadgeColumn.add(teamRenderer.asWidget());
+		Span createdOnSpan = new Span();
+		createdOnSpan.setText(createdOn);
+		teamBadgeColumn.add(createdOnSpan);
 		joinButtonWidget.addStyleName("right margin-top-15 margin-right-15");
 		
-		Column buttonContainer = new Column(ColumnSize.XS_4, ColumnSize.SM_3, ColumnSize.MD_2);
+		Button deleteButton = new Button("Remove");
+		deleteButton.setSize(ButtonSize.LARGE);
+		deleteButton.setType(ButtonType.DANGER);
+		deleteButton.setPull(Pull.RIGHT);
+		deleteButton.setMarginRight(5);
+		deleteButton.setMarginTop(15);
+		deleteButton.addClickHandler(event -> {
+			presenter.deleteInvitation(inviteId);
+		});
+		
+		Column buttonContainer = new Column(ColumnSize.XS_12, ColumnSize.SM_5, ColumnSize.MD_4);
 		buttonContainer.add(joinButtonWidget);
+		buttonContainer.add(deleteButton);
 		lc.add(teamBadgeColumn);
 		lc.add(buttonContainer);
+		
 		singleRow.add(lc);
+	}
+	
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
+	}
+	
+	@Override
+	public Widget asWidget() {
+		return widget;
 	}
 }

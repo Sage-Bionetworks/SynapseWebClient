@@ -2,9 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import java.util.List;
 
-import org.sagebionetworks.web.client.widget.pagination.PaginationWidget;
-import org.sagebionetworks.web.client.widget.table.v2.results.TablePageView.Presenter;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -18,6 +15,7 @@ import com.google.gwt.user.client.ui.Widget;
 public interface TablePageView extends IsWidget {
 	
 	public interface Presenter {
+		void onClearFacets();
 	}
 	
 	/**
@@ -44,7 +42,7 @@ public interface TablePageView extends IsWidget {
 	 * 
 	 * @param paginationWidget
 	 */
-	public void setPaginationWidget(PaginationWidget paginationWidget);
+	public void setPaginationWidget(IsWidget paginationWidget);
 	
 	/**
 	 * Show or hide the pagination widgets
@@ -62,6 +60,8 @@ public interface TablePageView extends IsWidget {
 	
 	void setFacetsWidget(Widget w);
 	void setFacetsVisible(boolean visible);
-
+	void setTableVisible(boolean visible);
 	void setPresenter(Presenter presenter);
+	void showLoading();
+	void hideLoading();
 }

@@ -20,18 +20,20 @@ import com.google.inject.Inject;
  * @author John
  * 
  */
-public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
+public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener, ActionMenuWidgetView.Presenter {
 
 	ActionMenuWidgetView view;
 
 	Map<Action, ActionView> actionViewMap;
 	Map<Action, List<ActionListener>> actionListenerMap;
-
+	
 	@Inject
-	public ActionMenuWidgetImpl(ActionMenuWidgetView view) {
+	public ActionMenuWidgetImpl(
+			ActionMenuWidgetView view) {
 		this.view = view;
 		this.actionViewMap = new HashMap<Action, ActionView>();
 		this.actionListenerMap = new HashMap<Action, List<ActionListener>>();
+		view.setPresenter(this);
 		// synchronize with the view
 		for (ActionView av : this.view.listActionViews()) {
 			Action action = av.getAction();
@@ -50,20 +52,18 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 		}
 		reset();
 	}
-
+	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
 	}
 
 	@Override
-	public void setActionEnabled(Action action, boolean enabled) {
-		getActionView(action).setEnabled(enabled);
-	}
-
-	@Override
 	public void setActionVisible(Action action, boolean visible) {
 		getActionView(action).setVisible(visible);
+		if (visible) {
+			view.setNoActionsAvailableVisible(false);
+		}
 	}
 
 	@Override
@@ -118,10 +118,19 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	@Override
 	public void reset() {
 		// Hide all widgets and clear all Listeners
+		hideAllActions();
 		for (Action action : this.actionListenerMap.keySet()) {
-			getActionView(action).setVisible(false);
 			getActionListeners(action).clear();
 		}
+	}
+	
+	@Override
+	public void hideAllActions() {
+		for (Action action : this.actionListenerMap.keySet()) {
+			getActionView(action).setVisible(false);
+		}
+		setACTDividerVisible(false);
+		view.setNoActionsAvailableVisible(true);
 	}
 
 	@Override
@@ -138,13 +147,12 @@ public class ActionMenuWidgetImpl implements ActionMenuWidget, ActionListener {
 	}
 
 	@Override
-	public void setBasicDivderVisible(boolean visible) {
-		view.setBasicDividerVisible(visible);
+	public void setACTDividerVisible(boolean visible) {
+		view.setACTDividerVisible(visible);
 	}
 
 	@Override
-	public void setToolsButtonVisible(boolean visible) {
-		view.setToolsButtonVisible(visible);
+	public void setToolsButtonIcon(String text, IconType icon) {
+		view.setToolsButtonIcon(text, icon);
 	}
-
 }

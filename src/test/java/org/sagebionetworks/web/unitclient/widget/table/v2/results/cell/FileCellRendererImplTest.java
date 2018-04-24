@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.TableFileHandleRequest;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererView;
 import org.sagebionetworks.web.shared.table.CellAddress;
@@ -47,10 +48,9 @@ public class FileCellRendererImplTest {
 	Throwable error;
 	Stubber succesStubber;
 	Stubber failureStubber;
+	TableType tableType;
 	@Mock
 	AuthenticationController mockAuthController;
-	String xsrfToken = "98208";
-	boolean isView;
 	@Mock
 	FileResult mockFileResult;
 	@Before
@@ -63,8 +63,8 @@ public class FileCellRendererImplTest {
 		column.setId("456");
 		rowId = 15L;
 		rowVersion = 2L;
-		isView = false;
-		address = new CellAddress(tableId, column, rowId, rowVersion, isView);
+		tableType = TableType.table;
+		address = new CellAddress(tableId, column, rowId, rowVersion, tableType);
 		renderer.setCellAddresss(address);
 		fileHandleId = "999";
 		fileHandle = new S3FileHandle();
@@ -72,25 +72,36 @@ public class FileCellRendererImplTest {
 		fileHandle.setFileName("filename.jpg");
 		
 		when(mockFileResult.getFileHandle()).thenReturn(fileHandle);
-		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
-		when(mockAuthController.getCurrentXsrfToken()).thenReturn(xsrfToken);
+		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFileHandleAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 	}
 	
 	@Test
 	public void testCreateAnchorHref(){
 		renderer.setValue(fileHandleId);
-		String expectedHref = "/Portal/filehandleassociation?associatedObjectId=syn123&associatedObjectType=TableEntity&fileHandleId="+fileHandleId+"&xsrfToken=98208";
+		String expectedHref = "/Portal/filehandleassociation?associatedObjectId=syn123&associatedObjectType=TableEntity&fileHandleId="+fileHandleId;
 		assertEquals(expectedHref, renderer.createAnchorHref());
 	}
 	
 	@Test
 	public void testCreateAnchorHrefView(){
-		isView = true;
-		address = new CellAddress(tableId, column, rowId, rowVersion, isView);
+		tableType = TableType.projectview;
+		address = new CellAddress(tableId, column, rowId, rowVersion, tableType);
 		renderer.setCellAddresss(address);
 		renderer.setValue(fileHandleId);
-		String expectedHref = "/Portal/filehandleassociation?associatedObjectId="+rowId+"&associatedObjectType=FileEntity&fileHandleId="+fileHandleId+"&xsrfToken=98208";
+		String expectedHref = "/Portal/filehandleassociation?associatedObjectId="+rowId+"&associatedObjectType=FileEntity&fileHandleId="+fileHandleId;
 		assertEquals(expectedHref, renderer.createAnchorHref());
+	}
+	
+	@Test
+	public void testCreateAnchorHrefFileViewMissingRowId(){
+		tableType = TableType.fileview;
+		rowId = null;
+		address = new CellAddress(tableId, column, rowId, rowVersion, tableType);
+		renderer.setCellAddresss(address);
+		renderer.setValue(fileHandleId);
+		verify(mockFileHandleAsyncHandler, never()).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		verify(mockView).setLoadingVisible(false);
+		verify(mockView).setErrorText(FileCellRendererImpl.FILE_SYNAPSE_ID_UNAVAILABLE);
 	}
 	
 	@Test
@@ -135,7 +146,7 @@ public class FileCellRendererImplTest {
 		String errorMessage = "an error";
 		final Throwable error = new Throwable(errorMessage);
 		
-		AsyncMockStubber.callFailureWith(error).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(error).when(mockFileHandleAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		//attached.
 		when(mockView.isAttached()).thenReturn(true);
 		renderer.setValue(fileHandleId);
@@ -150,7 +161,7 @@ public class FileCellRendererImplTest {
 	public void testSetValueFailureNotAttached(){
 		// setup an error.
 		final Throwable error = new Throwable("an error");
-		AsyncMockStubber.callFailureWith(error).when(mockFileHandleAsyncHandler).getFileHandle(any(FileHandleAssociation.class), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(error).when(mockFileHandleAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		//not attached.
 		when(mockView.isAttached()).thenReturn(false);
 		renderer.setValue(fileHandleId);

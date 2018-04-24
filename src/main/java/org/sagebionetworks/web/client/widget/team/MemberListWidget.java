@@ -1,12 +1,13 @@
 package org.sagebionetworks.web.client.widget.team;
 
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.TeamMemberPagedResults;
 
 import com.google.gwt.place.shared.Place;
@@ -25,7 +26,6 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	private TeamMemberPagedResults memberList;
 	private AuthenticationController authenticationController;
 	private Callback teamUpdatedCallback;
-	private SynapseAlert synAlert;
 	private LoadMoreWidgetContainer membersContainer;
 	
 	@Inject
@@ -34,15 +34,14 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			SynapseClientAsync synapseClient, 
 			AuthenticationController authenticationController, 
 			GlobalApplicationState globalApplicationState, 
-			LoadMoreWidgetContainer membersContainer,
-			SynapseAlert synAlert) {
+			LoadMoreWidgetContainer membersContainer) {
 		this.view = view;
 		view.setPresenter(this);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.membersContainer = membersContainer;
-		this.synAlert = synAlert;
 		view.setMembersContainer(membersContainer);
 		membersContainer.configure(new Callback() {
 			@Override
@@ -70,7 +69,6 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	}
 	
 	public void loadMore() {
-		synAlert.clear();
 		synapseClient.getTeamMembers(teamId, searchTerm, MEMBER_LIMIT, offset, new AsyncCallback<TeamMemberPagedResults>() {
 			@Override
 			public void onSuccess(TeamMemberPagedResults results) {
@@ -83,7 +81,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				view.showErrorMessage(caught.getMessage());
 			}
 		});
 	}
@@ -95,7 +93,6 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	
 	@Override
 	public void removeMember(String principalId) {
-		synAlert.clear();
 		synapseClient.deleteTeamMember(authenticationController.getCurrentUserPrincipalId(), principalId, teamId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
@@ -105,14 +102,13 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				view.showErrorMessage(caught.getMessage());
 			}
 		});
 	}
 	
 	@Override
 	public void setIsAdmin(String principalId, boolean isAdmin) {
-		synAlert.clear();
 		synapseClient.setIsTeamAdmin(authenticationController.getCurrentUserPrincipalId(), principalId, teamId, isAdmin, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
@@ -122,7 +118,7 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
+				view.showErrorMessage(caught.getMessage());
 				refresh();
 			}
 		});

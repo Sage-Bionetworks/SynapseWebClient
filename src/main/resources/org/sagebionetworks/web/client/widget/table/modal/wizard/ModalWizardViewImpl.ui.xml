@@ -22,9 +22,8 @@
 			<b:Alert ui:field="alert" type="DANGER" visible="false"></b:Alert>
 		</b:ModalBody>
 		<b:ModalFooter>
-			<b:Button ui:field="primaryButton" type="PRIMARY" dataLoadingText="Processing..." >Next</b:Button>
-			<b:Button ui:field="defaultButton" type="DEFAULT"
-				dataDismiss="MODAL">Cancel</b:Button>
+			<b:Button ui:field="defaultButton" type="LINK" text="Cancel"	></b:Button>
+			<b:Button ui:field="primaryButton" type="PRIMARY" dataLoadingText="Processing..." text="Next" ></b:Button>
 		</b:ModalFooter>
 	</b:Modal>
 </ui:UiBinder>

@@ -6,6 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -25,6 +26,7 @@ import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.discussion.ForumWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTab;
 import org.sagebionetworks.web.client.widget.entity.tabs.DiscussionTabView;
 import org.sagebionetworks.web.client.widget.entity.tabs.Tab;
@@ -47,7 +49,8 @@ public class DiscussionTabTest {
 	PlaceChanger mockPlaceChanger;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
-	
+	@Mock
+	ActionMenuWidget mockActionMenuWidget;
 	DiscussionTab tab;
 	public static final String FORUM_SYNAPSE_ID = "syn99990";
 	@Before
@@ -80,22 +83,29 @@ public class DiscussionTabTest {
 		String entityName = "discussion project test";
 		String areaToken = "a=b&c=d";
 		boolean canModerate = false;
-		tab.configure(entityId, entityName, areaToken, canModerate);
+		tab.configure(entityId, entityName, areaToken, canModerate, mockActionMenuWidget);
 
 		ArgumentCaptor<CallbackP> paramCaptor = ArgumentCaptor.forClass(CallbackP.class);
-		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class), anyBoolean(), paramCaptor.capture(), any(Callback.class));
-		
-		//simulate the forum calling back to the tab with the parameter
-		paramCaptor.getValue().invoke(new ParameterizedToken(areaToken));
-		
+		verify(mockForumWidget).configure(anyString(), any(ParameterizedToken.class), anyBoolean(), eq(mockActionMenuWidget), paramCaptor.capture(), any(Callback.class));
+		//SWC-3994: verify place is initialized with area token.
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(entityName), captor.capture());
 		Synapse place = captor.getValue();
-		assertEquals(entityId, place.getEntityId());
-		assertNull(place.getVersionNumber());
 		assertEquals(EntityArea.DISCUSSION, place.getArea());
 		assertTrue(place.getAreaToken().contains("a=b"));
 		assertTrue(place.getAreaToken().contains("c=d"));
+		
+		//simulate the forum calling back to the tab with the parameter
+		areaToken = "e=f&g=h";
+		paramCaptor.getValue().invoke(new ParameterizedToken(areaToken));
+		
+		verify(mockTab, times(2)).setEntityNameAndPlace(eq(entityName), captor.capture());
+		place = captor.getValue();
+		assertEquals(entityId, place.getEntityId());
+		assertNull(place.getVersionNumber());
+		assertEquals(EntityArea.DISCUSSION, place.getArea());
+		assertTrue(place.getAreaToken().contains("e=f"));
+		assertTrue(place.getAreaToken().contains("g=h"));
 		verifyZeroInteractions(mockPlaceChanger);
 	}
 	@Test
@@ -104,7 +114,7 @@ public class DiscussionTabTest {
 		String entityName = "discussion project test";
 		String areaToken = "a=b&c=d";
 		boolean canModerate = false;
-		tab.configure(entityId, entityName, areaToken, canModerate);
+		tab.configure(entityId, entityName, areaToken, canModerate, mockActionMenuWidget);
 		
 		ArgumentCaptor<SynapseForumPlace> captor = ArgumentCaptor.forClass(SynapseForumPlace.class);
 		verify(mockPlaceChanger).goTo(captor.capture());
@@ -120,4 +130,10 @@ public class DiscussionTabTest {
 	public void testAsTab() {
 		assertEquals(mockTab, tab.asTab());
 	}
+	@Test
+	public void testUpdateActionMenuCommands() {
+		tab.updateActionMenuCommands();
+		verify(mockForumWidget).updateActionMenuCommands();
+	}
+
 }

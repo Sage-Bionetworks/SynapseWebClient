@@ -1,37 +1,11 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Text;
 
-import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
-
-public class DivViewImpl implements DivView {
-	Div div = new Div();
-	
+public class DivViewImpl extends Div implements DivView {
 	@Override
-	public Widget asWidget() {
-		return div;
-	}
-	@Override
-	public void add(Widget child) {
-		div.add(child);
-	}
-	@Override
-	public void add(IsWidget child) {
-		div.add(child);
-	}
-	@Override
-	public void clear() {
-		div.clear();
-	}
-	
-	@Override
-	public void addStyleNames(String styles) {
-		div.addStyleName(styles);
-	}
-	
-	@Override
-	public void setAttribute(String name, String value) {
-		div.getElement().setAttribute(name, value);
+	public void setText(String text) {
+		add(new Text(text));
 	}
 }

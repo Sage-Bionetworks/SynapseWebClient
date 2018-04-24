@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
@@ -22,11 +22,13 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayUtils.SelectedHandler;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFilter;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityFinder;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContainerListWidgetView;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -38,7 +40,7 @@ public class EntityContainerListWidgetTest {
 	@Mock
 	EntityFinder mockEntityFinder;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	SynapseAlert mockSynapseAlert;
 	
@@ -52,7 +54,7 @@ public class EntityContainerListWidgetTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		widget = new EntityContainerListWidget(mockView, mockEntityFinder, mockSynapseClient, mockSynapseAlert);
+		widget = new EntityContainerListWidget(mockView, mockEntityFinder, mockSynapseJavascriptClient, mockSynapseAlert);
 		when(mockEntityHeader.getId()).thenReturn(headerId);
 		when(mockEntityHeader.getName()).thenReturn(headerName);
 		entityHeaders = new ArrayList<EntityHeader>();
@@ -61,17 +63,15 @@ public class EntityContainerListWidgetTest {
 	@Test
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
-		boolean showVersions = false;
-		verify(mockEntityFinder).configureMulti(eq(EntityFilter.CONTAINER), eq(showVersions), any(SelectedHandler.class));
 	}
 	
 	@Test
 	public void testConfigureHappyCase() {
 		// configure with pre-defined entity id list
-		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		boolean canEdit = true;
-		widget.configure(Collections.singletonList(headerId), canEdit);
-		verify(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		widget.configure(Collections.singletonList(headerId), canEdit, TableType.fileview);
+		verify(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		verify(mockView).setAddButtonVisible(true);
 		verify(mockView).setNoContainers(false);
 		verify(mockSynapseAlert).clear();
@@ -81,15 +81,35 @@ public class EntityContainerListWidgetTest {
 		assertTrue(widget.getEntityIds().contains(headerId));
 		widget.onRemoveProject(headerId);
 		assertTrue(widget.getEntityIds().isEmpty());
+
+		boolean showVersions = false;
+		verify(mockEntityFinder).configureMulti(eq(EntityFilter.CONTAINER), eq(showVersions), any(SelectedHandler.class));
+	}
+	
+	@Test
+	public void testMultipleConfigure() {
+		// SWC-3562: old ids should be cleared when widget is re-configured
+		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		boolean canEdit = true;
+		widget.configure(Collections.singletonList(headerId), canEdit, TableType.projectview);
+		assertTrue(widget.getEntityIds().contains(headerId));
+		assertEquals(1, widget.getEntityIds().size());
+		
+		boolean showVersions = false;
+		verify(mockEntityFinder).configureMulti(eq(EntityFilter.PROJECT), eq(showVersions), any(SelectedHandler.class));
+		
+		widget.configure(Collections.singletonList(headerId), canEdit, TableType.fileview);
+		assertTrue(widget.getEntityIds().contains(headerId));
+		assertEquals(1, widget.getEntityIds().size());
 	}
 	
 	@Test
 	public void testConfigureNoIdsNoEdit() {
 		entityHeaders.clear();
-		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		boolean canEdit = false;
-		widget.configure(Collections.EMPTY_LIST, canEdit);
-		verify(mockSynapseClient, never()).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		widget.configure(Collections.EMPTY_LIST, canEdit, TableType.fileview);
+		verify(mockSynapseJavascriptClient, never()).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		verify(mockView).setAddButtonVisible(false);
 		verify(mockView).setNoContainers(true);
 		verify(mockSynapseAlert).clear();
@@ -102,10 +122,10 @@ public class EntityContainerListWidgetTest {
 	@Test
 	public void testConfigureError() {
 		Exception ex = new Exception("error!"); 
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		boolean canEdit = false;
-		widget.configure(Collections.singletonList(headerId), canEdit);
-		verify(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		widget.configure(Collections.singletonList(headerId), canEdit, TableType.fileview);
+		verify(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		verify(mockSynapseAlert).clear();
 		verify(mockSynapseAlert).handleException(ex);
 		verify(mockView, never()).addEntity(anyString(), anyString(), anyBoolean());
@@ -121,7 +141,7 @@ public class EntityContainerListWidgetTest {
 	public void testOnAddProjectId() {
 		ArrayList<EntityHeader> returnList = new ArrayList<EntityHeader>();
 		returnList.add(mockEntityHeader);
-		AsyncMockStubber.callSuccessWith(returnList).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(returnList).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		widget.onAddProject(headerId);
 		
 		verify(mockView).setNoContainers(false);
@@ -135,7 +155,7 @@ public class EntityContainerListWidgetTest {
 	public void testOnAddProjectIdFailure() {
 		String error = "error during lookup!";
 		Exception ex = new Exception(error); 
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		widget.onAddProject(headerId);
 		
 		verify(mockEntityFinder).showError(error);
@@ -143,7 +163,7 @@ public class EntityContainerListWidgetTest {
 	
 	@Test
 	public void testSetValueInvalidResponse(){
-		AsyncMockStubber.callSuccessWith(new ArrayList<EntityHeader>()).when(mockSynapseClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(new ArrayList<EntityHeader>()).when(mockSynapseJavascriptClient).getEntityHeaderBatch(anyList(), any(AsyncCallback.class));
 		widget.onAddProject(headerId);
 		
 		verify(mockEntityFinder).showError(DisplayConstants.ERROR_LOADING);

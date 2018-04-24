@@ -12,15 +12,12 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.cache.SessionStorage;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheKey;
-import org.sagebionetworks.web.client.widget.cache.markdown.MarkdownCacheValue;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.shared.WidgetConstants;
@@ -41,14 +38,14 @@ import com.google.inject.Inject;
  */
 public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private MarkdownIt markdownIt;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private WidgetRegistrar widgetRegistrar;
 	private CookieProvider cookies;
 	AuthenticationController authenticationController;
 	GWTWrapper gwt;
-	private SessionStorage sessionStorage;
+	
 	PortalGinInjector ginInjector;
 	private ResourceLoader resourceLoader;
 	private String md;
@@ -57,7 +54,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	private WikiPageKey wikiKey;
 	private Long wikiVersionInView;
 	@Inject
-	public MarkdownWidget(SynapseClientAsync synapseClient,
+	public MarkdownWidget(SynapseJavascriptClient jsClient,
 			SynapseJSNIUtils synapseJSNIUtils, WidgetRegistrar widgetRegistrar,
 			CookieProvider cookies,
 			ResourceLoader resourceLoader, 
@@ -65,10 +62,9 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			PortalGinInjector ginInjector,
 			MarkdownWidgetView view,
 			SynapseAlert synAlert,
-			SessionStorage sessionStorage,
 			MarkdownIt markdownIt) {
 		super();
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.widgetRegistrar = widgetRegistrar;
 		this.cookies = cookies;
@@ -77,7 +73,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.ginInjector = ginInjector;
 		this.view = view;
 		this.synAlert = synAlert;
-		this.sessionStorage = sessionStorage;
 		this.markdownIt = markdownIt;
 		view.setSynAlertWidget(synAlert.asWidget());
 	}
@@ -96,73 +91,29 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 		this.md = md;
 		this.wikiKey = wikiKey;
 		this.wikiVersionInView = wikiVersionInView;
-		final String uniqueSuffix = new Date().getTime() + "" + gwt.nextRandomInt();
-//		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-//		String hostPrefix = gwt.getHostPrefix();
-//		final String key = getKey(md, hostPrefix, isInTestWebsite);
-		//avoid cache for new md processor until it is in good shape.
-//		final MarkdownCacheValue cachedValue = getValueFromCache(key);
-//		if(cachedValue == null) {
-			view.callbackWhenAttached(new Callback() {
-				@Override
-				public void invoke() {
-					try {
-						String result = markdownIt.markdown2Html(md, uniqueSuffix);
-						//avoid cache for new md processor until it is in good shape.
-//						sessionStorage.setItem(key, getValueToCache(uniqueSuffix, result));
-						loadHtml(uniqueSuffix, result);
-					} catch (RuntimeException e) { //JavaScriptException
-						synAlert.showError(e.getMessage());
-					}
+		final String uniqueSuffix = "-" + new Date().getTime() + "" + gwt.nextRandomInt();
+		view.callbackWhenAttached(new Callback() {
+			@Override
+			public void invoke() {
+				try {
+					String result = markdownIt.markdown2Html(md, uniqueSuffix);
+					loadHtml(uniqueSuffix, result);
+				} catch (RuntimeException e) { //JavaScriptException
+					synAlert.showError(e.getMessage());
 				}
-			});
-//		} else {
-//			//used cached value
-//			view.callbackWhenAttached(new Callback() {
-//				@Override
-//				public void invoke() {
-//					loadHtml(cachedValue.getUniqueSuffix(), cachedValue.getHtml());
-//				}
-//			});
-//		}
+			}
+		});
 	}
 	
-	public String getKey(String md, String hostPrefix, boolean isInTestWebsite) {
-		MarkdownCacheKey key = ginInjector.getMarkdownCacheKey();
-		key.init(md, hostPrefix, isInTestWebsite);
-		return key.toJSON();
-	}
-	
-	public String getValueToCache(String uniqueSuffix, String html) {
-		MarkdownCacheValue value = ginInjector.getMarkdownCacheValue();
-		value.init(uniqueSuffix, html);
-		return value.toJSON();
-	}
-	
-	public MarkdownCacheValue getValueFromCache(String key) {
-		String value = sessionStorage.getItem(key);
-		if (value != null) {
-			MarkdownCacheValue cacheValue = ginInjector.getMarkdownCacheValue();
-			cacheValue.init(value);
-			return cacheValue;
-		}
-		return null;
-	}
 	public void loadHtml(String uniqueSuffix, String result) {
 		if(result != null && !result.isEmpty()) {
 			view.setEmptyVisible(false);
 			view.setMarkdown(result);
-			boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
-
-			//TODO: remove highlightCodeBlocks call once markdown-it has replaced the server-side processor
-			// (because code highlighting is does in the new parser)
-			if (!isInTestWebsite) {
-				synapseJSNIUtils.highlightCodeBlocks();
-			}
-				
+			synapseJSNIUtils.highlightCodeBlocks();
 			loadMath(uniqueSuffix);
 			loadWidgets(wikiKey, wikiVersionInView, uniqueSuffix);	
 			loadTableSorters();
+			
 		} else {
 			view.setEmptyVisible(true);
 		}
@@ -261,7 +212,7 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 	public void loadMarkdownFromWikiPage(final WikiPageKey wikiKey, final boolean isIgnoreLoadingFailure) {
 		synAlert.clear();
 		//get the wiki page
-		synapseClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
+		jsClient.getV2WikiPageAsV1(wikiKey, new AsyncCallback<WikiPage>() {
 			@Override
 			public void onSuccess(WikiPage page) {
 				wikiKey.setWikiPageId(page.getId());
@@ -274,9 +225,6 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			}
 		});				
 	}
-
-	
-	
 	
 	public void refresh() {
 		configure(md, wikiKey, wikiVersionInView);

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.annotation;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +38,7 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 			PortalGinInjector ginInjector)  {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.transformer = transformer;
 		this.ginInjector = ginInjector;
 		view.setPresenter(this);

@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.SimpleCallback;
-
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -39,8 +37,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setAlert(Widget w);
 
 	void setDeleteIconVisible(boolean visible);
-
-	void showConfirm(String deleteConfirmMessage, String dialogTitle, String buttonName, String buttonStyle, SimpleCallback deleteCallback);
 	
 	void setShowAllRepliesButtonVisible(boolean visible);
 
@@ -57,8 +53,6 @@ public interface SingleDiscussionThreadWidgetView extends IsWidget{
 	void setLoadingMessageVisible(boolean visible);
 	void setRepliesContainer(IsWidget container);
 	void showSuccess(String successTitle, String successMessage);
-
-	void setThreadLink(String link);
 
 	void setRefreshAlert(Widget w);
 

@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -18,7 +19,6 @@ import com.google.inject.Inject;
 
 public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView {
 	
-	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	GlobalApplicationState globalApplicationState;
 	SageImageBundle sageImageBundle;
@@ -32,12 +32,13 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
+		addStyleName("bigTeamBadge");
 		notificationsPanel = new SimplePanel();
-		notificationsPanel.addStyleName("displayInline pull-left");
+		notificationsPanel.addStyleName("displayInline pull-left margin-left-5");
 	}
 	
 	@Override
-	public void setTeam(final Team team, String description, String xsrfToken) {
+	public void setTeam(final Team team, String description) {
 		clear();
 		notificationsPanel.clear();
 		if(team == null)  throw new IllegalArgumentException("Team is required");
@@ -46,28 +47,34 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 		ClickHandler clickHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
+				event.preventDefault();
 				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(team.getId()));
 			}
 		};
 		String pictureUrl = null;
 		if (team.getIcon() != null && team.getIcon().length() > 0) {
-			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId(), xsrfToken);
+			pictureUrl = DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId());
 		}
 		
-		addBadgeMedia(DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, false, 5));
+		addBadgeMedia(team.getId(), DisplayUtils.getMediaObject(name, description, clickHandler,  pictureUrl, false, 5));
 	}
 	
 	@Override
 	public void setTeamWithoutLink(String name) {
 		clear();
 		notificationsPanel.clear();
-		addBadgeMedia(DisplayUtils.getMediaObject(name, null, null,  null, false, 5));
+		addBadgeMedia(null, DisplayUtils.getMediaObject(name, null, null,  null, false, 5));
 	}
 	
-	private void addBadgeMedia(FlowPanel mediaObjectPanel) {
+	private void addBadgeMedia(String teamId, FlowPanel mediaObjectPanel) {
+		Anchor anchor = new Anchor();
+		if (teamId != null) {
+			anchor.setHref(DisplayUtils.getTeamHistoryToken(teamId));	
+		}
+		anchor.add(mediaObjectPanel);
 		mediaObjectPanel.addStyleName("displayInline");
 		add(notificationsPanel);
-		add(mediaObjectPanel);
+		add(anchor);
 	}
 
 	@Override
@@ -79,7 +86,7 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 	@Override
 	public void showLoading() {
 		clear();
-		add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		add(DisplayUtils.getSmallLoadingWidget());
 	}
 
 	@Override
@@ -88,11 +95,6 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 
 	@Override
 	public void showErrorMessage(String message) {
-	}
-
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;		
 	}
 
 	@Override

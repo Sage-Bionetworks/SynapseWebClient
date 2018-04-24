@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.footer;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -13,7 +14,6 @@ public class Footer implements FooterView.Presenter, IsWidget {
 	public static final String UNKNOWN = "unknown";
 	private FooterView view;
 	GlobalApplicationState globalAppState;
-	private boolean isInitialized = false;
 	JiraURLHelper jiraHelper;
 	
 	@Inject
@@ -28,32 +28,29 @@ public class Footer implements FooterView.Presenter, IsWidget {
 	}
 
 	public Widget asWidget() {
-		view.setPresenter(this);
-		if (!isInitialized) {
-			isInitialized = true;
-			globalAppState.checkVersionCompatibility(new AsyncCallback<VersionState>() {
-				@Override
-				public void onSuccess(VersionState state) {
-					if (state == null || state.getVersion() == null) {
-						onFailure(null);
-						return;
-					}
-					String versions = state.getVersion();
-					String[] vals = versions.split(",");
-					if(vals.length == 2) {
-						view.setVersion(vals[0],vals[1]);
-					} else {
-						onFailure(null);
-						return;
-					}
+		globalAppState.checkVersionCompatibility(new AsyncCallback<VersionState>() {
+			@Override
+			public void onSuccess(VersionState state) {
+				if (state == null || state.getVersion() == null) {
+					onFailure(null);
+					return;
 				}
-				
-				@Override
-				public void onFailure(Throwable caught) {
-					view.setVersion(UNKNOWN, UNKNOWN);
+				String versions = state.getVersion();
+				String[] vals = versions.split(",");
+				if(vals.length == 2) {
+					view.setVersion(vals[0],vals[1]);
+				} else {
+					onFailure(null);
+					return;
 				}
-			});
-		}
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setVersion(UNKNOWN, UNKNOWN);
+			}
+		});
+		view.refresh();
 		return view.asWidget();
 	}
 	

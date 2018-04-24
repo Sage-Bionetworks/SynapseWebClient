@@ -1,9 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.repo.model.EntityBundle.ACCESS_REQUIREMENTS;
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY;
 import static org.sagebionetworks.repo.model.EntityBundle.FILE_HANDLES;
-import static org.sagebionetworks.repo.model.EntityBundle.UNMET_ACCESS_REQUIREMENTS;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.EntityBundle;
@@ -11,10 +9,10 @@ import org.sagebionetworks.repo.model.EntityGroupRecord;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -33,25 +31,24 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	public static final String N_A = "N/A";
 	private EntityListRowBadgeView view;
 	private UserBadge createdByUserBadge;
-	private SynapseJSNIUtils synapseJSNIUtils;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private FileDownloadButton fileDownloadButton;
 	private String entityId;
 	private Long version;
 	private Callback selectionChangedCallback;
 	private LazyLoadHelper lazyLoadHelper;
-	
+	private DateTimeUtils dateTimeUtils;
 	@Inject
 	public EntityListRowBadge(EntityListRowBadgeView view, 
 			UserBadge userBadge,
-			SynapseJSNIUtils synapseJSNIUtils,
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			FileDownloadButton fileDownloadButton,
-			LazyLoadHelper lazyLoadHelper) {
+			LazyLoadHelper lazyLoadHelper,
+			DateTimeUtils dateTimeUtils) {
 		this.view = view;
 		this.createdByUserBadge = userBadge;
-		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.synapseClient = synapseClient;
+		this.dateTimeUtils = dateTimeUtils;
+		this.jsClient = jsClient;
 		this.fileDownloadButton = fileDownloadButton;
 		this.lazyLoadHelper = lazyLoadHelper;
 		view.setCreatedByWidget(userBadge.asWidget());
@@ -90,7 +87,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	}
 	
 	public void getEntityBundle() {
-		int partsMask = ENTITY | FILE_HANDLES | ACCESS_REQUIREMENTS | UNMET_ACCESS_REQUIREMENTS;
+		int partsMask = ENTITY | FILE_HANDLES;
 		view.showLoading();
 		AsyncCallback<EntityBundle> callback = new AsyncCallback<EntityBundle>() {
 			@Override
@@ -103,9 +100,9 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			};
 		};
 		if (version == null) {
-			synapseClient.getEntityBundle(entityId, partsMask, callback);	
+			jsClient.getEntityBundle(entityId, partsMask, callback);	
 		} else {
-			synapseClient.getEntityBundleForVersion(entityId, version, partsMask, callback);
+			jsClient.getEntityBundleForVersion(entityId, version, partsMask, callback);
 		}
 	}
 	
@@ -131,7 +128,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		}
 		
 		if (eb.getEntity().getCreatedOn() != null) {
-			String dateString = synapseJSNIUtils.convertDateToSmallString(eb.getEntity().getCreatedOn());
+			String dateString = dateTimeUtils.convertDateToSmallString(eb.getEntity().getCreatedOn());
 			view.setCreatedOn(dateString);
 		} else {
 			view.setCreatedOn("");
@@ -139,8 +136,8 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		view.setDescription(eb.getEntity().getDescription());
 		
 		if (eb.getEntity() instanceof FileEntity) {
+			fileDownloadButton.hideClientHelp();
 			fileDownloadButton.configure(eb);
-			fileDownloadButton.setClientsHelpVisible(false);
 			view.setFileDownloadButton(fileDownloadButton.asWidget());
 		}
 		

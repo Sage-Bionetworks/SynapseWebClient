@@ -1,11 +1,10 @@
 <!DOCTYPE ui:UiBinder SYSTEM "http://dl.google.com/gwt/DTD/xhtml.ent">
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
-	xmlns:g="urn:import:com.google.gwt.user.client.ui" xmlns:c="urn:import:com.google.gwt.user.cellview.client"
+	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:s="urn:import:org.sagebionetworks.web.client.view"
-	xmlns:b="urn:import:org.gwtbootstrap3.client.ui">
+	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<g:HTMLPanel>
-		<g:SimplePanel ui:field="header" />
-
 		<div class="margin-top-15 margin-left-35 margin-right-40">
 			<div class="row">
 				<div class="col-md-9 col-md-push-3">
@@ -34,13 +33,12 @@
 				<g:HTMLPanel ui:field="narrowResultsPanel" addStyleNames="col-md-3 col-md-pull-9">
 					<div class="well">
 						<h5>Narrow Results</h5>
+						<bh:Italic>Searching for a user profile?  Try our </bh:Italic><b:Anchor href="#!PeopleSearch:" addStyleNames="margin-left-5 font-italic">People Search</b:Anchor><bh:Italic>.</bh:Italic>
 						<g:SimplePanel ui:field="facetPanel" />
 					</div>
 				</g:HTMLPanel>
-				<div class="clear"></div>
 			</div>
 		</div>
-		<g:SimplePanel ui:field="footer" />
 
 	</g:HTMLPanel>
 </ui:UiBinder> 

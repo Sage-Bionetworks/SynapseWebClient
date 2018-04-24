@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.client.widget.verification;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
@@ -14,18 +16,11 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
-import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -35,24 +30,17 @@ import com.google.inject.Inject;
 public class VerificationSubmissionWidget implements VerificationSubmissionWidgetView.Presenter, IsWidget {
 	public static final String FILL_IN_PROFILE_FIELDS_MESSAGE = "Please edit your profile to fill in your first name, last name, affiliation, and city/country before requesting profile validation.";
 	private UserProfileClientAsync userProfileClient;
-	private SynapseClientAsync synapseClient;
-	private MarkdownWidget helpWikiPage;
 	private SynapseAlert synAlert;
 	private FileHandleList fileHandleList;
-	private static WikiPageKey validationPageKey;
 	private UserProfile profile;
 	private VerificationSubmission submission;
 	private String orcId;
 	private List<AttachmentMetadata> existingAttachments;
 	private VerificationSubmissionWidgetView view;
-	private SynapseJSNIUtils jsniUtils;
 	private PromptModalView promptModal;
 	private GlobalApplicationState globalAppState;
 	private PortalGinInjector ginInjector;
 	private GWTWrapper gwt;
-	private AuthenticationController authController;
-	CallbackP<String> fileHandleClickedCallback;
-	CallbackP<String> rawFileHandleClickedCallback;
 	//this could be Reject or Suspend.  We store this state while the reason is being collected from the ACT user
 	private VerificationStateEnum actRejectState;
 	private boolean isACTMember;
@@ -63,27 +51,20 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	public VerificationSubmissionWidget(
 			PortalGinInjector ginInjector,
 			UserProfileClientAsync userProfileClient,
-			MarkdownWidget helpWikiPage,
-			SynapseClientAsync synapseClient,
 			SynapseAlert synAlert,
 			FileHandleList fileHandleList,
-			SynapseJSNIUtils jsniUtils,
 			PromptModalView promptModalView,
 			GlobalApplicationState globalAppState,
-			GWTWrapper gwt,
-			AuthenticationController authController
+			GWTWrapper gwt
 			) {
 		this.ginInjector = ginInjector;
 		this.userProfileClient = userProfileClient;
-		this.helpWikiPage = helpWikiPage;
-		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(userProfileClient);
 		this.synAlert = synAlert;
 		this.fileHandleList = fileHandleList;
-		this.jsniUtils = jsniUtils;
 		this.promptModal = promptModalView;
 		this.globalAppState = globalAppState;
 		this.gwt = gwt;
-		this.authController = authController;
 		promptModal.configure("", "Reason", "OK", "");
 		promptModal.setPresenter(new PromptModalView.Presenter() {
 			@Override
@@ -91,19 +72,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 				updateVerificationState(actRejectState, promptModal.getValue());
 			}
 		});
-		fileHandleClickedCallback = new CallbackP<String>(){
-			@Override
-			public void invoke(String fileHandleId) {
-				getVerificationSubmissionHandleUrlAndOpen(fileHandleId);
-			}
-		};
-		
-		rawFileHandleClickedCallback = new CallbackP<String>(){
-			@Override
-			public void invoke(String fileHandleId) {
-				getRawFileHandleUrlAndOpen(fileHandleId);
-			}
-		};
 	}
 	
 	public void initView(boolean isModal) {
@@ -113,7 +81,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view = ginInjector.getVerificationSubmissionRowViewImpl();
 		}
 		view.setFileHandleList(fileHandleList.asWidget());
-		view.setWikiPage(helpWikiPage.asWidget());
 		view.setPromptModal(promptModal.asWidget());
 		view.setSynAlert(synAlert.asWidget());
 		view.setPresenter(this);
@@ -161,17 +128,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		return this;
 	}
 	
-	public void getVerificationSubmissionHandleUrlAndOpen(String fileHandleId) {
-		String xsrfToken = authController.getCurrentXsrfToken();
-		String url = jsniUtils.getFileHandleAssociationUrl(submission.getId(), FileHandleAssociateType.VerificationSubmission, fileHandleId, xsrfToken);
-		view.openWindow(url);
-	}
-	
-	public void getRawFileHandleUrlAndOpen(String fileHandleId) {
-		String url = jsniUtils.getBaseFileHandleUrl() + "?rawFileHandleId=" + fileHandleId;
-		view.openWindow(url);
-	}
-	
 	public void show() {
 		view.clear();
 		synAlert.clear();
@@ -185,10 +141,9 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	public void showNewVerificationSubmission() {
 		if (isPreconditionsForNewSubmissionMet(profile, orcId)) {
 			//show wiki on validation process
-			loadWikiHelpContent();
 			view.setCancelButtonVisible(true);
 			view.setSubmitButtonVisible(true);
-			fileHandleList.configure(rawFileHandleClickedCallback)
+			fileHandleList.configure()
 				.setUploadButtonText("Upload...")
 				.setCanDelete(true)
 				.setCanUpload(true);
@@ -207,7 +162,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	
 	public void showExistingVerificationSubmission() {
 		//view an existing verification submission
-		view.setWikiPageVisible(false);
 		view.setFirstName(submission.getFirstName());
 		view.setLastName(submission.getLastName());
 		view.setLocation(submission.getLocation());
@@ -238,7 +192,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			view.setResubmitButtonVisible(true);
 			view.setCloseButtonVisible(true);
 		}
-		fileHandleList.configure(fileHandleClickedCallback)
+		fileHandleList.configure()
 			.setCanDelete(false)
 			.setCanUpload(false);
 		initAttachments();
@@ -246,8 +200,18 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	}
 	
 	public void initAttachments() {
-		for (AttachmentMetadata metadata : existingAttachments) {
-			fileHandleList.addFileLink(metadata.getId(), metadata.getFileName());
+		if (submission == null) {
+			for (AttachmentMetadata metadata : existingAttachments) {
+				fileHandleList.addFileLink(metadata.getFileName(), metadata.getId());
+			}
+		} else {
+			for (AttachmentMetadata metadata : existingAttachments) {
+				FileHandleAssociation fha = new FileHandleAssociation();
+				fha.setAssociateObjectId(submission.getId());
+				fha.setAssociateObjectType(FileHandleAssociateType.VerificationSubmission);
+				fha.setFileHandleId(metadata.getId());
+				fileHandleList.addFileLink(fha);
+			}			
 		}
 		fileHandleList.refreshLinkUI();
 	}
@@ -274,30 +238,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			return false;
 		}
 		return true;
-	}
-	
-	public void loadWikiHelpContent() {
-		if (validationPageKey == null) {
-			//get the wiki page key, then load the content
-			synapseClient.getPageNameToWikiKeyMap(new AsyncCallback<HashMap<String,WikiPageKey>>() {
-				@Override
-				public void onSuccess(HashMap<String,WikiPageKey> result) {
-					validationPageKey = result.get(WebConstants.VALIDATION);
-					loadWikiHelpContent(validationPageKey);
-				};
-				@Override
-				public void onFailure(Throwable caught) {
-					synAlert.handleException(caught);
-				}
-			});
-		} else {
-			loadWikiHelpContent(validationPageKey);
-		}
-	}
-	
-	public void loadWikiHelpContent(WikiPageKey key) {
-		helpWikiPage.loadMarkdownFromWikiPage(key, false);
-		view.setWikiPageVisible(true);
 	}
 	
 	@Override

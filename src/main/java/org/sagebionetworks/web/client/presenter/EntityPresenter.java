@@ -6,8 +6,6 @@ import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
 
 import java.util.List;
 
-import org.sagebionetworks.repo.model.ACCESS_TYPE;
-import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Link;
@@ -17,7 +15,7 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -29,16 +27,13 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
-import org.sagebionetworks.web.shared.AccessRequirementUtils;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.activity.shared.AbstractActivity;
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
@@ -52,7 +47,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private EntityView view;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
-	private SynapseClientAsync synapseClient;
 	private StuAlert synAlert;
 	private String entityId;
 	private Long versionNumber;
@@ -60,29 +54,28 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 	private String areaToken;
 	private CookieProvider cookies;
 	private Header headerWidget;
-	Footer footerWidget;
 	private EntityPageTop entityPageTop;
 	private OpenTeamInvitationsWidget openTeamInvitesWidget;
 	private GWTWrapper gwt;
-	
+	private SynapseJavascriptClient jsClient;
 	@Inject
 	public EntityPresenter(EntityView view,
 			GlobalApplicationState globalAppState,
 			AuthenticationController authenticationController,
-			SynapseClientAsync synapseClient, CookieProvider cookies,
+			SynapseJavascriptClient jsClient, CookieProvider cookies,
 			StuAlert synAlert,
 			EntityPageTop entityPageTop, Header headerWidget,
-			Footer footerWidget, OpenTeamInvitationsWidget openTeamInvitesWidget,
-			GWTWrapper gwt) {
+			OpenTeamInvitationsWidget openTeamInvitesWidget,
+			GWTWrapper gwt
+			) {
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
 		this.entityPageTop = entityPageTop;
 		this.openTeamInvitesWidget = openTeamInvitesWidget;
 		this.view = view;
 		this.synAlert = synAlert;
 		this.globalApplicationState = globalAppState;
 		this.authenticationController = authenticationController;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.cookies = cookies;
 		this.gwt = gwt;
 		clear();
@@ -150,8 +143,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		headerWidget.refresh();
 		//place widgets and configure
 		view.setEntityPageTopWidget(entityPageTop);
-		view.setFooterWidget(footerWidget);
-		view.setHeaderWidget(headerWidget);
 		view.setOpenTeamInvitesWidget(openTeamInvitesWidget);
 		view.setSynAlertWidget(synAlert.asWidget());
 		// Hide the view panel contents until async callback completes
@@ -206,9 +197,9 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		
 		if(isValidEntityId(entityId)) {
 			if (versionNumber == null) {
-				synapseClient.getEntityBundle(entityId, mask, callback);
+				jsClient.getEntityBundle(entityId, mask, callback);
 			} else {
-				synapseClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
+				jsClient.getEntityBundleForVersion(entityId, versionNumber, mask, callback);
 			}
 		} else {
 			//invalid entity detected, indicate that the page was not found
@@ -256,14 +247,6 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 		view.setOpenTeamInvitesVisible(false);
 	}
 	
-	public static void filterToDownloadARs(EntityBundle bundle) {
-		List<AccessRequirement> filteredList = AccessRequirementUtils.filterAccessRequirements(bundle.getAccessRequirements(), ACCESS_TYPE.DOWNLOAD);
-		bundle.setAccessRequirements(filteredList);
-		
-		filteredList = AccessRequirementUtils.filterAccessRequirements(bundle.getUnmetAccessRequirements(), ACCESS_TYPE.DOWNLOAD);
-		bundle.setUnmetAccessRequirements(filteredList);
-	}
-
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();

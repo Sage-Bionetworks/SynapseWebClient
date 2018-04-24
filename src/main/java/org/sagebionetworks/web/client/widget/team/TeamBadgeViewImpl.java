@@ -8,9 +8,9 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -20,45 +20,61 @@ import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.InlineLabel;
 import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	
-	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
-	GlobalApplicationState globalApplicationState;
 	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
 	SimplePanel notificationsPanel;
-	Long publicAclPrincipalId;
+	ClickHandler customClickHandler;
+	Anchor anchor = new Anchor();
+	String teamId;
+	public static PlaceChanger placeChanger = null;
+	public static final String TEAM_ID_ATTRIBUTE = "data-team-id";
+	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
+		event.preventDefault();
+		Widget panel = (Widget)event.getSource();
+		String teamId = panel.getElement().getAttribute(TEAM_ID_ATTRIBUTE);
+		placeChanger.goTo(new org.sagebionetworks.web.client.place.Team(teamId));
+	};
 	
 	@Inject
-	public TeamBadgeViewImpl(SynapseJSNIUtils synapseJSNIUtils,
-			GlobalApplicationState globalApplicationState,
-			SageImageBundle sageImageBundle, IconsImageBundle iconsImageBundle) {
+	public TeamBadgeViewImpl(
+			SynapseJSNIUtils synapseJSNIUtils,
+			SageImageBundle sageImageBundle, 
+			IconsImageBundle iconsImageBundle,
+			GlobalApplicationState globalApplicationState) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
-		this.globalApplicationState = globalApplicationState;
 		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
-		addStyleName("displayInline");
+		addStyleName("teamBadge displayInline");
 		notificationsPanel = new SimplePanel();
-		notificationsPanel.addStyleName("displayInline");
-		
-		publicAclPrincipalId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID));
+		notificationsPanel.addStyleName("margin-left-5 displayInline");
+		placeChanger = globalApplicationState.getPlaceChanger();
 	}
 	
 	@Override
-	public void setTeam(final Team team, Integer maxNameLength, String xsrfToken) {
+	public void setTeam(final Team team, Integer maxNameLength, String teamIconUrl, ClickHandler customClickHandler) {
 		clear();
+		teamId = team.getId();
+		this.customClickHandler = customClickHandler;
+		if (customClickHandler == null) {
+			anchor.addClickHandler(STANDARD_CLICKHANDLER);
+		} else {
+			anchor.addClickHandler(event -> {
+				event.preventDefault();
+				customClickHandler.onClick(event);
+			});
+		}
 		notificationsPanel.clear();
 		if(team == null)  throw new IllegalArgumentException("Team is required");
-		
+		anchor.getElement().setAttribute(TEAM_ID_ATTRIBUTE, teamId);
 		if(team != null) {
-			String name = maxNameLength == null ? team.getName() : DisplayUtils.stubStrPartialWord(team.getName(), maxNameLength); 
-			
-			final Anchor anchor = new Anchor();
+			String name = maxNameLength == null ? team.getName() : DisplayUtils.stubStrPartialWord(team.getName(), maxNameLength);
 			anchor.setText(name);
-			anchor.addStyleName("font-size-15");
 			anchor.setHref(DisplayUtils.getTeamHistoryToken(team.getId()));
 			
 			ClickHandler clickHandler = new ClickHandler() {
@@ -69,34 +85,29 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			};
 			if (team.getIcon() != null && team.getIcon().length() > 0) {
 				Image profilePicture = new Image();
-				profilePicture.setUrl(DisplayUtils.createTeamIconUrl(synapseJSNIUtils.getBaseFileHandleUrl(), team.getId(), xsrfToken));
+				profilePicture.setUrl(teamIconUrl);
 				profilePicture.setHeight("24px");
 				profilePicture.addStyleName("imageButton userProfileImage displayInline margin-right-4");
 				profilePicture.addClickHandler(clickHandler);
 				add(profilePicture);
 			} else {
 				Icon defaultProfilePicture = new Icon(IconType.USERS);
-				defaultProfilePicture.addStyleName("font-size-lg imageButton lightGreyText margin-right-4");
+				defaultProfilePicture.addStyleName("imageButton lightGreyText margin-right-4");
 				add(defaultProfilePicture);
 			}
 			add(anchor);
 			add(notificationsPanel);
-		} 		
+		}
 	}
 	
 	@Override
-	public void setTeamWithoutLink(String name, String teamId) {
+	public void setTeamWithoutLink(String name, boolean isPublic) {
 		clear();
 		notificationsPanel.clear();
 		
 		InlineLabel nameLabel = new InlineLabel(name);
-		nameLabel.addStyleName("font-size-15 boldText");
-		Icon profilePicture;
-		if (publicAclPrincipalId != null && Long.parseLong(teamId) == publicAclPrincipalId) {
-			profilePicture = new Icon(IconType.GLOBE);
-		} else {
-			profilePicture = new Icon(IconType.USERS);
-		}
+		nameLabel.addStyleName("font-size-13 boldText");
+		Icon profilePicture = isPublic ? new Icon(IconType.GLOBE) : new Icon(IconType.USERS);
 		profilePicture.addStyleName("font-size-lg imageButton lightGreyText margin-right-4 margin-left-5");
 		add(profilePicture);
 			
@@ -113,7 +124,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	@Override
 	public void showLoading() {
 		clear();
-		add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		add(DisplayUtils.getSmallLoadingWidget());
 	}
 
 	@Override
@@ -125,18 +136,13 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	}
 
 	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;		
-	}
-
-	@Override
 	public void setRequestCount(String count) {
 		InlineHTML widget = new InlineHTML(DisplayUtils.getBadgeHtml(count));
 		notificationsPanel.setWidget(DisplayUtils.addTooltip(widget, DisplayConstants.PENDING_JOIN_REQUESTS_TOOLTIP));
 	}
-
-	/*
-	 * Private Methods
-	 */
-
+	
+	@Override
+	public void setTarget(String target) {
+		anchor.setTarget(target);
+	}
 }

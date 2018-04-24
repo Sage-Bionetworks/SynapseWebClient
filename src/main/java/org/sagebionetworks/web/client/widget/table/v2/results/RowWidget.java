@@ -6,7 +6,8 @@ import java.util.List;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.Cell;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
@@ -33,10 +34,10 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 	CellFactory cellFactory;
 	Long rowId;
 	Long rowVersion;
-	FileViewDefaultColumns fileViewDefaultColumns;
+	ViewDefaultColumns fileViewDefaultColumns;
 	
 	@Inject
-	public RowWidget(RowView view, CellFactory cellFactory, FileViewDefaultColumns fileViewDefaultColumns){
+	public RowWidget(RowView view, CellFactory cellFactory, ViewDefaultColumns fileViewDefaultColumns){
 		this.view = view;
 		this.cellFactory = cellFactory;
 		this.fileViewDefaultColumns = fileViewDefaultColumns;
@@ -51,33 +52,26 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 	 * @param row The row contains the data for this row.
 	 * @param rowSelectionListener A listener to row selection changes. When null, the row will not be selectable.
 	 */
-	public void configure(final String tableId, final List<ColumnModel> types, final boolean isEditor, final boolean isView, final Row row, RowSelectionListener rowSelectionListener){
+	public void configure(final String tableId, final List<ColumnModel> types, final boolean isEditor, TableType tableType, final Row row, RowSelectionListener rowSelectionListener){
 		this.rowSelectionListener = rowSelectionListener;
-		this.view.setSelectVisible(rowSelectionListener != null && !isView);
+		this.view.setSelectVisible(rowSelectionListener != null && TableType.table.equals(tableType));
 		this.rowId = row.getRowId();
 		this.rowVersion = row.getVersionNumber();
 		this.cells = new ArrayList<Cell>(types.size());
-		boolean clearIds = false;
-		fileViewDefaultColumns.getDefaultColumns(clearIds, new AsyncCallback<List<ColumnModel>>() {
-			@Override
-			public void onSuccess(List<ColumnModel> defaultColumns) {
-				configureAfterInit(tableId, types, isEditor, isView, row, defaultColumns);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				//unable to get the default columns.  try to edit all
-				configureAfterInit(tableId, types, isEditor, isView, row, new ArrayList<ColumnModel>());
-			}
-		});
+		configureAfterInit(tableId, types, isEditor, tableType, row);
 	}
 	
-	private void configureAfterInit(String tableId, List<ColumnModel> types, boolean isEditor, boolean isView, Row row, List<ColumnModel> defaultColumns){
+	private void configureAfterInit(String tableId, List<ColumnModel> types, boolean isEditor, TableType tableType, Row row){
 		// Setup each cell
+		List<ColumnModel> defaultColumns = null;
+		if (isEditor) {
+			boolean clearIds = false;
+			defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.getViewType(), clearIds);
+		}
 		for(ColumnModel type: types){
 			// Create each cell
 			Cell cell = null;
-			if(isEditor && !defaultColumns.contains(type)){
+			if(isEditor && (TableType.table.equals(tableType) || !defaultColumns.contains(type))){
 				cell = cellFactory.createEditor(type);
 			}else{
 				cell = cellFactory.createRenderer(type);
@@ -87,7 +81,7 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 			// Pass the address to cells the need it.
 			if(cell instanceof TakesAddressCell){
 				TakesAddressCell takesAddress = (TakesAddressCell) cell;
-				takesAddress.setCellAddresss(new CellAddress(tableId, type, rowId, rowVersion, isView));
+				takesAddress.setCellAddresss(new CellAddress(tableId, type, rowId, rowVersion, tableType));
 			}
 		}
 		// Set each cell with the data from the row.

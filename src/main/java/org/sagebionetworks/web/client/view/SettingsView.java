@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.view;
 
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseView;
+import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -28,11 +28,10 @@ public interface SettingsView extends IsWidget, SynapseView {
 	
 	public void updateNotificationCheckbox(UserProfile profile);
 	
-	void showNotificationEmailAddress(String primaryEmailAddress);
-	void showEmailChangeSuccess(String message);
 	void setSubscriptionsListWidget(Widget w);
 	void setSubscriptionsVisible(boolean visible);
 	void setPasswordStrengthWidget(Widget w);
+	void setEmailAddressesWidget(IsWidget w);
 	public interface Presenter {
 
 		void resetPassword(String existingPassword, String newPassword);
@@ -43,12 +42,12 @@ public interface SettingsView extends IsWidget, SynapseView {
 
 		void changeApiKey();
 		
-		void addEmail(String emailAddress);
 		void onEditProfile();
 		void getAPIKey();
 
 		void changePassword();
 		void passwordChanged(String password);
+		void setShowUTCTime(boolean isUTC);
 	}
 
 	public void setApiKey(String apiKey);
@@ -56,14 +55,12 @@ public interface SettingsView extends IsWidget, SynapseView {
 
 	public void setNotificationSynAlertWidget(IsWidget asWidget);
 
-	public void setAddressSynAlertWidget(IsWidget asWidget);
-
 	public void setAPISynAlertWidget(IsWidget synAlert);
 	
 	public void setPasswordSynAlertWidget(IsWidget synAlert);
 	
 	void hideAPIKey();
-	void showConfirm(String message, ConfirmCallback callback);
+	void showConfirm(String message, Callback callback);
 
 	String getPassword1Field();
 
@@ -80,4 +77,6 @@ public interface SettingsView extends IsWidget, SynapseView {
 	void setChangePasswordEnabled(boolean isEnabled);
 
 	void resetChangePasswordUI();
+	void setShowingUTCTime();
+	void setShowingLocalTime();
 }

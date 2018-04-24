@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -41,7 +43,9 @@ public class DoiWidget implements Presenter, IsWidget {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.stackConfigService = stackConfigService;
+		fixServiceEntryPoint(stackConfigService);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
 	}

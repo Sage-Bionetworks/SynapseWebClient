@@ -7,12 +7,14 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormLabel;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -41,7 +43,8 @@ public class PromptModalViewImpl implements PromptModalView {
 	@UiField
 	Button defaultButton;
 	Widget widget;
-
+	HandlerRegistration primaryButtonHandlerRegistration;
+	
 	@Inject
 	public PromptModalViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
@@ -56,6 +59,15 @@ public class PromptModalViewImpl implements PromptModalView {
 			@Override
 			public void onClick(ClickEvent event) {
 				modal.hide();
+			}
+		});
+		primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
+		this.nameField.addKeyDownHandler(new KeyDownHandler() {
+			@Override
+			public void onKeyDown(KeyDownEvent event) {
+				if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
+					primaryButton.click();
+				}
 			}
 		});
 	}
@@ -78,18 +90,13 @@ public class PromptModalViewImpl implements PromptModalView {
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
-		this.primaryButton.addClickHandler(new ClickHandler() {
+		if (primaryButtonHandlerRegistration != null) {
+			primaryButtonHandlerRegistration.removeHandler();
+		}
+		primaryButtonHandlerRegistration = this.primaryButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent arg0) {
 				presenter.onPrimary();
-			}
-		});
-		this.nameField.addKeyDownHandler(new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
-					presenter.onPrimary();
-				}
 			}
 		});
 	}
@@ -123,9 +130,12 @@ public class PromptModalViewImpl implements PromptModalView {
 
 	@Override
 	public void configure(String title, String label, String buttonText, String name) {
+		clear();
 		this.modal.setTitle(title);
 		this.nameLabel.setText(label);
-		this.primaryButton.setText(buttonText);
+		// TODO: SWC-3541: the primary button text is not being changed by this line.  We need to find out why.
+		// Or duplicates the button text value!  SWC-1606
+//		this.primaryButton.setText(buttonText);
 		this.nameField.setText(name);
 	}
 

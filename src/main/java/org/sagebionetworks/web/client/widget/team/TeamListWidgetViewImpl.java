@@ -6,7 +6,6 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserViewImpl;
 
@@ -18,19 +17,20 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetView {
-
-	private SageImageBundle sageImageBundle;
-	private Presenter presenter;
 	private PortalGinInjector ginInjector;
-	private Map<String, HasNotificationUI> team2Badge;
-	boolean isBig;
+	private Map<String, HasNotificationUI> team2Badge = new HashMap<String, HasNotificationUI>();
 	Widget emptyHTML;
 	
 	@Inject
-	public TeamListWidgetViewImpl(SageImageBundle sageImageBundle, PortalGinInjector ginInjector) {
-		this.sageImageBundle = sageImageBundle;
+	public TeamListWidgetViewImpl(PortalGinInjector ginInjector) {
 		this.ginInjector = ginInjector;
 		this.emptyHTML = new HTML(SafeHtmlUtils.fromSafeConstant("<div class=\"smallGreyText\">" + EntityTreeBrowserViewImpl.EMPTY_DISPLAY + "</div>").asString());
+	}
+	
+	@Override
+	public void clear() {
+		super.clear();
+		team2Badge = new HashMap<String, HasNotificationUI>();
 	}
 	
 	@Override
@@ -41,7 +41,7 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	@Override
 	public void showLoading() {
 		clear();
-		add(DisplayUtils.getLoadingWidget(sageImageBundle));
+		add(DisplayUtils.getLoadingWidget());
 	}
 
 	@Override
@@ -53,46 +53,24 @@ public class TeamListWidgetViewImpl extends FlowPanel implements TeamListWidgetV
 	public void showErrorMessage(String message) {
 		DisplayUtils.showErrorMessage(message);
 	}
-
-	@Override
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
 	
 	@Override
-	public void addTeam(Team team, Long notificationCount) {
+	public void addTeam(Team team) {
 		emptyHTML.setVisible(false);
 		SimplePanel container = new SimplePanel();
 		container.addStyleName("margin-top-10");
-		if (isBig) {
-			BigTeamBadge teamRenderer = ginInjector.getBigTeamBadgeWidget();
-			teamRenderer.configure(team, team.getDescription());
-			if (notificationCount != null && notificationCount > 0)
-				teamRenderer.setNotificationValue(String.valueOf(notificationCount));
-			team2Badge.put(team.getId(), teamRenderer);
-			Widget teamRendererWidget = teamRenderer.asWidget();
-			teamRendererWidget.addStyleName("col-sm-12 col-md-6");
-			teamRendererWidget.setHeight("120px");
-			container.add(teamRendererWidget);
-		} else {
-			TeamBadge teamRenderer = ginInjector.getTeamBadgeWidget();
-			teamRenderer.configure(team);
-			if (notificationCount != null && notificationCount > 0)
-				teamRenderer.setNotificationValue(String.valueOf(notificationCount));
-			team2Badge.put(team.getId(), teamRenderer);
-			Widget teamRendererWidget = teamRenderer.asWidget();
-			container.add(teamRendererWidget);
-		}
+		TeamBadge teamRenderer = ginInjector.getTeamBadgeWidget();
+		teamRenderer.configure(team);
+		team2Badge.put(team.getId(), teamRenderer);
+		Widget teamRendererWidget = teamRenderer.asWidget();
+		container.add(teamRendererWidget);
 		add(container);
 	}
 	
 	@Override
-	public void configure(boolean isBig) {
-		this.isBig = isBig;
-		team2Badge = new HashMap<String, HasNotificationUI>();
-		if (isBig)
-			addStyleName("row");
-		else
-			removeStyleName("row");
+	public void setNotificationValue(String teamId, Long notificationCount) {
+		if (notificationCount != null && notificationCount > 0) {
+			team2Badge.get(teamId).setNotificationValue(String.valueOf(notificationCount));
+		}
 	}
 }

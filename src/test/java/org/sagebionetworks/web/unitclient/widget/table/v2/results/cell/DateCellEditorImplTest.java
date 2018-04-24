@@ -4,23 +4,29 @@ import java.util.Date;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DateCellEditorView;
 
 public class DateCellEditorImplTest {
-	
-	DateCellEditorView mockView;
 	DateCellEditorImpl editor;
-
+	@Mock
+	DateCellEditorView mockView;
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
 	@Before
 	public void before(){
-		mockView = Mockito.mock(DateCellEditorView.class);
-		editor = new DateCellEditorImpl(mockView);
+		MockitoAnnotations.initMocks(this);
+		when(mockGlobalApplicationState.isShowingUTCTime()).thenReturn(false);
+		editor = new DateCellEditorImpl(mockView,mockGlobalApplicationState);
 	}
 	
 	@Test
@@ -42,6 +48,27 @@ public class DateCellEditorImplTest {
 		String sValue = Long.toString(now.getTime());
 		editor.setValue(sValue);
 		verify(mockView).setValue(eq(now));
+	}
+	
+	@Test
+	public void testUTCTime(){
+		when(mockGlobalApplicationState.isShowingUTCTime()).thenReturn(true);
+		Date now = new Date(System.currentTimeMillis());
+		editor.setValue(Long.toString(now.getTime()));
+		Date offsetDate = new Date(now.getTime() + GlobalApplicationStateImpl.getTimezoneOffsetMs());
+		verify(mockView).setValue(eq(offsetDate));
+	}
+	
+	@Test
+	public void testGetUTCTime(){
+		when(mockGlobalApplicationState.isShowingUTCTime()).thenReturn(true);
+		Date now = new Date(System.currentTimeMillis());
+		String sValue = Long.toString(1L);
+		editor.setValue(sValue);
+		Long newDate = now.getTime();
+		when(mockView.getValue()).thenReturn(new Date(newDate));
+		Long offsetNewDate = newDate - GlobalApplicationStateImpl.getTimezoneOffsetMs();
+		assertEquals(Long.toString(offsetNewDate), editor.getValue());
 	}
 	
 	@Test

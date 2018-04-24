@@ -4,10 +4,10 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PortalGinInjector;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.ButtonElement;
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -20,98 +20,71 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 	private Presenter presenter;
 	
 	@UiField
-	Anchor licensedDownloadLink;
+	Anchor downloadLink;
 	@UiField
-	Anchor licensedDownloadLink2;
+	Anchor downloadLink2;
 	@UiField
-	Anchor directDownloadLink;
+	Span otherWidgets;
 	@UiField
-	Anchor directDownloadLink2;
-	@UiField
-	Anchor authorizedDirectDownloadLink;
-	@UiField
-	Anchor authorizedDirectDownloadLink2;
-	@UiField
-	Span clientsHelpContainer;
-	@UiField
-	Span synAlertContainer;
-	@UiField
-	ButtonElement directDownloadButton;
-	@UiField
-	ButtonElement authorizedDownloadButton;
-	@UiField
-	ButtonElement licensedDownloadButton;
+	ButtonElement downloadButton;
+
+	PortalGinInjector ginInjector;
+	
 	boolean isExtraSmall;
 	interface FileDownloadButtonViewImplUiBinder extends UiBinder<Widget, FileDownloadButtonViewImpl> {}
 
 	private static FileDownloadButtonViewImplUiBinder uiBinder = GWT.create(FileDownloadButtonViewImplUiBinder.class);
 	Widget widget;
+	ClickHandler licensedDownloadClickHandler, authorizedDirectDownloadClickHandler;
+	
 	@Inject
-	public FileDownloadButtonViewImpl() {
+	public FileDownloadButtonViewImpl(PortalGinInjector ginInjector) {
 		widget = uiBinder.createAndBindUi(this);
-		ClickHandler licensedDownloadClickHandler = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				//if there is an href, ignore it
-				event.preventDefault();
-				presenter.onLicensedDownloadClick();
-			}
+		this.ginInjector = ginInjector;
+		licensedDownloadClickHandler = event -> {
+			//if there is an href, ignore it
+			event.preventDefault();
+			presenter.onUnauthenticatedS3DirectDownloadClicked();
 		};
-		licensedDownloadLink.addClickHandler(licensedDownloadClickHandler);
-		licensedDownloadLink2.addClickHandler(licensedDownloadClickHandler);
 		
-		ClickHandler authorizedDirectDownloadClickHandler = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onAuthorizedDirectDownloadClicked();
-			}
+		authorizedDirectDownloadClickHandler = event -> {
+			presenter.onAuthorizedDirectDownloadClicked();
 		};
-		authorizedDirectDownloadLink.addClickHandler(authorizedDirectDownloadClickHandler);
-		authorizedDirectDownloadLink2.addClickHandler(authorizedDirectDownloadClickHandler);
+	
 		isExtraSmall = false;
 	}
 	
 	@Override
 	public void clear() {
-		licensedDownloadLink.setVisible(false);
-		directDownloadLink.setVisible(false);
-		authorizedDirectDownloadLink.setVisible(false);
-		licensedDownloadLink2.setVisible(false);
-		directDownloadLink2.setVisible(false);
-		authorizedDirectDownloadLink2.setVisible(false);
+		downloadLink.setVisible(false);
+		downloadLink2.setVisible(false);
+		otherWidgets.clear();
 	}
 	
 	@Override
-	public void setClientsHelpVisible(boolean visible) {
-		clientsHelpContainer.setVisible(visible);
+	public void setIsAuthorizedDirectDownloadLink() {
+		downloadLink.addClickHandler(authorizedDirectDownloadClickHandler);
+		downloadLink2.addClickHandler(authorizedDirectDownloadClickHandler);
+		downloadLink.setVisible(!isExtraSmall);
+		downloadLink2.setVisible(isExtraSmall);
+	}
+	@Override
+	public void setIsUnauthenticatedS3DirectDownload() {
+		downloadLink.addClickHandler(licensedDownloadClickHandler);
+		downloadLink2.addClickHandler(licensedDownloadClickHandler);
+		updateDownloadLinkVisibility();
 	}
 	
 	@Override
-	public void setDirectDownloadLink(String href) {
-		directDownloadLink.setHref(href);
-		directDownloadLink2.setHref(href);
+	public void setIsDirectDownloadLink(String href) {
+		downloadLink.setHref(href);
+		downloadLink2.setHref(href);
+		updateDownloadLinkVisibility();
 	}
 	
-	@Override
-	public void setAuthorizedDirectDownloadLinkVisible(boolean visible) {
-		authorizedDirectDownloadLink.setVisible(visible && !isExtraSmall);
-		authorizedDirectDownloadLink2.setVisible(visible && isExtraSmall);
-	}
-	
-	@Override
-	public void setDirectDownloadLinkVisible(boolean visible) {
-		directDownloadLink.setVisible(visible && !isExtraSmall);
-		directDownloadLink2.setVisible(visible && isExtraSmall);
-	}
-	@Override
-	public void setLicensedDownloadLinkVisible(boolean visible) {
-		licensedDownloadLink.setVisible(visible && !isExtraSmall);
-		licensedDownloadLink2.setVisible(visible && isExtraSmall);
-	}
-	@Override
-	public void setSynAlert(IsWidget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
+	private void updateDownloadLinkVisibility() {
+		downloadLink.setVisible(!isExtraSmall);
+		downloadLink2.setVisible(isExtraSmall);
 	}
 	
 	@Override
@@ -125,9 +98,8 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 	}
 	
 	@Override
-	public void setFileClientsHelp(IsWidget w) {
-		clientsHelpContainer.clear();
-		clientsHelpContainer.add(w);
+	public void addWidget(IsWidget w) {
+		otherWidgets.add(w);
 	}
 	
 	private void removeButtonSizeStyles(ButtonElement el) {
@@ -141,11 +113,19 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 	@Override
 	public void setButtonSize(ButtonSize size) {
 		isExtraSmall = size.equals(ButtonSize.EXTRA_SMALL);
-		removeButtonSizeStyles(directDownloadButton);
-		removeButtonSizeStyles(authorizedDownloadButton);
-		removeButtonSizeStyles(licensedDownloadButton);
-		directDownloadButton.addClassName(size.getCssName());
-		authorizedDownloadButton.addClassName(size.getCssName());
-		licensedDownloadButton.addClassName(size.getCssName());
+		removeButtonSizeStyles(downloadButton);
+		downloadButton.addClassName(size.getCssName());
+	}
+	@Override
+	public void showLoginS3DirectDownloadDialog(String endpoint) {
+		S3DirectLoginDialog dialog = ginInjector.getS3DirectLoginDialog();
+		dialog.setPresenter(presenter);
+		dialog.showLoginS3DirectDownloadDialog(endpoint);
+	}
+	@Override
+	public void showS3DirectDownloadDialog() {
+		S3DirectLoginDialog dialog = ginInjector.getS3DirectLoginDialog();
+		dialog.setPresenter(presenter);
+		dialog.showS3DirectDownloadDialog();
 	}
 }

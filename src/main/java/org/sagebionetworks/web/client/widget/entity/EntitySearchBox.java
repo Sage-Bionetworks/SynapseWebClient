@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,6 +53,7 @@ public class EntitySearchBox implements EntitySearchBoxView.Presenter, IsWidget 
 		super();		
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		oracle = view.getOracle();
 		view.setPresenter(this);
 	}

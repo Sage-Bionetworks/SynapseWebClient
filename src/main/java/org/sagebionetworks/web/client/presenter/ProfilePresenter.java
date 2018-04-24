@@ -1,12 +1,15 @@
 package org.sagebionetworks.web.client.presenter;
 
+import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
+import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.PaginatedTeamIds;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
@@ -17,8 +20,8 @@ import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
-import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.ClientProperties;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -26,6 +29,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -39,27 +43,25 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.view.ProfileView;
-import org.sagebionetworks.web.client.view.TeamRequestBundle;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
+import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
+import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationSubmissionWidget;
-import org.sagebionetworks.web.shared.ChallengeBundle;
-import org.sagebionetworks.web.shared.ChallengePagedResults;
 import org.sagebionetworks.web.shared.LinkedInInfo;
-import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
-import org.sagebionetworks.web.shared.ProjectPagedResults;
 import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -84,7 +86,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private ProfileView view;
 	private SynapseClientAsync synapseClient;
 	private UserProfileClientAsync userProfileClient;
-	private ChallengeClientAsync challengeClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookies;
@@ -100,6 +101,8 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	private String currentUserId;
 	private boolean isOwner;
 	private int currentProjectOffset, currentChallengeOffset;
+	private String teamNextPageToken;
+	private boolean includeRequestCount;
 	public final static int PROJECT_PAGE_SIZE=20;
 	public final static int CHALLENGE_PAGE_SIZE=20;
 	public ProfileArea currentArea;
@@ -107,50 +110,55 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public String filterTeamId;
 	public SortOptionEnum currentProjectSort;
 	public TeamListWidget myTeamsWidget;
+	public LoadMoreWidgetContainer loadMoreTeamsWidgetContainer;
 	public SynapseAlert profileSynAlert;
 	public SynapseAlert projectSynAlert;
 	public SynapseAlert teamSynAlert;
 	public SynapseAlert challengeSynAlert;
 	public VerificationSubmissionWidget verificationModal;
 	public UserBundle currentUserBundle;
-	public Map<String, Boolean> isACTMemberMap;
 	public Callback resubmitVerificationCallback;
 	public LoadMoreWidgetContainer loadMoreProjectsWidgetContainer;
-	public Callback getMoreProjectsCallback;
+	public Callback getMoreProjectsCallback, getMoreTeamsCallback;
 	public Callback refreshTeamsCallback;
-	
+	public IsACTMemberAsyncHandler isACTMemberAsyncHandler;
+	public DateTimeUtils dateTimeUtils;
+	public PromptModalView promptForProjectNameDialog;
+	public PromptModalView promptForTeamNameDialog;
+	public SynapseJavascriptClient jsClient;
 	@Inject
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
 			SynapseClientAsync synapseClient,
-			ChallengeClientAsync challengeClient,
 			CookieProvider cookies,
-			UserProfileModalWidget userProfileModalWidget,
 			LinkedInServiceAsync linkedInServic,
 			GWTWrapper gwt,
 			TeamListWidget myTeamsWidget,
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
 			UserProfileClientAsync userProfileClient,
-			VerificationSubmissionWidget verificationModal) {
+			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
+			DateTimeUtils dateTimeUtils,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.ginInjector = ginInjector;
 		this.synapseClient = synapseClient;
-		this.challengeClient = challengeClient;
+		fixServiceEntryPoint(synapseClient);
 		this.cookies = cookies;
-		this.userProfileModalWidget = userProfileModalWidget;
 		this.linkedInService = linkedInServic;
+		fixServiceEntryPoint(linkedInService);
 		this.gwt = gwt;
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
 		this.userProfileClient = userProfileClient;
-		this.verificationModal = verificationModal;
-		
-		isACTMemberMap = new HashMap<String, Boolean>();
+		fixServiceEntryPoint(userProfileClient);
+		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
+		this.dateTimeUtils = dateTimeUtils;
+		this.jsClient = jsClient;
 		view.clearSortOptions();
 		for (SortOptionEnum sort: SortOptionEnum.values()) {
 			view.addSortOption(sort);
@@ -160,31 +168,66 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		teamSynAlert = ginInjector.getSynapseAlertWidget();
 		challengeSynAlert = ginInjector.getSynapseAlertWidget();
 		view.setPresenter(this);
-		view.addUserProfileModalWidget(userProfileModalWidget);
-		view.addMyTeamsWidget(myTeamsWidget);
 		view.addOpenInvitesWidget(openInvitesWidget);
 		view.setProfileSynAlertWidget(profileSynAlert.asWidget());
 		view.setProjectSynAlertWidget(projectSynAlert.asWidget());
 		view.setTeamSynAlertWidget(teamSynAlert.asWidget());
 		view.setChallengeSynAlertWidget(challengeSynAlert.asWidget());
-		resubmitVerificationCallback = new Callback() {
-			@Override
-			public void invoke() {
-				newVerificationSubmissionClicked();
-			}
+		resubmitVerificationCallback = () -> {
+			newVerificationSubmissionClicked();
 		};
-		getMoreProjectsCallback = new Callback() {
-			@Override
-			public void invoke() {
-				getMoreProjects();
-			}
+		getMoreProjectsCallback = () -> {
+			getMoreProjects();
 		};
-		refreshTeamsCallback = new Callback() {
-			@Override
-			public void invoke() {
-				refreshTeams();
-			}
+		
+		getMoreTeamsCallback = () -> {
+			getMoreTeams();
 		};
+		
+		refreshTeamsCallback = () -> {
+			refreshTeamsForFilter();
+		};
+	}
+	
+	public VerificationSubmissionWidget getVerificationSubmissionWidget() {
+		if (verificationModal == null) {
+			verificationModal = ginInjector.getVerificationSubmissionWidget();
+		}
+		return verificationModal;
+	}
+	public PromptModalView getPromptForTeamNameDialog() {
+		if (promptForTeamNameDialog == null) {
+			promptForTeamNameDialog = ginInjector.getPromptModal();
+			promptForTeamNameDialog.setPresenter(new PromptModalView.Presenter() {
+				@Override
+				public void onPrimary() {
+					createTeamAfterPrompt();
+				}
+			});
+		}
+		return promptForTeamNameDialog;
+	}
+	
+	public PromptModalView getPromptForProjectNameDialog() {
+		if (promptForProjectNameDialog == null) {
+			promptForProjectNameDialog = ginInjector.getPromptModal();
+			promptForProjectNameDialog.setPresenter(new PromptModalView.Presenter() {
+				@Override
+				public void onPrimary() {
+					createProjectAfterPrompt();
+				}
+			});
+		}
+		return promptForProjectNameDialog;
+	}
+
+	
+	public UserProfileModalWidget getUserProfileModalWidget() {
+		if (userProfileModalWidget == null) {
+			userProfileModalWidget = ginInjector.getUserProfileModalWidget();
+			view.addUserProfileModalWidget(userProfileModalWidget);
+		}
+		return userProfileModalWidget;
 	}
 
 	public SettingsPresenter getSettingsPresenter() {
@@ -205,16 +248,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void setPlace(Profile place) {
 		this.place = place;
-		this.view.setPresenter(this);
 		this.view.clear();
 		resetSynAlertWidgets();
 		showView(place);
+		view.setPresenter(this);
 	}
 	
 	private void resetSynAlertWidgets() {
 		profileSynAlert.clear();
-		projectSynAlert.clear();
-		teamSynAlert.clear();
+		projectSynAlert.clear();	
+		teamSynAlert.clear();	
 	}
 	
 	@Override
@@ -271,7 +314,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		myTeamsWidget.clear();
 		view.clearTeamNotificationCount();
-		myTeamsWidget.configure(false);
 		currentUserId = userId == null ? authenticationController.getCurrentUserPrincipalId() : userId;
 		if (isOwner) {
 			// make sure we have the user favorites before continuing
@@ -298,7 +340,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.setSynapseEmailVisible(authenticationController.isLoggedIn());
 		view.setOrcIdVisible(false);
 		view.setUnbindOrcIdVisible(false);
-		userProfileClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
+		jsClient.getUserBundle(currentUserIdLong, mask, new AsyncCallback<UserBundle>() {
 			@Override
 			public void onSuccess(UserBundle bundle) {
 				view.hideLoading();
@@ -400,7 +442,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		if (isVerified) {
 			List<VerificationState> stateHistory = submission.getStateHistory();
 			VerificationState latestState = stateHistory.get(stateHistory.size()-1);
-			String dateVerified = gwt.getFormattedDateString(latestState.getCreatedOn());
+			String dateVerified = dateTimeUtils.getLongFriendlyDate(latestState.getCreatedOn());
 			view.showVerifiedBadge(submission.getFirstName(), submission.getLastName(), submission.getLocation(),submission.getCompany(), submission.getOrcid(), dateVerified);
 		}
 		
@@ -432,27 +474,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getIsACTMemberAndShowVerificationUI(final VerificationSubmission submission) {
 		if (authenticationController.isLoggedIn()) {
-			//do we know if the current user is an act member?
-			Boolean isActMember = isACTMemberMap.get(authenticationController.getCurrentUserPrincipalId());
-			if (isActMember == null) {
-				//we don't know, find out.
-				int mask = IS_ACT_MEMBER;
-				userProfileClient.getMyOwnUserBundle(mask, new AsyncCallback<UserBundle>() {
-					@Override
-					public void onSuccess(UserBundle userBundle) {
-						isACTMemberMap.put(authenticationController.getCurrentUserPrincipalId(), userBundle.getIsACTMember());
-						showVerificationUI(submission, userBundle.getIsACTMember());
-					}
-					
-					@Override
-					public void onFailure(Throwable caught) {
-						view.hideLoading();
-						profileSynAlert.handleException(caught);
-					}
-				});	
-			} else {
-				showVerificationUI(submission, isActMember);
-			}
+			isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
+				@Override
+				public void invoke(Boolean isACTMember) {
+					showVerificationUI(submission, isACTMember);
+				}
+			});
 		}
 	}
 	
@@ -579,96 +606,193 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		currentProjectSort = sort;
 		view.setSortText(sort.sortText);
 		refreshProjects();
-	}	
+	}
+	
+	public void refreshTeamsForFilter() {
+		updateMembershipInvitationCount();
+		updateMembershipRequestCount();
+		getTeamBundles(false);
+	}
 	
 	@Override
 	public void refreshTeams() {
-		view.clearTeamNotificationCount();
-		if (isOwner)
-			refreshTeamInvites();
-		getTeamBundles(currentUserId, isOwner);
+		updateMembershipInvitationCount();
+		updateMembershipRequestCount();
+		refreshTeamInvites();
+		getTeamBundles(isOwner);
 	}
 	
-	@Override
 	public void refreshTeamInvites() {
-		CallbackP<List<OpenUserInvitationBundle>> openTeamInvitationsCallback = new CallbackP<List<OpenUserInvitationBundle>>() {
-			@Override
-			public void invoke(List<OpenUserInvitationBundle> invites) {
-				updateTeamInvites(invites);
-			}
-		};
-		openInvitesWidget.configure(new Callback() {
-			@Override
-			public void invoke() {
-				//refresh the teams after joining one
-				refreshTeams();
-			}
-		}, openTeamInvitationsCallback);
+		if (isOwner) {
+			openInvitesWidget.configure(new Callback() {
+				@Override
+				public void invoke() {
+					//refresh the teams after joining one
+					refreshTeams();
+				}
+			}, null);
+		}
 	}
 	
-	public void getTeamBundles(String userId, final boolean includeRequestCount) {
+	public void updateMembershipRequestCount() {
+		if (isOwner) {
+			openRequestCount = 0;
+			jsClient.getOpenMembershipRequestCount(new AsyncCallback<Long>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					teamSynAlert.handleException(caught);
+				}
+				
+				@Override
+				public void onSuccess(Long count) {
+					setMembershipRequestsCount(count.intValue());
+				}
+			});
+		}
+	}
+	
+	public void updateMembershipInvitationCount() {
+		if (isOwner) {
+			inviteCount = 0;
+			jsClient.getOpenMembershipInvitationCount(new AsyncCallback<Long>() {
+				@Override
+				public void onFailure(Throwable caught) {
+					teamSynAlert.handleException(caught);
+				}
+				
+				@Override
+				public void onSuccess(Long count) {
+					setTeamInvitationsCount(count.intValue());
+				}
+			});
+		}
+	}
+	
+	public void getTeamBundles(boolean includeRequestCount) {
+		this.includeRequestCount = includeRequestCount;
 		teamSynAlert.clear();
 		myTeamsWidget.clear();
-		myTeamsWidget.showLoading();
-		synapseClient.getTeamsForUser(userId, includeRequestCount, new AsyncCallback<List<TeamRequestBundle>>() {
-			@Override
-			public void onSuccess(List<TeamRequestBundle> teamsRequestBundles) {
-				myTeamsWidget.clear();
-				if (teamsRequestBundles != null && teamsRequestBundles.size() > 0) {
-					int totalRequestCount = 0;
-					view.addMyTeamProjectsFilter();
-					for (TeamRequestBundle teamAndRequest: teamsRequestBundles) {
-						// requests will always be 0 or greater
-						Long requestCount = teamAndRequest.getRequestCount();
-						Team team = teamAndRequest.getTeam();
-						myTeamsWidget.addTeam(team, requestCount);
-						view.addTeamsFilterTeam(team);
-						totalRequestCount += requestCount;
+		teamNextPageToken = null;
+		
+		loadMoreTeamsWidgetContainer = ginInjector.getLoadMoreProjectsWidgetContainer();
+		view.setTeamsContainer(loadMoreTeamsWidgetContainer.asWidget());
+		loadMoreTeamsWidgetContainer.setIsMore(false);
+		loadMoreTeamsWidgetContainer.configure(getMoreTeamsCallback);
+		if (myTeamsWidget.asWidget() != null) {
+			myTeamsWidget.asWidget().removeFromParent();	
+		}
+		loadMoreTeamsWidgetContainer.add(myTeamsWidget.asWidget());
+		view.addMyTeamProjectsFilter();
+		getMoreTeams();
+	}
+	
+	public void getMoreTeams() {
+		jsClient.getUserTeams(currentUserId, true, teamNextPageToken)
+			.addCallback(
+				new FutureCallback<PaginatedTeamIds>() {
+					@Override
+					public void onSuccess(PaginatedTeamIds paginatedTeamIds) {
+						teamNextPageToken = paginatedTeamIds.getNextPageToken();
+						List<String> teamIds = paginatedTeamIds.getTeamIds();
+						boolean isTeams = teamIds.size() > 0;
+						loadMoreTeamsWidgetContainer.setIsMore(teamNextPageToken != null);
+						view.setTeamsFilterVisible(isTeams);
+						if (isTeams) {
+							addTeams(teamIds);
+						} else {
+							myTeamsWidget.showEmpty();
+						}
 					}
-					view.setTeamsFilterVisible(true);
-					if (includeRequestCount) {
-						addMembershipRequests(totalRequestCount);
+	
+					@Override
+					public void onFailure(Throwable caught) {
+						view.setTeamsFilterVisible(false);
+						loadMoreTeamsWidgetContainer.setIsMore(false);
+						teamSynAlert.handleException(caught);
 					}
-				} else {
-					myTeamsWidget.showEmpty();
-					view.setTeamsFilterVisible(false);
-				}
-			}
+				},
+				directExecutor()
+		);
+	}
+	
+	public void addTeams(List<String> teamIds) {
+		jsClient.listTeams(teamIds)
+			.addCallback(
+				new FutureCallback<List<Team>>() {
+					@Override
+					public void onSuccess(List<Team> teams) {
+						ProfileArea currentArea = place.getArea();
+						switch (currentArea) {
+							case PROJECTS:
+								for (Team team: teams) {
+									view.addTeamsFilterTeam(team);
+								}
+								break;
+							case TEAMS:
+								for (Team team: teams) {
+									myTeamsWidget.addTeam(team);
+								}
+								break;
+							default:
+								break;
+						}
+						if (includeRequestCount) {
+							for (Team team: teams) {
+								getTeamRequestCount(currentUserId, team);
+							}
+						}
+					}
+	
+					@Override
+					public void onFailure(Throwable caught) {
+						view.setTeamsFilterVisible(false);
+						loadMoreTeamsWidgetContainer.setIsMore(false);
+						teamSynAlert.handleException(caught);
+					}
+				},
+				directExecutor()
+		);
+	}
+	
+	public void getTeamRequestCount(String userId, final Team team) {
+		synapseClient.getOpenRequestCount(userId, team.getId(), new AsyncCallback<Long>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				myTeamsWidget.clear();
-				view.setTeamsFilterVisible(false);
-				teamSynAlert.handleException(caught);
+			}
+			@Override
+			public void onSuccess(Long count) {
+				myTeamsWidget.setNotificationValue(team.getId(), count);
 			}
 		});
 	}
 	
-	
 	public void getMoreChallenges() {
 		challengeSynAlert.clear();
 		view.showChallengesLoading(true);
-		challengeClient.getChallenges(currentUserId, CHALLENGE_PAGE_SIZE, currentChallengeOffset, new AsyncCallback<ChallengePagedResults>() {
+		jsClient.getChallenges(currentUserId, CHALLENGE_PAGE_SIZE, currentChallengeOffset, new AsyncCallback<List<Challenge>>() {
 			@Override
-			public void onSuccess(ChallengePagedResults challengeResults) {
-				addChallengeResults(challengeResults.getResults());
-				challengePageAdded(challengeResults.getTotalNumberOfResults());
+			public void onSuccess(List<Challenge> challengeList) {
+				addChallengeResults(challengeList);
+				challengePageAdded(challengeList.size());
 			}
-	            @Override
+			
+			@Override
 			public void onFailure(Throwable caught) {
 				view.showChallengesLoading(false);
 				challengeSynAlert.handleException(caught);
 			}
+			
 		});
 	}
 	
 	public void getMyProjects(ProjectListType projectListType, final ProjectFilterEnum filter, int offset) {
 		projectSynAlert.clear();
-		synapseClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
+		jsClient.getMyProjects(projectListType, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>() {
 			@Override
-			public void onSuccess(ProjectPagedResults projectHeaders) {
+			public void onSuccess(List<ProjectHeader> results) {
 				if (filterType == filter) {
-					addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
-					projectPageAdded(projectHeaders.getTotalNumberOfResults());
+					addProjectResults(results);
+					projectPageAdded(results.size());
 				}
 			}
 			@Override
@@ -680,12 +804,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	public void getTeamProjects(int offset) {
 		projectSynAlert.clear();
-		synapseClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir,  new AsyncCallback<ProjectPagedResults>() {
+		jsClient.getProjectsForTeam(filterTeamId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>(){
 			@Override
-			public void onSuccess(ProjectPagedResults projectHeaders) {
+			public void onSuccess(List<ProjectHeader> results) {
 				if (filterType == ProjectFilterEnum.TEAM) {
-					addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
-					projectPageAdded(projectHeaders.getTotalNumberOfResults());
+					addProjectResults(results);
+					projectPageAdded(results.size());
 				}
 			}
 			@Override
@@ -697,11 +821,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	public void getUserProjects(int offset) {
 		projectSynAlert.clear();
-		synapseClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<ProjectPagedResults>() {
+		jsClient.getUserProjects(currentUserId, PROJECT_PAGE_SIZE, offset, currentProjectSort.sortBy, currentProjectSort.sortDir, new AsyncCallback<List<ProjectHeader>>() {
 			@Override
-			public void onSuccess(ProjectPagedResults projectHeaders) {
-				addProjectResults(projectHeaders.getResults(), projectHeaders.getLastModifiedBy());
-				projectPageAdded(projectHeaders.getTotalNumberOfResults());
+			public void onSuccess(List<ProjectHeader> results) {
+				addProjectResults(results);
+				projectPageAdded(results.size());
 			}
 			@Override
 			public void onFailure(Throwable caught) {
@@ -710,20 +834,19 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	public void addProjectResults(List<ProjectHeader> projectHeaders, List<UserProfile> lastModifiedByList) {
+	public void addProjectResults(List<ProjectHeader> projectHeaders) {
 		for (int i = 0; i < projectHeaders.size(); i++) {
 			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
 			badge.addStyleName("margin-bottom-10 col-xs-12");
-			badge.configure(projectHeaders.get(i), lastModifiedByList == null ? null :lastModifiedByList.get(i));
+			badge.configure(projectHeaders.get(i));
 			Widget widget = badge.asWidget();
 			loadMoreProjectsWidgetContainer.add(widget);
 		}
 	}
 	
-	public void addChallengeResults(List<ChallengeBundle> challenges) {
+	public void addChallengeResults(List<Challenge> challenges) {
 		view.showChallengesLoading(false);
-		view.clearChallenges();
-		for (ChallengeBundle challenge : challenges) {
+		for (Challenge challenge : challenges) {
 			ChallengeBadge badge = ginInjector.getChallengeBadgeWidget();
 			badge.configure(challenge);
 			Widget widget = badge.asWidget();
@@ -735,19 +858,19 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 	}
 	
-	public void projectPageAdded(int totalNumberOfResults) {
+	public void projectPageAdded(int projectsAdded) {
 		currentProjectOffset += PROJECT_PAGE_SIZE;
-		loadMoreProjectsWidgetContainer.setIsMore(currentProjectOffset < totalNumberOfResults);
+		loadMoreProjectsWidgetContainer.setIsMore(projectsAdded >= PROJECT_PAGE_SIZE);
 	}
 	
-	public void challengePageAdded(Long totalNumberOfResults) {
+	public void challengePageAdded(int challengesAdded) {
 		currentChallengeOffset += CHALLENGE_PAGE_SIZE;
-		view.setIsMoreChallengesVisible(currentChallengeOffset < totalNumberOfResults);
+		view.setIsMoreChallengesVisible(challengesAdded >= CHALLENGE_PAGE_SIZE);
 	}
 	
 	public void getFavorites() {
 		projectSynAlert.clear();
-		EntityBrowserUtils.loadFavorites(synapseClient, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+		EntityBrowserUtils.loadFavorites(jsClient, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				if (filterType == ProjectFilterEnum.FAVORITES) {
@@ -764,7 +887,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 							projectHeader.setName(header.getName());
 							headers.add(projectHeader);
 						}
-						addProjectResults(headers, null);
+						addProjectResults(headers);
 						loadMoreProjectsWidgetContainer.setIsMore(false);
 					}
 				}
@@ -778,17 +901,24 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	
 	@Override
-	public void createProject(final String name) {
-		projectSynAlert.clear();
+	public void createProject() {
+		//prompt for project name
+		getPromptForProjectNameDialog().configure("Create a New Project", "Project Name", "OK", "");
+		getPromptForProjectNameDialog().show();
+	}
+	
+	public void createProjectAfterPrompt() {
+		final String name = getPromptForProjectNameDialog().getValue();
 		//validate project name
 		if (!DisplayUtils.isDefined(name)) {
-			projectSynAlert.showError(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
+			getPromptForProjectNameDialog().showError(DisplayConstants.PLEASE_ENTER_PROJECT_NAME);
 			return;
 		}
 		
 		CreateEntityUtil.createProject(name, synapseClient, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newProjectId) {
+				getPromptForProjectNameDialog().hide();
 				view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
 				globalApplicationState.getPlaceChanger().goTo(new Synapse(newProjectId));						
 			}
@@ -796,27 +926,33 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof ConflictException) {
-					projectSynAlert.showError(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
+					getPromptForProjectNameDialog().showError(DisplayConstants.WARNING_PROJECT_NAME_EXISTS);
 				} else {
-					projectSynAlert.handleException(caught);
+					getPromptForProjectNameDialog().showError(caught.getMessage());
 				}
 			}
 		});
 	}
-	
 
 	@Override
-	public void createTeam(final String teamName) {
-		teamSynAlert.clear();
+	public void createTeam() {
+		// prompt for team name
+		getPromptForTeamNameDialog().configure("Create a New Team", "Team Name", "OK", "");
+		getPromptForTeamNameDialog().show();
+	}
+	
+	public void createTeamAfterPrompt() {
+		final String teamName = getPromptForTeamNameDialog().getValue();
 		//validate team name
 		if (!DisplayUtils.isDefined(teamName)) {
-			teamSynAlert.showError(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
+			getPromptForTeamNameDialog().showError(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
 			return;
 		}
 
 		synapseClient.createTeam(teamName, new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String newTeamId) {
+				getPromptForTeamNameDialog().hide();
 				view.showInfo(DisplayConstants.LABEL_TEAM_CREATED, teamName);
 				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(newTeamId));						
 			}
@@ -824,13 +960,12 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onFailure(Throwable caught) {
 				if(caught instanceof ConflictException) {
-					teamSynAlert.showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
+					getPromptForTeamNameDialog().showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);
 				} else {
-					teamSynAlert.handleException(caught);
+					getPromptForTeamNameDialog().showError(caught.getMessage());
 				}
 			}
-		});
-
+		});		
 	}
 	
 	private boolean checkIsLoggedIn() {
@@ -864,7 +999,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		currentArea = place.getArea();
 		filterType = place.getProjectFilter();
 		filterTeamId = place.getTeamId();
-		view.setPresenter(this);
+		if (loadMoreProjectsWidgetContainer != null) {
+			loadMoreProjectsWidgetContainer.clear();
+		}
+		if (loadMoreTeamsWidgetContainer != null) {
+			loadMoreTeamsWidgetContainer.clear();
+		}
+		
 		if (token.equals("oauth_bound")) {
 			view.showInfo("", DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
 			token = "v";
@@ -888,8 +1029,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		else {
 			//if this contains an oauth_token, it's from linkedin
-			if (token.contains("oauth_token"))
-			{
+			if (token.contains("oauth_token")) {
 				// User just logged in to LinkedIn. Get the request token and their info to update
 				// their profile with.
 
@@ -910,10 +1050,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 					}
 				}
 				
-				if(!requestToken.equals("") && !verifier.equals("")) {
+				globalApplicationState.replaceCurrentPlace(new Profile(authenticationController.getCurrentUserPrincipalId()));
+				
+				if(requestToken != null && !requestToken.equals("") && verifier != null && !verifier.equals("")) {
 					updateProfileWithLinkedIn(requestToken, verifier);
 				} else {
-					view.showErrorMessage("An error occurred. Please try reloading the page.");
+					view.showErrorMessage("Unable to import LinkedIn profile.");
+					globalApplicationState.refreshPage();
 				}
 			} else if (Profile.EDIT_PROFILE_TOKEN.equals(token)) {
 				editMyProfile();
@@ -944,21 +1087,22 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	@Override
-	public void updateTeamInvites(List<OpenUserInvitationBundle> invites) {
-		if (invites != null && invites.size() != inviteCount) {
-			inviteCount = invites.size();
-		}
-		if (openRequestCount + inviteCount > 0)
-			view.setTeamNotificationCount(Integer.toString(openRequestCount + inviteCount));
+	public void setTeamInvitationsCount(int count) {
+		inviteCount = count;
+		refreshTeamNotificationCount();
 	}
 
-	@Override
-	public void addMembershipRequests(int count) {
-		if (count != openRequestCount) 
-			openRequestCount = count;		
-		if (openRequestCount + inviteCount > 0)
+	public void setMembershipRequestsCount(int count) {
+		openRequestCount = count;		
+		refreshTeamNotificationCount();
+	}
+	
+	public void refreshTeamNotificationCount() {
+		if (openRequestCount + inviteCount > 0) {
 			view.setTeamNotificationCount(Integer.toString(openRequestCount + inviteCount));
+		} else {
+			view.clearTeamNotificationCount();
+		}
 	}
 	
 	/**
@@ -1076,7 +1220,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void initUserFavorites(final Callback callback) {
-		synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
+		jsClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> favorites) {
 				globalApplicationState.setFavorites(favorites);
@@ -1138,7 +1282,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 
 	@Override
 	public void onEditProfile() {
-		this.userProfileModalWidget.showEditProfile(this.currentUserId, new Callback() {
+		getUserProfileModalWidget().showEditProfile(this.currentUserId, new Callback() {
 			@Override
 			public void invoke() {
 				profileUpdated();
@@ -1161,7 +1305,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				Date date = new Date(System.currentTimeMillis() + 300000);
 				cookies.setCookie(CookieKeys.LINKEDIN, result.getRequestSecret(), date);
 				// Open the LinkedIn authentication window in the same tab
-				Window.open(result.getAuthUrl(), "_self", "");
+				view.open(result.getAuthUrl());
 			}
 			
 			@Override
@@ -1178,6 +1322,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		// Grab the requestToken secret from the cookie. If it's expired, show an error message.
 		// If not, grab the user's info for an update.
 		profileSynAlert.clear();
+		view.showLoading();
 		String secret = cookies.getCookie(CookieKeys.LINKEDIN);
 		if(secret == null || secret.equals("")) {
 			view.showErrorMessage("Your request has timed out. Please reload the page and try again.");
@@ -1185,8 +1330,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			linkedInService.getCurrentUserInfo(requestToken, secret, verifier, gwt.getHostPageBaseURL(), new AsyncCallback<UserProfile>() {
 				@Override
 				public void onSuccess(UserProfile linkedInProfile) {
+					view.hideLoading();
 					// Give the user a chance to edit the profile.
-					userProfileModalWidget.showEditProfile(linkedInProfile.getOwnerId(), linkedInProfile, new Callback(){
+					getUserProfileModalWidget().showEditProfile(linkedInProfile.getOwnerId(), linkedInProfile, new Callback(){
 						@Override
 						public void invoke() {
 							profileUpdated();
@@ -1204,12 +1350,17 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	@Override
 	public void editVerificationSubmissionClicked() {
 		//edit the existing submission
-		verificationModal.configure(
-				currentUserBundle.getVerificationSubmission(), 
-				isACTMemberMap.get(authenticationController.getCurrentUserPrincipalId()), 
-				true) //isModal
-			.setResubmitCallback(resubmitVerificationCallback)
-			.show();		
+		isACTMemberAsyncHandler.isACTActionAvailable(new CallbackP<Boolean>() {
+			@Override
+			public void invoke(Boolean isACTMember) {
+				getVerificationSubmissionWidget().configure(
+						currentUserBundle.getVerificationSubmission(), 
+						isACTMember, 
+						true) //isModal
+					.setResubmitCallback(resubmitVerificationCallback)
+					.show();		
+			}
+		});
 	}
 	
 	@Override
@@ -1220,7 +1371,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		
 		//create a new submission
-		verificationModal.configure(
+		getVerificationSubmissionWidget().configure(
 				currentUserBundle.getUserProfile(), 
 				currentUserBundle.getORCID(), 
 				true, //isModal

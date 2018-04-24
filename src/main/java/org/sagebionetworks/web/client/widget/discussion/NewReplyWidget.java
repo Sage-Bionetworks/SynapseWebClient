@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
@@ -50,13 +52,12 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
+		fixServiceEntryPoint(discussionForumClient);
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
 		this.storage = sessionStorage;
-		markdownEditor.hideUploadRelatedCommands();
-		markdownEditor.showExternalImageButton();
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setMarkdownEditor(markdownEditor.asWidget());
@@ -66,6 +67,11 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 		this.threadId = threadId;
 		this.newReplyCallback = newReplyCallback;
 		this.key = threadId + "_" + authController.getCurrentUserPrincipalId() + "_reply";
+		reset();
+	}
+	
+	public void reset() {
+		onCancel();
 	}
 
 	@Override
@@ -82,6 +88,8 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	}
 	
 	private void checkForSavedReply() {
+		markdownEditor.hideUploadRelatedCommands();
+		markdownEditor.showExternalImageButton();
 		if (storage.getItem(key) == null) {
 			markdownEditor.configure(DEFAULT_MARKDOWN);			
 		} else {
@@ -137,7 +145,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			}
 		});
 	}
-
+	
 	@Override
 	public void onCancel() {
 		view.resetButton();

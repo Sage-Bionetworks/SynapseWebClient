@@ -53,7 +53,6 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 		
 		view.setButtonText(buttonText);
 		descriptor = widgetDescriptor;
-		view.setButtonVisible(authenticationController.isLoggedIn());
 	}
 	
 	@Override
@@ -69,13 +68,9 @@ public class RegisterChallengeTeamWidget implements SingleButtonView.Presenter, 
 		}
 	}
 	
-	public ConfirmCallback getConfirmCallback() {
-		return new ConfirmCallback() {
-			@Override
-			public void callback(boolean confirmed) {
-				if (confirmed)
-					globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-			}
+	public Callback getConfirmCallback() {
+		return () -> {
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		};
 	}
 	@Override

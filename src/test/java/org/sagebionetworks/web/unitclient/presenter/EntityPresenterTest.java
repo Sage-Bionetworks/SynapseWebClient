@@ -1,21 +1,28 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.isA;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ACCESS_TYPE;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.Entity;
@@ -29,8 +36,8 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -42,26 +49,21 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.EntityView;
 import org.sagebionetworks.web.client.widget.entity.EntityPageTop;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
-import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
-import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
 
 public class EntityPresenterTest {
-	
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	EntityPresenter entityPresenter;
 	EntityView mockView;
 	GlobalApplicationState mockGlobalApplicationState;
 	AuthenticationController mockAuthenticationController;
-	SynapseClientAsync mockSynapseClient;
 	CookieProvider mockCookies;
 	PlaceChanger mockPlaceChanger;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
@@ -69,7 +71,6 @@ public class EntityPresenterTest {
 	OpenTeamInvitationsWidget mockOpenInviteWidget;
 	Header mockHeaderWidget;
 	EntityPageTop mockEntityPageTop;
-	Footer mockFooterWidget;
 	String EntityId = "1";
 	Synapse place = new Synapse("Synapse:"+ EntityId);
 	Entity EntityModel1;
@@ -85,34 +86,30 @@ public class EntityPresenterTest {
 	
 	@Before
 	public void setup() throws Exception{
+		MockitoAnnotations.initMocks(this);
 		mockView = mock(EntityView.class);
 		gwtWrapper = mock(GWTWrapper.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockAuthenticationController = mock(AuthenticationController.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockCookies = mock(CookieProvider.class);
 		mockSynAlert = mock(StuAlert.class);
 		mockOpenInviteWidget = mock(OpenTeamInvitationsWidget.class);
 		mockHeaderWidget = mock(Header.class);
 		mockEntityPageTop = mock(EntityPageTop.class);
-		mockFooterWidget = mock(Footer.class);
-		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient,
-				mockCookies, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockFooterWidget, mockOpenInviteWidget, gwtWrapper);
+		entityPresenter = new EntityPresenter(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseJavascriptClient,
+				mockCookies, mockSynAlert, mockEntityPageTop, mockHeaderWidget, mockOpenInviteWidget, gwtWrapper);
 		Entity testEntity = new Project();
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);
 		EntityPath path = new EntityPath();
 		path.setPath(new ArrayList<EntityHeader>());
 		eb.setPath(path);
-		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		id=0L;
-		AsyncMockStubber.callSuccessWith(rootWikiId).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
-		rootWikiAttachments = new FileHandleResults();
-		AsyncMockStubber.callSuccessWith(rootWikiAttachments).when(mockSynapseClient).getWikiAttachmentHandles(any(WikiPageKey.class), any(AsyncCallback.class));
 		when(mockGlobalApplicationState.isWikiBasedEntity(anyString())).thenReturn(false);
 	}	
 	
@@ -131,15 +128,13 @@ public class EntityPresenterTest {
 		
 		entityPresenter.setPlace(place);
 		//verify that background image is cleared
-		verify(mockSynapseClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
 		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockGlobalApplicationState).isWikiBasedEntity(entityId);
 		verify(mockView).setEntityPageTopVisible(true);
 		verify(mockEntityPageTop, atLeastOnce()).clearState();
 		verify(mockEntityPageTop).configure(eq(eb.getEntity()), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
-		verify(mockView).setFooterWidget(mockFooterWidget);
-		verify(mockView).setHeaderWidget(mockHeaderWidget);
 		verify(mockView).setOpenTeamInvitesWidget(mockOpenInviteWidget);
 		verify(mockHeaderWidget).refresh();
 		verify(mockHeaderWidget).configure(eq(false), any(EntityHeader.class));
@@ -153,7 +148,7 @@ public class EntityPresenterTest {
 		when(place.getEntityId()).thenReturn(entityId);
 		entityPresenter.setPlace(place);
 		//verify that background image is cleared
-		verify(mockSynapseClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
 		verify(mockView, times(2)).setLoadingVisible(Mockito.anyBoolean());
 		verify(mockGlobalApplicationState).isWikiBasedEntity(entityId);
 		verify(mockView).setEntityPageTopVisible(true);
@@ -179,7 +174,7 @@ public class EntityPresenterTest {
 		Synapse place = new Synapse(entityId, version, area, areaToken);
 		entityPresenter.setPlace(place);
 		//verify synapse client call
-		verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
 		//redirects to the wiki place
 		verify(mockPlaceChanger).goTo(isA(Wiki.class));
 		verify(mockView, never()).setEntityPageTopVisible(true);
@@ -191,7 +186,7 @@ public class EntityPresenterTest {
 		Synapse place = new Synapse(entityId, version, area, areaToken);
 		Exception caught = new Exception("test");
 		//will show full project page for wiki based entities when in alpha mode
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
 		when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		entityPresenter.setPlace(place);
@@ -212,14 +207,14 @@ public class EntityPresenterTest {
 	public void testSetPlaceAndRefreshFailure() {
 		Exception caught = new Exception("test");
 		//will show full project page for wiki based entities when in alpha mode
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(caught).when(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
 		when(mockGlobalApplicationState.isWikiBasedEntity(entityId)).thenReturn(true);
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		Long version = null;
 		Synapse place = new Synapse(entityId, version, area, areaToken);
 		entityPresenter.setPlace(place);
 		//verify synapse client call
-		verify(mockSynapseClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(caught);
 		//header should be reconfigured to set back to Synapse
 		verify(mockHeaderWidget).configure(false);
@@ -247,35 +242,6 @@ public class EntityPresenterTest {
 		verify(mockView, times(2)).clear();
 		verify(mockSynAlert, times(2)).clear();
 		verify(mockOpenInviteWidget, times(2)).clear();
-	}
-	
-	@Test
-	public void testFilterToDownloadARs() {
-		List<AccessRequirement> unfilteredARs = new ArrayList<AccessRequirement>();
-		List<AccessRequirement> unfilteredUnmetARs = new ArrayList<AccessRequirement>();
-		List<AccessRequirement> expectedFilteredARs = new ArrayList<AccessRequirement>();
-		List<AccessRequirement> expectedFilteredUnmetARs = new ArrayList<AccessRequirement>();
-		
-		unfilteredARs.add(createNewAR(ACCESS_TYPE.UPLOAD));
-		unfilteredUnmetARs.add(createNewAR(ACCESS_TYPE.UPLOAD));
-		
-		AccessRequirement ar = createNewAR(ACCESS_TYPE.DOWNLOAD);
-		unfilteredARs.add(ar);
-		expectedFilteredARs.add(ar);
-		
-		ar = createNewAR(ACCESS_TYPE.DOWNLOAD);
-		unfilteredUnmetARs.add(ar);
-		expectedFilteredUnmetARs.add(ar);
-		
-		unfilteredARs.add(createNewAR(ACCESS_TYPE.SUBMIT));
-		unfilteredUnmetARs.add(createNewAR(ACCESS_TYPE.SUBMIT));
-		
-		eb.setAccessRequirements(unfilteredARs);
-		eb.setUnmetAccessRequirements(unfilteredUnmetARs);
-		EntityPresenter.filterToDownloadARs(eb);
-		
-		assertEquals(expectedFilteredARs, eb.getAccessRequirements());
-		assertEquals(expectedFilteredUnmetARs, eb.getUnmetAccessRequirements());
 	}
 	
 	@Test

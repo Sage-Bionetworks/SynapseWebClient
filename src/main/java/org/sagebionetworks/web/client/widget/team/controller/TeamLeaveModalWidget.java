@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.team.controller;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -27,6 +29,7 @@ public class TeamLeaveModalWidget implements IsWidget, TeamLeaveModalWidgetView.
 		this.authenticationController = authenticationController;
 		this.synAlert = synAlert;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.view = view;
 		view.setPresenter(this);
 		view.setSynAlertWidget(synAlert.asWidget());

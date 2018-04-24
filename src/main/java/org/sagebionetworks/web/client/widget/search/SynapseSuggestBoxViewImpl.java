@@ -5,7 +5,6 @@ import org.gwtbootstrap3.client.ui.SuggestBox;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -14,6 +13,7 @@ import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.logical.shared.SelectionEvent;
 import com.google.gwt.event.logical.shared.SelectionHandler;
 import com.google.gwt.event.shared.HandlerRegistration;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Label;
 import com.google.gwt.user.client.ui.SuggestOracle;
@@ -27,29 +27,28 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 	SuggestBox suggestBox;
 	TextBox selectedItem;
 	Text selectedItemText;
-	SageImageBundle sageImageBundle;
 	SynapseAlert synAlert;
-	
+	int originalScrollTop = -1;
 	@Inject
-	public SynapseSuggestBoxViewImpl(SageImageBundle sageImageBundle, SynapseAlert synAlert) {
-		this.sageImageBundle = sageImageBundle;
+	public SynapseSuggestBoxViewImpl(SynapseAlert synAlert) {
 		this.synAlert = synAlert;
 	}
-	
+
 	@Override
 	public void configure(SynapseSuggestOracle oracle) {
-		suggestBox = new SuggestBox(oracle, new TextBox(), new SynapseSuggestionDisplay(sageImageBundle));
+		final TextBox suggestTextBox = new TextBox();
+		suggestTextBox.getElement().setAttribute("name", "address");
+		suggestBox = new SuggestBox(oracle, suggestTextBox, new SynapseSuggestionDisplay());
 		suggestBox.getValueBox().addStyleName("form-control");
 		suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
 			@Override
 			public void onSelection(SelectionEvent<Suggestion> event) {
-				selectSuggestion((SynapseSuggestion)event.getSelectedItem());
+				selectSuggestion((UserGroupSuggestion)event.getSelectedItem());
 			}
-			
 		});
 		selectedItem = new TextBox();
 		selectedItem.setVisible(false);
-		
+		selectedItem.getElement().setAttribute("name", "code");
 		selectedItem.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -125,17 +124,21 @@ public class SynapseSuggestBoxViewImpl extends FlowPanel implements SynapseSugge
 		selectedItemText.setText("");
 	}
 	
-	public void selectSuggestion(SynapseSuggestion suggestion) {
+	public void selectSuggestion(UserGroupSuggestion suggestion) {
 		// Update the SuggestBox's selected suggestion.
 		synAlert.clear();
 		selectedItem.setText(suggestion.getReplacementString());
 		selectedItem.setVisible(true);
 		suggestBox.setVisible(false);
 		presenter.setSelectedSuggestion(suggestion);
+		if (originalScrollTop > -1) {
+			Window.scrollTo(0, originalScrollTop);	
+		}
 	}
 	
 	@Override
 	public void showLoading() {
+		originalScrollTop = Window.getScrollTop();
 		((SynapseSuggestionDisplay) suggestBox.getSuggestionDisplay()).showLoading(this);
 	}
 	

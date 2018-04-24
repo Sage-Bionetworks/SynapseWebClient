@@ -68,14 +68,9 @@ public class ChallengeTabTest {
 		String entityId = "syn1"; 
 		String entityName = "challenge project test";
 		tab.configure(entityId, entityName);
-		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 		
-		verify(mockAdministerEvaluationsList).configure(eq(entityId), callbackCaptor.capture());
-		verify(mockChallengeWidget).configure(eq(entityId), any(Callback.class));
-		verify(mockTab, times(2)).setTabListItemVisible(false);
-		verify(mockTab, never()).setTabListItemVisible(true);
-		callbackCaptor.getValue().invoke();
-		verify(mockTab).setTabListItemVisible(true);
+		verify(mockAdministerEvaluationsList).configure(eq(entityId));
+		verify(mockChallengeWidget).configure(eq(entityId));
 		
 		ArgumentCaptor<Synapse> captor = ArgumentCaptor.forClass(Synapse.class);
 		verify(mockTab).setEntityNameAndPlace(eq(entityName), captor.capture());

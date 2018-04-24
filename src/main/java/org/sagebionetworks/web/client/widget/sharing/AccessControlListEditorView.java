@@ -23,7 +23,7 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	 * @param principals the available principals
 	 * @param isEditable
 	 */
-	public void buildWindow(boolean isInherited, boolean canEnableInheritance, boolean canChangePermission, PermissionLevel defaultPermissionLevel);
+	public void buildWindow(boolean isProject, boolean isInherited, String aclEntityId, boolean canEnableInheritance, boolean canChangePermission, PermissionLevel defaultPermissionLevel);
 	
 	/**
 	 * Add an ACL Entry to the permissions dialog
@@ -34,13 +34,13 @@ public interface AccessControlListEditorView extends IsWidget, SynapseView {
 	
 	public void setIsPubliclyVisible(Boolean isPubliclyVisible);
 	public void setPublicAclPrincipalId(Long publicAclPrincipalId);
-	
+	public void setAuthenticatedAclPrinciapalId(Long authenticatedPrincipalId);
+	void setSynAlert(IsWidget w);
 	/**
 	 * Set the view to a loading state while async loads
 	 */
 	public void showLoading();
 	
-	void showInfoError(String title, String message);
 	void setNotifyCheckboxVisible(boolean isVisible);
 	void setDeleteLocalACLButtonVisible(boolean isVisible);
 	void setPublicPrivateButtonVisible(boolean isVisible);

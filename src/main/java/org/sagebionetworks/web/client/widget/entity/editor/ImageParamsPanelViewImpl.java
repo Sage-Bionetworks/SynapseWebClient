@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
 import org.gwtbootstrap3.client.ui.Button;
-import org.sagebionetworks.web.shared.WidgetConstants;
+import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.extras.slider.client.ui.Slider;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -24,11 +26,18 @@ public class ImageParamsPanelViewImpl implements ImageParamsPanelView {
 	Button centerButton;
 	@UiField
 	Button rightButton;
+	@UiField
+	Div scaleSliderContainer;
+	@UiField
+	TextBox altText;
+	Slider scaleSlider;
 	
 	@Inject
 	public ImageParamsPanelViewImpl(ImageParamsPanelViewImplUiBinder binder) {
 		widget = binder.createAndBindUi(this);
 		initClickHandlers();
+		setScale(100);
+		altText.clear();
 	}
 	
 	private void initClickHandlers() {
@@ -99,4 +108,25 @@ public class ImageParamsPanelViewImpl implements ImageParamsPanelView {
 		rightButton.setActive(false);
 	}
 
+	@Override
+	public Integer getScale() {
+		return scaleSlider.getValue().intValue();
+	}
+	
+	@Override
+	public void setScale(Integer scale) {
+		// Slider does not behave well when it is detached and then re-attached.  Recreate.
+		scaleSliderContainer.clear();
+		scaleSlider = new Slider(1.0, 100.0, scale.doubleValue());
+		scaleSlider.setStep(1.0);
+		scaleSliderContainer.add(scaleSlider);
+	}
+	@Override
+	public void setAltText(String altTextValue) {
+		altText.setValue(altTextValue);
+	}
+	@Override
+	public String getAltText() {
+		return altText.getValue();
+	}
 }

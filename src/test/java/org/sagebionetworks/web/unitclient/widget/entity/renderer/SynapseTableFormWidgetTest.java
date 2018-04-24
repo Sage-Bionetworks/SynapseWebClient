@@ -24,6 +24,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -57,6 +58,8 @@ public class SynapseTableFormWidgetTest {
 	@Mock
 	SynapseClientAsync mockSynapseClient;
 	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
 	Row mockRow;
 	@Mock
 	AsynchronousResponseBody mockResponse;
@@ -74,9 +77,9 @@ public class SynapseTableFormWidgetTest {
 	public void setup() throws RequestException{
 		MockitoAnnotations.initMocks(this);
 		columnModels = new ArrayList<ColumnModel>();
-		widget = new SynapseTableFormWidget(mockView, mockSynAlert, mockRowFormWidget, mockAsynchronousJobTracker, mockSynapseClient, mockUserBadge);
+		widget = new SynapseTableFormWidget(mockView, mockSynAlert, mockRowFormWidget, mockAsynchronousJobTracker, mockSynapseClient, mockUserBadge, mockSynapseJavascriptClient);
 		AsyncMockStubber.callSuccessWith(columnModels).when(mockSynapseClient).getColumnModelsForTableEntity(anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockTableEntity).when(mockSynapseClient).getEntity(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockTableEntity).when(mockSynapseJavascriptClient).getEntity(anyString(), any(AsyncCallback.class));
 		
 		when(mockTableEntity.getCreatedBy()).thenReturn(CREATED_BY);
 		descriptor = new HashMap<String, String>();

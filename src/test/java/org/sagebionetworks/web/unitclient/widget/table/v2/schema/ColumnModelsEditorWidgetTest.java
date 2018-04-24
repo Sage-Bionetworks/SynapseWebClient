@@ -31,18 +31,16 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler.RowOfWidgets;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.FileViewDefaultColumns;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
+import org.sagebionetworks.web.client.widget.table.v2.schema.ImportTableViewColumnsButton;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRowViewer;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsView.ViewType;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.table.v2.TableModelTestUtils;
-
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 /**
  * Unit test for ColumnModelsViewWidget
@@ -62,13 +60,15 @@ public class ColumnModelsEditorWidgetTest {
 	@Mock
 	CookieProvider mockCookies;
 	@Mock
-	FileViewDefaultColumns mockFileViewDefaultColumns;
+	ViewDefaultColumns mockFileViewDefaultColumns;
 	ColumnModelsEditorWidget widget;
 	List<ColumnModel> schema;
 	@Mock
 	ColumnModelTableRowEditorWidget mockColumnModelTableRowEditorWidget1;
 	@Mock
 	ColumnModelTableRowEditorWidget mockColumnModelTableRowEditorWidget2;
+	@Mock
+	ImportTableViewColumnsButton mockAddTableViewColumnsButton;
 	
 	ColumnModel nonEditableColumn;
 	List<ColumnModel> nonEditableColumns;
@@ -91,6 +91,7 @@ public class ColumnModelsEditorWidgetTest {
 				return new ColumnModelTableRowViewerStub();
 			}
 		});
+		when(mockGinInjector.getImportTableViewColumnsButton()).thenReturn(mockAddTableViewColumnsButton);
 		when(mockGinInjector.createKeyboardNavigationHandler()).thenReturn(mockKeyboardNavigationHandler);
 		when(mockGinInjector.getCookieProvider()).thenReturn(mockCookies);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("true");
@@ -109,7 +110,7 @@ public class ColumnModelsEditorWidgetTest {
 		nonEditableColumnNames.add(colName1);
 		nonEditableColumnNames.add(ETAG_COLUMN_NAME);
 		
-		AsyncMockStubber.callSuccessWith(nonEditableColumnNames).when(mockFileViewDefaultColumns).getDefaultColumnNames(any(AsyncCallback.class));
+		when(mockFileViewDefaultColumns.getDefaultViewColumnNames(any(org.sagebionetworks.repo.model.table.ViewType.class))).thenReturn(nonEditableColumnNames);
 		widget = new ColumnModelsEditorWidget(mockGinInjector, adapterFactory, mockFileViewDefaultColumns);
 		schema = TableModelTestUtils.createOneOfEachType(true);
 	}
@@ -139,16 +140,36 @@ public class ColumnModelsEditorWidgetTest {
 	}
 	
 	@Test
+	public void testAddDuplicateColumns(){
+		widget.configure(TableType.table, schema);
+		
+		List<ColumnModel> clone = widget.getEditedColumnModels();
+		assertEquals(schema, clone);
+		
+		// change the column type of the first column
+		clone.get(0).setId(null);
+		clone.get(0).setColumnType(ColumnType.FILEHANDLEID);
+		// change the column name of the second column
+		clone.get(1).setId(null);
+		clone.get(1).setName("newname");
+		
+		// the third column looks to be new, but should be filtered out because it has the same name and type as an existing column in the editor
+		clone.get(2).setId(null);
+		// all other columns should be ignored (because they have the same name and type)
+		widget.addColumns(clone);
+		verify(mockEditor, times(schema.size() + 2)).addColumn(any(ColumnModelTableRow.class));
+	}
+	
+	@Test
 	public void testFileView() {
 		//try to add non-editable column
 		when(mockGinInjector.createColumnModelEditorWidget()).thenReturn(mockColumnModelTableRowEditorWidget1, mockColumnModelTableRowEditorWidget2);
-		widget.configure(TableType.view, nonEditableColumns);
+		widget.configure(TableType.fileview, nonEditableColumns);
 		verify(mockGinInjector,  times(nonEditableColumns.size())).createColumnModelEditorWidget();
 		verify(mockColumnModelTableRowEditorWidget1).setToBeDefaultFileViewColumn();
 		verify(mockColumnModelTableRowEditorWidget2).setToBeDefaultFileViewColumn();
-		//verify etag column selection is not enabled
-		verify(mockColumnModelTableRowEditorWidget1).setSelectVisible(true);
-		verify(mockColumnModelTableRowEditorWidget2).setSelectVisible(false);
+		verify(mockColumnModelTableRowEditorWidget1).setCanHaveDefault(false);
+		verify(mockColumnModelTableRowEditorWidget2).setCanHaveDefault(false);
 	}
 	
 	@Test
@@ -171,6 +192,7 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testOnSaveSuccessValidateFalse() throws JSONObjectAdapterException{
+		widget.configure(TableType.table, schema);
 		// Add a column
 		ColumnModelTableRowEditorStub editor = (ColumnModelTableRowEditorStub) widget.addNewColumn();
 		editor.setValid(false);
@@ -194,6 +216,7 @@ public class ColumnModelsEditorWidgetTest {
 		verify(mockEditor).setCanDelete(false);
 		verify(mockEditor).setCanMoveUp(false);
 		verify(mockEditor).setCanMoveDown(false);
+		assertTrue(((ColumnModelTableRowEditorStub)one).canHaveDefault());
 		
 		ColumnModelTableRowEditorWidget two = widget.addNewColumn();
 		// Start with two selected
@@ -226,6 +249,7 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testSelectNone(){
+		widget.configure(TableType.table, schema);
 		// Add three columns
 		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
 		ColumnModelTableRowEditorWidget two = widget.addNewColumn();
@@ -241,6 +265,7 @@ public class ColumnModelsEditorWidgetTest {
 	
 	@Test
 	public void testToggleSelect(){
+		widget.configure(TableType.table, schema);
 		// Add three columns
 		ColumnModelTableRowEditorWidget one = widget.addNewColumn();
 		ColumnModelTableRowEditorWidget two = widget.addNewColumn();

@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import java.util.Date;
-
 import org.gwtbootstrap3.extras.notify.client.constants.NotifyType;
 import org.gwtbootstrap3.extras.notify.client.ui.Notify;
 import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
@@ -13,20 +11,14 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.client.Callback;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.Document;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.dom.client.LinkElement;
 import com.google.gwt.dom.client.MetaElement;
 import com.google.gwt.dom.client.NodeList;
-import com.google.gwt.i18n.client.DateTimeFormat;
-import com.google.gwt.i18n.client.DateTimeFormat.PredefinedFormat;
-import com.google.gwt.user.client.Command;
 import com.google.gwt.user.client.History;
 import com.google.gwt.user.client.Random;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.Window.Location;
 import com.google.gwt.xhr.client.XMLHttpRequest;
 
@@ -45,31 +37,25 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public String getCurrentHistoryToken() {
-		return History.getToken();
+	public void sendAnalyticsEvent(String eventCategory, String eventAction) {
+		_sendAnalyticsEvent(eventCategory, eventAction, getCurrentURL());
 	}
 
-	@Override
-	public void bindBootstrapTooltip(String id) {
-		_bindBootstrapTooltip(id);
-	}
-
-	private static native void _bindBootstrapTooltip(String id) /*-{
-		$wnd.jQuery('#'+id).tooltip().tooltip('fixTitle');	//update title from data-original-title, if necessary
+	private static native void _sendAnalyticsEvent(String eventCategoryValue, String eventActionValue, String eventLabelValue) /*-{
+		$wnd.ga('send', 
+			{
+			  hitType: 'event',
+			  eventCategory: eventCategoryValue,
+			  eventAction: eventActionValue,
+			  eventLabel: eventLabelValue,
+			  fieldsObject: { nonInteraction: true}
+			});
 	}-*/;
 
-	@Override
-	public void hideBootstrapTooltip(String id) {
-		_hideBootstrapTooltip(id);
-	}
-
-	private static native void _hideBootstrapTooltip(String id) /*-{
-		$wnd.jQuery('#'+id).tooltip('hide');
-	}-*/;
 	
 	@Override
-	public void bindBootstrapPopover(String id) {
-		_bindBootstrapPopover(id);
+	public String getCurrentHistoryToken() {
+		return History.getToken();
 	}
 	
 	@Override
@@ -78,7 +64,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	public static native void _highlightCodeBlocks() /*-{
-	  $wnd.jQuery('pre code').each(function(i, e) {$wnd.hljs.highlightBlock(e)});
+		try {
+			$wnd.jQuery('pre code').each(function(i, e) {$wnd.hljs.highlightBlock(e)});
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 	
 	@Override
@@ -87,62 +77,29 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	private static native void _tablesorter() /*-{
-		$wnd.jQuery('table.markdowntable').tablesorter();
+		try {
+			$wnd.jQuery('table.markdowntable').tablesorter();
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
-	
-	private static native void _bindBootstrapPopover(String id) /*-{
-		$wnd.jQuery('#'+id).popover();
-	}-*/;
-	
-	private static native String _getRelativeTime(String s) /*-{
-		return $wnd.moment(s).fromNow();
-	}-*/;
-	private static native String _getCalendarTime(String s) /*-{
-		return $wnd.moment(s).calendar();
-	}-*/;
-	
-	private static native String _getLongFriendlyDate(String s) /*-{
-		return $wnd.moment(s).format('LLLL');
-	}-*/;
-
-	private static DateTimeFormat smallDateFormat = DateTimeFormat.getFormat("MM/dd/yyyy hh:mm:ssaa");
-	private static DateTimeFormat iso8601Format =  DateTimeFormat.getFormat(PredefinedFormat.ISO_8601);
-	
-	@Override
-	public String convertDateToSmallString(Date toFormat) {
-		return smallDateFormat.format(toFormat);
-	}
-	@Override
-	public String getRelativeTime(Date toFormat) {
-		return _getRelativeTime(iso8601Format.format(toFormat));
-	}
-	@Override
-	public String getCalendarTime(Date toFormat) {
-		return _getCalendarTime(iso8601Format.format(toFormat));
-	}
-	
-	@Override
-	public String getLongFriendlyDate(Date toFormat) {
-		return _getLongFriendlyDate(iso8601Format.format(toFormat));
-	}
 	
 	@Override
 	public String getBaseFileHandleUrl() {
-		return GWT.getModuleBaseURL()+"filehandle";
+		return GWTWrapperImpl.getRealGWTModuleBaseURL()+"filehandle";
 	}
 	
 	@Override
 	public String getBaseProfileAttachmentUrl() {
-		return GWT.getModuleBaseURL() + "profileAttachment";
+		return GWTWrapperImpl.getRealGWTModuleBaseURL() + "profileAttachment";
 	}
 	
 	@Override
-	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId, String xsrfToken) {
-		return GWT.getModuleBaseURL() + WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET + "?" + 
+	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId) {
+		return GWTWrapperImpl.getRealGWTModuleBaseURL() + WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET + "?" + 
 				WebConstants.ASSOCIATED_OBJECT_ID_PARAM_KEY + "=" + objectId + "&" +
 				WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY + "=" + objectType.toString() + "&" + 
-				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId + "&" +
-				WebConstants.XSRF_TOKEN_KEY + "=" + xsrfToken;
+				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId;
 	}
 
 	@Override
@@ -166,27 +123,31 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		return _nChartlayout(layers, characters);
 	}
 
-	private final static native LayoutResultJso _nChartlayout(NChartLayersArray layers, NChartCharacters characters) /*-{	        
-	    var debug = {'features': ['nodes'], 'wireframe': true};
-		var conf = {'group_styles': {'pov': {'stroke-width': 3}},
-	        'debug': debug};	        
-		var chart = new $wnd.NChart(characters, layers, conf).calc().plot();
-			
-		// convert graph into LayoutResult
-		var layoutResult = {}; 
-		var ncGraph = chart.graph;
-		for(var i=0; i<ncGraph.layers.length; i++) {		
-			var ncLayer = ncGraph.layers[i];
-			for(var j=0; j<ncLayer.nodes.length; j++) {
-				var ncNode = ncLayer.nodes[j];
-				var provGraphNodeId = ncNode.event;
-				var xypoint = { 'x':ncNode.x, 'y':ncNode.y };
-				if(!(provGraphNodeId in layoutResult)) { 
-					layoutResult[provGraphNodeId] = [];
+	private final static native LayoutResultJso _nChartlayout(NChartLayersArray layers, NChartCharacters characters) /*-{
+		var layoutResult = {};
+		try {
+		    var debug = {'features': ['nodes'], 'wireframe': true};
+			var conf = {'group_styles': {'pov': {'stroke-width': 3}},
+		        'debug': debug};	        
+			var chart = new $wnd.NChart(characters, layers, conf).calc().plot();
+				
+			// convert graph into LayoutResult
+			var ncGraph = chart.graph;
+			for(var i=0; i<ncGraph.layers.length; i++) {		
+				var ncLayer = ncGraph.layers[i];
+				for(var j=0; j<ncLayer.nodes.length; j++) {
+					var ncNode = ncLayer.nodes[j];
+					var provGraphNodeId = ncNode.event;
+					var xypoint = { 'x':ncNode.x, 'y':ncNode.y };
+					if(!(provGraphNodeId in layoutResult)) { 
+						layoutResult[provGraphNodeId] = [];
+					}
+					layoutResult[provGraphNodeId].push(xypoint);				
 				}
-				layoutResult[provGraphNodeId].push(xypoint);				
 			}
-		}		
+		} catch (err) {
+			console.error(err);
+		}
 		return layoutResult;
 	}-*/;
 
@@ -212,14 +173,34 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	@Override
-	public void uploadFileChunk(String contentType, int index, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback) {
+	public void uploadFileChunk(String contentType, JavaScriptObject blob, Long startByte, Long endByte, String url, XMLHttpRequest xhr, ProgressCallback callback) {
 		SynapseJSNIUtilsImpl.progressCallback = callback;
-		_directUploadFile(contentType, index, fileFieldId, startByte, endByte, url, xhr);
+		_directUploadBlob(contentType, blob, startByte, endByte, url, xhr);
 	}
 	
-	private final static native void _directUploadFile(String contentType, int index, String fileFieldId, Long startByte, Long endByte, String url, XMLHttpRequest xhr) /*-{
+	@Override
+	public JavaScriptObject getFileList(String fileFieldId) {
+		return _getFileList(fileFieldId);
+	}
+	
+	private final static native JavaScriptObject _getFileList(String fileFieldId) /*-{
 		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var fileToUpload = fileToUploadElement.files[index];
+		if (fileToUploadElement && 'files' in fileToUploadElement) {
+			return fileToUploadElement.files;
+		}
+		return null;
+	}-*/;
+	
+	@Override
+	public JavaScriptObject getFileBlob(int index, JavaScriptObject fileList) {
+		return _getFileBlob(index, fileList);
+	}
+	
+	private final static native JavaScriptObject _getFileBlob(int index, JavaScriptObject fileList) /*-{
+		return fileList[index];
+	}-*/;
+	
+	private final static native void _directUploadBlob(String contentType, JavaScriptObject fileToUpload, Long startByte, Long endByte, String url, XMLHttpRequest xhr) /*-{
 		var start = parseInt(startByte) || 0;
 		var end = parseInt(endByte) || fileToUpload.size - 1;
 		var fileSliceToUpload;
@@ -262,43 +243,35 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public String getContentType(String fileFieldId, int index) {
-		return _getContentType(fileFieldId, index);
+	public String getContentType(JavaScriptObject fileList, int index) {
+		return _getContentType(fileList, index);
 	}
-	private final static native String _getContentType(String fileFieldId, int index) /*-{
-		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		return fileToUploadElement.files[index].type;
+	private final static native String _getContentType(JavaScriptObject fileList, int index) /*-{
+		return fileList[index].type;
 	}-*/;
 	
 	@Override
-	public double getFileSize(String fileFieldId, int index) {
-		return _getFileSize(fileFieldId, index);
+	public double getFileSize(JavaScriptObject blob) {
+		return _getFileSize(blob);
 	}
-	private final static native double _getFileSize(String fileFieldId, int index) /*-{
-		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var fileSize = 0;
-		if (fileToUploadElement && ('files' in fileToUploadElement))
-			fileSize = fileToUploadElement.files[index].size;
-		return fileSize;
+	private final static native double _getFileSize(JavaScriptObject blob) /*-{
+		return blob.size;
 	}-*/;
 	
 	@Override
-	public String[] getMultipleUploadFileNames(String fileFieldId) {
-		String unSplitNames = _getFilesSelected(fileFieldId);
+	public String[] getMultipleUploadFileNames(JavaScriptObject fileList) {
+		String unSplitNames = _getFilesSelected(fileList);
 		if (unSplitNames.equals(""))
 			return null;
 		return unSplitNames.split(";");
 	}
 	
-	private static native String _getFilesSelected(String fileFieldId) /*-{
-		var fileToUploadElement = $doc.getElementById(fileFieldId);
-	    var out = "";
-		if (fileToUploadElement) {
-		    for (i = 0; i < fileToUploadElement.files.length; i++) {
-		        var file = fileToUploadElement.files[i];
-		        out += file.name + ';';
-		    }
-		}
+	private static native String _getFilesSelected(JavaScriptObject fileList) /*-{
+		var out = "";
+	    for (i = 0; i < fileList.length; i++) {
+	        var file =fileList[i];
+	        out += file.name + ';';
+	    }
 	    return out;
 	}-*/;
 	
@@ -306,16 +279,19 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		return Document.get().getElementById(elementId) != null;
 	};
 	
+	@Override
+	public Element getElementById(String elementId) {
+		return Document.get().getElementById(elementId);
+	};
+	
 	/**
 	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to (progressively by slicing the file) calculate the md5.
 	 */
 	@Override
-	public void getFileMd5(String fileFieldId, int index, MD5Callback md5Callback) {
-		_getFileMd5(fileFieldId, index, md5Callback);
+	public void getFileMd5(JavaScriptObject blob, MD5Callback md5Callback) {
+		_getFileMd5(blob, md5Callback);
 	}
-	private final static native void _getFileMd5(String fileFieldId, int index, MD5Callback md5Callback) /*-{
-		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var file = fileToUploadElement.files[index];
+	private final static native void _getFileMd5(JavaScriptObject file, MD5Callback md5Callback) /*-{
 		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
 		chunkSize = 2097152; // read in chunks of 2MB
         chunks = Math.ceil(file.size / chunkSize);
@@ -357,12 +333,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to calculate the md5 of part of a file.
 	 */
 	@Override
-	public void getFilePartMd5(String fileFieldId, int currentChunk, Long chunkSize, int fileIndex, MD5Callback md5Callback) {
-		_getFilePartMd5(fileFieldId, currentChunk, chunkSize.doubleValue(), fileIndex, md5Callback);
+	public void getFilePartMd5(JavaScriptObject blob, int currentChunk, Long chunkSize, MD5Callback md5Callback) {
+		_getFilePartMd5(blob, currentChunk, chunkSize.doubleValue(), md5Callback);
 	}
-	private final static native void _getFilePartMd5(String fileFieldId, int currentChunk, double chunkSize, int fileIndex, MD5Callback md5Callback) /*-{
-		var fileToUploadElement = $doc.getElementById(fileFieldId);
-		var file = fileToUploadElement.files[fileIndex];
+	private final static native void _getFilePartMd5(JavaScriptObject file, int currentChunk, double chunkSize, MD5Callback md5Callback) /*-{
 		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
 		spark = new $wnd.SparkMD5.ArrayBuffer();
         $wnd.frOnload = function(e) {
@@ -415,33 +389,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 
 	@Override
-	public void uploadUrlToGenomeSpace(String url) {
-		_uploadUrlToGenomeSpace(url, null);
-	}
-
-	@Override
-	public void uploadUrlToGenomeSpace(String url, String filename) {
-		_uploadUrlToGenomeSpace(url, filename);		
-	}
-
-	private final static native void _uploadUrlToGenomeSpace(String url, String fileName) /*-{
-		var gsUploadUrl = "https://gsui.genomespace.org/jsui/upload/loadUrlToGenomespace.html?uploadUrl=";
-		var dest = $wnd.encodeURIComponent(url);
-		gsUploadUrl += dest;
-		if(fileName != null) {
-			gsUploadUrl += "&fileName=" + fileName;
-		}
-		var newWin = $wnd.open(gsUploadUrl, "GenomeSpace Upload", "height=340px,width=550px");
-		newWin.focus();
-		newWin.setCallbackOnGSUploadComplete = function(savePath) {
-			alert('outer Saved to GenomeSpace as ' + savePath);
-		}
-		newWin.setCallbackOnGSUploadError = function(savePath) {
-			alert('outer ERROR saving to GenomeSpace as ' + savePath);
-		}
-	}-*/;
-
-	@Override
 	public void consoleLog(String message) {
 		_consoleLog(message);
 	}
@@ -465,34 +412,19 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	private final static native void _processWithMathJax(Element element) /*-{
-		$wnd.layoutMath(element);
+		try {
+			$wnd.layoutMath(element);
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 
 	@Override
-	public void loadCss(final String url, final Callback<Void, Exception> callback) {
+	public void loadCss(final String url) {
 		final LinkElement link = Document.get().createLinkElement();
 		link.setRel("stylesheet");
 		link.setHref(url);
 		_nativeAttachToHead(link);
-		
-		// fall back timer
-		final Timer t = new Timer() {
-			@Override
-			public void run() {
-				callback.onSuccess(null);
-			}
-		};
-		
-		Command loadedCommand = new Command() {			
-			@Override
-			public void execute() {
-				callback.onSuccess(null);
-				t.cancel();
-			}
-		};
-		
-		_addCssLoadHandler(url, loadedCommand);		
-		t.schedule(5000); // failsafe: after 5 seconds assume loaded
 	}
 	
 	/**
@@ -500,21 +432,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	 */
 	protected static native void _nativeAttachToHead(JavaScriptObject scriptElement) /*-{
 	    $doc.getElementsByTagName("head")[0].appendChild(scriptElement);
-	}-*/;
-
-
-	/**
-	 * provides a callback mechanism for when CSS resources that have been added to the dom are fully loaded
-	 * @param cssUrl
-	 * @param finishedUploadingCallback
-	 */
-	private static native void _addCssLoadHandler(String cssUrl, Command command) /*-{
-		// Use Image load error callback to detect loading as no reliable/cross-browser callback exists for Link element
-		var img = $doc.createElement('img');		
-		img.onerror = function() {			
-			command.@com.google.gwt.user.client.Command::execute()();
-		}
-		img.src = cssUrl;
 	}-*/;
 	
 	@Override
@@ -542,16 +459,19 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	private final static native void _showTwitterFeed(String dataWidgetId,
 			String elementId, String linkColorHex, String borderColorHex,
 			int tweetCount) /*-{
-		if (typeof $wnd.twttr !== 'undefined') {
-			var element = $doc.getElementById(elementId);
-			$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
-				chrome : "nofooter noheader",
-				linkColor : linkColorHex,
-				borderColor : borderColorHex,
-				tweetLimit : tweetCount
-			});
+		try {
+			if (typeof $wnd.twttr !== 'undefined') {
+				var element = $doc.getElementById(elementId);
+				$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
+					chrome : "nofooter noheader",
+					linkColor : linkColorHex,
+					borderColor : borderColorHex,
+					tweetLimit : tweetCount
+				});
+			}
+		} catch (err) {
+			console.error(err);
 		}
-		
 	}-*/;
 	
 	@Override
@@ -613,6 +533,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    h4:     [],
 				    h5:     [],
 				    h6:     [],
+				    head:   [],
 				    header: [],
 				    hr:     [],
 				    html:   [],
@@ -622,6 +543,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    li:     [],
 				    mark:   [],
 				    nav:    [],
+				    noscript: [],
 				    ol:     [],
 				    p:      [],
 				    pre:    [],
@@ -644,13 +566,22 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    ul:     [],
 				    video:  ['autoplay', 'controls', 'loop', 'preload', 'src', 'height', 'width']
 				},
-				stripIgnoreTagBody: ['script'],  // the script tag is a special case, we need
-				allowCommentTag: true,
+				stripIgnoreTagBody: true,  // filter out all tags not in the whitelist
+				allowCommentTag: false,
+				css: false,
 				onIgnoreTag: function (tag, html, options) {
 					if (tag === '!doctype') {
 				      // do not filter doctype
 				      return html;
 				    }
+				},
+				safeAttrValue: function (tag, name, value) {
+					// returning nothing means keep the default behavior
+					if (tag === 'img' && name === 'src') {
+						if (value && value.startsWith('data:image/')) {
+							return value;
+						}
+					}
 				}
 			};
 			$wnd.xss = new $wnd.filterXSS.FilterXSS(options);
@@ -752,5 +683,19 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 
 	private final static native String _copyToClipboard() /*-{
 		$doc.execCommand('copy');
+	}-*/;
+	
+	@Override
+	public String getCdnEndpoint() {
+		return _getCdnEndpoint();
+	}
+
+	private final static native String _getCdnEndpoint() /*-{
+		// initialized in Portal.html
+		return $wnd.cdnEndpoint;
+	}-*/;
+	
+	public final static native void _unmountComponentAtNode(Element el) /*-{
+		return $wnd.ReactDOM.unmountComponentAtNode(el);
 	}-*/;
 }

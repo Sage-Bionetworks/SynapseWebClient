@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -8,6 +10,7 @@ import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.S3UploadDestination;
@@ -16,11 +19,14 @@ import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView.Presenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationsRendererWidget;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
+import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
+import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,44 +39,52 @@ public class EntityMetadata implements Presenter {
 	private AnnotationsRendererWidget annotationsWidget;
 	private DoiWidget doiWidget;
 	private FileHistoryWidget fileHistoryWidget;
-	private RestrictionWidget restrictionWidget;
 	private SynapseClientAsync synapseClient;
 	private SynapseJSNIUtils jsni;
-	
+	private org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget restrictionWidgetV2;
+	private CookieProvider cookies;
+	boolean isShowingAnnotations, isShowingFileHistory;
 	@Inject
 	public EntityMetadata(EntityMetadataView view, 
 			DoiWidget doiWidget,
 			AnnotationsRendererWidget annotationsWidget,
-			RestrictionWidget restrictionWidget,
 			FileHistoryWidget fileHistoryWidget, 
 			SynapseClientAsync synapseClient, 
-			SynapseJSNIUtils jsni) {
+			SynapseJSNIUtils jsni,
+			RestrictionWidget restrictionWidgetV2,
+			CookieProvider cookies) {
 		this.view = view;
 		this.doiWidget = doiWidget;
 		this.annotationsWidget = annotationsWidget;
 		this.fileHistoryWidget = fileHistoryWidget;
-		this.restrictionWidget = restrictionWidget;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.jsni = jsni;
+		this.restrictionWidgetV2 = restrictionWidgetV2;
+		this.cookies = cookies;
 		this.view.setDoiWidget(doiWidget);
 		this.view.setAnnotationsRendererWidget(annotationsWidget);
 		this.view.setFileHistoryWidget(fileHistoryWidget);
-		this.view.setRestrictionWidget(restrictionWidget);
+		this.view.setRestrictionWidgetV2(restrictionWidgetV2);
+		restrictionWidgetV2.setShowChangeLink(true);
+		restrictionWidgetV2.setShowIfProject(false);
+		restrictionWidgetV2.setShowFlagLink(true);
+		view.setRestrictionWidgetV2Visible(true);
 	}
 	
 	public Widget asWidget() {
 		return view.asWidget();
 	}
 	
-	public void setEntityBundle(EntityBundle bundle, Long versionNumber) {
+	public void configure(EntityBundle bundle, Long versionNumber, ActionMenuWidget actionMenu) {
 		clear();
 		Entity en = bundle.getEntity();
 		view.setEntityId(en.getId());
 		boolean canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-		boolean showDetailedMetadata = true;
+		
+		boolean isCurrentVersion = versionNumber == null;
 		if (bundle.getEntity() instanceof FileEntity) {
 			fileHistoryWidget.setEntityBundle(bundle, versionNumber);
-			fileHistoryWidget.setEntityUpdatedHandler(entityUpdatedHandler);
 			view.setFileHistoryWidget(fileHistoryWidget);
 			view.setRestrictionPanelVisible(true);
 		} else {
@@ -78,18 +92,26 @@ public class EntityMetadata implements Presenter {
 					|| en instanceof Folder || en instanceof DockerRepository);
 		}
 		configureStorageLocation(en);
-		restrictionWidget.configure(bundle, true, false, true, new Callback() {
-			@Override
-			public void invoke() {
-				fireEntityUpdatedEvent();
-			}
-		});
 		doiWidget.configure(bundle.getDoi(), en.getId());
-		boolean isCurrentVersion = versionNumber == null;
 		annotationsWidget.configure(bundle, canEdit, isCurrentVersion);
-		view.setDetailedMetadataVisible(showDetailedMetadata);
-	}	
-
+		restrictionWidgetV2.configure(en, bundle.getPermissions().getCanChangePermissions());
+		isShowingAnnotations = false;
+		setAnnotationsVisible(isShowingAnnotations);
+		isShowingFileHistory = false;
+		setFileHistoryVisible(isShowingFileHistory);
+		actionMenu.setActionListener(Action.SHOW_ANNOTATIONS, action -> {
+			isShowingAnnotations = !isShowingAnnotations;
+			setAnnotationsVisible(isShowingAnnotations);
+		});
+		
+		actionMenu.setActionListener(Action.SHOW_FILE_HISTORY, action -> {
+			isShowingFileHistory = !isShowingFileHistory;
+			setFileHistoryVisible(isShowingFileHistory);
+		});
+	}
+	public void setVisible(boolean visible) {
+		view.setDetailedMetadataVisible(visible);
+	}
 	@Override
 	public void fireEntityUpdatedEvent() {
 		if (entityUpdatedHandler != null)
@@ -140,6 +162,10 @@ public class EntityMetadata implements Presenter {
 							description += externalUploadDestination.getBaseKey();
 						};
 						view.setUploadDestinationText(description);
+					} else if (uploadDestinations.get(0) instanceof ExternalObjectStoreUploadDestination) {
+						ExternalObjectStoreUploadDestination destination = (ExternalObjectStoreUploadDestination) uploadDestinations.get(0);
+						String description = destination.getEndpointUrl() + "/" + destination.getBucket();
+						view.setUploadDestinationText(description);
 					}
 					view.setUploadDestinationPanelVisible(true);
 				}
@@ -151,5 +177,9 @@ public class EntityMetadata implements Presenter {
 			});
 		 }
     }
+	 
+	 public void setAnnotationsTitleText(String text) {
+		 view.setAnnotationsTitleText(text);
+	 }
 	
 }

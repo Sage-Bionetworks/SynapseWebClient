@@ -4,14 +4,10 @@ import static org.junit.Assert.*;
 import static org.mockito.Matchers.*;
 import static org.mockito.Mockito.*;
 
-
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.cache.ClientCacheImpl;
 import org.sagebionetworks.web.client.cache.StorageWrapper;
-
-import com.google.gwt.storage.client.Storage;
 
 public class ClientCacheImplTest {
 	

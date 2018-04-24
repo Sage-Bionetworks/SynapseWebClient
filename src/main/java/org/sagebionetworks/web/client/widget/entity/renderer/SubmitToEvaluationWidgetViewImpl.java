@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -32,8 +33,9 @@ public class SubmitToEvaluationWidgetViewImpl extends FlowPanel implements Submi
 		//include the evaluation submitter widget on the page
 		add(evaluationSubmitterContainer);
 		
-		String primaryButtonText = buttonText == null ? "Submit To Challenge" : buttonText;
+		String primaryButtonText = buttonText == null ? WidgetConstants.SUBMIT_TO_CHALLENGE : buttonText;
 		Button button = DisplayUtils.createButton(primaryButtonText, ButtonType.PRIMARY);
+		button.addStyleName("margin-5");
 		button.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {

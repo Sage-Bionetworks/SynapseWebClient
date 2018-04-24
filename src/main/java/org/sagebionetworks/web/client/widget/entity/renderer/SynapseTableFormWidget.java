@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -12,6 +14,7 @@ import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.PartialRow;
 import org.sagebionetworks.repo.model.table.PartialRowSet;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousJobTracker;
@@ -42,6 +45,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 	private AsynchronousJobTracker jobTracker;
 	private UserBadge ownerUserBadge;
 	public static final String DEFAULT_SUCCESS_MESSAGE = "Your response has been recorded";
+	SynapseJavascriptClient jsClient;
 	
 	@Inject
 	public SynapseTableFormWidget(SynapseTableFormWidgetView view,
@@ -49,13 +53,16 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 			RowFormEditorWidget rowWidget,
 			AsynchronousJobTracker jobTracker,
 			SynapseClientAsync synapseClient,
-			UserBadge ownerUserBadge) {
+			UserBadge ownerUserBadge,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.synAlert = synAlert;
 		this.rowWidget = rowWidget;
 		this.jobTracker = jobTracker;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.ownerUserBadge = ownerUserBadge;
+		this.jsClient = jsClient;
 		view.setRowFormWidget(rowWidget.asWidget());
 		view.setSynAlertWidget(synAlert.asWidget());
 		view.setUserBadge(ownerUserBadge.asWidget());
@@ -86,7 +93,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 		}
 		view.setSuccessMessage(successMessage);
 		
-		synapseClient.getEntity(tableId, new AsyncCallback<Entity>() {
+		jsClient.getEntity(tableId, new AsyncCallback<Entity>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);

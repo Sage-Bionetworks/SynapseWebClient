@@ -9,10 +9,14 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.sagebionetworks.web.client.widget.header.Header.ANONYMOUS;
+import static org.sagebionetworks.web.client.widget.header.Header.N_A;
+import static org.sagebionetworks.web.client.widget.header.Header.SYNAPSE_ORG;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -20,13 +24,15 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -38,8 +44,10 @@ import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidget;
+import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.junit.GWTMockUtilities;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -49,7 +57,6 @@ public class HeaderTest {
 	HeaderView mockView;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
-	SynapseClientAsync mockSynapseClient;
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	PlaceChanger mockPlaceChanger;
 	FavoriteWidget mockFavWidget;
@@ -59,31 +66,45 @@ public class HeaderTest {
 	CookieProvider mockCookies;
 	@Mock
 	StuAnnouncementWidget mockStuAnnouncementWidget;
-	
+	@Mock
+	PendoSdk mockPendoSdk;
+	@Mock
+	UserSessionData mockUserSessionData;
+	@Mock
+	UserProfile mockUserProfile;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
+		GWTMockUtilities.disarm();
 		mockView = Mockito.mock(HeaderView.class);		
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
 		mockFavWidget = mock(FavoriteWidget.class);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseClient, mockFavWidget, mockSynapseJSNIUtils, mockStuAnnouncementWidget);
+		when(mockPortalGinInjector.getStuAnnouncementWidget()).thenReturn(mockStuAnnouncementWidget);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector);
 		entityHeaders = new ArrayList<EntityHeader>();
-		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseClient).getFavorites(any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
+		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
+	}
+	@After
+	public void tearDown() {
+		GWTMockUtilities.restore();
 	}
 
 	@Test
 	public void testSetPresenter() {
 		verify(mockView).setPresenter(header);
 		verify(mockView).setStagingAlertVisible(false);
-		verify(mockStuAnnouncementWidget).init();
 	}
 
 	@Test
@@ -115,7 +136,6 @@ public class HeaderTest {
 	@Test
 	public void testOnLogoutClick() {
 		header.onLogoutClick();
-		verify(mockGlobalApplicationState).clearCurrentPlace();
 		verify(mockGlobalApplicationState).clearLastPlace();
 		ArgumentCaptor<Place> captor = ArgumentCaptor.forClass(Place.class);
 		verify(mockPlaceChanger).goTo(captor.capture());
@@ -180,7 +200,7 @@ public class HeaderTest {
 		header.onFavoriteClick();
 		verify(mockView).showFavoritesLoading();
 		verify(mockView).clearFavorite();
-		verify(mockSynapseClient, times(1)).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, times(1)).getFavorites(any(AsyncCallback.class));
 		//initially empty
 		verify(mockView).setEmptyFavorite();
 		
@@ -193,7 +213,7 @@ public class HeaderTest {
 		header.onFavoriteClick();
 		verify(mockView, times(2)).showFavoritesLoading();
 		verify(mockView, times(2)).clearFavorite();
-		verify(mockSynapseClient, times(2)).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, times(2)).getFavorites(any(AsyncCallback.class));
 		verify(mockView).addFavorite(entityHeaders);
 	}
 	
@@ -205,7 +225,7 @@ public class HeaderTest {
 		header.onFavoriteClick();
 		verify(mockView, never()).showFavoritesLoading();
 		verify(mockView, never()).clearFavorite();
-		verify(mockSynapseClient, never()).getFavorites(any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).getFavorites(any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -240,5 +260,55 @@ public class HeaderTest {
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn("localhost");
 		header.initStagingAlert();
 		verify(mockView).setStagingAlertVisible(true);
+	}
+	
+	@Test
+	public void testRefresh() {
+		String userId = "10001";
+		String userName = "testuser";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUserSessionData);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
+		when(mockUserProfile.getUserName()).thenReturn(userName);
+		
+		header.refresh();
+		
+		verify(mockView).setUser(mockUserSessionData);
+		verify(mockView).refresh();
+		verify(mockView).setSearchVisible(true);
+		
+		verify(mockPendoSdk).initialize(userId, userName + SYNAPSE_ORG);
+	}
+	
+
+	@Test
+	public void testRefreshAnonymous() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
+		
+		header.refresh();
+		
+		verify(mockView).setUser(null);
+		verify(mockView).refresh();
+		verify(mockView).setSearchVisible(true);
+		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);
+	}
+	
+	@Test
+	public void testRefreshNullProfile() {
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		String userId = "10001";
+		String userName = "testuser";
+		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
+		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(mockUserSessionData);
+		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(userId);
+		when(mockUserProfile.getUserName()).thenReturn(userName);
+		when(mockUserSessionData.getProfile()).thenReturn(null);
+		
+		header.refresh();
+		
+		verify(mockView).setUser(mockUserSessionData);
+		verify(mockView).refresh();
+		verify(mockView).setSearchVisible(true);
+		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);
 	}
 }

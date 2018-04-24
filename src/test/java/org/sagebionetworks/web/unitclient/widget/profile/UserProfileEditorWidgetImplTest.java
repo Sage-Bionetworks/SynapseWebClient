@@ -1,48 +1,45 @@
 package org.sagebionetworks.web.unitclient.widget.profile;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.stubbing.Answer;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.profile.ProfileImageWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetImpl;
 import org.sagebionetworks.web.client.widget.profile.UserProfileEditorWidgetView;
-import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
-import org.sagebionetworks.web.client.widget.upload.FileInputWidget;
-import org.sagebionetworks.web.client.widget.upload.FileMetadata;
-import org.sagebionetworks.web.client.widget.upload.FileUploadHandler;
-import org.sagebionetworks.web.client.widget.upload.FileValidator;
-import org.sagebionetworks.web.client.widget.upload.ImageFileValidator;
+import org.sagebionetworks.web.client.widget.upload.CroppedImageUploadViewImpl;
+import org.sagebionetworks.web.client.widget.upload.ImageUploadWidget;
 
 public class UserProfileEditorWidgetImplTest {
-	
+	@Mock
 	UserProfileEditorWidgetView mockView;
+	@Mock
 	ProfileImageWidget mockImageWidget;
-	FileHandleUploadWidget mockfileHandleUploadWidget;
+	@Mock
+	ImageUploadWidget mockfileHandleUploadWidget;
 	UserProfileEditorWidgetImpl widget;
-	
+	@Mock
+	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	CroppedImageUploadViewImpl mockCroppedImageUploadViewImpl;
+	@Mock
+	Callback mockCallback;
 	UserProfile profile;
 	
 	@Before
 	public void before(){
-		mockView = Mockito.mock(UserProfileEditorWidgetView.class);
-		mockImageWidget = Mockito.mock(ProfileImageWidget.class);
-		mockfileHandleUploadWidget = Mockito.mock(FileHandleUploadWidget.class);
-		widget = new UserProfileEditorWidgetImpl(mockView, mockImageWidget, mockfileHandleUploadWidget);
+		MockitoAnnotations.initMocks(this);
+		when(mockPortalGinInjector.getCroppedImageUploadView()).thenReturn(mockCroppedImageUploadViewImpl);
+		widget = new UserProfileEditorWidgetImpl(mockView, mockImageWidget, mockfileHandleUploadWidget, mockPortalGinInjector);
 		
 		profile = new UserProfile();
 		profile.setOwnerId("123");
@@ -60,6 +57,11 @@ public class UserProfileEditorWidgetImplTest {
 	}
 	
 	@Test
+	public void testConstruction() {
+		verify(mockfileHandleUploadWidget).setView(mockCroppedImageUploadViewImpl);
+	}
+	
+	@Test
 	public void testConfigure(){
 		widget.configure(profile);
 		verify(mockView).hideLinkError();
@@ -74,14 +76,24 @@ public class UserProfileEditorWidgetImplTest {
 		verify(mockView).setLink(profile.getUrl());
 		verify(mockView).setBio(profile.getSummary());
 		verify(mockImageWidget).configure(profile.getProfilePicureFileHandleId());
+	}
+	
+	@Test
+	public void testSetNewFileHandle() {
+		String newFileHandle = "293";
+		widget.setUploadingCompleteCallback(mockCallback);
+		verify(mockCallback, never()).invoke();
 		
-		//also verify that max image size is set
-		ArgumentCaptor<FileValidator> captor = ArgumentCaptor.forClass(FileValidator.class);
-		verify(mockfileHandleUploadWidget).setValidation(captor.capture());
-		FileValidator validator = captor.getValue();
-		assertTrue(validator instanceof ImageFileValidator);
-		ImageFileValidator v = (ImageFileValidator)validator;
-		assertEquals(UserProfileEditorWidgetImpl.MAX_IMAGE_SIZE, v.getMaxFileSize(), .1);
+		widget.setNewFileHandle(newFileHandle);
+		
+		verify(mockImageWidget).configure(newFileHandle);
+		verify(mockCallback).invoke();
+	}
+	
+	@Test
+	public void testSetUploadingCallback() {
+		widget.setUploadingCallback(mockCallback);
+		verify(mockfileHandleUploadWidget).setUploadingCallback(mockCallback);
 	}
 	
 	@Test

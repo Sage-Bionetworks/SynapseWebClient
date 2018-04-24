@@ -1,18 +1,15 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
-import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.EntityType;
-import org.sagebionetworks.repo.model.file.ExternalFileHandle;
-import org.sagebionetworks.repo.model.file.FileHandle;
-import org.sagebionetworks.repo.model.file.S3FileHandleInterface;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
-import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
 import com.google.gwt.core.client.GWT;
@@ -29,7 +26,6 @@ import com.google.inject.Inject;
 
 public class FileTitleBarViewImpl extends Composite implements FileTitleBarView {
 
-	private Presenter presenter;
 	private Md5Link md5Link;
 	private FavoriteWidget favoriteWidget;
 	
@@ -57,20 +53,34 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	SpanElement externalUrl;
 	@UiField
-	Heading entityName;
+	Text entityName;
 	@UiField
 	Span fileDownloadButtonContainer;
+	@UiField
+	Div externalObjectStoreUI;
+	@UiField
+	Span endpoint;
+	@UiField
+	Span bucket;
+	@UiField
+	Span fileKey;
+	@UiField
+	Span version;
+	@UiField
+	Anchor currentVersionLink;
+	@UiField
+	Div versionInfoUI;
 	
 	interface FileTitleBarViewImplUiBinder extends UiBinder<Widget, FileTitleBarViewImpl> {
 	}
-
+	private String currentEntityId;
 	private static FileTitleBarViewImplUiBinder uiBinder = GWT
 			.create(FileTitleBarViewImplUiBinder.class);
-	
 	@Inject
-	public FileTitleBarViewImpl(SageImageBundle sageImageBundle,
+	public FileTitleBarViewImpl(
 			FavoriteWidget favoriteWidget,
-			Md5Link md5Link) {
+			Md5Link md5Link, 
+			GlobalApplicationState globalAppState) {
 		this.favoriteWidget = favoriteWidget;
 		this.md5Link = md5Link;
 		
@@ -79,70 +89,56 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
+		currentVersionLink.addClickHandler(event -> {
+			event.preventDefault();
+			globalAppState.getPlaceChanger().goTo(new Synapse(currentEntityId));
+		});
 	}
 	
 	@Override
-	public void createTitlebar(
-			EntityBundle entityBundle, 
-			EntityType entityType, 
-			AuthenticationController authenticationController) {
-		Entity entity = entityBundle.getEntity();
-
-		favoriteWidget.configure(entity.getId());
-		
+	public void createTitlebar(Entity entity) {
+		currentEntityId = entity.getId();
+		favoriteWidget.configure(currentEntityId);
 		md5Link.clear();
 		md5LinkContainer.clear();
 		md5LinkContainer.add(md5Link);
-
 		entityIcon.setType(EntityTypeUtils.getIconTypeForEntity(entity));
-		
-		//fileHandle is null if user can't access the filehandle associated with this file entity
-		FileHandle fileHandle = DisplayUtils.getFileHandle(entityBundle);
-		boolean isFilenamePanelVisible = fileHandle != null;
-		fileNameContainer.setVisible(isFilenamePanelVisible);
-		entityName.setText(entity.getName());
-		if (isFilenamePanelVisible) {
-			fileName.setInnerText(entityBundle.getFileName());
-			//don't ask for the size if it's external, just display that this is external data
-			boolean isExternalFile = fileHandle instanceof ExternalFileHandle;
-			UIObject.setVisible(externalUrlUI, isExternalFile);
-			if (isExternalFile) {
-				ExternalFileHandle externalFileHandle = (ExternalFileHandle)fileHandle;
-				externalUrl.setInnerText(externalFileHandle.getExternalURL());
-				if (externalFileHandle.getContentSize() != null) {
-					fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(externalFileHandle.getContentSize().doubleValue(), true));
-				} else {
-					fileSize.setInnerText("");	
-				}
-				
-				fileLocation.setInnerText("| External Storage");
-				String md5 = externalFileHandle.getContentMd5();
-				if (md5 != null) {
-					md5Link.configure(md5);
-				}
-			}
-			else if (fileHandle instanceof S3FileHandleInterface){
-				final S3FileHandleInterface s3FileHandle = (S3FileHandleInterface)fileHandle;
-				presenter.setS3Description();
-
-				fileSize.setInnerText("| "+DisplayUtils.getFriendlySize(s3FileHandle.getContentSize().doubleValue(), true));
-				final String md5 = s3FileHandle.getContentMd5();
-				if (md5 != null) {
-					md5Link.configure(md5);
-				} 
-			}
-		}
+		currentVersionLink.setHref("#!Synapse:"+currentEntityId);
+	}
+	
+	@Override
+	public void setExternalUrlUIVisible(boolean visible) {
+		UIObject.setVisible(externalUrlUI, visible);	
+	}
+	@Override
+	public void setFilenameContainerVisible(boolean visible) {
+		fileNameContainer.setVisible(visible);
+	}
+	@Override
+	public void setFilename(String fileNameString) {
+		fileName.setInnerText(fileNameString);	
+	}
+	@Override
+	public void setFileSize(String fileSizeString) {
+		fileSize.setInnerText(fileSizeString);
+	}
+	@Override
+	public void setMd5(String md5) {
+		md5Link.configure(md5);	
+	}
+	@Override
+	public void setEntityName(String name) {
+		entityName.setText(name);
+	}
+	@Override
+	public void setExternalUrl(String url) {
+		externalUrl.setInnerText(url);
 	}
 	
 	@Override
 	public Widget asWidget() {
 		return this;
 	}	
-
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
 		
 	@Override
 	public void showErrorMessage(String message) {
@@ -171,5 +167,23 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	public void setFileDownloadButton(Widget w) {
 		fileDownloadButtonContainer.clear();
 		fileDownloadButtonContainer.add(w);
+	}
+	@Override
+	public void setExternalObjectStoreUIVisible(boolean visible) {
+		externalObjectStoreUI.setVisible(visible);
+	}
+	@Override
+	public void setExternalObjectStoreInfo(String endpointValue, String bucketValue, String fileKeyValue) {
+		endpoint.setText(endpointValue);
+		bucket.setText(bucketValue);
+		fileKey.setText(fileKeyValue);
+	}
+	@Override
+	public void setVersionUIVisible(boolean visible) {
+		versionInfoUI.setVisible(visible);
+	}
+	@Override
+	public void setVersion(Long versionNumber) {
+		version.setText(versionNumber.toString());
 	}
 }

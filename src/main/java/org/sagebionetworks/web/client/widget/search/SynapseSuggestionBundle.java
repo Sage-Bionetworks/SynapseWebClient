@@ -3,10 +3,10 @@ package org.sagebionetworks.web.client.widget.search;
 import java.util.List;
 
 public class SynapseSuggestionBundle {
-	List<SynapseSuggestion> suggestions;
+	List<UserGroupSuggestion> suggestions;
 	long totalResults;
 	
-	public SynapseSuggestionBundle(List<SynapseSuggestion> suggestions, long totalResults) {
+	public SynapseSuggestionBundle(List<UserGroupSuggestion> suggestions, long totalResults) {
 		this.totalResults = totalResults;
 		this.suggestions = suggestions;
 	}
@@ -15,7 +15,7 @@ public class SynapseSuggestionBundle {
 		return totalResults;
 	}
 	
-	public List<SynapseSuggestion> getSuggestionBundle() {
+	public List<UserGroupSuggestion> getSuggestionBundle() {
 		return suggestions;
 	}
 }

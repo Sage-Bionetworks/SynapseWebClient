@@ -27,10 +27,14 @@ public class ZxcvbnWrapperImpl implements ZxcvbnWrapper {
 	 */
 	private static native void _scorePassword(ZxcvbnWrapperImpl x, String password) /*-{
 		// Write instance field on x
-		var result = $wnd.zxcvbn(password);
-		x.@org.sagebionetworks.web.client.widget.login.ZxcvbnWrapperImpl::score = result.score;
-		if (result.score <= 2) {
-			x.@org.sagebionetworks.web.client.widget.login.ZxcvbnWrapperImpl::feedback = result.feedback.warning;
+		try {
+			var result = $wnd.zxcvbn(password);
+			x.@org.sagebionetworks.web.client.widget.login.ZxcvbnWrapperImpl::score = result.score;
+			if (result.score <= 2) {
+				x.@org.sagebionetworks.web.client.widget.login.ZxcvbnWrapperImpl::feedback = result.feedback.warning;
+			}
+		} catch(err) {
+			console.log(err);
 		}
 	}-*/;
 }

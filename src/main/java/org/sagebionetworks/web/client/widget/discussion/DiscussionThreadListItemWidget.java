@@ -1,9 +1,11 @@
 package org.sagebionetworks.web.client.widget.discussion;
 
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
@@ -14,7 +16,7 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 
 	DiscussionThreadListItemWidgetView view;
 	PortalGinInjector ginInjector;
-	SynapseJSNIUtils jsniUtils;
+	DateTimeUtils dateTimeUtils;
 	UserBadge authorWidget;
 	private CallbackP<DiscussionThreadBundle> threadIdClickedCallback; 
 	
@@ -24,11 +26,11 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 			DiscussionThreadListItemWidgetView view,
 			UserBadge authorWidget,
 			PortalGinInjector ginInjector,
-			SynapseJSNIUtils jsniUtils
+			DateTimeUtils dateTimeUtils
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
-		this.jsniUtils = jsniUtils;
+		this.dateTimeUtils = dateTimeUtils;
 		this.authorWidget = authorWidget;
 		
 		view.setPresenter(this);
@@ -43,6 +45,7 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 	public void configure(DiscussionThreadBundle bundle) {
 		this.bundle = bundle;
 		view.setTitle(bundle.getTitle());
+		view.setThreadUrl(TopicUtils.buildThreadLink(bundle.getProjectId(), bundle.getId()));
 		authorWidget.configure(bundle.getCreatedBy());
 		authorWidget.setSize(BadgeSize.SMALL_PICTURE_ONLY);
 		view.clearActiveAuthors();
@@ -55,7 +58,7 @@ public class DiscussionThreadListItemWidget implements DiscussionThreadListItemW
 		Long numberOfReplies = bundle.getNumberOfReplies();
 		view.setNumberOfReplies(numberOfReplies.toString());
 		view.setNumberOfViews(bundle.getNumberOfViews().toString());
-		view.setLastActivity(jsniUtils.getRelativeTime(bundle.getLastActivity()));
+		view.setLastActivity(dateTimeUtils.getRelativeTime(bundle.getLastActivity()));
 
 		Boolean isPinned = bundle.getIsPinned();
 		if (isPinned == null) {

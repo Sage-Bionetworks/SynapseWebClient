@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -19,9 +18,7 @@ public class LoadMoreWidgetContainerViewImpl implements LoadMoreWidgetContainerV
 	@UiField
 	Div container;
 	@UiField
-	HTMLPanel loadMore;
-	@UiField
-	Image loadMoreImage;
+	LoadingSpinner loadMoreImage;
 
 	Widget widget;
 
@@ -56,21 +53,21 @@ public class LoadMoreWidgetContainerViewImpl implements LoadMoreWidgetContainerV
 
 	@Override
 	public void setLoadMoreVisibility(boolean visible) {
-		loadMore.setVisible(visible);
+		loadMoreImage.setVisible(visible);
 	}
 
 	@Override
 	public boolean isLoadMoreAttached() {
-		return loadMore.isAttached();
+		return loadMoreImage.isAttached();
 	}
 
 	@Override
 	public boolean isLoadMoreInViewport() {
-		return DisplayUtils.isInViewport(loadMoreImage);
+		return DisplayUtils.isInViewport(loadMoreImage.asWidget());
 	}
 
 	@Override
 	public boolean getLoadMoreVisibility() {
-		return loadMore.isVisible();
+		return loadMoreImage.isVisible();
 	}
 }

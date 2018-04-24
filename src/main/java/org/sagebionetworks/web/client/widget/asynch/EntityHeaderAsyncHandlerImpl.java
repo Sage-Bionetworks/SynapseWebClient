@@ -8,29 +8,27 @@ import java.util.Map;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 	private Map<String, List<AsyncCallback<EntityHeader>>> reference2Callback = new HashMap<String, List<AsyncCallback<EntityHeader>>>();
-	SynapseClientAsync synapseClient;
-	// This singleton checks for new work every <DELAY> milliseconds.
-	public static final int DELAY = 300;
+	SynapseJavascriptClient jsClient;
 	
 	@Inject
-	public EntityHeaderAsyncHandlerImpl(SynapseClientAsync synapseClient, GWTWrapper gwt) {
-		this.synapseClient = synapseClient;
+	public EntityHeaderAsyncHandlerImpl(SynapseJavascriptClient jsClient, GWTWrapper gwt) {
+		this.jsClient = jsClient;
 		Callback callback = new Callback() {
 			@Override
 			public void invoke() {
 				executeRequests();
 			}
 		};
-		gwt.scheduleFixedDelay(callback, DELAY);
+		gwt.scheduleFixedDelay(callback, 200 + gwt.nextInt(150));
 	}
 	
 	@Override
@@ -50,7 +48,7 @@ public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 			reference2Callback.clear();
 			List<String> entityIdsList = new ArrayList<String>();
 			entityIdsList.addAll(reference2CallbackCopy.keySet());
-			synapseClient.getEntityHeaderBatch(entityIdsList,new AsyncCallback<ArrayList<EntityHeader>>() {
+			jsClient.getEntityHeaderBatch(entityIdsList,new AsyncCallback<ArrayList<EntityHeader>>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					// go through all requested objects, and inform them of the error
@@ -78,7 +76,7 @@ public class EntityHeaderAsyncHandlerImpl implements EntityHeaderAsyncHandler {
 							}
 						}
 					}
-					UnknownErrorException notReturnedException = new UnknownErrorException(DisplayConstants.ERROR_LOADING);
+					NotFoundException notReturnedException = new NotFoundException(DisplayConstants.ERROR_LOADING);
 					for (String entityId : reference2CallbackCopy.keySet()) {
 						// not returned
 						callOnFailure(entityId, notReturnedException);

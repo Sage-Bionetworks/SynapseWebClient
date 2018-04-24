@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -44,6 +45,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.SettingsView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.login.PasswordStrengthWidget;
+import org.sagebionetworks.web.client.widget.profile.EmailAddressesWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.subscription.SubscriptionListWidget;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -80,7 +82,10 @@ public class SettingsPresenterTest {
 	SubscriptionListWidget mockSubscriptionListWidget;
 	@Mock
 	PasswordStrengthWidget mockPasswordStrengthWidget;
-	
+	@Mock
+	EmailAddressesWidget mockEmailAddressesWidget;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Before
 	public void setup() throws JSONObjectAdapterException{
 		MockitoAnnotations.initMocks(this);
@@ -96,8 +101,18 @@ public class SettingsPresenterTest {
 		mockUserProfileModalWidget = mock(UserProfileModalWidget.class);
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		
-		presenter = new SettingsPresenter(mockView, mockAuthenticationController, mockUserService, mockGlobalApplicationState, mockSynapseClient, 
-				mockGWT, mockInjector, mockUserProfileModalWidget, mockSubscriptionListWidget,mockPasswordStrengthWidget);	
+		presenter = new SettingsPresenter(
+				mockView, 
+				mockAuthenticationController, 
+				mockUserService, 
+				mockGlobalApplicationState, 
+				mockSynapseClient, 
+				mockInjector, 
+				mockUserProfileModalWidget, 
+				mockSubscriptionListWidget,
+				mockPasswordStrengthWidget, 
+				mockEmailAddressesWidget, 
+				mockSynapseJavascriptClient);	
 		verify(mockView).setPresenter(presenter);
 		verify(mockView).setSubscriptionsListWidget(any(Widget.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
@@ -105,7 +120,7 @@ public class SettingsPresenterTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		AsyncMockStubber.callSuccessWith(APIKEY).when(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
 
-		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(profile).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).updateUserProfile(any(UserProfile.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(email).when(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
@@ -218,95 +233,6 @@ public class SettingsPresenterTest {
 	}
 	
 	@Test
-	public void testGetUserNotificationEmail() throws JSONObjectAdapterException {
-		presenter.getUserNotificationEmail();
-		verify(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
-		verify(mockView).showNotificationEmailAddress(eq(email));
-	}
-	
-	@Test
-	public void testGetUserNotificationEmailFailure() throws JSONObjectAdapterException {
-		Exception caught = new Exception("unexpected exception");
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
-		presenter.getUserNotificationEmail();
-		verify(mockSynapseClient).getNotificationEmail(any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(caught);
-	}
-	
-	@Test
-	public void testSetUserNotificationEmail() throws JSONObjectAdapterException {
-		presenter.setUserNotificationEmail(email);
-		verify(mockSynapseClient).setNotificationEmail(eq(email), any(AsyncCallback.class));
-		//reload profile
-		verify(mockPlaceChanger).goTo(isA(Profile.class));
-	}
-	
-	@Test
-	public void testSetUserNotificationEmailFailure() throws JSONObjectAdapterException {
-		Exception caught = new Exception("unexpected exception");
-		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
-		presenter.setUserNotificationEmail(email);
-		verify(mockSynapseClient).setNotificationEmail(anyString(), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(caught);
-
-	}
-	
-	@Test
-	public void testAdditionalEmailValidation() throws JSONObjectAdapterException {
-		presenter.additionalEmailValidation(email);
-		verify(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockView).showEmailChangeSuccess(anyString());
-	}
-	
-	@Test
-	public void testAdditionalEmailValidationFailure() throws JSONObjectAdapterException {
-		Exception ex = new Exception("unexpected exception");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		presenter.additionalEmailValidation(email);
-		verify(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		verify(mockSynAlert).handleException(ex);
-	}
-	
-	@Test
-	public void testAdditionalEmailValidationInvalidEmail() throws JSONObjectAdapterException {
-		String email = "invalidEmailAddress";
-		presenter.additionalEmailValidation(email);
-		verify(mockSynAlert).showError(WebConstants.INVALID_EMAIL_MESSAGE);
-	}
-	
-	@Test (expected=IllegalStateException.class)
-	public void testAddEmailNullEmails(){
-		profile.setEmails(null);
-		presenter.addEmail(email);
-	}
-	
-	@Test (expected=IllegalStateException.class)
-	public void testAddEmailEmptyEmails(){
-		profile.setEmails(new ArrayList());
-		presenter.addEmail(email);
-	}
-	
-	@Test
-	public void testAddEmailNewEmail(){
-		String email2 = "testuser2@test.com";
-		presenter.addEmail(email2);
-		verify(mockSynapseClient).additionalEmailValidation(anyString(), anyString(), anyString(), any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testAddEmailNewEmailWithSpaces(){
-		String email3 = " testuser3@test.com ";
-		presenter.addEmail(email3);
-		verify(mockSynapseClient).additionalEmailValidation(anyString(), Mockito.eq("testuser3@test.com"), anyString(), any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testAddEmailExistingEmail(){
-		presenter.addEmail(email);
-		verify(mockSynapseClient).setNotificationEmail(eq(email), any(AsyncCallback.class));
-	}
-	
-	@Test
 	public void testGetAPIKey() {
 		presenter.getAPIKey();
 		verify(mockSynapseClient).getAPIKey(any(AsyncCallback.class));
@@ -336,19 +262,28 @@ public class SettingsPresenterTest {
 	
 	@Test
 	public void testConfigure() {
+		when(mockGlobalApplicationState.isShowingUTCTime()).thenReturn(false);
 		presenter.configure();
-		verify(mockSynAlert, times(5)).clear();
+		verify(mockSynAlert, times(3)).clear();
 		verify(mockPasswordStrengthWidget).setVisible(false);
 		verify(mockView).clear();
 		verify(mockSubscriptionListWidget).configure();
 		verify(mockView).updateNotificationCheckbox(profile);
 		verify(mockAuthenticationController).updateCachedProfile(profile);
+		verify(mockView).setShowingLocalTime();
+	}
+	
+	@Test
+	public void testConfigureIsShowingUTCTime() {
+		when(mockGlobalApplicationState.isShowingUTCTime()).thenReturn(true);
+		presenter.configure();
+		verify(mockView).setShowingUTCTime();
 	}
 	
 	@Test
 	public void testConfigureFailure() {
 		Exception ex = new Exception("error occurred");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getUserProfile(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getUserProfile(anyString(), any(AsyncCallback.class));
 		presenter.configure();
 		verify(mockView).clear();
 		verify(mockSubscriptionListWidget).configure();
@@ -373,16 +308,14 @@ public class SettingsPresenterTest {
 	@Test
 	public void testConfirmAPIKeyChange(){
 		presenter.changeApiKey();
-		ArgumentCaptor<ConfirmCallback> captor = ArgumentCaptor.forClass(ConfirmCallback.class);
+		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockView).showConfirm(anyString(),  captor.capture());
 		
-		ConfirmCallback callback = captor.getValue();
-		//test not confirmed (user clicked cancel)
-		callback.callback(false);
+		Callback callback = captor.getValue();
 		verify(mockSynapseClient, never()).deleteApiKey(any(AsyncCallback.class));
 		verify(mockView, never()).setApiKey(APIKEY2);
 		
-		callback.callback(true);
+		callback.invoke();
 		verify(mockSynapseClient).deleteApiKey(any(AsyncCallback.class));
 		verify(mockView).setApiKey(APIKEY2);
 	}
@@ -466,5 +399,11 @@ public class SettingsPresenterTest {
 		verify(mockView).setCurrentPasswordInError(false);
 		verify(mockView).setPassword1InError(false);
 		verify(mockView).setPassword2InError(false);
+	}
+	
+	@Test
+	public void testSetShowUTCTime() {
+		presenter.setShowUTCTime(true);
+		verify(mockGlobalApplicationState).setShowUTCTime(true);
 	}
 }

@@ -11,15 +11,20 @@ public interface RegisterWidgetView extends IsWidget {
 	 */
 	void setPresenter(Presenter presenter);
 	void setSynAlert(Widget w);
+
+	void enableEmailAddressField(boolean enabled);
+
 	/**
 	 * Presenter interface
 	 */
-	public interface Presenter {
-		void registerUser(String email);		
+	interface Presenter {
+		void registerUser(String email);
+
+		String getEncodedMembershipInvtnSignedToken();
 	}
 	void enableRegisterButton(boolean enable);
 	void setVisible(boolean isVisible);
-	void setInlineUI(boolean isInline);
+
 	void setEmail(String email);
 	void clear();
 	void showInfo(String message);

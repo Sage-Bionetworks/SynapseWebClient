@@ -6,13 +6,18 @@
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
   xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
   xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2">
-	<g:HTMLPanel ui:field="container" visible="false">
-   	    <bh:Span text="Created by"/>
-	    <bh:Span ui:field="createdBadgePanel" addStyleNames="movedown-7"/>
-	    <bh:Span ui:field="createdOnText"/>
-	    <br/>
-   	    <bh:Span text="Modified by"/>
-   	    <bh:Span ui:field="modifiedBadgePanel" addStyleNames="movedown-7"/>
-   	    <bh:Span ui:field="modifiedOnText"/>
-	</g:HTMLPanel>
+  	<bh:Div ui:field="container" visible="false">
+	 	<bh:Span ui:field="createdByUI">
+		 	<bh:Span text="Created by"/>
+		    <bh:Span ui:field="createdBadgePanel"/>
+		    <bh:Span ui:field="createdOnText"/>
+		</bh:Span>
+	    <bh:Br />
+	    <bh:Span ui:field="modifiedByUI">
+		    <bh:Span text="Modified by" />
+	  	    <bh:Span ui:field="modifiedBadgePanel"/>
+	  	    <bh:Span ui:field="modifiedOnText"/>
+	    </bh:Span>
+	    
+  	</bh:Div>
 </ui:UiBinder>

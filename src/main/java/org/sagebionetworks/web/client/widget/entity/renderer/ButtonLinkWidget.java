@@ -13,7 +13,7 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class ButtonLinkWidget implements ButtonLinkWidgetView.Presenter, WidgetRendererPresenter {
+public class ButtonLinkWidget implements WidgetRendererPresenter {
 	
 	private ButtonLinkWidgetView view;
 	private Map<String,String> descriptor;
@@ -25,7 +25,6 @@ public class ButtonLinkWidget implements ButtonLinkWidgetView.Presenter, WidgetR
 	public ButtonLinkWidget(ButtonLinkWidgetView view, GWTWrapper gwt) {
 		this.view = view;
 		this.gwt = gwt;
-		view.setPresenter(this);
 	}
 	
 	@Override
@@ -68,8 +67,4 @@ public class ButtonLinkWidget implements ButtonLinkWidgetView.Presenter, WidgetR
 	public Widget asWidget() {
 		return view.asWidget();
 	}
-
-		/*
-	 * Private Methods
-	 */
 }

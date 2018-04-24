@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.upload;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
@@ -26,8 +26,13 @@ import org.sagebionetworks.web.client.widget.upload.FileHandleUploadView;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidgetImpl;
 import org.sagebionetworks.web.client.widget.upload.FileMetadata;
 import org.sagebionetworks.web.client.widget.upload.FileUpload;
+import org.sagebionetworks.web.client.widget.upload.FileValidator;
 import org.sagebionetworks.web.client.widget.upload.MultipartUploader;
 import org.sagebionetworks.web.client.widget.upload.ProgressingFileUploadHandler;
+import org.sagebionetworks.web.shared.WebConstants;
+
+import com.google.gwt.core.client.JavaScriptObject;
+import com.google.gwt.event.logical.shared.HasAttachHandlers;
 
 public class FileHandleUploadWidgetImplTest {
 	
@@ -60,8 +65,8 @@ public class FileHandleUploadWidgetImplTest {
 
 		//The metadata returned should correspond to testFileName
 		when(mockView.getInputId()).thenReturn(inputId);
-		when(jsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"testName"});
-		when(jsniUtils.getContentType(anyString(), anyInt())).thenReturn(null);
+		when(jsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(new String[]{"testName"});
+		when(jsniUtils.getContentType(any(JavaScriptObject.class), anyInt())).thenReturn(null);
 		
 	}
 	
@@ -88,7 +93,7 @@ public class FileHandleUploadWidgetImplTest {
 		verify(mockView).setInputEnabled(false);
 		verify(mockView).hideError();
 		
-		verify(mockMultipartUploader).uploadFile(anyString(), anyString(), anyInt(), handleCaptor.capture(), any(Long.class));
+		verify(mockMultipartUploader).uploadFile(anyString(), anyString(), any(JavaScriptObject.class), handleCaptor.capture(), any(Long.class), eq(mockView));
 		handleCaptor.getValue().updateProgress(0.1, "10%", "100 KB/s");
 		handleCaptor.getValue().updateProgress(0.9, "90%", "10 MB/s");
 		handleCaptor.getValue().uploadSuccess(successFileHandle);
@@ -104,11 +109,33 @@ public class FileHandleUploadWidgetImplTest {
 		verify(mockView).setInputEnabled(true);
 		verify(mockView).showProgress(false);
 	}
+	@Test
+	public void testSelectInvalidFileName() {
+		FileValidator mockFileValidator = mock(FileValidator.class);
+		when(mockFileValidator.getInvalidFileCallback()).thenReturn(mockFailedValidationCallback);
+		when(jsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(new String[]{"testName#($*#.jpg"});
+		widget.configure("button text", mockCallback);
+		widget.setValidation(mockFileValidator);
+		
+		widget.onFileSelected();
+		
+		verify(mockView).showError(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+		verify(mockFailedValidationCallback).invoke();
+	}
+	@Test
+	public void testSelectInvalidFileNameNoValidator() {
+		when(jsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(new String[]{"testName#($*#.jpg"});
+		widget.configure("button text", mockCallback);
+		
+		widget.onFileSelected();
+		
+		verify(mockView).showError(WebConstants.INVALID_ENTITY_NAME_MESSAGE);
+	}
 	
 	@Test
 	public void testMultiFileSelected() {
 		final String successFileHandle = "123";
-		when(jsniUtils.getMultipleUploadFileNames(anyString())).thenReturn(new String[]{"testName", "testName2"});
+		when(jsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(new String[]{"testName", "testName2"});
 		
 		// Configure before the test
 		widget.configure("button text", mockCallback);
@@ -121,7 +148,7 @@ public class FileHandleUploadWidgetImplTest {
 		verify(mockView).hideError();
 		
 		// The progress should be updated with scaled values based on the presence of two files to upload
-		verify(mockMultipartUploader).uploadFile(anyString(), anyString(), anyInt(), handleCaptor.capture(), any(Long.class));
+		verify(mockMultipartUploader).uploadFile(anyString(), anyString(), any(JavaScriptObject.class), handleCaptor.capture(), any(Long.class), eq(mockView));
 		verify(mockView).showProgress(true);
 		verify(mockView).setInputEnabled(false);
 		handleCaptor.getValue().updateProgress(0.1, "10%", "100 KB/s");
@@ -154,7 +181,8 @@ public class FileHandleUploadWidgetImplTest {
 				handler.uploadFailed(error);
 				return null;
 			}
-		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class));
+		}).when(mockMultipartUploader).uploadFile(anyString(), anyString(), any(JavaScriptObject.class), handleCaptor.capture(), any(Long.class), eq(mockView));
+		
 		// Configure before the test
 		widget.configure("button text", mockCallback);
 		AbstractFileValidator validator = new AbstractFileValidator() {
@@ -200,7 +228,7 @@ public class FileHandleUploadWidgetImplTest {
 				handler.uploadFailed(error);
 				return null;
 			}
-		}).when(mockMultipartUploader).uploadSelectedFile(anyString(), any(ProgressingFileUploadHandler.class), any(Long.class));
+		}).when(mockMultipartUploader).uploadFile(anyString(), anyString(), any(JavaScriptObject.class), handleCaptor.capture(), any(Long.class), eq(mockView));
 		// Configure before the test
 		widget.configure("button text", mockCallback);
 		AbstractFileValidator validator = new AbstractFileValidator () {

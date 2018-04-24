@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -14,19 +13,25 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueue;
+import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueueImpl;
 
 public class LoadMoreWidgetContainerTest {
 	@Mock
 	LoadMoreWidgetContainerView mockView;
 	@Mock
-	GWTWrapper mockGWT;
+	LazyLoadCallbackQueue mockLazyLoadCallbackQueue;
 	@Mock
 	Callback mockLoadMoreCallback;
+	@Mock
+	GWTWrapper mockGWT;
+	
 	LoadMoreWidgetContainer widget;
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new LoadMoreWidgetContainer(mockView, mockGWT);
+		widget = new LoadMoreWidgetContainer(mockView, mockLazyLoadCallbackQueue);
+		
 		widget.configure(mockLoadMoreCallback);
 	}
 
@@ -35,7 +40,8 @@ public class LoadMoreWidgetContainerTest {
 		boolean isMore = true;
 		widget.setIsMore(isMore);
 		verify(mockView).setLoadMoreVisibility(isMore);
-		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
+		verify(mockLazyLoadCallbackQueue).subscribe(any(Callback.class));
+		verify(mockLazyLoadCallbackQueue, never()).unsubscribe(any(Callback.class));
 	}
 	
 	@Test
@@ -43,7 +49,8 @@ public class LoadMoreWidgetContainerTest {
 		boolean isMore = false;
 		widget.setIsMore(isMore);
 		verify(mockView).setLoadMoreVisibility(isMore);
-		verify(mockGWT, never()).scheduleExecution(any(Callback.class), anyInt());
+		verify(mockLazyLoadCallbackQueue, never()).subscribe(any(Callback.class));
+		verify(mockLazyLoadCallbackQueue).unsubscribe(any(Callback.class));
 	}
 
 
@@ -63,23 +70,23 @@ public class LoadMoreWidgetContainerTest {
 	public void testClear() {
 		widget.clear();
 		verify(mockView).clear();
+		verify(mockView).setLoadMoreVisibility(false);
+		verify(mockLazyLoadCallbackQueue).unsubscribe(any(Callback.class));
 	}
 
 	@Test
 	public void testCheckForInViewAndLoadDataNotAttached() {
 		when(mockView.isLoadMoreAttached()).thenReturn(false);
 		widget.checkForInViewAndLoadData();
-		verify(mockGWT, never()).scheduleExecution(any(Callback.class), anyInt());
+		verify(mockLazyLoadCallbackQueue, never()).subscribe(any(Callback.class));
 		verify(mockLoadMoreCallback, never()).invoke();
 	}
-
 	
 	@Test
 	public void testCheckForInViewAndLoadDataAttachedNotInViewport() {
 		when(mockView.isLoadMoreAttached()).thenReturn(true);
 		when(mockView.isLoadMoreInViewport()).thenReturn(false);
 		widget.checkForInViewAndLoadData();
-		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 		verify(mockLoadMoreCallback, never()).invoke();
 	}
 
@@ -89,7 +96,6 @@ public class LoadMoreWidgetContainerTest {
 		when(mockView.isLoadMoreInViewport()).thenReturn(true);
 		when(mockView.getLoadMoreVisibility()).thenReturn(false);
 		widget.checkForInViewAndLoadData();
-		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 		verify(mockLoadMoreCallback, never()).invoke();
 	}
 
@@ -99,7 +105,6 @@ public class LoadMoreWidgetContainerTest {
 		when(mockView.isLoadMoreInViewport()).thenReturn(false);
 		when(mockView.getLoadMoreVisibility()).thenReturn(true);
 		widget.checkForInViewAndLoadData();
-		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 		verify(mockLoadMoreCallback, never()).invoke();
 	}
 
@@ -109,7 +114,7 @@ public class LoadMoreWidgetContainerTest {
 		when(mockView.isLoadMoreInViewport()).thenReturn(true);
 		when(mockView.getLoadMoreVisibility()).thenReturn(true);
 		widget.checkForInViewAndLoadData();
-		verify(mockGWT, never()).scheduleExecution(any(Callback.class), anyInt());
+		verify(mockLazyLoadCallbackQueue, never()).subscribe(any(Callback.class));
 		verify(mockLoadMoreCallback).invoke();
 	}
 
@@ -120,7 +125,6 @@ public class LoadMoreWidgetContainerTest {
 		when(mockView.getLoadMoreVisibility()).thenReturn(true);
 		widget.setIsProcessing(true);
 		widget.checkForInViewAndLoadData();
-		verify(mockGWT).scheduleExecution(any(Callback.class), anyInt());
 		verify(mockLoadMoreCallback, never()).invoke();
 	}
 }

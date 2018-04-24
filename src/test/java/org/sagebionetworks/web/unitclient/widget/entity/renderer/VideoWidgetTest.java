@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -25,14 +23,12 @@ public class VideoWidgetTest {
 	VideoWidgetView mockView;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
 	AuthenticationController mockAuthController;
-	String xsrfToken = "12345";
 	@Before
 	public void setup(){
 		mockView = mock(VideoWidgetView.class);
 		mockAuthController = mock(AuthenticationController.class);
 		widget = new VideoWidget(mockView, mockAuthController);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
-		when(mockAuthController.getCurrentXsrfToken()).thenReturn(xsrfToken);
 	}
 	
 	@Test
@@ -56,7 +52,16 @@ public class VideoWidgetTest {
 		descriptor.put(WidgetConstants.HEIGHT_KEY, height);
 		
 		widget.configure(wikiKey, descriptor, null, null);
-		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height), eq(xsrfToken));
+		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height));
+	}
+	
+	@Test
+	public void testConfigureYouTube() {
+		Map<String, String> descriptor = new HashMap<String, String>();
+		String videoId = "my test video id";
+		descriptor.put(WidgetConstants.YOUTUBE_WIDGET_VIDEO_ID_KEY, videoId);
+		widget.configure(wikiKey, descriptor, null, null);
+		verify(mockView).configure(eq(VideoWidget.YOUTUBE_URL_PREFIX + videoId));
 	}
 	
 	@Test
@@ -67,7 +72,7 @@ public class VideoWidgetTest {
 		String width = "400";
 		String height="600";
 		widget.configure(mp4VideoId, "filename.mp4", 400, 600);
-		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height), eq(xsrfToken));
+		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height));
 	}
 	
 	@Test
@@ -78,7 +83,7 @@ public class VideoWidgetTest {
 		String width = "400";
 		String height="600";
 		widget.configure(webMVideoId, "filename.webm", 400, 600);
-		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height), eq(xsrfToken));
+		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height));
 	}
 	
 	@Test
@@ -89,6 +94,6 @@ public class VideoWidgetTest {
 		String width = "400";
 		String height="600";
 		widget.configure(oggVideoId, "filename.ogg", 400, 600);
-		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height), eq(xsrfToken));
+		verify(mockView).configure(eq(mp4VideoId), eq(oggVideoId), eq(webMVideoId), eq(width), eq(height));
 	}
 }

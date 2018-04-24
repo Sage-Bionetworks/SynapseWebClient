@@ -1,28 +1,24 @@
 package org.sagebionetworks.web.client.view;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
-import org.gwtbootstrap3.extras.bootbox.client.callback.ConfirmCallback;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyUpEvent;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -30,7 +26,6 @@ import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
-import com.google.gwt.user.client.ui.InlineHTML;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -55,7 +50,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	Panel apiKeyUI;
 	@UiField
 	org.gwtbootstrap3.client.ui.Button editProfileButton;
-	
+	@UiField
+	Div dateTimeFormatPanel;
 	@UiField
 	FlowPanel forgotPasswordContainer;
 	Anchor forgotPasswordLink;
@@ -63,14 +59,7 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	Div emailSettingsPanel;
 	@UiField
-	Div changeEmailUI;
-	@UiField
-	FlowPanel emailsPanel;
-	@UiField
-	TextBox newEmailField;
-	@UiField
-	Button addEmailButton;
-
+	Div emailsPanel;
 	
 	@UiField
 	PasswordTextBox currentPasswordField;
@@ -101,8 +90,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	org.gwtbootstrap3.client.ui.Button showApiKey;
 	
 	@UiField
-	SimplePanel addressSynAlertPanel;
-	@UiField
 	SimplePanel notificationSynAlertPanel;
 	@UiField
 	SimplePanel apiSynAlertPanel;
@@ -111,6 +98,13 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@UiField
 	Div passwordStrengthContainer;
 
+	@UiField
+	AnchorListItem dateFormatLocal;
+	@UiField
+	AnchorListItem dateFormatUTC;
+	@UiField
+	Button dateFormatDropdown;
+	
 	private Presenter presenter;
 	
 	@Inject
@@ -156,21 +150,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		changeSynapsePasswordHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Change Synapse Password");
 		apiKeyHighlightBox.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Synapse API Key");
 		editProfilePanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Profile");
+		dateTimeFormatPanel.getElement().setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Date/Time Format");
 		
-		newEmailField.addKeyDownHandler(new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					addEmailButton.click();
-				}
-			}
-		});
-		addEmailButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.addEmail(newEmailField.getValue());
-			}
-		});
 		editProfileButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -190,6 +171,22 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 				presenter.passwordChanged(password1Field.getText());
 			}
 		});
+		
+		dateFormatLocal.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				dateFormatDropdown.setText(dateFormatLocal.getText());
+				presenter.setShowUTCTime(false);
+			}
+		});
+		dateFormatUTC.addClickHandler(new ClickHandler() {
+			@Override
+			public void onClick(ClickEvent event) {
+				dateFormatDropdown.setText(dateFormatUTC.getText());
+				presenter.setShowUTCTime(true);
+			}
+		});
+
 	}
 
 
@@ -204,7 +201,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 		currentPasswordField.getElement().setAttribute("placeholder", "Enter current password");
 		password1Field.getElement().setAttribute("placeholder", "Enter new password");
 		password2Field.getElement().setAttribute("placeholder", "Confirm new password");
-		newEmailField.getElement().setAttribute("placeholder", "Enter new email address");
 		clear();
 	}
 
@@ -221,22 +217,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 
 	@Override
 	public void showLoading() {
-	}
-
-	
-	public void showNotificationEmailAddress(String primaryEmail) {
-		emailsPanel.clear();
-		emailsPanel.add(new InlineHTML("<h5 class=\"displayInline\">" + SafeHtmlUtils.htmlEscape(primaryEmail) + "</h5>"));
-		final Anchor changeEmail = new Anchor("change");
-		changeEmail.addStyleName("link margin-left-10");
-		emailsPanel.add(changeEmail);
-		changeEmail.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				changeEmail.setVisible(false);
-				DisplayUtils.show(changeEmailUI);
-			}
-		});
 	}
 	
 	@Override
@@ -310,14 +290,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void clear() {
 		hideAPIKey();
 		resetChangePasswordUI();
-		resetAddEmailUI();
-	}
-	
-	private void resetAddEmailUI() {
-		emailsPanel.clear();
-		newEmailField.setValue("");
-		addEmailButton.setEnabled(true);
-		DisplayUtils.hide(changeEmailUI);
 	}
 	
 	@Override
@@ -332,12 +304,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	}
 	
 	@Override
-	public void showEmailChangeSuccess(String message) {
-		DisplayUtils.hide(changeEmailUI);
-		DisplayUtils.showInfoDialog("", message, null);
-	}
-
-	@Override
 	public void setApiKey(String apiKey) {
 		apiKeyContainer.setText(apiKey);
 		apiKeyUI.setVisible(true);
@@ -349,12 +315,6 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	@Override
 	public void setNotificationSynAlertWidget(IsWidget notificationSynAlert) {
 		notificationSynAlertPanel.setWidget(notificationSynAlert);
-	}
-
-
-	@Override
-	public void setAddressSynAlertWidget(IsWidget addressSynAlert) {
-		addressSynAlertPanel.setWidget(addressSynAlert);
 	}
 
 	@Override
@@ -371,8 +331,8 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	}
 	
 	@Override
-	public void showConfirm(String message, ConfirmCallback callback) {
-		Bootbox.confirm(message, callback);
+	public void showConfirm(String message, Callback callback) {
+		DisplayUtils.confirm(message, callback);
 	}
 	
 	@Override
@@ -399,5 +359,19 @@ public class SettingsViewImpl extends Composite implements SettingsView {
 	public void setPasswordStrengthWidget(Widget w) {
 		passwordStrengthContainer.clear();
 		passwordStrengthContainer.add(w);
+	}
+	@Override
+	public void setShowingUTCTime() {
+		dateFormatDropdown.setText(dateFormatUTC.getText());
+	}
+	@Override
+	public void setShowingLocalTime() {
+		dateFormatDropdown.setText(dateFormatLocal.getText());
+	}
+	
+	@Override
+	public void setEmailAddressesWidget(IsWidget w) {
+		emailsPanel.clear();
+		emailsPanel.add(w);
 	}
 }

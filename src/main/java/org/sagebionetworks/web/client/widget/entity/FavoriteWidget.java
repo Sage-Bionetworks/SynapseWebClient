@@ -1,11 +1,14 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidgetView.Presenter;
 
@@ -20,7 +23,7 @@ public class FavoriteWidget implements Presenter, IsWidget {
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
-	
+	private SynapseJavascriptClient jsClient;
 	String entityId;
 	
 	public static final String FAVORITES_REMINDER = "FavoritesReminder";
@@ -29,12 +32,15 @@ public class FavoriteWidget implements Presenter, IsWidget {
 	public FavoriteWidget(FavoriteWidgetView view,
 			SynapseClientAsync synapseClient,
 			GlobalApplicationState globalApplicationState,
-			AuthenticationController authenticationController) {
+			AuthenticationController authenticationController,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.view.setPresenter(this);
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.jsClient = jsClient;
 	}
 	
 	public void configure(String entityId) {
@@ -129,7 +135,7 @@ public class FavoriteWidget implements Presenter, IsWidget {
 	}
 
 	private void updateStoredFavorites(final AsyncCallback<Void> callback) {
-		synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
+		jsClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> favorites) {
 				globalApplicationState.setFavorites(favorites);

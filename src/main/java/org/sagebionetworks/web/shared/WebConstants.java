@@ -22,7 +22,7 @@ public class WebConstants {
 	 */
 	public static final String VALID_ENTITY_NAME_REGEX = ModelConstants.VALID_ENTITY_NAME_REGEX;
 	
-	public static final String INVALID_ENTITY_NAME_MESSAGE = "Entity names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
+	public static final String INVALID_ENTITY_NAME_MESSAGE = "Names may only contain letters, numbers, spaces, underscores, hypens, periods, plus signs, and parentheses.";
 	
 	public static final String INVALID_EMAIL_MESSAGE = "Invalid email address";
 
@@ -99,8 +99,6 @@ public class WebConstants {
 	public static final int DESCRIPTION_SUMMARY_LENGTH = 450; // characters for summary
 
 	public static final String PROXY_PARAM_KEY = "proxy";
-	public static final String XSRF_TOKEN_KEY = "xsrfToken";
-	
 	public static final String REDIRECT_URL_KEY = "redirect";
 
 	public static final String ENTITY_PARENT_ID_KEY = "parentId";
@@ -174,7 +172,7 @@ public class WebConstants {
 	public static final String ANONYMOUS_USER_PRINCIPAL_ID = "org.sagebionetworks.portal.anonymous_user_principal_id";
 	public static final String PROVENANCE_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.provenance_synapse_id";
 	public static final String PROVENANCE_WIKI_ID_PROPERTY ="org.sagebionetworks.portal.provenance_wiki_id";
-	
+	public static final String NBCONVERT_ENDPOINT_PROPERTY ="org.sagebionetworks.portal.nbconvert_endpoint";
 	public static final String FORUM_SYNAPSE_ID_PROPERTY ="org.sagebionetworks.portal.forum_project_id";
 	
 	//Workshop
@@ -191,6 +189,8 @@ public class WebConstants {
 	public static final String STAGE_X_ENTITY_ID_PROPERTY ="org.sagebionetworks.portal.stageX_synapse_id";
 	
 	public static final String FILE_HANDLE_ASSOCIATION_SERVLET = "filehandleassociation";
+	public static final String ALIAS_REDIRECTOR_SERVLET = "aliasredirector";
+	public static final String ALIAS_PARAM_KEY = "alias";
 	public static final String SLACK_SERVLET = "slack";
 	public static final String FILE_HANDLE_UPLOAD_SERVLET = "filehandle";
 	public static final String FILE_ENTITY_RESOLVER_SERVLET = "fileresolver";
@@ -211,9 +211,7 @@ public class WebConstants {
 	
 	
 	public static final String GETTING_STARTED = "GettingStarted";
-	public static final String R_CLIENT = "RClient";
-	public static final String PYTHON_CLIENT = "PythonClient";
-	public static final String COMMAND_LINE_CLIENT = "CommandLineClient";
+	
 	public static final String FORMATTING_GUIDE = "FormattingGuide";
 	public static final String CHALLENGE_PARTICIPATION_INFO = "ChallengeParticipationInfo";
 	
@@ -240,6 +238,7 @@ public class WebConstants {
 	public static final String DEFAULT_COL_NAME_MODIFIED_ON = "modifiedon";
 	public static final String DEFAULT_COL_NAME_CREATED_ON = "createdon";
 	public static final String DEFAULT_COL_NAME_USER_ID = "userid";
+	public static final String DEFAULT_COL_NAME_SUBMITTER_ID = "submitterid";
 	public static final String DEFAULT_COL_NAME_MODIFIED_BY_PRINCIPAL_ID = "modifiedbyprincipalid";
 	public static final String DEFAULT_COL_NAME_CREATED_BY_PRINCIPAL_ID = "createdbyprincipalid";
 	public static final String DEFAULT_COL_NAME_ID = "id";
@@ -293,8 +292,13 @@ public class WebConstants {
 	public static final String REPLY_TYPE = "reply";
 
 	public static final String TEXT_PLAIN_CHARSET_UTF8 = "text/plain; charset=utf-8";
+	public static final String TEXT_HTML_CHARSET_UTF8 = "text/html; charset=utf-8";
 
 	public static final String CONTENT_TYPE = "Content-Type";
 
 	public static final Long ZERO_OFFSET = 0L;
+	public static final String REPO_SERVICE_URL_KEY = "repoServiceUrl";
+	public static final String FILE_SERVICE_URL_KEY = "fileServiceUrl";
+	public static final String AUTH_PUBLIC_SERVICE_URL_KEY = "authPublicServiceUrl";
+	public static final String SYNAPSE_VERSION_KEY = "synapseVersionInfo";
 }

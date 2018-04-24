@@ -6,7 +6,6 @@ import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
-import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.inject.Inject;
 
@@ -21,7 +20,6 @@ public class ChallengeTab implements ChallengeTabView.Presenter{
 		this.tab = tab;
 		this.ginInjector = ginInjector;
 		tab.configure("Challenge", "Challenges are computational contests organized through the Dream Challenges.", "http://dreamchallenges.org");
-		tab.setTabListItemVisible(false);
 	}
 	
 	public void lazyInject() {
@@ -41,15 +39,8 @@ public class ChallengeTab implements ChallengeTabView.Presenter{
 	public void configure(String entityId, String entityName) {
 		lazyInject();
 		tab.setEntityNameAndPlace(entityName, new Synapse(entityId, null, EntityArea.ADMIN, null));
-		tab.setTabListItemVisible(false);
-		Callback isChallengeOrEvaluationQueueCallback = new Callback() {
-			@Override
-			public void invoke() {
-				tab.setTabListItemVisible(true);
-			}
-		};
-		challengeWidget.configure(entityId, isChallengeOrEvaluationQueueCallback);
-		evaluationList.configure(entityId, isChallengeOrEvaluationQueueCallback);
+		challengeWidget.configure(entityId);
+		evaluationList.configure(entityId);
 	}
 	
 	public Tab asTab(){

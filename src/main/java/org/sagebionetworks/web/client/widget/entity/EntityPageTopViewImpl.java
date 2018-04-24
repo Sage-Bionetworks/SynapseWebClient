@@ -1,15 +1,18 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.ui.Row;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public class EntityPageTopViewImpl extends Composite implements EntityPageTopView {
 
@@ -17,20 +20,17 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	@UiField
-	Row projectMetaContainer;
-	
-	@UiField
 	Div tabsUI;
-	
-	private Presenter presenter;
+	@UiField
+	LoadingSpinner loadingUI;
 	
 	//project level info
 	@UiField
 	SimplePanel projectMetadataContainer;
 	@UiField
-	SimplePanel projectDescriptionContainer;
+	Span projectActionMenuContainer;
 	@UiField
-	SimplePanel projectActionMenuContainer;
+	Span entityActionMenuContainer;
 	
 	@Inject
 	public EntityPageTopViewImpl(Binder uiBinder) {
@@ -38,8 +38,12 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 
 	@Override
-	public void setActionMenu(Widget w) {
+	public void setProjectActionMenu(Widget w) {
 		projectActionMenuContainer.add(w);
+	}
+	@Override
+	public void setEntityActionMenu(Widget w) {
+		entityActionMenuContainer.add(w);
 	}
 	@Override
 	public void setProjectMetadata(Widget w) {
@@ -50,11 +54,6 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	@Override
 	public Widget asWidget() {
 		return this;
-	}
-
-	@Override
-	public void setPresenter(Presenter p) {
-		presenter = p;
 	}
 
 	@Override
@@ -81,7 +80,20 @@ public class EntityPageTopViewImpl extends Composite implements EntityPageTopVie
 	}
 	
 	@Override
-	public void setProjectInformationVisible(boolean isVisible) {
-		projectMetaContainer.setVisible(isVisible);
+	public void setProjectLoadingVisible(boolean visible) {
+		loadingUI.setVisible(visible);
+	}
+	@Override
+	public void scrollToTop() {
+		DisplayUtils.scrollToTop();
+	}
+	
+	/** Event binder code **/
+	interface EBinder extends EventBinder<EntityPageTop> {};
+	private final EBinder eventBinder = GWT.create(EBinder.class);
+	
+	@Override
+	public EventBinder<EntityPageTop> getEventBinder() {
+		return eventBinder;
 	}
 }

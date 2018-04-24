@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.view;
 
-import java.util.List;
-
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.web.client.SynapseView;
@@ -10,8 +8,6 @@ import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
-import org.sagebionetworks.web.client.widget.team.TeamListWidget;
-import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -32,6 +28,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void refreshHeader();
 	void setProjectContainer(Widget widget);
 	void addChallengeWidget(Widget widget);
+	void setTeamsContainer(Widget widget);
 	void clearChallenges();
 	void showChallengesLoading(boolean isVisible);
 	void setIsMoreChallengesVisible(boolean isVisible);
@@ -76,12 +73,10 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void showProfileButtonClicked();
 		void hideProfileButtonClicked();
 		void updateProfileWithLinkedIn(String requestToken, String verifier);
-		void createProject(String name);
-		void createTeam(final String teamName);
+		void createProject();
+		void createTeam();
 		void goTo(Place place);
 		void refreshTeams();
-		void updateTeamInvites(List<OpenUserInvitationBundle> invites);
-		void addMembershipRequests(int count);
 		void tabClicked(ProfileArea areaTab);
 		void unbindOrcId();
 		void certificationBadgeClicked();
@@ -91,7 +86,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void onImportLinkedIn();
 		void setGetCertifiedDismissed();
 		void resort(SortOptionEnum sortOption);
-		void refreshTeamInvites();
 		void newVerificationSubmissionClicked();
 		void editVerificationSubmissionClicked();
 		void setVerifyDismissed();
@@ -102,8 +96,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void addMyTeamProjectsFilter();
 
 	void addTeamsFilterTeam(Team team);
-
-	void addMyTeamsWidget(TeamListWidget myTeamsWidget);
 
 	void addOpenInvitesWidget(OpenTeamInvitationsWidget openInvitesWidget);
 
@@ -118,5 +110,5 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void showVerifiedBadge(String firstName, String lastName, String location, String affiliation, String orcIdHref, String dateVerified);
 
 	void showTabs(boolean isOwner);
-
+	void open(String url);
 }

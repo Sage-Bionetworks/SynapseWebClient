@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import java.util.Date;
 
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.StringUtils;
 
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -14,10 +16,12 @@ public class DateCellEditorImpl implements DateCellEditor {
 	
 	private DateCellEditorView view;
 	private Long originalTime;
+	GlobalApplicationState globalAppState;
 	
 	@Inject
-	public DateCellEditorImpl(DateCellEditorView view) {
+	public DateCellEditorImpl(DateCellEditorView view, GlobalApplicationState globalAppState) {
 		this.view = view;
+		this.globalAppState = globalAppState;
 	}
 
 	@Override
@@ -38,7 +42,11 @@ public class DateCellEditorImpl implements DateCellEditor {
 		originalTime = null;
 		if(value != null){
 			originalTime = Long.parseLong(value);
-			date = new Date(originalTime);
+			Long time = originalTime;
+			if (globalAppState.isShowingUTCTime()) {
+				time += GlobalApplicationStateImpl.getTimezoneOffsetMs();
+			}
+			date = new Date(time);
 		}
 		view.setValue(date);
 	}
@@ -48,6 +56,9 @@ public class DateCellEditorImpl implements DateCellEditor {
 		Date date = view.getValue();
 		if(date != null){
 			Long time = date.getTime();
+			if (globalAppState.isShowingUTCTime()) {
+				time -= GlobalApplicationStateImpl.getTimezoneOffsetMs();
+			}
 			if (originalTime != null) {
 				double originalSeconds = Math.floor(originalTime / 1000);
 				double newSeconds = Math.floor(time / 1000);

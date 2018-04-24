@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,11 +13,13 @@ import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizard.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
+import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalWizardWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsEditorWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -32,6 +36,8 @@ import com.google.inject.Inject;
  *
  */
 public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
+	public static final String DELETE_PLACEHOLDER_FAILURE_MESSAGE = "Unable to delete table/view ";
+	public static final String DELETE_PLACEHOLDER_SUCCESS_MESSAGE = "User cancelled creation of table/view.  Deleted placeholder: ";
 	public static final String SCHEMA_UPDATE_CANCELLED = "Schema update cancelled";
 	public static final String FINISH = "Finish";
 	ColumnModelsEditorWidget editor;
@@ -42,13 +48,15 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	TableType tableType;
 	SynapseClientAsync synapseClient;
 	JobTrackingWidget jobTrackingWidget;
+	SynapseJavascriptClient jsClient;
 	CreateTableViewWizardStep2View view;
+	SynapseJSNIUtils jsniUtils;
 	
 	/*
 	 * Set to true to indicate that change selections are in progress.  This allows selection change events to be ignored during this period.
 	 */
 	boolean changingSelection = false;
-	FileViewDefaultColumns fileViewDefaultColumns;
+	ViewDefaultColumns fileViewDefaultColumns;
 	/**
 	 * New presenter with its view.
 	 * @param view
@@ -58,12 +66,17 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 			ColumnModelsEditorWidget editor, 
 			SynapseClientAsync synapseClient, 
 			JobTrackingWidget jobTrackingWidget,
-			FileViewDefaultColumns fileViewDefaultColumns){
+			ViewDefaultColumns fileViewDefaultColumns,
+			SynapseJavascriptClient jsClient,
+			SynapseJSNIUtils jsniUtils){
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.editor = editor;
 		this.jobTrackingWidget = jobTrackingWidget;
 		this.fileViewDefaultColumns = fileViewDefaultColumns;
+		this.jsClient = jsClient;
+		this.jsniUtils = jsniUtils;
 		view.setJobTracker(jobTrackingWidget.asWidget());
 		view.setEditor(editor.asWidget());
 		editor.setOnAddDefaultViewColumnsCallback(new Callback() {
@@ -88,7 +101,7 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 		
 		editor.configure(tableType, new ArrayList<ColumnModel>());
 		
-		boolean isView = TableType.view.equals(tableType);
+		boolean isView = !TableType.table.equals(tableType);
 		this.editor.setAddDefaultViewColumnsButtonVisible(isView);
 		this.editor.setAddAnnotationColumnsButtonVisible(isView);
 		if (isView) {
@@ -99,21 +112,14 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	
 	public void getDefaultColumnsForView() {
 		boolean clearIds = true;
-		fileViewDefaultColumns.getDefaultColumns(clearIds, new AsyncCallback<List<ColumnModel>>() {
-			@Override
-			public void onFailure(Throwable caught) {
-				presenter.setErrorMessage(caught.getMessage());
-			}
-			@Override
-			public void onSuccess(List<ColumnModel> columns) {
-				editor.addColumns(columns);
-			}
-		});
+		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.getViewType(), clearIds);
+		editor.addColumns(defaultColumns);
 	}
 	
 	public void getPossibleColumnModelsForViewScope(String nextPageToken) {
 		ViewScope scope = new ViewScope();
 		scope.setScope(((EntityView)entity).getScopeIds());
+		scope.setViewType(tableType.getViewType());
 		synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken, new AsyncCallback<ColumnModelPage>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -138,6 +144,32 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	public void setModalPresenter(ModalPresenter presenter) {
 		this.presenter = presenter;
 		presenter.setPrimaryButtonText(FINISH);
+		
+		((ModalWizardWidget)presenter).addCallback(new ModalWizardWidget.WizardCallback() {
+			@Override
+			public void onFinished() {
+			}
+			
+			@Override
+			public void onCanceled() {
+				onCancel();
+			}
+		});
+	}
+	
+	public void onCancel() {
+		//user decided not to create the table/view.  clean it up.
+		String entityId = entity.getId();
+		jsClient.deleteEntityById(entityId, true, new AsyncCallback<Void>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				jsniUtils.consoleError(DELETE_PLACEHOLDER_FAILURE_MESSAGE + entityId + ": " + caught.getMessage());
+			}
+			@Override
+			public void onSuccess(Void result) {
+				jsniUtils.consoleLog(DELETE_PLACEHOLDER_SUCCESS_MESSAGE + entityId);
+			}
+		});
 	}
 	
 	@Override

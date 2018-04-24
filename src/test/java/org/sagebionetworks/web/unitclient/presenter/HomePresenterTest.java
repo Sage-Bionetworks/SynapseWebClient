@@ -2,11 +2,9 @@ package org.sagebionetworks.web.unitclient.presenter;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,69 +14,65 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SearchServiceAsync;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.WebResource;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.security.AuthenticationException;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
-import org.sagebionetworks.web.unitclient.widget.entity.team.TeamListWidgetTest;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class HomePresenterTest {
 
 	HomePresenter homePresenter;
+	@Mock
 	HomeView mockView;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
 	StackConfigServiceAsync mockStackConfigService;
-	SearchServiceAsync mockSearchService; 
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	CookieProvider mockCookies;
+	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
-	GWTWrapper mockGwtWrapper;
 	
 	List<EntityHeader> testEvaluationResults;
 	List<OpenUserInvitationBundle> openInvitations;
 	
 	String testTeamId = "42";
 	UserSessionData testSessionData;
+	@Mock
 	ResourceLoader mockResourceLoader;
+	
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{
-		mockView = mock(HomeView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
-		mockSearchService = mock(SearchServiceAsync.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		mockGwtWrapper = mock(GWTWrapper.class);
-		mockCookies = mock(CookieProvider.class);
-		mockResourceLoader = mock(ResourceLoader.class);
+		MockitoAnnotations.initMocks(this);
 		
 		org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> testBatchResults = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
 		testEvaluationResults = new ArrayList<EntityHeader>();
@@ -89,12 +83,7 @@ public class HomePresenterTest {
 		testBatchResults.setTotalNumberOfResults(1);
 		testBatchResults.setResults(testEvaluationResults);
 		
-		ArrayList<EntityHeader> testBatchResultsList = new ArrayList<EntityHeader>();
-		testBatchResultsList.addAll(testBatchResults.getResults());
-		
 		AsyncMockStubber.callSuccessWith(testTeamId).when(mockSynapseClient).createTeam(anyString(),any(AsyncCallback.class));
-		
-		AsyncMockStubber.callSuccessWith(testBatchResultsList).when(mockSynapseClient).getEntityHeaderBatch(anyList(),any(AsyncCallback.class));
 		
 		openInvitations = new ArrayList<OpenUserInvitationBundle>();
 		AsyncMockStubber.callSuccessWith(openInvitations).when(mockSynapseClient).getOpenInvitations(anyString(), any(AsyncCallback.class));
@@ -102,7 +91,6 @@ public class HomePresenterTest {
 		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		
 		homePresenter = new HomePresenter(mockView, 
 				mockAuthenticationController, 
 				mockGlobalApplicationState,
@@ -111,7 +99,6 @@ public class HomePresenterTest {
 				mockSynapseJSNIUtils
 				);
 		verify(mockView).setPresenter(homePresenter);
-		TeamListWidgetTest.setupUserTeams(mockSynapseClient);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		testSessionData = new UserSessionData();
@@ -131,21 +118,6 @@ public class HomePresenterTest {
 		Home place = Mockito.mock(Home.class);
 		homePresenter.setPlace(place);
 		verify(mockView).refresh();
-	}
-	
-	@Test
-	public void testValidateTokenSSO() {
-		homePresenter.validateToken();
-		verify(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
-	}
-	
-
-	@Test
-	public void testInvalidToken() {
-		AsyncMockStubber.callFailureWith(new AuthenticationException()).when(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
-		homePresenter.validateToken();
-		verify(mockAuthenticationController).revalidateSession(anyString(), any(AsyncCallback.class));
-		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 	
 	@Test

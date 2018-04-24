@@ -6,11 +6,11 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.RESTRICTION_LEVEL;
 import org.sagebionetworks.web.client.widget.HelpWidget;
+import org.sagebionetworks.web.client.widget.entity.restriction.v2.RestrictionWidget;
 import org.sagebionetworks.web.client.widget.sharing.AccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -31,28 +31,32 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 	private Presenter presenter;
 	SynapseJSNIUtils synapseJSNIUtils;
 	GlobalApplicationState globalApplicationState;
-	SageImageBundle sageImageBundle;
 	IconsImageBundle iconsImageBundle;
 	FlowPanel container;
 	PublicPrivateBadge publicPrivateBadge;
-	RestrictionWidget restrictionWidget;
+	RestrictionWidget restrictionWidgetV2;
 	AccessControlListModalWidget accessControlListModalWidget;
+	CookieProvider cookies;
 	
 	@Inject
 	public SharingAndDataUseConditionWidgetViewImpl(SynapseJSNIUtils synapseJSNIUtils,
 			GlobalApplicationState globalApplicationState,
-			SageImageBundle sageImageBundle, 
 			IconsImageBundle iconsImageBundle, 
 			PublicPrivateBadge publicPrivateBadge, 
-			RestrictionWidget restrictionWidget,
-			AccessControlListModalWidget accessControlListModalWidget) {
+			AccessControlListModalWidget accessControlListModalWidget,
+			RestrictionWidget restrictionWidgetV2,
+			CookieProvider cookies) {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.globalApplicationState = globalApplicationState;
-		this.sageImageBundle = sageImageBundle;
 		this.iconsImageBundle = iconsImageBundle;
 		this.publicPrivateBadge = publicPrivateBadge;
-		this.restrictionWidget = restrictionWidget;
+		this.restrictionWidgetV2 = restrictionWidgetV2;
+		restrictionWidgetV2.showFolderRestrictionUI();
+		this.cookies = cookies;
+		restrictionWidgetV2.setShowIfProject(true);
+		restrictionWidgetV2.setShowFlagLink(false);
 		this.accessControlListModalWidget = accessControlListModalWidget;
+		this.addStyleName("sharingAndDataUseConditions");
 		container = new FlowPanel();
 		container.addStyleName("margin-top-left-10");
 		this.add(container);
@@ -119,29 +123,15 @@ public class SharingAndDataUseConditionWidgetViewImpl extends FlowPanel implemen
 		container.add(helpWidget.asWidget());
 
 		container.add(new InlineHTML("<h5 class=\"inline-block\">"+ DisplayConstants.DATA_USE +"</h5>"));
-		restrictionWidget.configure(bundle, showChangeLink, true, false, new Callback() {
-			@Override
-			public void invoke() {
-				presenter.entityUpdated();
-			}
-		});
-		
-		Widget widget = restrictionWidget.asWidget();
-		if (widget != null) {
-			widget.addStyleName("margin-top-left-10");
-			container.add(widget);
-			//and add description
-			RESTRICTION_LEVEL level = restrictionWidget.getRestrictionLevel();
-			String description = RESTRICTION_LEVEL.OPEN.equals(level) ? DisplayConstants.DATA_USE_UNRESTRICTED_DATA_DESCRIPTION : DisplayConstants.DATA_USE_RESTRICTED_DESCRIPTION;
-			container.add(new HTML("<p class=\"margin-left-20 margin-bottom-20\">"+description+"</p>"));
-		}
-					
+		restrictionWidgetV2.setShowChangeLink(showChangeLink);
+		restrictionWidgetV2.configure(bundle.getEntity(), bundle.getPermissions().getCanChangePermissions());
+		container.add(restrictionWidgetV2);
 	}
 	
 	@Override
 	public void showLoading() {
 		container.clear();
-		container.add(new HTML(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		container.add(DisplayUtils.getSmallLoadingWidget());
 	}
 
 	@Override

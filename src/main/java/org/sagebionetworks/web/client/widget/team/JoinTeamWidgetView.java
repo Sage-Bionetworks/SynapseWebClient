@@ -1,17 +1,15 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
-public interface JoinTeamWidgetView extends IsWidget, SynapseView {
+public interface JoinTeamWidgetView extends IsWidget {
 	
 	public interface Presenter extends IsWidget {
 		public void sendJoinRequest(String message);
-		//service may be added later to query for current user requests to allow deletion
-//		public void deleteAllJoinRequests();
 		void gotoLoginPage();
+		void onRequestAccess();
 	}
 	
 	/**
@@ -39,5 +37,8 @@ public interface JoinTeamWidgetView extends IsWidget, SynapseView {
 	void setJoinWizardPrimaryButtonText(String primaryButtonText);
 	void setAccessRequirementHTML(String html);
 	void setCurrentWizardPanelVisible(boolean isVisible);
-	void showPostMessageContentAccessRequirement(String url);
+	void setSynAlert(IsWidget widget);
+	void clear();
+	void open(String url);
+	void setAccessRequirementsLinkVisible(boolean visible);
 }

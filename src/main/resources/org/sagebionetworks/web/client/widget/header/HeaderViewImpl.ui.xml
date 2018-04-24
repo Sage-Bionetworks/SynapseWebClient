@@ -5,7 +5,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
 	
-	<b:Container fluid="true">
+	<b:Container addStyleNames="header" fluid="true">
 		<b:Row ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg">
 			<b:Column size="XS_12">
 		        <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 displayInline">
@@ -18,23 +18,31 @@
 			  	</bh:Div>
 			  	<bh:Span ui:field="headerButtons" addStyleNames="right">
 					<b:Tooltip placement="BOTTOM" title="Sign out">
-						<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-left-5 margin-right-15 margin-top-5" height="28px" />	
+						<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-left-5 margin-top-5" height="28px" />	
 					</b:Tooltip>
-					<b:Button ui:field="helpButton" size="EXTRA_SMALL" height="28px" text="Help" addStyleNames="right margin-left-5 margin-right-5 margin-top-5"/>
+					<b:DropDown addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
+						<b:Button ui:field="helpMenu" dataToggle="DROPDOWN" size="EXTRA_SMALL" height="28px" >Support</b:Button>
+						<b:DropDownMenu ui:field="helpDropdownMenu" addStyleNames="dropdown-menu-right">
+							<b:AnchorListItem ui:field="documentationLink" icon="EXTERNAL_LINK" iconFixedWidth="true" iconPosition="RIGHT" href="http://docs.synapse.org">Documentation</b:AnchorListItem>
+							<b:AnchorListItem href="#!SynapseForum:default">Help Forum</b:AnchorListItem>
+							<b:AnchorListItem addStyleNames="submit-feedback-command">Submit Feedback</b:AnchorListItem>
+							<b:AnchorListItem ui:field="emailSynapseSupportLink" icon="ENVELOPE_O" href="mailto:synapseinfo@sagebionetworks.org" iconFixedWidth="true" iconPosition="RIGHT">Contact Us</b:AnchorListItem>
+						</b:DropDownMenu>
+					</b:DropDown>
 					<b:Tooltip placement="BOTTOM" title="Favorites">
-						<b:ButtonGroup ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5">
+						<b:ButtonGroup ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5" visible="false">
 							<b:Button ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" size="EXTRA_SMALL" height="28px" addStyleNames="favoriteIcon"></b:Button>
 							<b:DropDownMenu ui:field="headerFavList" addStyleNames="dropdown-menu-right">
 							</b:DropDownMenu>
 						</b:ButtonGroup>
 					</b:Tooltip>
-				    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
+				    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" visible="false">
 						<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="28px">Sign in</b:Button>
 					</g:SimplePanel>
-				    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
+				    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" visible="false">
 						<b:Button ui:field="registerLink" size="EXTRA_SMALL" height="28px">Register</b:Button>
 					</g:SimplePanel>
-					<g:SimplePanel ui:field="dashboardButtonUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
+					<g:SimplePanel ui:field="dashboardButtonUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" visible="false">
 						<b:Button ui:field="dashboardButton" size="EXTRA_SMALL" height="28px" addStyleNames="my-dashboard-header-button" />
 					</g:SimplePanel>
 				    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-5 margin-right-5 margin-top-5 margin-bottom-20"/>
@@ -50,7 +58,7 @@
 					<bh:Span addStyleNames="smallerText color-white strong">on</bh:Span>
 					<bh:Span addStyleNames="smallerText color-white">&nbsp;/&nbsp;</bh:Span>
 					<b:Anchor addStyleNames="smallerText color-white" ui:field="goToStandardSite" text="off" />
-					<b:Anchor ui:field="trashLink" icon="TRASH_O" addStyleNames="margin-left-20 smallerText color-white" text="Trash can" />
+					<b:Anchor ui:field="trashLink" icon="TRASH_O" addStyleNames="margin-left-20 smallerText color-white" text="Trash can" visible="false" />
 				</g:FlowPanel>
 			</b:Column>
 		</b:Row>

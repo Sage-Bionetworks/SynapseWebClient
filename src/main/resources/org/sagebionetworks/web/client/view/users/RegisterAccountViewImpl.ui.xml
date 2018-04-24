@@ -5,7 +5,6 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<g:HTMLPanel>
-		<g:SimplePanel ui:field="header" />
 		<div class="container margin-top-15 min-height-400">
 			<b:Heading size="H2" text="Start using Synapse." addStyleNames="text-align-center margin-top-20"/>
 			<b:Heading size="H4" subText="It's free." addStyleNames="text-align-center margin-top-20"/>
@@ -18,9 +17,6 @@
 					<b:Column size="SM_3"></b:Column>
 				</b:Row>
 			</b:Container>
-							
 		</div>
-		<g:SimplePanel ui:field="footer" />
-
 	</g:HTMLPanel>
 </ui:UiBinder> 

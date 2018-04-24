@@ -12,7 +12,6 @@ import org.gwtbootstrap3.client.ui.Radio;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.repo.model.VersionInfo;
@@ -20,11 +19,10 @@ import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.SageImageBundle;
+import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.entity.EntitySearchBox;
 import org.sagebionetworks.web.client.widget.entity.browse.MyEntitiesBrowser.SelectedHandler;
-import org.sagebionetworks.web.shared.PaginatedResults;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -34,7 +32,6 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
@@ -56,28 +53,30 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	Button okButton;
 	@UiField
 	Button cancelButton;
+	@UiField
+	HelpWidget helpWidget;
 	
 	@UiField
-	SimplePanel browseMyEntitiesContainer;
+	Div browseMyEntitiesContainer;
 	@UiField
-	SimplePanel searchContainer;
+	Div searchContainer;
 	@UiField
-	SimplePanel enterSynapseIdContainer;
+	Div enterSynapseIdContainer;
 	@UiField
-	SimplePanel enterSynapseMultiIdContainer;
+	Div enterSynapseMultiIdContainer;
 	@UiField
-	SimplePanel myEntitiesBrowserContainer;
+	Div myEntitiesBrowserContainer;
 	@UiField
-	FlowPanel entitySearchWidgetContainer;
+	Div entitySearchWidgetContainer;
 	@UiField
-	SimplePanel entitySearchBoxContainer;
+	Div entitySearchBoxContainer;
 	
 	@UiField
-	FlowPanel enterIdWidgetContainer;
+	Div enterIdWidgetContainer;
 	@UiField
-	FlowPanel enterMultiIdWidgetContainer;
+	Div enterMultiIdWidgetContainer;
 	@UiField
-	FlowPanel versionUI;
+	Div versionUI;
 	@UiField
 	Text selectedText;
 	@UiField
@@ -122,6 +121,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				presenter.okClicked();
 			}
 		});
+		okButton.addDomHandler(DisplayUtils.getPreventTabHandler(okButton), KeyDownEvent.getType());
 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -162,18 +162,17 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		}
 	}
 	
-	private void hideAllRightTopWidgets() {
-		myEntitiesBrowserContainer.setVisible(false);
-		entitySearchWidgetContainer.setVisible(false);
-		enterIdWidgetContainer.setVisible(false);
-		enterMultiIdWidgetContainer.setVisible(false);
+	private void showRightTopWidget(Widget visibleWidget) {
+		myEntitiesBrowserContainer.setVisible(myEntitiesBrowserContainer.equals(visibleWidget));
+		entitySearchWidgetContainer.setVisible(entitySearchWidgetContainer.equals(visibleWidget));
+		enterIdWidgetContainer.setVisible(enterIdWidgetContainer.equals(visibleWidget));
+		enterMultiIdWidgetContainer.setVisible(enterMultiIdWidgetContainer.equals(visibleWidget));
 	}
 	
 	private void showTopRightContainer(Widget container, EntityFinderArea newArea) {
 		versionUI.setVisible(false);
 		versionDropDownMenu.clear();
-		hideAllRightTopWidgets();
-		container.setVisible(true);
+		showRightTopWidget(container);
 		currentArea = newArea;
 	}
 	
@@ -198,6 +197,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 
 	@Override
 	public void clear() {
+		selectedRef.clear();
 		presenter.clearSelectedEntities();
 		updateSelectedView();
 		selectedRef.clear();
@@ -229,7 +229,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 			}
 		});
 		myEntitiesBrowserContainer.clear();
-		myEntitiesBrowserContainer.setWidget(myEntitiesBrowser.asWidget());
+		myEntitiesBrowserContainer.add(myEntitiesBrowser.asWidget());
 
 		// list entry
 		Widget entry = createNewLeftEntry(DisplayConstants.BROWSE_MY_ENTITIES, new ClickHandler(){
@@ -239,7 +239,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	        }
 	    });
 		browseMyEntitiesContainer.clear();
-		browseMyEntitiesContainer.setWidget(entry);
+		browseMyEntitiesContainer.add(entry);
 	}
 	@Override
 	public void setBrowseAreaVisible() {
@@ -271,6 +271,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 				createVersionChooser(entityId);
 			}
 		}, false);
+		entitySearchBoxContainer.clear();
 		entitySearchBoxContainer.add(entitySearchBox.asWidget());
 		
 		// list entry
@@ -281,7 +282,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	        }
 	    });
 		searchContainer.clear();
-		searchContainer.setWidget(entry);
+		searchContainer.add(entry);
 	}	
 
 	private void createEnterIdWidget() {
@@ -321,7 +322,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	        }
 	    });
 		enterSynapseIdContainer.clear();
-		enterSynapseIdContainer.setWidget(entry);
+		enterSynapseIdContainer.add(entry);
 	}
 	
 	private void createEnterMultiIdWidget() {
@@ -359,7 +360,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	    });
 		
 		enterSynapseMultiIdContainer.clear();
-		enterSynapseMultiIdContainer.setWidget(entry);
+		enterSynapseMultiIdContainer.add(entry);
 	}
 				
 	private Widget createNewLeftEntry(String name, ClickHandler handler) {
@@ -473,6 +474,7 @@ public class EntityFinderViewImpl implements EntityFinderView {
 	public void show() {
 		//show modal
 		modal.show();
+		helpWidget.focus();
 	}
 	
 	@Override
@@ -495,9 +497,10 @@ public class EntityFinderViewImpl implements EntityFinderView {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
 	}
-
-	public void setMultiVisible(boolean b) {
-		createEnterMultiIdWidget();
+	
+	@Override
+	public void setMultiVisible(boolean visible) {
+		enterSynapseMultiIdContainer.setVisible(visible);
 	}
 }
 

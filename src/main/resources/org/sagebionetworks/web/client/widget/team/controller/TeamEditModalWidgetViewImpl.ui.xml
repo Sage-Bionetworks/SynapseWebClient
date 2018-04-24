@@ -6,16 +6,12 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
-    <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle' />
-    
-	<b:Modal ui:field="modal"
-		dataBackdrop="STATIC" dataKeyboard="false">
+    <b:Modal ui:field="modal" dataBackdrop="STATIC" size="LARGE" dataKeyboard="false">
 		<b:ModalHeader closable="true">
 		    <b:Heading size="H4" text="Edit Team" addStyleNames="displayInline"/>
 		    <w:HelpWidget helpMarkdown="Teams are a way to easily manage groups of users for the purposes of project access, communication, and challenge participation." 
 				href="http://docs.synapse.org/articles/teams.html" addStyleNames="margin-left-5" placement="BOTTOM"/>
 		</b:ModalHeader>
-	
 		<b:ModalBody>
 		    <b:FieldSet>
 		        <b:FormGroup>
@@ -28,27 +24,29 @@
 		            <b:TextArea ui:field="editDescriptionField" b:id="editDescription"
 			            addStyleNames="margin-left-10 margin-bottom-10 hide-resize"/>
 		        </b:FormGroup>
-				<b:FormGroup>
+				<b:FormGroup addStyleNames="margin-top-20">
 					<b:CheckBox text="People can join this team without team manager authorization" ui:field="publicJoinCheckbox"
-						addStyleNames="checkbox margin-left-10 displayInlineBlock"/>
+						addStyleNames="checkbox displayInlineBlock"/>
 				</b:FormGroup>
 				<b:FormGroup>
 					<b:CheckBox text="Any Synapse user can send messages to this team"
-						ui:field="authenticatedUsersCanSendCheckbox" addStyleNames="checkbox margin-left-10 displayInlineBlock" />
+						ui:field="authenticatedUsersCanSendCheckbox" addStyleNames="checkbox displayInlineBlock" />
 				</b:FormGroup>
-		        <b:FormGroup>
+		        <b:FormGroup addStyleNames="margin-top-20">
 		            <b:FormLabel for="uploadWidget">Upload new Icon</b:FormLabel>
 		            <b:Row b:id="uploadWidget">
 		                <b:Column size="MD_4">
 		                    <bh:Div ui:field="iconContainer">
-		                        <b:Icon ui:field="defaultIcon" type="USER"
+		                        <b:Icon ui:field="defaultIcon" type="USERS"
 								addStyleNames="font-size-150 lightGreyText" visible="true"/>
-								<b:Image ui:field="previewImage" type="ROUNDED" width="150px" visible="false"/>
+								<g:HTMLPanel width="150px" addStyleNames="position-relative">
+								    <bh:Div addStyleNames="position-absolute topLevelZIndex">
+						    				<b:Button ui:field="removePicture" icon="TIMES" size="EXTRA_SMALL" type="DANGER" visible="false"/>
+						       		</bh:Div>
+						       		<b:Image ui:field="previewImage" type="ROUNDED" width="150px" visible="false"/>
+								</g:HTMLPanel>
 		                    </bh:Div>
-							<bh:Div ui:field="teamImageLoading" visible="false">
-								<g:Image styleName="displayInline" resource='{sageImageBundle.loading16}' />
-								<bh:Text>&nbsp;Loading...</bh:Text>
-							</bh:Div>		                
+							<w:LoadingSpinner ui:field="teamImageLoading" size="16px" visible="false"/>
 						</b:Column>
 		                <b:Column size="MD_8" >
 		                    <g:SimplePanel ui:field="uploadWidgetPanel"/>
@@ -58,9 +56,9 @@
 		    </b:FieldSet>
 		    <g:SimplePanel ui:field="synAlertPanel"/>			     
 		</b:ModalBody>
-		<b:ModalFooter>
-		    <b:Button text="Save" ui:field="primaryButton" type="PRIMARY" addStyleNames="right margin-right-5"/>
-		    <b:Button text="Cancel" ui:field="secondaryButton" addStyleNames="right margin-right-5"/>
+		<b:ModalFooter addStyleNames="margin-top-60">
+			<b:Button text="Cancel" ui:field="secondaryButton" type="LINK" addStyleNames="margin-right-5"/>
+		    <b:Button text="Save" ui:field="primaryButton" type="PRIMARY" addStyleNames="margin-right-5"/>
 		</b:ModalFooter>	        
     </b:Modal>
 </ui:UiBinder> 

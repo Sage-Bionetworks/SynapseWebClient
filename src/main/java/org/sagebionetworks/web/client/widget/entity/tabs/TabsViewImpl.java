@@ -39,4 +39,8 @@ public class TabsViewImpl implements TabsView {
 	public Widget asWidget() {
 		return widget;
 	}
+	@Override
+	public void setNavTabsVisible(boolean visible) {
+		navTabs.setVisible(visible);
+	}
 }

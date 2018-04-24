@@ -6,8 +6,9 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
@@ -15,8 +16,10 @@ import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
+import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
-import com.google.gwt.core.shared.GWT;
+import com.google.gwt.core.client.GWT;
+import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -24,9 +27,11 @@ import com.google.inject.Inject;
 
 public class Header implements HeaderView.Presenter, IsWidget {
 
+	public static final String N_A = "n/a";
+	public static final String ANONYMOUS = "VISITOR_UNIQUE_ID";
+	public static final String SYNAPSE_ORG = "@synapse.org";
 	public static final String GET_SATISFACTION_SUPPORT_SITE = "http://support.sagebase.org";
 	public static final String WWW_SYNAPSE_ORG = "www.synapse.org";
-
 	public static enum MenuItems {
 		DATASETS, TOOLS, NETWORKS, PEOPLE, PROJECTS
 	}
@@ -34,26 +39,52 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	private HeaderView view;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private FavoriteWidget favWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private StuAnnouncementWidget stuAnnouncementWidget;
-	
+	private PendoSdk pendoSdk;
+	PortalGinInjector portalGinInjector;
 	@Inject
-	public Header(HeaderView view, AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState, SynapseClientAsync synapseClient,
-			FavoriteWidget favWidget, SynapseJSNIUtils synapseJSNIUtils, StuAnnouncementWidget stuAnnouncementWidget) {
+	public Header(HeaderView view, 
+			AuthenticationController authenticationController,
+			GlobalApplicationState globalApplicationState, 
+			SynapseJavascriptClient jsClient,
+			FavoriteWidget favWidget, 
+			SynapseJSNIUtils synapseJSNIUtils, 
+			PendoSdk pendoSdk,
+			PortalGinInjector portalGinInjector) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.synapseClient = synapseClient;
+		this.jsClient = jsClient;
 		this.favWidget = favWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.portalGinInjector = portalGinInjector;
 		view.clear();
-		this.stuAnnouncementWidget = stuAnnouncementWidget;
+		this.pendoSdk = pendoSdk;
 		view.setPresenter(this);
-		stuAnnouncementWidget.init();
 		initStagingAlert();
+		initStuAnnouncementWidget();
+	}
+	
+	public void initStuAnnouncementWidget() {
+		try {
+			GWT.runAsync(StuAnnouncementWidget.class, new RunAsyncCallback() {
+				@Override
+				public void onSuccess() {
+					StuAnnouncementWidget stuAnnouncementWidget = portalGinInjector.getStuAnnouncementWidget();
+					view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
+					stuAnnouncementWidget.init();		
+				}
+				
+				@Override
+				public void onFailure(Throwable e) {
+					synapseJSNIUtils.consoleError(e.getMessage());
+				}
+			});
+		} catch (Exception e) {
+			synapseJSNIUtils.consoleError(e.getMessage());
+		}
 	}
 	
 	public void initStagingAlert() {
@@ -109,7 +140,12 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.refresh();
 		view.setSearchVisible(true);
 		view.setProjectFavoriteWidget(favWidget);
-		view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
+		if (authenticationController.isLoggedIn() && userSessionData.getProfile() != null) {
+			String userName = userSessionData.getProfile().getUserName();
+			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
+		} else {
+			pendoSdk.initialize(ANONYMOUS, N_A);
+		}
 	}
 
 	@Override
@@ -120,7 +156,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	@Override
 	public void onLogoutClick() {
 		//explicitly logging out, clear the current and last place.
-		globalApplicationState.clearCurrentPlace();
 		globalApplicationState.clearLastPlace();
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));	
 	}
@@ -153,7 +188,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	public void onFavoriteClick() {
 		if(authenticationController.isLoggedIn()) {
 			view.showFavoritesLoading();
-			synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
+			jsClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 				@Override
 				public void onSuccess(List<EntityHeader> favorites) {
 					view.clearFavorite();

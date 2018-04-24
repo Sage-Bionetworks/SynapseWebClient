@@ -3,7 +3,8 @@
   xmlns:ui="urn:ui:com.google.gwt.uibinder"
   xmlns:g="urn:import:com.google.gwt.user.client.ui"
   xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+  xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+  xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
   	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
   	<g:FlowPanel>
   		<b:Modal title="Submit to Challenge"
@@ -22,7 +23,7 @@
 				</bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button type="LINK" dataDismiss="MODAL">Cancel</b:Button>
 				<b:Button ui:field="dockerCommitNextButton" type="PRIMARY" dataLoadingText="Processing...">Next</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
@@ -55,7 +56,7 @@
 				</bh:Div>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button type="LINK" dataDismiss="MODAL">Cancel</b:Button>
 				<b:Button ui:field="nextButton" type="PRIMARY" dataLoadingText="Processing...">Next</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
@@ -72,16 +73,13 @@
 							<bh:Paragraph emphasis="DANGER" ui:field="teamIneligibleHtml" />
 							<bh:Div ui:field="availableTeamsUI">
 								<b:FormGroup>
-									<b:FormLabel>Select Team</b:FormLabel> 
+									<b:FormLabel>Select Team</b:FormLabel>
 									<g:ListBox ui:field="teamComboBox" styleName="form-control" />
 									<b:Anchor ui:field="registerMyTeamLink" text="Register a different team" />
 								</b:FormGroup>
 								<g:SimplePanel ui:field="teamSelectSynAlertPanel"/>
 								<b:FormGroup>
-									<bh:Div ui:field="contributorsLoadingUI">
-										<g:Image styleName="displayInline " resource='{sageImageBundle.loading31}' />
-								        <bh:Text>&nbsp; Loading...</bh:Text>
-									</bh:Div>
+									<w:LoadingSpinner size="31px" ui:field="contributorsLoadingUI"/>
 									<b:FormLabel>Contributors</b:FormLabel>
 									<b:Panel ui:field="contributorsPanel"  addStyleNames="padding-5" />
 								</b:FormGroup> 
@@ -96,8 +94,8 @@
 				</b:FieldSet>
 			</b:ModalBody>
 			<b:ModalFooter>
-				<b:Button type="DEFAULT" dataDismiss="MODAL">Cancel</b:Button>
-				<b:Button ui:field="okButton" type="PRIMARY">Submit</b:Button>
+				<b:Button type="LINK" dataDismiss="MODAL">Cancel</b:Button>
+				<b:Button ui:field="okButton" type="PRIMARY" dataLoadingText="Processing...">Submit</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 		<g:SimplePanel ui:field="registerTeamDialogContainer" />

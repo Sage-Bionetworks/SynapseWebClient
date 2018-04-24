@@ -34,9 +34,8 @@ public class EntitySearchBoxViewImpl extends FlowPanel implements EntitySearchBo
 	
 	@Inject
 	public EntitySearchBoxViewImpl(
-			EntitySearchBoxOracle oracle,
-			SageImageBundle sageImageBundle) {
-		suggestBox = new SuggestBox(oracle, new TextBox(), new SynapseSuggestionDisplay(sageImageBundle));
+			EntitySearchBoxOracle oracle) {
+		suggestBox = new SuggestBox(oracle, new TextBox(), new SynapseSuggestionDisplay());
 		suggestBox.addSelectionHandler(new SelectionHandler<SuggestOracle.Suggestion>() {
 			@Override
 			public void onSelection(SelectionEvent<Suggestion> event) {

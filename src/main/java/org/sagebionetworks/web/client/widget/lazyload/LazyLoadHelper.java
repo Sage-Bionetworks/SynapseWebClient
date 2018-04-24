@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.lazyload;
 
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.inject.Inject;
@@ -9,15 +7,13 @@ import com.google.inject.Inject;
 public class LazyLoadHelper {
 	private Callback inViewportCallback;
 	private SupportsLazyLoadInterface view;
-	private GWTWrapper gwt;
 	private Callback invokeCheckForInViewAndLoadData;
 	boolean isAttached, isConfigured;
+	public LazyLoadCallbackQueue lazyLoadCallbackQueue;
 	
 	@Inject
-	public LazyLoadHelper(
-			GWTWrapper gwt
-			) {
-		this.gwt = gwt;
+	public LazyLoadHelper(LazyLoadCallbackQueue lazyLoadCallbackQueue) {
+		this.lazyLoadCallbackQueue = lazyLoadCallbackQueue;
 		isConfigured = false;
 		isAttached = false;
 		invokeCheckForInViewAndLoadData = new Callback() {
@@ -28,9 +24,13 @@ public class LazyLoadHelper {
 		};
 	}
 	
+	public void setLazyLoadCallbackQueue(LazyLoadCallbackQueueImpl lazyLoadCallbackQueue) {
+		this.lazyLoadCallbackQueue = lazyLoadCallbackQueue;
+	}
+	
 	public void startCheckingIfAttachedAndConfigured() {
 		if (isAttached && isConfigured) {
-			checkForInViewAndLoadData();
+			lazyLoadCallbackQueue.subscribe(invokeCheckForInViewAndLoadData);
 		}
 	}
 	
@@ -47,16 +47,21 @@ public class LazyLoadHelper {
 		});
 	}
 	
+	private void clearAttachCallback() {
+		view.setOnAttachCallback(() -> {});	
+	}
+	
 	public void checkForInViewAndLoadData() {
 		if (!view.isAttached()) {
 			//Done, view has been detached and widget was never in the viewport
+			lazyLoadCallbackQueue.unsubscribe(invokeCheckForInViewAndLoadData);
+			clearAttachCallback();
 			return;
 		} else if (view.isInViewport()) {
 			//try to load data!
+			lazyLoadCallbackQueue.unsubscribe(invokeCheckForInViewAndLoadData);
+			clearAttachCallback();
 			inViewportCallback.invoke();
-		} else {
-			//wait for a few seconds and see if we should load data
-			gwt.scheduleExecution(invokeCheckForInViewAndLoadData, DisplayConstants.DELAY_UNTIL_IN_VIEW);
 		}
 	}
 	

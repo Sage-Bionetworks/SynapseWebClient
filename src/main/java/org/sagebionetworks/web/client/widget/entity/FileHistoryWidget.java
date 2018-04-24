@@ -1,22 +1,23 @@
 package org.sagebionetworks.web.client.widget.entity;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
+import java.util.Objects;
+
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.VersionInfo;
-import org.sagebionetworks.repo.model.Versionable;
+import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
-import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.shared.PaginatedResults;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -28,33 +29,33 @@ import com.google.inject.Inject;
  *
  * @author jayhodgson
  */
-public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWidget, PageChangeListener {
+public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWidget {
 	
 	private FileHistoryWidgetView view;
 	private EntityBundle bundle;
-	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
 	private AuthenticationController authenticationController;
 	public static final Integer VERSION_LIMIT = 100;
 	public PreflightController preflightController;
 	
-	private DetailedPaginationWidget paginationWidget;
 	private boolean canEdit;
 	private Long versionNumber;
+	int currentOffset;
+	
 	@Inject
 	public FileHistoryWidget(FileHistoryWidgetView view,
-			 SynapseClientAsync synapseClient, GlobalApplicationState globalApplicationState, AuthenticationController authenticationController,
-			 DetailedPaginationWidget paginationWidget,
+			 SynapseClientAsync synapseClient, 
+			 GlobalApplicationState globalApplicationState, 
+			 AuthenticationController authenticationController,
 			 PreflightController preflightController) {
 		super();
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
-		this.paginationWidget = paginationWidget;
 		this.preflightController = preflightController;
-		view.setPaginationWidget(paginationWidget.asWidget());
 		this.view.setPresenter(this);
 	}
 	
@@ -62,12 +63,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		this.bundle = bundle;
 		this.versionNumber = versionNumber;
 		this.canEdit = bundle.getPermissions().getCanCertifiedUserEdit();
-		boolean isShowingCurrentVersion = versionNumber == null;
-		view.setEntityBundle(bundle.getEntity(), !isShowingCurrentVersion);
-		view.setEditVersionInfoButtonVisible(isShowingCurrentVersion && canEdit);
-		
-		//initialize versions
-		onPageChange(WebConstants.ZERO_OFFSET);
+		refreshFileHistory();
 	}
 
 	@Override
@@ -76,11 +72,12 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	}
 
 	private void editCurrentVersionInfo(Entity entity, String version, String comment) {
-		if (entity instanceof Versionable) {
-			final Versionable vb = (Versionable)entity;
-			if (version != null && version.equals(vb.getVersionLabel()) &&
-				comment != null && comment.equals(vb.getVersionComment())) {
-				view.showInfo("Version Info Unchanged", "You didn't change anything about the version info.");
+		if (entity instanceof VersionableEntity) {
+			final VersionableEntity vb = (VersionableEntity)entity;
+			if (Objects.equals(version, vb.getVersionLabel()) &&
+				Objects.equals(comment, vb.getVersionComment())) {
+				// no-op
+				view.hideEditVersionInfo();
 				return;
 			}
 			String versionLabel = null;
@@ -96,15 +93,16 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 							if (!DisplayUtils.handleServiceException(
 									caught, globalApplicationState,
 									authenticationController.isLoggedIn(), view)) {
-								view.showErrorMessage(DisplayConstants.ERROR_UPDATE_FAILED
-										+ "\n" + caught.getMessage());
+								view.showEditVersionInfoError(DisplayConstants.ERROR_UPDATE_FAILED
+										+ ": " + caught.getMessage());
 							}
 						}
+						
 						@Override
 						public void onSuccess(Entity result) {
 							view.hideEditVersionInfo();
 							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated " + vb.getName());
-							fireEntityUpdatedEvent();
+							refreshFileHistory();
 						}
 					});
 		}
@@ -124,7 +122,12 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 			@Override
 			public void onSuccess(Void result) {
 				view.showInfo("Version deleted", "Version "+ versionNumber + " of " + bundle.getEntity().getId() + " " + DisplayConstants.LABEL_DELETED);
-				fireEntityUpdatedEvent();
+				//SWC-4002: if deleting the version that we're looking at, go to the latest version
+				if (versionNumber.equals(FileHistoryWidget.this.versionNumber)) {
+					gotoCurrentVersion();
+				} else {
+					refreshFileHistory();
+				}
 			}
 		});
 	}
@@ -135,32 +138,40 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		return view.asWidget();
 	}
 	
-	
-	public void fireEntityUpdatedEvent() {
-		if (entityUpdatedHandler != null)
-			entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
-	}
-	
-	public void setEntityUpdatedHandler(EntityUpdatedHandler handler) {
-		this.entityUpdatedHandler = handler;
-	}
-	
-	@Override
-	public void onPageChange(final Long newOffset) {
+	public void refreshFileHistory() {
 		view.clearVersions();
-		synapseClient.getEntityVersions(bundle.getEntity().getId(), newOffset.intValue(), VERSION_LIMIT,
+		currentOffset = 0;
+		onMore();
+	}
+	
+	public void gotoCurrentVersion() {
+		Long targetVersion = null;
+		Synapse synapse = new Synapse(bundle.getEntity().getId(), targetVersion, EntityArea.FILES, null);
+		globalApplicationState.getPlaceChanger().goTo(synapse);
+	}
+	
+	public void onMore() {
+		synapseClient.getEntityVersions(bundle.getEntity().getId(), currentOffset, VERSION_LIMIT,
 			new AsyncCallback<PaginatedResults<VersionInfo>>() {
 				@Override
 				public void onSuccess(PaginatedResults<VersionInfo> result) {
 					PaginatedResults<VersionInfo> paginatedResults;
 					paginatedResults = result;
-					paginationWidget.configure(VERSION_LIMIT.longValue(), newOffset, paginatedResults.getTotalNumberOfResults(), FileHistoryWidget.this);
-					if (versionNumber == null && newOffset == 0 && paginatedResults.getResults().size() > 0) {
+					view.setMoreButtonVisible(paginatedResults.getResults().size() == VERSION_LIMIT);
+					if (currentOffset == 0) {
+						//we know the current version based on this
+						Long currentVersion = paginatedResults.getResults().get(0).getVersionNumber();
+						boolean isCurrentVersion = versionNumber == null || currentVersion.equals(versionNumber);
+						view.setEntityBundle(bundle.getEntity(), !isCurrentVersion);
+						view.setEditVersionInfoButtonVisible(isCurrentVersion && canEdit);
+					}
+					if (versionNumber == null && currentOffset == 0 && paginatedResults.getResults().size() > 0) {
 						versionNumber = paginatedResults.getResults().get(0).getVersionNumber();
 					}
 					for (VersionInfo versionInfo : paginatedResults.getResults()) {
 						view.addVersion(versionInfo, canEdit, versionInfo.getVersionNumber().equals(versionNumber));
 					}
+					currentOffset += VERSION_LIMIT;
 				}
 
 				@Override
@@ -184,7 +195,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		preflightController.checkUploadToEntity(bundle, new Callback() {
 			@Override
 			public void invoke() {
-				final Versionable vb = (Versionable)bundle.getEntity();
+				final VersionableEntity vb = (VersionableEntity)bundle.getEntity();
 				view.showEditVersionInfo(vb.getVersionLabel(), vb.getVersionComment());
 			}
 		});

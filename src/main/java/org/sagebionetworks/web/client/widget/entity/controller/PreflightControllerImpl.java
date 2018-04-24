@@ -12,15 +12,12 @@ import com.google.inject.Inject;
 public class PreflightControllerImpl implements PreflightController {
 	
 	CertifiedUserController certifiedUserController;
-	AccessRequirementController accessRestrictionController;
 	
 	@Inject
 	public PreflightControllerImpl(
-			CertifiedUserController certifiedUserController,
-			AccessRequirementController accessRestrictionController) {
+			CertifiedUserController certifiedUserController) {
 		super();
 		this.certifiedUserController = certifiedUserController;
-		this.accessRestrictionController = accessRestrictionController;
 	}
 
 	@Override
@@ -32,7 +29,7 @@ public class PreflightControllerImpl implements PreflightController {
 	@Override
 	public void checkDownloadFromEntity(EntityBundle uploadTo, Callback callback) {
 		// Only access restrictions.
-		accessRestrictionController.checkDownloadFromEntity(uploadTo, callback);
+		callback.invoke();
 	}
 
 	@Override
@@ -51,12 +48,6 @@ public class PreflightControllerImpl implements PreflightController {
 	public void checkUpdateEntity(EntityBundle toUpdate, Callback callback) {
 		// only certified user.
 		certifiedUserController.checkUpdateEntity(toUpdate, callback);
-	}
-
-	@Override
-	public boolean hasUnmetDownloadRestriction(EntityBundle uploadTo) {
-		// Only access restrictions.
-		return accessRestrictionController.hasUnmetDownloadRestriction(uploadTo);
 	}
 
 	@Override

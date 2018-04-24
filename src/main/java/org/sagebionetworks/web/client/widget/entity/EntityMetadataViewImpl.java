@@ -2,8 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.sagebionetworks.web.client.DisplayConstants;
-import org.sagebionetworks.web.client.IconsImageBundle;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.core.client.GWT;
@@ -40,7 +39,7 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@UiField
 	SimplePanel annotationsContainer;
 	@UiField
-	Span restrictionPanel;
+	Span restrictionPanelV2;
 	@UiField
 	Collapse fileHistoryContent;
 	@UiField
@@ -49,13 +48,11 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	Span uploadDestinationPanel;
 	@UiField
 	Span uploadDestinationField;
+	@UiField
+	Text annotationsTitleText;
 		
-	@UiField(provided = true)
-	final IconsImageBundle icons;
-	
 	@Inject
-	public EntityMetadataViewImpl(IconsImageBundle icons, final SynapseJSNIUtils jsniUtils) {
-		this.icons = icons;
+	public EntityMetadataViewImpl(final SynapseJSNIUtils jsniUtils) {
 		initWidget(uiBinder.createAndBindUi(this));
 		fileHistoryContainer.getElement().setAttribute("highlight-box-title", "File History");
 		idField.addClickHandler(new ClickHandler() {
@@ -85,12 +82,6 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	@Override
 	public void setUploadDestinationText(String text) {
 		uploadDestinationField.setText(text);
-	}
-
-	@Override
-	public void setRestrictionWidget(IsWidget restrictionWidget) {
-		restrictionPanel.clear();
-		restrictionPanel.add(restrictionWidget);
 	}
 
 	@Override
@@ -139,5 +130,18 @@ public class EntityMetadataViewImpl extends Composite implements EntityMetadataV
 	public void setRestrictionPanelVisible(boolean visible) {
 		dataUseContainer.setVisible(visible);
 	}
+	@Override
+	public void setRestrictionWidgetV2(IsWidget restrictionWidget) {
+		restrictionPanelV2.clear();
+		restrictionPanelV2.add(restrictionWidget);
+	}
 
+	@Override
+	public void setRestrictionWidgetV2Visible(boolean visible) {
+		restrictionPanelV2.setVisible(visible);
+	}
+	@Override
+	public void setAnnotationsTitleText(String text) {
+		annotationsTitleText.setText(text);
+	}
 }

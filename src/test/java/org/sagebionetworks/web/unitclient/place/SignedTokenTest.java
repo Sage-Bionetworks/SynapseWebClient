@@ -3,10 +3,8 @@ package org.sagebionetworks.web.unitclient.place;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.web.client.place.SignedToken;
-import org.sagebionetworks.web.client.place.Wiki;
-import org.sagebionetworks.web.server.servlet.NotificationTokenType;
+import org.sagebionetworks.web.shared.NotificationTokenType;
 
 /**
  *

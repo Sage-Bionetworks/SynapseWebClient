@@ -5,12 +5,20 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Collapse;
 import org.gwtbootstrap3.client.ui.Heading;
+import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.place.ParameterizedPlace;
+import org.sagebionetworks.web.client.place.ParameterizedToken;
+import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
+import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -54,10 +62,14 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	Alert diffVersionAlert;
 	
 	@UiField
-	SimplePanel modifiedCreatedByPanel;
+	Italic createdOnText;
+	@UiField
+	Italic modifiedOnText;
 	
 	@UiField
 	Button wikiHistoryButton;
+	@UiField
+	Button wikiCompareButton;
 	
 	@UiField
 	Button restoreButton;
@@ -72,10 +84,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	SimplePanel synAlertPanel;
 	
 	@UiField
-	HTMLPanel loadingPanel;
-	
-	@UiField
-	SimplePanel breadcrumbPanel;
+	LoadingSpinner loadingPanel;
 	
 	@UiField
 	SimplePanel markdownPanel;
@@ -87,9 +96,10 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	Collapse historyCollapse;
 	
 	@UiField
+	Div wikiHeadingContainer;
 	Heading wikiHeading;
-	
 	Widget widget;
+	WikiPageKey key;
 
 	@Override
 	public void setPresenter(Presenter presenter) {
@@ -122,21 +132,31 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 				} else {
 					wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
 					historyCollapse.show();
+					presenter.showWikiHistory();
 				}
 			}
 		});
 		historyCollapse.hide();
 		wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
+		wikiCompareButton.addClickHandler(event -> {
+			WikiDiff place = new WikiDiff(key);
+			DisplayUtils.newWindow("#!WikiDiff:" + place.toToken(), "_blank", "");
+		});
 	}
 	
 	@Override
 	public void setWikiHeadingText(String title) {
+		wikiHeadingContainer.clear();
+		wikiHeading = new Heading(HeadingSize.H2);
 		wikiHeading.setText(title);
+		wikiHeadingContainer.add(wikiHeading);
 	}
 	
 	@Override
 	public void scrollWikiHeadingIntoView() {
-		wikiHeading.getElement().scrollIntoView();
+		if (wikiHeading != null) {
+			wikiHeading.getElement().scrollIntoView();	
+		}
 	}
 	
 	@Override
@@ -229,11 +249,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	}
 
 	@Override
-	public void setBreadcrumbWidget(IsWidget breadcrumb) {
-		breadcrumbPanel.setWidget(breadcrumb);
-	}
-
-	@Override
 	public void setRestoreButtonVisible(boolean isVisible) {
 		restoreButton.setVisible(isVisible);
 	}
@@ -241,11 +256,6 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public void setDiffVersionAlertVisible(boolean isVisible) {
 		diffVersionAlert.setVisible(isVisible);
-	}
-
-	@Override
-	public void setBreadcrumbsVisible(boolean isVisible) {
-		breadcrumbPanel.setVisible(isVisible);
 	}
 
 	@Override
@@ -283,13 +293,25 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	public void setWikiHistoryVisible(boolean isVisible) {
 		if (isVisible) {
 			historyCollapse.show();
+			wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_DOWN);
 		} else {
 			historyCollapse.hide();
+			wikiHistoryButton.setIcon(IconType.CARET_SQUARE_O_RIGHT);
 		}
 	}
 
 	@Override
-	public void setModifiedCreatedBy(IsWidget modifiedCreatedBy) {
-		modifiedCreatedByPanel.setWidget(modifiedCreatedBy);
+	public void setCreatedOn(String date) {
+		createdOnText.setText(date);
+	}
+	@Override
+	public void setModifiedOn(String date) {
+		modifiedOnText.setText(date);
+	}
+	
+	@Override
+	public void setWikiHistoryDiffToolButtonVisible(boolean visible, WikiPageKey key) {
+		this.key = key;
+		wikiCompareButton.setVisible(visible);
 	}
 }

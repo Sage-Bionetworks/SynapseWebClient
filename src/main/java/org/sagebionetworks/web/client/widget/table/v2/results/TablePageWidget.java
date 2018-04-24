@@ -16,9 +16,11 @@ import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.SortDirection;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
-import org.sagebionetworks.web.client.widget.pagination.DetailedPaginationWidget;
+import org.sagebionetworks.web.client.widget.pagination.BasicPaginationWidget;
 import org.sagebionetworks.web.client.widget.table.KeyboardNavigationHandler;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.v2.results.facets.FacetsWidget;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelUtils;
 
@@ -38,13 +40,14 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	PortalGinInjector ginInjector;
 	List<ColumnModel> types;
 	RowSelectionListener rowSelectionListener;
-	DetailedPaginationWidget paginationWidget;
+	BasicPaginationWidget paginationWidget;
 	List<RowWidget> rows;
 	KeyboardNavigationHandler keyboardNavigationHandler;
 	String tableId;
-	boolean isView;
+	TableType tableType;
 	FacetsWidget facetsWidget;
-	
+	Callback resetFacetsHandler;
+	boolean facetsVisible = true;
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
@@ -53,7 +56,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	@Inject
 	public TablePageWidget(TablePageView view, 
 			PortalGinInjector ginInjector, 
-			DetailedPaginationWidget paginationWidget, 
+			BasicPaginationWidget paginationWidget, 
 			FacetsWidget facetsWidget){
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
@@ -76,15 +79,19 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 			Query query, 
 			List<SortItem> sortList, 
 			boolean isEditable, 
-			boolean isView, 
+			TableType tableType, 
 			RowSelectionListener rowSelectionListener, 
 			final PagingAndSortingListener pageChangeListener,
-			CallbackP<FacetColumnRequest> facetChangedHandler){
-		this.isView = isView;
+			CallbackP<FacetColumnRequest> facetChangedHandler,
+			Callback resetFacetsHandler){
+		this.tableType = tableType;
 		this.rowSelectionListener = rowSelectionListener;
+		this.resetFacetsHandler = resetFacetsHandler;
+		view.showLoading();
+		Integer rowCount = bundle.getQueryResult().getQueryResults().getRows().size();
 		// The pagination widget is only visible if a listener was provider
-		if(pageChangeListener != null){
-			this.paginationWidget.configure(query.getLimit(), query.getOffset(), bundle.getQueryCount(), pageChangeListener);
+		if(pageChangeListener != null) {
+			this.paginationWidget.configure(query.getLimit(), query.getOffset(), rowCount.longValue(), pageChangeListener);
 			view.setPaginationWidgetVisible(true);
 		}else {
 			view.setPaginationWidgetVisible(false);
@@ -137,20 +144,23 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		boolean isFacetsSupported = !isEditable && 
 				facetChangedHandler != null && 
 				facets != null && 
-				!facets.isEmpty();
+				!facets.isEmpty()
+				&& facetsVisible;
+		
+		view.setFacetsVisible(isFacetsSupported);
 		
 		if (isFacetsSupported) {
 			facetsWidget.configure(facets, facetChangedHandler, types);
-		} else {
-			view.setFacetsVisible(false);	
+			view.setFacetsVisible(facetsWidget.isShowingFacets());
 		}
 		view.setTableHeaders(headers);
-		rows = new ArrayList<RowWidget>(bundle.getQueryResult().getQueryResults().getRows().size());
+		rows = new ArrayList<RowWidget>(rowCount);
 		// Build the rows for this table
 		for(Row row: bundle.getQueryResult().getQueryResults().getRows()){
 			// Create the row 
 			addRow(row, isEditable);
 		}
+		view.hideLoading();
 	}
 	
 	/**
@@ -166,7 +176,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		if(rowSelectionListener != null){
 			listner = this;
 		}
-		rowWidget.configure(tableId, types, isEditor, isView, row, listner);
+		rowWidget.configure(tableId, types, isEditor, tableType, row, listner);
 		rows.add(rowWidget);
 		view.addRow(rowWidget);
 		if(keyboardNavigationHandler != null){
@@ -305,6 +315,16 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	}
 	
 	public void setFacetsVisible(boolean visible) {
+		facetsVisible = visible;
 		view.setFacetsVisible(visible);
+	}
+	@Override
+	public void onClearFacets() {
+		if (resetFacetsHandler != null) {
+			resetFacetsHandler.invoke();
+		}
+	}
+	public void setTableVisible(boolean visible) {
+		view.setTableVisible(visible);
 	}
 }

@@ -29,4 +29,6 @@ public interface DiscussionThreadListItemWidgetView extends IsWidget{
 	void setPinnedIconVisible(boolean visible);
 
 	void clearActiveAuthors();
+	
+	void setThreadUrl(String url);
 }

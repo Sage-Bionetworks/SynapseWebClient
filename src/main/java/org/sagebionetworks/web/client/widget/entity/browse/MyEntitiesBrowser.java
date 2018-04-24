@@ -1,29 +1,24 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
 import static org.sagebionetworks.repo.model.EntityBundle.ENTITY_PATH;
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
-import org.sagebionetworks.repo.model.entity.query.Condition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryUtils;
-import org.sagebionetworks.repo.model.entity.query.Operator;
-import org.sagebionetworks.repo.model.entity.query.Sort;
+import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
+import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -35,16 +30,16 @@ import com.google.inject.Inject;
 
 public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, SynapseWidgetPresenter {
 	
-	public static final Long ZERO_OFFSET = 0L;
-	public static final Long PROJECT_LIMIT = 20L;
+	public static final int ZERO_OFFSET = 0;
+	public static final int PROJECT_LIMIT = 20;
 	private MyEntitiesBrowserView view;	
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
-	private SynapseClientAsync synapseClient;
+	private SynapseJavascriptClient jsClient;
 	private SelectedHandler selectedHandler;
 	private Place cachedPlace;
 	private String cachedUserId;
-	Long userUpdatableOffset = ZERO_OFFSET;
+	int userUpdatableOffset = ZERO_OFFSET;
 	public interface SelectedHandler {
 		void onSelection(String selectedEntityId);
 	}
@@ -53,13 +48,12 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	public MyEntitiesBrowser(MyEntitiesBrowserView view,
 			AuthenticationController authenticationController,
 			final GlobalApplicationState globalApplicationState,
-			SynapseClientAsync synapseClient,
-			JSONObjectAdapter jsonObjectAdapter) {
+			JSONObjectAdapter jsonObjectAdapter,
+			SynapseJavascriptClient jsClient) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
-		this.synapseClient = synapseClient;
-		
+		this.jsClient = jsClient;
 		// default selection behavior is to do nothing
 		this.selectedHandler = new SelectedHandler() {			
 			@Override
@@ -144,7 +138,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		if (isSynapsePlace) {
 			String entityId = ((Synapse) currentPlace).getEntityId();
 			int mask = ENTITY_PATH;
-			synapseClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundle>() {
+			jsClient.getEntityBundle(entityId, mask, new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onFailure(Throwable caught) {
 					view.showErrorMessage(caught.getMessage());
@@ -167,20 +161,20 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	@Override
 	public void loadMoreUserUpdateable() {
 		if (authenticationController.isLoggedIn()) {
-			synapseClient.executeEntityQuery(createMyProjectQuery(userUpdatableOffset), new AsyncCallback<EntityQueryResults>() {
+			jsClient.getMyProjects(ProjectListType.MY_CREATED_PROJECTS, PROJECT_LIMIT, userUpdatableOffset, ProjectListSortColumn.PROJECT_NAME, SortDirection.ASC, new AsyncCallback<List<ProjectHeader>>() {
 				@Override
-				public void onSuccess(EntityQueryResults results) {
+				public void onSuccess(List<ProjectHeader> projectHeaders) {
 					List<EntityHeader> headers = new ArrayList<EntityHeader>();
-					for (EntityQueryResult result : results.getEntities()) {
+					for (ProjectHeader result : projectHeaders) {
 						EntityHeader h = new EntityHeader();
 						h.setType(Project.class.getName());
 						h.setId(result.getId());
 						h.setName(result.getName());
 						headers.add(h);
-					}
+					};
 					view.addUpdatableEntities(headers);
 					userUpdatableOffset += PROJECT_LIMIT;
-					view.setIsMoreUpdatableEntities(userUpdatableOffset < results.getTotalEntityCount());
+					view.setIsMoreUpdatableEntities(!projectHeaders.isEmpty());
 				}
 				@Override
 				public void onFailure(Throwable caught) {
@@ -190,21 +184,6 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		}
 	}
 	
-	public EntityQuery createMyProjectQuery(Long offset) {
-		EntityQuery newQuery = new EntityQuery();
-		Sort sort = new Sort();
-		sort.setColumnName(EntityFieldName.name.name());
-		sort.setDirection(SortDirection.ASC);
-		newQuery.setSort(sort);
-		Condition condition = EntityQueryUtils.buildCondition(
-				EntityFieldName.createdByPrincipalId, Operator.EQUALS, authenticationController.getCurrentUserPrincipalId());
-		newQuery.setConditions(Arrays.asList(condition));
-		newQuery.setFilterByType(org.sagebionetworks.repo.model.EntityType.project);
-		newQuery.setLimit(PROJECT_LIMIT);
-		newQuery.setOffset(offset);
-		return newQuery;
-	}
-
 	public EntityTreeBrowser getEntityTreeBrowser() {
 		return view.getEntityTreeBrowser();
 	}
@@ -216,7 +195,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 	@Override
 	public void loadFavorites() {
 		view.getFavoritesTreeBrowser().clear();
-		EntityBrowserUtils.loadFavorites(synapseClient, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
+		EntityBrowserUtils.loadFavorites(jsClient, globalApplicationState, new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> result) {
 				view.setFavoriteEntities(result);
@@ -241,7 +220,7 @@ public class MyEntitiesBrowser implements MyEntitiesBrowserView.Presenter, Synap
 		return getEntityTreeBrowser().getEntityFilter();
 	}
 
-	public Long getUserUpdatableOffset() {
+	public int getUserUpdatableOffset() {
 		return userUpdatableOffset;
 	}
 	

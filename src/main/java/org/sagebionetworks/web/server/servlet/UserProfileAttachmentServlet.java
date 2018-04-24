@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
+import org.sagebionetworks.client.exceptions.UnknownSynapseServerException;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.inject.Inject;
@@ -107,7 +108,10 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 			// Redirect the user to the url
 			response.sendRedirect(url.toString());
 		} catch(SynapseServerException sse) {
-			response.setStatus(sse.getStatusCode());
+			if (sse instanceof UnknownSynapseServerException) {
+				response.setStatus(((UnknownSynapseServerException)sse).getStatusCode());	
+			}
+			
 			response.getOutputStream().write(
 					("Failed to get the pre-signed url: " + sse.getMessage())
 							.getBytes("UTF-8"));

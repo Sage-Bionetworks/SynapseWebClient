@@ -10,24 +10,39 @@
 
 	<g:HTMLPanel ui:field="panel">
 		<g:HTMLPanel ui:field="fileFoundContainer">
-			<div>
-			 	<b:Heading size="H2" addStyleNames="displayInline"><b:Icon ui:field="entityIcon" addStyleNames="lightGreyText" type="FILE"/></b:Heading>
-			 	<b:Heading size="H2" ui:field="entityName" addStyleNames="displayInline"/>
-			 	<b:Heading size="H2" addStyleNames="displayInline margin-right-10"><g:SimplePanel ui:field="favoritePanel"/></b:Heading>
-			 	<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="moveup-5"/>
-			</div>
+			<b:Heading size="H2" addStyleNames="displayInlineBlock">
+			 	<b:Icon ui:field="entityIcon" addStyleNames="lightGreyText margin-right-5" type="FILE"/>
+			 	<bh:Text ui:field="entityName" />
+			 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5 margin-right-10"/>
+			</b:Heading>
+			<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="moveup-5"/>
+			<bh:Div ui:field="versionInfoUI" visible="false">
+				<bh:Span addStyleNames="boldText" text="Version:"/>
+				<bh:Span addStyleNames="margin-left-5" ui:field="version"/>
+				<bh:Span addStyleNames="margin-left-5">
+					<bh:Text>(</bh:Text><b:Anchor ui:field="currentVersionLink" text="Go to the current version"/><bh:Text>)</bh:Text>
+				</bh:Span>
+			</bh:Div>
 			<g:HTMLPanel ui:field="fileNameContainer">
 				<span class="boldText">Download file as:</span>
 				<span ui:field="fileName"/>
 				<span style="margin-left: 5px;" class="file-size" ui:field="fileSize" />
 				<span style="margin-left: 5px;" class="file-size" ui:field="fileLocation" />
 				<g:SimplePanel ui:field="md5LinkContainer" styleName="inline-block margin-left-5"/>
+				<w:HelpWidget helpMarkdown="This block contains information about the content such as file size, storage location and md5 hash." 
+					addStyleNames="margin-left-5"/>
 				<div ui:field="externalUrlUI">
 					<span class="boldText">URL:</span>
 					<span ui:field="externalUrl"/>
 				</div>
-				<w:HelpWidget helpMarkdown="This block contains information about the content such as file size, storage location and md5 hash." 
-					addStyleNames="margin-left-5"/>
+				<bh:Div ui:field="externalObjectStoreUI">
+					<bh:Strong text="Endpoint:" addStyleNames="margin-right-5"/>
+					<bh:Span ui:field="endpoint" addStyleNames="margin-right-5"/>
+					<bh:Strong text="Bucket:" addStyleNames="margin-right-5"/>
+					<bh:Span ui:field="bucket" addStyleNames="margin-right-5"/>
+					<bh:Strong text="File key:" addStyleNames="margin-right-5"/>
+					<bh:Span ui:field="fileKey"/>
+				</bh:Div>
 
 			</g:HTMLPanel>
 		</g:HTMLPanel>

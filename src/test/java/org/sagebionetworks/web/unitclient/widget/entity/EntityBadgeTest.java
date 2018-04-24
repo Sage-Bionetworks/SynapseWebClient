@@ -8,22 +8,22 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
@@ -32,26 +32,23 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Link;
 import org.sagebionetworks.repo.model.Project;
+import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
-import org.sagebionetworks.repo.model.discussion.EntityThreadCount;
-import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
-import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
-import org.sagebionetworks.web.client.SynapseClientAsync;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.PopupUtilsView;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
@@ -61,6 +58,7 @@ import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
+import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -75,7 +73,6 @@ public class EntityBadgeTest {
 	private static final String KEY3 = "key3";
 	private static final String KEY1 = "key1";
 	private static final String KEY2 = "key2";
-	SynapseClientAsync mockSynapseClient;
 	GlobalApplicationState mockGlobalApplicationState;
 	PlaceChanger mockPlaceChanger;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
@@ -90,19 +87,31 @@ public class EntityBadgeTest {
 	List<Annotation> annotationList;
 	Annotations annotations;
 	UserBadge mockUserBadge;
-	SynapseJSNIUtils mockSynapseJSNIUtils;
 	UserEntityPermissions mockPermissions;
 	AccessControlList mockBenefactorAcl;
 	@Mock
 	FileDownloadButton mockFileDownloadButton;
 	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
+	@Mock
+	PublicPrincipalIds mockPublicPrincipalIds;
+	@Mock
+	ResourceAccess mockResourceAccess;
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	PopupUtilsView mockPopupUtils;
 	
+	@Captor
+	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
+	
+	Set<ResourceAccess> resourceAccessSet;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		mockView = mock(EntityBadgeView.class);
 		mockClientCache = mock(ClientCache.class);
 		getInfoCallback = mock(AsyncCallback.class);
@@ -111,14 +120,15 @@ public class EntityBadgeTest {
 		mockUserBadge = mock(UserBadge.class);
 		mockPermissions = mock(UserEntityPermissions.class);
 		when(mockPermissions.getCanPublicRead()).thenReturn(true);
-		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		mockBenefactorAcl = mock(AccessControlList.class);
 		when(mockBenefactorAcl.getId()).thenReturn("not the current entity id");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
-				mockUserBadge, mockSynapseJSNIUtils, mockSynapseClient,
-				mockFileDownloadButton, mockLazyLoadHelper);
+				mockUserBadge, mockSynapseJavascriptClient,
+				mockFileDownloadButton, mockLazyLoadHelper,
+				mockDateTimeUtils, mockPopupUtils);
 		
+		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY1, Collections.EMPTY_LIST));
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY2, Collections.singletonList(VALUE2)));
@@ -128,6 +138,9 @@ public class EntityBadgeTest {
 		rootWikiKeyId = "123";
 		when(mockView.isAttached()).thenReturn(true);
 		entityThreadCount = 0L;
+		resourceAccessSet = new HashSet<>();
+		resourceAccessSet.add(mockResourceAccess);
+		when(mockBenefactorAcl.getResourceAccess()).thenReturn(resourceAccessSet);
 	}
 	
 	private EntityBundle setupEntity(Entity entity) {
@@ -138,12 +151,12 @@ public class EntityBadgeTest {
 		when(bundle.getBenefactorAcl()).thenReturn(mockBenefactorAcl);
 		when(bundle.getRootWikiId()).thenReturn(rootWikiKeyId);
 		when(bundle.getThreadCount()).thenReturn(entityThreadCount);
-		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(bundle).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		return bundle;
 	}
 	
-	private EntityQueryResult configure() {
-		EntityQueryResult header = new EntityQueryResult();
+	private EntityHeader configure() {
+		EntityHeader header = new EntityHeader();
 		header.setId(entityId);
 		widget.configure(header);
 		return header;
@@ -151,32 +164,8 @@ public class EntityBadgeTest {
 	
 	@Test
 	public void testConfigure() throws Exception {
-		EntityQueryResult header = configure();
+		EntityHeader header = configure();
 		verify(mockView).setEntity(header);
-		
-		//in this case, "modified by" and "modified on" are not set.
-		verify(mockView).setModifiedByWidgetVisible(false);
-		verify(mockView).setModifiedOn("");
-	}
-	
-	@Test
-	public void testConfigureWithModificationData() throws Exception {
-		EntityQueryResult header = new EntityQueryResult();
-		header.setId("syn008");
-		Long modifiedByPrincipalId = 12345L;
-		Date modifiedOn = new Date();
-		String smallDateString="10/02/2000 01:26:45PM";
-		when(mockSynapseJSNIUtils.convertDateToSmallString(any(Date.class))).thenReturn(smallDateString);
-		header.setModifiedByPrincipalId(modifiedByPrincipalId);
-		header.setModifiedOn(modifiedOn);
-		widget.configure(header);
-		verify(mockView).setEntity(header);
-		
-		//in this case, "modified by" and "modified on" are not set.
-		verify(mockUserBadge).configure(modifiedByPrincipalId.toString());
-		verify(mockView).setModifiedByWidgetVisible(true);
-		verify(mockSynapseJSNIUtils).convertDateToSmallString(modifiedOn);
-		verify(mockView).setModifiedOn(smallDateString);
 	}
 
 	/**
@@ -185,10 +174,9 @@ public class EntityBadgeTest {
 	@Test
 	public void testCheckForInViewAndLoadData() {
 		//set up entity
+		when(mockPublicPrincipalIds.isPublic(anyLong())).thenReturn(true);
 		String entityId = "syn12345";
 		Project testProject = new Project();
-		testProject.setModifiedBy("4444");
-		//note: can't test modified on because it format it using the gwt DateUtils (calls GWT.create())
 		testProject.setId(entityId);
 		entityThreadCount = 0L;
 		setupEntity(testProject);
@@ -200,13 +188,10 @@ public class EntityBadgeTest {
 		verify(mockLazyLoadHelper).configure(captor.capture(), eq(mockView));
 		captor.getValue().invoke();
 		
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showPublicIcon();
-		verify(mockView).showAnnotationsIcon();
-		verify(mockView).setAnnotations(anyString());
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
-		verify(mockView).setDiscussionThreadIconVisible(false);
 		verify(mockFileDownloadButton, never()).configure(any(EntityBundle.class));
 		verify(mockView, never()).setFileDownloadButton(any(Widget.class));
 	}
@@ -216,21 +201,31 @@ public class EntityBadgeTest {
 		//verify download button is configured and shown
 		String entityId = "syn12345";
 		FileEntity testFile = new FileEntity();
-		testFile.setModifiedBy("4444");
 		testFile.setId(entityId);
+		Long modifiedByPrincipalId = 12345L;
+		testFile.setModifiedBy(modifiedByPrincipalId.toString());
+		Date modifiedOn = new Date();
+		String smallDateString="10/02/2000 01:26:45PM";
+		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(smallDateString);
+		testFile.setModifiedOn(modifiedOn);
+		when(mockPublicPrincipalIds.isPublic(anyLong())).thenReturn(true);
 		entityThreadCount = 1L;
 		setupEntity(testFile);
 		configure();
 		widget.getEntityBundle();
 		
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockUserBadge).configure(modifiedByPrincipalId.toString());
+		verify(mockView).setModifiedByWidgetVisible(true);
+		verify(mockDateTimeUtils).convertDateToSmallString(modifiedOn);
+		verify(mockView).setModifiedOn(smallDateString);
+				
 		verify(mockView).showPublicIcon();
-		verify(mockView).showAnnotationsIcon();
-		verify(mockView).setAnnotations(anyString());
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
-		verify(mockView).setDiscussionThreadIconVisible(true);
+		verify(mockView).showDiscussionThreadIcon();
 		verify(mockFileDownloadButton).configure(any(EntityBundle.class));
+		verify(mockFileDownloadButton).hideClientHelp();
 		verify(mockView).setFileDownloadButton(any(Widget.class));
 	}
 	
@@ -240,65 +235,28 @@ public class EntityBadgeTest {
 		//test failure response from getEntityBundle
 		String errorMessage = "problem occurred while asking for entity bundle";
 		Exception ex = new Exception(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		widget.getEntityBundle();
-
-		verify(mockView).showErrorIcon();
+		
 		verify(mockView).setError(errorMessage);
 	}
 
 	@Test
-	public void testEntityClicked() throws Exception {
-		//check the passthrough
-		EntityQueryResult header = new EntityQueryResult();
-		header.setId("syn93847");
-		widget.entityClicked(header);
-		verify(mockPlaceChanger).goTo(isA(Synapse.class));
-	}
-	
-	@Test
 	public void testEntityClickedCustomHandler() throws Exception {
-		CallbackP<String> mockEntityClicked = mock(CallbackP.class);
-		widget.setEntityClickedHandler(mockEntityClicked);
-		String id = "syn77";
-		EntityQueryResult header = new EntityQueryResult();
-		header.setId(id);
-		widget.entityClicked(header);
-		verify(mockEntityClicked).invoke(id);
-	}
-	
-	@Test
-	public void testShowTypeIcon() throws Exception {
-		EntityHeader header = new EntityHeader();
-		header.setId("syn93847");
-		widget.hideLoadingIcon();
-		verify(mockView).hideLoadingIcon();
-	}
-	
-	@Test
-	public void testShowLoadingIcon() throws Exception {
-		EntityHeader header = new EntityHeader();
-		header.setId("syn93847");
-		widget.showLoadingIcon();
-		verify(mockView).showLoadingIcon();
+		configure();
+		ClickHandler mockEntityClicked = mock(ClickHandler.class);
+		widget.addClickHandler(mockEntityClicked);
+		verify(mockView).addClickHandler(mockEntityClicked);
 	}
 	
 	@Test
 	public void testGetEntity() {
-		EntityQueryResult header = new EntityQueryResult();
+		EntityHeader header = new EntityHeader();
 		header.setId("syn12345");
 		widget.configure(header);
 		assertTrue(header == widget.getHeader());
 	}
 	
-	@Test
-	public void testSetClickHandler() {
-		ClickHandler mockClickHandler = mock(ClickHandler.class);
-		widget.setClickHandler(mockClickHandler);
-		verify(mockView).setClickHandler(mockClickHandler);
-		verify(mockUserBadge).setCustomClickHandler(mockClickHandler);
-	}
-
 	@Test
 	public void testAnnotationsEmpty() throws Exception {
 		annotationList.clear();
@@ -333,6 +291,67 @@ public class EntityBadgeTest {
 		widget.setEntityBundle(bundle);
 		verify(mockView).showPrivateIcon();
 	}
+	
+	@Test
+	public void testCanUnlink() {
+		configure();
+		EntityBundle bundle = setupEntity(new Link());
+		when(mockPermissions.getCanDelete()).thenReturn(true);
+		
+		widget.setEntityBundle(bundle);
+		verify(mockView).showUnlinkIcon();
+	}
+
+	@Test
+	public void testUnlinkCannotDeletePermission() {
+		configure();
+		EntityBundle bundle = setupEntity(new Link());
+		when(mockPermissions.getCanDelete()).thenReturn(false);
+		
+		widget.setEntityBundle(bundle);
+		verify(mockView, never()).showUnlinkIcon();
+	}
+	
+	@Test
+	public void testUnlinkNotALink() {
+		configure();
+		EntityBundle bundle = setupEntity(new Project());
+		when(mockPermissions.getCanDelete()).thenReturn(true);
+		
+		widget.setEntityBundle(bundle);
+		verify(mockView, never()).showUnlinkIcon();
+	}
+	
+	@Test
+	public void testOnUnlink() {
+		//simulate successful delete of Link entity
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		configure();
+		EntityBundle bundle = setupEntity(new Link());
+		when(mockPermissions.getCanDelete()).thenReturn(true);
+		widget.setEntityBundle(bundle);
+		
+		widget.onUnlink();
+		verify(mockSynapseJavascriptClient).deleteEntityById(eq(entityId), any(AsyncCallback.class));
+		verify(mockPopupUtils).showInfo(EntityBadge.LINK_SUCCESSFULLY_DELETED, "");
+	}
+	
+	@Test
+	public void testOnUnlinkFailure() {
+		//simulate failure to delete of Link entity
+		String errorMessage = "error occurred";
+		Exception ex = new Exception(errorMessage);
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
+		configure();
+		EntityBundle bundle = setupEntity(new Link());
+		when(mockPermissions.getCanDelete()).thenReturn(true);
+		widget.setEntityBundle(bundle);
+		
+		widget.onUnlink();
+		verify(mockSynapseJavascriptClient).deleteEntityById(eq(entityId), any(AsyncCallback.class));
+		verify(mockPopupUtils).showErrorMessage(errorMessage);
+	}
+
 	
 	@Test
 	public void testLocalSharingSettings() throws Exception {

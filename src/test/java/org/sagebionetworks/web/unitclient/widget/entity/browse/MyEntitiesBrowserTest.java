@@ -1,10 +1,18 @@
 package org.sagebionetworks.web.unitclient.widget.entity.browse;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,21 +21,17 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.entity.query.Condition;
-import org.sagebionetworks.repo.model.entity.query.EntityFieldName;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
-import org.sagebionetworks.repo.model.EntityType;
+import org.sagebionetworks.repo.model.ProjectHeader;
+import org.sagebionetworks.repo.model.ProjectListSortColumn;
+import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -40,12 +44,10 @@ import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class MyEntitiesBrowserTest {
-	EntityQueryResults searchResults;
 	MyEntitiesBrowser widget;
 	MyEntitiesBrowserView mockView;
 	AuthenticationController mockAuthenticationController;
 	GlobalApplicationState mockGlobalApplicationState;
-	SynapseClientAsync mockSynapseClient;
 	JSONObjectAdapter jsonObjectAdapter;
 	@Mock
 	EntityTreeBrowser mockEntityTreeBrowser;
@@ -53,53 +55,51 @@ public class MyEntitiesBrowserTest {
 	EntityTreeBrowser mockFavoritesTreeBrowser;
 	@Mock
 	EntityTreeBrowser mockCurrentContextTreeBrowser;
-	
+	@Mock
+	SynapseJavascriptClient mockSynapseJavascriptClient;
+	List<ProjectHeader> entities;
 	String currentUserId = "100042";
+	
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		mockView = mock(MyEntitiesBrowserView.class);
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		widget = new MyEntitiesBrowser(mockView, mockAuthenticationController,
-				mockGlobalApplicationState, mockSynapseClient,
-				jsonObjectAdapter);
+				mockGlobalApplicationState,
+				jsonObjectAdapter,
+				mockSynapseJavascriptClient);
 		mockEntityTreeBrowser = mock(EntityTreeBrowser.class);
 		when(mockView.getEntityTreeBrowser()).thenReturn(mockEntityTreeBrowser);
 		when(mockView.getFavoritesTreeBrowser()).thenReturn(mockFavoritesTreeBrowser);
 		when(mockView.getCurrentContextTreeBrowser()).thenReturn(mockCurrentContextTreeBrowser);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(currentUserId);
-		searchResults = new EntityQueryResults();
-		List<EntityQueryResult> entities = new ArrayList<EntityQueryResult>();
-		searchResults.setEntities(entities);
-		searchResults.setTotalEntityCount(new Long(entities.size()));
-
-		AsyncMockStubber
-			.callSuccessWith(searchResults).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
-				any(AsyncCallback.class));
+		
+		entities = new ArrayList<ProjectHeader>();
+		ProjectHeader projectHeader1 = new ProjectHeader();
+		projectHeader1.setId("syn1");
+		ProjectHeader projectHeader2 = new ProjectHeader();
+		projectHeader2.setId("syn2");
+		entities.add(projectHeader1);
+		entities.add(projectHeader2);
+		AsyncMockStubber.callSuccessWith(entities).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 	}
 
 	@Test
 	public void testLoadUserUpdateable() {
 		widget.loadMoreUserUpdateable();
-		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
-				any(AsyncCallback.class));
-		verify(mockView).addUpdatableEntities(anyList());
-		verify(mockView).setIsMoreUpdatableEntities(false);
-	}
-	
-	@Test
-	public void testLoadUserUpdateableWithMore() {
-		searchResults.setTotalEntityCount(MyEntitiesBrowser.PROJECT_LIMIT*2);
-		widget.loadMoreUserUpdateable();
-		verify(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
-				any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		verify(mockView).addUpdatableEntities(anyList());
 		verify(mockView).setIsMoreUpdatableEntities(true);
+		
+		entities.clear();
+		widget.loadMoreUserUpdateable();
+		verify(mockSynapseJavascriptClient, times(2)).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
+		verify(mockView).setIsMoreUpdatableEntities(false);
 	}
-	
+		
 	@Test
 	public void testLoadUserUpdateableAnonymous() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
@@ -110,28 +110,10 @@ public class MyEntitiesBrowserTest {
 	@Test
 	public void testLoadUserUpdateableFailure() {
 		String errorMessage = "An error occurred.";
-		AsyncMockStubber
-		.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).executeEntityQuery(any(EntityQuery.class),
-			any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		widget.loadMoreUserUpdateable();
 		verify(mockView, never()).addUpdatableEntities(anyList());
 		verify(mockView).showErrorMessage(errorMessage);
-	}
-
-	@Test
-	public void testCreateGetMyProjectQuery() {
-		Long offset = 40L;
-		EntityQuery query = widget.createMyProjectQuery(offset);
-
-		// verify sort
-		assertEquals(EntityFieldName.name.name(), query.getSort()
-				.getColumnName());
-		assertEquals(SortDirection.ASC, query.getSort().getDirection());
-		List<Condition> conditions = query.getConditions();
-		assertEquals(1, conditions.size());
-		assertEquals(EntityType.project, query.getFilterByType());
-		assertEquals(MyEntitiesBrowser.PROJECT_LIMIT, query.getLimit());
-		assertEquals(offset, query.getOffset());
 	}
 	
 	@Test
@@ -161,8 +143,6 @@ public class MyEntitiesBrowserTest {
 		
 		//test refresh when the context has not changed
 		widget.refresh();
-		//should have done nothing
-		verifyZeroInteractions(mockSynapseClient);
 		
 		//test clearState() when context has not changed
 		widget.clearState();
@@ -175,8 +155,7 @@ public class MyEntitiesBrowserTest {
 		verify(mockEntityTreeBrowser).clear();
 		verify(mockView).setIsMoreUpdatableEntities(true);
 		assertEquals(MyEntitiesBrowser.ZERO_OFFSET, widget.getUserUpdatableOffset());
-		verify(mockSynapseClient, never()).executeEntityQuery(any(EntityQuery.class),
-				any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).getMyProjects(any(ProjectListType.class), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class), any(AsyncCallback.class));
 		
 		//test clearState() when context has changed
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("yet another different place"));
@@ -198,24 +177,24 @@ public class MyEntitiesBrowserTest {
 		EntityPath path = new EntityPath();
 		path.setPath(new ArrayList<EntityHeader>());
 		eb.setPath(path);
-		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("syn123"));
 		widget.loadCurrentContext();
 		verify(mockView).setCurrentContextTabVisible(true);
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockCurrentContextTreeBrowser).configure(anyList());
 	}
 	@Test
 	public void testLoadContextSynapsePlaceFailure() {
 		String errorMessage = "failure to load entity path";
 		Exception ex = new Exception(errorMessage);
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		
 		when(mockGlobalApplicationState.getCurrentPlace()).thenReturn(new Synapse("syn123"));
 		widget.loadCurrentContext();
 		verify(mockView).setCurrentContextTabVisible(true);
-		verify(mockSynapseClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showErrorMessage(errorMessage);
 	}
 	

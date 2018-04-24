@@ -1,13 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
 import com.google.gwt.core.shared.GWT;
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
@@ -32,21 +30,14 @@ public class StuAlertViewImpl implements
 	@UiField
 	Anchor requestAccessLink;
 	@UiField
-	Div requestLoadingUI;
+	LoadingSpinner requestLoadingUI;
 	@UiField
 	Div synAlertContainer;
 	Presenter presenter;
-	
+	Widget synAlertWidget;
+	Div container = new Div();
 	@Inject
 	public StuAlertViewImpl(){
-		Binder b = GWT.create(Binder.class);
-		widget = b.createAndBindUi(this);
-		requestAccessLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onRequestAccess();
-			}
-		});
 	}
 	
 	public void setPresenter(Presenter presenter) {
@@ -60,50 +51,71 @@ public class StuAlertViewImpl implements
 
 	@Override
 	public Widget asWidget() {
-		return widget;
+		return container;
 	}
 	
 	@Override
 	public void clearState() {
-		widget.setVisible(false);
-		httpCode403.setVisible(false);
-		httpCode404.setVisible(false);
-		requestAccessUI.setVisible(false);
-		requestLoadingUI.setVisible(false);
+		container.setVisible(false);
+		if (widget != null) {
+			httpCode403.setVisible(false);
+			httpCode404.setVisible(false);
+			requestAccessUI.setVisible(false);
+			requestLoadingUI.setVisible(false);
+		}
 	}
 	
+	private void lazyConstruct() {
+		if (widget == null) {
+			Binder b = GWT.create(Binder.class);
+			widget = b.createAndBindUi(this);
+			requestAccessLink.addClickHandler(event -> {
+				presenter.onRequestAccess();
+			});
+			synAlertContainer.add(synAlertWidget);
+			container.add(widget);
+		}
+	}
 	
 	@Override
 	public void show403() {
-		widget.setVisible(true);
+		lazyConstruct();
+		container.setVisible(true);
 		httpCode403.setVisible(true);
 	}
 	
 	@Override
 	public void show404() {
-		widget.setVisible(true);
+		lazyConstruct();
+		container.setVisible(true);
 		httpCode404.setVisible(true);
 	}
 	@Override
 	public void showRequestAccessUI() {
+		lazyConstruct();
 		requestLoadingUI.setVisible(false);
 		requestAccessUI.setVisible(true);
 	}
 	@Override
 	public void hideRequestAccessUI() {
+		lazyConstruct();
 		requestAccessUI.setVisible(false);
 	}
 	@Override
 	public void showRequestAccessButtonLoading() {
+		lazyConstruct();
 		requestLoadingUI.setVisible(true);
 	}
 	@Override
 	public void setSynAlert(Widget w) {
-		synAlertContainer.clear();
-		synAlertContainer.add(w);
+		synAlertWidget = w;
 	}
+	
 	@Override
 	public void setVisible(boolean visible) {
-		widget.setVisible(visible);
+		if (visible) {
+			lazyConstruct();	
+		}
+		container.setVisible(visible);
 	}
 }

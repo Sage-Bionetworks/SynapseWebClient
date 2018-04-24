@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.StringUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.upload.FileHandleUploadWidget;
@@ -19,22 +20,30 @@ public class FileCellEditorImpl implements FileCellEditor, FileCellEditorView.Pr
 	public static final String PLEASE_SELECT_A_FILE_TO_UPLOAD = "Please select a file to upload.";
 	FileCellEditorView view;
 	FileHandleUploadWidget fileInputWidget;
+	PortalGinInjector ginInjector;
 	
 	@Inject
-	public FileCellEditorImpl(final FileCellEditorView view, FileHandleUploadWidget fileInputWidget){
+	public FileCellEditorImpl(final FileCellEditorView view, PortalGinInjector ginInjector){
 		this.view = view;
-		this.fileInputWidget = fileInputWidget;
-		fileInputWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, new CallbackP<FileUpload>() {
-			@Override
-			public void invoke(FileUpload file) {
-				view.hideErrorMessage();
-				view.setValue(file.getFileHandleId());
-				view.hideCollapse();
-			}
-		});
+		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
-		this.view.addFileInputWidget(fileInputWidget);
 	}
+	
+	public void initFileInputWidget() {
+		if (fileInputWidget == null) {
+			fileInputWidget = ginInjector.getFileHandleUploadWidget();
+			fileInputWidget.configure(WebConstants.DEFAULT_FILE_HANDLE_WIDGET_TEXT, new CallbackP<FileUpload>() {
+				@Override
+				public void invoke(FileUpload file) {
+					view.hideErrorMessage();
+					view.setValue(file.getFileHandleId());
+					view.hideCollapse();
+				}
+			});
+			this.view.addFileInputWidget(fileInputWidget);
+		}
+	}
+	
 
 	@Override
 	public boolean isValid() {
@@ -99,6 +108,7 @@ public class FileCellEditorImpl implements FileCellEditor, FileCellEditorView.Pr
 
 	@Override
 	public void onToggleCollapse() {
+		initFileInputWidget();
 		view.hideErrorMessage();
 		this.fileInputWidget.reset();
 		view.toggleCollapse();

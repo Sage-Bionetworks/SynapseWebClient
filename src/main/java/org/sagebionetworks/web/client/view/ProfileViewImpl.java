@@ -10,16 +10,12 @@ import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.gwt.HTMLPanel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Quiz;
 import org.sagebionetworks.web.client.place.Search;
@@ -29,11 +25,10 @@ import org.sagebionetworks.web.client.presenter.ProjectFilterEnum;
 import org.sagebionetworks.web.client.presenter.SortOptionEnum;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FitImage;
-import org.sagebionetworks.web.client.widget.footer.Footer;
+import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
-import org.sagebionetworks.web.client.widget.team.TeamListWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationIDCardViewImpl;
 
 import com.google.gwt.dom.client.DivElement;
@@ -47,7 +42,6 @@ import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FocusPanel;
@@ -63,12 +57,6 @@ import com.google.inject.Inject;
 public class ProfileViewImpl extends Composite implements ProfileView {
 
 	public interface ProfileViewImplUiBinder extends UiBinder<Widget, ProfileViewImpl> {}
-	
-	@UiField
-	SimplePanel header;
-	@UiField
-	SimplePanel footer;
-	
 	@UiField
 	 Div viewProfilePanel;
 	 @UiField
@@ -115,7 +103,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	LIElement teamsListItem;
 	@UiField
-	Anchor settingsLink;
+	FocusPanel settingsLink;
 	@UiField
 	LIElement settingsListItem;
 	@UiField
@@ -159,7 +147,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DropDownMenu teamFiltersDropDownMenu;
 	
 	@UiField
-	TextBox createProjectTextBox;
+	TextBox projectSearchTextBox;
 	@UiField
 	Button createProjectButton;
 	@UiField
@@ -184,7 +172,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	//Teams tab
 	@UiField
-	TextBox createTeamTextBox;
+	TextBox teamSearchTextBox;
 	@UiField
 	Button createTeamButton;
 	@UiField
@@ -218,9 +206,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	DivElement teamsHighlightBox;
 
 	@UiField 
-	DivElement challengesLoadingUI;
+	LoadingSpinner challengesLoadingUI;
 	@UiField 
-	Row profilePictureLoadingUI;
+	LoadingSpinner profilePictureLoadingUI;
+	@UiField 
+	LoadingSpinner dashboardLoadingUI;
 	
 	@UiField
 	FlowPanel favoritesHelpPanel;
@@ -274,59 +264,50 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Span teamNotifications;
 	private Presenter presenter;
 	private Header headerWidget;
-	private SageImageBundle sageImageBundle;
 	
 	//View profile widgets
 	private static HTML defaultProfilePicture = new HTML(DisplayUtils.getFontAwesomeIcon("user font-size-150 lightGreyText"));
-	
-	private Footer footerWidget;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
-			Header headerWidget, 
-			Footer footerWidget, 
-			SageImageBundle sageImageBundle,
+			Header headerWidget,
 			SynapseJSNIUtils synapseJSNIUtils) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.footerWidget = footerWidget;
-		this.sageImageBundle = sageImageBundle;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.add(footerWidget.asWidget());
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 		picturePanel.clear();
 		initTabs();
-		createProjectTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_PROJECT_NAME);
+		projectSearchTextBox.getElement().setAttribute("placeholder", "Project name");
 		createProjectButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.createProject(createProjectTextBox.getValue());
+				presenter.createProject();
 			}
 		});
-		createProjectTextBox.addKeyDownHandler(new KeyDownHandler() {
+		projectSearchTextBox.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					createProjectButton.click();
+					projectSearchButton.click();
 				}
 			}
 		});
-		createTeamTextBox.getElement().setAttribute("placeholder", DisplayConstants.NEW_TEAM_NAME);
+		teamSearchTextBox.getElement().setAttribute("placeholder", "Team name");
 		createTeamButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.createTeam(createTeamTextBox.getValue());
+				presenter.createTeam();
 			}
 		});
 		
-		createTeamTextBox.addKeyDownHandler(new KeyDownHandler() {
+		teamSearchTextBox.addKeyDownHandler(new KeyDownHandler() {
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					createTeamButton.click();
+					teamSearchButton.click();
 				}
 			}
 		});
@@ -334,14 +315,14 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		teamSearchButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.goTo(new TeamSearch(""));
+				presenter.goTo(new TeamSearch(teamSearchTextBox.getValue()));
 			}
 		});
 		
 		projectSearchButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.goTo(new Search(""));
+				presenter.goTo(new Search(projectSearchTextBox.getValue()));
 			}
 		});
 		alertFocusPanel.addClickHandler(new ClickHandler() {
@@ -487,9 +468,9 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	@Override
-	public void addMyTeamsWidget(TeamListWidget myTeamsWidget) {
+	public void setTeamsContainer(Widget toAdd) {
 		teamsTabContent.clear();
-		teamsTabContent.add(myTeamsWidget.asWidget());
+		teamsTabContent.add(toAdd);
 	}
 	
 	@Override
@@ -500,7 +481,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setProfileSynAlertWidget(Widget profileSynAlert) {
-		profileSynAlertPanel.setWidget(profileSynAlert);
+		profileSynAlertPanel.clear();
+		profileSynAlertPanel.add(profileSynAlert);
 	}
 	
 	@Override
@@ -517,7 +499,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void setTeamSynAlertWidget(Widget teamSynAlert) {
-		teamSynAlertPanel.setWidget(teamSynAlert);
+		teamSynAlertPanel.clear();
+		teamSynAlertPanel.add(teamSynAlert);
 	}
 	
 	public void clearSortOptions() {
@@ -552,11 +535,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		header.clear();
 		headerWidget.configure(false);
-		header.add(headerWidget.asWidget());
-		footer.clear();
-		footer.add(footerWidget.asWidget());
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
@@ -580,6 +559,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	public void setProfile(UserProfile profile, boolean isOwner) {
 		viewProfilePanel.setVisible(true);
 		fillInProfileView(profile);
+		picturePanel.clear();
 		picturePanel.add(getProfilePicture(profile, synapseJSNIUtils));
 		if (!isOwner) {
 			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
@@ -683,7 +663,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void showChallengesLoading(boolean isVisible) {
-		UIObject.setVisible(challengesLoadingUI, isVisible);
+		challengesLoadingUI.setVisible(isVisible);
 	}
 	
 	@Override
@@ -768,11 +748,13 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void showLoading() {
 		profilePictureLoadingUI.setVisible(true);
+		dashboardLoadingUI.setVisible(true);
 	}
 
 	@Override
 	public void hideLoading() {
 		profilePictureLoadingUI.setVisible(false);
+		dashboardLoadingUI.setVisible(false);
 	}
 	
 	@Override
@@ -794,7 +776,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		picturePanel.clear();
 		DisplayUtils.hide(navtabContainer);
 		//init with loading widget
-		projectsTabContent.add(new HTMLPanel(DisplayUtils.getLoadingHtml(sageImageBundle)));
+		projectsTabContent.add(DisplayUtils.getSmallLoadingWidget());
 		
 		settingsTabContent.clear();
 		
@@ -805,8 +787,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
 		DisplayUtils.hide(challengesListItem);
-		createTeamTextBox.setValue("");
-		createProjectTextBox.setValue("");
+		teamSearchTextBox.setValue("");
+		projectSearchTextBox.setValue("");
 		
 		//reset tab link text (remove any notifications)
 		clearTeamNotificationCount();
@@ -1019,5 +1001,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setVerificationDetailsButtonVisible(boolean isVisible) {
 		verificationApprovedButton.setVisible(isVisible);
+	}
+	
+	@Override
+	public void open(String url) {
+		Window.open(url, "_self", "");	
 	}
 }

@@ -1,7 +1,9 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
 	<head>
-		<meta name="description" content="" />
+		<title>Synapse | Sage Bionetworks</title>
+		<meta name="description" content="Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges." />
+		<meta name='author' content='Sage Bionetworks, info@sagebase.org' />
 		<meta name="google-site-verification" content="KIO5H8Bg3i0oAEAzTEMK5qIlYJLbd2zogLs_-im4rI0" />
 		<meta name="msvalidate.01" content="E37AC1589F823723B64275D4BC890B1A" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -34,60 +36,84 @@
 		
 		<link rel="icon" type="image/png"  href="favicon.png?v=3" />
 		<link href="/opensearch.xml" rel="search" title="Synapse" type="application/opensearchdescription+xml" />
-		<link rel="stylesheet" href="//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css" media="print" />
-		<link rel="stylesheet" type="text/css" href="Portal.css" />
-		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.1.0/styles/default.min.css"/>
-		<link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
-				
-		<!-- head.js -->
-		<script src="js/head.load.min.js"></script>
-		<script>
-			head
-			.js("//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js")
-			.js("//ajax.googleapis.com/ajax/libs/jqueryui/1.11.0/jquery-ui.min.js")
-			.js("js/spark-md5.min.js")
-			.js("js/swfobject/swfobject.js")
-			.js("js/jquery.tablesorter.min.js")
-			.js("js/jquery.tablesorter.scinot.js")
-			.js("js/highlight.pack.js")
-			.js("js/jsPlumb/jquery.jsPlumb-1.6.2-min.js")
-			.js("js/init-nchart.js")
-			.js("js/moment_min.js")
-			.js("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js")
-			.js("js/markdown-it-plugins-8.min.js")
-			.js("js/polyfill.js")
-			.js("js/xss.min.js")
-			;
-	   	</script>
-	   	<!-- xss.min.js from https://github.com/leizongmin/js-xss -->
-	
-		<title>Sage Synapse : Contribute to the Cure</title>
+		<link rel="manifest" href="manifest.json" />
 		
-		<!--                                           -->
-		<!-- This script loads your compiled module.   -->
-		<!-- If you add any GWT meta tags, they must   -->
-		<!-- be added before this line.                -->
-		<!--                                           -->
-		<script type="text/javascript" language="javascript" src="js/compiled-closure-lib.js"></script>
-		<script type="text/javascript" language="javascript" src="Portal/Portal.nocache.js"></script>
-			
-		<!-- Search autocomplete script. Temporary -->
-	
-		<!-- put this last -->
 		<!-- Google Analytics -->
 		<script type="text/javascript">
 			window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 			ga('create', 'UA-29804340-1', 'auto');
 			ga('send', 'pageview');
 		</script>
-		<script async src='//www.google-analytics.com/analytics.js'></script>
-		<!-- End Google Analytics -->
+		
+		
+		
+		<script>
+			// determine cdn endpoint (staging, prod, or dev)
+			var cdnEndpoint = "//cdn-" + location.hostname + "/";
+			var localhostRegex = /^(127[.]{1}0[.]{1}0[.]{1}1)$|^(localhost)$/;
+			if (localhostRegex.test(location.hostname)) {
+				cdnEndpoint = "";
+			}
+			window.cdnEndpoint = cdnEndpoint;
+			
+			var link = document.createElement( "link" );
+			link.href = cdnEndpoint + "loading.css";
+			link.type = "text/css";
+			link.rel = "stylesheet";
+			document.head.appendChild(link);
+
+			var script = document.createElement('script');
+			script.onload = function () {
+				head.load("Portal.css");
+				head.load("//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js");
+				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
+				head.load(cdnEndpoint + "js/spark-md5.min.js");
+				head.load(cdnEndpoint + "js/swfobject/swfobject.js");
+				head.load(cdnEndpoint + "js/jquery.tablesorter.min.js");
+				head.load(cdnEndpoint + "js/jquery.tablesorter.scinot.js");
+				head.load(cdnEndpoint + "js/highlight.pack.js");
+				head.load("//cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.1.8/jsPlumb.min.js");
+				head.load(cdnEndpoint + "js/init-nchart.js");
+				head.load("//cdn.jsdelivr.net/npm/moment@2.21.0/min/moment.min.js");
+				head.load("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js");
+				head.load(cdnEndpoint + "js/markdown-it-plugins-11.min.js");
+				head.load(cdnEndpoint + "js/polyfill.js");
+				head.load(cdnEndpoint + "js/xss.min.js");
+				head.load(cdnEndpoint + "js/pica.min.js");
+				head.load("//www.google-analytics.com/analytics.js");
+				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/themes/base/jquery-ui.css");
+				head.load("//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css");
+				head.load("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css");
+				head.load("https://unpkg.com/react@16.2.0/umd/react.production.min.js");
+				head.load("https://unpkg.com/react-dom@16.2.0/umd/react-dom.production.min.js");
+				head.load("https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.1/croppie.min.css");
+				head.load("https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.1/croppie.min.js");
+				head.load("https://cdn.pendo.io/agent/static/f155f8f7-30b9-4cc3-671a-70f99f803504/pendo.js");
+				head.load(cdnEndpoint + "js/diff/diffview.css");
+			};
+			script.src = cdnEndpoint + "js/head.load.min.js";
+			document.head.appendChild(script);
+			
+			script = document.createElement('script');
+			script.src = cdnEndpoint + "js/compiled-closure-lib.js";
+			document.head.appendChild(script);
+			 
+			script = document.createElement('script');
+			script.src = cdnEndpoint + "Portal/Portal.nocache.js";
+			document.head.appendChild(script);
+			
+	   	</script>
 	</head>
-	<body style="overflow-y: auto">
+	<body id="body">
 		<div>
 			<!-- GWT history support -->
 			<iframe src="javascript:''" id="__gwt_historyFrame" tabIndex='-1' style="position: absolute; width: 0; height: 0; border: 0"></iframe>
-	
+			<div id="dropzone" class="dropzone" style="display: none;">
+				<h2 class="center" style="color:white; padding-top: 180px">
+					<span class="fa fa-cloud-upload"></span>
+					Drop files to upload
+				</h2>
+			</div>
 			<noscript>
 				<div
 					style="width: 22em; position: absolute; left: 50%; margin-left: -11em; color: red; background-color: white; border: 1px solid red; padding: 4px; font-family: sans-serif">
@@ -112,8 +138,28 @@
 			<div id="alertWrapper">
 				<div id="alertContainer"></div>
 			</div>
+			<div id="headerPanel"></div>
 			<div id="rootPanel"></div>
-	
+			<div id="footerPanel"></div>
+			<div id="initialLoadingUI" style="padding-top: 180px">
+				<div class="sk-circle" style="width: 80px; height: 80px;">
+					<div class="sk-circle1 sk-child"></div>
+					<div class="sk-circle2 sk-child"></div>
+					<div class="sk-circle3 sk-child"></div>
+					<div class="sk-circle4 sk-child"></div>
+					<div class="sk-circle5 sk-child"></div>
+					<div class="sk-circle6 sk-child"></div>
+					<div class="sk-circle7 sk-child"></div>
+					<div class="sk-circle8 sk-child"></div>
+					<div class="sk-circle9 sk-child"></div>
+					<div class="sk-circle10 sk-child"></div>
+					<div class="sk-circle11 sk-child"></div>
+					<div class="sk-circle12 sk-child"></div>
+				</div>
+				<center>
+					<h4 style="color: #1e7098; margin-top: 10px; font-family: Sans-serif">Loading...</h4>
+				</center>
+			</div>
 		</div>
 		<div class="clear"></div>
 	</body>

@@ -2,20 +2,19 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Modal;
-import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.client.ui.html.Strong;
 import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.sagebionetworks.web.client.DisplayUtils;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.inject.Inject;
 
 public class SynapseAlertViewImpl implements
 		SynapseAlertView {
@@ -23,17 +22,12 @@ public class SynapseAlertViewImpl implements
 	public interface Binder extends
 			UiBinder<Widget, SynapseAlertViewImpl> {
 	}
+	private static Binder uiBinder = GWT.create(Binder.class);
 
-	Widget widget;
+	Widget widget = null;
 	
 	@UiField
-	Modal jiraDialog;
-	@UiField
-	TextArea userReportField;
-	@UiField
-	Button okButton;
-	@UiField
-	Button cancelButton;
+	Button reloadButton;
 	
 	@UiField
 	Strong alertText;
@@ -44,24 +38,38 @@ public class SynapseAlertViewImpl implements
 	Presenter presenter;
 	@UiField
 	Div loginWidgetContainer;
+	@UiField
+	Div jiraDialogContainer;
+	ClickHandler onCreateJiraIssue;
+	JiraDialog jiraDialog;
 	
-	@Inject
-	public SynapseAlertViewImpl(Binder binder){
-		widget = binder.createAndBindUi(this);
-		okButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onCreateJiraIssue(userReportField.getText());
-			}
-		});
-		cancelButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				jiraDialog.hide();
-			}
-		});
+	Span synapseAlertContainer = new Span();
+	public SynapseAlertViewImpl(){
+		onCreateJiraIssue = event -> {
+			presenter.onCreateJiraIssue(jiraDialog.getText());
+		};
 	}
 	
+	private void lazyConstruct() {
+		if (widget == null) {
+			synapseAlertContainer.setVisible(false);
+			widget = uiBinder.createAndBindUi(this);
+			synapseAlertContainer.add(widget);
+			reloadButton.addClickHandler(new ClickHandler() {
+				@Override
+				public void onClick(ClickEvent event) {
+					reload();
+				}
+			});
+			clearState();
+		}
+	}
+	
+	@Override
+	public void setRetryButtonVisible(boolean visible) {
+		lazyConstruct();
+		reloadButton.setVisible(visible);
+	}
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
@@ -73,38 +81,50 @@ public class SynapseAlertViewImpl implements
 
 	@Override
 	public Widget asWidget() {
-		return widget;
+		return synapseAlertContainer;
 	}
 	
 	@Override
 	public void hideJiraDialog() {
-		jiraDialog.hide();
+		if (jiraDialog != null) {
+			jiraDialog.hideJiraDialog();	
+		}
 	}
 	
 	@Override
 	public void showJiraDialog(String errorMessage) {
-		widget.setVisible(true);
-		jiraDialog.show();
+		lazyConstruct();
+		if (jiraDialog == null) {
+			jiraDialog = new JiraDialog();
+			jiraDialog.addClickHandler(onCreateJiraIssue);
+			jiraDialogContainer.add(jiraDialog.asWidget());
+		}
+		synapseAlertContainer.setVisible(true);
+		jiraDialog.showJiraDialog(errorMessage);
 	}
 	
 	@Override
 	public void clearState() {
-		hideJiraDialog();
-		alert.setVisible(false);
-		alertText.setText("");
-		loginAlert.setVisible(false);
-		widget.setVisible(false);
+		if (widget != null) {
+			hideJiraDialog();
+			alert.setVisible(false);
+			alertText.setText("");
+			loginAlert.setVisible(false);
+			reloadButton.setVisible(false);
+		}
 	}
 	
 	@Override
 	public void showLogin() {
-		widget.setVisible(true);
+		lazyConstruct();
+		synapseAlertContainer.setVisible(true);
 		loginAlert.setVisible(true);	
 	}
 	
 	@Override
 	public void showError(String error) {
-		widget.setVisible(true);
+		lazyConstruct();
+		synapseAlertContainer.setVisible(true);
 		alert.setText(error);
 		alert.setVisible(true);
 	}
@@ -116,6 +136,7 @@ public class SynapseAlertViewImpl implements
 	
 	@Override
 	public void setLoginWidget(Widget w) {
+		lazyConstruct();
 		loginWidgetContainer.clear();
 		loginWidgetContainer.add(w);
 	}

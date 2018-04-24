@@ -5,10 +5,10 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui">
 	
    <!-- <g:HTMLPanel ui:field="mainContainer" addStyleNames="panel panel-default"> -->
+   <bh:Div>
+   		<b:Heading size="H5" text="Add More People" addStyleNames="margin-top-40"/>
+   		<g:Label text="Search for a Synapse user or team below.  Click on the user or team name, then adjust their access level above before clicking Save." addStyleNames="margin-bottom-10"/>
         <b:Panel>
-            <b:PanelHeader>
-                <b:Heading size="H3" text="Add People"/>
-            </b:PanelHeader>
 	        <b:PanelBody>
 	            <!-- <b:Container> -->
 					<b:FormGroup>
@@ -30,5 +30,6 @@
 	            </b:Row>
 	        </b:PanelFooter>
         </b:Panel>
+    </bh:Div>
     <!-- </g:HTMLPanel> -->
 </ui:UiBinder>

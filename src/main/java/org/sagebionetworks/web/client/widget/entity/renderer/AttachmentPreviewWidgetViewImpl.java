@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.sagebionetworks.web.client.ContentTypeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -12,14 +13,11 @@ import com.google.inject.Inject;
 
 public class AttachmentPreviewWidgetViewImpl extends FlowPanel implements AttachmentPreviewWidgetView {
 
-	private Presenter presenter;
 	private SynapseJSNIUtils synapseJsniUtils;
-	private AuthenticationController authController;
+	
 	@Inject
-	public AttachmentPreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils,
-			AuthenticationController authController) {
+	public AttachmentPreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils) {
 		this.synapseJsniUtils= synapseJsniUtils;
-		this.authController = authController;
 	}
 	
 	@Override
@@ -30,17 +28,17 @@ public class AttachmentPreviewWidgetViewImpl extends FlowPanel implements Attach
 		this.setStyleName("displayInline");
 		StringBuilder sb = new StringBuilder();
 		sb.append("<a class=\"link\" href=\"");
-		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false, authController.getCurrentXsrfToken()));
+		sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName,false));
 		sb.append("\">");
 		int lastDotIndex = fileName.lastIndexOf(".");
 		boolean isPreviewed = false;
 		if (lastDotIndex > -1) {
 			String extension = fileName.substring(lastDotIndex+1);
-			if (DisplayUtils.isRecognizedImageContentType("image/"+extension)) {
-				sb.append("<img class=\"imageDescriptor\" ");
+			if (ContentTypeUtils.isRecognizedImageContentType("image/"+extension)) {
+				sb.append("<img class=\"imageDescriptor\" alt" );
 				sb.append(" src=\"");
-				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true, authController.getCurrentXsrfToken()));
-				sb.append("\"></img>");
+				sb.append(DisplayUtils.createWikiAttachmentUrl(synapseJsniUtils.getBaseFileHandleUrl(), wikiKey, fileName, true));
+				sb.append("\" ></img>");
 				isPreviewed = true;
 			}
 		}
@@ -57,15 +55,4 @@ public class AttachmentPreviewWidgetViewImpl extends FlowPanel implements Attach
 	public Widget asWidget() {
 		return this;
 	}	
-
-	@Override 
-	public void setPresenter(Presenter presenter) {
-		this.presenter = presenter;
-	}
-		
-	
-	/*
-	 * Private Methods
-	 */
-
 }

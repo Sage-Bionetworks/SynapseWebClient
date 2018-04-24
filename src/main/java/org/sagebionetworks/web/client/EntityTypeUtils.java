@@ -104,11 +104,4 @@ public class EntityTypeUtils {
 		
 		return icon;
 	}
-
-	public static Icon getSynapseIconForEntityClassName(String className, IconSize iconSize) {
-		Icon icon = new Icon(getIconTypeForEntityClassName(className));
-		icon.setSize(iconSize);
-		return icon;
-	}
-
 }

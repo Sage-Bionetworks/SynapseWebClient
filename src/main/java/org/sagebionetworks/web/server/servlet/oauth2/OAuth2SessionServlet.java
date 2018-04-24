@@ -11,6 +11,7 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
+import org.sagebionetworks.client.exceptions.UnknownSynapseServerException;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthValidationRequest;
@@ -63,11 +64,11 @@ public class OAuth2SessionServlet extends OAuth2Servlet {
 			resp.sendRedirect(LOGIN_PLACE+token.getSessionToken());
 		} catch (SynapseNotFoundException e) {
 			// Send the user to register
-			resp.sendRedirect(REGISTER_ACCOUNT+e.getMessage());
+			resp.sendRedirect(REGISTER_ACCOUNT+athenticationCode);
 		}catch (SynapseForbiddenException e) {
 			resp.setStatus(HttpStatus.FORBIDDEN.value());
 			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
-		}catch (SynapseServerException e) {
+		}catch (UnknownSynapseServerException e) {
 			resp.setStatus(e.getStatusCode());
 			resp.getWriter().println("{\"reason\":\"" + e.getMessage() + "\"}");
 		}catch (SynapseException e) {

@@ -8,8 +8,7 @@
 
 	<g:HTMLPanel>
 	    <div class="color-line"></div>
-		<g:SimplePanel ui:field="header" />
-		<div class="separator separator-header-page"></div>
+		<div class="separator margin-top-3"></div>
 	    <div class="margin-top-left-10 margin-right-15">
 	    	<bh:Div ui:field="allUsersTitle">
 	    		<b:Heading text="All Synapse Users" size="H4" />
@@ -17,6 +16,5 @@
 			<bh:Div ui:field="teamBadgeContainer" />
 			<bh:Div ui:field="mapPanel" />	
         </div>
-		<g:SimplePanel ui:field="footer" />
 	</g:HTMLPanel>
 </ui:UiBinder> 

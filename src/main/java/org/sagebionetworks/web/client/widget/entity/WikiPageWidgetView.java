@@ -19,16 +19,14 @@ public interface WikiPageWidgetView extends IsWidget {
 	 * Presenter interface
 	 */
 	public interface Presenter {
-		public void configure(WikiPageKey inWikiKey, Boolean canEdit, Callback callback, boolean showSubpages);
 		public void showPreview(final Long versionToPreview, Long currentVersion);
 		void restoreConfirmed();
 		void resetWikiMarkdown(String markdown);
 		void reloadWikiPage();
 		void showRestoreWarning(Long versionToRestore);
 		public void restoreClicked();
-		void configureWikiSubpagesWidget();
 		void configureHistoryWidget(boolean canEdit);
-		void configureBreadcrumbs(boolean isRootWiki, String ownerObjectName);
+		void showWikiHistory();
 	}
 	
 	void setWikiHistoryWidget(IsWidget historyWidget);
@@ -40,14 +38,14 @@ public interface WikiPageWidgetView extends IsWidget {
 			org.sagebionetworks.web.client.utils.Callback cancelCallback);
 
 	void setMarkdownWidget(IsWidget markdownWidget);
-	void setBreadcrumbWidget(IsWidget breadcrumb);
 	void setSynapseAlertWidget(IsWidget synapseAlert);
 	void setWikiHeadingText(String title);
 	void scrollWikiHeadingIntoView();
 	public void setRestoreButtonVisible(boolean isVisible);
 	public void setDiffVersionAlertVisible(boolean isVisible);
-	public void setBreadcrumbsVisible(boolean isVisible);
 	public void setModifiedCreatedByHistoryPanelVisible(boolean isVisible);
+	void setCreatedOn(String date);
+	void setModifiedOn(String date);
 	public void setNoWikiCannotEditMessageVisible(boolean isVisible);
 	public void setMarkdownVisible(boolean isVisible);
 	public void setMainPanelVisible(boolean isVisible);
@@ -58,5 +56,5 @@ public interface WikiPageWidgetView extends IsWidget {
 	void showInfo(String title, String message);
 	public void clear();
 	void addStyleName(String style);
-	public void setModifiedCreatedBy(IsWidget modifiedCreatedBy);
+	void setWikiHistoryDiffToolButtonVisible(boolean visible, WikiPageKey key);
 }

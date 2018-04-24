@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.docker;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.web.client.DockerClientAsync;
@@ -49,6 +51,7 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 			GWTWrapper gwtWrapper) {
 		this.view = view;
 		this.dockerClient = dockerClient;
+		fixServiceEntryPoint(dockerClient);
 		this.synAlert = synAlert;
 		this.commitsContainer = commitsContainer;
 		this.ginInjector = ginInjector;

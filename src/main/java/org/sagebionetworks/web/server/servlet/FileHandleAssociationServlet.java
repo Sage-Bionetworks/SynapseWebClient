@@ -2,7 +2,6 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.io.IOException;
 import java.net.URL;
-import java.util.logging.Logger;
 
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
@@ -29,10 +28,7 @@ import com.google.inject.Inject;
  *
  */
 public class FileHandleAssociationServlet extends HttpServlet {
-
-	private static Logger logger = Logger.getLogger(FileHandleAssociationServlet.class.getName());
 	private static final long serialVersionUID = 1L;
-
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 	
 	/**
@@ -105,8 +101,6 @@ public class FileHandleAssociationServlet extends HttpServlet {
 		String objectId = request.getParameter(WebConstants.ASSOCIATED_OBJECT_ID_PARAM_KEY);
 		String objectType = request.getParameter(WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY);
 		String fileHandleId = request.getParameter(WebConstants.FILE_HANDLE_ID_PARAM_KEY);
-		String xsrfToken = request.getParameter(WebConstants.XSRF_TOKEN_KEY);
-		FileHandleServlet.validateXsrfToken(xsrfToken, token);
 		
 		try {
 			FileHandleAssociation fha = new FileHandleAssociation();

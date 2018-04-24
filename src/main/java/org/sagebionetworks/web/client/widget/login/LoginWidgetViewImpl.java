@@ -1,18 +1,18 @@
 package org.sagebionetworks.web.client.widget.login;
 
+import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.users.PasswordReset;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
@@ -22,6 +22,7 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.FormPanel.SubmitEvent;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.PasswordTextBox;
 import com.google.gwt.user.client.ui.SubmitButton;
 import com.google.gwt.user.client.ui.TextBox;
@@ -38,15 +39,14 @@ public class LoginWidgetViewImpl extends Composite implements
 	@UiField
 	FlowPanel synapseLoginFieldsContainer;
 	
-	@UiField
-	SpanElement messageLabel;
 	Button signInBtn;
 	Anchor forgotPasswordLink;
 	@UiField
 	Button registerBtn;
 	@UiField
 	org.gwtbootstrap3.client.ui.Button googleSignInButton;
-	
+	@UiField
+	Row synAlertContainer;
 	PasswordTextBox password = null;
 	TextBox username = null;
 	
@@ -116,6 +116,7 @@ public class LoginWidgetViewImpl extends Composite implements
 		form.addSubmitHandler(new FormPanel.SubmitHandler() {
 			@Override
 			public void onSubmit(SubmitEvent event) {
+				event.cancel();
 				loginUser();
 			}
 		});
@@ -132,21 +133,9 @@ public class LoginWidgetViewImpl extends Composite implements
 	}
 
 	@Override
-	public void showError(String message) {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">"+SafeHtmlUtils.htmlEscapeAllowEntities(message)+"</h4>");
-		clear();
-	}
-
-	@Override
-	public void showAuthenticationFailed() {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Invalid username or password.</h4> <span class=\"text-warning\">Please try again.</span>");
-		clear();
-	}
-
-	@Override
-	public void showTermsOfUseDownloadFailed() {
-		messageLabel.setInnerHTML("<br/><br/><h4 class=\"text-warning\">Unable to Download Synapse Terms of Use.</h4>");
-		clear();
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 
 	@Override
@@ -167,7 +156,6 @@ public class LoginWidgetViewImpl extends Composite implements
 	private void loginUser() {
 		signInBtn.setEnabled(false);
 		signInBtn.setText(DisplayConstants.SIGNING_IN);
-		messageLabel.setInnerHTML(""); 
 		presenter.setUsernameAndPassword(username.getValue(), password.getValue());
 	}
 

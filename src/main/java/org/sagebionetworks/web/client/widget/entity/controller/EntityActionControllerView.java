@@ -18,7 +18,7 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	 * @param string
 	 * @param action
 	 */
-	void showConfirmDialog(String title, String string, Callback callback);
+	void showConfirmDeleteDialog(String message, Callback callback);
 	
 
 	/**
@@ -38,7 +38,7 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	 * @param prompt
 	 * @param callback
 	 */
-	void showPromptDialog(String prompt, PromptCallback callback);
+	void showPromptDialog(String title, PromptCallback callback);
 
 	void addWidget(IsWidget asWidget);
 }

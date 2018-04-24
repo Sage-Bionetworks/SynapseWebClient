@@ -5,10 +5,9 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
-	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
     
-	<ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/> 
-	
 	<bh:Div>
 	    <bh:Span ui:field="emptyUI" text="&#8212; Empty"/>
 	    
@@ -31,17 +30,13 @@
 				<t:TableHeader width="65px" addStyleNames="visible-lg">
 					<bh:Span text="MD5"/>
 				</t:TableHeader>
-				<t:TableHeader width="100px" addStyleNames="visible-md visible-lg">
+				<t:TableHeader width="130px" addStyleNames="visible-md visible-lg">
 					<bh:Span text="ID" />
 				</t:TableHeader>
 			</t:TableRow>
 		</t:Table>
-		<bh:Hr addStyleNames="margin-top-5 margin-bottom-5" />
-	    <g:Tree ui:field="entityTree">
-		</g:Tree>  
-		<bh:Span ui:field="loadingUI" addStyleNames="center-block center">
-	        <g:Image resource='{sageImageBundle.loading31}' />&nbsp;Loading...
-	    </bh:Span> 	    
+		<bh:Hr ui:field="hrUnderTableHeaders" addStyleNames="margin-top-5 margin-bottom-5" />
+		<bh:Div ui:field="mainContainer" />
 	</bh:Div>
 
 </ui:UiBinder>

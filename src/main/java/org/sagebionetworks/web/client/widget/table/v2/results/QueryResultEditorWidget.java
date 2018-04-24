@@ -1,15 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
-import static org.sagebionetworks.web.client.widget.table.v2.results.RowSetUtils.ETAG_COLUMN_NAME;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.AppendableRowSetRequest;
-import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityUpdateResult;
 import org.sagebionetworks.repo.model.table.EntityUpdateResults;
 import org.sagebionetworks.repo.model.table.PartialRow;
@@ -24,6 +20,7 @@ import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
+import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -52,8 +49,7 @@ public class QueryResultEditorWidget implements
 	GlobalApplicationState globalApplicationState;
 	Callback callback;
 	String tableId;
-	boolean isView;
-	String etagColumnId;
+	TableType tableType;
 	
 	@Inject
 	public QueryResultEditorWidget(QueryResultEditorView view,
@@ -81,21 +77,21 @@ public class QueryResultEditorWidget implements
 	 * 
 	 * @param bundle
 	 */
-	public void showEditor(QueryResultBundle bundle, boolean isView, Callback callback) {
+	public void showEditor(QueryResultBundle bundle, TableType tableType, Callback callback) {
 		this.callback = callback;
 		this.startingBundle = bundle;
-		this.isView = isView;
+		this.tableType = tableType;
 		this.view.setErrorMessageVisible(false);
 		// configure the widget
-		pageWidget.configure(bundle, null, null, true, isView, this, null, null);
+		pageWidget.configure(bundle, null, null, true, tableType, this, null, null, null);
 		setJobRunning(false);
 		this.globalApplicationState.setIsEditing(true);
 		this.view.setSaveButtonLoading(false);
-		view.setAddRowButtonVisible(!isView);
-		view.setButtonToolbarVisible(!isView);
+		boolean isTable = TableType.table.equals(tableType);
+		view.setAddRowButtonVisible(isTable);
+		view.setButtonToolbarVisible(isTable);
 		view.showEditor();
 		this.tableId = QueryBundleUtils.getTableId(bundle);
-		this.etagColumnId = getEtagColumnId();
 	}
 
 	@Override
@@ -140,9 +136,6 @@ public class QueryResultEditorWidget implements
 		PartialRowSet prs = RowSetUtils.buildDelta(startingBundle.getQueryResult()
 				.getQueryResults(), pageWidget.extractRowSet(), pageWidget
 				.extractHeaders());
-		if (isView) {
-			removeEtagOnlyRows(etagColumnId, prs);
-		}
 		return prs;
 	}
 
@@ -245,26 +238,6 @@ public class QueryResultEditorWidget implements
 		return -1;
 	}
 	
-	public String getEtagColumnId() {
-		List<ColumnModel> columnModels = pageWidget.extractHeaders();
-		for (ColumnModel columnModel : columnModels) {
-			if (ETAG_COLUMN_NAME.equals(columnModel.getName())) {
-				return columnModel.getId();
-			}
-		}
-		return null;
-	}
-	
-	public void removeEtagOnlyRows(String etagColumnId, PartialRowSet prs) {
-		List<PartialRow> changes = new ArrayList<PartialRow>();
-		for (PartialRow pr : prs.getRows()) {
-			if (pr.getValues().size() > 1 || !pr.getValues().containsKey(etagColumnId)) {
-				changes.add(pr);
-			}
-		}
-		prs.setRows(changes);
-	}
-	
 	@Override
 	public void onSave() {
 		view.setErrorMessageVisible(false);
@@ -308,11 +281,11 @@ public class QueryResultEditorWidget implements
 						if (!errors.isEmpty()){
 							view.showErrorDialog("<h4>Unable to update the following files</h4>" + errors);
 						}
-						if (isView) {
+						if (!TableType.table.equals(tableType)) {
 							int successIndex = getFirstIndexOfEntityUpdateResultSuccess(response);
 							if (successIndex > -1) {
-								Map<String, String> values = prs.getRows().get(successIndex).getValues();
-								String etag = values.get(etagColumnId);
+								PartialRow pr = prs.getRows().get(successIndex);
+								String etag = pr.getEtag();
 								Date now = new Date();
 								clientCache.put(tableId + VIEW_RECENTLY_CHANGED_KEY, etag, now.getTime() + MESSAGE_EXPIRE_TIME);
 							}

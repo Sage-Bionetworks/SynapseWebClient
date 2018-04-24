@@ -8,14 +8,15 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class EntityBrowserUtils {
-	public static void loadFavorites(SynapseClientAsync synapseClient,
+	public static void loadFavorites(SynapseJavascriptClient jsClient,
 			final GlobalApplicationState globalApplicationState,
 			final AsyncCallback<List<EntityHeader>> callback) {
-		synapseClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
+		jsClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 			@Override
 			public void onSuccess(List<EntityHeader> favorites) {
 				//show whatever projects that we found (maybe zero)
