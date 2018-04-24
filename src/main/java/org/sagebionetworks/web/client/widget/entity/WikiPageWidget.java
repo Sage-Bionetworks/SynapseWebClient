@@ -116,7 +116,7 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		view.clear();
 		view.setLoadingVisible(false);
 		markdownWidget.clear();
-		view.collapseWikiSubpages();
+		view.setWikiSubpagesWidgetVisible(false);
 		view.setWikiHeadingText("");
 	}
 
