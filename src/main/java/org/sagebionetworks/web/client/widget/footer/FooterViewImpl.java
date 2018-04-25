@@ -36,7 +36,8 @@ public class FooterViewImpl implements FooterView {
 	Span portalVersionSpan;
 	@UiField
 	Span repoVersionSpan;
-	
+	@UiField
+	Div sponsorsUI;
 	@UiField
 	Anchor reportAbuseLink;
 	@UiField
@@ -47,6 +48,7 @@ public class FooterViewImpl implements FooterView {
 	private GlobalApplicationState globalAppState;
 	private ToggleACTActionsButton hideACTActionsButton;
 	Div container = new Div();
+	boolean sponsorsVisible;
 	
 	@Inject
 	public FooterViewImpl(Binder binder, CookieProvider cookies, GlobalApplicationState globalAppState, ToggleACTActionsButton hideACTActionsButton, GWTWrapper gwt) {
@@ -70,6 +72,8 @@ public class FooterViewImpl implements FooterView {
 				portalVersionSpan.setText(portalVersion);
 				repoVersionSpan.setText(repoVersion);
 			}
+			
+			sponsorsUI.setVisible(sponsorsVisible);
 		};
 		gwt.scheduleExecution(constructViewCallback, 2500);
 		this.cookies = cookies;
@@ -128,5 +132,13 @@ public class FooterViewImpl implements FooterView {
 	@Override
 	public void refresh() {
 		hideACTActionsButton.refresh();	
+	}
+	
+	@Override
+	public void setSynapseSponsorsVisible(boolean visible) {
+		sponsorsVisible = visible;
+		if (sponsorsUI != null) {
+			sponsorsUI.setVisible(visible);	
+		}
 	}
 }

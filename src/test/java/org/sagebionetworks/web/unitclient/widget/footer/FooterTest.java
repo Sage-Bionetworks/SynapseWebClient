@@ -36,20 +36,25 @@ public class FooterTest {
 		verify(mockView).setPresenter(footer);
 		when(mockJiraHelper.createReportAbuseIssueURL()).thenReturn(REPORT_ABUSE_URL);
 	}
-	
+
 	@Test
-	public void testAsWidget(){
-		footer.asWidget();
+	public void testConstruction(){
 		verify(mockSynapseClient).checkVersionCompatibility(any(AsyncCallback.class));
 		verify(mockView).refresh();
 	}
-	
+
 	@Test
-	public void testAsWidgetNullVersion(){
+	public void testConstructionNullVersion(){
 		VersionState versionState = new VersionState(null, false);
 		AsyncMockStubber.callSuccessWith(versionState).when(mockSynapseClient).checkVersionCompatibility(any(AsyncCallback.class));
-		footer.asWidget();
+		footer = new Footer(mockView, mockSynapseClient, mockJiraHelper);
 		verify(mockView).setVersion(Footer.UNKNOWN, Footer.UNKNOWN);
+	}
+
+	@Test
+	public void testAsWidget(){
+		footer.asWidget();
+		verify(mockView).asWidget();
 	}
 	
 	@Test
