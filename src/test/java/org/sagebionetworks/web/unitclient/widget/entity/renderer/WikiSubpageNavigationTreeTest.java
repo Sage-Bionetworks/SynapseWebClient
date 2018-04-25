@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,7 +11,11 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiHeader;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -24,19 +29,21 @@ import org.sagebionetworks.web.shared.WikiPageKey;
 
 public class WikiSubpageNavigationTreeTest {
 	WikiSubpageNavigationTree tree;
+	@Mock
 	WikiSubpageNavigationTreeView mockView;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	CallbackP<WikiPageKey> mockReloadWikiPageCallback;
-
+	@Captor
+	ArgumentCaptor<WikiPageKey> pageKeyCaptor;
 	List<V2WikiHeader> wikiHeaders;
 	String ownerObjectName;
 	WikiPageKey currentWikiKey;
 
 	@Before
 	public void before() {
-		mockView = Mockito.mock(WikiSubpageNavigationTreeView.class);
-		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
-		mockReloadWikiPageCallback = Mockito.mock(CallbackP.class);
+		MockitoAnnotations.initMocks(this);
 		tree = new WikiSubpageNavigationTree(mockView, mockGlobalApplicationState);
 
 		wikiHeaders = new ArrayList<V2WikiHeader>();
@@ -172,14 +179,14 @@ public class WikiSubpageNavigationTreeTest {
 	@Test
 	public void testReloadWiki() {
 		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false, mockReloadWikiPageCallback);
-		Mockito.reset(mockGlobalApplicationState);
+		reset(mockGlobalApplicationState);
 		SubpageNavTreeNode aNode = tree.getOverallRoot();
 		SubpageNavTreeNode bNode = aNode.getChildren().get(0);
 		SubpageNavTreeNode cNode = bNode.getChildren().get(0);
 		SubpageNavTreeNode dNode = aNode.getChildren().get(1);
 		SubpageNavTreeNode eNode = aNode.getChildren().get(2);
 
-		Mockito.verify(mockView, Mockito.times(1)).configure(aNode);
+		verify(mockView, times(1)).configure(aNode);
 
 		testReloadWikiForNode(aNode, aNode, 1);
 		testReloadWikiForNode(bNode, aNode, 2);
@@ -190,10 +197,10 @@ public class WikiSubpageNavigationTreeTest {
 
 	private void testReloadWikiForNode(SubpageNavTreeNode aNode, SubpageNavTreeNode root, int time) {
 		tree.reloadWiki(aNode);
-		Mockito.verify(mockReloadWikiPageCallback).invoke(aNode.getWikiPageKey());
+		verify(mockReloadWikiPageCallback).invoke(aNode.getWikiPageKey());
 		//pushCurrentPlace called once from configure, and once from reload
-		Mockito.verify(mockGlobalApplicationState).pushCurrentPlace(aNode.getTargetPlace());
-		Mockito.verify(mockView, Mockito.times(time)).resetNavTree(root);
+		verify(mockGlobalApplicationState).pushCurrentPlace(aNode.getTargetPlace());
+		verify(mockView, Mockito.times(time)).resetNavTree(root);
 	}
 
 	private void testInstanceOfSynapse(List<SubpageNavTreeNode> nodes) {
@@ -227,5 +234,28 @@ public class WikiSubpageNavigationTreeTest {
 		assertTrue(eNode.getChildren().isEmpty());
 		// E has an empty string for a title, should use it's ID
 		assertTrue(eNode.getPageTitle().equals("4"));
+	}
+	
+	@Test
+	public void testContains() {
+		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false, mockReloadWikiPageCallback);
+		
+		assertTrue(tree.contains(wikiHeaders.get(0).getId()));
+		assertTrue(tree.contains(wikiHeaders.get(1).getId()));
+		assertFalse(tree.contains("777"));
+	}
+	
+	@Test
+	public void testSetPage() {
+		// tree contains no pages
+		String pageId = wikiHeaders.get(0).getId();
+		tree.setPage(pageId);
+		verify(mockReloadWikiPageCallback, never()).invoke(any(WikiPageKey.class));
+		
+		//tree contains wiki headers
+		tree.configure(wikiHeaders, ownerObjectName, new Wiki(""), currentWikiKey, false, mockReloadWikiPageCallback);
+		tree.setPage(pageId);
+		verify(mockReloadWikiPageCallback).invoke(pageKeyCaptor.capture());
+		assertEquals(pageId, pageKeyCaptor.getValue().getWikiPageId());
 	}
 }

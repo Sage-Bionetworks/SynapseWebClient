@@ -35,6 +35,8 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
+import org.sagebionetworks.web.client.events.WikiSubpagesExpandEvent;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -97,6 +99,10 @@ public class WikiPageWidgetTest {
 	EventBus mockEventBus;
 	@Mock
 	EventBinder<WikiPageWidget> mockEventBinder;
+	@Mock
+	WikiSubpagesCollapseEvent mockWikiSubpagesCollapseEvent;
+	@Mock
+	WikiSubpagesExpandEvent mockWikiSubpagesExpandEvent;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
 	WikiPageWidget presenter;
@@ -342,4 +348,17 @@ public class WikiPageWidgetTest {
 		assertTrue(cacheKey.contains(wikiId));
 		assertTrue(cacheKey.contains(WebConstants.WIKIPAGE_SUFFIX));
 	}
+	
+	@Test
+	public void testCollapseWikiSubpages() {
+		presenter.onWikiSubpagesCollapseEvent(mockWikiSubpagesCollapseEvent);
+		verify(mockView).collapseWikiSubpages();
+	}
+
+	@Test
+	public void testExpandWikiSubpages() {
+		presenter.onWikiSubpagesExpandEvent(mockWikiSubpagesExpandEvent);
+		verify(mockView).expandWikiSubpages();
+	}
+
 }
