@@ -1,32 +1,51 @@
 package org.sagebionetworks.web.unitclient.widget.entity.controller;
 
-import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.place.LoginPlace;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.CertifiedUserControllerImpl;
 import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
-import org.sagebionetworks.repo.model.EntityBundle;
 
 public class CertifiedUserControllerImplTest {
 
+	@Mock
 	QuizInfoDialog mockQuizInfoDialog;
 	CertifiedUserControllerImpl controller;
+	@Mock
 	Callback mockCallback;
 	UserEntityPermissions permissions;
 	EntityBundle bundle;
+	@Mock
+	PortalGinInjector mockGinInjector;
+	@Mock
+	AuthenticationController mockAuthController;
+	@Mock
+	GlobalApplicationState mockGlobalAppState;
+	@Mock
+	PlaceChanger mockPlaceChanger;
 	
 	@Before
 	public void before(){
-		mockQuizInfoDialog = Mockito.mock(QuizInfoDialog.class);
-		mockCallback = Mockito.mock(Callback.class);
-		controller = new CertifiedUserControllerImpl(mockQuizInfoDialog);
+		MockitoAnnotations.initMocks(this);
+		when(mockGlobalAppState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		when(mockGinInjector.getQuizInfoDialog()).thenReturn(mockQuizInfoDialog);
+		when(mockAuthController.isLoggedIn()).thenReturn(true);
+
+		controller = new CertifiedUserControllerImpl(mockGinInjector, mockAuthController, mockGlobalAppState);
 		Project entity = new Project();
 		permissions = new UserEntityPermissions();
 		permissions.setIsCertifiedUser(true);
@@ -93,4 +112,27 @@ public class CertifiedUserControllerImplTest {
 		verify(mockCallback).invoke();
 		verify(mockQuizInfoDialog, never()).show();
 	}
+	
+	@Test
+	public void testUpdateAnonymous(){
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+
+		controller.checkUpdateEntity(bundle, mockCallback);
+		
+		verify(mockCallback, never()).invoke();
+		verify(mockQuizInfoDialog, never()).show();
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+	
+	@Test
+	public void testDeleteAnonymous(){
+		when(mockAuthController.isLoggedIn()).thenReturn(false);
+		
+		controller.checkDeleteEntity(bundle, mockCallback);
+		
+		verify(mockCallback, never()).invoke();
+		verify(mockQuizInfoDialog, never()).show();
+		verify(mockPlaceChanger).goTo(any(LoginPlace.class));
+	}
+
 }
