@@ -3,11 +3,11 @@ package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.reset;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -51,11 +51,16 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class WikiSubpagesTest {
 
+	@Mock
 	WikiSubpagesView mockView;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
 	AdapterFactory adapterFactory;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	V2WikiOrderHint mockV2WikiOrderHint;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
@@ -71,11 +76,7 @@ public class WikiSubpagesTest {
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
-		mockView = mock(WikiSubpagesView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
 		widget = new WikiSubpagesWidget(mockView, mockSynapseClient, mockAuthenticationController, mockSynapseJavascriptClient);
 		
 		AsyncMockStubber.callSuccessWith("entity id 1").when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
@@ -185,4 +186,32 @@ public class WikiSubpagesTest {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
 		verify(mockView, Mockito.times(3)).setEditOrderButtonVisible(true);
 	}
+	
+	@Test
+	public void testConfigureDifferentEntity() throws Exception {
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));
+		
+		String entityId2 = "syn9834";
+		widget.configure(new WikiPageKey(entityId2, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId2), anyInt(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testConfigureSameEntityViewContainsWikiPageId() throws Exception {
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
+		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));		
+		
+		//widget has been configured for this entity id, let's reconfigure with a different page (same entity)
+		String wikiPageId = "123";
+		when(mockView.contains(eq(wikiPageId))).thenReturn(true);
+		
+		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), wikiPageId), false, null, mockActionMenuWidget);
+		
+		//verify using existing tree (since wiki page is in the subpages nav tree)
+		verify(mockView).setPage(wikiPageId);
+		verifyNoMoreInteractions(mockSynapseJavascriptClient);
+	}
+
+
 }
