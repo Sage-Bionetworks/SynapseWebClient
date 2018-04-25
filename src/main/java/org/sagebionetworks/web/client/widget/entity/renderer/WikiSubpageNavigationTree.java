@@ -34,7 +34,6 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 		this.globalApplicationState = globalApplicationState;
 		this.view = view;
 		view.setPresenter(this);
-
 		headerToNode = new HashMap<V2WikiHeader, SubpageNavTreeNode>();
 		idToNode = new HashMap<String, SubpageNavTreeNode>();
 	}
@@ -145,6 +144,16 @@ public class WikiSubpageNavigationTree implements WikiSubpageNavigationTreeView.
 		}
 	}
 
+	public boolean contains(String wikiPageKey) {
+		return idToNode.containsKey(wikiPageKey);
+	}
+	
+	public void setPage(String wikiPageKey) {
+		if (contains(wikiPageKey)) {
+			reloadWiki(idToNode.get(wikiPageKey));	
+		}
+	}
+	
 	@Override
 	public boolean isCurrentPage(SubpageNavTreeNode root) {
 		return root.getWikiPageKey().getWikiPageId().equals(this.currentWikiKey.getWikiPageId());
