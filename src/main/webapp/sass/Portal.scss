@@ -741,52 +741,73 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	word-wrap: break-word;
 	overflow-x: auto;
 	overflow-y: hidden;
-	text-align: justify;
 	line-height: 1.8em;
 	color: #000000;
-}
+	ol { 
+		list-style-type: decimal;
+		padding-left: 15px;
+		li {
+			padding-top: 5px;
+		}
+	}
+	ul { 
+		list-style-type: square;
+		padding-left: 17px;
+		li {
+			padding-top: 5px;
+		}
+	}
 
-.markdown ol { 
-	list-style-type: decimal;
-	padding-left: 15px;
-}
-.markdown ol li {
-	padding-top: 5px;
-}
-.markdown ul { 
-	list-style-type: square;
-	padding-left: 17px;
-}
-.markdown ul li {
-	padding-top: 5px;
-}
+	strong { font-weight: bold; }
+	del { text-decoration: line-through; }
+	em { font-style: italic; }
 
-.markdown strong { font-weight: bold; }
-.markdown del { text-decoration: line-through; }
-.markdown em { font-style: italic; }
-.markdown blockquote {
-	margin: 1em 3em;
-	padding: 0.5em 1em;
-	background-color: #fcf8f2;
-	border-left: 3px solid #f0ad4e;
-	font-size: 13px;
-}
+	blockquote {
+		margin: 1em 3em;
+		padding: 0.5em 1em;
+		background-color: #fcf8f2;
+		border-left: 3px solid #f0ad4e;
+		font-size: 13px;
+	
+		h4, h3, h2, h1 {
+			color: #f0ad4e;
+		}
+	}
 
-.markdown blockquote h4, .markdown blockquote h3, .markdown blockquote h2, .markdown blockquote h1 {
-	color: #f0ad4e;
-}
+	code {
+		background-clip: padding-box;
+		border-radius: 3px 3px 3px 3px;
+		padding: 0 5px 2px;
+		overflow:auto;
+		white-space:pre;
+		word-wrap: normal;
+	}
 
-.markdown code {
-	background-clip: padding-box;
-    border-radius: 3px 3px 3px 3px;
-    padding: 0 5px 2px;
-    overflow:auto;
-    white-space:pre;
-    word-wrap: normal;
-}
+	img {
+		max-width: 100%;
+	}
 
-.markdown img {
-	max-width: 100%;
+	p {
+		margin: 0px;	
+	}
+	h1 {
+		padding: 35px 0 12px 0;
+	}
+	h2 {
+		padding: 29px 0 10px 0;
+	}
+	h3 {
+		padding: 23px 0 8px 0;
+	}
+	h4 {
+		padding: 17px 0 6px 0;
+	}
+	h5 {
+		padding: 11px 0 4px 0;
+	}
+	h6 {
+		padding: 5px 0 2px 0;
+	}
 }
 
 .max-width-none, #body .max-width-none {
@@ -983,30 +1004,6 @@ h1, h2, h3, h4, h5, h6 {
 
 .maxWidth50px {
 	max-width: 50px;
-}
-
-.markdown {
-	p {
-		margin: 0px;	
-	}
-	h1 {
-		padding: 35px 0 12px 0;
-	}
-	h2 {
-		padding: 29px 0 10px 0;
-	}
-	h3 {
-		padding: 23px 0 8px 0;
-	}
-	h4 {
-		padding: 17px 0 6px 0;
-	}
-	h5 {
-		padding: 11px 0 4px 0;
-	}
-	h6 {
-		padding: 5px 0 2px 0;
-	}
 }
 
 .previewtable {
