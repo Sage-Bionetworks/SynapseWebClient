@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.place.Down;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -61,6 +62,8 @@ public class SynapseAlertImplTest {
 	GWTWrapper mockGWT;
 	@Mock
 	LoginWidget mockLoginWidget;
+	@Mock
+	SynapseProperties mockSynapseProperties;
 	
 	// a new jira odyssey
 	String newJiraKey = "SWC-2001";
@@ -81,11 +84,12 @@ public class SynapseAlertImplTest {
 		
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockGlobalApplicationState.getJiraURLHelper()).thenReturn(mockJiraClient);
-		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.CONFLUENCE_ENDPOINT)).thenReturn(JIRA_ENDPOINT_URL);
+		when(mockSynapseProperties.getSynapseProperty(WebConstants.CONFLUENCE_ENDPOINT)).thenReturn(JIRA_ENDPOINT_URL);
 		
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		verify(mockView).setPresenter(widget);
 		when(mockPortalGinInjector.getLoginWidget()).thenReturn(mockLoginWidget);
+		when(mockPortalGinInjector.getSynapseProperties()).thenReturn(mockSynapseProperties);
 	}
 	
 	@Test

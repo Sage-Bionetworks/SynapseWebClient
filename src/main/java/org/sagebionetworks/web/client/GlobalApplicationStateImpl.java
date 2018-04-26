@@ -5,7 +5,6 @@ import static org.sagebionetworks.web.client.cookie.CookieKeys.LAST_PLACE;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -19,7 +18,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
-import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
@@ -31,7 +29,6 @@ import com.google.gwt.place.shared.Place;
 import com.google.gwt.place.shared.PlaceChangeEvent;
 import com.google.gwt.place.shared.PlaceController;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.rpc.ServiceDefTarget;
 import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
@@ -58,9 +55,9 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private GWTWrapper gwt;
 	private boolean isShowingVersionAlert;
 	private DateTimeUtils dateTimeUtils;
-	private PublicPrincipalIds publicPrincipalIds;
 	private SynapseJavascriptClient jsClient;
 	private CallbackP<JavaScriptObject> fileListCallback;
+	private SynapseProperties synapseProperties;
 	boolean isDragDropInitialized = false;
 	@Inject
 	public GlobalApplicationStateImpl(GlobalApplicationStateView view,
@@ -72,7 +69,8 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			ClientCache localStorage, 
 			GWTWrapper gwt,
 			DateTimeUtils dateTimeUtils,
-			SynapseJavascriptClient jsClient) {
+			SynapseJavascriptClient jsClient,
+			SynapseProperties synapseProperties) {
 		this.cookieProvider = cookieProvider;
 		this.jiraUrlHelper = jiraUrlHelper;
 		this.eventBus = eventBus;
@@ -86,6 +84,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.jsClient = jsClient;
 		isEditing = false;
 		isShowingVersionAlert = false;
+		this.synapseProperties = synapseProperties;
 		initUncaughtExceptionHandler();
 	}
 	
@@ -283,44 +282,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.isEditing = isEditing;
 	}
 	
-	@Override
-	public void initSynapseProperties(final Callback c) {
-		String isLoaded = localStorage.get(PROPERTIES_LOADED_KEY);
-		if (isLoaded != null) {
-			// we have properties locally, defer updating properties from server
-			gwt.scheduleDeferred(new Callback() {
-				@Override
-				public void invoke() {
-					initSynapsePropertiesFromServer();
-				}
-			});
-		} else {
-			initSynapsePropertiesFromServer();
-		}
-		initWikiEntitiesAndVersions(c);
-		view.initGlobalViewProperties();
-		String showInUTC = cookieProvider.getCookie(SHOW_DATETIME_IN_UTC);
-		if (showInUTC != null) {
-			setShowUTCTime(Boolean.parseBoolean(showInUTC));
-		}
-	}
-	
-	public void initSynapsePropertiesFromServer() {
-		stackConfigService.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
-			@Override
-			public void onSuccess(HashMap<String, String> properties) {
-				for (String key : properties.keySet()) {
-					localStorage.put(key, properties.get(key), DateTimeUtilsImpl.getYearFromNow().getTime());
-				}
-				localStorage.put(PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateTimeUtilsImpl.getWeekFromNow().getTime());
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				synapseJSNIUtils.consoleError(caught.getMessage());
-			}
-		});
-	}
 	
 	public void initWikiEntitiesAndVersions(Callback c) {
 		initWikiEntities();
@@ -341,13 +302,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 			}
 		});
 	}
-
 	
-	@Override
-	public String getSynapseProperty(String key) {
-		return localStorage.get(key);
-	}
-
 	@Override
 	public boolean isWikiBasedEntity(String entityId) {
 		if(wikiBasedEntites == null){
@@ -456,17 +411,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		return timezoneOffsetMs;
 	}
 	
-	@Override
-	public PublicPrincipalIds getPublicPrincipalIds() {
-		if (publicPrincipalIds == null) {
-			publicPrincipalIds = new PublicPrincipalIds();
-			publicPrincipalIds.setPublicAclPrincipalId(Long.parseLong(getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID)));
-			publicPrincipalIds.setAnonymousUserId(Long.parseLong(getSynapseProperty(WebConstants.ANONYMOUS_USER_PRINCIPAL_ID)));
-			publicPrincipalIds.setAuthenticatedAclPrincipalId(Long.parseLong(getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID)));	
-		}
-		return publicPrincipalIds;
-	}
-	
 	public boolean isDragAndDropListenerSet() {
 		return fileListCallback != null;
 	}
@@ -542,5 +486,16 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void clearDropZoneHandler() {
 		fileListCallback = null;
+	}
+	
+	@Override
+	public void init(final Callback c) {
+		synapseProperties.initSynapseProperties();
+		initWikiEntitiesAndVersions(c);
+		view.initGlobalViewProperties();
+		String showInUTC = cookieProvider.getCookie(SHOW_DATETIME_IN_UTC);
+		if (showInUTC != null) {
+			setShowUTCTime(Boolean.parseBoolean(showInUTC));
+		}
 	}
 }

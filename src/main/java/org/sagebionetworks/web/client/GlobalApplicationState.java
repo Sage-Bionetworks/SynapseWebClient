@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
+
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -17,6 +19,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface GlobalApplicationState {
 
+	public void init(final Callback c);
 	
 	/**
 	 * Gets the place changer for the application
@@ -92,13 +95,6 @@ public interface GlobalApplicationState {
 	public boolean isEditing();
 	public void setIsEditing(boolean isEditing);
 	
-	/**
-	 * As app loads, initialize Synapse properties in the GlobalApplicationState so that they can be used client-side.
-	 */
-	void initSynapseProperties(Callback c);
-	
-	String getSynapseProperty(String key);
-	
 	void clearLastPlace();
 	
 	public boolean isWikiBasedEntity(String entityId);
@@ -124,7 +120,6 @@ public interface GlobalApplicationState {
 	void setShowUTCTime(boolean showUTC);
 	boolean isShowingUTCTime();
 	
-	PublicPrincipalIds getPublicPrincipalIds();
 	void initializeDropZone();
 	void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback);
 	void clearDropZoneHandler();

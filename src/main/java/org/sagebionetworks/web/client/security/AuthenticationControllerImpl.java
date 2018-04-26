@@ -127,11 +127,11 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 				for (String key : properties.keySet()) {
 					localStorage.put(key, properties.get(key), DateTimeUtilsImpl.getYearFromNow().getTime());
 				}
-				localStorage.put(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateTimeUtilsImpl.getWeekFromNow().getTime());
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				
 			}
 		});
 	}

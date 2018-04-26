@@ -41,6 +41,7 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -136,6 +137,8 @@ public class SingleDiscussionThreadWidgetTest {
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
 	@Mock
+	SynapseProperties mockSynapseProperties;
+	@Mock
 	PopupUtilsView mockPopupUtils;
 	Set<String> moderatorIds;
 	SingleDiscussionThreadWidget discussionThreadWidget;
@@ -151,6 +154,7 @@ public class SingleDiscussionThreadWidgetTest {
 		when(mockGinInjector.createReplyWidget()).thenReturn(mockReplyWidget);
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		when(mockGinInjector.getReplyCountAlert()).thenReturn(mockRefreshAlert);
+		when(mockGinInjector.getSynapseProperties()).thenReturn(mockSynapseProperties);
 		discussionThreadWidget = new SingleDiscussionThreadWidget(mockView, mockSynAlert,
 				mockAuthorWidget, mockDiscussionForumClientAsync, mockGinInjector,
 				mockDateTimeUtils, mockRequestBuilder, mockAuthController,
@@ -324,7 +328,7 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean isEdited = false;
 		boolean isPinned = false;
 		String threadId = "1";
-		when(mockGlobalApplicationState.getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY)).thenReturn(threadId);
+		when(mockSynapseProperties.getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY)).thenReturn(threadId);
 		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle(threadId, "title",
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
