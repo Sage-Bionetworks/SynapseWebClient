@@ -46,6 +46,12 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	CallbackP<String> entityClickedHandler;
 	EntityFilter filter = EntityFilter.ALL;
 	
+	private SortBy currentSortBy;
+	private Direction currentDirection;
+	private String rootEntityId;
+	public static final SortBy DEFAULT_SORT_BY = SortBy.NAME;
+	public static final Direction DEFAULT_DIRECTION = Direction.ASC;
+	
 	@Inject
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, 
@@ -74,17 +80,28 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	 * 
 	 * @param entityId
 	 */
-	public void configure(String searchId) {
-		view.clear();
-		view.setLoadingVisible(true);
-		getChildren(searchId, null, null);
+	public void configure(String entityId) {
+		this.rootEntityId = entityId;
+		onSort(currentSortBy, currentDirection);
 	}
 	
 	public void configure(List<EntityHeader> headers) {
+		//set existing headers.
+		rootEntityId = null;
 		view.clear();
 		view.setLoadingVisible(true);
 		addHeaders(headers);
 		view.setLoadingVisible(false);
+		// if we are only configuring with a single entity, then we can show the sorting UI for the child queries
+	}
+	
+	@Override
+	public void onSort(SortBy sortColumn, Direction sortDirection) {
+		currentSortBy = sortColumn;
+		currentDirection = sortDirection;
+		view.clear();
+		view.setLoadingVisible(true);
+		getChildren(rootEntityId, null, null);
 	}
 	
 	public void addHeaders(List<EntityHeader> headers) {
@@ -239,8 +256,14 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		EntityChildrenRequest request = new EntityChildrenRequest();
 		request.setNextPageToken(nextPageToken);
 		request.setParentId(parentId);
-		request.setSortBy(SortBy.NAME);
-		request.setSortDirection(Direction.ASC);
+		if (currentSortBy == null) {
+			currentSortBy = DEFAULT_SORT_BY;
+		}
+		if (currentDirection == null) {
+			currentDirection = DEFAULT_DIRECTION;
+		}
+		request.setSortBy(currentSortBy);
+		request.setSortDirection(currentDirection);
 		request.setIncludeTypes(filter.getEntityQueryValues());
 		
 		return request;

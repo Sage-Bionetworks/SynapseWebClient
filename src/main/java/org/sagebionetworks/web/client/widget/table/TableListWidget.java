@@ -35,7 +35,8 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	private CallbackP<String> onTableClickCallback;
 	private LoadMoreWidgetContainer loadMoreWidget;
 	private SynapseAlert synAlert;
-	
+	public static final SortBy DEFAULT_SORT_BY = SortBy.CREATED_ON;
+	public static final Direction DEFAULT_DIRECTION = Direction.DESC;
 	@Inject
 	public TableListWidget(
 			TableListWidgetView view,
@@ -65,7 +66,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	 */
 	public void configure(EntityBundle parentBundle) {
 		this.parentBundle = parentBundle;
-		view.resetSortUI();
+		view.setSortUI(DEFAULT_SORT_BY, DEFAULT_DIRECTION);
 		loadData();
 	}
 	
@@ -91,8 +92,8 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	 */
 	public EntityChildrenRequest createQuery(String parentId) {
 		EntityChildrenRequest newQuery = new EntityChildrenRequest();
-		newQuery.setSortBy(SortBy.CREATED_ON);
-		newQuery.setSortDirection(Direction.DESC);
+		newQuery.setSortBy(DEFAULT_SORT_BY);
+		newQuery.setSortDirection(DEFAULT_DIRECTION);
 		newQuery.setParentId(parentId);
 		List<EntityType> types = new ArrayList<EntityType>();
 		types.add(EntityType.table);

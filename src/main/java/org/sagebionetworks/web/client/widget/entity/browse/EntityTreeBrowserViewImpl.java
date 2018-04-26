@@ -13,6 +13,7 @@ import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
+import org.sagebionetworks.web.client.widget.table.SortEntityChildrenDropdownButton;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.resources.client.ClientBundle;
@@ -52,10 +53,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	Hr hrUnderTableHeaders;
 	Div entityTreeContainer = new Div();
 	private Widget widget;
-
 	@Inject
 	public EntityTreeBrowserViewImpl(IconsImageBundle iconsImageBundle,
-			Binder uiBinder) {
+			Binder uiBinder,
+			SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.widget = uiBinder.createAndBindUi(this);
 		// Make sure to show this and hide the tree on empty.
@@ -78,7 +79,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	public Widget asWidget() {
 		return widget;
 	}
-
+	
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;

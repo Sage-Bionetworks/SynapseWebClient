@@ -5,6 +5,7 @@
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.entity.menu.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 	<bh:Div addStyleNames="filesBrowser">
-		<g:SimplePanel ui:field="files" styleName="highlight-box padding-top-0-imp" />
+		<bh:Div ui:field="sortButtonContainer"/>
+	    <bh:Div ui:field="files" styleName="highlight-box padding-top-0-imp" marginTop="0" />
 	</bh:Div>
 </ui:UiBinder>
