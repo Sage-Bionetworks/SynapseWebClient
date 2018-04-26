@@ -5,7 +5,6 @@ import static org.sagebionetworks.web.client.cookie.CookieKeys.LAST_PLACE;
 import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,7 +17,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
-import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
@@ -282,12 +280,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.isEditing = isEditing;
 	}
 	
-	
-	public void initWikiEntitiesAndVersions(Callback c) {
-		initWikiEntities();
-		initSynapseVersions(c);
-	}
-	
 	public void initSynapseVersions(final Callback c) {
 		stackConfigService.getSynapseVersions(new AsyncCallback<String>() {			
 			@Override
@@ -304,28 +296,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 	
 	@Override
-	public boolean isWikiBasedEntity(String entityId) {
-		if(wikiBasedEntites == null){
-			return false;
-		}else{
-			return wikiBasedEntites.contains(entityId);
-	}
-	}
-	
-	/**
-	 * Setup the wiki based entities.
-	 * @param properties
-	 */
-	private void initWikiEntities() {
-		wikiBasedEntites = new HashSet<String>();
-		wikiBasedEntites.add(localStorage.get(WebConstants.GETTING_STARTED_GUIDE_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(localStorage.get(WebConstants.CREATE_PROJECT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(localStorage.get(WebConstants.R_CLIENT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(localStorage.get(WebConstants.PYTHON_CLIENT_ENTITY_ID_PROPERTY));
-		wikiBasedEntites.add(localStorage.get(WebConstants.FORMATTING_GUIDE_ENTITY_ID_PROPERTY));
-	}
-	
-	@Override
 	public void pushCurrentPlace(Place targetPlace) {
 		//only push this place into the history if it is a place change
 		setCurrentPlaceInHistory(targetPlace, true);
@@ -335,7 +305,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public void replaceCurrentPlace(Place targetPlace) {
 		setCurrentPlaceInHistory(targetPlace, false);
 	}
-	
 	
 	private void setCurrentPlaceInHistory(Place targetPlace, boolean pushState) {
 		//only push this place into the history if it is a place change
@@ -491,7 +460,7 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	@Override
 	public void init(final Callback c) {
 		synapseProperties.initSynapseProperties();
-		initWikiEntitiesAndVersions(c);
+		initSynapseVersions(c);
 		view.initGlobalViewProperties();
 		String showInUTC = cookieProvider.getCookie(SHOW_DATETIME_IN_UTC);
 		if (showInUTC != null) {

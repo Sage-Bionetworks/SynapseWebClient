@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_UTC;
-
 import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -10,7 +8,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
-import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.place.shared.Place;
@@ -97,8 +94,6 @@ public interface GlobalApplicationState {
 	
 	void clearLastPlace();
 	
-	public boolean isWikiBasedEntity(String entityId);
-
 	/**
 	 * This method can be used to change the URL in the browser without reloading the page.
 	 * 
