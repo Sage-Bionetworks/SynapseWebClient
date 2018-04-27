@@ -32,8 +32,8 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -75,7 +75,6 @@ public class EvaluationAccessControlListEditorTest {
 	private static UserEvaluationPermissions uep;
 	private static Evaluation evaluation;
 	private static UserGroupHeaderResponsePage userGroupHeaderRP;
-	GlobalApplicationState mockGlobalApplicationState;
 	EvaluationAccessControlListEditor.HasChangesHandler mockHasChangesHandler;
 	@Mock
 	PublicPrincipalIds mockPublicPrincipalIds;
@@ -83,6 +82,9 @@ public class EvaluationAccessControlListEditorTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	SynapseAlert mockSynAlert;
+	@Mock
+	SynapseProperties mockSynapseProperties;
+	
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() throws JSONObjectAdapterException {
@@ -102,8 +104,7 @@ public class EvaluationAccessControlListEditorTest {
 		mockUserAccountService = mock(UserAccountServiceAsync.class);
 		
 		AsyncMockStubber.callSuccessWith(new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID, TEST_ANONYMOUS_PRINCIPAL_ID)).when(mockUserAccountService).getPublicAndAuthenticatedGroupPrincipalIds(any(AsyncCallback.class));
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
+		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		when(mockPublicPrincipalIds.getPublicAclPrincipalId()).thenReturn(TEST_PUBLIC_PRINCIPAL_ID);
 		AsyncMockStubber.callSuccessWith(acl.writeToJSONObject(adapterFactory.createNew()).toJSONString()).when(mockChallengeClient).getEvaluationAcl(anyString(), any(AsyncCallback.class));
 		
@@ -118,7 +119,7 @@ public class EvaluationAccessControlListEditorTest {
 		acle = new EvaluationAccessControlListEditor(mockACLEView,
 				mockSynapseJavascriptClient,
 				mockAuthenticationController,
-				mockGlobalApplicationState,
+				mockSynapseProperties,
 				new JSONObjectAdapterImpl(),
 				mockChallengeClient,
 				mockSynAlert

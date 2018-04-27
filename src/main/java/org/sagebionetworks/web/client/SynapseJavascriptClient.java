@@ -86,10 +86,8 @@ import org.sagebionetworks.schema.adapter.JSONEntity;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
-import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
@@ -159,11 +157,11 @@ public class SynapseJavascriptClient {
 	private static final String LOG = "/log";
 	AuthenticationController authController;
 	JSONObjectAdapter jsonObjectAdapter;
-	ClientCache localStorage;
 	GWTWrapper gwt;
 	SynapseJavascriptFactory jsFactory;
 	PortalGinInjector ginInjector;
 	SynapseJSNIUtils jsniUtils;
+	SynapseProperties synapseProperties;
 
 	public static final String ENTITY_URI_PATH = "/entity";
 	public static final String USER = "/user";
@@ -221,14 +219,14 @@ public class SynapseJavascriptClient {
 	@Inject
 	public SynapseJavascriptClient(
 			JSONObjectAdapter jsonObjectAdapter,
-			ClientCache localStorage,
+			SynapseProperties synapseProperties,
 			GWTWrapper gwt,
 			SynapseJavascriptFactory jsFactory,
 			PortalGinInjector ginInjector,
 			SynapseJSNIUtils jsniUtils) {
 		this.authController = ginInjector.getAuthenticationController();
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.localStorage = localStorage;
+		this.synapseProperties = synapseProperties;
 		this.gwt = gwt;
 		this.jsFactory = jsFactory;
 		this.ginInjector = ginInjector;
@@ -236,28 +234,29 @@ public class SynapseJavascriptClient {
 	}
 	private String getRepoServiceUrl() {
 		if (repoServiceUrl == null) {
-			repoServiceUrl = localStorage.get(REPO_SERVICE_URL_KEY);
+			repoServiceUrl = synapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY);
 		}
 		return repoServiceUrl;
 	}
 	
 	private String getAuthServiceUrl() {
 		if (authServiceUrl == null) {
-			authServiceUrl = localStorage.get(AUTH_PUBLIC_SERVICE_URL_KEY);
+			
+			authServiceUrl = synapseProperties.getSynapseProperty(AUTH_PUBLIC_SERVICE_URL_KEY);
 		}
 		return authServiceUrl;
 	}
 	
 	private String getFileServiceUrl() {
 		if (fileServiceUrl == null) {
-			fileServiceUrl = localStorage.get(FILE_SERVICE_URL_KEY);
+			fileServiceUrl = synapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY);
 		}
 		return fileServiceUrl;
 	}
 	
 	private String getSynapseVersionInfo() {
 		if (synapseVersionInfo == null) {
-			synapseVersionInfo = localStorage.get(SYNAPSE_VERSION_KEY);
+			synapseVersionInfo = synapseProperties.getSynapseProperty(SYNAPSE_VERSION_KEY);
 		}
 		return synapseVersionInfo;
 	}

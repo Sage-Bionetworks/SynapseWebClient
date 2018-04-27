@@ -608,4 +608,5 @@ public interface PortalGinInjector extends Ginjector {
 	StuAnnouncementWidget getStuAnnouncementWidget();
 	
 	WikiVersionAnchorListItem getWikiVersionAnchorListItem();
+	SynapseProperties getSynapseProperties();
 }

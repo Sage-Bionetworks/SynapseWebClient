@@ -7,11 +7,10 @@ import java.util.List;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
@@ -21,9 +20,9 @@ public class UserGroupSuggestionProvider {
 	@Inject
 	public UserGroupSuggestionProvider(
 			SynapseJavascriptClient jsClient,
-			GlobalApplicationState globalAppState) {
+			SynapseProperties synapseProperties) {
 		this.jsClient = jsClient;
-		PublicPrincipalIds ids = globalAppState.getPublicPrincipalIds();
+		PublicPrincipalIds ids = synapseProperties.getPublicPrincipalIds();
 		publicPrincipalIds.add(ids.getAnonymousUserPrincipalId().toString());
 		publicPrincipalIds.add(ids.getAuthenticatedAclPrincipalId().toString());
 		publicPrincipalIds.add(ids.getPublicAclPrincipalId().toString());

@@ -1,29 +1,69 @@
 package org.sagebionetworks.web.client;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
-import static org.apache.http.HttpStatus.*;
-import static org.sagebionetworks.web.shared.WebConstants.*;
+import static com.google.gwt.http.client.RequestBuilder.GET;
+import static com.google.gwt.http.client.RequestBuilder.POST;
+import static com.google.gwt.http.client.RequestBuilder.PUT;
+import static org.apache.http.HttpStatus.SC_ACCEPTED;
+import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
+import static org.apache.http.HttpStatus.SC_CONFLICT;
+import static org.apache.http.HttpStatus.SC_CREATED;
+import static org.apache.http.HttpStatus.SC_FORBIDDEN;
+import static org.apache.http.HttpStatus.SC_GONE;
+import static org.apache.http.HttpStatus.SC_LOCKED;
+import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_OK;
+import static org.apache.http.HttpStatus.SC_PRECONDITION_FAILED;
+import static org.apache.http.HttpStatus.SC_SERVICE_UNAVAILABLE;
+import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.APPLICATION_JSON_CHARSET_UTF8;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.ASYNC_GET;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.ASYNC_START;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.BUNDLE_MASK_PATH;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.CHILDREN;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.ENTITY;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.ENTITY_URI_PATH;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.FAVORITE_URI_PATH;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.FILE_BULK;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.FILE_HANDLE_BATCH;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.INITIAL_RETRY_REQUEST_DELAY_MS;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.LIMIT_PARAMETER;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.OFFSET_PARAMETER;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.OPEN_MEMBERSHIP_INVITATION_COUNT;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.OPEN_MEMBERSHIP_REQUEST_COUNT;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.REPO_SUFFIX_VERSION;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.RESTRICTION_INFORMATION;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.SESSION_TOKEN_HEADER;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_DOWNLOAD_CSV;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_QUERY;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_TRANSACTION;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TEAM;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.TYPE_FILTER_PARAMETER;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.USER;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.USER_GROUP_HEADER_PREFIX_PATH;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.USER_PROFILE_PATH;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.WIKI;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.WIKI2;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.WIKI_VERSION_PARAMETER;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.getException;
+import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
+import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
-import static com.google.gwt.http.client.RequestBuilder.*;
-import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.*;
-
-import org.sagebionetworks.web.shared.exceptions.*;
-
-import com.google.gwt.http.client.Request;
-import com.google.gwt.http.client.RequestCallback;
-import com.google.gwt.http.client.RequestException;
-import com.google.gwt.user.client.rpc.AsyncCallback;
-
-import org.sagebionetworks.web.shared.WebConstants;
-import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.asynch.AsynchType;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -48,7 +88,6 @@ import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
-import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.table.DownloadFromTableRequest;
 import org.sagebionetworks.repo.model.table.EntityView;
@@ -56,17 +95,33 @@ import org.sagebionetworks.repo.model.table.QueryBundleRequest;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
-import org.sagebionetworks.repo.model.table.UploadToTableRequest;
 import org.sagebionetworks.repo.model.v2.wiki.V2WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
-import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
+import org.sagebionetworks.web.shared.exceptions.BadRequestException;
+import org.sagebionetworks.web.shared.exceptions.ConflictException;
+import org.sagebionetworks.web.shared.exceptions.ConflictingUpdateException;
+import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
+import org.sagebionetworks.web.shared.exceptions.LockedException;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
+import org.sagebionetworks.web.shared.exceptions.ResultNotReadyException;
+import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
+import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
+import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
+import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.http.client.Request;
+import com.google.gwt.http.client.RequestCallback;
+import com.google.gwt.http.client.RequestException;
 import com.google.gwt.http.client.Response;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 public class SynapseJavascriptClientTest {
 	SynapseJavascriptClient client;
 	private static SynapseJavascriptFactory synapseJsFactory = new SynapseJavascriptFactory();
@@ -86,7 +141,7 @@ public class SynapseJavascriptClientTest {
 	@Mock
 	SynapseJSNIUtils mockJsniUtils;
 	@Mock
-	ClientCache mockClientCache;
+	SynapseProperties mockSynapseProperties;
 	@Captor
 	ArgumentCaptor<RequestCallback> requestCallbackCaptor;
 	@Mock
@@ -105,13 +160,13 @@ public class SynapseJavascriptClientTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		when(mockClientCache.get(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT);
-		when(mockClientCache.get(FILE_SERVICE_URL_KEY)).thenReturn(FILE_ENDPOINT);
+		when(mockSynapseProperties.getSynapseProperty(REPO_SERVICE_URL_KEY)).thenReturn(REPO_ENDPOINT);
+		when(mockSynapseProperties.getSynapseProperty(FILE_SERVICE_URL_KEY)).thenReturn(FILE_ENDPOINT);
 		when(mockGinInjector.getRequestBuilder()).thenReturn(mockRequestBuilder);
 		when(mockGinInjector.getAuthenticationController()).thenReturn(mockAuthController);
 		client = new SynapseJavascriptClient(
 				jsonObjectAdapter, 
-				mockClientCache, 
+				mockSynapseProperties, 
 				mockGwt,
 				synapseJsFactory,
 				mockGinInjector,
