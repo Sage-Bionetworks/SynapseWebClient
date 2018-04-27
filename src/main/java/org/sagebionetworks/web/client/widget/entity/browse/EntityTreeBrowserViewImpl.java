@@ -55,8 +55,7 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	private Widget widget;
 	@Inject
 	public EntityTreeBrowserViewImpl(IconsImageBundle iconsImageBundle,
-			Binder uiBinder,
-			SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton) {
+			Binder uiBinder) {
 		this.iconsImageBundle = iconsImageBundle;
 		this.widget = uiBinder.createAndBindUi(this);
 		// Make sure to show this and hide the tree on empty.
