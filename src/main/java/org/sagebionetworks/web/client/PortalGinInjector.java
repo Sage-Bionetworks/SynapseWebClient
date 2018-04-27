@@ -109,6 +109,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.controller.URLProvEntryView;
 import org.sagebionetworks.web.client.widget.entity.download.AddFolderDialogWidget;
+import org.sagebionetworks.web.client.widget.entity.download.QuizInfoDialog;
 import org.sagebionetworks.web.client.widget.entity.download.UploadDialogWidget;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.entity.editor.APITableColumnConfigView;
@@ -609,4 +610,5 @@ public interface PortalGinInjector extends Ginjector {
 	
 	WikiVersionAnchorListItem getWikiVersionAnchorListItem();
 	SynapseProperties getSynapseProperties();
+	QuizInfoDialog getQuizInfoDialog();
 }
