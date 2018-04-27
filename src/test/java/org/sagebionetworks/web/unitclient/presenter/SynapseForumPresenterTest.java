@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
@@ -42,13 +43,14 @@ public class SynapseForumPresenterTest {
 	SynapseForumPlace mockPlace;
 	@Mock
 	AccessControlList mockACL;
-	
+	@Mock
+	SynapseProperties mockSynapseProperties;
 	SynapseForumPresenter presenter;
 	
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		presenter = new SynapseForumPresenter(mockView, mockGlobalApplicationState, mockCookies, mockForumWidget);
+		presenter = new SynapseForumPresenter(mockView, mockGlobalApplicationState, mockCookies, mockForumWidget, mockSynapseProperties);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockPlace.toToken()).thenReturn("fake token");

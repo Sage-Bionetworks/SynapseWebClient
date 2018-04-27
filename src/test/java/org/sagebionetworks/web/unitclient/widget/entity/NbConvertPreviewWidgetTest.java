@@ -1,18 +1,21 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
-import static org.mockito.Matchers.*;
+import static com.google.gwt.http.client.RequestBuilder.GET;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.*;
-import static org.sagebionetworks.web.shared.WebConstants.*;
-import static com.google.gwt.http.client.RequestBuilder.*;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
+import static org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget.HTML_PREFIX;
+import static org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget.HTML_SUFFIX;
+import static org.sagebionetworks.web.shared.WebConstants.NBCONVERT_ENDPOINT_PROPERTY;
+import static org.sagebionetworks.web.shared.WebConstants.TEXT_HTML_CHARSET_UTF8;
 
-import org.apache.http.client.methods.RequestBuilder;
-
-import static org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget.*;
-import org.junit.*;
+import org.junit.Before;
+import org.junit.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
@@ -22,17 +25,16 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewView;
-import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewWidget;
 import org.sagebionetworks.web.client.widget.entity.renderer.NbConvertPreviewWidget;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.test.helper.RequestBuilderMockStubber;
@@ -59,7 +61,7 @@ public class NbConvertPreviewWidgetTest {
 	@Mock
 	PresignedURLAsyncHandler mockPresignedURLAsyncHandler;
 	@Mock
-	GlobalApplicationState mockGlobalAppState;
+	SynapseProperties mockSynapseProperties;
 	@Mock
 	GWTWrapper mockGwt;
 	@Mock
@@ -96,7 +98,7 @@ public class NbConvertPreviewWidgetTest {
 	@Before
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
-		when(mockGlobalAppState.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY)).thenReturn(NBCONVERT_ENDPOINT);
+		when(mockSynapseProperties.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY)).thenReturn(NBCONVERT_ENDPOINT);
 		previewWidget = new NbConvertPreviewWidget(
 				mockView, 
 				mockPresignedURLAsyncHandler, 
@@ -105,7 +107,7 @@ public class NbConvertPreviewWidgetTest {
 				mockSynapseAlert, 
 				mockSynapseClient, 
 				mockPopupUtils,
-				mockGlobalAppState,
+				mockSynapseProperties,
 				mockGwt);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		when(mockResponse.getText()).thenReturn(HTML);

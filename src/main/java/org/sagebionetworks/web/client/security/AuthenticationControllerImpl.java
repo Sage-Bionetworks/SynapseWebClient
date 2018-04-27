@@ -3,7 +3,6 @@ package org.sagebionetworks.web.client.security;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Objects;
 
 import org.sagebionetworks.repo.model.UserProfile;
@@ -15,9 +14,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtilsImpl;
-import org.sagebionetworks.web.client.GlobalApplicationStateImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -49,7 +46,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 	private SessionStorage sessionStorage;
 	private ClientCache localStorage;
 	private AdapterFactory adapterFactory;
-	private StackConfigServiceAsync stackConfigService;
 	private PortalGinInjector ginInjector;
 	
 	@Inject
@@ -59,7 +55,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			SessionStorage sessionStorage, 
 			ClientCache localStorage, 
 			AdapterFactory adapterFactory,
-			StackConfigServiceAsync stackConfigService,
 			PortalGinInjector ginInjector){
 		this.cookies = cookies;
 		this.userAccountService = userAccountService;
@@ -67,8 +62,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		this.sessionStorage = sessionStorage;
 		this.localStorage = localStorage;
 		this.adapterFactory = adapterFactory;
-		this.stackConfigService = stackConfigService;
-		fixServiceEntryPoint(stackConfigService);
 		this.ginInjector = ginInjector;
 	}
 
@@ -115,27 +108,10 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 		
 		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		localStorage.clear();
-		initSynapsePropertiesFromServer();
 		sessionStorage.clear();
 		currentUser = null;
 		ginInjector.getSessionTokenDetector().initializeSessionTokenState();
 		ginInjector.getHeader().refresh();
-	}
-
-	public void initSynapsePropertiesFromServer() {
-		stackConfigService.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
-			@Override
-			public void onSuccess(HashMap<String, String> properties) {
-				for (String key : properties.keySet()) {
-					localStorage.put(key, properties.get(key), DateTimeUtilsImpl.getYearFromNow().getTime());
-				}
-				localStorage.put(GlobalApplicationStateImpl.PROPERTIES_LOADED_KEY, Boolean.TRUE.toString(), DateTimeUtilsImpl.getWeekFromNow().getTime());
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-			}
-		});
 	}
 	
 	private void setUser(final String token, final AsyncCallback<UserSessionData> callback) {

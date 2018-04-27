@@ -19,6 +19,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
@@ -51,17 +52,20 @@ public class DiscussionTabTest {
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
+	@Mock
+	SynapseProperties mockSynapseProperties;
 	DiscussionTab tab;
 	public static final String FORUM_SYNAPSE_ID = "syn99990";
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
 		tab = new DiscussionTab(mockTab, mockPortalGinInjector);
-		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY)).thenReturn(FORUM_SYNAPSE_ID);
+		when(mockSynapseProperties.getSynapseProperty(WebConstants.FORUM_SYNAPSE_ID_PROPERTY)).thenReturn(FORUM_SYNAPSE_ID);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockPortalGinInjector.getDiscussionTabView()).thenReturn(mockView);
 		when(mockPortalGinInjector.getForumWidget()).thenReturn(mockForumWidget);
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
+		when(mockPortalGinInjector.getSynapseProperties()).thenReturn(mockSynapseProperties);
 		tab.lazyInject();
 	}
 

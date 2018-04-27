@@ -11,11 +11,11 @@ import org.sagebionetworks.web.client.DateTimeUtilsImpl;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.gwt.user.datepicker.client.CalendarUtil;
@@ -27,6 +27,7 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 	SynapseJSNIUtils synapseJSNIUtils;
 	DiscussionForumClientAsync discussionForumClient;
 	GlobalApplicationState globalApplicationState;
+	SynapseProperties synapseProperties;
 	ClientCache clientCache;
 	public static final String STU_ANNOUNCEMENTS_FORUM_ID_KEY = "org.sagebionetworks.portal.stu_announcements_forum_id";
 	public static final String STU_ANNOUNCEMENTS_PROJECT_ID_KEY = "org.sagebionetworks.portal.stu_announcements_project_id";
@@ -40,7 +41,8 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 			SynapseJSNIUtils synapseJSNIUtils,
 			DiscussionForumClientAsync discussionForumClient,
 			GlobalApplicationState globalApplicationState,
-			ClientCache clientCache
+			ClientCache clientCache,
+			SynapseProperties synapseProperties
 			) {
 		this.view = view;
 		this.synapseJSNIUtils = synapseJSNIUtils;
@@ -48,12 +50,13 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 		fixServiceEntryPoint(discussionForumClient);
 		this.globalApplicationState = globalApplicationState;
 		this.clientCache = clientCache;
+		this.synapseProperties = synapseProperties;
 		view.setPresenter(this);
 	}
 
 	public void init() {
 		view.hide();
-		String forumId = globalApplicationState.getSynapseProperty(STU_ANNOUNCEMENTS_FORUM_ID_KEY);
+		String forumId = synapseProperties.getSynapseProperty(STU_ANNOUNCEMENTS_FORUM_ID_KEY);
 		Long limit = 1L;
 		Long offset = 0L;
 		boolean ascending = false;
@@ -90,7 +93,7 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 	 */
 	public boolean isShowAnnouncement(DiscussionThreadBundle bundle) {
 		// only display posts by stu
-		String stuUserId = globalApplicationState.getSynapseProperty(STU_USER_ID_KEY);
+		String stuUserId = synapseProperties.getSynapseProperty(STU_USER_ID_KEY);
 		boolean show = false;
 		int daysOld = CalendarUtil.getDaysBetween(bundle.getModifiedOn(), new Date());
 		if (bundle.getCreatedBy().equals(stuUserId) && daysOld < 3 && !clientCache.contains(STU_ANNOUNCEMENT_CLICKED_PREFIX_KEY + announcementThreadId)) {
@@ -103,7 +106,7 @@ public class StuAnnouncementWidget implements StuAnnouncementWidgetView.Presente
 	public void onClickAnnouncement() {
 		onDismiss();
 		//go to the thread!
-		String stuAnnouncementsProjectId = globalApplicationState.getSynapseProperty(STU_ANNOUNCEMENTS_PROJECT_ID_KEY);
+		String stuAnnouncementsProjectId = synapseProperties.getSynapseProperty(STU_ANNOUNCEMENTS_PROJECT_ID_KEY);
 		globalApplicationState.getPlaceChanger().goTo(TopicUtils.getThreadPlace(stuAnnouncementsProjectId, announcementThreadId));
 	}
 	

@@ -58,6 +58,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
@@ -106,6 +107,8 @@ public class UploaderTest {
 	JavaScriptObject mockFileList;
 	@Mock
 	JavaScriptObject mockDroppedFileList;
+	@Mock
+	SynapseProperties mockSynapseProperties;
 	@Captor
 	ArgumentCaptor<CallbackP<JavaScriptObject>> dragAndDropHandlerCaptor;
 	
@@ -163,7 +166,8 @@ public class UploaderTest {
 				multipartUploader, 
 				mockGlobalApplicationState, 
 				mockS3DirectUploader,
-				mockSynapseJavascriptClient);
+				mockSynapseJavascriptClient,
+				mockSynapseProperties);
 		uploader.addCancelHandler(cancelHandler);
 		parentEntityId = "syn1234";
 		uploader.asWidget(parentEntityId);
@@ -478,7 +482,7 @@ public class UploaderTest {
 	@Test
 	public void testUploadToExternal() {
 		String sftpProxy = "http://mytestproxy.com/sftp";
-		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy);
+		when(mockSynapseProperties.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy);
 		String url = "sftp://ok.net";
 		when(mockGwt.encodeQueryString(anyString())).thenReturn(url);
 
@@ -619,14 +623,14 @@ public class UploaderTest {
 		String sftpProxy = "http://mytestproxy.com/sftp";
 		String filename = "override that.txt";
 		//test with existing query param
-		when(mockGlobalApplicationState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy +"?gwt.codesvr=localhost:9999");
+		when(mockSynapseProperties.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(sftpProxy +"?gwt.codesvr=localhost:9999");
 		//and the sftp link contains characters that should be escaped
 		String sftpLink = "sftp://this/and/that.txt?foo=bar";
 		String encodedUrl = URLEncoder.encode(sftpLink, "UTF-8");
 		String encodedFilename = URLEncoder.encode(filename, "UTF-8");
 		when(mockGwt.encodeQueryString(sftpLink)).thenReturn(encodedUrl);
 		when(mockGwt.encodeQueryString(filename)).thenReturn(encodedFilename);
-		String sftpProxyLink = Uploader.getSftpProxyLink(filename, sftpLink, mockGlobalApplicationState, mockGwt);
+		String sftpProxyLink = Uploader.getSftpProxyLink(filename, sftpLink, mockSynapseProperties, mockGwt);
 		//verify that the sftp link was encoded
 		assertTrue(sftpProxyLink.contains(encodedUrl));
 		assertTrue(sftpProxyLink.contains(encodedFilename));

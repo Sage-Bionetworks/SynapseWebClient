@@ -10,7 +10,6 @@
     
 	<bh:Div>
 	    <bh:Span ui:field="emptyUI" text="&#8212; Empty"/>
-	    
 	    <!-- File browser tree "table" header -->
 	    <t:Table ui:field="entityTreeHeader" width="100%">
 			<t:TableRow>

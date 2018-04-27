@@ -89,7 +89,7 @@ public class Portal implements EntryPoint {
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
-						globalApplicationState.initSynapseProperties(new Callback() {
+						globalApplicationState.init(new Callback() {
 							
 							@Override
 							public void invoke() {
