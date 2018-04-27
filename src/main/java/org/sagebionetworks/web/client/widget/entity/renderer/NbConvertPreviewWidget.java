@@ -5,11 +5,11 @@ import static org.sagebionetworks.web.shared.WebConstants.TEXT_HTML_CHARSET_UTF8
 
 import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
@@ -33,10 +33,10 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 			SynapseAlert synAlert,
 			SynapseClientAsync synapseClient,
 			PopupUtilsView popupUtils,
-			GlobalApplicationState globalAppState,
+			SynapseProperties synapseProperties,
 			GWTWrapper gwt) {
 		super(view, presignedURLAsyncHandler, jsniUtils, requestBuilder, synAlert, synapseClient, popupUtils, gwt);
-		nbConvertEndpoint = globalAppState.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY);
+		nbConvertEndpoint = synapseProperties.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY);
 		view.setShowContentLinkText(DOWNLOAD_NOTEBOOK_MESSAGE);
 	}
 	

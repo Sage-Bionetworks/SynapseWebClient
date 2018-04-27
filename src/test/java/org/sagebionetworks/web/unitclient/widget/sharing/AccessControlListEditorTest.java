@@ -31,7 +31,6 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.UserGroupHeader;
@@ -39,9 +38,9 @@ import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -84,7 +83,8 @@ public class AccessControlListEditorTest {
 	private static EntityBundle entityBundleTransport_inheritedACL;
 	private static Project project;
 	private static UserGroupHeaderResponsePage userGroupHeaderRP;
-	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	SynapseProperties mockSynapseProperties;
 	@Captor
 	ArgumentCaptor<ArrayList<String>> listCaptor;
 	@Mock
@@ -113,8 +113,7 @@ public class AccessControlListEditorTest {
 		mockHasChangeHandler = Mockito.mock(HasChangesHandler.class);
 		mockAuthenticationController = mock(AuthenticationController.class, RETURNS_DEEP_STUBS);
 		mockACLEView = mock(AccessControlListEditorView.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
+		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		when(mockPublicPrincipalIds.getPublicAclPrincipalId()).thenReturn(TEST_PUBLIC_PRINCIPAL_ID);
 		mockGwt = mock(GWTWrapper.class);
 		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn(new Long(ADMIN_ID).toString());
@@ -128,7 +127,7 @@ public class AccessControlListEditorTest {
 		acle = new AccessControlListEditor(mockACLEView,
 				mockSynapseClient,
 				mockAuthenticationController,
-				mockGlobalApplicationState, 
+				mockSynapseProperties, 
 				mockGwt,
 				mockSynapseJavascriptClient,
 				mockSynAlert

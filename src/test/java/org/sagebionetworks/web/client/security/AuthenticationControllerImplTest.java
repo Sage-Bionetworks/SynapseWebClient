@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.SessionTokenDetector;
 import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.cache.SessionStorage;
@@ -54,8 +55,6 @@ public class AuthenticationControllerImplTest {
 	@Mock
 	ClientCache mockClientCache;
 	@Mock
-	StackConfigServiceAsync mockStackConfigService;
-	@Mock
 	PortalGinInjector mockGinInjector;
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
@@ -69,7 +68,6 @@ public class AuthenticationControllerImplTest {
 	Header mockHeader;
 	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
-	HashMap<String, String> serverProperties;
 	
 	@Before
 	public void before() throws JSONObjectAdapterException {
@@ -84,9 +82,7 @@ public class AuthenticationControllerImplTest {
 		when(mockCookieProvider.getCookie(CookieKeys.USER_LOGIN_TOKEN)).thenReturn("1234");
 		when(mockGinInjector.getSynapseJavascriptClient()).thenReturn(mockJsClient);
 		AsyncMockStubber.callSuccessWith(sessionData).when(mockUserAccountService).getUserSessionData(anyString(), any(AsyncCallback.class));
-		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockStackConfigService, mockGinInjector);
-		serverProperties = new HashMap<String, String>();
-		AsyncMockStubber.callSuccessWith(serverProperties).when(mockStackConfigService).getSynapseProperties(any(AsyncCallback.class));
+		authenticationController = new AuthenticationControllerImpl(mockCookieProvider, mockUserAccountService, mockSessionStorage, mockClientCache, adapterFactory, mockGinInjector);
 		when(mockGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockGinInjector.getHeader()).thenReturn(mockHeader);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
@@ -199,15 +195,11 @@ public class AuthenticationControllerImplTest {
 	
 	@Test
 	public void testLogout() {
-		String propKey = "foo";
-		String propValue = "bar";
-		serverProperties.put(propKey, propValue);
 		authenticationController.logoutUser();
+		
 		verify(mockCookieProvider).removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		verify(mockSessionStorage).clear();
 		verify(mockClientCache).clear();
-		verify(mockStackConfigService).getSynapseProperties(any(AsyncCallback.class));
-		verify(mockClientCache).put(eq(propKey), eq(propValue), anyLong());
 		verify(mockSessionTokenDetector).initializeSessionTokenState();
 		verify(mockHeader).refresh();
 	}

@@ -38,8 +38,8 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
@@ -71,7 +71,7 @@ public class ApproveUserAccessModalTest {
 	@Mock
 	DataAccessClientAsync mockDataAccessClient;
 	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
+	SynapseProperties mockSynapseProperties;
 	@Mock
 	JobTrackingWidget mockProgressWidget;
 	@Mock
@@ -118,8 +118,8 @@ public class ApproveUserAccessModalTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockGlobalApplicationState, mockProgressWidget, mockDataAccessClient);
-		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn("syn7444807");
+		dialog = new ApproveUserAccessModal(mockView, mockSynAlert, mockPeopleSuggestWidget, mockProvider, mockSynapseClient, mockSynapseProperties, mockProgressWidget, mockDataAccessClient);
+		when(mockSynapseProperties.getSynapseProperty(anyString())).thenReturn("syn7444807");
 		
 		message = "Message";
 		userId = "1234567";
@@ -243,7 +243,7 @@ public class ApproveUserAccessModalTest {
 	@Test
 	public void testOnSubmitNoMessage() {
 		dialog.configure(actList, mockEntityBundle);
-		when(mockGlobalApplicationState.getSynapseProperty(anyString())).thenReturn(null);
+		when(mockSynapseProperties.getSynapseProperty(anyString())).thenReturn(null);
 		when(mockView.getEmailMessage()).thenReturn("");
 		dialog.onUserSelected(mockUser);
 		dialog.onSubmit();

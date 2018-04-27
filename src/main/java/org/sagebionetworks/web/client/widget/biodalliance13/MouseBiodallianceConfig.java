@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.client.widget.biodalliance13;
 
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInterface;
-import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseProperties;
 
 import com.google.inject.Inject;
 
 public class MouseBiodallianceConfig implements BiodallianceConfigInterface {
-	GlobalApplicationState globalApplicationState;
 	public static boolean isUrlInitialized = false;
 	
 	public static final String MOUSE_SPECIES_NAME = "mouse";
@@ -20,22 +19,22 @@ public class MouseBiodallianceConfig implements BiodallianceConfigInterface {
 	public static String mouseTrixURI;
 	public static String mouseTrixxURI;
 	public static String mouseStylesheetURI;
-	
+	SynapseProperties synapseProperties;
 	
 	@Inject
-	public MouseBiodallianceConfig(GlobalApplicationState globalApplicationState) {
-		this.globalApplicationState = globalApplicationState;
+	public MouseBiodallianceConfig(SynapseProperties synapseProperties) {
+		this.synapseProperties = synapseProperties;
 		
 		if (!isUrlInitialized) {
 			initURIs();
 		}
 	}
 	public void initURIs() {
-		mouseTwoBitURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.twobit"));
-		mouseBwgURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.bwg"));
-		mouseTrixURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.trix"));
-		mouseTrixxURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.trixx"));
-		mouseStylesheetURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.stylesheet"));
+		mouseTwoBitURI = BiodallianceWidget.getFileResolverURL(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.twobit"));
+		mouseBwgURI = BiodallianceWidget.getFileResolverURL(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.bwg"));
+		mouseTrixURI = BiodallianceWidget.getFileResolverURL(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.trix"));
+		mouseTrixxURI = BiodallianceWidget.getFileResolverURL(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.trixx"));
+		mouseStylesheetURI = BiodallianceWidget.getFileResolverURL(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.biodalliance.mouse.stylesheet"));
 		isUrlInitialized = true;
 	}
 	@Override

@@ -790,8 +790,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			actionMenu.setActionVisible(Action.SHARE, true);
 			actionMenu.setActionListener(Action.SHARE, this);
 			actionMenu.setActionText(Action.SHARE, enityTypeDisplay + " Sharing Settings");
-			GlobalApplicationState globalAppState = getGlobalApplicationState();
-			if(PublicPrivateBadge.isPublic(entityBundle.getBenefactorAcl(), globalAppState.getPublicPrincipalIds())){
+			if(PublicPrivateBadge.isPublic(entityBundle.getBenefactorAcl(), ginInjector.getSynapseProperties().getPublicPrincipalIds())){
 				actionMenu.setActionIcon(Action.SHARE, IconType.GLOBE);
 			}else{
 				actionMenu.setActionIcon(Action.SHARE, IconType.LOCK);

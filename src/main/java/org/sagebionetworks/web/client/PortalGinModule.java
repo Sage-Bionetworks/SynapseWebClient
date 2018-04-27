@@ -1400,5 +1400,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(S3DirectLoginDialog.class).to(S3DirectLoginDialogImpl.class);
 		bind(WikiPageDeleteConfirmationDialogView.class).to(WikiPageDeleteConfirmationDialogViewImpl.class);
 		bind(WikiDiffView.class).to(WikiDiffViewImpl.class);
+		bind(SynapseProperties.class).to(SynapsePropertiesImpl.class).in(Singleton.class);
 	}
 }

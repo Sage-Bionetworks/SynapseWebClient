@@ -20,6 +20,7 @@ import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidget;
@@ -37,6 +38,8 @@ public class StuAnnouncementWidgetTest {
 	StuAnnouncementWidgetView mockView;
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
+	SynapseProperties mockSynapseProperties;
 	@Mock
 	DiscussionForumClientAsync mockDiscussionForumClient;
 	@Mock
@@ -64,16 +67,16 @@ public class StuAnnouncementWidgetTest {
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		widget = new StuAnnouncementWidget(mockView, mockSynapseJSNIUtils, mockDiscussionForumClient, mockGlobalApplicationState, mockClientCache);
+		widget = new StuAnnouncementWidget(mockView, mockSynapseJSNIUtils, mockDiscussionForumClient, mockGlobalApplicationState, mockClientCache, mockSynapseProperties);
 		discussionThreadBundleList = new ArrayList<DiscussionThreadBundle>();
 		AsyncMockStubber.callSuccessWith(mockThreadBundlePage)
 			.when(mockDiscussionForumClient).getThreadsForForum(anyString(), anyLong(),
 					anyLong(), any(DiscussionThreadOrder.class), anyBoolean(),
 					any(DiscussionFilter.class), any(AsyncCallback.class));
 		when(mockThreadBundlePage.getResults()).thenReturn(discussionThreadBundleList);
-		when(mockGlobalApplicationState.getSynapseProperty(StuAnnouncementWidget.STU_ANNOUNCEMENTS_FORUM_ID_KEY)).thenReturn(forumId);
-		when(mockGlobalApplicationState.getSynapseProperty(StuAnnouncementWidget.STU_USER_ID_KEY)).thenReturn(stuUserId);
-		when(mockGlobalApplicationState.getSynapseProperty(StuAnnouncementWidget.STU_ANNOUNCEMENTS_PROJECT_ID_KEY)).thenReturn(stuAnnouncementsProjectId);
+		when(mockSynapseProperties.getSynapseProperty(StuAnnouncementWidget.STU_ANNOUNCEMENTS_FORUM_ID_KEY)).thenReturn(forumId);
+		when(mockSynapseProperties.getSynapseProperty(StuAnnouncementWidget.STU_USER_ID_KEY)).thenReturn(stuUserId);
+		when(mockSynapseProperties.getSynapseProperty(StuAnnouncementWidget.STU_ANNOUNCEMENTS_PROJECT_ID_KEY)).thenReturn(stuAnnouncementsProjectId);
 		
 		when(mockDiscussionThreadBundle.getModifiedOn()).thenReturn(new Date());
 		when(mockDiscussionThreadBundle.getCreatedBy()).thenReturn(stuUserId);

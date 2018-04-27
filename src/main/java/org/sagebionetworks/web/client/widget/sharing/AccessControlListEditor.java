@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -54,7 +55,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	private SynapseClientAsync synapseClient;
 	private AuthenticationController authenticationController;
 	private boolean hasLocalACL_inRepo;
-	GlobalApplicationState globalApplicationState;
 	PublicPrincipalIds publicPrincipalIds;
 	GWTWrapper gwt;
 	SynapseJavascriptClient jsClient;
@@ -74,7 +74,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 	public AccessControlListEditor(AccessControlListEditorView view,
 			SynapseClientAsync synapseClientAsync,
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState,
+			SynapseProperties synapseProperties,
 			GWTWrapper gwt,
 			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert) {
@@ -82,7 +82,6 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		this.synapseClient = synapseClientAsync;
 		fixServiceEntryPoint(synapseClient);
 		this.authenticationController = authenticationController;
-		this.globalApplicationState = globalApplicationState;
 		this.gwt = gwt;
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
@@ -90,7 +89,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		userGroupHeaders = new HashMap<String, UserGroupHeader>();
 		view.setPresenter(this);
 		view.setSynAlert(synAlert);
-		publicPrincipalIds = globalApplicationState.getPublicPrincipalIds();
+		publicPrincipalIds = synapseProperties.getPublicPrincipalIds();
 		initViewPrincipalIds();
 	}
 

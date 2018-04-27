@@ -136,6 +136,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.threadSubscribersWidget = threadSubscribersWidget;
 		this.jsClient = jsClient;
 		this.popupUtils = popupUtils;
+		
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setAuthor(authorWidget.asWidget());
@@ -217,7 +218,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 		authorWidget.configure(bundle.getCreatedBy());
 		configureMessage();
-		if (!bundle.getId().equals(globalApplicationState.getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY))) {
+		if (!bundle.getId().equals(ginInjector.getSynapseProperties().getSynapseProperty(ForumWidget.DEFAULT_THREAD_ID_KEY))) {
 			view.setSubscribersWidgetContainerVisible(true);
 			if (replyId != null) {
 				configureReply(replyId);
