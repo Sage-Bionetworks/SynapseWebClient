@@ -12,6 +12,5 @@ public interface FilesBrowserView extends IsWidget, SynapseView {
 	 * @param entityId
 	 */
 	void configure(String entityId);
-	void refreshTreeView(String entityId);
 	void setEntityClickedHandler(CallbackP<String> callback);
 }
