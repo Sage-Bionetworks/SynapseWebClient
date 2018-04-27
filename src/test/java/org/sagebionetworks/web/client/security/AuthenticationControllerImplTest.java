@@ -202,6 +202,7 @@ public class AuthenticationControllerImplTest {
 		verify(mockClientCache).clear();
 		verify(mockSessionTokenDetector).initializeSessionTokenState();
 		verify(mockHeader).refresh();
+		verify(mockJsClient).logout();
 	}
 	
 	@Test
