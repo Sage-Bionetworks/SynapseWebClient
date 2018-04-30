@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.subscription;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -24,6 +25,10 @@ public class SubscribeButtonWidgetViewImpl implements SubscribeButtonWidgetView{
 	Icon followIcon;
 	@UiField
 	Icon unfollowIcon;
+	@UiField
+	Tooltip followIconTooltip;
+	@UiField
+	Tooltip unfollowIconTooltip;
 	
 	@UiField
 	Div synAlertContainer;
@@ -36,20 +41,16 @@ public class SubscribeButtonWidgetViewImpl implements SubscribeButtonWidgetView{
 	@Inject
 	public SubscribeButtonWidgetViewImpl(Binder binder){
 		this.w = binder.createAndBindUi(this);
-		ClickHandler followClickHandler = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSubscribe();
-			}
+		ClickHandler followClickHandler = event -> {
+			presenter.onSubscribe();
+			followIconTooltip.hide();
 		};
 		followIcon.addClickHandler(followClickHandler);
 		followButton.addClickHandler(followClickHandler);
 		
-		ClickHandler unfollowClickHandler = new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onUnsubscribe();
-			}
+		ClickHandler unfollowClickHandler = event -> {
+			presenter.onUnsubscribe();
+			unfollowIconTooltip.hide();
 		};
 		unfollowIcon.addClickHandler(unfollowClickHandler);
 		unfollowButton.addClickHandler(unfollowClickHandler);
