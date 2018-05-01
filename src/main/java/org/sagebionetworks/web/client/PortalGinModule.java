@@ -479,8 +479,6 @@ import org.sagebionetworks.web.client.widget.googlemap.GoogleMapViewImpl;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.HeaderViewImpl;
-import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetView;
-import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueue;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueueImpl;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapperView;
@@ -1311,7 +1309,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UserSelectorView.class).to(UserSelectorViewImpl.class);
 		bind(CreateTableViewWizardStep1View.class).to(CreateTableViewWizardStep1ViewImpl.class);
 		bind(EntityContainerListWidgetView.class).to(EntityContainerListWidgetViewImpl.class);
-		bind(StuAnnouncementWidgetView.class).to(StuAnnouncementWidgetViewImpl.class);
 		bind(ScopeWidgetView.class).to(ScopeWidgetViewImpl.class);
 		bind(CopyTextModal.class).to(CopyTextModalImpl.class);
 		
