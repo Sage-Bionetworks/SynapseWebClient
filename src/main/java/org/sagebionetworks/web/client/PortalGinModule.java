@@ -367,6 +367,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.SynapseFormConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.SynapseFormConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiView;
@@ -1247,6 +1249,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(StorageLocationWidgetView.class).to(StorageLocationWidgetViewImpl.class);
 		bind(ErrorView.class).to(ErrorViewImpl.class);
 		bind(PreviewConfigView.class).to(PreviewConfigViewImpl.class);
+		bind(SynapseFormConfigView.class).to(SynapseFormConfigViewImpl.class);
 		
 		bind(EditFileMetadataModalView.class).to(EditFileMetadataModalViewImpl.class);
 		bind(EditFileMetadataModalWidget.class).to(EditFileMetadataModalWidgetImpl.class);

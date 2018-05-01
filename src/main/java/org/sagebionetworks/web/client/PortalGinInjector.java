@@ -128,6 +128,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.ProvenanceConfigEdito
 import org.sagebionetworks.web.client.widget.entity.editor.QueryTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.SynapseFormConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamConfigEditor;
@@ -366,6 +367,7 @@ public interface PortalGinInjector extends Ginjector {
 	VideoConfigEditor getVideoConfigEditor();
 	TableQueryResultWikiEditor getSynapseTableQueryResultEditor();
 	PreviewConfigEditor getPreviewConfigEditor();
+	SynapseFormConfigEditor getSynapseFormConfigEditor();
 	BiodallianceEditor getBiodallianceEditor();
 	BiodallianceSourceEditor getBiodallianceSourceEditor();
 	CytoscapeConfigEditor getCytoscapeConfigEditor();
