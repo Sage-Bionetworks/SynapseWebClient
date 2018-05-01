@@ -34,7 +34,7 @@ public class SynapseFormConfigEditor implements SynapseFormConfigView.Presenter,
 	}
 
 	private void configureEntityFinder() {
-		entityFinder.configure(EntityFilter.TABLE, true, new SelectedHandler<Reference>() {
+		entityFinder.configure(EntityFilter.PROJECT_OR_TABLE, true, new SelectedHandler<Reference>() {
 			@Override
 			public void onSelected(Reference selected) {
 				view.setEntityId(selected.getTargetId());
@@ -47,8 +47,8 @@ public class SynapseFormConfigEditor implements SynapseFormConfigView.Presenter,
 	public void configure(WikiPageKey wikiKey, Map<String, String> widgetDescriptor, DialogCallback dialogCallback) {
 		descriptor = widgetDescriptor;
 
-		if (descriptor.get(WidgetConstants.WIDGET_ENTITY_ID_KEY) != null) {
-			view.setEntityId(descriptor.get(WidgetConstants.WIDGET_ENTITY_ID_KEY));
+		if (descriptor.get(WidgetConstants.TABLE_ID_KEY) != null) {
+			view.setEntityId(descriptor.get(WidgetConstants.TABLE_ID_KEY));
 		}
 	}
 
@@ -68,7 +68,7 @@ public class SynapseFormConfigEditor implements SynapseFormConfigView.Presenter,
 		if (!DisplayUtils.isDefined(entityId))
 			throw new IllegalArgumentException(DisplayConstants.INVALID_SELECTION);
 		descriptor.clear();
-		descriptor.put(WidgetConstants.WIDGET_ENTITY_ID_KEY, entityId);
+		descriptor.put(WidgetConstants.TABLE_ID_KEY, entityId);
 	}
 
 	@Override
