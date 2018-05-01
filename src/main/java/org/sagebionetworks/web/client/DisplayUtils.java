@@ -78,8 +78,10 @@ import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
+import com.google.gwt.dom.client.NodeList;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.dom.client.Style.Unit;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -137,6 +139,19 @@ public class DisplayUtils {
 				lastWidget.setFocus(true);
 			}
 		};
+	}
+	
+	public static void focusOnChildInput(Widget w) {
+		// in case no input is found, focus on the first button that we can find
+		focusOnChild(w, "button");
+		focusOnChild(w, "input");
+	}
+	
+	private static void focusOnChild(Widget w, String tagName) {
+		NodeList<com.google.gwt.dom.client.Element> children = w.getElement().getElementsByTagName(tagName);
+		if (children != null && children.getLength() > 0) {
+			children.getItem(0).focus();
+		} 
 	}
 	
 	public static NotifySettings getDefaultSettings() {

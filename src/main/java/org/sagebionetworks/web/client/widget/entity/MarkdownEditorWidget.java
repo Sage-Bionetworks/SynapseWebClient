@@ -1,11 +1,13 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import static org.sagebionetworks.web.shared.WidgetConstants.*;
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 import static org.sagebionetworks.web.shared.WebConstants.*;
+import static org.sagebionetworks.web.shared.WidgetConstants.*;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.gwtbootstrap3.client.shared.event.ModalShownEvent;
 import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -23,7 +25,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrar;
 import org.sagebionetworks.web.client.widget.entity.renderer.SynapseTableFormWidget;
 import org.sagebionetworks.web.client.widget.team.SelectTeamModal;
-
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.event.dom.client.ClickEvent;
