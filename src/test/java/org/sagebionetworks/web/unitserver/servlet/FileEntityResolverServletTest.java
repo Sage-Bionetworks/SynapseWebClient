@@ -26,9 +26,9 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.server.servlet.FileEntityResolverServlet;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -38,8 +38,6 @@ public class FileEntityResolverServletTest {
 	HttpServletRequest mockRequest;
 	@Mock
 	HttpServletResponse mockResponse;
-	@Mock
-	ServiceUrlProvider mockUrlProvider;
 	@Mock
 	SynapseProvider mockSynapseProvider;
 	@Mock
@@ -61,8 +59,6 @@ public class FileEntityResolverServletTest {
 
 		URL resolvedUrl = new URL(resolvedUrlString);
 		when(mockSynapse.getFileEntityTemporaryUrlForVersion(anyString(), anyLong())).thenReturn(resolvedUrl);
-		
-		servlet.setServiceUrlProvider(mockUrlProvider);
 		servlet.setSynapseProvider(mockSynapseProvider);
 		servlet.setTokenProvider(mockTokenProvider);
 
@@ -83,8 +79,9 @@ public class FileEntityResolverServletTest {
 		//set up general synapse client configuration test
 		String authBaseUrl = "authbase";
 		String repoServiceUrl = "repourl";
-		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
-		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
+		//set up general synapse client configuration test
+		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, repoServiceUrl);
+		System.setProperty(StackEndpoints.AUTH_ENDPOINT_KEY, authBaseUrl);
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
 		
 		setupFileEntity();

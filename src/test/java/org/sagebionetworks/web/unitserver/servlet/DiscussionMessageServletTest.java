@@ -21,9 +21,9 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseBadRequestException;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.server.servlet.DiscussionMessageServlet;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -35,8 +35,6 @@ public class DiscussionMessageServletTest {
 	@Mock
 	HttpServletResponse mockResponse;
 	@Mock
-	ServiceUrlProvider mockUrlProvider;
-	@Mock
 	SynapseProvider mockSynapseProvider;
 	@Mock
 	TokenProvider mockTokenProvider;
@@ -44,12 +42,13 @@ public class DiscussionMessageServletTest {
 	SynapseClient mockSynapse;
 	ServletOutputStream responseOutputStream;
 	DiscussionMessageServlet servlet;
+	String authBaseUrl = "authbase";
+	String repoServiceUrl = "repourl";
 
 	@Before
 	public void setup() throws IOException, SynapseException, JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		servlet = new DiscussionMessageServlet();
-		servlet.setServiceUrlProvider(mockUrlProvider);
 		ReflectionTestUtils.setField(servlet, "synapseProvider", mockSynapseProvider);
 		ReflectionTestUtils.setField(servlet, "tokenProvider", mockTokenProvider);
 
@@ -59,17 +58,16 @@ public class DiscussionMessageServletTest {
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		when(mockResponse.getOutputStream()).thenReturn(responseOutputStream);
 		when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("https://www.synapse.org/"));
+
+		//set up general synapse client configuration test
+		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, repoServiceUrl);
+		System.setProperty(StackEndpoints.AUTH_ENDPOINT_KEY, authBaseUrl);
 	}
 	
 	@Test
 	public void testDoGetThreadMessage() throws Exception {
 		String sessionToken = "fake";
 
-		//set up general synapse client configuration test
-		String authBaseUrl = "authbase";
-		String repoServiceUrl = "repourl";
-		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
-		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
 
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
@@ -93,10 +91,6 @@ public class DiscussionMessageServletTest {
 		String sessionToken = "fake";
 
 		//set up general synapse client configuration test
-		String authBaseUrl = "authbase";
-		String repoServiceUrl = "repourl";
-		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
-		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
 
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
@@ -120,10 +114,6 @@ public class DiscussionMessageServletTest {
 		String sessionToken = "fake";
 
 		//set up general synapse client configuration test
-		String authBaseUrl = "authbase";
-		String repoServiceUrl = "repourl";
-		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
-		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
 
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
@@ -139,10 +129,6 @@ public class DiscussionMessageServletTest {
 		String sessionToken = "fake";
 
 		//set up general synapse client configuration test
-		String authBaseUrl = "authbase";
-		String repoServiceUrl = "repourl";
-		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
-		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
 
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};

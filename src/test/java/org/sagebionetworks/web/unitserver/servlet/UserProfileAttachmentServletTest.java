@@ -18,10 +18,9 @@ import org.mockito.Matchers;
 import org.mockito.Mockito;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.client.exceptions.UnknownSynapseServerException;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -32,7 +31,6 @@ public class UserProfileAttachmentServletTest {
 	HttpServletResponse mockResponse;
 	SynapseClient mockClient;
 	SynapseProvider mockSynapseProvider;
-	ServiceUrlProvider mockServiceUrlProvider;
 	ServletOutputStream mockOutStream;
 	Cookie sessionCookie;
 	
@@ -53,13 +51,11 @@ public class UserProfileAttachmentServletTest {
 		mockResponse = Mockito.mock(HttpServletResponse.class);
 		mockClient = Mockito.mock(SynapseClient.class);
 		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-		mockServiceUrlProvider = Mockito.mock(ServiceUrlProvider.class);
 		mockOutStream = Mockito.mock(ServletOutputStream.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockClient);
 		servlet = new UserProfileAttachmentServlet();
 		servlet.setSynapseProvider(mockSynapseProvider);
-		servlet.setServiceUrlProvider(mockServiceUrlProvider);
-		when(mockServiceUrlProvider.getRepositoryServiceUrl()).thenReturn("repo");
+		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, "repo");
 		when(mockResponse.getOutputStream()).thenReturn(mockOutStream);
 		sessionCookie = new Cookie(CookieKeys.USER_LOGIN_TOKEN, "token");
 		when(mockRequest.getCookies()).thenReturn(new Cookie[]{sessionCookie});

@@ -145,7 +145,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.util.SerializationUtils;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
@@ -182,7 +182,6 @@ public class SynapseClientImplTest {
 	
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
-	ServiceUrlProvider mockUrlProvider;
 	SynapseClient mockSynapse;
 	SynapseClientImpl synapseClient;
 	String entityId = "123";
@@ -284,7 +283,6 @@ public class SynapseClientImplTest {
 		MockitoAnnotations.initMocks(this);
 		mockSynapse = Mockito.mock(SynapseClient.class);
 		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
 		mockPaginatedMembershipRequest = Mockito.mock(PaginatedResults.class);
@@ -293,7 +291,6 @@ public class SynapseClientImplTest {
 		synapseClient = new SynapseClientImpl();
 		synapseClient.setSynapseProvider(mockSynapseProvider);
 		synapseClient.setTokenProvider(mockTokenProvider);
-		synapseClient.setServiceUrlProvider(mockUrlProvider);
 
 		// Setup the the entity
 		entity = new ExampleEntity();
@@ -768,7 +765,7 @@ public class SynapseClientImplTest {
 	public void testGetUserProfile() throws Exception {
 		// verify call is directly calling the synapse client provider
 		String testRepoUrl = "http://mytestrepourl";
-		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(testRepoUrl);
+		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, testRepoUrl);
 		UserProfile userProfile = synapseClient.getUserProfile(testUserId);
 		assertEquals(userProfile, testUserProfile);
 	}

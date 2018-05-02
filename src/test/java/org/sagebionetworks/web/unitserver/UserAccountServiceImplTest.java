@@ -19,7 +19,6 @@ import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
@@ -31,7 +30,6 @@ import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 public class UserAccountServiceImplTest {
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
-	ServiceUrlProvider mockUrlProvider;
 	SynapseClient mockSynapse;
 	UserAccountServiceImpl userAccountService;
 	UserSessionData mockUserSessionData;
@@ -42,7 +40,6 @@ public class UserAccountServiceImplTest {
 	public void before() throws SynapseException, JSONObjectAdapterException {
 		mockSynapse = Mockito.mock(SynapseClient.class);
 		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
 		mockUserSessionData = Mockito.mock(UserSessionData.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
@@ -53,7 +50,6 @@ public class UserAccountServiceImplTest {
 		userAccountService = new UserAccountServiceImpl();
 		userAccountService.setSynapseProvider(mockSynapseProvider);
 		userAccountService.setTokenProvider(mockTokenProvider);
-		userAccountService.setServiceUrlProvider(mockUrlProvider);
 		Session testSession = new Session();
 		testSession.setSessionToken(testSessionToken);
 		testSession.setAcceptsTermsOfUse(true);

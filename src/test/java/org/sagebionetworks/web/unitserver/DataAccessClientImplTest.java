@@ -1,8 +1,9 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,20 +17,15 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.dataaccess.CreateSubmissionRequest;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.server.servlet.DataAccessClientImpl;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
-
-import com.google.gwt.user.client.rpc.core.java.util.Collections;
 
 public class DataAccessClientImplTest {
 	@Mock
 	SynapseProvider mockSynapseProvider;
 	@Mock
 	TokenProvider mockTokenProvider;
-	@Mock
-	ServiceUrlProvider mockUrlProvider;
 	@Mock
 	SynapseClient mockSynapse;
 	@Mock
@@ -50,7 +46,6 @@ public class DataAccessClientImplTest {
 		dataAccessClient = new DataAccessClientImpl();
 		dataAccessClient.setSynapseProvider(mockSynapseProvider);
 		dataAccessClient.setTokenProvider(mockTokenProvider);
-		dataAccessClient.setServiceUrlProvider(mockUrlProvider);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		when(mockSubject.getId()).thenReturn(TARGET_SUBJECT_ID);
 		when(mockSubject.getType()).thenReturn(TARGET_SUBJECT_TYPE);

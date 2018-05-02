@@ -18,25 +18,13 @@ import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlRequest;
 import org.sagebionetworks.repo.model.oauth.OAuthUrlResponse;
 import org.sagebionetworks.util.SerializationUtils;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProviderImpl;
 import org.sagebionetworks.web.shared.WebConstants;
-import org.springframework.http.HttpStatus;
-
-import com.google.inject.Inject;
 
 public abstract class OAuth2Servlet extends HttpServlet {
-	private ServiceUrlProvider urlProvider;
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-
-	/**
-	 * Injected with Gin
-	 */
-	@Inject
-	public void setUrlProvider(ServiceUrlProvider urlProvider) {
-		this.urlProvider = urlProvider;
-	}
 
 	/**
 	 * Injected
@@ -118,7 +106,7 @@ public abstract class OAuth2Servlet extends HttpServlet {
 		if (sessionToken != null) {
 			synapseClient.setSessionToken(sessionToken);	
 		}
-		synapseClient.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
+		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		return synapseClient;
 	}
 }

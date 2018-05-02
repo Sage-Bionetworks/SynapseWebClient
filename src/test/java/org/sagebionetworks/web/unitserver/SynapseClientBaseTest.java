@@ -1,22 +1,23 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.*;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.internal.util.reflection.Whitebox;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientBase;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
-import org.mockito.internal.util.reflection.Whitebox;
-import org.junit.runner.RunWith;
 
 @RunWith (MockitoJUnitRunner.class)
 public class SynapseClientBaseTest {
@@ -25,15 +26,11 @@ public class SynapseClientBaseTest {
 	SynapseProvider mockSynapseProvider;
 	
 	@Mock
-	ServiceUrlProvider mockServiceUrlProvider;
-	
-	@Mock
 	SynapseClient mockSynapseClient;
 	
 	SynapseClientBase synapseClientBase;
 	
-	String publicAuthBaseUrl;
-	String repositoryServiceUrl;
+	String publicAuthBaseUrl, repositoryServiceUrl, fileUrl;
 	
 	@Mock
 	ThreadLocal<HttpServletRequest> mockThreadLocal;
@@ -47,11 +44,12 @@ public class SynapseClientBaseTest {
 	public void setUp() throws Exception {
 		repositoryServiceUrl = "asdf.com";
 		publicAuthBaseUrl = "qwerty.com";
+		fileUrl = "zxcvbn.com";
 		synapseClientBase = new SynapseClientBase();
-		synapseClientBase.setServiceUrlProvider(mockServiceUrlProvider);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapseClient);
-		when(mockServiceUrlProvider.getRepositoryServiceUrl()).thenReturn(repositoryServiceUrl);
-		when(mockServiceUrlProvider.getPublicAuthBaseUrl()).thenReturn(publicAuthBaseUrl);
+		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, repositoryServiceUrl);
+		System.setProperty(StackEndpoints.AUTH_ENDPOINT_KEY, publicAuthBaseUrl);
+		System.setProperty(StackEndpoints.FILE_ENDPOINT_KEY, fileUrl);
 		Whitebox.setInternalState(synapseClientBase, "synapseProvider", mockSynapseProvider);
 		Whitebox.setInternalState(synapseClientBase, "perThreadRequest", mockThreadLocal);
 		userIp = "127.0.0.1";
@@ -67,8 +65,7 @@ public class SynapseClientBaseTest {
 		verify(mockSynapseClient).setSessionToken(sessionToken);
 		verify(mockSynapseClient).setRepositoryEndpoint(repositoryServiceUrl);
 		verify(mockSynapseClient).setAuthEndpoint(publicAuthBaseUrl);
-		verify(mockSynapseClient).setFileEndpoint(StackConfiguration
-				.getFileServiceEndpoint());
+		verify(mockSynapseClient).setFileEndpoint(fileUrl);
 		verify(mockSynapseClient).appendUserAgent(SynapseClientBase.PORTAL_USER_AGENT);
 		verify(mockSynapseClient).setUserIpAddress(userIp);
 		

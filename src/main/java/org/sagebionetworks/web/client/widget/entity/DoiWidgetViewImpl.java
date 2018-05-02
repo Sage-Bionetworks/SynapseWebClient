@@ -17,8 +17,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DoiWidgetViewImpl implements DoiWidgetView {
-	
-	private Presenter presenter;
 	GlobalApplicationState globalApplicationState;
 	AuthenticationController authenticationController;
 	
@@ -90,11 +88,6 @@ public class DoiWidgetViewImpl implements DoiWidgetView {
 		doiLabel.setVisible(true);
 	}
 	
-	@Override
-	public void setPresenter(Presenter p) {
-		presenter = p;
-	}
-
 	@Override
 	public void showLoading() {
 	}

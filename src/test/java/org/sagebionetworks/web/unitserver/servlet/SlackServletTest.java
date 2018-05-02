@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,7 +31,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.springframework.test.util.ReflectionTestUtils;
@@ -41,8 +41,6 @@ public class SlackServletTest {
 	HttpServletRequest mockRequest;
 	@Mock
 	HttpServletResponse mockResponse;
-	@Mock
-	ServiceUrlProvider mockUrlProvider;
 	@Mock
 	SynapseProvider mockSynapseProvider;
 	@Mock
@@ -82,7 +80,6 @@ public class SlackServletTest {
 	public void setup() throws IOException, SynapseException, JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		servlet = new SlackServlet();
-		servlet.setServiceUrlProvider(mockUrlProvider);
 		ReflectionTestUtils.setField(servlet, "synapseProvider", mockSynapseProvider);
 		
 		when(mockSynapse.getEntityBundle(anyString(), anyInt())).thenReturn(mockEntityBundle);
@@ -99,8 +96,8 @@ public class SlackServletTest {
 		when(mockResponse.getOutputStream()).thenReturn(mockOutputStream);
 		when(mockEntityBundle.getThreadCount()).thenReturn(THREAD_COUNT);
 		//set up general synapse client configuration test
-		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
-		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
+		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, repoServiceUrl);
+		System.setProperty(StackEndpoints.AUTH_ENDPOINT_KEY, authBaseUrl);
 		when(mockEntityBundle.getAnnotations()).thenReturn(mockAnnotations);
 		Map<String, List<String>> stringAnnotations = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
@@ -112,9 +109,6 @@ public class SlackServletTest {
 	
 	@Test
 	public void testDoGet() throws Exception {
-		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
-		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
-	
 		String requestSynId = "syn1234";
 		when(mockRequest.getParameter("text")).thenReturn(requestSynId);
 		when(mockRequest.getParameter("command")).thenReturn("/synapse");
@@ -139,9 +133,6 @@ public class SlackServletTest {
 	
 	@Test
 	public void testDoGetStaging() throws Exception {
-		when(mockUrlProvider.getPrivateAuthBaseUrl()).thenReturn(authBaseUrl);
-		when(mockUrlProvider.getRepositoryServiceUrl()).thenReturn(repoServiceUrl);
-	
 		String requestSynId = "syn1234";
 		when(mockRequest.getParameter("text")).thenReturn(requestSynId);
 		when(mockRequest.getParameter("command")).thenReturn("/synapsestaging");
