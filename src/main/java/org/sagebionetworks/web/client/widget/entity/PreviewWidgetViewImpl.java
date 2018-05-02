@@ -2,8 +2,16 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import java.util.ArrayList;
 
+import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.constants.AlertType;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.widget.modal.Dialog;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -22,15 +30,17 @@ import com.google.inject.Inject;
 public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetView, IsWidget{
 	private Presenter presenter;
 	private SynapseJSNIUtils synapseJSNIUtils;
-	private boolean isCode;
 	private Dialog previewDialog;
 	private Widget dialogContent;
+	private PlaceChanger placeChanger;
 	
 	@Inject
 	public PreviewWidgetViewImpl(SynapseJSNIUtils synapseJsniUtils, 
-			final Dialog previewDialog) {
+			final Dialog previewDialog,
+			GlobalApplicationState globalAppState) {
 		this.synapseJSNIUtils = synapseJsniUtils;
 		this.previewDialog = previewDialog;
+		this.placeChanger = globalAppState.getPlaceChanger();
 		previewDialog.configure("", null, "Close", new Dialog.Callback() {
 			@Override
 			public void onDefault() {
@@ -113,7 +123,6 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		clear();
 		add(new HTMLPanel(getCodeHtml(code, language)));
 		synapseJSNIUtils.highlightCodeBlocks();
-		isCode = true;
 	}
 	
 	private String getCodeHtml(String code, String language) {
@@ -160,16 +169,30 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 		sb.append("</table>");
 		return sb.toString();
 	}
-	
-	@Override
-	public void clear() {
-		isCode = false;
-		super.clear();
-	}
 	  
 	@Override
 	public void addSynapseAlertWidget(IsWidget w) {
 		clear();
 		add(w);
+	}
+	
+	@Override
+	public void showNoPreviewAvailable(String entityId, Long version) {
+		clear();
+		String versionString = version==null ? "" : "." + version;
+		Alert alert = new Alert();
+		alert.setType(AlertType.INFO);
+		alert.add(new Text("No preview is available for"));
+		Anchor link = new Anchor();
+		link.addStyleName("margin-left-5");
+		link.setHref("#!Synapse:" + entityId + versionString);
+		link.addClickHandler(event -> {
+			event.preventDefault();
+			placeChanger.goTo(new Synapse(entityId, version, null, null));
+		});
+		link.setText(entityId + versionString);
+		link.addStyleName("color-white");
+		alert.add(link);
+		add(alert);
 	}
 }

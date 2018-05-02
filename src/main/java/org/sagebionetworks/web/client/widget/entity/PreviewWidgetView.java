@@ -19,6 +19,7 @@ public interface PreviewWidgetView extends IsWidget{
 	public void setPreviewWidget(IsWidget w);
 	void addStyleName(String style);
 	void showLoading();
+	void showNoPreviewAvailable(String entityId, Long version);
 	
 	/**
 	 * @param text
