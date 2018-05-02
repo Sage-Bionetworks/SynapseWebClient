@@ -18,8 +18,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -64,27 +62,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		this.pendoSdk = pendoSdk;
 		view.setPresenter(this);
 		initStagingAlert();
-		initStuAnnouncementWidget();
-	}
-	
-	public void initStuAnnouncementWidget() {
-		try {
-			GWT.runAsync(StuAnnouncementWidget.class, new RunAsyncCallback() {
-				@Override
-				public void onSuccess() {
-					StuAnnouncementWidget stuAnnouncementWidget = portalGinInjector.getStuAnnouncementWidget();
-					view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
-					stuAnnouncementWidget.init();		
-				}
-				
-				@Override
-				public void onFailure(Throwable e) {
-					synapseJSNIUtils.consoleError(e.getMessage());
-				}
-			});
-		} catch (Exception e) {
-			synapseJSNIUtils.consoleError(e.getMessage());
-		}
 	}
 	
 	public void initStagingAlert() {
