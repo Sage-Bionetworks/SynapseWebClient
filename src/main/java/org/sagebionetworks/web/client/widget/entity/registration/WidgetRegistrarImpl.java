@@ -122,7 +122,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getCytoscapeConfigEditor();
 		} else if(contentTypeKey.equals(PLOT_CONTENT_TYPE)) {
 			presenter = ginInjector.getPlotlyConfigEditor();
-		} //TODO: add other widget descriptors to this mapping as they become available
+		} else if(contentTypeKey.equals(SYNAPSE_FORM_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseFormConfigEditor();
+		}//TODO: add other widget descriptors to this mapping as they become available
 		if (presenter != null)
 			presenter.configure(wikiKey, model, dialogCallback);
 		
@@ -263,7 +265,6 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		return urlBuilder.toString();
 	}
 	
-
 	@Override
 	public Map<String, String> getWidgetDescriptor(String md) {
 		if (md == null || md.length() == 0) throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + md);
