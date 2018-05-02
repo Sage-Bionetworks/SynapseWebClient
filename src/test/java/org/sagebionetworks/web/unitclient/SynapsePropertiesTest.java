@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.SynapsePropertiesImpl;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -29,6 +30,8 @@ public class SynapsePropertiesTest {
 	StackConfigServiceAsync mockStackConfigService;
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
+	Callback mockCallback;
 	
 	@Before
 	public void setUp() throws Exception {
@@ -52,7 +55,7 @@ public class SynapsePropertiesTest {
 		testProps.put(WebConstants.ANONYMOUS_USER_PRINCIPAL_ID, anonymousPrincipalId);
 		testProps.put(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID, authenticatedPrincipalId);
 
-		synapseProperties.initSynapseProperties();
+		synapseProperties.initSynapseProperties(mockCallback);
 		
 		verify(mockStackConfigService).getSynapseProperties(any(AsyncCallback.class));
 		assertEquals(value, synapseProperties.getSynapseProperty(key));
@@ -62,6 +65,7 @@ public class SynapsePropertiesTest {
 		assertEquals(publicPrincipalId, publicPrincipalIds.getPublicAclPrincipalId().toString());
 		assertEquals(anonymousPrincipalId, publicPrincipalIds.getAnonymousUserPrincipalId().toString());
 		assertEquals(authenticatedPrincipalId, publicPrincipalIds.getAuthenticatedAclPrincipalId().toString());
+		verify(mockCallback).invoke();
 	}
 	
 	@Test
@@ -69,8 +73,9 @@ public class SynapsePropertiesTest {
 		String errorMessage = "unable to get properties";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockStackConfigService).getSynapseProperties(any(AsyncCallback.class));
 
-		synapseProperties.initSynapseProperties();
+		synapseProperties.initSynapseProperties(mockCallback);
 		
 		verify(mockSynapseJSNIUtils).consoleError(errorMessage);
+		verify(mockCallback).invoke();
 	}
 }

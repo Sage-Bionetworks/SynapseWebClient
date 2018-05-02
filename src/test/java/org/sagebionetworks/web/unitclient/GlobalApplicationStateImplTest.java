@@ -23,6 +23,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -74,6 +75,8 @@ public class GlobalApplicationStateImplTest {
 	SynapseJavascriptClient mockJsClient;
 	@Mock
 	SynapseProperties mockSynapseProperties;
+	@Captor
+	ArgumentCaptor<Callback> synapsePropertiesInitCallbackCaptor;
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
@@ -165,6 +168,11 @@ public class GlobalApplicationStateImplTest {
 		verify(mockEventBus).fireEvent(any(PlaceChangeEvent.class));
 	}
 
+	private void verifyAndInvokeSynapsePropertiesInitCallback() {
+		verify(mockSynapseProperties).initSynapseProperties(synapsePropertiesInitCallbackCaptor.capture());
+		synapsePropertiesInitCallbackCaptor.getValue().invoke();
+	}
+	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testCheckVersionCompatibility() {
@@ -172,6 +180,8 @@ public class GlobalApplicationStateImplTest {
 			@Override
 			public void invoke() {}
 		});
+		verifyAndInvokeSynapsePropertiesInitCallback();
+		
 		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
 		globalApplicationState.checkVersionCompatibility(callback);
 		verify(mockStackConfigService, times(2)).getSynapseVersions(any(AsyncCallback.class));
@@ -205,6 +215,7 @@ public class GlobalApplicationStateImplTest {
 		Exception ex = new Exception("couldn't get version");
 		AsyncMockStubber.callFailureWith(ex).when(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
 		globalApplicationState.init(() -> {});
+		verifyAndInvokeSynapsePropertiesInitCallback();
 		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
 		globalApplicationState.checkVersionCompatibility(callback);
 		verify(mockStackConfigService, times(2)).getSynapseVersions(any(AsyncCallback.class));
@@ -221,7 +232,7 @@ public class GlobalApplicationStateImplTest {
 			@Override
 			public void invoke() {}
 		});
-		
+		verifyAndInvokeSynapsePropertiesInitCallback();
 		reset(mockStackConfigService);
 		globalApplicationState.checkVersionCompatibility(callback);
 		
@@ -238,8 +249,10 @@ public class GlobalApplicationStateImplTest {
 		Callback mockCallback = mock(Callback.class);
 		globalApplicationState.init(mockCallback);
 		
+		verify(mockCallback, never()).invoke();
+		verifyAndInvokeSynapsePropertiesInitCallback();
+		
 		verify(mockView).initGlobalViewProperties();
-		verify(mockSynapseProperties).initSynapseProperties();
 		//also sets synapse versions on app load
 		verify(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
 		assertEquals("v1", globalApplicationState.getSynapseVersion());
