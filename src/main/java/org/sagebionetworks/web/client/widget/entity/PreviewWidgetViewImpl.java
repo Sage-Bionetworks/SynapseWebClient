@@ -179,17 +179,18 @@ public class PreviewWidgetViewImpl extends FlowPanel implements PreviewWidgetVie
 	@Override
 	public void showNoPreviewAvailable(String entityId, Long version) {
 		clear();
+		String versionString = version==null ? "" : "." + version;
 		Alert alert = new Alert();
 		alert.setType(AlertType.INFO);
 		alert.add(new Text("No preview is available for"));
 		Anchor link = new Anchor();
 		link.addStyleName("margin-left-5");
-		link.setHref("#!Synapse:" + entityId+"."+version);
+		link.setHref("#!Synapse:" + entityId + versionString);
 		link.addClickHandler(event -> {
 			event.preventDefault();
 			placeChanger.goTo(new Synapse(entityId, version, null, null));
 		});
-		link.setText(entityId+"."+version);
+		link.setText(entityId + versionString);
 		link.addStyleName("color-white");
 		alert.add(link);
 		add(alert);
