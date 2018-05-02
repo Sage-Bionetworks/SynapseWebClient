@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client;
 
 import java.util.HashMap;
 
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 
@@ -22,7 +23,7 @@ public class SynapsePropertiesImpl implements SynapseProperties {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 	}
 	@Override
-	public void initSynapseProperties() {
+	public void initSynapseProperties(Callback c) {
 		stackConfigService.getSynapseProperties(new AsyncCallback<HashMap<String, String>>() {			
 			@Override
 			public void onSuccess(HashMap<String, String> properties) {
@@ -30,12 +31,14 @@ public class SynapsePropertiesImpl implements SynapseProperties {
 				for (String key : properties.keySet()) {
 					synapseProperties.put(key, properties.get(key));
 				}
+				c.invoke();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				synapseProperties.clear();
 				synapseJSNIUtils.consoleError(caught.getMessage());
+				c.invoke();
 			}
 		});
 	}
