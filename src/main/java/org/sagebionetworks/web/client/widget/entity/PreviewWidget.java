@@ -226,6 +226,8 @@ public class PreviewWidget implements PreviewWidgetView.Presenter, WidgetRendere
 		} else if (previewFileHandle != null) {
 			PreviewFileType previewType = getPreviewFileType(previewFileHandle, originalFileHandle);
 			renderFilePreview(previewType, previewFileHandle);
+		} else {
+			view.showNoPreviewAvailable(bundle.getEntity().getId(), ((FileEntity)bundle.getEntity()).getVersionNumber());
 		}
 	}
 	
