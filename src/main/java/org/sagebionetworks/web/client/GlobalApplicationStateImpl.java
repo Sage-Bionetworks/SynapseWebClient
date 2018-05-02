@@ -458,9 +458,14 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 	
 	@Override
-	public void init(final Callback c) {
-		synapseProperties.initSynapseProperties();
-		initSynapseVersions(c);
+	public void init(final Callback finalCallback) {
+		synapseProperties.initSynapseProperties(() -> {
+			initStep2(finalCallback);
+		});
+	}
+	
+	private void initStep2(Callback finalCallback) {
+		initSynapseVersions(finalCallback);
 		view.initGlobalViewProperties();
 		String showInUTC = cookieProvider.getCookie(SHOW_DATETIME_IN_UTC);
 		if (showInUTC != null) {
