@@ -64,7 +64,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		this.pendoSdk = pendoSdk;
 		view.setPresenter(this);
 		initStagingAlert();
-		initStuAnnouncementWidget();
 	}
 	
 	public void initStuAnnouncementWidget() {
