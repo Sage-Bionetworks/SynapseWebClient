@@ -109,7 +109,7 @@
 				        	<b:Container fluid="true">
 					        	<b:Row>
 					        		<b:Column size="XS_12">
-					        			<b:Button ui:field="importLinkedIn" icon="LINKEDIN_SQUARE">Import from LinkedIn</b:Button>
+					        			<b:Button ui:field="importLinkedIn" icon="LINKEDIN_SQUARE" visible="false">Import from LinkedIn</b:Button>
 					        			<b:Button ui:field="editProfileButton" icon="EDIT" type="INFO" pull="RIGHT" >Edit Profile</b:Button>
 					        			<b:Button ui:field="linkORCIDButton" pull="RIGHT" addStyleNames="margin-right-10">Link to ORCID</b:Button>
 					        		</b:Column>

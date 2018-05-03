@@ -942,7 +942,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setProfileEditButtonVisible(boolean isVisible) {
 		this.editProfileButton.setVisible(isVisible);
-		this.importLinkedIn.setVisible(isVisible);
+//		this.importLinkedIn.setVisible(isVisible);
 	}
 	
 	@Override
