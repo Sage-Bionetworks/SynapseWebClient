@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client;
 
 import java.io.IOException;
+import java.util.Properties;
 
 import org.jdom.JDOMException;
+import org.sagebionetworks.SettingsLoader;
 
 public class StackEndpoints {
 	public static final String REPO_ENDPOINT_KEY = "org.sagebionetworks.repositoryservice.endpoint";
@@ -49,8 +51,14 @@ public class StackEndpoints {
 		if (endpointPrefix == null) {
 			// init endpoint prefix
 			try {
-				//override any properties with the m2 settings property values (if available)
-				System.setProperties(SettingsLoader.loadSettingsFile());
+				//override any properties with the m2 settings property values (if set)
+				Properties props = SettingsLoader.loadSettingsFile();
+				for (Object propertyName : props.keySet()) {
+					String value = (String)props.get(propertyName);
+					if (value!=null && value.length()>0) {
+						System.setProperty((String)propertyName,value);
+					}
+				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (JDOMException e) {
