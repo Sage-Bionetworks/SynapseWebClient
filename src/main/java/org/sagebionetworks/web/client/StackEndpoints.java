@@ -64,25 +64,32 @@ public class StackEndpoints {
 			} catch (JDOMException e) {
 				e.printStackTrace();
 			}
-			// get stack name, like "prod" or "dev"
-			String stackName = System.getProperty(PARAM3);
-			if (stackName == null) {
-				stackName = System.getProperty(STACK_PROPERTY_NAME);
+			
+			String repoEndpoint = System.getProperty("org.sagebionetworks.repositoryservice.endpoint");
+			if (repoEndpoint != null) {
+				//done, overwriting using old params
+				endpointPrefix = repoEndpoint.substring(0, repoEndpoint.indexOf("/repo/"));
+			} else {
+				// get stack name, like "prod" or "dev"
+				String stackName = System.getProperty(PARAM3);
+				if (stackName == null) {
+					stackName = System.getProperty(STACK_PROPERTY_NAME);
+				}
+				// get stack instance, like "225"
+				String stackInstance = System.getProperty(PARAM4);
+				if (stackInstance == null) {
+					stackInstance = System.getProperty(STACK_INSTANCE_PROPERTY_NAME);
+				}
+	
+				// get stack number, like "0" or "1"
+				String stack = System.getProperty(PARAM5);
+				if (stack == null) {
+					stack = "0";
+				}
+	
+				// put it all together.  like https://repo-prod-225-0.prod.sagebase.org
+				endpointPrefix = "https://repo-" + stackName + "-" + stackInstance + "-" + stack + ".prod.sagebase.org";
 			}
-			// get stack instance, like "225"
-			String stackInstance = System.getProperty(PARAM4);
-			if (stackInstance == null) {
-				stackInstance = System.getProperty(STACK_INSTANCE_PROPERTY_NAME);
-			}
-
-			// get stack number, like "0" or "1"
-			String stack = System.getProperty(PARAM5);
-			if (stack == null) {
-				stack = "0";
-			}
-
-			// put it all together.  like https://repo-prod-225-0.prod.sagebase.org
-			endpointPrefix = "https://repo-" + stackName + "-" + stackInstance + "-" + stack + ".prod.sagebase.org";
 		}
 		return endpointPrefix;
 	}
