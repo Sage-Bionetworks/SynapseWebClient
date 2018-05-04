@@ -14,6 +14,7 @@ import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.EntityTypeUtils;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
+import org.sagebionetworks.repo.model.search.query.KeyRange;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -124,15 +125,11 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		
 		// only add if not exists already. but do run the search
 		if(!exists) {	
-					
 			// add facet to query list
 			KeyValue kv = new KeyValue();		
 			kv.setKey(facetName);
 			kv.setValue(facetValue);		
 			bq.add(kv);
-			
-			// set start back to zero so we go to first page with the new facet
-			currentSearch.setStart(new Long(0));			
 		}
 
 		executeNewSearch();
@@ -150,14 +147,44 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	@Override
 	public void addTimeFacet(String facetName, String facetValue, String displayValue) {
 		timeValueToDisplay.put(createTimeValueKey(facetName, facetValue), displayValue);
-		// time facets allow a single facet value only.
-		removeFacet(facetName);
-		addFacet(facetName, facetValue);
+		List<KeyRange> rq = currentSearch.getRangeQuery();
+		if (rq == null) {
+			rq = new ArrayList<>();
+			currentSearch.setRangeQuery(rq);
+		}
+		KeyRange targetKeyRange = null;
+		for (KeyRange keyRange : rq) {
+			if (facetName.equals(keyRange.getKey())) {
+				targetKeyRange = keyRange;
+				if (keyRange.getMin().equals(facetValue)) {
+					// no change, return
+					return;
+				}
+				break;
+			}
+		}
+		if (targetKeyRange == null) {
+			targetKeyRange = new KeyRange();
+			targetKeyRange.setKey(facetName);
+			rq.add(targetKeyRange);
+		}
+		targetKeyRange.setMin(facetValue);
+		executeNewSearch();
 	}
 	
 	@Override
-	public void removeFacetAndRefresh(String facetName) {
-		removeFacet(facetName);
+	public void removeTimeFacetAndRefresh(String facetName) {
+		List<KeyRange> rq = currentSearch.getRangeQuery();
+		if(rq != null) {
+			List<KeyRange> newRq = new ArrayList<KeyRange>();
+			for(KeyRange kv : rq) {
+				if(!kv.getKey().equals(facetName)) {
+					newRq.add(kv);
+				}
+			}
+			currentSearch.setRangeQuery(newRq);
+		}
+
 		executeNewSearch();
 	}
 	
@@ -178,7 +205,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	public String getDisplayForTimeFacet(String facetName, String facetValue) {
 		return timeValueToDisplay.get(createTimeValueKey(facetName, facetValue));
 	}
-	
 	
 	@Override
 	public void removeFacet(String facetName, String facetValue) {
@@ -210,6 +236,17 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			return bq;
 		}
 	}
+	
+	@Override
+	public List<KeyRange> getAppliedTimeFacets() {
+		List<KeyRange> bq = currentSearch.getRangeQuery(); 
+		if(bq == null) {
+			return new ArrayList<KeyRange>();
+		} else {
+			return bq;
+		}
+	}
+
 
 	@Override
 	public List<String> getFacetDisplayOrder() {
