@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.search.FacetConstraint;
 import org.sagebionetworks.repo.model.search.FacetTypeNames;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
+import org.sagebionetworks.repo.model.search.query.KeyRange;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DateTimeUtils;
@@ -224,25 +225,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 			}
 			
 			String text = facet.getValue();
-			if(text.contains("..")) {				
-				text = presenter.getDisplayForTimeFacet(facet.getKey(), facet.getValue());
-				if (text != null) {
-					text = formatFacetName(facet.getKey()) + ": " + text;
-				} else {
-					// continuous variable, in this case time in seconds
-					String valueAsString = facet.getValue().replaceAll("\\.\\.", "");
-					
-					String formattedDateString;
-					try{
-						long valueInMiliseconds = Long.parseLong(valueAsString) * 1000;
-						formattedDateString = valueInMiliseconds == 0 ? "any time": dateTimeUtils.convertDateToSimpleString(new Date(valueInMiliseconds));
-					}catch (NumberFormatException e){
-						formattedDateString = valueAsString;
-					}
-					
-					text = formatFacetName(facet.getKey()) + " >= " + formattedDateString;
-				}
-			}
 			facetNames.append(text);
 			facetNames.append(" ");
 			Button btn = new Button("", IconType.TIMES, event -> {				
@@ -272,9 +254,49 @@ public class SearchViewImpl extends Composite implements SearchView {
 			currentFacets.add(btn);
 			facetButtons.add(btn);
 		}
+		addTimeFacets(searchResults, facetNames, currentFacets);
 		currentFacetsPanel.clear();
 		currentFacetsPanel.add(currentFacets);
 		return facetNames.toString();
+	}
+	
+	private void addTimeFacets(SearchResults searchResults, StringBuilder facetNames, FlowPanel currentFacets) {
+		for(final KeyRange facet : presenter.getAppliedTimeFacets()) {
+			String text = presenter.getDisplayForTimeFacet(facet.getKey(), facet.getMin());
+			if (text != null) {
+				text = formatFacetName(facet.getKey()) + ": " + text;
+			} else {
+				// continuous variable, in this case time in seconds
+				String valueAsString = facet.getMin();
+				
+				String formattedDateString;
+				try{
+					long valueInMiliseconds = Long.parseLong(valueAsString) * 1000;
+					formattedDateString = valueInMiliseconds == 0 ? "any time": dateTimeUtils.convertDateToSimpleString(new Date(valueInMiliseconds));
+				}catch (NumberFormatException e){
+					formattedDateString = valueAsString;
+				}
+				
+				text = formatFacetName(facet.getKey()) + " >= " + formattedDateString;
+			}
+			
+			facetNames.append(text);
+			facetNames.append(" ");
+			Button btn = new Button(text, IconType.TIMES, event -> {				
+				// disable all buttons to allow only one click
+				for(Button facetButton : facetButtons) {
+					facetButton.setEnabled(false);
+				}
+				Window.scrollTo(0, 0);
+				presenter.removeTimeFacetAndRefresh(facet.getKey());						
+			});
+			
+			btn.setHeight(BUTTON_HEIGHT);
+			btn.addStyleName("margin-right-5 margin-top-5");
+			btn.setPull(Pull.LEFT);
+			currentFacets.add(btn);
+			facetButtons.add(btn);
+		}
 	}
 
 	private void createFacetWidgets(SearchResults searchResults) {
@@ -481,15 +503,14 @@ public class SearchViewImpl extends Composite implements SearchView {
 		return lc;
 	}
 
-	private Anchor createTimeFacet(final Facet facet, final long startTime, final String title) {
+	private Anchor createTimeFacet(final Facet facet, final Long startTime, final String title) {
 		Anchor a;
 		a = new Anchor(title);
-		final String facetValue = startTime + "..";
 		a.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {
 				Window.scrollTo(0, 0);
-				presenter.addTimeFacet(facet.getName(), facetValue, title);
+				presenter.addTimeFacet(facet.getName(), startTime.toString(), title);
 			}
 		});
 		return a;
@@ -500,7 +521,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		a = new Anchor(title);
 		a.addClickHandler( event -> {
 			Window.scrollTo(0, 0);
-			presenter.removeFacetAndRefresh(facet.getName());
+			presenter.removeTimeFacetAndRefresh(facet.getName());
 		});
 		return a;
 	}
