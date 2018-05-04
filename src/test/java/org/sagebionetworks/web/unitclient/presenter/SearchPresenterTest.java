@@ -188,7 +188,7 @@ public class SearchPresenterTest {
 		assertEquals(1, facetValues.size());
 		assertEquals(facetValue, facetValues.get(0).getValue());
 		
-		searchPresenter.removeFacetAndRefresh(facetName);
+		searchPresenter.removeTimeFacetAndRefresh(facetName);
 		verify(mockSynapseClient, times(3)).search(any(SearchQuery.class), any(AsyncCallback.class)); // 4
 		assertTrue(getFacet(facetName).isEmpty());
 	}
