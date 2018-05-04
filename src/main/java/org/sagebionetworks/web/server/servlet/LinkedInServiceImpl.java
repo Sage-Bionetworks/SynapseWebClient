@@ -11,15 +11,12 @@ import java.util.logging.Logger;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.LinkedInService;
 import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.shared.LinkedInInfo;
-import org.scribe.builder.ServiceBuilder;
-import org.scribe.builder.api.LinkedInApi;
 import org.scribe.model.OAuthRequest;
 import org.scribe.model.Response;
 import org.scribe.model.Token;
@@ -233,10 +230,11 @@ public class LinkedInServiceImpl extends RemoteServiceServlet implements
 	public void validateService(String newCallbackUrl) {
 		if (oAuthService == null || !newCallbackUrl.equals(portalCallbackUrl)) {
 			portalCallbackUrl = newCallbackUrl;
-			oAuthService = new ServiceBuilder().provider(LinkedInApi.class)
-					.apiKey(StackConfiguration.getPortalLinkedInKey())
-					.apiSecret(StackConfiguration.getPortalLinkedInSecret())
-					.callback(portalCallbackUrl + "#!Profile:").build();
+			//TODO: use repo service for this feature (portal has no access to Synapse credentials.
+//			oAuthService = new ServiceBuilder().provider(LinkedInApi.class)
+//					.apiKey(StackConfiguration.getPortalLinkedInKey())
+//					.apiSecret(StackConfiguration.getPortalLinkedInSecret())
+//					.callback(portalCallbackUrl + "#!Profile:").build();
 		}
 	}
 

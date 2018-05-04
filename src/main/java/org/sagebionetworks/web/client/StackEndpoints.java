@@ -24,6 +24,10 @@ public class StackEndpoints {
 
 	private static String endpointPrefix = null;
 
+	public static void clear() {
+		endpointPrefix = null;
+	}
+	
 	public static String getRepositoryServiceEndpoint() {
 		return getEndpoint(REPO_ENDPOINT_KEY, REPO_SUFFIX);
 	}
