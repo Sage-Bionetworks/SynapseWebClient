@@ -15,10 +15,10 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.sagebionetworks.repo.model.search.query.KeyRange;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
@@ -156,6 +156,18 @@ public class SearchPresenterTest {
 		return foundFacets;
 	}
 	
+	private List<KeyRange> getTimeFacet(String facetName) {
+		List<KeyRange> facets = searchPresenter.getAppliedTimeFacets();
+		List<KeyRange> foundFacets = new ArrayList<KeyRange>();
+		for(KeyRange facet : facets) {
+			if(facetName.equals(facet.getKey())) {
+				foundFacets.add(facet);
+			}
+		}
+		return foundFacets;
+	}
+
+	
 	@Test 
 	public void testTimeFacets() {
 		String facetName = "createdOn";
@@ -171,9 +183,9 @@ public class SearchPresenterTest {
 		// 4. Execute the current search (that now has the new facet).
 
 		// 1
-		List<KeyValue> facetValues = getFacet(facetName);
+		List<KeyRange> facetValues = getTimeFacet(facetName);
 		assertEquals(1, facetValues.size());
-		assertEquals(facetValue, facetValues.get(0).getValue());
+		assertEquals(facetValue, facetValues.get(0).getMin());
 		verify(mockView).clear(); // 2
 		verify(mockLoadMoreWidgetContainer).clear(); // 2
 		verify(mockGlobalApplicationState).pushCurrentPlace(any(Search.class)); // 3
@@ -184,15 +196,13 @@ public class SearchPresenterTest {
 		facetValue = "2";
 		searchPresenter.addTimeFacet(facetName, facetValue, "Yesterday");
 		verify(mockSynapseClient, times(2)).search(any(SearchQuery.class), any(AsyncCallback.class)); // 4
-		facetValues = getFacet(facetName);
+		facetValues = getTimeFacet(facetName);
 		assertEquals(1, facetValues.size());
-		assertEquals(facetValue, facetValues.get(0).getValue());
+		assertEquals(facetValue, facetValues.get(0).getMin());
 		
 		searchPresenter.removeTimeFacetAndRefresh(facetName);
 		verify(mockSynapseClient, times(3)).search(any(SearchQuery.class), any(AsyncCallback.class)); // 4
-		assertTrue(getFacet(facetName).isEmpty());
+		assertTrue(getTimeFacet(facetName).isEmpty());
 	}
-
-	
 }
 
