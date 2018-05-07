@@ -24,13 +24,6 @@ public class StackEndpoints {
 
 	private static String endpointPrefix = null;
 	private static boolean loadSettingsFile = true;
-
-	public static void clear() {
-		endpointPrefix = null;
-	}
-	public static void skipLoadingSettingsFile() {
-		loadSettingsFile = false;
-	}
 	
 	public static String getRepositoryServiceEndpoint() {
 		return getEndpoint(REPO_ENDPOINT_KEY, REPO_SUFFIX);
@@ -96,4 +89,15 @@ public class StackEndpoints {
 		}
 		return endpointPrefix;
 	}
+	
+	/**
+	 * For testing only
+	 */
+	public static void clear() {
+		endpointPrefix = null;
+	}
+	public static void skipLoadingSettingsFile() {
+		loadSettingsFile = false;
+	}
+
 }
