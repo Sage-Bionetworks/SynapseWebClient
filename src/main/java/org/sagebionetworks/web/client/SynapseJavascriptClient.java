@@ -64,6 +64,8 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
 import org.sagebionetworks.repo.model.discussion.Forum;
+import org.sagebionetworks.repo.model.docker.DockerCommit;
+import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
@@ -103,6 +105,7 @@ import org.sagebionetworks.web.shared.exceptions.TooManyRequestsException;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
+import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FluentFuture;
 import com.google.gwt.http.client.Request;
 import com.google.gwt.http.client.RequestBuilder;
@@ -163,7 +166,6 @@ public class SynapseJavascriptClient {
 	SynapseJSNIUtils jsniUtils;
 	SynapseProperties synapseProperties;
 
-	public static final String ENTITY_URI_PATH = "/entity";
 	public static final String USER = "/user";
 	public static final String BUNDLE_MASK_PATH = "/bundle?mask=";
 	public static final String ACCEPT = "Accept";
@@ -186,7 +188,7 @@ public class SynapseJavascriptClient {
 	public static final String INVITEE_ID = "/inviteeId";
 	public static final String ICON = "/icon";
 	public static final String PROJECTS_URI_PATH = "/projects";
-	
+	public static final String DOCKER_COMMIT = "/dockerCommit";
 	public static final String OFFSET_PARAMETER = "offset=";
 	public static final String LIMIT_PARAMETER = "limit=";
 	private static final String NEXT_PAGE_TOKEN_PARAM = "nextPageToken=";
@@ -432,7 +434,7 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.JSON, callback);
 	}
 	public void getEntityBundleForVersion(String entityId, Long versionNumber, int partsMask, final AsyncCallback<EntityBundle> callback) {
-		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId;
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId;
 		if (versionNumber != null) {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
@@ -459,7 +461,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getEntityChildren(EntityChildrenRequest request, final AsyncCallback<EntityChildrenResponse> callback) {
-		String url = getRepoServiceUrl() + ENTITY_URI_PATH + CHILDREN;
+		String url = getRepoServiceUrl() + ENTITY + CHILDREN;
 		doPost(url, request, OBJECT_TYPE.EntityChildrenResponse, callback);
 	}
 	
@@ -710,7 +712,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	private void getEntityByID(String entityId, OBJECT_TYPE type, Long versionNumber, AsyncCallback<Entity> callback) {
-		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId;
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId;
 		if (versionNumber != null) {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
@@ -833,7 +835,7 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getEntityHeaderBatchFromReferences(List<Reference> list, AsyncCallback<ArrayList<EntityHeader>> callback) {
-		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/header";
+		String url = getRepoServiceUrl() + ENTITY + "/header";
 		ReferenceList refList = new ReferenceList();
 		refList.setReferences(list);
 		doPost(url, refList, OBJECT_TYPE.PaginatedResultsEntityHeader, callback);
@@ -1028,12 +1030,42 @@ public class SynapseJavascriptClient {
 	}
 	
 	public void getActivityForEntityVersion(String entityId, Long versionNumber, AsyncCallback<Activity> callback) {
-		String url = getRepoServiceUrl() + ENTITY_URI_PATH + "/" + entityId;
+		String url = getRepoServiceUrl() + ENTITY + "/" + entityId;
 		if (versionNumber != null) {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
 		url += GENERATED_BY_SUFFIX;
 		doGet(url, OBJECT_TYPE.Activity, callback);
 	}
+
+	public void getDockerCommits(
+			String entityId, 
+			Long limit, 
+			Long offset,
+			DockerCommitSortBy sortBy, 
+			Boolean ascending,
+			AsyncCallback<ArrayList<DockerCommit>> callback) {
+		String url = getRepoServiceUrl() + ENTITY+"/"+entityId+DOCKER_COMMIT;
+		List<String> requestParams = new ArrayList<String>();
+		if (limit!=null) {
+			requestParams.add(LIMIT_PARAMETER+limit);
+		}
+		if (offset!=null) {
+			requestParams.add(OFFSET_PARAMETER+offset);
+		}
+		if (sortBy!=null) {
+			requestParams.add("sort="+sortBy.name());
+		}
+		if (ascending!=null) {
+			requestParams.add("ascending="+ascending);
+		}
+		if (!requestParams.isEmpty()) {
+			url += "?" + Joiner.on('&').join(requestParams);
+		}
+
+		
+		doGet(url, OBJECT_TYPE.PaginatedDockerCommit, callback);
+	}
+
 }
 

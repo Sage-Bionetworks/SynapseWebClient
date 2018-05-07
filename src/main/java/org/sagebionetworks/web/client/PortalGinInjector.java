@@ -561,7 +561,6 @@ public interface PortalGinInjector extends Ginjector {
 	UserProfileClientAsync getUserProfileClientAsync();
 	DataAccessClientAsync getDataAccessClientAsync();
 	DiscussionForumClientAsync getDiscussionForumClientAsync();
-	DockerClientAsync getDockerClientAsync();
 	StackConfigServiceAsync getStackConfigServiceAsync();
 	SubscriptionClientAsync getSubscriptionClientAsync();
 	UserAccountServiceAsync getUserAccountServiceAsync();

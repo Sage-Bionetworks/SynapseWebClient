@@ -37,6 +37,7 @@ import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.repo.model.discussion.ThreadCount;
+import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
@@ -76,6 +77,7 @@ public class SynapseJavascriptFactory {
 		V2WikiPage,
 		V2WikiOrderHint,
 		DockerRepository,
+		PaginatedDockerCommit,
 		FileEntity,
 		Project,
 		Folder,
@@ -209,6 +211,15 @@ public class SynapseJavascriptFactory {
 				entityHeaderList.add(new EntityHeader(jsonObject));
 			}
 			return entityHeaderList;
+		case PaginatedDockerCommit :
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<DockerCommit> dockerCommitList = new ArrayList<>();
+			JSONArrayAdapter dockerCommitJsonArray = json.getJSONArray("results");
+			for (int i = 0; i < dockerCommitJsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = dockerCommitJsonArray.getJSONObject(i);
+				dockerCommitList.add(new DockerCommit(jsonObject));
+			}
+			return dockerCommitList;
 		case PaginatedResultProjectHeader : 
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<ProjectHeader> projectHeaderList = new ArrayList<>();
