@@ -103,7 +103,9 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 
 	@Override
 	public void logoutUser() {
-		// don't actually terminate session, just remove the cookie
+		// terminate the session, remove the cookie
+		ginInjector.getSynapseJavascriptClient().logout();
+		
 		cookies.removeCookie(CookieKeys.USER_LOGIN_TOKEN);
 		localStorage.clear();
 		sessionStorage.clear();

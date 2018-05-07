@@ -344,7 +344,9 @@ public class SynapseJavascriptClient {
 								JSONObjectAdapter jsonObject = jsonObjectAdapter.createNew(response.getText());
 								responseObject = jsFactory.newInstance(responseType, jsonObject);
 							}
-							callback.onSuccess(responseObject);
+							if (callback != null) {
+								callback.onSuccess(responseObject);
+							}
 						} catch (JSONObjectAdapterException e) {
 							onError(null, e);
 						} catch (ResultNotReadyException e) {
@@ -382,11 +384,15 @@ public class SynapseJavascriptClient {
 
 				@Override
 				public void onError(Request request, Throwable exception) {
-					callback.onFailure(exception);
+					if (callback != null) {
+						callback.onFailure(exception);	
+					}
 				}
 			});
 		} catch (final Exception e) {
-			callback.onFailure(e);
+			if (callback != null) {
+				callback.onFailure(e);	
+			}
 		}
 	}
 	
@@ -853,6 +859,7 @@ public class SynapseJavascriptClient {
 		doDelete(url, callback);
 	}
 	
+	
 	public void deleteMembershipRequest(String id, AsyncCallback<Void> callback) {
 		String url = getRepoServiceUrl() + MEMBERSHIP_REQUEST + "/" + id;
 		doDelete(url, callback);
@@ -953,6 +960,11 @@ public class SynapseJavascriptClient {
 		doPost(url, loginRequest, OBJECT_TYPE.LoginResponse, callback);
 	}
 	
+	public void logout() {
+		String url = getAuthServiceUrl() + "/session";
+		doDelete(url, null);
+	}
+
 	public void getMyProjects(ProjectListType projectListType, int limit, int offset, ProjectListSortColumn sortBy, SortDirection sortDir, AsyncCallback<List<ProjectHeader>> projectHeadersCallback) {
 		getProjects(projectListType, null, null, limit, offset, sortBy, sortDir, projectHeadersCallback);
 	}
