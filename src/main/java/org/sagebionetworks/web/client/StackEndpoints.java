@@ -23,9 +23,13 @@ public class StackEndpoints {
 	public static final String AUTH_SUFFIX = "/auth/v1";
 
 	private static String endpointPrefix = null;
+	private static boolean loadSettingsFile = true;
 
 	public static void clear() {
 		endpointPrefix = null;
+	}
+	public static void skipLoadingSettingsFile() {
+		loadSettingsFile = false;
 	}
 	
 	public static String getRepositoryServiceEndpoint() {
@@ -41,35 +45,30 @@ public class StackEndpoints {
 	}
 
 	public static String getEndpoint(String propertyName, String suffix) {
-		// is this defined in the application properties (can be overwritten in the
-		// maven settings file)
-		String value = System.getProperty(propertyName);
-		if (value == null) {
-			// not overwritten, build it up using other properties
-			value = getEndpointPrefix() + suffix;
-		}
-		return value;
+		return getEndpointPrefix() + suffix;
 	}
 
 	private static String getEndpointPrefix() {
 		if (endpointPrefix == null) {
 			// init endpoint prefix
-			try {
-				//override any properties with the m2 settings property values (if set)
-				Properties props = SettingsLoader.loadSettingsFile();
-				for (Object propertyName : props.keySet()) {
-					String value = (String)props.get(propertyName);
-					if (value!=null && value.length()>0) {
-						System.setProperty((String)propertyName,value);
+			if (loadSettingsFile) {
+				try {
+					//override any properties with the m2 settings property values (if set)
+					Properties props = SettingsLoader.loadSettingsFile();
+					for (Object propertyName : props.keySet()) {
+						String value = (String)props.get(propertyName);
+						if (value!=null && value.length()>0) {
+							System.setProperty((String)propertyName,value);
+						}
 					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				} catch (JDOMException e) {
+					e.printStackTrace();
 				}
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (JDOMException e) {
-				e.printStackTrace();
 			}
 			
-			String repoEndpoint = System.getProperty("org.sagebionetworks.repositoryservice.endpoint");
+			String repoEndpoint = System.getProperty(REPO_ENDPOINT_KEY);
 			if (repoEndpoint != null) {
 				//done, overwriting using old params
 				endpointPrefix = repoEndpoint.substring(0, repoEndpoint.indexOf("/repo/"));
@@ -79,19 +78,19 @@ public class StackEndpoints {
 				if (stackName == null) {
 					stackName = System.getProperty(STACK_PROPERTY_NAME);
 				}
-				// get stack instance, like "225"
+				// get stack instance, like "222"
 				String stackInstance = System.getProperty(PARAM4);
 				if (stackInstance == null) {
 					stackInstance = System.getProperty(STACK_INSTANCE_PROPERTY_NAME);
 				}
 	
-				// get stack number, like "0" or "1"
+				// get beanstalk number, like "0" or "1"
 				String stack = System.getProperty(PARAM5);
 				if (stack == null) {
 					stack = "0";
 				}
 	
-				// put it all together.  like https://repo-prod-225-0.prod.sagebase.org
+				// put it all together.  like https://repo-prod-222-0.prod.sagebase.org
 				endpointPrefix = "https://repo-" + stackName + "-" + stackInstance + "-" + stack + ".prod.sagebase.org";
 			}
 		}
