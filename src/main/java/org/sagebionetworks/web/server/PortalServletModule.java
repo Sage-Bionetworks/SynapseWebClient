@@ -24,7 +24,6 @@ import org.sagebionetworks.web.server.servlet.JiraJavaClient;
 import org.sagebionetworks.web.server.servlet.JiraJavaClientImpl;
 import org.sagebionetworks.web.server.servlet.LayoutServiceImpl;
 import org.sagebionetworks.web.server.servlet.LinkedInServiceImpl;
-import org.sagebionetworks.web.server.servlet.MultipartFileUploadClientImpl;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
@@ -130,16 +129,9 @@ public class PortalServletModule extends ServletModule {
 		bind(AliasRedirectorServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.ALIAS_REDIRECTOR_SERVLET).with(AliasRedirectorServlet.class);
 
-
-		// Multipart file upload
-		bind(MultipartFileUploadClientImpl.class).in(Singleton.class);
-		serve("/Portal/multipartFileUploadClient").with(MultipartFileUploadClientImpl.class);
-
-		
 		// FileHandle upload
 		bind(FileEntityResolverServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.FILE_ENTITY_RESOLVER_SERVLET).with(FileEntityResolverServlet.class);
-				
 		
 		// User Profile Attachment (photo)
 		bind(UserProfileAttachmentServlet.class).in(Singleton.class);

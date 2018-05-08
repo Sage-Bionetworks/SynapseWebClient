@@ -39,8 +39,11 @@ import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
+import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.subscription.Etag;
@@ -109,6 +112,9 @@ public class SynapseJavascriptFactory {
 		ChallengePagedResults,
 		Etag,
 		Activity,
+		MultipartUploadStatus,
+		BatchPresignedUploadUrlResponse,
+		AddPartResponse,
 		None,
 		String
 	}
@@ -278,6 +284,12 @@ public class SynapseJavascriptFactory {
 			return new Etag(json);
 		case Activity:
 			return new Activity(json);
+		case MultipartUploadStatus : 
+			return new MultipartUploadStatus(json);
+		case BatchPresignedUploadUrlResponse :
+			return new BatchPresignedUploadUrlResponse(json);
+		case AddPartResponse :
+			return new AddPartResponse(json);
 		default:
 			throw new IllegalArgumentException("No match found for : "+ type);
 		}

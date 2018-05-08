@@ -111,7 +111,7 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 							}
 						}
 						offset += LIMIT;
-						commitsContainer.setIsMore(LIMIT.equals(result.size()));
+						commitsContainer.setIsMore(!(result.size() < LIMIT));
 					}
 		});
 	}

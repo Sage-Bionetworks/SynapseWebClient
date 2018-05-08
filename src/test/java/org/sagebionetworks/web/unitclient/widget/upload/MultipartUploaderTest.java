@@ -16,8 +16,9 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
-import static org.sagebionetworks.web.client.ContentTypeUtils.*;
-import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.*;
+import static org.sagebionetworks.web.client.ContentTypeUtils.fixDefaultContentType;
+import static org.sagebionetworks.web.client.widget.upload.MultipartUploaderImpl.EMPTY_FILE_ERROR_MESSAGE;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,9 +43,9 @@ import org.sagebionetworks.repo.model.util.ContentTypeUtils;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.MultipartFileUploadClientAsync;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -74,7 +75,7 @@ public class MultipartUploaderTest {
 	String[] fileNames;
 	Long storageLocationId = 9090L;
 	@Mock
-	MultipartFileUploadClientAsync mockMultipartFileUploadClient;
+	SynapseJavascriptClient mockJsClient;
 	@Mock
 	CookieProvider mockCookies;
 	@Mock
@@ -109,17 +110,17 @@ public class MultipartUploaderTest {
 		//direct upload
 		//by default, do not support direct upload (direct upload tests will turn on)
 		when(synapseJsniUtils.getContentType(any(JavaScriptObject.class), anyInt())).thenReturn("image/png");
-		AsyncMockStubber.callSuccessWith(mockMultipartUploadStatus).when(mockMultipartFileUploadClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockMultipartUploadStatus).when(mockJsClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
 		when(mockMultipartUploadStatus.getUploadId()).thenReturn(UPLOAD_ID);
 		when(mockMultipartUploadStatus.getResultFileHandleId()).thenReturn(RESULT_FILE_HANDLE_ID);
 		List<PartPresignedUrl> presignedUrlList = new ArrayList<PartPresignedUrl>();
 		when(mockBatchPresignedUploadUrlResponse.getPartPresignedUrls()).thenReturn(presignedUrlList);
 		presignedUrlList.add(mockPartPresignedUrl);
 		when(mockPartPresignedUrl.getUploadPresignedUrl()).thenReturn("http://fakepresignedurl.uploader.test");
-		AsyncMockStubber.callSuccessWith(mockBatchPresignedUploadUrlResponse).when(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockBatchPresignedUploadUrlResponse).when(mockJsClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
 		when(mockAddPartResponse.getAddPartState()).thenReturn(AddPartState.ADD_SUCCESS);
-		AsyncMockStubber.callSuccessWith(mockAddPartResponse).when(mockMultipartFileUploadClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockMultipartUploadStatus).when(mockMultipartFileUploadClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockAddPartResponse).when(mockJsClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(mockMultipartUploadStatus).when(mockJsClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 		// Stub the generation of a MD5.
 		MD5 = "some md5";
 		doAnswer(new Answer<Void>() {
@@ -153,7 +154,7 @@ public class MultipartUploaderTest {
 		fileNames = new String[]{file1};
 		when(synapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(fileNames);
 		
-		uploader = new MultipartUploaderImpl(gwt, synapseJsniUtils, mockMultipartFileUploadClient, mockCookies);
+		uploader = new MultipartUploaderImpl(gwt, synapseJsniUtils, mockJsClient, mockCookies);
 		
 		when(mockView.isAttached()).thenReturn(true);
 	}
@@ -183,13 +184,13 @@ public class MultipartUploaderTest {
 	public void testDirectUploadAllPartsExist() throws Exception {
 		setPartsState("11");
 		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
-		verify(mockMultipartFileUploadClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockJsClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
 		
 		//never tries to get a presigned url, since all parts are uploaded.
-		verify(mockMultipartFileUploadClient, never()).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
+		verify(mockJsClient, never()).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
 		verify(synapseJsniUtils, never()).uploadFileChunk(anyString(), any(JavaScriptObject.class), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//combine parts
-		verify(mockMultipartFileUploadClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		verify(mockJsClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 		// the handler should get the id.
 		verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
 	}
@@ -199,7 +200,7 @@ public class MultipartUploaderTest {
 		when(synapseJsniUtils.getFileSize(any(JavaScriptObject.class))).thenReturn(0.0);
 		setPartsState("0");
 		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
-		verify(mockMultipartFileUploadClient, never()).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockJsClient, never()).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
 		verify(mockHandler).uploadFailed(EMPTY_FILE_ERROR_MESSAGE + FILE_NAME);
 	}
 	
@@ -207,15 +208,15 @@ public class MultipartUploaderTest {
 	public void testDirectUploadSinglePart() throws Exception {
 		setPartsState("0");
 		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
-		verify(mockMultipartFileUploadClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockJsClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
 		ArgumentCaptor<BatchPresignedUploadUrlRequest> captor = ArgumentCaptor.forClass(BatchPresignedUploadUrlRequest.class);
-		verify(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(captor.capture(), any(AsyncCallback.class));
+		verify(mockJsClient).getMultipartPresignedUrlBatch(captor.capture(), any(AsyncCallback.class));
 		assertEquals(MultipartUploaderImpl.BINARY_CONTENT_TYPE, captor.getValue().getContentType());
 		verify(synapseJsniUtils).uploadFileChunk(eq(MultipartUploaderImpl.BINARY_CONTENT_TYPE), any(JavaScriptObject.class), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//manually call the method that's invoked with a successful xhr put (upload)
 		uploader.addCurrentPartToMultipartUpload();
-		verify(mockMultipartFileUploadClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
-		verify(mockMultipartFileUploadClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		verify(mockJsClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
+		verify(mockJsClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 		// the handler should get the id.
 		verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
 	}
@@ -224,13 +225,13 @@ public class MultipartUploaderTest {
 	public void testDirectUploadSingleSecondPart() throws Exception {
 		setPartsState("10");
 		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
-		verify(mockMultipartFileUploadClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
-		verify(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
+		verify(mockJsClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockJsClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
 		verify(synapseJsniUtils).uploadFileChunk(anyString(), any(JavaScriptObject.class), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//manually call the method that's invoked with a successful xhr put (upload)
 		uploader.addCurrentPartToMultipartUpload();
-		verify(mockMultipartFileUploadClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
-		verify(mockMultipartFileUploadClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		verify(mockJsClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
+		verify(mockJsClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 		// the handler should get the id.
 		verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
 	}
@@ -239,17 +240,17 @@ public class MultipartUploaderTest {
 	public void testDirectUploadMultiPart() throws Exception {
 		setPartsState("00");
 		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
-		verify(mockMultipartFileUploadClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
-		verify(mockMultipartFileUploadClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
+		verify(mockJsClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockJsClient).getMultipartPresignedUrlBatch(any(BatchPresignedUploadUrlRequest.class), any(AsyncCallback.class));
 		verify(synapseJsniUtils).uploadFileChunk(anyString(), any(JavaScriptObject.class), anyLong(), anyLong(), anyString(), any(XMLHttpRequest.class), any(ProgressCallback.class));
 		//manually call the method that's invoked with a successful xhr put (upload)
 		uploader.addCurrentPartToMultipartUpload();
-		verify(mockMultipartFileUploadClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
+		verify(mockJsClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
 		//should not have completed, since there's another part
-		verify(mockMultipartFileUploadClient, never()).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		verify(mockJsClient, never()).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 		
 		uploader.addCurrentPartToMultipartUpload();
-		verify(mockMultipartFileUploadClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		verify(mockJsClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 		// the handler should get the id.
 		verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
 	}
@@ -263,7 +264,7 @@ public class MultipartUploaderTest {
 		when(mockView.isAttached()).thenReturn(false);
 		setPartsState("10");
 		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
-		verify(mockMultipartFileUploadClient, never()).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		verify(mockJsClient, never()).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -284,7 +285,7 @@ public class MultipartUploaderTest {
 	@Test
 	public void testStartMultipartUploadFailure() throws Exception {
 		String error = "failed";
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error)).when(mockMultipartFileUploadClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error)).when(mockJsClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
 		setPartsState("00");
 		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
 
@@ -300,18 +301,18 @@ public class MultipartUploaderTest {
 			uploader.partFailure("part failed");
 		}
 		//should have retried 11 times.  plus the initial attempt, so 12 calls to start the upload...
-		verify(mockMultipartFileUploadClient, times(12)).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockJsClient, times(12)).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
 		//close dialog, and retry once more
 		when(mockView.isAttached()).thenReturn(false);
-		reset(mockMultipartFileUploadClient);
+		reset(mockJsClient);
 		uploader.partFailure("part failed");
-		verifyZeroInteractions(mockMultipartFileUploadClient);
+		verifyZeroInteractions(mockJsClient);
 	}
 	
 	@Test
 	public void testCompleteMultipartUploadFailure() throws Exception {
 		String error = "failed";
-		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error)).when(mockMultipartFileUploadClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new IllegalArgumentException(error)).when(mockJsClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 		setPartsState("0");
 		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
 		
@@ -319,7 +320,7 @@ public class MultipartUploaderTest {
 		uploader.addCurrentPartToMultipartUpload();
 		//should have logged the error locally, and attempted to retry the upload from the beginning
 		verify(synapseJsniUtils).consoleError(error);
-		verify(mockMultipartFileUploadClient, times(2)).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockJsClient, times(2)).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
 	}
 
 	@Test

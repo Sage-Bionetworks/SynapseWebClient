@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.upload;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
 import java.util.Collections;
 import java.util.Date;
 
@@ -16,9 +14,9 @@ import org.sagebionetworks.repo.model.file.PartUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.MultipartFileUploadClientAsync;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -45,7 +43,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	public static final int RETRY_DELAY = 3000;
 	
 	private GWTWrapper gwt;
-	private MultipartFileUploadClientAsync multipartFileUploadClient;
+	private SynapseJavascriptClient jsClient;
 	private SynapseJSNIUtils synapseJsniUtils;
 	private NumberFormat percentFormat;
 	private CookieProvider cookies;
@@ -76,13 +74,12 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	@Inject
 	public MultipartUploaderImpl(GWTWrapper gwt,
 			SynapseJSNIUtils synapseJsniUtils,
-			MultipartFileUploadClientAsync multipartFileUploadClient,
+			SynapseJavascriptClient jsClient,
 			CookieProvider cookies) {
 		super();
 		this.gwt = gwt;
 		this.synapseJsniUtils = synapseJsniUtils;
-		this.multipartFileUploadClient = multipartFileUploadClient;
-		fixServiceEntryPoint(multipartFileUploadClient);
+		this.jsClient = jsClient;
 		this.percentFormat = gwt.getNumberFormat("##");;
 		this.cookies = cookies;
 	}
@@ -140,7 +137,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		if (isStillUploading()) {
 			retryRequired = false;
 			//update the status and process
-			multipartFileUploadClient.startMultipartUpload(request, false, new AsyncCallback<MultipartUploadStatus>() {
+			jsClient.startMultipartUpload(request, false, new AsyncCallback<MultipartUploadStatus>() {
 				@Override
 				public void onFailure(Throwable t) {
 					logError(t.getMessage());
@@ -198,7 +195,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		batchPresignedUploadUrlRequest.setContentType(BINARY_CONTENT_TYPE);
 		batchPresignedUploadUrlRequest.setPartNumbers(Collections.singletonList(new Long(currentPartNumber)));
 		batchPresignedUploadUrlRequest.setUploadId(currentStatus.getUploadId());
-		multipartFileUploadClient.getMultipartPresignedUrlBatch(batchPresignedUploadUrlRequest, new AsyncCallback<BatchPresignedUploadUrlResponse>() {
+		jsClient.getMultipartPresignedUrlBatch(batchPresignedUploadUrlRequest, new AsyncCallback<BatchPresignedUploadUrlResponse>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				partFailure(caught.getMessage());
@@ -308,7 +305,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	public void completeMultipartUpload() {
 		logFullUpload();
 		//combine
-		multipartFileUploadClient.completeMultipartUpload(currentStatus.getUploadId(), new AsyncCallback<MultipartUploadStatus>() {
+		jsClient.completeMultipartUpload(currentStatus.getUploadId(), new AsyncCallback<MultipartUploadStatus>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				//failed to complete multipart upload.  log it and start over.
@@ -331,7 +328,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 				@Override
 				public void setMD5(String partMd5) {
 					log("partNumber="+currentPartNumber + " partNumberMd5="+partMd5);
-					multipartFileUploadClient.addPartToMultipartUpload(currentStatus.getUploadId(), currentPartNumber, partMd5, new AsyncCallback<AddPartResponse>() {
+					jsClient.addPartToMultipartUpload(currentStatus.getUploadId(), currentPartNumber, partMd5, new AsyncCallback<AddPartResponse>() {
 						@Override
 						public void onFailure(Throwable caught) {
 							partFailure(caught.getMessage());

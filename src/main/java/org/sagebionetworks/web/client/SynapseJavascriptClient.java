@@ -69,9 +69,14 @@ import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
+import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
+import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlRequest;
+import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
+import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -295,12 +300,16 @@ public class SynapseJavascriptClient {
 	}
 	
 	private void doPostOrPut(RequestBuilder.Method method, String url, JSONEntity requestObject, OBJECT_TYPE responseType, AsyncCallback callback) {
-		JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
-		try {
-			requestObject.writeToJSONObject(adapter);
-		} catch (JSONObjectAdapterException exception) {
-			callback.onFailure(exception);
-			return;
+		String requestData = null;
+		if (requestObject != null) {
+			try {
+				JSONObjectAdapter adapter = jsonObjectAdapter.createNew();
+				requestObject.writeToJSONObject(adapter);
+				requestData = adapter.toJSONString();
+			} catch (JSONObjectAdapterException exception) {
+				callback.onFailure(exception);
+				return;
+			}
 		}
 		RequestBuilderWrapper requestBuilder = ginInjector.getRequestBuilder();
 		requestBuilder.configure(method, url);
@@ -309,7 +318,7 @@ public class SynapseJavascriptClient {
 		if (authController.isLoggedIn()) {
 			requestBuilder.setHeader(SESSION_TOKEN_HEADER, authController.getCurrentUserSessionToken());
 		}
-		sendRequest(requestBuilder, adapter.toJSONString(), responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
+		sendRequest(requestBuilder, requestData, responseType, INITIAL_RETRY_REQUEST_DELAY_MS, callback);
 	}
 	
 	private void doPost(String url, JSONEntity requestObject, OBJECT_TYPE responseType, AsyncCallback callback) {
@@ -1067,5 +1076,28 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.PaginatedDockerCommit, callback);
 	}
 
+	public void startMultipartUpload(MultipartUploadRequest request, Boolean forceRestart, AsyncCallback<MultipartUploadStatus> callback) {
+		String url = getFileServiceUrl() + "/file/multipart";
+		//the restart parameter is optional.
+		if(forceRestart != null){
+			url += "?forceRestart=" + forceRestart.toString();
+		}
+		doPost(url, request, OBJECT_TYPE.MultipartUploadStatus, callback);
+	}
+
+	public void getMultipartPresignedUrlBatch(BatchPresignedUploadUrlRequest request, AsyncCallback<BatchPresignedUploadUrlResponse> callback) {
+		String url = getFileServiceUrl() + "/file/multipart/" + request.getUploadId() + "/presigned/url/batch";
+		doPost(url, request, OBJECT_TYPE.BatchPresignedUploadUrlResponse, callback);
+	}
+
+	public void addPartToMultipartUpload(String uploadId, int partNumber, String partMD5Hex, AsyncCallback<AddPartResponse> callback) {
+		String url = getFileServiceUrl() + "/file/multipart/" + uploadId + "/add/" + partNumber + "?partMD5Hex=" + partMD5Hex;
+		doPut(url, null, OBJECT_TYPE.AddPartResponse, callback);
+	}
+
+	public void completeMultipartUpload(String uploadId, AsyncCallback<MultipartUploadStatus> callback) {
+		String url = getFileServiceUrl() + "/file/multipart/" + uploadId + "/complete";
+		doPut(url, null, OBJECT_TYPE.MultipartUploadStatus, callback);
+	}
 }
 
