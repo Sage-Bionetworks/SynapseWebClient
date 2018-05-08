@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.transform;
 
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayer;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
@@ -16,9 +15,6 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.XYPoint;
  *
  */
 public interface JsoProvider {
-
-	LayoutResult newLayoutResult();
-
 	NChartCharacters newNChartCharacters();
 	
 	NChartLayer newNChartLayer();
