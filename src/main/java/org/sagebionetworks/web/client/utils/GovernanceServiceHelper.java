@@ -94,16 +94,6 @@ public class GovernanceServiceHelper {
 		return ans;
 	}
 	
-	public static RESTRICTION_LEVEL getRestrictionLevel(AccessRequirement ar) {
-		RESTRICTION_LEVEL ans = RESTRICTION_LEVEL.OPEN;
-		if (ar instanceof SelfSignAccessRequirementInterface) {
-			if (ans==RESTRICTION_LEVEL.OPEN) ans=RESTRICTION_LEVEL.RESTRICTED;
-		} else if (ar instanceof ACTAccessRequirement || ar instanceof LockAccessRequirement) {
-			ans=RESTRICTION_LEVEL.CONTROLLED;
-		}
-		return ans;
-	}
-	
 	public static String getAccessRequirementText(AccessRequirement ar) {
 		if (ar==null || ar instanceof ManagedACTAccessRequirement || ar instanceof SelfSignAccessRequirement) return "";
 		if (ar instanceof TermsOfUseAccessRequirement) {
