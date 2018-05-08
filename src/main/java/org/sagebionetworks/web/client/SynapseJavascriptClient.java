@@ -151,7 +151,6 @@ public class SynapseJavascriptClient {
 	public static final String FILE_HANDLE_BATCH = "/fileHandle/batch";
 	public static final String THREAD_COUNTS = "/threadcounts";
 	public static final String ENTITY_THREAD_COUNTS = ENTITY + THREAD_COUNTS;
-	public static final String STACK_STATUS = "/admin/synapse/status";
 	public static final String ATTACHMENT_HANDLES = "attachmenthandles";
 	private static final String PROFILE_IMAGE = "/image";
 	private static final String PROFILE_IMAGE_PREVIEW = PROFILE_IMAGE+"/preview";
@@ -175,7 +174,6 @@ public class SynapseJavascriptClient {
 	public static final String BUNDLE_MASK_PATH = "/bundle?mask=";
 	public static final String ACCEPT = "Accept";
 	public static final String SESSION_TOKEN_HEADER = "sessionToken";
-	public static final String USER_AGENT = "User-Agent";
 	public static final String SYNAPSE_ENCODING_CHARSET = "UTF-8";
 	public static final String APPLICATION_JSON_CHARSET_UTF8 = "application/json; charset="+SYNAPSE_ENCODING_CHARSET;
 	public static final String REPO_SUFFIX_VERSION = "/version";
@@ -201,11 +199,8 @@ public class SynapseJavascriptClient {
 	private static final String ASCENDING_PARAM = "ascending=";
 	
 	public static final String COLUMN = "/column";
-	public static final String COLUMN_BATCH = COLUMN + "/batch";
 	public static final String COLUMN_VIEW_DEFAULT = COLUMN + "/tableview/defaults/";
 	public static final String TABLE = "/table";
-	public static final String ROW_ID = "/row";
-	public static final String ROW_VERSION = "/version";
 	public static final String TABLE_QUERY = TABLE + "/query";
 	public static final String TABLE_QUERY_NEXTPAGE = TABLE_QUERY + "/nextPage";
 	public static final String TABLE_DOWNLOAD_CSV = TABLE + "/download/csv";
@@ -213,7 +208,6 @@ public class SynapseJavascriptClient {
 	public static final String TABLE_UPLOAD_CSV_PREVIEW = TABLE + "/upload/csv/preview";
 	public static final String TABLE_APPEND = TABLE + "/append";
 	public static final String TABLE_TRANSACTION = TABLE+"/transaction";
-	public static final String ASYNCHRONOUS_JOB = "/asynchronous/job";
 	public static final String FILE = "/file";
 	public static final String FILE_BULK = FILE+"/bulk";
 	public static final String ACTIVITY_URI_PATH = "/activity";
@@ -589,10 +583,6 @@ public class SynapseJavascriptClient {
 		
 		doGet(builder.toString(), OBJECT_TYPE.UserGroupHeaderResponsePage, callback);
 	}
-
-	public void getMyUserProfile(AsyncCallback<UserProfile> callback) {
-		getUserProfile(null, callback);
-	}
 	
 	public void getUserProfile(String userId, AsyncCallback<UserProfile> callback) {
 		String url = getRepoServiceUrl() + USER_PROFILE_PATH;
@@ -803,13 +793,6 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.ThreadCount, callback);
 	}
 	
-	public void getEntityThreadCount(List<String> entityIds, AsyncCallback<EntityThreadCounts> callback) {
-		String url = getRepoServiceUrl() + ENTITY_THREAD_COUNTS;
-		EntityIdList idList = new EntityIdList();
-		idList.setIdList(entityIds);
-		doPost(url, idList, OBJECT_TYPE.EntityThreadCounts, callback);
-	}
-	
 	public void getModerators(String forumId, Long limit, Long offset, AsyncCallback<PaginatedIds> callback) {
 		String url = getRepoServiceUrl() + FORUM+"/"+forumId+MODERATORS+"?"+LIMIT_PARAMETER+limit+"&"+OFFSET_PARAMETER+offset;
 		doGet(url, OBJECT_TYPE.PaginatedIds, callback);
@@ -870,12 +853,6 @@ public class SynapseJavascriptClient {
 		doDelete(url, callback);
 	}
 	
-	
-	public void deleteMembershipRequest(String id, AsyncCallback<Void> callback) {
-		String url = getRepoServiceUrl() + MEMBERSHIP_REQUEST + "/" + id;
-		doDelete(url, callback);
-	}
-
 	public void deleteEntityById(String id, AsyncCallback<Void> callback) {
 		deleteEntityById(id, false, callback);
 	}

@@ -2013,13 +2013,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public void deleteOpenMembershipRequests(String currentUserId, String teamId)
-			throws RestServiceException {
-		// This method does nothing?
-		
-	}
-
-	@Override
 	public List<String> getMyLocationSettingBanners() throws RestServiceException{
 		try {
 			Set<String> banners = new HashSet<String>();

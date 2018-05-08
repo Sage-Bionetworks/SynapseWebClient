@@ -18,8 +18,6 @@ public interface SubscriptionClientAsync{
 
 	void unsubscribe(Long subscriptionId, AsyncCallback<Void> callback);
 
-	void unsubscribeAll(AsyncCallback<Void> callback);
-
 	void getSubscription(Long subscriptionId,
 			AsyncCallback<Subscription> callback);
 

@@ -9,15 +9,12 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
-import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
-import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.discussion.UpdateThread;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 import com.google.gwt.user.client.rpc.RemoteService;
 import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
-import com.google.gwt.user.client.rpc.XsrfProtectedService;
 
 @RemoteServiceRelativePath("discussionforumclient")	
 public interface DiscussionForumClient extends RemoteService {
@@ -30,12 +27,6 @@ public interface DiscussionForumClient extends RemoteService {
 			DiscussionFilter filter) throws RestServiceException;
 
 	DiscussionThreadBundle updateThread(String threadId, UpdateThread newThread)
-			throws RestServiceException;
-
-	DiscussionThreadBundle updateThreadTitle(String threadId, UpdateThreadTitle newTitle)
-			throws RestServiceException;
-
-	DiscussionThreadBundle updateThreadMessage(String threadId, UpdateThreadMessage newMessage)
 			throws RestServiceException;
 
 	void markThreadAsDeleted(String threadId) throws RestServiceException;

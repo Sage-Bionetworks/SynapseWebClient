@@ -18,9 +18,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface ChallengeClientAsync {
-
-	void getEvaluations(List<String> evaluationIds,
-			AsyncCallback<PaginatedResults<Evaluation>> callback);
 	void getAvailableEvaluations(AsyncCallback<PaginatedResults<Evaluation>> callback) throws RestServiceException;
 	void getAvailableEvaluations(Set<String> targetEvaluationIds, AsyncCallback<PaginatedResults<Evaluation>> callback) throws RestServiceException;
 	void getSharableEvaluations(String entityId, AsyncCallback<List<Evaluation>> asyncCallback);
@@ -45,14 +42,6 @@ public interface ChallengeClientAsync {
 	void getUserEvaluationPermissions(String evalId, AsyncCallback<String> callback); 
 	void getEvaluationAcl(String evalId, AsyncCallback<String> callback);
 	void updateEvaluationAcl(AccessControlList acl, AsyncCallback<AccessControlList> callback);
-	
-	/**
-	 * Return true if the current user has created at least one submission in the given evaluations
-	 * @param evaluationIds
-	 * @param callback
-	 * @throws RestServiceException
-	 */
-	void hasSubmitted(AsyncCallback<Boolean> callback)	throws RestServiceException;
 	
 	void getChallengeEvaluationIds(String challengeId, AsyncCallback<Set<String>> callback);
 	void getTeamSubmissionEligibility(String evaluationId, String teamId, AsyncCallback<TeamSubmissionEligibility> callback);
