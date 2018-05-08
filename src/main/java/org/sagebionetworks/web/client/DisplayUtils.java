@@ -1194,6 +1194,6 @@ public class DisplayUtils {
 		int docViewBottom = docViewTop + Window.getClientHeight() + paddingBottom;
 		int elemTop = widget.getAbsoluteTop();
 //		int elemBottom = elemTop + widget.getOffsetHeight();
-		return docViewBottom >= elemTop;
+		return docViewBottom >= elemTop && elemTop != 0;
 	}
 }

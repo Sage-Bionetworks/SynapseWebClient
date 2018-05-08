@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
@@ -155,7 +156,11 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			@Override
 			public void onSuccess() {
 				WidgetRendererPresenter presenter = getWidgetRendererForWidgetDescriptorAfterLazyLoad(contentTypeKey);
-				callback.onSuccess(presenter);
+				if (presenter == null) {
+					onFailure(new NotFoundException("Widget renderer not found for type \"" + contentTypeKey + "\""));
+				} else {
+					callback.onSuccess(presenter);	
+				}
 			}
 			
 			@Override
