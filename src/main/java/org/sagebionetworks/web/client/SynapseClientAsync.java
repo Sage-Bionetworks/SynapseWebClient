@@ -63,8 +63,6 @@ public interface SynapseClientAsync {
 
 	void search(SearchQuery searchQuery, AsyncCallback<SearchResults> callback);
  	
-	void getRepositoryServiceUrl(AsyncCallback<String> callback);
-
 	void createOrUpdateEntity(Entity entity, Annotations annos,
 			boolean isNew, AsyncCallback<String> callback);
 	

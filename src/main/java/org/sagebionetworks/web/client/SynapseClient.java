@@ -85,13 +85,6 @@ public interface SynapseClient extends RemoteService{
 	Entity updateEntity(Entity toUpdate) throws RestServiceException;
 	
 	/**
-	 * Get the repository service URL
-	 * @return
-	 */
-	String getRepositoryServiceUrl();
-	
-
-	/**
 	 * Create or update an entity
 	 * @param entity
 	 * @param annos
