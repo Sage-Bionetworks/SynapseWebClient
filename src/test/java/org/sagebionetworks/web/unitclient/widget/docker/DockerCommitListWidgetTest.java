@@ -57,6 +57,8 @@ public class DockerCommitListWidgetTest {
 	private DockerCommitListWidget dockerCommitListWidget;
 	private String entityId;
 	private List<DockerCommit> dockerCommitList;
+	@Mock
+	DockerCommit mockCommit;
 
 	@Before
 	public void before() {
@@ -110,17 +112,31 @@ public class DockerCommitListWidgetTest {
 	public void testLoadMoreSuccess() {
 		boolean withRadio = false;
 		when(mockGinInjector.createNewDockerCommitRowWidget()).thenReturn(mockCommitRow);
-		DockerCommit commit = new DockerCommit();
-		dockerCommitList.add(commit);
+		dockerCommitList.add(mockCommit);
 		dockerCommitListWidget.configure(entityId, withRadio);
-		verify(mockCommitRow).configure(commit);
+		verify(mockCommitRow).configure(mockCommit);
 		verify(mockCommitsContainer).clear();
 		verify(mockSynAlert).clear();
 		verify(mockJsClient).getDockerCommits(eq(entityId),
 				anyLong(), anyLong(), any(DockerCommitSortBy.class),
 				anyBoolean(), any(AsyncCallback.class));
 		verify(mockCommitsContainer).add(any(Widget.class));
+		//only a single value was returned, so there must not be more
 		verify(mockCommitsContainer).setIsMore(false);
+		verify(mockCommitsContainer, never()).setIsMore(true);
+	}
+	
+	@Test
+	public void testLoadMoreSuccessIsMore() {
+		boolean withRadio = false;
+		when(mockGinInjector.createNewDockerCommitRowWidget()).thenReturn(mockCommitRow);
+		for (int i = 0; i < DockerCommitListWidget.LIMIT; i++) {
+			dockerCommitList.add(mockCommit);	
+		}
+		dockerCommitListWidget.configure(entityId, withRadio);
+		//the maximum number of commits were returned, there may be more...
+		verify(mockCommitsContainer, never()).setIsMore(false);
+		verify(mockCommitsContainer).setIsMore(true);
 	}
 
 	@Test
