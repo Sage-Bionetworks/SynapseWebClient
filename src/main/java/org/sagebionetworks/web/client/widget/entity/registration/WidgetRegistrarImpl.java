@@ -155,12 +155,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		GWT.runAsync(WidgetRendererPresenter.class, new RunAsyncCallback() {
 			@Override
 			public void onSuccess() {
-				WidgetRendererPresenter presenter = getWidgetRendererForWidgetDescriptorAfterLazyLoad(contentTypeKey);
-				if (presenter == null) {
-					onFailure(new NotFoundException("Widget renderer not found for type \"" + contentTypeKey + "\""));
-				} else {
-					callback.onSuccess(presenter);	
-				}
+				getWidgetRendererForWidgetDescriptorAfterLazyLoadAndCodeSplit(contentTypeKey, callback);
 			}
 			
 			@Override
@@ -169,7 +164,15 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			}
 		});
 	}
-	
+	public void getWidgetRendererForWidgetDescriptorAfterLazyLoadAndCodeSplit(String contentTypeKey, AsyncCallback<WidgetRendererPresenter> callback) {
+		WidgetRendererPresenter presenter = getWidgetRendererForWidgetDescriptorAfterLazyLoad(contentTypeKey);
+		if (presenter == null) {
+			callback.onFailure(new NotFoundException("Widget renderer not found for type \"" + contentTypeKey + "\""));
+		} else {
+			callback.onSuccess(presenter);	
+		}
+
+	}
 	/**
 	 * Is public for testing purposes only
 	 * @param contentTypeKey
