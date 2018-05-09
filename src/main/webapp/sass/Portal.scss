@@ -58,7 +58,7 @@ sticky footer
 **/
 #rootPanel {
   /** set the min height of the root panel to subtract the height of the header and footer **/
-	min-height: calc(100vh - 250px);
+	min-height: calc(100vh - 50px);
 	color:#666666;
 	font-size:1em;
 	line-height:1.6em;
