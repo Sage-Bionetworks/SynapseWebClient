@@ -40,7 +40,7 @@ public class SynapseTableFormWidgetViewImpl implements SynapseTableFormWidgetVie
 			presenter.onSubmit();
 		});
 		submitAnotherResponseLink.addClickHandler(event -> {
-			presenter.reset();
+			presenter.onReset();
 		});
 	}
 	

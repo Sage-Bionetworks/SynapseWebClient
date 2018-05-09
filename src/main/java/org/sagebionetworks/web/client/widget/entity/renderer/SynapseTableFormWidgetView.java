@@ -19,6 +19,6 @@ public interface SynapseTableFormWidgetView extends IsWidget {
 	 */
 	public interface Presenter {
 		void onSubmit();
-		void reset();
+		void onReset();
 	}
 }

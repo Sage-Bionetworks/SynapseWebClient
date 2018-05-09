@@ -175,7 +175,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 				});
 	}
 	
-	public void reset() {
+	public void onReset() {
 		configure(null, descriptor, null, null);
 	}
 }
