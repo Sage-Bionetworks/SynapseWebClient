@@ -6,7 +6,6 @@ import static org.sagebionetworks.web.client.cookie.CookieKeys.SHOW_DATETIME_IN_
 
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -33,7 +32,6 @@ import com.google.inject.Inject;
 
 public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	public static final String RECENTLY_CHECKED_SYNAPSE_VERSION = "org.sagebionetworks.web.client.recently-checked-synapse-version";
-	public static final String PROPERTIES_LOADED_KEY = "org.sagebionetworks.web.client.properties-loaded";
 	public static final String DEFAULT_REFRESH_PLACE = "!Home:0";
 	public static final String UNCAUGHT_JS_EXCEPTION = "Uncaught JS Exception:";
 	private PlaceController placeController;
@@ -45,7 +43,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	private EventBus eventBus;
 	private List<EntityHeader> favorites;
 	private boolean isEditing;
-	Set<String> wikiBasedEntites;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	private GlobalApplicationStateView view;
 	private String synapseVersion;

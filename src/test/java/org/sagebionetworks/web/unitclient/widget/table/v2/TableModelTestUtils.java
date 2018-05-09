@@ -345,18 +345,6 @@ public class TableModelTestUtils {
 		cm.setColumnType(type);
 		return cm;
 	}
-
-	/**
-	 * Create a CSV string from the passed row data.
-	 * @param  input List of rows where each row is represented by a string array.
-	 * @return
-	 */
-	public static String createCSVString(List<String[]> input) {
-		StringWriter writer = new StringWriter();
-		CSVWriter csvWriter = new CSVWriter(writer);
-		csvWriter.writeAll(input);
-		return writer.toString();
-	}
 	
 	/**
 	 * Build a list of column Id from a list of ColumnModels.

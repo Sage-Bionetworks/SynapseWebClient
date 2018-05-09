@@ -4,30 +4,6 @@ import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ImageResource;
 
 public interface SageImageBundle extends ClientBundle {
-
-	@Source("resource/images/icon-gene-expression-16.gif")
-	ImageResource iconGeneExpression16();
-
-	@Source("resource/images/icon-phenotypes-16.gif")
-	ImageResource iconPhenotypes16();
-	
-	@Source("resource/images/icon-genotypes-16.gif")
-	ImageResource iconGenotype16();
-	
-	@Source("resource/images/transparent-16.png")
-	ImageResource iconTransparent16();
-	
-	@Source("resource/images/upArrow.png")
-	ImageResource iconUpArrow();
-	
-	@Source("resource/images/downArrow.png")
-	ImageResource iconDownArrow();
-	
-	@Source("resource/images/searchButtonIcon.png")
-	ImageResource searchButtonIcon();
-
-	@Source("resource/images/headerSearchButtonIcon.png")
-	ImageResource searchButtonHeaderIcon();
 	
 	@Source("resource/images/expand.png")
 	ImageResource expand();
@@ -43,9 +19,6 @@ public interface SageImageBundle extends ClientBundle {
 	
 	@Source("resource/images/logo-Shell.png")
 	ImageResource logoCommandLine45();
-	
-	@Source("resource/images/genomeSpace-logo-title-16.gif")
-	ImageResource genomeSpaceLogoTitle16();
 	
 	@Source("resource/images/certificate.png")
 	ImageResource certificate();

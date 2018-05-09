@@ -69,16 +69,6 @@ public class UserProfileClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public void deleteVerificationSubmission(long verificationId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			synapseClient.deleteVerificationSubmission(verificationId);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
 	public UserBundle getMyOwnUserBundle(int mask) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {

@@ -49,7 +49,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	private Map<String,String> timeValueToDisplay = new HashMap<String, String>();
 	private Date searchStartTime;
 	
-	LoadMoreWidgetContainer loadMoreWidgetContainer;
+	private LoadMoreWidgetContainer loadMoreWidgetContainer;
 	
 	@Inject
 	public SearchPresenter(SearchView view,
@@ -186,19 +186,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		}
 
 		executeNewSearch();
-	}
-	
-	public void removeFacet(String facetName) {
-		List<KeyValue> bq = currentSearch.getBooleanQuery();
-		if(bq != null) {
-			List<KeyValue> newBq = new ArrayList<KeyValue>();
-			for(KeyValue kv : bq) {
-				if(!kv.getKey().equals(facetName)) {
-					newBq.add(kv);
-				}
-			}
-			currentSearch.setBooleanQuery(newBq);
-		}
 	}
 	
 	@Override

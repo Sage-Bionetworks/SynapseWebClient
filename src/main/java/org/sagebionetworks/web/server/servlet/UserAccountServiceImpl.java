@@ -4,8 +4,6 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.AuthorizationConstants;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.auth.LoginRequest;
-import org.sagebionetworks.repo.model.auth.LoginResponse;
 import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
@@ -149,28 +147,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 		}
 	}
 	
-	@Override
-	public void terminateSession(String sessionToken) throws RestServiceException {
-		validateService();
-
-		SynapseClient client = createSynapseClient();
-		try {
-			client.logout();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
-	public String getPrivateAuthServiceUrl() {
-		return urlProvider.getPrivateAuthBaseUrl();
-	}
-
-	@Override
-	public String getPublicAuthServiceUrl() {
-		return urlProvider.getPublicAuthBaseUrl();
-	}
-
 	@Override
 	public String getTermsOfUse() {
 		SynapseClient client = createAnonymousSynapseClient();

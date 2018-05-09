@@ -21,12 +21,6 @@ public interface UserAccountServiceAsync {
 
 	void createUserStep2(String userName, String fName, String lName, String password, EmailValidationSignedToken emailValidationSignedToken, AsyncCallback<String> callback);
 	
-	void terminateSession(String sessionToken, AsyncCallback<Void> callback);
-
-	void getPrivateAuthServiceUrl(AsyncCallback<String> callback);
-
-	void getPublicAuthServiceUrl(AsyncCallback<String> callback);
-	
 	void getTermsOfUse(AsyncCallback<String> callback);
 	
 	void getPublicAndAuthenticatedGroupPrincipalIds(AsyncCallback<PublicPrincipalIds> callback);

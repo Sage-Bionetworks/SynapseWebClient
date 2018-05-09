@@ -1,18 +1,17 @@
 package org.sagebionetworks.web.client.widget.docker;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+import java.util.ArrayList;
 
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
-import org.sagebionetworks.web.client.DockerClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainer;
 import org.sagebionetworks.web.client.widget.RadioWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -27,12 +26,12 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 	public static final DockerCommitSortBy DEFAULT_ORDER = DockerCommitSortBy.CREATED_ON;
 	public static final Boolean DEFAULT_ASCENDING = false;
 	private DockerCommitListWidgetView view;
-	private DockerClientAsync dockerClient;
+	private SynapseJavascriptClient jsClient;
 	private SynapseAlert synAlert;
 	private LoadMoreWidgetContainer commitsContainer;
 	private PortalGinInjector ginInjector;
 	private GWTWrapper gwtWrapper;
-	private Long offset;
+	private Long offset = 0L;
 	private DockerCommitSortBy order;
 	private Boolean ascending;
 	private String entityId;
@@ -44,14 +43,13 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 	@Inject
 	public DockerCommitListWidget(
 			DockerCommitListWidgetView view,
-			DockerClientAsync dockerClient,
+			SynapseJavascriptClient jsClient,
 			SynapseAlert synAlert,
 			LoadMoreWidgetContainer commitsContainer,
 			PortalGinInjector ginInjector,
 			GWTWrapper gwtWrapper) {
 		this.view = view;
-		this.dockerClient = dockerClient;
-		fixServiceEntryPoint(dockerClient);
+		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.commitsContainer = commitsContainer;
 		this.ginInjector = ginInjector;
@@ -70,7 +68,7 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 
 	public void loadMore() {
 		synAlert.clear();
-		dockerClient.getDockerCommits(entityId, LIMIT, offset, order, ascending, new AsyncCallback<PaginatedResults<DockerCommit>>(){
+		jsClient.getDockerCommits(entityId, LIMIT, offset, order, ascending, new AsyncCallback<ArrayList<DockerCommit>>(){
 
 					@Override
 					public void onFailure(Throwable caught) {
@@ -79,14 +77,13 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 					}
 
 					@Override
-					public void onSuccess(PaginatedResults<DockerCommit> result) {
-						long numberOfCommits = result.getTotalNumberOfResults();
-						if (numberOfCommits == 0) {
+					public void onSuccess(ArrayList<DockerCommit> result) {
+						if (offset == 0 && result.isEmpty()) {
 							if (emptyCommitCallback != null) {
 								emptyCommitCallback.invoke();
 							}
 						} else {
-							for(final DockerCommit commit: result.getResults()) {
+							for(final DockerCommit commit: result) {
 								DockerCommitRowWidget dockerCommitRow = ginInjector.createNewDockerCommitRowWidget();
 								dockerCommitRow.configure(commit);
 								dockerCommitRow.setOnClickCallback(new CallbackP<DockerCommit>(){
@@ -114,7 +111,7 @@ public class DockerCommitListWidget implements IsWidget, DockerCommitListWidgetV
 							}
 						}
 						offset += LIMIT;
-						commitsContainer.setIsMore(offset < numberOfCommits);
+						commitsContainer.setIsMore(!(result.size() < LIMIT));
 					}
 		});
 	}

@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.resources.WebResource.ResourceType;
 
 import com.google.gwt.core.client.Callback;
@@ -16,13 +15,11 @@ import com.google.inject.Inject;
 public class ResourceLoaderImpl implements ResourceLoader {
 
 	Set<WebResource> loaded;	
-	SynapseJSNIUtils synapseJSNIUtils;
 	
 	@Inject
-	public ResourceLoaderImpl(SynapseJSNIUtils synapseJSNIUtils) {
+	public ResourceLoaderImpl() {
 		super();		
 		loaded = new HashSet<WebResource>();
-		this.synapseJSNIUtils = synapseJSNIUtils;
 	}	
 	
 	@Override

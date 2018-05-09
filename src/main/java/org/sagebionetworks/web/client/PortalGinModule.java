@@ -776,9 +776,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		//file history
 		bind(FileHistoryWidgetView.class).to(FileHistoryWidgetViewImpl.class);
-				
-		// The URL cache
-		bind(UrlCache.class).to(UrlCacheImpl.class).in(Singleton.class);;
 		
 		//GWT utility methods
 		bind(GWTWrapper.class).to(GWTWrapperImpl.class).in(Singleton.class);

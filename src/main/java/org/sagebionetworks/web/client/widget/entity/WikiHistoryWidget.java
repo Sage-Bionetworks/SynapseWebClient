@@ -20,7 +20,6 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -131,12 +130,10 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 		return mapIdToName.get(userId);
 	}
 	
-	@Override
 	public void hideHistoryWidget() {
 		view.hideHistoryWidget();
 	}
 	
-	@Override
 	public void showHistoryWidget() {
 		view.showHistoryWidget();
 	}

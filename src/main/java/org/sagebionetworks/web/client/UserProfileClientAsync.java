@@ -22,9 +22,6 @@ public interface UserProfileClientAsync {
 	void updateVerificationState(long verificationId,
 			VerificationState verificationState, String hostPageBaseURL, AsyncCallback<Void> callback);
 
-	void deleteVerificationSubmission(long verificationId,
-			AsyncCallback<Void> callback);
-
 	void getMyOwnUserBundle(int mask, AsyncCallback<UserBundle> callback);
 
 	void unbindOAuthProvidersUserId(OAuthProvider provider, String alias,
