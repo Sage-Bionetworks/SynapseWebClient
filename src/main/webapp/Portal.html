@@ -48,9 +48,9 @@
 		
 		
 		<script>
-			// determine cdn endpoint (staging, prod, or dev)
+			// determine cdn endpoint (staging or prod, do not use a cdn for local or dev builds)
 			var cdnEndpoint = "//cdn-" + location.hostname + "/";
-			var localhostRegex = /^(127[.]{1}0[.]{1}0[.]{1}1)$|^(localhost)$/;
+			var localhostRegex = /^(127[.]{1}0[.]{1}0[.]{1}1)$|^(localhost)$|[-.]dev[-.]/;
 			if (localhostRegex.test(location.hostname)) {
 				cdnEndpoint = "";
 			}
