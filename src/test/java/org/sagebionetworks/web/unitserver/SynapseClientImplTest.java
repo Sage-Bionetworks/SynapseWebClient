@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -165,8 +166,6 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
-
-import com.google.appengine.repackaged.com.google.common.base.Objects;
 
 /**
  * Test for the SynapseClientImpl
@@ -2032,7 +2031,7 @@ public class SynapseClientImplTest {
 	
 	private ColumnChange getColumnChange(String oldColumnId, List<ColumnChange> changes) {
 		for (ColumnChange columnChange : changes) {
-			if (Objects.equal(oldColumnId, columnChange.getOldColumnId())) {
+			if (Objects.equals(oldColumnId, columnChange.getOldColumnId())) {
 				return columnChange;
 			}
 		}
