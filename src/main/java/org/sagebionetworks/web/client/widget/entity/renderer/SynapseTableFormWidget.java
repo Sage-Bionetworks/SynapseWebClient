@@ -44,7 +44,7 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 	private SynapseClientAsync synapseClient;
 	private AsynchronousJobTracker jobTracker;
 	private UserBadge ownerUserBadge;
-	public static final String DEFAULT_SUCCESS_MESSAGE = "Your response has been recorded";
+	public static final String DEFAULT_SUCCESS_MESSAGE = "Your response has been recorded.";
 	SynapseJavascriptClient jsClient;
 	
 	@Inject
@@ -173,5 +173,9 @@ public class SynapseTableFormWidget implements SynapseTableFormWidgetView.Presen
 						return true;
 					}
 				});
+	}
+	
+	public void onReset() {
+		configure(null, descriptor, null, null);
 	}
 }
