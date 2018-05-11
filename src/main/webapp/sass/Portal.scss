@@ -2507,11 +2507,3 @@ div.colborder {
 	-webkit-filter: blur(4px);
 	filter: blur(4px);
 }
-
-/* SWC-4210: hide tooltips on mobile devices */
-@media only screen
-and (max-device-width : 1024px) {
-    .tooltip {
-        display: none !important;
-    }
- }
