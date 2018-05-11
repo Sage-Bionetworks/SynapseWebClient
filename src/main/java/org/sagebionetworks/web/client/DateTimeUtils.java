@@ -4,7 +4,7 @@ import java.util.Date;
 
 public interface DateTimeUtils {
 
-	String convertDateToSmallString(Date toFormat);
+	String getDateTimeString(Date toFormat);
 	/**
 	 * Return a friendly relative date string.  Like "4 hours ago"
 	 * @param toFormat
@@ -23,7 +23,7 @@ public interface DateTimeUtils {
 	 * @return
 	 */
 	String getLongFriendlyDate(Date toFormat);
-	String convertDateToSimpleString(Date toFormat);
+	String getDateString(Date toFormat);
 	void setShowUTCTime(boolean showUTC);
 	boolean isShowingUTCTime();
 }

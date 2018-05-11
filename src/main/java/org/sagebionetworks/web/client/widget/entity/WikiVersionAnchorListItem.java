@@ -31,7 +31,7 @@ public class WikiVersionAnchorListItem implements IsWidget {
 	public void setV2WikiHistorySnapshot(V2WikiHistorySnapshot version) {
 		fp.clear();
 		modifiedByBadge.configure(version.getModifiedBy());
-		String dateTime = dateTimeUtils.convertDateToSmallString(version.getModifiedOn());
+		String dateTime = dateTimeUtils.getDateTimeString(version.getModifiedOn());
 		Div p = new Div();
 		p.addStyleName("whitespace-nowrap margin-left-5");
 		p.add(new Span("v.<strong>" + version.getVersion() + "</strong> created on " + dateTime + " by "));

@@ -110,7 +110,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setProjectLead(submission.getResearchProjectSnapshot().getProjectLead());
 		view.setPublications(submission.getPublication());
 		view.setSummaryOfUse(submission.getSummaryOfUse());
-		view.setSubmittedOn(dateTimeUtils.convertDateToSmallString(submission.getSubmittedOn()));
+		view.setSubmittedOn(dateTimeUtils.getDateTimeString(submission.getSubmittedOn()));
 		view.setRenewalColumnsVisible(submission.getIsRenewalSubmission());
 		UserBadge badge = ginInjector.getUserBadgeWidget();
 		badge.configure(submission.getSubmittedBy());

@@ -129,7 +129,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		// Add the invitations to the view
 		for (OpenTeamInvitationBundle b : bundles) {
 			MembershipInvitation mis = b.getMembershipInvitation();
-			String createdOn = dateTimeUtils.convertDateToSmallString(b.getMembershipInvitation().getCreatedOn());
+			String createdOn = dateTimeUtils.getDateTimeString(b.getMembershipInvitation().getCreatedOn());
 			if (b.getUserProfile() != null) {
 				// Invitee is an existing user
 				UserBadge userBadge = ginInjector.getUserBadgeWidget();

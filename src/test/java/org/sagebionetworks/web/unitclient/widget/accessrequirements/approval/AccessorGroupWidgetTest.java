@@ -80,7 +80,7 @@ public class AccessorGroupWidgetTest {
 		when(mockAccessorGroup.getAccessorIds()).thenReturn(accessorIds);
 		when(mockAccessorGroup.getAccessRequirementId()).thenReturn(ACCESS_REQUIREMENT_ID);
 		when(mockAccessorGroup.getExpiredOn()).thenReturn(AROUND_NOW);
-		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(FORMATTED_DATE);
+		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(FORMATTED_DATE);
 	}
 	
 	@Test
@@ -97,7 +97,7 @@ public class AccessorGroupWidgetTest {
 		verify(mockUserBadge).configure(ACCESSOR_USER_ID);
 		verify(mockView).setSubmittedBy(mockUserBadge);
 		verify(mockView).addAccessor(mockUserBadge);
-		verify(mockDateTimeUtils).convertDateToSmallString(AROUND_NOW);
+		verify(mockDateTimeUtils).getDateTimeString(AROUND_NOW);
 		verify(mockView).setExpiresOn(FORMATTED_DATE);
 	}
 	

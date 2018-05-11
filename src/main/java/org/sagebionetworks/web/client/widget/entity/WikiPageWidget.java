@@ -377,8 +377,8 @@ public class WikiPageWidget implements WikiPageWidgetView.Presenter, SynapseWidg
 		wikiKey.setWikiPageId(currentPage.getId());
 		resetWikiMarkdown(currentPage.getMarkdown());
 		configureWikiTitle(isRootWiki, currentPage.getTitle());
-		view.setCreatedOn(dateTimeUtils.convertDateToSmallString(result.getCreatedOn()));
-		view.setModifiedOn(dateTimeUtils.convertDateToSmallString(result.getModifiedOn()));
+		view.setCreatedOn(dateTimeUtils.getDateTimeString(result.getCreatedOn()));
+		view.setModifiedOn(dateTimeUtils.getDateTimeString(result.getModifiedOn()));
 		view.setWikiHistoryVisible(false);
 		historyWidget.clear();
 	}

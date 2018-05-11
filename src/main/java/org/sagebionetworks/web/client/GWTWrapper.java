@@ -62,4 +62,6 @@ public interface GWTWrapper {
 
 	String getUniqueAliasName(String inputName);
 	String getFriendlySize(double size, boolean abbreviatedUnits);
+	DateTimeFormat getFormat(String formatPattern);
+	DateTimeFormat getFormat(PredefinedFormat predefinedFormat);
 }
