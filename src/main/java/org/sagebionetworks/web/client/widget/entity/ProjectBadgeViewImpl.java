@@ -77,7 +77,7 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	
 	@Override
 	public String getSimpleDateString(Date date) {
-		return dateTimeUtils.convertDateToSimpleString(date);
+		return dateTimeUtils.getDateString(date);
 	}
 	
 	@Override

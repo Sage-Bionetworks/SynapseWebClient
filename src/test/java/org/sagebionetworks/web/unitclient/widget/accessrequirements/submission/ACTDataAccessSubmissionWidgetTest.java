@@ -106,7 +106,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		when(mockResearchProjectSnapshot.getInstitution()).thenReturn(INSTITUTION);
 		when(mockResearchProjectSnapshot.getIntendedDataUseStatement()).thenReturn(INTENDED_DATA_USE);
 		when(mockResearchProjectSnapshot.getProjectLead()).thenReturn(PROJECT_LEAD);
-		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(SMALL_DATE_STRING);
+		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(SMALL_DATE_STRING);
 		
 		widget = new ACTDataAccessSubmissionWidget(mockView, 
 				mockSynapseAlert, 

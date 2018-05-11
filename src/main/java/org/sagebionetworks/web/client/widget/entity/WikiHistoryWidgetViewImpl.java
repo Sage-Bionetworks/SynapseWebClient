@@ -219,7 +219,7 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 
         	// Modified on
         	td = new TableData();
-			td.add(new Text(dateTimeUtils.convertDateToSmallString(entry.modifiedOn)));
+			td.add(new Text(dateTimeUtils.getDateTimeString(entry.modifiedOn)));
         	row.add(td);
 		}
 		historyTable.add(tBody);

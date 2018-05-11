@@ -208,7 +208,7 @@ public class EntityBadgeTest {
 		testFile.setModifiedBy(modifiedByPrincipalId.toString());
 		Date modifiedOn = new Date();
 		String smallDateString="10/02/2000 01:26:45PM";
-		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(smallDateString);
+		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(smallDateString);
 		testFile.setModifiedOn(modifiedOn);
 		when(mockPublicPrincipalIds.isPublic(anyLong())).thenReturn(true);
 		entityThreadCount = 1L;
@@ -219,7 +219,7 @@ public class EntityBadgeTest {
 		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockUserBadge).configure(modifiedByPrincipalId.toString());
 		verify(mockView).setModifiedByWidgetVisible(true);
-		verify(mockDateTimeUtils).convertDateToSmallString(modifiedOn);
+		verify(mockDateTimeUtils).getDateTimeString(modifiedOn);
 		verify(mockView).setModifiedOn(smallDateString);
 				
 		verify(mockView).showPublicIcon();
