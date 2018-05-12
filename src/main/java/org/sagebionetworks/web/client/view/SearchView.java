@@ -6,6 +6,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.search.Hit;
 import org.sagebionetworks.repo.model.search.SearchResults;
+import org.sagebionetworks.repo.model.search.query.KeyRange;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.web.client.SynapseView;
 
@@ -38,7 +39,7 @@ public interface SearchView extends IsWidget, SynapseView {
 		void setSearchTerm(String queryTerm);
 		
 		void addFacet(String facetName, String facetValue);
-		void removeFacetAndRefresh(String facetName);
+		void removeTimeFacetAndRefresh(String facetName);
 		void addTimeFacet(String facetName, String facetValue,
 				String displayValue);
 
@@ -47,6 +48,7 @@ public interface SearchView extends IsWidget, SynapseView {
 		void clearSearch();
 		
 		List<KeyValue> getAppliedFacets();
+		List<KeyRange> getAppliedTimeFacets();
 		
 		List<String> getFacetDisplayOrder(); 
 		

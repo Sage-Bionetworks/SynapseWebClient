@@ -23,8 +23,6 @@ import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.sun.syndication.io.impl.NumberParser;
-
 public class PreviewConfigEditorTest {
 		
 	PreviewConfigEditor editor;

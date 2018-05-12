@@ -6,6 +6,7 @@ import org.sagebionetworks.web.client.widget.entity.renderer.WikiSubpagesWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
 import com.google.gwt.user.client.ui.IsWidget;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public interface WikiPageWidgetView extends IsWidget {
 
@@ -32,7 +33,6 @@ public interface WikiPageWidgetView extends IsWidget {
 	void setWikiHistoryWidget(IsWidget historyWidget);
 	void setWikiSubpagesWidget(IsWidget historyWidget);
 	void setWikiSubpagesWidgetVisible(boolean isVisible);
-	void setWikiSubpagesContainers(WikiSubpagesWidget wikiSubpages);
 	void showPopup(String title, String message, MessagePopup popupType,
 			org.sagebionetworks.web.client.utils.Callback okCallback,
 			org.sagebionetworks.web.client.utils.Callback cancelCallback);
@@ -57,4 +57,7 @@ public interface WikiPageWidgetView extends IsWidget {
 	public void clear();
 	void addStyleName(String style);
 	void setWikiHistoryDiffToolButtonVisible(boolean visible, WikiPageKey key);
+	void expandWikiSubpages();
+	void collapseWikiSubpages();
+	EventBinder<WikiPageWidget> getEventBinder();
 }

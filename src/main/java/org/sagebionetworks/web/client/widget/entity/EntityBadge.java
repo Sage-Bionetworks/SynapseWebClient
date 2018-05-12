@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -55,6 +56,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private LazyLoadHelper lazyLoadHelper;
 	private DateTimeUtils dateTimeUtils;
 	private PopupUtilsView popupUtils;
+	private SynapseProperties synapseProperties;
 	
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
@@ -65,7 +67,8 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			FileDownloadButton fileDownloadButton,
 			LazyLoadHelper lazyLoadHelper,
 			DateTimeUtils dateTimeUtils,
-			PopupUtilsView popupUtils) {
+			PopupUtilsView popupUtils,
+			SynapseProperties synapseProperties) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
@@ -75,6 +78,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		this.fileDownloadButton = fileDownloadButton;
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.popupUtils = popupUtils;
+		this.synapseProperties = synapseProperties;
 		view.setModifiedByWidget(modifiedByUserBadge.asWidget());
 		Callback loadDataCallback = new Callback() {
 			@Override
@@ -126,7 +130,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		Annotations annotations = eb.getAnnotations();
 		String rootWikiId = eb.getRootWikiId();
 		List<FileHandle> handles = eb.getFileHandles();
-		if (PublicPrivateBadge.isPublic(eb.getBenefactorAcl(), globalAppState.getPublicPrincipalIds())) {
+		if (PublicPrivateBadge.isPublic(eb.getBenefactorAcl(), synapseProperties.getPublicPrincipalIds())) {
 			view.showPublicIcon();
 		} else {
 			view.showPrivateIcon();
@@ -168,7 +172,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		}
 		
 		if (eb.getEntity().getModifiedOn() != null) {
-			String modifiedOnString = dateTimeUtils.convertDateToSmallString(eb.getEntity().getModifiedOn());
+			String modifiedOnString = dateTimeUtils.getDateTimeString(eb.getEntity().getModifiedOn());
 			view.setModifiedOn(modifiedOnString);
 		} else {
 			view.setModifiedOn("");

@@ -2,11 +2,11 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +19,8 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestionBundle;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -36,7 +36,7 @@ public class UserGroupSuggestionProviderTest {
 	@Mock
 	AsyncCallback<SynapseSuggestionBundle> mockCallback;
 	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
+	SynapseProperties mockSynapseProperties;
 	@Mock
 	PublicPrincipalIds mockPublicPrincipalIds;
 	int offset = 0;
@@ -49,11 +49,11 @@ public class UserGroupSuggestionProviderTest {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
+		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		when(mockPublicPrincipalIds.getAnonymousUserPrincipalId()).thenReturn(ANONYMOUS_USER_ID);
 		when(mockPublicPrincipalIds.getAuthenticatedAclPrincipalId()).thenReturn(AUTHENTICATED_USERS_ID);
 		when(mockPublicPrincipalIds.getPublicAclPrincipalId()).thenReturn(PUBLIC_ACL_ID);
-		presenter = new UserGroupSuggestionProvider(mockSynapseJavascriptClient, mockGlobalApplicationState);
+		presenter = new UserGroupSuggestionProvider(mockSynapseJavascriptClient, mockSynapseProperties);
 	}
 	
 	@Test

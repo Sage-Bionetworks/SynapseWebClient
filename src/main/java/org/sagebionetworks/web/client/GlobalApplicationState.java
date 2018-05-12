@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.VersionState;
-import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.place.shared.Place;
@@ -17,6 +16,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public interface GlobalApplicationState {
 
+	public void init(final Callback c);
 	
 	/**
 	 * Gets the place changer for the application
@@ -92,17 +92,8 @@ public interface GlobalApplicationState {
 	public boolean isEditing();
 	public void setIsEditing(boolean isEditing);
 	
-	/**
-	 * As app loads, initialize Synapse properties in the GlobalApplicationState so that they can be used client-side.
-	 */
-	void initSynapseProperties(Callback c);
-	
-	String getSynapseProperty(String key);
-	
 	void clearLastPlace();
 	
-	public boolean isWikiBasedEntity(String entityId);
-
 	/**
 	 * This method can be used to change the URL in the browser without reloading the page.
 	 * 
@@ -124,7 +115,6 @@ public interface GlobalApplicationState {
 	void setShowUTCTime(boolean showUTC);
 	boolean isShowingUTCTime();
 	
-	PublicPrincipalIds getPublicPrincipalIds();
 	void initializeDropZone();
 	void setDropZoneHandler(CallbackP<JavaScriptObject> fileListCallback);
 	void clearDropZoneHandler();

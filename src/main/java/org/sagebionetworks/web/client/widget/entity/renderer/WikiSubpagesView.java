@@ -19,7 +19,7 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	 * @param entityId
 	 * @param title
 	 */
-	public void configure(List<V2WikiHeader> wikiHeaders, FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer,
+	public void configure(List<V2WikiHeader> wikiHeaders,
 							String ownerObjectName, Place ownerObjectLink,
 							WikiPageKey curWikiKey, boolean isEmbeddedOwnerPage,
 							CallbackP<WikiPageKey> wikiPageCallback,
@@ -28,7 +28,9 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	void hideSubpages();
 	void showSubpages();
 	void setEditOrderButtonVisible(boolean visible);
-	
+	boolean contains(String wikiPageKey);
+	void setPage(String wikiPageKey);
+
 	// List<String> getCurrentOrderHintIdList();
 	
 	/**

@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseJavascriptFactory.OBJECT_TYPE;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.events.CancelEvent;
 import org.sagebionetworks.web.client.events.CancelHandler;
@@ -84,7 +85,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	private S3DirectUploader s3DirectUploader;
 	private String bucketName, endpointUrl, keyPrefixUUID;
 	private SynapseJavascriptClient jsClient;
-	
+	private SynapseProperties synapseProperties;
 	@Inject
 	public Uploader(
 			UploaderView view, 			
@@ -95,7 +96,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			MultipartUploader multiPartUploader,
 			GlobalApplicationState globalAppState,
 			S3DirectUploader s3DirectUploader,
-			SynapseJavascriptClient jsClient
+			SynapseJavascriptClient jsClient,
+			SynapseProperties synapseProperties
 			) {
 	
 		this.view = view;		
@@ -109,6 +111,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		this.multiPartUploader = multiPartUploader;
 		this.s3DirectUploader = s3DirectUploader;
 		this.jsClient = jsClient;
+		this.synapseProperties = synapseProperties;
 		view.setPresenter(this);
 		clearHandlers();
 	}		
@@ -342,8 +345,8 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	 * @param globalAppState
 	 * @return
 	 */
-	public static String getSftpProxyLink(String fileNameOverride, String realSftpUrl, GlobalApplicationState globalAppState, GWTWrapper gwt) {
-		String sftpProxy = globalAppState.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
+	public static String getSftpProxyLink(String fileNameOverride, String realSftpUrl, SynapseProperties synapseProperties, GWTWrapper gwt) {
+		String sftpProxy = synapseProperties.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT);
 		if (sftpProxy != null) {
 			String delimiter = sftpProxy.contains("?") ? "&" : "?";
 			
@@ -361,7 +364,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			Callback callback = new Callback() {
 				@Override
 				public void invoke() {
-					view.submitForm(getSftpProxyLink("", url, globalAppState, gwt));		
+					view.submitForm(getSftpProxyLink("", url, synapseProperties, gwt));		
 				}
 			};
 			checkForExistingFileName(fileNames[currIndex], callback);

@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.ParameterizedToken;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -83,7 +84,8 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			SubscribeButtonWidget subscribeToForumButton,
 			SingleDiscussionThreadWidget defaultThreadWidget,
 			SubscribersWidget forumSubscribersWidget,
-			SynapseJavascriptClient jsClient
+			SynapseJavascriptClient jsClient,
+			SynapseProperties synapseProperties
 			) {
 		this.view = view;
 		this.stuAlert = stuAlert;
@@ -108,7 +110,7 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 		view.setDefaultThreadWidget(defaultThreadWidget.asWidget());
 		view.setDeletedThreadList(deletedThreadListWidget.asWidget());
 		view.setSubscribersWidget(forumSubscribersWidget.asWidget());
-		String defaultThreadId = globalApplicationState.getSynapseProperty(DEFAULT_THREAD_ID_KEY);
+		String defaultThreadId = synapseProperties.getSynapseProperty(DEFAULT_THREAD_ID_KEY);
 		forumTopic.setObjectType(SubscriptionObjectType.FORUM);
 		initDefaultThread(defaultThreadId);
 		emptyListCallback = new CallbackP<Boolean>(){

@@ -168,6 +168,8 @@ public class PreviewWidgetTest {
 		previewWidget.configure(testBundle);
 		previewWidget.asWidget();
 		verify(mockView, times(0)).setImagePreview(anyString());
+		
+		verify(mockView).showNoPreviewAvailable(TEST_ENTITY_ID, null);
 	}
 	
 	@Test
@@ -327,6 +329,7 @@ public class PreviewWidgetTest {
 		verify(mockView, times(0)).setTablePreview(any());
 		verify(mockView, times(0)).setImagePreview(anyString());
 		verify(mockView, times(0)).setPreviewWidget(any(Widget.class));
+		verify(mockView).showNoPreviewAvailable(TEST_ENTITY_ID, null);
 	}
 	
 	@Test

@@ -22,7 +22,6 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 	public static final int DELAY_MS = 10000;
 	public int timeToNextRefresh;
 	private DownView view;
-	GWTWrapper gwt;
 	GlobalApplicationState globalAppState;
 	Callback updateTimerCallback;
 	StackConfigServiceAsync stackConfigService;
@@ -34,7 +33,6 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 			GlobalApplicationState globalAppState,
 			StackConfigServiceAsync stackConfigService) {
 		this.view = view;
-		this.gwt = gwt;
 		this.globalAppState = globalAppState;
 		this.stackConfigService = stackConfigService;
 		fixServiceEntryPoint(stackConfigService);

@@ -28,10 +28,6 @@ public class EventHandlerUtils {
 		return $wnd;
 	}-*/;
 	
-	public final static native Element getDoc() /*-{
-		return $doc;
-	}-*/;
-	
 	/**
 	 * Start listening to the given event type on the given element.
 	 * @param eventType

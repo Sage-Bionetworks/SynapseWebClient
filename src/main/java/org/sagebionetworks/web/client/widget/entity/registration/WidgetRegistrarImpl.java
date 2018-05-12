@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.dialog.DialogCallback;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapper;
 import org.sagebionetworks.web.shared.WikiPageKey;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.core.client.RunAsyncCallback;
@@ -122,7 +123,9 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getCytoscapeConfigEditor();
 		} else if(contentTypeKey.equals(PLOT_CONTENT_TYPE)) {
 			presenter = ginInjector.getPlotlyConfigEditor();
-		} //TODO: add other widget descriptors to this mapping as they become available
+		} else if(contentTypeKey.equals(SYNAPSE_FORM_CONTENT_TYPE)) {
+			presenter = ginInjector.getSynapseFormConfigEditor();
+		}//TODO: add other widget descriptors to this mapping as they become available
 		if (presenter != null)
 			presenter.configure(wikiKey, model, dialogCallback);
 		
@@ -152,8 +155,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		GWT.runAsync(WidgetRendererPresenter.class, new RunAsyncCallback() {
 			@Override
 			public void onSuccess() {
-				WidgetRendererPresenter presenter = getWidgetRendererForWidgetDescriptorAfterLazyLoad(contentTypeKey);
-				callback.onSuccess(presenter);
+				getWidgetRendererForWidgetDescriptorAfterLazyLoadAndCodeSplit(contentTypeKey, callback);
 			}
 			
 			@Override
@@ -162,7 +164,15 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			}
 		});
 	}
-	
+	public void getWidgetRendererForWidgetDescriptorAfterLazyLoadAndCodeSplit(String contentTypeKey, AsyncCallback<WidgetRendererPresenter> callback) {
+		WidgetRendererPresenter presenter = getWidgetRendererForWidgetDescriptorAfterLazyLoad(contentTypeKey);
+		if (presenter == null) {
+			callback.onFailure(new NotFoundException("Widget renderer not found for type \"" + contentTypeKey + "\""));
+		} else {
+			callback.onSuccess(presenter);	
+		}
+
+	}
 	/**
 	 * Is public for testing purposes only
 	 * @param contentTypeKey
@@ -263,7 +273,6 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		return urlBuilder.toString();
 	}
 	
-
 	@Override
 	public Map<String, String> getWidgetDescriptor(String md) {
 		if (md == null || md.length() == 0) throw new IllegalArgumentException(DisplayConstants.INVALID_WIDGET_MARKDOWN_MESSAGE + md);

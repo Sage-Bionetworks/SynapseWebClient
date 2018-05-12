@@ -24,14 +24,6 @@ public class PeopleSearch extends Place {
 		searchTerm = token;
 	}
 	
-	public PeopleSearch(String searchTerm, Integer start) {		
-		this.token = searchTerm;
-		if(start != null) 
-			this.token += START_DELIMITER + start;
-		this.searchTerm = searchTerm;
-		this.start = start;
-	}
-	
 	public String getSearchTerm() {
 		return searchTerm;
 	}

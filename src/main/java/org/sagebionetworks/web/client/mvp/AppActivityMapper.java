@@ -54,7 +54,6 @@ public class AppActivityMapper implements ActivityMapper {
 	private List<Class> excludeFromLastPlace;
 	private SynapseJSNIUtils synapseJSNIUtils;
 	AppLoadingView loading;
-	Activity lastActivity;
 	private static boolean isFirstTime = false;
 
 	/**
@@ -149,7 +148,6 @@ public class AppActivityMapper implements ActivityMapper {
 		bulkPresenterProxy.setGinjector(ginjector);
 		bulkPresenterProxy.setloader(loading);
 		bulkPresenterProxy.setPlace(place);
-		lastActivity = bulkPresenterProxy;
 		return bulkPresenterProxy;
 	}
 

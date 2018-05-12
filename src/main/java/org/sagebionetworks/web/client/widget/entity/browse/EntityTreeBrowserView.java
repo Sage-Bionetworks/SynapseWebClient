@@ -1,8 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import org.sagebionetworks.repo.model.entity.Direction;
+import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.web.client.SynapseView;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
+import org.sagebionetworks.web.client.widget.table.SortEntityChildrenDropdownButtonListener;
 
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -23,40 +26,26 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	/**
 	 * Presenter interface
 	 */
-	public interface Presenter {
+	public interface Presenter extends SortEntityChildrenDropdownButtonListener {
 
 		void setSelection(String id);
-
 		void expandTreeItemOnOpen(final EntityTreeItem target);
-		
 		void clearRecordsFetchedChildren();
-
 		void addMoreButton(MoreTreeItem moreItem, String parentId,
 				EntityTreeItem parent, String nextPageToken);
-
 		void getChildren(String parentId, EntityTreeItem parent, String nextPageToken);
 	}
-
 	void appendRootEntityTreeItem(EntityTreeItem childToAdd);
-
 	void appendChildEntityTreeItem(EntityTreeItem childToAdd,
 			EntityTreeItem parent);
-
 	void configureEntityTreeItem(EntityTreeItem childToAdd);
-
 	void placeChildMoreTreeItem(MoreTreeItem childToCreate,
 			EntityTreeItem parent, String nextPageToken);
-
 	void placeRootMoreTreeItem(MoreTreeItem childToCreate,
 			String parentId, String nextPageToken);
 
-
 	void showEmptyUI();
-
 	int getRootCount();
-
 	void hideEmptyUI();
-	
 	void setLoadingVisible(boolean isShown);
-
 }

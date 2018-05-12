@@ -8,7 +8,6 @@ import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
@@ -19,8 +18,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.core.client.RunAsyncCallback;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -33,7 +30,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	public static final String SYNAPSE_ORG = "@synapse.org";
 	public static final String GET_SATISFACTION_SUPPORT_SITE = "http://support.sagebase.org";
 	public static final String WWW_SYNAPSE_ORG = "www.synapse.org";
-
 	public static enum MenuItems {
 		DATASETS, TOOLS, NETWORKS, PEOPLE, PROJECTS
 	}
@@ -66,27 +62,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		this.pendoSdk = pendoSdk;
 		view.setPresenter(this);
 		initStagingAlert();
-		initStuAnnouncementWidget();
-	}
-	
-	public void initStuAnnouncementWidget() {
-		try {
-			GWT.runAsync(StuAnnouncementWidget.class, new RunAsyncCallback() {
-				@Override
-				public void onSuccess() {
-					StuAnnouncementWidget stuAnnouncementWidget = portalGinInjector.getStuAnnouncementWidget();
-					view.setStuAnnouncementWidget(stuAnnouncementWidget.asWidget());
-					stuAnnouncementWidget.init();		
-				}
-				
-				@Override
-				public void onFailure(Throwable e) {
-					synapseJSNIUtils.consoleError(e.getMessage());
-				}
-			});
-		} catch (Exception e) {
-			synapseJSNIUtils.consoleError(e.getMessage());
-		}
 	}
 	
 	public void initStagingAlert() {

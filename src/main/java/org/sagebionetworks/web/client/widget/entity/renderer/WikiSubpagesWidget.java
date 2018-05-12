@@ -15,15 +15,14 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Wiki;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,8 +34,7 @@ public class WikiSubpagesWidget implements IsWidget {
 	private WikiPageKey wikiKey; 
 	private String ownerObjectName;
 	private Place ownerObjectLink;
-	private FlowPanel wikiSubpagesContainer;
-	private FlowPanel wikiPageContainer;
+
 	private boolean canEdit;
 	private ActionMenuWidget actionMenu;
 	
@@ -56,16 +54,28 @@ public class WikiSubpagesWidget implements IsWidget {
 
 	public void configure(
 			final WikiPageKey wikiKey, 
-			Callback widgetRefreshRequired, 
 			boolean embeddedInOwnerPage, 
 			CallbackP<WikiPageKey> reloadWikiPageCallback,
 			ActionMenuWidget actionMenu) {
+		
+		//SWC-4177: if loading a page within the currently shown nav tree, don't reload the tree.
+		if (this.wikiKey != null && 
+			this.wikiKey.getOwnerObjectId().equals(wikiKey.getOwnerObjectId()) &&
+			view.contains(wikiKey.getWikiPageId())
+			) {
+			view.setPage(wikiKey.getWikiPageId());
+			view.showSubpages();
+			return;
+		}
+		
 		canEdit = false;
 		this.reloadWikiPageCallback = reloadWikiPageCallback;
 		this.wikiKey = wikiKey;
 		this.isEmbeddedInOwnerPage = embeddedInOwnerPage;
 		this.actionMenu = actionMenu;
+		
 		view.clear();
+		view.hideSubpages();
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
@@ -87,11 +97,6 @@ public class WikiSubpagesWidget implements IsWidget {
 		}
 	}
 	
-	public void setContainers(FlowPanel wikiSubpagesContainer, FlowPanel wikiPageContainer) {
-		this.wikiPageContainer = wikiPageContainer;
-		this.wikiSubpagesContainer = wikiSubpagesContainer;
-	}
-	
 	public static Place getLinkPlace(String entityId, Long entityVersion, String wikiId, boolean isEmbeddedInOwnerPage) {
 		if (isEmbeddedInOwnerPage)
 			return new Synapse(entityId, entityVersion, Synapse.EntityArea.WIKI, wikiId);
@@ -99,34 +104,28 @@ public class WikiSubpagesWidget implements IsWidget {
 			return new Wiki(entityId, ObjectType.ENTITY.toString(), wikiId);
 	}
 	
-	public void clearState() {
-		view.clear();
-	}
-
 	public Widget asWidget() {
 		return view.asWidget();
 	}
 	
 	public void refreshTableOfContents() {
 		view.clear();
-		
 		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onSuccess(final List<V2WikiHeader> wikiHeaders) {
-				
 				synapseClient.getV2WikiOrderHint(wikiKey, new AsyncCallback<V2WikiOrderHint>() {
 					@Override
 					public void onSuccess(V2WikiOrderHint result) {
 						// "Sort" stuff'
 						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, result);
-						view.configure(wikiHeaders, wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
+						view.configure(wikiHeaders, ownerObjectName,
 										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
 						view.setEditOrderButtonVisible(canEdit);
 					}
 					@Override
 					public void onFailure(Throwable caught) {
 						// Failed to get order hint. Just ignore it.
-						view.configure(wikiHeaders, wikiSubpagesContainer, wikiPageContainer, ownerObjectName,
+						view.configure(wikiHeaders, ownerObjectName,
 								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
 						view.setEditOrderButtonVisible(canEdit);
 					}

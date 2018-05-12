@@ -128,7 +128,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 		}
 		
 		if (eb.getEntity().getCreatedOn() != null) {
-			String dateString = dateTimeUtils.convertDateToSmallString(eb.getEntity().getCreatedOn());
+			String dateString = dateTimeUtils.getDateTimeString(eb.getEntity().getCreatedOn());
 			view.setCreatedOn(dateString);
 		} else {
 			view.setCreatedOn("");

@@ -59,6 +59,7 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 import org.sagebionetworks.web.unitclient.widget.provenance.nchart.JsoProviderTestImpl;
+import org.sagebionetworks.web.unitclient.widget.provenance.nchart.LayoutResultTestImpl;
 
 import com.google.gwt.dev.util.collect.HashSet;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -88,7 +89,6 @@ public class ProvenanceWidgetTest {
 	DateTimeUtils mockDateTimeUtils;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
-	
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() throws Exception {
@@ -96,7 +96,7 @@ public class ProvenanceWidgetTest {
 		mockView = mock(ProvenanceWidgetView.class);
 		mockAuthController = mock(AuthenticationController.class);
 		jsoProvider = new JsoProviderTestImpl();
-		when(mockSynapseJSNIUtils.nChartlayout(any(NChartLayersArray.class), any(NChartCharacters.class))).thenReturn(jsoProvider.newLayoutResult());
+		when(mockSynapseJSNIUtils.nChartlayout(any(NChartLayersArray.class), any(NChartCharacters.class))).thenReturn(new LayoutResultTestImpl());
 		mockClientCache = mock(ClientCache.class);
 		mockGlobalAppState = mock(GlobalApplicationState.class);
 		provenanceWidget = new ProvenanceWidget(mockView, 
@@ -269,7 +269,7 @@ public class ProvenanceWidgetTest {
 	@Test
 	public void testFindOldVersionsNotFoundException() throws Exception {
 		SynapseJSNIUtils mockJsniUtils = mock(SynapseJSNIUtils.class);
-		when(mockJsniUtils.nChartlayout(any(NChartLayersArray.class), any(NChartCharacters.class))).thenReturn(jsoProvider.newLayoutResult());
+		when(mockJsniUtils.nChartlayout(any(NChartLayersArray.class), any(NChartCharacters.class))).thenReturn(new LayoutResultTestImpl());
 		provenanceWidget = new ProvenanceWidget(mockView, mockGlobalAppState, mockAuthController, mockJsniUtils, jsoProvider, mockClientCache, mockDateTimeUtils, mockSynapseJavascriptClient);
 		
 		String message = "entity syn999 was not found";

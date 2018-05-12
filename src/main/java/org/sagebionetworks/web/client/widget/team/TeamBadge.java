@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandler;
@@ -30,12 +30,12 @@ public class TeamBadge implements SynapseWidgetPresenter, HasNotificationUI, IsW
 	public TeamBadge(TeamBadgeView view, 
 			TeamAsyncHandler teamAsyncHandler,
 			SynapseJavascriptClient jsClient,
-			GlobalApplicationState globalApplicationState) {
+			SynapseProperties synapseProperties) {
 		this.view = view;
 		this.teamAsyncHandler = teamAsyncHandler;
 		this.jsClient = jsClient;
-		publicAclPrincipalId = globalApplicationState.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID);
-		authenticatedAclPrincipalId = globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID);
+		publicAclPrincipalId = synapseProperties.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID);
+		authenticatedAclPrincipalId = synapseProperties.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID);
 	}
 	
 	public void setMaxNameLength(Integer maxLength) {

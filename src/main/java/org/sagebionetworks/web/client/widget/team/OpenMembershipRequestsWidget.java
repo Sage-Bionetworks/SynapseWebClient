@@ -83,7 +83,7 @@ public class OpenMembershipRequestsWidget implements OpenMembershipRequestsWidge
 					requestMessages.add(requestMessage);
 					requestIds.add(request.getId());
 					profiles.add(b.getUserProfile());
-					createdOnDates.add(dateTimeUtils.convertDateToSmallString(request.getCreatedOn()));
+					createdOnDates.add(dateTimeUtils.getDateTimeString(request.getCreatedOn()));
 				}
 				view.configure(profiles, requestMessages, createdOnDates, requestIds);
 				gwt.restoreWindowPosition();

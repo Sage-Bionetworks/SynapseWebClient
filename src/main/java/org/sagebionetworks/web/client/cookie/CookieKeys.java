@@ -8,11 +8,6 @@ package org.sagebionetworks.web.client.cookie;
  */
 public class CookieKeys {
 
-	/**
-	 * Key for the selected filters applied on the datasets table.
-	 */
-	public static String APPLIED_DATASETS_FILTERS = "org.sagebionetworks.datasets.applied.filters";
-
 	public static String USER_LOGGED_IN_RECENTLY = "org.sagebionetworks.security.user.login.recently";
 	
 	/**

@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
 import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,17 +29,18 @@ public class SynapseTableFormWidgetViewImpl implements SynapseTableFormWidgetVie
 	Div formUI;
 	@UiField
 	Span userBadgeContainer;
-	
+	@UiField
+	Anchor submitAnotherResponseLink;
 	Widget w;
 	Presenter presenter;
 	@Inject
 	public SynapseTableFormWidgetViewImpl(Binder binder) {
 		w=binder.createAndBindUi(this);
-		submitButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onSubmit();
-			}
+		submitButton.addClickHandler(event -> {
+			presenter.onSubmit();
+		});
+		submitAnotherResponseLink.addClickHandler(event -> {
+			presenter.onReset();
 		});
 	}
 	

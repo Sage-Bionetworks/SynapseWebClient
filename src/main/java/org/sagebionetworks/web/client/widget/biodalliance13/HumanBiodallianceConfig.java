@@ -1,12 +1,11 @@
 package org.sagebionetworks.web.client.widget.biodalliance13;
 
 import org.gwtvisualizationwrappers.client.biodalliance13.BiodallianceConfigInterface;
-import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.SynapseProperties;
 
 import com.google.inject.Inject;
 
 public class HumanBiodallianceConfig implements BiodallianceConfigInterface {
-	GlobalApplicationState globalApplicationState;
 	
 	public static final String HUMAN_SPECIES_NAME = "human";
 	public static final int HUMAN_TAXON = 9606;
@@ -21,21 +20,21 @@ public class HumanBiodallianceConfig implements BiodallianceConfigInterface {
 	public static String humanStylesheetURI;
 	
 	public static boolean isUrlInitialized = false;
-	
+	SynapseProperties synapseProperties;
 	@Inject
-	public HumanBiodallianceConfig(GlobalApplicationState globalApplicationState) {
-		this.globalApplicationState = globalApplicationState;
+	public HumanBiodallianceConfig(SynapseProperties synapseProperties) {
+		this.synapseProperties = synapseProperties;
 		
 		if (!isUrlInitialized) {
 			initURIs();
 		}
 	}
 	public void initURIs() {
-		humanTwoBitURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.twobit"));
-		humanBwgURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.bwg"));
-		humanTrixURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.trix"));
-		humanTrixxURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.trixx"));
-		humanStylesheetURI = BiodallianceWidget.getFileResolverURL(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.stylesheet"));
+		humanTwoBitURI = BiodallianceWidget.getFileResolverURL(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.twobit"));
+		humanBwgURI = BiodallianceWidget.getFileResolverURL(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.bwg"));
+		humanTrixURI = BiodallianceWidget.getFileResolverURL(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.trix"));
+		humanTrixxURI = BiodallianceWidget.getFileResolverURL(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.trixx"));
+		humanStylesheetURI = BiodallianceWidget.getFileResolverURL(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.biodalliance.human.stylesheet"));
 		isUrlInitialized = true;
 	}
 	@Override

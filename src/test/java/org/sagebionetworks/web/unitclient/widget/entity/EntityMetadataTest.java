@@ -81,7 +81,6 @@ public class EntityMetadataTest {
 		MockitoAnnotations.initMocks(this);
 		widget = new EntityMetadata(mockView, mockDoiWidget, mockAnnotationsWidget, 
 				mockFileHistoryWidget, mockSynapseClient, mockJSNI, mockRestrictionWidgetV2, mockCookies);
-		when(mockInjector.getFileHistoryWidget()).thenReturn(mockFileHistoryWidget);
 	}
 	
 	@Test

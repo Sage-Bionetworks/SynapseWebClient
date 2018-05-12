@@ -10,9 +10,10 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -49,15 +50,17 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 			final ImageUploadWidget uploader, 
 			SynapseJSNIUtils jsniUtils,
 			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState) {
+			SynapseProperties synapseProperties,
+			PortalGinInjector ginInjector) {
 		this.synAlert = synAlert;
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.uploader = uploader;
+		uploader.setView(ginInjector.getCroppedImageUploadView());
 		this.baseImageURL = jsniUtils.getBaseFileHandleUrl();
 		this.authController = authenticationController;
-		authenticatedUserGroupId = Long.parseLong(globalApplicationState.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));
+		authenticatedUserGroupId = Long.parseLong(synapseProperties.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));
 		uploader.configure(new CallbackP<FileUpload>() {
 			@Override
 			public void invoke(FileUpload fileUpload) {

@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.utils.GovernanceServiceHelper;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
@@ -70,7 +71,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	private SynapseSuggestBox peopleSuggestWidget;
 	private Map<String, AccessRequirement> arMap;
 	private SynapseClientAsync synapseClient;
-	private GlobalApplicationState globalApplicationState;
+	private SynapseProperties synapseProperties;
 	private JobTrackingWidget progressWidget;
 	private DataAccessClientAsync dataAccessClient;
 	@Inject
@@ -79,7 +80,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 			SynapseSuggestBox peopleSuggestBox,
 			UserGroupSuggestionProvider provider, 
 			SynapseClientAsync synapseClient,
-			GlobalApplicationState globalApplicationState,
+			SynapseProperties synapseProperties,
 			JobTrackingWidget progressWidget,
 			DataAccessClientAsync dataAccessClient) {
 		this.view = view;
@@ -87,7 +88,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 		this.peopleSuggestWidget = peopleSuggestBox;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
-		this.globalApplicationState = globalApplicationState;
+		this.synapseProperties = synapseProperties;
 		this.progressWidget = progressWidget;
 		this.dataAccessClient = dataAccessClient;
 		fixServiceEntryPoint(dataAccessClient);
@@ -203,7 +204,7 @@ public class ApproveUserAccessModal implements ApproveUserAccessModalView.Presen
 	public Query getDefaultQuery() {
 		StringBuilder builder = new StringBuilder();
 		builder.append(SELECT_FROM);
-		builder.append(globalApplicationState.getSynapseProperty("org.sagebionetworks.portal.act.synapse_storage_id"));
+		builder.append(synapseProperties.getSynapseProperty("org.sagebionetworks.portal.act.synapse_storage_id"));
 		builder.append(WHERE);
 		builder.append(datasetId + "'");
 		

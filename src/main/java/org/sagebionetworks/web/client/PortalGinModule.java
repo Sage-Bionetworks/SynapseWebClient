@@ -367,6 +367,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ReferenceConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ShinySiteConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.SynapseFormConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.SynapseFormConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.TabbedTableConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.TableQueryResultWikiView;
@@ -479,8 +481,6 @@ import org.sagebionetworks.web.client.widget.googlemap.GoogleMapViewImpl;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.header.HeaderViewImpl;
-import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetView;
-import org.sagebionetworks.web.client.widget.header.StuAnnouncementWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueue;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadCallbackQueueImpl;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadWikiWidgetWrapperView;
@@ -776,9 +776,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		//file history
 		bind(FileHistoryWidgetView.class).to(FileHistoryWidgetViewImpl.class);
-				
-		// The URL cache
-		bind(UrlCache.class).to(UrlCacheImpl.class).in(Singleton.class);;
 		
 		//GWT utility methods
 		bind(GWTWrapper.class).to(GWTWrapperImpl.class).in(Singleton.class);
@@ -1247,6 +1244,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(StorageLocationWidgetView.class).to(StorageLocationWidgetViewImpl.class);
 		bind(ErrorView.class).to(ErrorViewImpl.class);
 		bind(PreviewConfigView.class).to(PreviewConfigViewImpl.class);
+		bind(SynapseFormConfigView.class).to(SynapseFormConfigViewImpl.class);
 		
 		bind(EditFileMetadataModalView.class).to(EditFileMetadataModalViewImpl.class);
 		bind(EditFileMetadataModalWidget.class).to(EditFileMetadataModalWidgetImpl.class);
@@ -1311,7 +1309,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(UserSelectorView.class).to(UserSelectorViewImpl.class);
 		bind(CreateTableViewWizardStep1View.class).to(CreateTableViewWizardStep1ViewImpl.class);
 		bind(EntityContainerListWidgetView.class).to(EntityContainerListWidgetViewImpl.class);
-		bind(StuAnnouncementWidgetView.class).to(StuAnnouncementWidgetViewImpl.class);
 		bind(ScopeWidgetView.class).to(ScopeWidgetViewImpl.class);
 		bind(CopyTextModal.class).to(CopyTextModalImpl.class);
 		
@@ -1400,5 +1397,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(S3DirectLoginDialog.class).to(S3DirectLoginDialogImpl.class);
 		bind(WikiPageDeleteConfirmationDialogView.class).to(WikiPageDeleteConfirmationDialogViewImpl.class);
 		bind(WikiDiffView.class).to(WikiDiffViewImpl.class);
+		bind(SynapseProperties.class).to(SynapsePropertiesImpl.class).in(Singleton.class);
+		bind(Moment.class).to(MomentImpl.class);
 	}
 }

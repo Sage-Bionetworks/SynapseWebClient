@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.unitclient.widget.entity.file;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -20,8 +24,8 @@ import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
@@ -43,7 +47,7 @@ public class FileTitleBarTest {
 	@Mock
 	EntityBundle mockBundle;
 	@Mock
-	GlobalApplicationState mockGlobalAppState;
+	SynapseProperties mockSynapseProperties;
 	@Mock
 	org.sagebionetworks.repo.model.FileEntity mockFileEntity;
 	S3FileHandle handle;
@@ -65,13 +69,13 @@ public class FileTitleBarTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		fileTitleBar = new FileTitleBar(mockView, mockGlobalAppState, mockFileDownloadButton, mockSynapseClient);
+		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockSynapseClient);
 		when(mockFileEntity.getId()).thenReturn("syn123");
 		when(mockFileEntity.getName()).thenReturn("syn123");
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(DATA_FILE_HANDLE_ID);
 		when(mockFileEntity.getVersionNumber()).thenReturn(FILE_VERSION);
 		when(mockBundle.getEntity()).thenReturn(mockFileEntity);
-		when(mockGlobalAppState.getSynapseProperty("org.sagebionetworks.portal.synapse_storage_id"))
+		when(mockSynapseProperties.getSynapseProperty("org.sagebionetworks.portal.synapse_storage_id"))
 				.thenReturn(String.valueOf(synStorageLocationId));
 		List<FileHandle> fileHandles = new LinkedList<FileHandle>();
 		handle = new S3FileHandle();

@@ -47,6 +47,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityBadge;
@@ -103,7 +104,8 @@ public class EntityBadgeTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	PopupUtilsView mockPopupUtils;
-	
+	@Mock
+	SynapseProperties mockSynapseProperties;
 	@Captor
 	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
 	
@@ -126,9 +128,9 @@ public class EntityBadgeTest {
 		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
 				mockUserBadge, mockSynapseJavascriptClient,
 				mockFileDownloadButton, mockLazyLoadHelper,
-				mockDateTimeUtils, mockPopupUtils);
+				mockDateTimeUtils, mockPopupUtils, mockSynapseProperties);
 		
-		when(mockGlobalApplicationState.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
+		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		annotationList = new ArrayList<Annotation>();
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY1, Collections.EMPTY_LIST));
 		annotationList.add(new Annotation(ANNOTATION_TYPE.STRING, KEY2, Collections.singletonList(VALUE2)));
@@ -206,7 +208,7 @@ public class EntityBadgeTest {
 		testFile.setModifiedBy(modifiedByPrincipalId.toString());
 		Date modifiedOn = new Date();
 		String smallDateString="10/02/2000 01:26:45PM";
-		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(smallDateString);
+		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(smallDateString);
 		testFile.setModifiedOn(modifiedOn);
 		when(mockPublicPrincipalIds.isPublic(anyLong())).thenReturn(true);
 		entityThreadCount = 1L;
@@ -217,7 +219,7 @@ public class EntityBadgeTest {
 		verify(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		verify(mockUserBadge).configure(modifiedByPrincipalId.toString());
 		verify(mockView).setModifiedByWidgetVisible(true);
-		verify(mockDateTimeUtils).convertDateToSmallString(modifiedOn);
+		verify(mockDateTimeUtils).getDateTimeString(modifiedOn);
 		verify(mockView).setModifiedOn(smallDateString);
 				
 		verify(mockView).showPublicIcon();

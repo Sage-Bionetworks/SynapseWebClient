@@ -26,9 +26,6 @@ public interface UserProfileClient extends RemoteService {
 	void updateVerificationState(long verificationId,
 			VerificationState verificationState, String hostPageBaseURL) throws RestServiceException;
 
-	void deleteVerificationSubmission(long verificationId)
-			throws RestServiceException;
-
 	UserBundle getMyOwnUserBundle(int mask) throws RestServiceException;
 
 	void unbindOAuthProvidersUserId(OAuthProvider provider, String alias)

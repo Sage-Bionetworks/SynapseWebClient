@@ -1,14 +1,11 @@
 package org.sagebionetworks.web.client.widget.table;
 
-import org.gwtbootstrap3.client.ui.AnchorListItem;
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -17,10 +14,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -39,15 +34,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@UiField
 	Div loadMoreWidgetContainer;
 	@UiField
-	AnchorListItem createdOnDesc;
-	@UiField
-	AnchorListItem createdOnAsc;
-	@UiField
-	AnchorListItem nameAsc;
-	@UiField
-	AnchorListItem nameDesc;
-	@UiField
-	Button sortButton;
+	Div sortButtonContainer;
 	@UiField
 	Div synAlertContainer;
 	
@@ -56,40 +43,15 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	PortalGinInjector ginInjector;
 	@UiField
 	LoadingSpinner loadingUI;
-	
+	SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton;
 	@Inject
-	public TableListWidgetViewImpl(Binder binder, PortalGinInjector ginInjector) {
+	public TableListWidgetViewImpl(Binder binder, 
+			PortalGinInjector ginInjector, 
+			SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton) {
 		this.panel = binder.createAndBindUi(this);
 		this.ginInjector = ginInjector;
-		createdOnDesc.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				sortButton.setText(createdOnDesc.getText());
-				presenter.onSort(SortBy.CREATED_ON, Direction.DESC);
-			}
-		});
-		createdOnAsc.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				sortButton.setText(createdOnAsc.getText());
-				presenter.onSort(SortBy.CREATED_ON, Direction.ASC);
-			}
-		});
-		nameDesc.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				sortButton.setText(nameDesc.getText());
-				presenter.onSort(SortBy.NAME, Direction.DESC);
-			}
-		});
-
-		nameAsc.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				sortButton.setText(nameAsc.getText());
-				presenter.onSort(SortBy.NAME, Direction.ASC);
-			}
-		});
+		this.sortEntityChildrenDropdownButton = sortEntityChildrenDropdownButton;
+		sortButtonContainer.add(sortEntityChildrenDropdownButton);
 	}
 
 	@Override
@@ -114,13 +76,14 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	}
 	
 	@Override
-	public void resetSortUI() {
-		sortButton.setText(createdOnDesc.getText());	
+	public void setSortUI(SortBy sortBy, Direction dir) {
+		sortEntityChildrenDropdownButton.setSortUI(sortBy, dir);
 	}
 	
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
+		sortEntityChildrenDropdownButton.setListener(presenter);
 	}
 	
 	@Override
