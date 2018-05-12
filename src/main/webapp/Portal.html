@@ -50,7 +50,7 @@
 		<script>
 			// determine cdn endpoint (staging or prod, do not use a cdn for local or dev builds)
 			var cdnEndpoint = "//cdn-" + location.hostname + "/";
-			var synapseOrgRegex = /[.]synapse[.]org$/;
+			var synapseOrgRegex = /(www|staging|tst)\.synapse\.org$/;
 			if (!synapseOrgRegex.test(location.hostname)) {
 				cdnEndpoint = "";
 			}
