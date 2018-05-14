@@ -133,7 +133,6 @@ public interface SynapseClientAsync {
 	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset,
 			AsyncCallback<PaginatedResults<Team>> callback);
 	void getTeamBundle(String userId, String teamId, boolean isLoggedIn, AsyncCallback<TeamBundle> callback);
-	void getOpenRequestCount(String currentUserId, String teamId, AsyncCallback<Long> callback);
 	void getOpenInvitations(String userId, AsyncCallback<ArrayList<OpenUserInvitationBundle>> callback);
 	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<ArrayList<OpenTeamInvitationBundle>> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);

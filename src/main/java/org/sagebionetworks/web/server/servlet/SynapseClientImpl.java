@@ -1315,34 +1315,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		return userId2UserProfile;
 	}
 
-	private boolean isTeamAdmin(String currentUserId, String teamId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
-		TeamMember member = synapseClient.getTeamMember(teamId, currentUserId);
-		return member.getIsAdmin();
-	}
-	
-	
-	@Override
-	public Long getOpenRequestCount(String currentUserId, String teamId)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			// must be an admin to the team open requests. To get admin status,
-			// must be a member
-			// get's membership request count
-			if (isTeamAdmin(currentUserId, teamId, synapseClient)) {
-				org.sagebionetworks.reflection.model.PaginatedResults<MembershipRequest> requests = synapseClient
-						.getOpenMembershipRequests(teamId, null, 1, ZERO_OFFSET);
-				// need open request count.
-				return requests.getTotalNumberOfResults();
-			} else {
-				return null;
-			}
-				
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
 	@Override
 	public ArrayList<OpenUserInvitationBundle> getOpenInvitations(String userId)
 			throws RestServiceException {
