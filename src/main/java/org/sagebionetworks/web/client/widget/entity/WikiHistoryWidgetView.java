@@ -31,4 +31,5 @@ public interface WikiHistoryWidgetView extends IsWidget, SynapseView{
 	public void hideHistoryWidget();
 	public void showHistoryWidget();
 	void hideLoadMoreButton();
+	void setSynAlert(IsWidget w);
 }

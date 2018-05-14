@@ -2,8 +2,6 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
@@ -25,6 +23,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidget.ActionHandler;
 import org.sagebionetworks.web.client.widget.entity.WikiHistoryWidgetView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -37,23 +36,24 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
  *
  */
 public class WikiHistoryWidgetTest {
+	@Mock
 	WikiHistoryWidgetView mockView;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	AuthenticationController mockAuthenticationController;
 	WikiHistoryWidget presenter;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	SynapseAlert mockSynAlert;
 	
 	@Before
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
-		mockView = mock(WikiHistoryWidgetView.class);
-		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		
-		presenter = new WikiHistoryWidget(mockGlobalApplicationState, mockView, mockSynapseClient, mockAuthenticationController, mockSynapseJavascriptClient);
+		presenter = new WikiHistoryWidget(mockGlobalApplicationState, mockView, mockSynapseClient, mockAuthenticationController, mockSynapseJavascriptClient, mockSynAlert);
 		
 		PaginatedResults<JSONEntity> paginatedHistory = new PaginatedResults<JSONEntity>();
 		paginatedHistory.setTotalNumberOfResults(1);
@@ -104,10 +104,11 @@ public class WikiHistoryWidgetTest {
 	
 	@Test
 	public void testConfigureNextPageFailure() {
-		AsyncMockStubber.callFailureWith(new Exception())
+		Exception ex = new Exception();
+		AsyncMockStubber.callFailureWith(ex)
 			.when(mockSynapseClient).getV2WikiHistory(any(WikiPageKey.class), any(Long.class), any(Long.class), any(AsyncCallback.class));
 		presenter.configureNextPage(new Long(0), new Long(10));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test
@@ -132,10 +133,11 @@ public class WikiHistoryWidgetTest {
 	
 	@Test
 	public void testConfigureNextPageFailure2() {
-		AsyncMockStubber.callFailureWith(new Exception())
+		Exception ex = new Exception();
+		AsyncMockStubber.callFailureWith(ex)
 			.when(mockSynapseJavascriptClient).getUserGroupHeadersById(any(ArrayList.class), any(AsyncCallback.class));
 		presenter.configureNextPage(new Long(0), new Long(10));
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test

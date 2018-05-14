@@ -6,9 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -23,14 +21,10 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadgeView;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
@@ -45,33 +39,26 @@ public class PublicPrivateBadgeTest {
 	private static final Long TEST_ANONYMOUS_PRINCIPAL_ID = 422l;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
-
 	PublicPrivateBadge publicPrivateBadge;
+	@Mock
 	PublicPrivateBadgeView mockView;
-	AuthenticationController mockAuthenticationController;
+	@Mock
 	UserAccountServiceAsync mockUserService;
-	GlobalApplicationState mockGlobalApplicationState;
-	PlaceChanger mockPlaceChanger;	
 	JSONObjectAdapter adapter = new JSONObjectAdapterImpl();
 	AccessControlList acl;
 	PublicPrincipalIds publicPrincipalIds;
 	Set<ResourceAccess> resourceAccessSet = new HashSet<ResourceAccess>();
 	Entity testEntity;
+	
 	@Before
-	public void setup() throws JSONObjectAdapterException {
+	public void setup() {
 		MockitoAnnotations.initMocks(this);
-		mockView = mock(PublicPrivateBadgeView.class);
-		mockAuthenticationController = mock(AuthenticationController.class);
-		mockUserService = mock(UserAccountServiceAsync.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
-		publicPrivateBadge = new PublicPrivateBadge(mockView, mockSynapseJavascriptClient, mockGlobalApplicationState, mockAuthenticationController, mockUserService);
+		publicPrivateBadge = new PublicPrivateBadge(mockView, mockSynapseJavascriptClient, mockUserService);
 		acl = new AccessControlList();
 		acl.setResourceAccess(resourceAccessSet);
 		testEntity = new FileEntity();
 		testEntity.setId("syn12345");
 		publicPrincipalIds=new PublicPrincipalIds(TEST_PUBLIC_PRINCIPAL_ID, TEST_AUTHENTICATED_PRINCIPAL_ID, TEST_ANONYMOUS_PRINCIPAL_ID);
-		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		EntityBundle transport = new EntityBundle();
 		transport.setBenefactorAcl(acl);
 		AsyncMockStubber.callSuccessWith(transport).when(mockSynapseJavascriptClient).getEntityBundle(anyString(),  anyInt(),  any(AsyncCallback.class));

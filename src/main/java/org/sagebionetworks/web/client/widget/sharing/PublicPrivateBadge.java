@@ -7,10 +7,8 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -19,8 +17,6 @@ import com.google.inject.Inject;
 
 public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	
-	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 	private PublicPrivateBadgeView view;
 	private PublicPrincipalIds publicPrincipalIds;
 	private UserAccountServiceAsync userAccountService;
@@ -32,13 +28,9 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 	public PublicPrivateBadge(
 			PublicPrivateBadgeView view, 
 			SynapseJavascriptClient jsClient, 
-			GlobalApplicationState globalApplicationState, 
-			AuthenticationController authenticationController, 
 			UserAccountServiceAsync userAccountService) {
 		this.view = view;
 		this.jsClient = jsClient;
-		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.userAccountService = userAccountService;
 		fixServiceEntryPoint(userAccountService);
 		view.setPresenter(this);
@@ -74,8 +66,7 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				if (!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(caught.getMessage());
+				view.showErrorMessage(caught.getMessage());
 			}
 		};
 		
@@ -97,8 +88,9 @@ public class PublicPrivateBadge implements PublicPrivateBadgeView.Presenter {
 			public void onFailure(Throwable caught) {
 				if (isPublicCallback != null)
 					isPublicCallback.onFailure(caught);
-				else if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
+				else {
 					view.showErrorMessage("Could not find the public group: " + caught.getMessage());
+				}
 			}
 		});
 	}

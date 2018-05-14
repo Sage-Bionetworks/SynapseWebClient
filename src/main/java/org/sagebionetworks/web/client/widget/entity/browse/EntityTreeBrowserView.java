@@ -48,4 +48,5 @@ public interface EntityTreeBrowserView extends IsWidget, SynapseView {
 	int getRootCount();
 	void hideEmptyUI();
 	void setLoadingVisible(boolean isShown);
+	void setSynAlert(IsWidget w);
 }
