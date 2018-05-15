@@ -134,6 +134,19 @@ public class QueryTableConfigEditorTest {
 		assertEquals(isShowRowNumbers.toString(),descriptor.get(WidgetConstants.API_TABLE_WIDGET_SHOW_ROW_NUMBER_KEY));
 	}
 	
+	@Test (expected=IllegalArgumentException.class)
+	public void testQueryWithOrderByAndPagination() {
+		editor.configure(mockWikiKey, descriptor, null);
+		decodedTestQuery = "select * from evaluation_1234 Order BY name";
+		when(mockView.getQueryString()).thenReturn(decodedTestQuery);
+		Boolean isPaging = true;
+		when(mockView.isPaging()).thenReturn(isPaging);
+		Boolean isShowRowNumbers = false;
+		when(mockView.isShowRowNumbers()).thenReturn(isShowRowNumbers);
+		
+		editor.updateDescriptorFromView();
+	}
+	
 	
 	@Test
 	public void testAutoAddColumns() {
