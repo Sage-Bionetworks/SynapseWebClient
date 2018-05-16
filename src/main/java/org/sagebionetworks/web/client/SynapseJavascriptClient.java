@@ -156,6 +156,7 @@ public class SynapseJavascriptClient {
 	public static final String ETAG = "etag";
 	public static final String GENERATED_PATH = "/generated";
 	public static final String GENERATED_BY_SUFFIX = "/generatedBy";
+	public static final String OPEN_MEMBERSHIP_REQUEST = "/openRequest";
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	private static final String LOG = "/log";
@@ -1072,6 +1073,11 @@ public class SynapseJavascriptClient {
 	public void completeMultipartUpload(String uploadId, AsyncCallback<MultipartUploadStatus> callback) {
 		String url = getFileServiceUrl() + "/file/multipart/" + uploadId + "/complete";
 		doPut(url, null, OBJECT_TYPE.MultipartUploadStatus, callback);
+	}
+	
+	public void getOpenMembershipRequestCount(String teamId, AsyncCallback<Long> callback) {
+		String url = getRepoServiceUrl() + TEAM + "/" + teamId + OPEN_MEMBERSHIP_REQUEST + "?" + OFFSET_PARAMETER + "0&" + LIMIT_PARAMETER + "1";
+		doGet(url, OBJECT_TYPE.PaginatedResultsTotalNumberOfResults, callback);
 	}
 }
 

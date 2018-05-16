@@ -960,7 +960,7 @@ public class ProfilePresenterTest {
 		when(mockPaginatedTeamIds.getTeamIds()).thenReturn(teamIds);
 		when(mockSynapseJavascriptClient.getUserTeams(anyString(), anyBoolean(), anyString())).thenReturn(getDoneFuture(mockPaginatedTeamIds));
 		when(mockSynapseJavascriptClient.listTeams(anyList())).thenReturn(getDoneFuture(teams));
-		AsyncMockStubber.callSuccessWith(openRequestNumberPerTeam).when(mockSynapseClient).getOpenRequestCount(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(openRequestNumberPerTeam).when(mockSynapseJavascriptClient).getOpenMembershipRequestCount(anyString(), any(AsyncCallback.class));
 		return teams;
 	}
 	

@@ -755,7 +755,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getTeamRequestCount(String userId, final Team team) {
-		synapseClient.getOpenRequestCount(userId, team.getId(), new AsyncCallback<Long>() {
+		jsClient.getOpenMembershipRequestCount(team.getId(), new AsyncCallback<Long>() {
 			@Override
 			public void onFailure(Throwable caught) {
 			}

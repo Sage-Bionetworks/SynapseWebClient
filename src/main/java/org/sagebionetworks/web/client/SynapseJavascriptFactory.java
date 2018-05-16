@@ -115,6 +115,7 @@ public class SynapseJavascriptFactory {
 		MultipartUploadStatus,
 		BatchPresignedUploadUrlResponse,
 		AddPartResponse,
+		PaginatedResultsTotalNumberOfResults,
 		None,
 		String
 	}
@@ -204,6 +205,8 @@ public class SynapseJavascriptFactory {
 			return new UserProfile(json);
 		case FileHandleResults :
 			return new FileHandleResults(json).getList();
+		case PaginatedResultsTotalNumberOfResults :
+			return json.getLong("totalNumberOfResults");
 		case ChallengePagedResults:
 			return new ChallengePagedResults(json).getResults();
 		case JSON :

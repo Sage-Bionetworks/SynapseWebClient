@@ -151,7 +151,6 @@ public interface SynapseClient extends RemoteService{
 	void deleteTeam(String teamId) throws RestServiceException;
 	PaginatedResults<Team> getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
 	TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;
-	Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException;
 	ArrayList<OpenUserInvitationBundle> getOpenInvitations(String userId) throws RestServiceException;
 	ArrayList<OpenTeamInvitationBundle> getOpenTeamInvitations(String teamId, Integer limit, Integer offset) throws RestServiceException;
 	List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
