@@ -38,7 +38,8 @@ public class GWTCacheControlFilter implements Filter {
 		if (requestURI.contains(".cache.")) {
 			//safe to cache
 			//https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#cache-control
-			httpResponse.setHeader("Cache-Control", "max-age="+CACHE_TIME_SECONDS);
+			//note: no-cache forces client to resubmit the request to the origin server for validation (based on etag) before using the cached file.  Will avoid download of the resource if etag matches.
+			httpResponse.setHeader("Cache-Control", "no-cache, max-age="+CACHE_TIME_SECONDS);  
 			httpResponse.setHeader("Pragma", "");
 			httpResponse.setDateHeader("Expires", now+CACHE_TIME);
 		}
