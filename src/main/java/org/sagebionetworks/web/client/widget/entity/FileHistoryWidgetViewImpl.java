@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Panel;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -45,6 +46,8 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	Button editInfoButton;
 	@UiField
 	Button moreButton;
+	@UiField
+	Div synAlertContainer;
 	PromptTwoValuesModalView editVersionInfoModal;
 	
 	private static DateTimeFormat shortDateFormat = DateTimeFormat.getShortDateFormat();
@@ -164,5 +167,10 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 	@Override
 	public void hideEditVersionInfo() {
 		editVersionInfoModal.hide();
+	}
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }

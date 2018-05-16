@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JsoProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayersArray;
@@ -73,6 +74,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 	ProvGraph currentGraph;
 	ClientCache clientCache;
 	DateTimeUtils dateTimeUtils;
+	SynapseAlert synAlert;
+	
 	@Inject
 	public ProvenanceWidget(ProvenanceWidgetView view, 
 			GlobalApplicationState globalApplicationState,
@@ -81,7 +84,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			JsoProvider jsoProvider, 
 			ClientCache clientCache,
 			DateTimeUtils dateTimeUtils,
-			SynapseJavascriptClient jsClient) {
+			SynapseJavascriptClient jsClient,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -90,6 +94,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		this.clientCache = clientCache;
 		this.dateTimeUtils = dateTimeUtils;
 		this.jsClient = jsClient;
+		this.synAlert = synAlert;
+		view.setSynAlert(synAlert);
 		view.setPresenter(this);
 	}
 
@@ -143,7 +149,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		
 		// do not create expand nodes for these (generally for previously expanded/discovered nodes without an activity)
 		noExpandNode = new HashSet<Reference>();		
-		
+		synAlert.clear();
 		// callback after all starting references have their current version looked up (if Versionable)
 		AsyncCallback<Void> lookupCurrentVersionCallback = new AsyncCallback<Void>() {
 			@Override
@@ -165,7 +171,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 			}
 			@Override
 			public void onFailure(Throwable caught) {
-				view.showErrorMessage(DisplayConstants.ERROR_PROVENANCE);
+				synAlert.handleException(caught);
 			}
 		};
 		// lookup versions for the start references, if needed
@@ -500,6 +506,7 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 		}
 		
 		// batch request all entity ids to get current version. Notify view of non current versions
+		synAlert.clear();
 		jsClient.getEntityHeaderBatchFromReferences(new ArrayList<Reference>(entityIds), new AsyncCallback<ArrayList<EntityHeader>>() {
 			@Override
 			public void onSuccess(ArrayList<EntityHeader> currentVersions) {
@@ -523,9 +530,8 @@ public class ProvenanceWidget implements ProvenanceWidgetView.Presenter, WidgetR
 					//SWC-1843: do not redirect home.  log full exception to the console
 					synapseJSNIUtils.consoleError(caught.getMessage() + "\n" + DisplayUtils.getStackTrace(caught));
 				} else {
-					DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view);	
+					synAlert.handleException(caught);
 				}
-				
 			}
 		});
 	}

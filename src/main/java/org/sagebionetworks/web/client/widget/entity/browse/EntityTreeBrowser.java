@@ -14,19 +14,17 @@ import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
 import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntitySelectedEvent;
 import org.sagebionetworks.web.client.events.EntitySelectedHandler;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -36,8 +34,6 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 		SynapseWidgetPresenter {
 	private EntityTreeBrowserView view;
 	private SynapseJavascriptClient jsClient;
-	private AuthenticationController authenticationController;
-	private GlobalApplicationState globalApplicationState;
 	AdapterFactory adapterFactory;
 	private Set<EntityTreeItem> alreadyFetchedEntityChildren;
 	private PortalGinInjector ginInjector;
@@ -45,7 +41,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	EntitySelectedHandler entitySelectedHandler;
 	CallbackP<String> entityClickedHandler;
 	EntityFilter filter = EntityFilter.ALL;
-	
+	SynapseAlert synAlert;
 	private SortBy currentSortBy;
 	private Direction currentDirection;
 	private String rootEntityId;
@@ -56,18 +52,17 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public EntityTreeBrowser(PortalGinInjector ginInjector,
 			EntityTreeBrowserView view, 
 			SynapseJavascriptClient synapseClient,
-			AuthenticationController authenticationController,
-			GlobalApplicationState globalApplicationState,
 			IconsImageBundle iconsImageBundle, 
-			AdapterFactory adapterFactory) {
+			AdapterFactory adapterFactory,
+			SynapseAlert synAlert) {
 		this.view = view;
 		this.jsClient = synapseClient;
-		this.authenticationController = authenticationController;
-		this.globalApplicationState = globalApplicationState;
 		this.adapterFactory = adapterFactory;
 		this.ginInjector = ginInjector;
 		alreadyFetchedEntityChildren = new HashSet<EntityTreeItem>();
 		view.setPresenter(this);
+		this.synAlert = synAlert;
+		view.setSynAlert(synAlert);
 	}
 	
 	public void clear() {
@@ -145,6 +140,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 	public void getChildren(final String parentId,
 			final EntityTreeItem parent, String nextPageToken) {
 		EntityChildrenRequest request = createGetEntityChildrenRequest(parentId, nextPageToken);
+		synAlert.clear();
 		// ask for the folder children, then the files
 		jsClient.getEntityChildren(request,
 				new AsyncCallback<EntityChildrenResponse>() {
@@ -172,9 +168,7 @@ public class EntityTreeBrowser implements EntityTreeBrowserView.Presenter,
 
 					@Override
 					public void onFailure(Throwable caught) {
-						DisplayUtils.handleServiceException(caught,
-								globalApplicationState,
-								authenticationController.isLoggedIn(), view);
+						synAlert.handleException(caught);
 					}
 				});
 	}

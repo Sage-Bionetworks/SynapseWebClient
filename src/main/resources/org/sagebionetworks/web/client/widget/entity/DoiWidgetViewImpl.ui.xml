@@ -10,6 +10,7 @@
 	    <b:Alert ui:field="errorCreatingDoi" addStyleNames="boldText" visible="false">
 	        <bh:Strong text="Error creating DOI"/>
 	    </b:Alert>
+	    <bh:Div ui:field="synAlertContainer"/>
 	    <bh:Span ui:field="doiLabel" addStyleNames="boldText margin-right-5" text="DOI: " visible="false"/>
 	    <g:TextBox ui:field="doi" width="240px" addStyleNames="border-none noBackground padding-0" readOnly="true" />
 	    <g:SimplePanel ui:field="doiProcessing" addStyleNames="inline-block padding-right-5">

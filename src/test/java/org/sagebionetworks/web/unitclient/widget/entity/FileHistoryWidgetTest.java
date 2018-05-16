@@ -51,6 +51,7 @@ import org.sagebionetworks.web.client.widget.entity.FileHistoryWidget;
 import org.sagebionetworks.web.client.widget.entity.FileHistoryWidgetView;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -89,6 +90,8 @@ public class FileHistoryWidgetTest {
 	public static final Long DEFAULT_MOCK_VERSION_COUNT = 2L;
 	@Mock
 	PaginatedResults<VersionInfo> mockPagedResults;
+	@Mock
+	SynapseAlert mockSynAlert;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -100,7 +103,7 @@ public class FileHistoryWidgetTest {
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(usd);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 
-		fileHistoryWidget = new FileHistoryWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockPreflightController);
+		fileHistoryWidget = new FileHistoryWidget(mockView, mockSynapseClient, mockGlobalApplicationState, mockAuthenticationController, mockPreflightController, mockSynAlert);
 
 		vb = new FileEntity();
 		vb.setId(entityId);
@@ -201,7 +204,7 @@ public class FileHistoryWidgetTest {
 		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).updateEntity(any(Entity.class), any(AsyncCallback.class));
 		fileHistoryWidget.updateVersionInfo(testLabel, testComment);
 		verify(mockSynapseClient).updateEntity(any(Entity.class), (AsyncCallback<Entity>) any());
-		verify(mockView).showEditVersionInfoError(anyString());
+		verify(mockSynAlert).handleException(ex);
 	}
 
 	@Test
@@ -244,7 +247,7 @@ public class FileHistoryWidgetTest {
 		fileHistoryWidget.deleteVersion(vb.getVersionNumber());
 		
 		verify(mockSynapseClient).deleteEntityVersionById(matches(vb.getId()), eq(vb.getVersionNumber()), (AsyncCallback<Void>) any());
-		verify(mockView).showErrorMessage(anyString());
+		verify(mockSynAlert).handleException(ex);
 	}
 	
 	@Test

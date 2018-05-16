@@ -44,6 +44,7 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.transform.JsoProvider;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget.ActivityProcessItem;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
@@ -89,6 +90,8 @@ public class ProvenanceWidgetTest {
 	DateTimeUtils mockDateTimeUtils;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	SynapseAlert mockSynAlert;
 	@SuppressWarnings("unchecked")
 	@Before
 	public void setup() throws Exception {
@@ -106,7 +109,8 @@ public class ProvenanceWidgetTest {
 				jsoProvider, 
 				mockClientCache, 
 				mockDateTimeUtils,
-				mockSynapseJavascriptClient);
+				mockSynapseJavascriptClient,
+				mockSynAlert);
 		verify(mockView).setPresenter(provenanceWidget);
 		
 		outputEntity = new FileEntity();
@@ -270,7 +274,7 @@ public class ProvenanceWidgetTest {
 	public void testFindOldVersionsNotFoundException() throws Exception {
 		SynapseJSNIUtils mockJsniUtils = mock(SynapseJSNIUtils.class);
 		when(mockJsniUtils.nChartlayout(any(NChartLayersArray.class), any(NChartCharacters.class))).thenReturn(new LayoutResultTestImpl());
-		provenanceWidget = new ProvenanceWidget(mockView, mockGlobalAppState, mockAuthController, mockJsniUtils, jsoProvider, mockClientCache, mockDateTimeUtils, mockSynapseJavascriptClient);
+		provenanceWidget = new ProvenanceWidget(mockView, mockGlobalAppState, mockAuthController, mockJsniUtils, jsoProvider, mockClientCache, mockDateTimeUtils, mockSynapseJavascriptClient, mockSynAlert);
 		
 		String message = "entity syn999 was not found";
 		AsyncMockStubber.callFailureWith(new NotFoundException(message)).when(mockSynapseJavascriptClient).getEntityHeaderBatchFromReferences(anyList(), any(AsyncCallback.class));
