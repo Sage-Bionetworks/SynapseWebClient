@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -95,6 +96,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	ActionMenuWidget.ActionListener editActionListener, unpinActionListener, pinActionListener, deleteActionListener;
 	Boolean isPinned;
 	PopupUtilsView popupUtils;
+	ClientCache clientCache;
 	
 	@Inject
 	public SingleDiscussionThreadWidget(
@@ -115,7 +117,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			NewReplyWidget secondNewReplyWidget,
 			SubscribersWidget threadSubscribersWidget,
 			SynapseJavascriptClient jsClient,
-			PopupUtilsView popupUtils
+			PopupUtilsView popupUtils,
+			ClientCache clientCache
 			) {
 		this.ginInjector = ginInjector;
 		this.view = view;
@@ -136,6 +139,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.threadSubscribersWidget = threadSubscribersWidget;
 		this.jsClient = jsClient;
 		this.popupUtils = popupUtils;
+		this.clientCache = clientCache;
 		
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
@@ -329,21 +333,28 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	public void configureMessage() {
 		synAlert.clear();
 		markdownWidget.clear();
-		view.setLoadingMessageVisible(true);
-		subscribeButtonWidget.configure(SubscriptionObjectType.THREAD, threadId, actionMenu);
-		jsClient.getThreadUrl(messageKey, new AsyncCallback<String>(){
+		//check cache for message
+		if (clientCache.contains(messageKey + WebConstants.MESSAGE_SUFFIX)) {
+			//cache hit
+			setMessage(clientCache.get(messageKey + WebConstants.MESSAGE_SUFFIX));
+		} else {
+			//cache miss
+			view.setLoadingMessageVisible(true);
+			subscribeButtonWidget.configure(SubscriptionObjectType.THREAD, threadId, actionMenu);
+			jsClient.getThreadUrl(messageKey, new AsyncCallback<String>(){
 
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setLoadingMessageVisible(false);
-				synAlert.handleException(caught);
-			}
+				@Override
+				public void onFailure(Throwable caught) {
+					view.setLoadingMessageVisible(false);
+					synAlert.handleException(caught);
+				}
 
-			@Override
-			public void onSuccess(String result) {
-				getMessage(result);
-			}
-		});
+				@Override
+				public void onSuccess(String result) {
+					getMessage(result);
+				}
+			});
+		}
 	}
 
 	public void getMessage(String url) {
@@ -359,8 +370,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 					if (statusCode == Response.SC_OK) {
 						String message = response.getText();
 						view.setLoadingMessageVisible(false);
-						markdownWidget.configure(message);
-						configureEditThreadModal(message);
+						setMessage(message);
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve message for thread " + threadId + ". Reason: " + response.getStatusText()));
 					}
@@ -376,6 +386,12 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			view.setLoadingMessageVisible(false);
 			synAlert.handleException(e);
 		}
+	}
+	
+	public void setMessage(String message) {
+		markdownWidget.configure(message);
+		configureEditThreadModal(message);
+		clientCache.put(messageKey + WebConstants.MESSAGE_SUFFIX, message);
 	}
 
 	private void configureEditThreadModal(String message) {
