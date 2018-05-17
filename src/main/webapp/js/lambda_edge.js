@@ -17,21 +17,25 @@ exports.handler = (event, context, callback) => {
             key: cacheControlHeader,
             value: noCacheValue
         }];
-        console.log(`Response header "${cacheControlHeader}" was set to ` +
-                    `"${headers[cacheControlHeader.toLowerCase()][0].value}"`);
-        headers[expiresHeader.toLowerCase()] = [{
-            key: expiresHeader,
-            value: 0
-        }];
-        console.log(`Response header "${expiresHeader}" was set to ` +
-                `"${headers[expiresHeader.toLowerCase()][0].value}"`);
+        console.log('Response header "${cacheControlHeader}" was set to ' +
+                    '"${headers[cacheControlHeader.toLowerCase()][0].value}"');
+        if (headers[expiresHeader.toLowerCase()]) {
+            headers[expiresHeader.toLowerCase()] = [{
+                key: expiresHeader,
+                value: '0'
+            }];
+            console.log('Response header "${expiresHeader}" was set to ' +
+                    '"${headers[expiresHeader.toLowerCase()][0].value}"');
+        }
         
-        headers[pragmaHeader.toLowerCase()] = [{
-            key: pragmaHeader,
-            value: noCachePragmaValue
-        }];
-        console.log(`Response header "${pragmaHeader}" was set to ` +
-                `"${headers[pragmaHeader.toLowerCase()][0].value}"`);
+        if (headers[pragmaHeader.toLowerCase()]) {
+            headers[pragmaHeader.toLowerCase()] = [{
+                key: pragmaHeader,
+                value: noCachePragmaValue
+            }];
+            console.log('Response header "${pragmaHeader}" was set to ' +
+                    '"${headers[pragmaHeader.toLowerCase()][0].value}"');
+        }
     }
     callback(null, response);
 };
