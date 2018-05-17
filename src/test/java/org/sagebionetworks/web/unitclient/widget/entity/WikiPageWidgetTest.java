@@ -138,7 +138,7 @@ public class WikiPageWidgetTest {
 		boolean canEdit = true;
 		String suffix = "-test-suffix";
 		String formattedDate = "today";
-		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(formattedDate);
+		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(formattedDate);
 		WikiPageKey key = new WikiPageKey("ownerId", ObjectType.ENTITY.toString(), WIKI_PAGE_ID, null);
 		presenter.configure(key, canEdit, null);
 		verify(mockView).setLoadingVisible(true);

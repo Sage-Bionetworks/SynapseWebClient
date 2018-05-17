@@ -31,7 +31,7 @@ public class DateCellRendererImplTest {
 	@Test
 	public void testSetValue(){
 		String dateString = "a formatted date string";
-		when(mockDateTimeUtils.convertDateToSmallString(any(Date.class))).thenReturn(dateString);
+		when(mockDateTimeUtils.getDateTimeString(any(Date.class))).thenReturn(dateString);
 		renderer.setValue("1");
 		verify(mockStringRendererCell).setValue(dateString);
 	}

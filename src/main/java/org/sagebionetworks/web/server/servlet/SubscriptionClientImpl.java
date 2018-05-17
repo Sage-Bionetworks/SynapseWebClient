@@ -57,16 +57,6 @@ public class SubscriptionClientImpl extends SynapseClientBase implements
 	}
 	
 	@Override
-	public void unsubscribeAll() throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			synapseClient.unsubscribeAll();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
 	public SubscriptionPagedResults listSubscription(SubscriptionRequest request) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {

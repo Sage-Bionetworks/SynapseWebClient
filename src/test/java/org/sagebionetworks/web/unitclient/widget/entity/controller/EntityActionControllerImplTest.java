@@ -254,7 +254,6 @@ public class EntityActionControllerImplTest {
 		when(mockPortalGinInjector.getSelectTeamModal()).thenReturn(mockSelectTeamModal);
 		when(mockPortalGinInjector.getApproveUserAccessModal()).thenReturn(mockApproveUserAccessModal);
 		when(mockPortalGinInjector.getChallengeClientAsync()).thenReturn(mockChallengeClient);
-		when(mockPortalGinInjector.getUserProfileClientAsync()).thenReturn(mockUserProfileClient);
 		when(mockPortalGinInjector.getSynapseClientAsync()).thenReturn(mockSynapseClient);
 		when(mockPortalGinInjector.getGlobalApplicationState()).thenReturn(mockGlobalApplicationState);
 		when(mockPortalGinInjector.getEvaluationSubmitter()).thenReturn(mockSubmitter);

@@ -37,6 +37,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -165,8 +166,6 @@ import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 import org.sagebionetworks.web.shared.users.AclUtils;
 import org.sagebionetworks.web.shared.users.PermissionLevel;
-
-import com.google.appengine.repackaged.com.google.common.base.Objects;
 
 /**
  * Test for the SynapseClientImpl
@@ -1260,47 +1259,6 @@ public class SynapseClientImplTest {
 		assertEquals(message, request.getMessage());
 	}
 
-
-	@Test
-	public void testGetOpenRequestCountUnauthorized() throws SynapseException,
-			RestServiceException {
-		// is not an admin
-		TeamMember testTeamMember = new TeamMember();
-		testTeamMember.setIsAdmin(false);
-		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(
-				testTeamMember);
-
-		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
-		// should never ask for open request count
-		verify(mockSynapse, Mockito.never()).getOpenMembershipRequests(
-				anyString(), anyString(), anyLong(), anyLong());
-		assertNull(count);
-	}
-
-	@Test
-	public void testGetOpenRequestCount() throws SynapseException,
-			RestServiceException, MalformedURLException,
-			JSONObjectAdapterException {
-		// is admin
-		TeamMember testTeamMember = new TeamMember();
-		testTeamMember.setIsAdmin(true);
-		when(mockSynapse.getTeamMember(anyString(), anyString())).thenReturn(
-				testTeamMember);
-
-		Long testCount = 42L;
-		PaginatedResults<MembershipRequest> testOpenRequests = new PaginatedResults<MembershipRequest>();
-		testOpenRequests.setTotalNumberOfResults(testCount);
-		when(
-				mockSynapse.getOpenMembershipRequests(anyString(), anyString(),
-						anyLong(), anyLong())).thenReturn(testOpenRequests);
-
-		Long count = synapseClient.getOpenRequestCount("myUserId", "myTeamId");
-
-		verify(mockSynapse, Mockito.times(1)).getOpenMembershipRequests(
-				anyString(), anyString(), anyLong(), anyLong());
-		assertEquals(testCount, count);
-	}
-
 	@Test
 	public void testGetOpenTeamInvitations() throws SynapseException,
 			RestServiceException, JSONObjectAdapterException {
@@ -2029,7 +1987,7 @@ public class SynapseClientImplTest {
 	
 	private ColumnChange getColumnChange(String oldColumnId, List<ColumnChange> changes) {
 		for (ColumnChange columnChange : changes) {
-			if (Objects.equal(oldColumnId, columnChange.getOldColumnId())) {
+			if (Objects.equals(oldColumnId, columnChange.getOldColumnId())) {
 				return columnChange;
 			}
 		}

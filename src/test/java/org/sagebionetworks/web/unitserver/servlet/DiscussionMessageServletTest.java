@@ -27,6 +27,7 @@ import org.sagebionetworks.web.server.servlet.DiscussionMessageServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 public class DiscussionMessageServletTest {
@@ -42,8 +43,6 @@ public class DiscussionMessageServletTest {
 	SynapseClient mockSynapse;
 	ServletOutputStream responseOutputStream;
 	DiscussionMessageServlet servlet;
-	String authBaseUrl = "authbase";
-	String repoServiceUrl = "repourl";
 
 	@Before
 	public void setup() throws IOException, SynapseException, JSONObjectAdapterException {
@@ -59,9 +58,7 @@ public class DiscussionMessageServletTest {
 		when(mockResponse.getOutputStream()).thenReturn(responseOutputStream);
 		when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("https://www.synapse.org/"));
 
-		//set up general synapse client configuration test
-		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, repoServiceUrl);
-		System.setProperty(StackEndpoints.AUTH_ENDPOINT_KEY, authBaseUrl);
+		SynapseClientBaseTest.setupTestEndpoints();
 	}
 	
 	@Test
@@ -80,9 +77,9 @@ public class DiscussionMessageServletTest {
 		verify(mockResponse).sendRedirect(anyString());
 
 		//as an additional test, verify that synapse client is set up
-		verify(mockSynapse).setAuthEndpoint(authBaseUrl);
-		verify(mockSynapse).setRepositoryEndpoint(repoServiceUrl);
-		verify(mockSynapse).setFileEndpoint(anyString());
+		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
+		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
+		verify(mockSynapse).setFileEndpoint(SynapseClientBaseTest.FILE_BASE);
 		verify(mockSynapse).setSessionToken(sessionToken);
 	}
 
@@ -103,9 +100,9 @@ public class DiscussionMessageServletTest {
 		verify(mockResponse).sendRedirect(anyString());
 
 		//as an additional test, verify that synapse client is set up
-		verify(mockSynapse).setAuthEndpoint(authBaseUrl);
-		verify(mockSynapse).setRepositoryEndpoint(repoServiceUrl);
-		verify(mockSynapse).setFileEndpoint(anyString());
+		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
+		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
+		verify(mockSynapse).setFileEndpoint(SynapseClientBaseTest.FILE_BASE);
 		verify(mockSynapse).setSessionToken(sessionToken);
 	}
 

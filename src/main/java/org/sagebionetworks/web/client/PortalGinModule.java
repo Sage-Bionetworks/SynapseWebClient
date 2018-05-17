@@ -776,9 +776,6 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		//file history
 		bind(FileHistoryWidgetView.class).to(FileHistoryWidgetViewImpl.class);
-				
-		// The URL cache
-		bind(UrlCache.class).to(UrlCacheImpl.class).in(Singleton.class);;
 		
 		//GWT utility methods
 		bind(GWTWrapper.class).to(GWTWrapperImpl.class).in(Singleton.class);
@@ -1401,5 +1398,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiPageDeleteConfirmationDialogView.class).to(WikiPageDeleteConfirmationDialogViewImpl.class);
 		bind(WikiDiffView.class).to(WikiDiffViewImpl.class);
 		bind(SynapseProperties.class).to(SynapsePropertiesImpl.class).in(Singleton.class);
+		bind(Moment.class).to(MomentImpl.class);
 	}
 }

@@ -27,6 +27,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -46,12 +47,14 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 	private int resultSize;
 	DateTimeUtils dateTimeUtils;
 	Div loadingUI;
+	Div synAlertContainer = new Div();
 	@Inject
 	public WikiHistoryWidgetViewImpl(DateTimeUtils dateTimeUtils) {
 		this.dateTimeUtils = dateTimeUtils;
 		addStyleName("min-height-200");
 		loadingUI = new Div();
 		loadingUI.add(DisplayUtils.getLoadingWidget("Loading"));
+		add(synAlertContainer);
 	}
 	
 	private static class HistoryEntry {
@@ -219,7 +222,7 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 
         	// Modified on
         	td = new TableData();
-			td.add(new Text(dateTimeUtils.convertDateToSmallString(entry.modifiedOn)));
+			td.add(new Text(dateTimeUtils.getDateTimeString(entry.modifiedOn)));
         	row.add(td);
 		}
 		historyTable.add(tBody);
@@ -301,5 +304,11 @@ public class WikiHistoryWidgetViewImpl extends FlowPanel implements WikiHistoryW
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
+	}
+	
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }

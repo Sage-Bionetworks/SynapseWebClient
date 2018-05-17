@@ -172,7 +172,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		}
 		
 		if (eb.getEntity().getModifiedOn() != null) {
-			String modifiedOnString = dateTimeUtils.convertDateToSmallString(eb.getEntity().getModifiedOn());
+			String modifiedOnString = dateTimeUtils.getDateTimeString(eb.getEntity().getModifiedOn());
 			view.setModifiedOn(modifiedOnString);
 		} else {
 			view.setModifiedOn("");

@@ -48,7 +48,6 @@ public class ACTAccessApprovalsPresenter extends AbstractActivity implements Pre
 	boolean isAccessRequirementVisible;
 	public static final String HIDE_AR_TEXT = "Hide Access Requirement";
 	public static final String SHOW_AR_TEXT = "Show Access Requirement";
-	public static final String INVALID_AR_ID = "Invalid Access Requirement ID";
 	AccessorGroupRequest accessorGroupRequest;
 	SynapseSuggestBox peopleSuggestWidget;
 	private UserBadge selectedUserBadge;

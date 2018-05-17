@@ -3,18 +3,7 @@ package org.sagebionetworks.web.client;
 import static com.google.gwt.http.client.RequestBuilder.GET;
 import static com.google.gwt.http.client.RequestBuilder.POST;
 import static com.google.gwt.http.client.RequestBuilder.PUT;
-import static org.apache.http.HttpStatus.SC_ACCEPTED;
-import static org.apache.http.HttpStatus.SC_BAD_REQUEST;
-import static org.apache.http.HttpStatus.SC_CONFLICT;
-import static org.apache.http.HttpStatus.SC_CREATED;
-import static org.apache.http.HttpStatus.SC_FORBIDDEN;
-import static org.apache.http.HttpStatus.SC_GONE;
-import static org.apache.http.HttpStatus.SC_LOCKED;
-import static org.apache.http.HttpStatus.SC_NOT_FOUND;
-import static org.apache.http.HttpStatus.SC_OK;
-import static org.apache.http.HttpStatus.SC_PRECONDITION_FAILED;
-import static org.apache.http.HttpStatus.SC_SERVICE_UNAVAILABLE;
-import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
+import static org.apache.http.HttpStatus.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
@@ -25,37 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.client.exceptions.SynapseTooManyRequestsException.TOO_MANY_REQUESTS_STATUS_CODE;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.APPLICATION_JSON_CHARSET_UTF8;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.ASYNC_GET;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.ASYNC_START;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.BUNDLE_MASK_PATH;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.CHILDREN;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.ENTITY;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.ENTITY_URI_PATH;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.FAVORITE_URI_PATH;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.FILE_BULK;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.FILE_HANDLE_BATCH;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.INITIAL_RETRY_REQUEST_DELAY_MS;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.LIMIT_PARAMETER;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.OFFSET_PARAMETER;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.OPEN_MEMBERSHIP_INVITATION_COUNT;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.OPEN_MEMBERSHIP_REQUEST_COUNT;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.REPO_SUFFIX_VERSION;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.RESTRICTION_INFORMATION;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.SESSION_TOKEN_HEADER;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_DOWNLOAD_CSV;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_QUERY;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TABLE_TRANSACTION;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TEAM;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.TYPE_FILTER_PARAMETER;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.USER;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.USER_GROUP_HEADER_PREFIX_PATH;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.USER_PROFILE_PATH;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.WIKI;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.WIKI2;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.WIKI_VERSION_PARAMETER;
-import static org.sagebionetworks.web.client.SynapseJavascriptClient.getException;
+import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
 import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 
@@ -196,7 +155,7 @@ public class SynapseJavascriptClientTest {
 		client.getEntityBundle(entityId, partsMask, mockAsyncCallback);
 		
 		//verify url and method
-		String url = REPO_ENDPOINT + ENTITY_URI_PATH + "/" + entityId + BUNDLE_MASK_PATH + partsMask;
+		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + BUNDLE_MASK_PATH + partsMask;
 		verify(mockRequestBuilder).configure(GET, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder, never()).setHeader(eq(SESSION_TOKEN_HEADER), anyString());
@@ -224,7 +183,7 @@ public class SynapseJavascriptClientTest {
 		client.getEntityBundleForVersion(entityId, versionNumber, partsMask, mockAsyncCallback);
 		
 		//verify url and method
-		String url = REPO_ENDPOINT + ENTITY_URI_PATH + "/" + entityId + REPO_SUFFIX_VERSION + "/" + versionNumber + BUNDLE_MASK_PATH + partsMask;
+		String url = REPO_ENDPOINT + ENTITY + "/" + entityId + REPO_SUFFIX_VERSION + "/" + versionNumber + BUNDLE_MASK_PATH + partsMask;
 		verify(mockRequestBuilder).configure(GET, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder).setHeader(SESSION_TOKEN_HEADER, USER_SESSION_TOKEN);
@@ -319,7 +278,7 @@ public class SynapseJavascriptClientTest {
 		
 		client.getEntityChildren(entityChildrenRequest, mockAsyncCallback);
 		//verify url and method
-		String url = REPO_ENDPOINT + ENTITY_URI_PATH + CHILDREN;
+		String url = REPO_ENDPOINT + ENTITY + CHILDREN;
 		verify(mockRequestBuilder).configure(POST, url);
 		verify(mockRequestBuilder).setHeader(ACCEPT, APPLICATION_JSON_CHARSET_UTF8);
 		verify(mockRequestBuilder).setHeader(WebConstants.CONTENT_TYPE, APPLICATION_JSON_CHARSET_UTF8);
@@ -468,7 +427,7 @@ public class SynapseJavascriptClientTest {
 		
 		//verify url and method
 		String url = REPO_ENDPOINT + 
-			ENTITY_URI_PATH + "/" + entityId;
+			ENTITY + "/" + entityId;
 		verify(mockRequestBuilder).configure(GET, url);
 	}
 	
@@ -479,7 +438,7 @@ public class SynapseJavascriptClientTest {
 		
 		//verify url and method
 		String url = REPO_ENDPOINT + 
-			ENTITY_URI_PATH + "/" + entityId +
+			ENTITY + "/" + entityId +
 			REPO_SUFFIX_VERSION + "/" + versionNumber;
 		verify(mockRequestBuilder).configure(GET, url);
 	}

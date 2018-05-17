@@ -380,41 +380,6 @@ public class ChallengeClientImplTest {
 		verify(mockSynapse).getChallenge(anyString());
 	}
 	
-	@Test
-	public void testGetEvaluations() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		when(mockSynapse.getEvaluation(anyString())).thenReturn(new Evaluation());
-		List<String> evaluationIds = new ArrayList<String>();
-		evaluationIds.add("1");
-		evaluationIds.add("2");
-		PaginatedResults<Evaluation> evaluations = synapseClient.getEvaluations(evaluationIds);
-		
-		verify(mockSynapse, Mockito.times(2)).getEvaluation(anyString());
-		
-//		org.sagebionetworks.web.shared.PaginatedResults<Evaluation> evaluationObjectList = 
-//				nodeModelCreator.createPaginatedResults(evaluationsJson, Evaluation.class);
-		assertEquals(2, evaluations.getTotalNumberOfResults());
-		assertEquals(2, evaluations.getResults().size());
-	}
-
-	
-	@Test
-	public void testHasSubmitted() throws SynapseException, RestServiceException, MalformedURLException, JSONObjectAdapterException {
-		String sharedEntityId = "syn123455";
-		setupGetAvailableEvaluations(sharedEntityId);
-		
-		org.sagebionetworks.reflection.model.PaginatedResults<Submission> submissions = new org.sagebionetworks.reflection.model.PaginatedResults<Submission>();
-		//verify when all empty, hasSubmitted returns false
-		when(mockSynapse.getMySubmissions(anyString(), anyLong(), anyLong())).thenReturn(submissions);
-		assertFalse(synapseClient.hasSubmitted());
-		
-		//verify when there is a submission, it returns true
-		submissions.setTotalNumberOfResults(1);
-		List<Submission> submissionList = new ArrayList<Submission>();
-		submissionList.add(new Submission());
-		submissions.setResults(submissionList);
-		assertTrue(synapseClient.hasSubmitted());
-	}
-	
 	public void setupGetEvaluationsForEntity(String sharedEntityId) throws SynapseException {
 		org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> testResults = getTestEvaluations(sharedEntityId);
 		when(mockSynapse.getEvaluationByContentSource(anyString(),anyInt(),anyInt())).thenReturn(getEmptyPaginatedResults());

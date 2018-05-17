@@ -33,6 +33,7 @@ import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.AliasRedirectorServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 
 public class AliasRedirectorServletTest {
 
@@ -49,12 +50,11 @@ public class AliasRedirectorServletTest {
 	@Mock
 	UserGroupHeader mockUserGroupHeader;
 	
-	String authBaseUrl = "authbase";
-	String repoServiceUrl = "repourl";
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
 	@Captor
 	ArgumentCaptor<List<String>> stringListCaptor;
+	
 	@Before
 	public void setup() throws IOException, SynapseException, JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -71,9 +71,6 @@ public class AliasRedirectorServletTest {
 		when(mockRequest.getRequestURI()).thenReturn("");
 		when(mockRequest.getContextPath()).thenReturn("");
 	
-		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, repoServiceUrl);
-		System.setProperty(StackEndpoints.AUTH_ENDPOINT_KEY, authBaseUrl);
-
 		when(mockSynapse.getUserGroupHeadersByAliases(anyList())).thenReturn(Collections.singletonList(mockUserGroupHeader));
 		
 		//when asking to encode the redirect URL, just return the input param.
@@ -82,6 +79,7 @@ public class AliasRedirectorServletTest {
 				return (String) invocation.getArguments()[0];
 			}
 		});
+		SynapseClientBaseTest.setupTestEndpoints();
 	}
 	
 	@Test
@@ -104,8 +102,8 @@ public class AliasRedirectorServletTest {
 		assertTrue(redirectUrl.contains(ownerId));
 		
 		//as an additional test, verify that synapse client is set up
-		verify(mockSynapse).setAuthEndpoint(authBaseUrl);
-		verify(mockSynapse).setRepositoryEndpoint(repoServiceUrl);
+		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
+		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		
 		//look for no cache headers
 		verify(mockResponse).setHeader(eq(WebConstants.CACHE_CONTROL_KEY), eq(WebConstants.CACHE_CONTROL_VALUE_NO_CACHE));

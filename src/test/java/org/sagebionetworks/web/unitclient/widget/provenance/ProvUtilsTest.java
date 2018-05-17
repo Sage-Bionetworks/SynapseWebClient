@@ -27,11 +27,9 @@ import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
-import org.sagebionetworks.web.client.services.LayoutServiceAsync;
 import org.sagebionetworks.web.client.widget.provenance.ProvUtils;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidget;
 import org.sagebionetworks.web.client.widget.provenance.ProvenanceWidgetView;
-import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
@@ -46,17 +44,14 @@ public class ProvUtilsTest {
 	AuthenticationController mockAuthController;
 	AdapterFactory adapterFactory;
 	SynapseClientAsync mockSynapseClient;
-	LayoutServiceAsync mockLayoutService;
 	
 	@Before
 	public void setup(){
 		mockView = mock(ProvenanceWidgetView.class);
 		mockAuthController = mock(AuthenticationController.class);
 		mockSynapseClient = mock(SynapseClientAsync.class);
-		mockLayoutService = mock(LayoutServiceAsync.class);
 		adapterFactory = new AdapterFactoryImpl();
 	}
-
 	
 	/*
 	 * Test Graph:

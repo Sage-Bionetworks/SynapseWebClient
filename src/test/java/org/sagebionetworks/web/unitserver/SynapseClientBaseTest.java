@@ -30,8 +30,6 @@ public class SynapseClientBaseTest {
 	
 	SynapseClientBase synapseClientBase;
 	
-	String publicAuthBaseUrl, repositoryServiceUrl, fileUrl;
-	
 	@Mock
 	ThreadLocal<HttpServletRequest> mockThreadLocal;
 	
@@ -39,22 +37,29 @@ public class SynapseClientBaseTest {
 	HttpServletRequest mockRequest;
 	
 	String userIp = "127.0.0.1";
+	public static final String ENDPOINT_PREFIX = "endpointprefix";
+	public static final String FILE_BASE = ENDPOINT_PREFIX + "/file/v1";
+	public static final String AUTH_BASE = ENDPOINT_PREFIX + "/auth/v1";
+	public static final String REPO_BASE = ENDPOINT_PREFIX + "/repo/v1";
+
+	public static void setupTestEndpoints() {
+		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, REPO_BASE);
+		System.setProperty(StackEndpoints.AUTH_ENDPOINT_KEY, AUTH_BASE);
+		System.setProperty(StackEndpoints.FILE_ENDPOINT_KEY, FILE_BASE);
+		StackEndpoints.clear();
+		StackEndpoints.skipLoadingSettingsFile();
+	}
 	
 	@Before
 	public void setUp() throws Exception {
-		repositoryServiceUrl = "asdf.com";
-		publicAuthBaseUrl = "qwerty.com";
-		fileUrl = "zxcvbn.com";
 		synapseClientBase = new SynapseClientBase();
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapseClient);
-		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, repositoryServiceUrl);
-		System.setProperty(StackEndpoints.AUTH_ENDPOINT_KEY, publicAuthBaseUrl);
-		System.setProperty(StackEndpoints.FILE_ENDPOINT_KEY, fileUrl);
 		Whitebox.setInternalState(synapseClientBase, "synapseProvider", mockSynapseProvider);
 		Whitebox.setInternalState(synapseClientBase, "perThreadRequest", mockThreadLocal);
 		userIp = "127.0.0.1";
 		when(mockThreadLocal.get()).thenReturn(mockRequest);
 		when(mockRequest.getRemoteAddr()).thenReturn(userIp);
+		SynapseClientBaseTest.setupTestEndpoints();
 	}
 
 	@Test
@@ -63,9 +68,9 @@ public class SynapseClientBaseTest {
 		SynapseClient createdClient = synapseClientBase.createSynapseClient(sessionToken);
 		assertEquals(mockSynapseClient, createdClient);
 		verify(mockSynapseClient).setSessionToken(sessionToken);
-		verify(mockSynapseClient).setRepositoryEndpoint(repositoryServiceUrl);
-		verify(mockSynapseClient).setAuthEndpoint(publicAuthBaseUrl);
-		verify(mockSynapseClient).setFileEndpoint(fileUrl);
+		verify(mockSynapseClient).setRepositoryEndpoint(REPO_BASE);
+		verify(mockSynapseClient).setAuthEndpoint(AUTH_BASE);
+		verify(mockSynapseClient).setFileEndpoint(FILE_BASE);
 		verify(mockSynapseClient).appendUserAgent(SynapseClientBase.PORTAL_USER_AGENT);
 		verify(mockSynapseClient).setUserIpAddress(userIp);
 		

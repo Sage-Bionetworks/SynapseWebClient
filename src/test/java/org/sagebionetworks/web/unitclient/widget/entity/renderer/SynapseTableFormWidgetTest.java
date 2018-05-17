@@ -198,5 +198,23 @@ public class SynapseTableFormWidgetTest {
 		verify(mockView).setFormUIVisible(false);
 		verify(mockView).setSuccessMessageVisible(true);
 	}
-
+	
+	@Test
+	public void testOnSubmitAndReset() {
+		widget.configure(wikiKey, descriptor, null, null);
+		widget.onSubmit();
+		
+		//simulate user resetting to submit another response
+		widget.onReset();
+		
+		//verify cleared then reconfigured
+		verify(mockSynAlert, times(3)).clear();
+		verify(mockRowFormWidget, times(2)).clear();
+		verify(mockView, times(2)).setFormUIVisible(false);
+		verify(mockView, times(2)).setSuccessMessageVisible(false);
+		verify(mockSynapseClient, times(2)).getColumnModelsForTableEntity(eq(TABLE_ID), any(AsyncCallback.class));
+		verify(mockRowFormWidget, times(2)).configure(TABLE_ID, columnModels);
+		verify(mockUserBadge, times(2)).configure(CREATED_BY);
+		verify(mockView, times(2)).setFormUIVisible(true);
+	}
 }

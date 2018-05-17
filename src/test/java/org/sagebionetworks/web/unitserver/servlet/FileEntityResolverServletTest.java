@@ -32,6 +32,7 @@ import org.sagebionetworks.web.server.servlet.FileEntityResolverServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 
 public class FileEntityResolverServletTest {
 	@Mock
@@ -64,6 +65,8 @@ public class FileEntityResolverServletTest {
 
 		// Setup output stream and response
 		when(mockResponse.getWriter()).thenReturn(responseOutputWriter);
+		
+		SynapseClientBaseTest.setupTestEndpoints();
 	}
 	
 	private void setupFileEntity() {
@@ -75,13 +78,6 @@ public class FileEntityResolverServletTest {
 	@Test
 	public void testDoGetLoggedInFileEntity() throws Exception {
 		String sessionToken = "fake";
-
-		//set up general synapse client configuration test
-		String authBaseUrl = "authbase";
-		String repoServiceUrl = "repourl";
-		//set up general synapse client configuration test
-		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, repoServiceUrl);
-		System.setProperty(StackEndpoints.AUTH_ENDPOINT_KEY, authBaseUrl);
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
 		
 		setupFileEntity();
@@ -96,8 +92,8 @@ public class FileEntityResolverServletTest {
 		assertTrue(responseText.contains(resolvedUrlString));
 		
 		//as an additional test, verify that synapse client is set up
-		verify(mockSynapse).setAuthEndpoint(authBaseUrl);
-		verify(mockSynapse).setRepositoryEndpoint(repoServiceUrl);
+		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
+		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		verify(mockSynapse).setFileEndpoint(anyString());
 		verify(mockSynapse).setSessionToken(sessionToken);
 	}

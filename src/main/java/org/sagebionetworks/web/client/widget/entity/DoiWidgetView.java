@@ -9,4 +9,5 @@ public interface DoiWidgetView extends IsWidget, SynapseView {
 	void showDoiInProgress();
 	void showDoiError();
 	void setVisible(boolean visible);
+	void setSynAlert(IsWidget w);
 }

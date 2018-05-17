@@ -13,8 +13,10 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.WidgetEditorPresenter;
+import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.registration.WidgetRegistrarImpl;
 import org.sagebionetworks.web.shared.WidgetConstants;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
@@ -28,7 +30,10 @@ public class WidgetRegistrarImplTest {
 	Map<String, String> testImageWidgetDescriptor;
 	String testFileName = "testfile.png";
 	@Mock
-	AsyncCallback<WidgetEditorPresenter> mockAsyncCallback; 
+	AsyncCallback<WidgetEditorPresenter> mockAsyncCallback;
+	@Mock
+	AsyncCallback<WidgetRendererPresenter> mockRendererAsyncCallback; 
+	
 	@Before
 	public void setup(){	
 		MockitoAnnotations.initMocks(this);
@@ -52,6 +57,13 @@ public class WidgetRegistrarImplTest {
 		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoad(WidgetConstants.LEADERBOARD_CONTENT_TYPE);
 		verify(mockGinInjector, times(3)).getSynapseAPICallRenderer();
 	}
+	
+	@Test
+	public void testCreateInvalidWidget() {
+		widgetRegistrar.getWidgetRendererForWidgetDescriptorAfterLazyLoadAndCodeSplit("invalid wiki widget type", mockRendererAsyncCallback);
+		verify(mockRendererAsyncCallback).onFailure(any(NotFoundException.class));
+	}
+	
 	@Test
 	public void testCreateWidgetEditors() {
 		widgetRegistrar.getWidgetEditorForWidgetDescriptor(null, WidgetConstants.YOUTUBE_CONTENT_TYPE, null, null);

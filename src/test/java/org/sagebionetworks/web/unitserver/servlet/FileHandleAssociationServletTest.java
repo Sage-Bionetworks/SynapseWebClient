@@ -32,6 +32,7 @@ import org.sagebionetworks.web.server.servlet.FileHandleAssociationServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 
 public class FileHandleAssociationServletTest {
 
@@ -79,17 +80,12 @@ public class FileHandleAssociationServletTest {
 		when(mockRequest.getRequestURL()).thenReturn(new StringBuffer("https://www.synapse.org/"));
 		when(mockRequest.getRequestURI()).thenReturn("");
 		when(mockRequest.getContextPath()).thenReturn("");
+		SynapseClientBaseTest.setupTestEndpoints();
 	}
 	
 	@Test
 	public void testDoGet() throws Exception {
 		String sessionToken = "fake";
-
-		//set up general synapse client configuration test
-		String authBaseUrl = "authbase";
-		String repoServiceUrl = "repourl";
-		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, repoServiceUrl);
-		System.setProperty(StackEndpoints.AUTH_ENDPOINT_KEY, authBaseUrl);
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
 		
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
@@ -105,8 +101,8 @@ public class FileHandleAssociationServletTest {
 		assertEquals(fileHandleId, fha.getFileHandleId());
 		
 		//as an additional test, verify that synapse client is set up
-		verify(mockSynapse).setAuthEndpoint(authBaseUrl);
-		verify(mockSynapse).setRepositoryEndpoint(repoServiceUrl);
+		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
+		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		verify(mockSynapse).setFileEndpoint(anyString());
 		verify(mockSynapse).setSessionToken(sessionToken);
 		

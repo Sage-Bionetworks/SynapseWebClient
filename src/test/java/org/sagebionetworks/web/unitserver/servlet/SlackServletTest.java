@@ -34,6 +34,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SlackServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
+import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 import org.springframework.test.util.ReflectionTestUtils;
 
 public class SlackServletTest {
@@ -72,9 +73,6 @@ public class SlackServletTest {
 	@Captor
 	ArgumentCaptor<byte[]> byteArrayCaptor;
 	List<EntityHeader> entityPath;
-	
-	String authBaseUrl = "authbase";
-	String repoServiceUrl = "repourl";
 
 	@Before
 	public void setup() throws IOException, SynapseException, JSONObjectAdapterException {
@@ -95,9 +93,6 @@ public class SlackServletTest {
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		when(mockResponse.getOutputStream()).thenReturn(mockOutputStream);
 		when(mockEntityBundle.getThreadCount()).thenReturn(THREAD_COUNT);
-		//set up general synapse client configuration test
-		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, repoServiceUrl);
-		System.setProperty(StackEndpoints.AUTH_ENDPOINT_KEY, authBaseUrl);
 		when(mockEntityBundle.getAnnotations()).thenReturn(mockAnnotations);
 		Map<String, List<String>> stringAnnotations = new HashMap<String, List<String>>();
 		List<String> values = new ArrayList<String>();
@@ -105,6 +100,7 @@ public class SlackServletTest {
 		values.add(ENTITY_STRING_ANNOTATION_VALUE2);
 		stringAnnotations.put(ENTITY_STRING_ANNOTATION_KEY, values);
 		when(mockAnnotations.getStringAnnotations()).thenReturn(stringAnnotations);
+		SynapseClientBaseTest.setupTestEndpoints();
 	}
 	
 	@Test
@@ -126,9 +122,9 @@ public class SlackServletTest {
 		assertTrue(outputValue.contains(ENTITY_STRING_ANNOTATION_VALUE2));
 		
 		//as an additional test, verify that synapse client is set up
-		verify(mockSynapse).setAuthEndpoint(authBaseUrl);
-		verify(mockSynapse).setRepositoryEndpoint(repoServiceUrl);
-		verify(mockSynapse).setFileEndpoint(anyString());
+		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
+		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
+		verify(mockSynapse).setFileEndpoint(SynapseClientBaseTest.FILE_BASE);
 	}
 	
 	@Test

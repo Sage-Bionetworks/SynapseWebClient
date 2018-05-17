@@ -37,9 +37,13 @@ import org.sagebionetworks.repo.model.discussion.EntityThreadCounts;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.repo.model.discussion.ThreadCount;
+import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
+import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.subscription.Etag;
@@ -76,6 +80,7 @@ public class SynapseJavascriptFactory {
 		V2WikiPage,
 		V2WikiOrderHint,
 		DockerRepository,
+		PaginatedDockerCommit,
 		FileEntity,
 		Project,
 		Folder,
@@ -107,6 +112,10 @@ public class SynapseJavascriptFactory {
 		ChallengePagedResults,
 		Etag,
 		Activity,
+		MultipartUploadStatus,
+		BatchPresignedUploadUrlResponse,
+		AddPartResponse,
+		PaginatedResultsTotalNumberOfResults,
 		None,
 		String
 	}
@@ -196,6 +205,8 @@ public class SynapseJavascriptFactory {
 			return new UserProfile(json);
 		case FileHandleResults :
 			return new FileHandleResults(json).getList();
+		case PaginatedResultsTotalNumberOfResults :
+			return json.getLong("totalNumberOfResults");
 		case ChallengePagedResults:
 			return new ChallengePagedResults(json).getResults();
 		case JSON :
@@ -209,6 +220,15 @@ public class SynapseJavascriptFactory {
 				entityHeaderList.add(new EntityHeader(jsonObject));
 			}
 			return entityHeaderList;
+		case PaginatedDockerCommit :
+			// json really represents a PaginatedResults (cannot reference here in js)
+			List<DockerCommit> dockerCommitList = new ArrayList<>();
+			JSONArrayAdapter dockerCommitJsonArray = json.getJSONArray("results");
+			for (int i = 0; i < dockerCommitJsonArray.length(); i++) {
+				JSONObjectAdapter jsonObject = dockerCommitJsonArray.getJSONObject(i);
+				dockerCommitList.add(new DockerCommit(jsonObject));
+			}
+			return dockerCommitList;
 		case PaginatedResultProjectHeader : 
 			// json really represents a PaginatedResults (cannot reference here in js)
 			List<ProjectHeader> projectHeaderList = new ArrayList<>();
@@ -267,6 +287,12 @@ public class SynapseJavascriptFactory {
 			return new Etag(json);
 		case Activity:
 			return new Activity(json);
+		case MultipartUploadStatus : 
+			return new MultipartUploadStatus(json);
+		case BatchPresignedUploadUrlResponse :
+			return new BatchPresignedUploadUrlResponse(json);
+		case AddPartResponse :
+			return new AddPartResponse(json);
 		default:
 			throw new IllegalArgumentException("No match found for : "+ type);
 		}

@@ -272,7 +272,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 				String formattedDateString;
 				try{
 					long valueInMiliseconds = Long.parseLong(valueAsString) * 1000;
-					formattedDateString = valueInMiliseconds == 0 ? "any time": dateTimeUtils.convertDateToSimpleString(new Date(valueInMiliseconds));
+					formattedDateString = valueInMiliseconds == 0 ? "any time": dateTimeUtils.getDateString(new Date(valueInMiliseconds));
 				}catch (NumberFormatException e){
 					formattedDateString = valueAsString;
 				}
@@ -395,13 +395,13 @@ public class SearchViewImpl extends Composite implements SearchView {
 		Widget createdByBadgeWidget = createdByBadge.asWidget();
 		attributionPanel.add(createdByBadgeWidget);
 		
-		inlineHtml = new InlineHTML(" on " + dateTimeUtils.convertDateToSimpleString(new Date(hit.getCreated_on()*1000)) + ", Updated by ");
+		inlineHtml = new InlineHTML(" on " + dateTimeUtils.getDateString(new Date(hit.getCreated_on()*1000)) + ", Updated by ");
 		inlineHtml.addStyleName("hitattribution");
 		
 		attributionPanel.add(inlineHtml);
 		Widget modifiedByBadgeWidget = modifiedByBadge.asWidget();
 		attributionPanel.add(modifiedByBadgeWidget);
-		inlineHtml = new InlineHTML(" on " + dateTimeUtils.convertDateToSimpleString(new Date(hit.getModified_on()*1000)));
+		inlineHtml = new InlineHTML(" on " + dateTimeUtils.getDateString(new Date(hit.getModified_on()*1000)));
 		inlineHtml.addStyleName("hitattribution");
 		
 		attributionPanel.add(inlineHtml);

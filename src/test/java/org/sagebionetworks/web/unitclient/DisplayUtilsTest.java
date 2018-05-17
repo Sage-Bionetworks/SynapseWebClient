@@ -306,52 +306,6 @@ public class DisplayUtilsTest {
 	}
 	
 	@Test
-	public void testHandleServiceExceptionReadOnly() {
-		assertTrue(DisplayUtils.handleServiceException(new ReadOnlyModeException(), mockGlobalApplicationState, true, mockView));
-		verify(mockPlaceChanger).goTo(isA(Down.class));
-	}
-	
-	@Test
-	public void testHandleServiceExceptionDown() {
-		assertTrue(DisplayUtils.handleServiceException(new SynapseDownException(), mockGlobalApplicationState, true, mockView));
-		verify(mockPlaceChanger).goTo(isA(Down.class));
-	}
-	
-	@Test
-	public void testHandleServiceExceptionForbiddenLoggedIn() {
-		assertTrue(DisplayUtils.handleServiceException(new ForbiddenException(), mockGlobalApplicationState, true, mockView));
-		ArgumentCaptor<String> c = ArgumentCaptor.forClass(String.class);
-		verify(mockView).showErrorMessage(c.capture());
-		assertTrue(c.getValue().startsWith(DisplayConstants.ERROR_FAILURE_PRIVLEDGES));
-	}
-	
-	@Test
-	public void testHandleServiceExceptionForbiddenNotLoggedIn() {
-		assertTrue(DisplayUtils.handleServiceException(new ForbiddenException(), mockGlobalApplicationState, false, mockView));
-		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_LOGIN_REQUIRED));
-		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
-	}
-	
-	@Test
-	public void testHandleServiceExceptionBadRequest() {
-		assertTrue(DisplayUtils.handleServiceException(new BadRequestException(errorMessage), mockGlobalApplicationState, true, mockView));
-		verify(mockView).showErrorMessage(eq(errorMessage));
-	}
-
-	@Test
-	public void testHandleServiceExceptionNotFound() {
-		assertTrue(DisplayUtils.handleServiceException(new NotFoundException(), mockGlobalApplicationState, true, mockView));
-		verify(mockView).showErrorMessage(eq(DisplayConstants.ERROR_NOT_FOUND));
-		verify(mockPlaceChanger).goTo(isA(Home.class));
-	}
-	
-	@Test
-	public void testHandleServiceExceptionNotRecognized() {
-		assertFalse(DisplayUtils.handleServiceException(new IllegalArgumentException(), mockGlobalApplicationState, true, mockView));
-		Mockito.verifyZeroInteractions(mockView, mockPlaceChanger);
-	}
-	
-	@Test
 	public void testCreateEntityVersionString(){
 		assertEquals("", DisplayUtils.createEntityVersionString(null, null));
 		assertEquals("", DisplayUtils.createEntityVersionString("", null));

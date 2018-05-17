@@ -11,10 +11,6 @@ public class EntitySelectedEvent extends GwtEvent<EntitySelectedHandler> {
 		this.selectedEntityId = selectedEntityId;
 	}
 	
-	public static Type getType() {
-		return TYPE;
-	}
-	
 	public String getSelectedEntityId() {
 		return selectedEntityId;
 	}

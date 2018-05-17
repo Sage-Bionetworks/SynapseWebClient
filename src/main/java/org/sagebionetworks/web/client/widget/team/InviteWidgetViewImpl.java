@@ -4,7 +4,6 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -37,19 +36,12 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 	@UiField
 	Button cancelButton;
 	
-	private static final int FIELD_WIDTH = 500;
-	
-	private SynapseJSNIUtils synapseJSNIUtils;
-	
 	private InviteWidgetView.Presenter presenter;
-	private TextArea messageArea;
-	
 	private Widget widget;
 	
 	@Inject
 	public InviteWidgetViewImpl(InviteWidgetViewImplUiBinder binder) {
 		this.widget = binder.createAndBindUi(this);
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		sendInviteButton.addClickHandler(new ClickHandler() {			
 			@Override
 			public void onClick(ClickEvent event) {

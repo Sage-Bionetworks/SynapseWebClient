@@ -21,8 +21,6 @@ public interface SubscriptionClient extends RemoteService {
 	
 	void unsubscribe(Long subscriptionId) throws RestServiceException;
 	
-	void unsubscribeAll() throws RestServiceException;
-
 	SubscriptionPagedResults listSubscription(SubscriptionRequest request)
 			throws RestServiceException;
 }

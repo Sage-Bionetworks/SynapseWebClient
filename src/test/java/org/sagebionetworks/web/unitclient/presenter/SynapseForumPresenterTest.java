@@ -30,8 +30,6 @@ public class SynapseForumPresenterTest {
 	@Mock
 	SynapseForumView mockView;
 	@Mock
-	CookieProvider mockCookies;
-	@Mock
 	Forum mockForum;
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
@@ -50,8 +48,7 @@ public class SynapseForumPresenterTest {
 	@Before
 	public void setUp() {
 		MockitoAnnotations.initMocks(this);
-		presenter = new SynapseForumPresenter(mockView, mockGlobalApplicationState, mockCookies, mockForumWidget, mockSynapseProperties);
-		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("not null");
+		presenter = new SynapseForumPresenter(mockView, mockGlobalApplicationState, mockForumWidget, mockSynapseProperties);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockPlace.toToken()).thenReturn("fake token");
 	}

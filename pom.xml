@@ -17,7 +17,7 @@
 		<maven.compiler.target>1.8</maven.compiler.target>
 		<webappDirectory>${project.build.directory}/${project.build.finalName}</webappDirectory>
 		<synapse.version>2018-04-27-3207-d6cad8979a</synapse.version>
-		<gwtVersion>2.8.1</gwtVersion>
+		<gwtVersion>2.8.2</gwtVersion>
 		<org.springframework.version>4.3.3.RELEASE</org.springframework.version>
 		<guiceVersion>3.0</guiceVersion>
 		<ginVersion>2.1.2</ginVersion>
@@ -27,7 +27,7 @@
 		<jackson.version>1.8.1</jackson.version>
 		<log4j.version>2.6.1</log4j.version>
 		<markdown.version>2016-01-22-a2731f7-19</markdown.version>
-		<gwtbootstrap3.version>1.5.2</gwtbootstrap3.version>
+		<gwtbootstrap3.version>1.5.3</gwtbootstrap3.version>
 		<gwtbootstrap3.extras.version>1.5.2</gwtbootstrap3.extras.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<gwtvisualizationwrappers.version>1.6-gwt-2.7.0</gwtvisualizationwrappers.version>
@@ -509,39 +509,13 @@
 			<artifactId>guice-servlet</artifactId>
 			<version>${guiceVersion}</version>
 		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-server</artifactId>
-			<version>1.5-ea09</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.sun.jersey</groupId>
-			<artifactId>jersey-json</artifactId>
-			<version>1.5-ea09</version>
-		</dependency>
 		<!-- This provides the GWT MVP framework -->
 		<dependency>
 			<groupId>com.gwtplatform</groupId>
 			<artifactId>gwtp-all</artifactId>
-			<version>0.7</version>
+			<version>1.6</version>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>com.google.develop</groupId>
-			<artifactId>gwt-syncproxy</artifactId>
-			<version>0.2</version>
-			<scope>test</scope>
-		</dependency>
-		<!-- We are using this to serialize column metadata. We can drop it when 
-			the API provides this functionality -->
-		<dependency>
-			<groupId>com.thoughtworks.xstream</groupId>
-			<artifactId>xstream</artifactId>
-			<version>${xstream.version}</version>
-		</dependency>
-
 		<dependency>
 			<groupId>org.sagebionetworks</groupId>
 			<artifactId>lib-shared-models</artifactId>
@@ -553,14 +527,6 @@
 			<artifactId>schema-to-pojo-gwt</artifactId>
 			<version>${schema-to-pojo.version}</version>
 		</dependency>
-		
-		<!-- Rome for rss consumption -->
-		<dependency>
-			<groupId>rome</groupId>
-			<artifactId>rome</artifactId>
-			<version>1.0</version>
-		</dependency>
-
 		<dependency>
 			<groupId>commons-lang</groupId>
 			<artifactId>commons-lang</artifactId>
@@ -592,13 +558,6 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.jukito</groupId>
-			<artifactId>jukito</artifactId>
-			<version>1.1</version>
-			<scope>test</scope>
-		</dependency>
-
-		<dependency>
 			<groupId>org.json</groupId>
 			<artifactId>json</artifactId>
 			<version>${org.json.version}</version>
@@ -620,20 +579,20 @@
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava</artifactId>
-			<version>23.0</version>
+			<version>25.0-jre</version>
 		</dependency>
 
 		<dependency>
 			<groupId>com.google.guava</groupId>
 			<artifactId>guava-gwt</artifactId>
-			<version>23.0</version>
+			<version>25.0-jre</version>
 		</dependency>
 		
 		<!-- Prov Tree layout -->
 		<dependency>
 			<groupId>org.abego.treelayout</groupId>
 			<artifactId>org.abego.treelayout.core</artifactId>
-			<version>1.0.1</version>
+			<version>1.0.3</version>
 		</dependency>
 
 		<!-- note: This refers to a custom POM in the SageBionetworks artifactory, omitting Guice 2.0 -->
@@ -656,10 +615,9 @@
 		<dependency>
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-all</artifactId>
-			<version>1.8.5</version>
+			<version>1.10.19</version>
 			<scope>test</scope>
 		</dependency>
-		
 		<dependency>
 			<groupId>com.atlassian.jira</groupId>
 			<artifactId>jira-rest-java-client</artifactId>

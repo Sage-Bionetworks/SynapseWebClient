@@ -39,6 +39,7 @@ import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
 import org.sagebionetworks.web.shared.WebConstants;
+import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 
 public class FileHandleServletTest {
 
@@ -49,7 +50,7 @@ public class FileHandleServletTest {
 	SynapseClient mockSynapse;
 	ServletOutputStream responseOutputStream;
 	FileHandleServlet servlet;
-
+	
 	@Before
 	public void setup() throws IOException, SynapseException, JSONObjectAdapterException {
 		servlet = new FileHandleServlet();
@@ -89,6 +90,7 @@ public class FileHandleServletTest {
 
 		// Setup request
 		mockRequest = mock(HttpServletRequest.class);
+		SynapseClientBaseTest.setupTestEndpoints();
 	}
 	
 	private void setupWiki() {
@@ -152,16 +154,12 @@ public class FileHandleServletTest {
 	@Test
 	public void testDoGetLoggedInFileEntityPreview() throws Exception {
 		String sessionToken = "fake";
-
 		//set up general synapse client configuration test
-		String authBaseUrl = "authbase";
-		String repoServiceUrl = "repourl";
-		System.setProperty(StackEndpoints.REPO_ENDPOINT_KEY, repoServiceUrl);
-		System.setProperty(StackEndpoints.AUTH_ENDPOINT_KEY, authBaseUrl);
-
+		
 		when(mockTokenProvider.getSessionToken()).thenReturn(sessionToken);
 		
 		setupFileEntity();
+		
 		when(mockRequest.getParameter(WebConstants.FILE_HANDLE_PREVIEW_PARAM_KEY)).thenReturn("true");
 		Cookie[] cookies = {new Cookie(CookieKeys.USER_LOGIN_TOKEN, sessionToken)};
 		when(mockRequest.getCookies()).thenReturn(cookies);
@@ -170,8 +168,8 @@ public class FileHandleServletTest {
 		verify(mockResponse).sendRedirect(anyString());
 		
 		//as an additional test, verify that synapse client is set up
-		verify(mockSynapse).setAuthEndpoint(authBaseUrl);
-		verify(mockSynapse).setRepositoryEndpoint(repoServiceUrl);
+		verify(mockSynapse).setAuthEndpoint(SynapseClientBaseTest.AUTH_BASE);
+		verify(mockSynapse).setRepositoryEndpoint(SynapseClientBaseTest.REPO_BASE);
 		verify(mockSynapse).setFileEndpoint(anyString());
 		verify(mockSynapse).setSessionToken(sessionToken);
 	}

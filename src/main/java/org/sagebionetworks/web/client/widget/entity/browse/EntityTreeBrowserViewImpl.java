@@ -22,6 +22,7 @@ import com.google.gwt.resources.client.ImageResource;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Tree;
 import com.google.gwt.user.client.ui.TreeItem;
 import com.google.gwt.user.client.ui.Widget;
@@ -51,6 +52,8 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	Table entityTreeHeader;
 	@UiField
 	Hr hrUnderTableHeaders;
+	@UiField
+	Div synAlertContainer;
 	Div entityTreeContainer = new Div();
 	private Widget widget;
 	@Inject
@@ -293,5 +296,10 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 	@Override
 	public void showLoading() {
 		setLoadingVisible(true);
+	}
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }

@@ -28,4 +28,5 @@ public interface FileHistoryWidgetView extends IsWidget, SynapseView{
 	void showEditVersionInfoError(String error);
 	void hideEditVersionInfo();
 	void setMoreButtonVisible(boolean visible);
+	void setSynAlert(IsWidget w);
 }

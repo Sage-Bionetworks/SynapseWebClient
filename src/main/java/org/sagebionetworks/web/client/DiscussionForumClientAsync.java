@@ -9,8 +9,6 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyOrder;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadOrder;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
-import org.sagebionetworks.repo.model.discussion.UpdateThreadMessage;
-import org.sagebionetworks.repo.model.discussion.UpdateThreadTitle;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.discussion.UpdateThread;
 
@@ -28,12 +26,6 @@ public interface DiscussionForumClientAsync{
 			AsyncCallback<PaginatedResults<DiscussionThreadBundle>> callback);
 
 	void updateThread(String threadId, UpdateThread newThread,
-			AsyncCallback<DiscussionThreadBundle> callback);
-
-	void updateThreadTitle(String threadId, UpdateThreadTitle newTitle,
-			AsyncCallback<DiscussionThreadBundle> callback);
-
-	void updateThreadMessage(String threadId, UpdateThreadMessage newMessage,
 			AsyncCallback<DiscussionThreadBundle> callback);
 
 	void markThreadAsDeleted(String threadId, AsyncCallback<Void> callback);

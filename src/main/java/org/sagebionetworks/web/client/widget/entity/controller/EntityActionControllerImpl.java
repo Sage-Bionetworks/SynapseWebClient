@@ -1308,8 +1308,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	            }
 	            @Override
 	            public void onFailure(Throwable caught) {
-	                if(!DisplayUtils.handleServiceException(caught, getGlobalApplicationState(), authenticationController.isLoggedIn(), view))
-	                    view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED + ": " + caught.getMessage());
+	            	view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED + ": " + caught.getMessage());
 	            }
 	        });
 		}
@@ -1445,9 +1444,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, getGlobalApplicationState(),isUserAuthenticated, view)) {
-					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
-				}
+				view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
 			}
 		});
 	}

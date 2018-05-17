@@ -11,11 +11,6 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.XYPoint;
 public class JsoProviderTestImpl implements JsoProvider {
 
 	@Override
-	public LayoutResult newLayoutResult() {
-		return new LayoutResultTestImpl();
-	}
-
-	@Override
 	public NChartCharacters newNChartCharacters() {
 		return new NChartCharactersTestImpl();
 	}

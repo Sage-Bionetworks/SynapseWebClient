@@ -21,7 +21,6 @@ import org.sagebionetworks.web.shared.provenance.ProvGraphEdge;
 import org.sagebionetworks.web.shared.provenance.ProvGraphNode;
 
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -37,7 +36,7 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 	private HashMap<String,String> filledPopoverIds;
 	private Integer height = null;
 	private static final String TOP3_LEFT3 = "margin-left-3 margin-top-3";
-	
+	private Div synAlertContainer = new Div();
 	private FlowPanel container;
 	private FlowPanel thisLayoutContainer;
 	private FlowPanel prov;
@@ -55,6 +54,7 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 		container = new FlowPanel();
 		this.thisLayoutContainer = this;
 		this.add(container);
+		this.add(synAlertContainer);
 		loadingContainer = DisplayUtils.getLoadingWidget("Loading provenance");
 	}
 
@@ -245,5 +245,11 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 				container.showMessage("<span class=\"small moveup-5\">(" + DisplayConstants.OLD_VERSION + ")</span>");				
 			}
 		}
+	}
+	
+	@Override
+	public void setSynAlert(IsWidget w) {
+		synAlertContainer.clear();
+		synAlertContainer.add(w);
 	}
 }

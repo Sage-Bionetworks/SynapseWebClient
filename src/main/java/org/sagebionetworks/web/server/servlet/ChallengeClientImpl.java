@@ -58,29 +58,7 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 	private static final Long GROUPS_PAGINATION_OFFSET = 0L;
 	// before we hit this limit we will use another mechanism to find groups
 	private static final Long GROUPS_PAGINATION_LIMIT = 1000L;
-
-	/*
-	 * (non-Javadoc)
-	 * @see org.sagebionetworks.web.client.ChallengeClient#getEvaluations(java.util.List)
-	 */
-	@Override
-	public PaginatedResults<Evaluation> getEvaluations(List<String> evaluationIds)
-			throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			List<Evaluation> evalList = new ArrayList<Evaluation>();
-			for (String evalId : evaluationIds) {
-				evalList.add(synapseClient.getEvaluation(evalId));
-			}
-			PaginatedResults<Evaluation> results = new PaginatedResults<Evaluation>();
-			results.setResults(evalList);
-			results.setTotalNumberOfResults(evalList.size());
-			return results;
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
+	
 	@Override
 	public PaginatedResults<Evaluation> getAvailableEvaluations() throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
@@ -211,30 +189,6 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			return synapseClient.updateEvaluationAcl(acl);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
-	@Override
-	public Boolean hasSubmitted() throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			// get all evaluations for which the user has joined as a
-			// participant
-			org.sagebionetworks.reflection.model.PaginatedResults<Evaluation> evaluations = synapseClient
-					.getAvailableEvaluationsPaginated(
-							EVALUATION_PAGINATION_OFFSET,
-							EVALUATION_PAGINATION_LIMIT);
-			for (Evaluation evaluation : evaluations.getResults()) {
-				// return true if any of these have a submission
-				org.sagebionetworks.reflection.model.PaginatedResults<Submission> res = synapseClient
-						.getMySubmissions(evaluation.getId(), 0, 1);
-				if (res.getResults() != null && !res.getResults().isEmpty()) {
-					return true;
-				}
-			}
-			return false;
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}

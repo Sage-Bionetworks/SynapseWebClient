@@ -58,7 +58,7 @@ public class APITableColumnRendererDate implements APITableColumnRenderer {
 					isMsFromEpoch = false;
 					date = standardFormatter.parse(colValue);
 				}
-				outputValues.add(dateTimeUtils.convertDateToSmallString(date));
+				outputValues.add(dateTimeUtils.getDateTimeString(date));
 			}
 		}
 		outputColumnData.put(outputColumnName, outputValues);

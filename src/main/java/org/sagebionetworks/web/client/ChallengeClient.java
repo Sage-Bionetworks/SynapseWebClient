@@ -22,14 +22,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("challengeclient")	
 public interface ChallengeClient extends RemoteService {
 
-	/**
-	 * Get evaluations given a list of ids.
-	 * @param evaluationIds
-	 * @return
-	 * @throws RestServiceException
-	 */
-	public PaginatedResults<Evaluation> getEvaluations(List<String> evaluationIds) throws RestServiceException;
-	
 	PaginatedResults<Evaluation> getAvailableEvaluations() throws RestServiceException;
 	PaginatedResults<Evaluation> getAvailableEvaluations(
 			Set<String> targetEvaluationIds) throws RestServiceException;
@@ -42,8 +34,6 @@ public interface ChallengeClient extends RemoteService {
 	public String getUserEvaluationPermissions(String evalId) throws RestServiceException; 
 	public String getEvaluationAcl(String evalId) throws RestServiceException;
 	public AccessControlList updateEvaluationAcl(AccessControlList acl) throws RestServiceException;
-	
-	public Boolean hasSubmitted()	throws RestServiceException;
 	
 	List<Team> getSubmissionTeams(String userId, String challengeId) throws RestServiceException;
 	ChallengeTeam registerChallengeTeam(ChallengeTeam challengeTeam) throws RestServiceException;

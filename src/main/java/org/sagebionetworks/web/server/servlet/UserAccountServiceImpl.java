@@ -132,28 +132,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 	
 	@Override
-	public void terminateSession(String sessionToken) throws RestServiceException {
-		validateService();
-
-		SynapseClient client = createSynapseClient();
-		try {
-			client.logout();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-	
-	@Override
-	public String getPrivateAuthServiceUrl() {
-		return StackEndpoints.getAuthenticationServicePublicEndpoint();
-	}
-
-	@Override
-	public String getPublicAuthServiceUrl() {
-		return StackEndpoints.getAuthenticationServicePublicEndpoint();
-	}
-
-	@Override
 	public String getTermsOfUse() {
 		SynapseClient client = createAnonymousSynapseClient();
 		try {

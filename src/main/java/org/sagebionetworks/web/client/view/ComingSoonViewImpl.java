@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.header.Header;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -35,10 +34,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	private Presenter presenter;
 	
 	private Header headerWidget;
-	SynapseJSNIUtils synapseJSNIUtils;
-	JiraURLHelper jiraErrorHelper;
-	AuthenticationController authenticationController;
-	GoogleMap map;
 	JSONObjectAdapter jsonObjectAdapter;
 	@Inject
 	public ComingSoonViewImpl(ComingSoonViewImplUiBinder binder,
@@ -51,13 +46,9 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 			JSONObjectAdapter jsonObjectAdapter) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
-		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		this.jiraErrorHelper = jiraErrorHelper;
-		this.authenticationController = authenticationController;
 		headerWidget.configure(false);
 		widgetContainer.add(map.asWidget());
-//		map.configure();
 	}
 	
 	@Override

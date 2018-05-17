@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.transform;
 
-import org.sagebionetworks.web.client.widget.provenance.nchart.LayoutResult;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartCharacters;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayer;
 import org.sagebionetworks.web.client.widget.provenance.nchart.NChartLayerNode;
@@ -10,11 +9,6 @@ import org.sagebionetworks.web.client.widget.provenance.nchart.XYPoint;
 import com.google.gwt.core.client.JavaScriptObject;
 
 public class JsoProviderImpl implements JsoProvider {
-
-	@Override
-	public LayoutResult newLayoutResult() {
-		return (LayoutResult) JavaScriptObject.createObject();
-	}
 
 	@Override
 	public NChartCharacters newNChartCharacters() {

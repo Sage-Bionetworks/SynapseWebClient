@@ -70,7 +70,6 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			});
 		}
 		notificationsPanel.clear();
-		if(team == null)  throw new IllegalArgumentException("Team is required");
 		anchor.getElement().setAttribute(TEAM_ID_ATTRIBUTE, teamId);
 		if(team != null) {
 			String name = maxNameLength == null ? team.getName() : DisplayUtils.stubStrPartialWord(team.getName(), maxNameLength);
