@@ -13,6 +13,7 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.widget.discussion.SingleDiscussionThreadWidget.*;
 
@@ -42,6 +43,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -140,6 +142,9 @@ public class SingleDiscussionThreadWidgetTest {
 	SynapseProperties mockSynapseProperties;
 	@Mock
 	PopupUtilsView mockPopupUtils;
+	@Mock
+	ClientCache mockClientCache;
+
 	Set<String> moderatorIds;
 	SingleDiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -161,7 +166,7 @@ public class SingleDiscussionThreadWidgetTest {
 				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
 				mockRepliesContainer, mockSubscribeButtonWidget, mockNewReplyWidget,
 				mockNewReplyWidget, mockSubscribersWidget, mockSynapseJavascriptClient,
-				mockPopupUtils);
+				mockPopupUtils, mockClientCache);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
 		moderatorIds = new HashSet<String>();
@@ -808,6 +813,27 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockEditThreadModal).configure(anyString(), anyString(), anyString(), any(Callback.class));
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
+	}
+	
+	@Test
+	public void testConfigureMessageFromCache() throws RequestException {
+		boolean isDeleted = false;
+		boolean canModerate = false;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		String messageKey = "messageKey22223";
+		
+		DiscussionThreadBundle bundle = DiscussionTestUtils.createThreadBundle("123", "title", Arrays.asList("1"),
+				1L, 1L, new Date(), messageKey, isDeleted, CREATED_BY, isEdited, isPinned);
+
+		String message = "message";
+		when(mockClientCache.contains(messageKey + WebConstants.MESSAGE_SUFFIX)).thenReturn(true);
+		when(mockClientCache.get(messageKey + WebConstants.MESSAGE_SUFFIX)).thenReturn(message);
+		
+		discussionThreadWidget.configure(bundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
+		
+		verifyZeroInteractions(mockSynapseJavascriptClient, mockRequestBuilder);
+		verify(mockMarkdownWidget).configure(message);
 	}
 
 	@Test
