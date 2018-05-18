@@ -15,6 +15,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +29,7 @@ import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
@@ -72,7 +74,8 @@ public class EntityPresenterTest {
 	Synapse.EntityArea area = Synapse.EntityArea.FILES;
 	String areaToken = null;
 	long id;
-	
+	@Mock
+	EntityHeader mockProjectEntityHeader;
 	String rootWikiId = "12333";
 	FileHandleResults rootWikiAttachments;
 	GWTWrapper gwtWrapper;
@@ -98,7 +101,8 @@ public class EntityPresenterTest {
 		eb = new EntityBundle();
 		eb.setEntity(testEntity);
 		EntityPath path = new EntityPath();
-		path.setPath(new ArrayList<EntityHeader>());
+		path.setPath(Collections.singletonList(mockProjectEntityHeader));
+		when(mockProjectEntityHeader.getType()).thenReturn(Project.class.getName());
 		eb.setPath(path);
 		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundle(anyString(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(eb).when(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
@@ -146,6 +150,22 @@ public class EntityPresenterTest {
 		verify(mockEntityPageTop).configure(eq(eb.getEntity()), eq(versionNumber), any(EntityHeader.class), any(EntityArea.class), anyString());
 		
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
+	}
+	
+	@Test
+	public void testInvalidEntityPath() {
+		EntityPath emptyPath = new EntityPath();
+		emptyPath.setPath(Collections.EMPTY_LIST);
+		eb.setPath(emptyPath);
+		Long versionNumber = 1L;
+		Synapse place = Mockito.mock(Synapse.class);
+		when(place.getVersionNumber()).thenReturn(versionNumber);
+		when(place.getEntityId()).thenReturn(entityId);
+		
+		entityPresenter.setPlace(place);
+		
+		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(eq(entityId), eq(versionNumber), anyInt(), any(AsyncCallback.class));
+		verify(mockSynAlert).showError(DisplayConstants.ERROR_GENERIC_RELOAD);
 	}
 	
 	@Test
