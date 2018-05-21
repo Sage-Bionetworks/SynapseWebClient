@@ -8,11 +8,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.shared.WebConstants;
-
-import com.google.inject.Inject;
 
 /**
  * Handle downloading discussion messages.
@@ -21,10 +19,6 @@ public class DiscussionMessageServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 
-	/**
-	 * Injected with Gin
-	 */
-	private ServiceUrlProvider urlProvider;
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
@@ -32,16 +26,6 @@ public class DiscussionMessageServlet extends HttpServlet {
 			return UserDataProvider.getThreadLocalUserToken(DiscussionMessageServlet.perThreadRequest.get());
 		}
 	};
-
-	/**
-	 * Setup synapse client.
-	 *
-	 * @param provider
-	 */
-	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider) {
-		this.urlProvider = provider;
-	}
 
 	@Override
 	protected void service(HttpServletRequest arg0, HttpServletResponse arg1)
@@ -82,9 +66,9 @@ public class DiscussionMessageServlet extends HttpServlet {
 	 */
 	private SynapseClient createNewClient(String sessionToken) {
 		SynapseClient client = synapseProvider.createNewClient();
-		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
-		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
-		client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
+		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
+		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
 		if (sessionToken != null)
 			client.setSessionToken(sessionToken);
 		return client;

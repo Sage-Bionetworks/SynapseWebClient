@@ -12,14 +12,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.repo.model.LogEntry;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.util.SerializationUtils;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.shared.WebConstants;
-
-import com.google.inject.Inject;
 
 /**
  * Handles given an alias, will redirect to the profile or team page assocated with that alias
@@ -40,8 +38,6 @@ public class AliasRedirectorServlet extends HttpServlet {
 	/**
 	 * Injected with Gin
 	 */
-	@SuppressWarnings("unused")
-	private ServiceUrlProvider urlProvider;
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 	
 	/**
@@ -51,16 +47,6 @@ public class AliasRedirectorServlet extends HttpServlet {
 	 */
 	public void setSynapseProvider(SynapseProvider synapseProvider) {
 		this.synapseProvider = synapseProvider;
-	}
-
-	/**
-	 * Essentially the constructor. Setup synapse client.
-	 *
-	 * @param provider
-	 */
-	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider) {
-		this.urlProvider = provider;
 	}
 
 	@Override
@@ -118,9 +104,9 @@ public class AliasRedirectorServlet extends HttpServlet {
 		
 	private SynapseClient createNewClient() {
 		SynapseClient client = synapseProvider.createNewClient();
-		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
-		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
-		client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
+		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
+		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
 		return client;
 	}
 

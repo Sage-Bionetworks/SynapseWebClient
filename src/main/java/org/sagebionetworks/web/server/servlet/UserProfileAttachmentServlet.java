@@ -9,10 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.client.exceptions.UnknownSynapseServerException;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.inject.Inject;
@@ -30,10 +30,6 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
 
-	/**
-	 * Injected with Gin
-	 */
-	private ServiceUrlProvider urlProvider;
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 	
 	private int previewTimeoutMs = WAIT_FOR_PREVIEW_MS;
@@ -55,16 +51,6 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 		this.previewTimeoutMs = previewTimeoutMs;
 	}
 	
-	/**
-	 * Essentially the constructor. Setup synapse client.
-	 * 
-	 * @param provider
-	 */
-	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider) {
-		this.urlProvider = provider;
-	}
-
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
@@ -201,9 +187,9 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 	 */
 	private SynapseClient createNewClient(String sessionToken) {
 		SynapseClient client = synapseProvider.createNewClient();
-		client.setAuthEndpoint(urlProvider.getPrivateAuthBaseUrl());
-		client.setRepositoryEndpoint(urlProvider.getRepositoryServiceUrl());
-		client.setFileEndpoint(StackConfiguration.getFileServiceEndpoint());
+		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
+		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
 		client.setSessionToken(sessionToken);
 		return client;
 	}

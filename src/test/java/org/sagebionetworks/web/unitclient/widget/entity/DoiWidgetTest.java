@@ -4,7 +4,6 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Before;
@@ -15,7 +14,6 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.doi.DoiStatus;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.StackConfigServiceAsync;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.DoiWidget;
@@ -32,11 +30,8 @@ public class DoiWidgetTest {
 	@Mock
 	DoiWidgetView mockView;
 	String entityId = "syn123";
-	String testDoiPrefix = "testDoiPrefix";
 	DoiWidget doiWidget;
 	Doi testDoi;
-	@Mock
-	StackConfigServiceAsync mockStackConfigService;
 	@Mock
 	AuthenticationController mockAuthenticationController;
 	@Mock
@@ -50,9 +45,8 @@ public class DoiWidgetTest {
 		testDoi = new Doi();
 		testDoi.setId(entityId);
 		testDoi.setDoiStatus(DoiStatus.CREATED);
-		AsyncMockStubber.callSuccessWith(testDoiPrefix).when(mockStackConfigService).getDoiPrefix(any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(testDoi).when(mockSynapseClient).getEntityDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		doiWidget = new DoiWidget(mockView, mockGlobalApplicationState, mockStackConfigService, mockAuthenticationController, mockSynapseClient, mockSynAlert);
+		doiWidget = new DoiWidget(mockView, mockGlobalApplicationState, mockAuthenticationController, mockSynapseClient, mockSynAlert);
 	}
 	
 	@Test
@@ -61,7 +55,7 @@ public class DoiWidgetTest {
 		doiWidget.configure(testDoi, entityId);
 		verify(mockView).setVisible(false);
 		verify(mockView).clear();
-		verify(mockView).showDoiCreated(doiWidget.getDoi(testDoiPrefix, false));
+		verify(mockView).showDoiCreated(doiWidget.getDoi(DoiWidget.DOI_PREFIX, false));
 	}
 
 	@Test
@@ -85,12 +79,6 @@ public class DoiWidgetTest {
 		doiWidget.configure(null, entityId);
 		verify(mockView).setVisible(false);
 		verify(mockView).clear();
-	}
-	
-	@Test
-	public void testGetDoiPrefix() throws Exception {
-		doiWidget.getDoiPrefix(mock(AsyncCallback.class));
-		verify(mockStackConfigService).getDoiPrefix(any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -124,7 +112,7 @@ public class DoiWidgetTest {
 		doiWidget.getEntityDoi(entityId, null);
 		verify(mockView).setVisible(false);
 		verify(mockView).clear();
-		verify(mockView).showDoiCreated(doiWidget.getDoi(testDoiPrefix, false));
+		verify(mockView).showDoiCreated(doiWidget.getDoi(DoiWidget.DOI_PREFIX, false));
 		Mockito.reset(mockView);
 		// when in error
 		testDoi.setDoiStatus(DoiStatus.ERROR);
