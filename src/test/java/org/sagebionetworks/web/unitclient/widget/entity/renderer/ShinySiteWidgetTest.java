@@ -33,10 +33,10 @@ public class ShinySiteWidgetTest {
 	@Mock
 	AuthenticationController mockAuthenticationController;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
-	String validSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
+	String validSiteUrl = "http://test.sagebase.org/something";
 	String validSiteUrl2 = "https://s3.amazonaws.com/static.synapse.org/rstudio/faithful/";
 
-	String invalidSiteUrl = "http://glimmer.rstudio.com.hackers.com/problem.html";
+	String invalidSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
 	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
 	
@@ -55,6 +55,7 @@ public class ShinySiteWidgetTest {
 	
 	@Test
 	public void testConfigure() {
+		when(mockSynapseJSNIUtils.getHostname(anyString())).thenReturn("test.sagebase.org");
 		Map<String, String> descriptor = new HashMap<String, String>();
 		descriptor.put(WidgetConstants.SHINYSITE_SITE_KEY, validSiteUrl);
 		widget.configure(wikiKey, descriptor, null, null);
