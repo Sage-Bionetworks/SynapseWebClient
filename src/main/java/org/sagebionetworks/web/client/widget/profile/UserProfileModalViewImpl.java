@@ -7,6 +7,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -37,14 +38,15 @@ public class UserProfileModalViewImpl implements UserProfileModalView {
 	@Inject
 	public UserProfileModalViewImpl(Binder binder, GlobalApplicationState globalAppState) {
 		widget = binder.createAndBindUi(this);
-		defaultButton.addClickHandler( event -> {
+		ClickHandler onCancel =  event -> {
 			modal.hide();
-			globalAppState.refreshPage();
-		});
+		};
+		defaultButton.addClickHandler(onCancel);
 		primaryButton.addClickHandler(event -> {
 			presenter.onSave();
 		});
 		primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
+		modal.addDomHandler(DisplayUtils.getESCKeyDownHandler(onCancel), KeyDownEvent.getType());
 	}
 
 	@Override
@@ -72,6 +74,7 @@ public class UserProfileModalViewImpl implements UserProfileModalView {
 	@Override
 	public void showModal() {
 		modal.show();
+		DisplayUtils.focusOnChildInput(modal);
 	}
 
 	@Override

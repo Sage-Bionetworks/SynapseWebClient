@@ -2,24 +2,19 @@ package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.widget.modal.Dialog;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.KeyPressEvent;
 import com.google.gwt.event.dom.client.KeyPressHandler;
 import com.google.gwt.event.dom.client.KeyUpHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -43,16 +38,12 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	public org.gwtbootstrap3.client.ui.TextArea markdownTextArea;
 	
 	@UiField
-	public SimplePanel formattingGuideContainer;
-	@UiField
 	public Div selectTeamModalContainer;
 	/**
 	 * List of toolbar commands
 	 */
 	@UiField
 	public Button editWidgetButton;
-	@UiField
-	public Button formattingGuideOkButton;
 	@UiField
 	public Button writeMarkdownButton;
 	//insert widget menu commands
@@ -104,8 +95,6 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	
 	@UiField
 	public Button formattingGuideButton;
-	@UiField
-	public Modal formattingGuideModal;
 	
 	//Alpha mode button and commands
 	@UiField
@@ -185,8 +174,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	Span widget = new Span();
 	//this UI widget
 	Widget viewWidget;
-	HandlerRegistration formattingGuideKeyHandlerRegistration;
-	KeyDownHandler formattingGuideKeyDownHandler;
+	Widget formattingGuideWidget;
 	Binder binder;
 	@Inject
 	public MarkdownEditorWidgetViewImpl(Binder binder) {
@@ -265,30 +253,15 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 			heading4Link.addStyleName("font-size-18");
 			heading5Link.addStyleName("font-size-14");
 			heading6Link.addStyleName("font-size-12");
-			final ClickHandler hideFormattingGuide = new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					formattingGuideKeyHandlerRegistration.removeHandler();
-					formattingGuideModal.hide();
+			formattingGuideButton.addClickHandler(event -> {
+				if (formattingGuideWidget.getParent() != null) {
+					formattingGuideWidget.removeFromParent();
 				}
-			};
-			formattingGuideKeyDownHandler = new KeyDownHandler() {
-				@Override
-				public void onKeyDown(KeyDownEvent event) {
-					if (event.getNativeKeyCode() == KeyCodes.KEY_ESCAPE) {
-						hideFormattingGuide.onClick(null);
-					}
-				}
-			};
-			formattingGuideModal.addCloseHandler(hideFormattingGuide);
-			formattingGuideButton.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					formattingGuideModal.show();
-					formattingGuideKeyHandlerRegistration = RootPanel.get().addDomHandler(formattingGuideKeyDownHandler, KeyDownEvent.getType());
-				}
+				Dialog formattingGuideModal = new Dialog();
+				formattingGuideModal.configure("Formatting Guide", null, "Close", null, true);
+				formattingGuideModal.add(formattingGuideWidget);
+				formattingGuideModal.show();
 			});
-			formattingGuideOkButton.addClickHandler(hideFormattingGuide);
 			
 			markdownTextArea.addKeyPressHandler(new KeyPressHandler() {
 				@Override
@@ -425,8 +398,7 @@ public class MarkdownEditorWidgetViewImpl implements MarkdownEditorWidgetView {
 	
 	@Override
 	public void setFormattingGuideWidget(Widget formattingGuideWidget) {
-		lazyConstruct();
-		formattingGuideContainer.setWidget(formattingGuideWidget);
+		this.formattingGuideWidget = formattingGuideWidget;
 	}
 	@Override
 	public boolean isEditorAttachedAndVisible() {

@@ -5,7 +5,6 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 	<bh:Div>
-		<!-- dataKeyboard must be false in this case since close handler is not called when ESC is clicked (we're in edit mode at this point, warning the user of page change) -->
 		<b:Modal ui:field="editorDialog" addStyleNames="modal-fullscreen" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
 			<b:ModalBody>
 				<b:TextBox ui:field="titleField" placeholder="Title" addStyleNames="font-size-32 margin-bottom-10" height="50px" />

@@ -123,14 +123,5 @@
 		    </bh:Div>
 		</bh:Div>
 	    <bh:Div ui:field="selectTeamModalContainer"/>
-	    <!-- dataKeyboard must be false in this case since clicking ESC will also close the parent modal -->
-		<b:Modal ui:field="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="false" dataBackdrop="STATIC" dataKeyboard="false">
-		  <b:ModalBody>
-		    <g:SimplePanel ui:field="formattingGuideContainer" />
-		  </b:ModalBody>
-		  <b:ModalFooter>
-		    <b:Button ui:field="formattingGuideOkButton" type="PRIMARY">OK</b:Button>
-		  </b:ModalFooter>
-		</b:Modal>
 	</bh:Div>
 </ui:UiBinder>

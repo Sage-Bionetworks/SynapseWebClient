@@ -12,7 +12,9 @@ import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -75,9 +77,10 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 		primaryButton.addClickHandler(event -> {
 			presenter.onConfirm();
 		});
-		secondaryButton.addClickHandler(event -> {
+		ClickHandler onCancel = event -> {
 			modal.hide();
-		});
+		};
+		secondaryButton.addClickHandler(onCancel);
 		KeyDownHandler saveInfo = event -> {
 			if(event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
 				primaryButton.click();
@@ -87,6 +90,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 			presenter.onRemovePicture();
 		});
 		editNameField.addKeyDownHandler(saveInfo);
+		modal.addDomHandler(DisplayUtils.getESCKeyDownHandler(onCancel), KeyDownEvent.getType());
 	}
 	
 	@Override
@@ -152,6 +156,7 @@ public class TeamEditModalWidgetViewImpl implements IsWidget, TeamEditModalWidge
 	@Override
 	public void show() {
 		modal.show();
+		DisplayUtils.focusOnChildInput(modal);
 	}
 	
 	@Override

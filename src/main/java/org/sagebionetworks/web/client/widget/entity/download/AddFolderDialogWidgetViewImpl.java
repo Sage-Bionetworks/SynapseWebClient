@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -58,6 +59,7 @@ public class AddFolderDialogWidgetViewImpl implements AddFolderDialogWidgetView 
 				}
 			}
 		});
+		newFolderDialog.addDomHandler(DisplayUtils.getESCKeyDownHandler(deleteCancelledHandler), KeyDownEvent.getType());
 	}
 	
 	@Override

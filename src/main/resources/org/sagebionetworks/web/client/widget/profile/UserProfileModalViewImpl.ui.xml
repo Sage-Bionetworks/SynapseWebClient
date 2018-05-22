@@ -5,7 +5,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<b:Modal ui:field="modal" title="Edit Profile" closable="true"
-		dataBackdrop="STATIC" dataKeyboard="true" size="LARGE">
+		dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
 		<b:ModalBody>
 			<g:SimplePanel ui:field="bodyPanel" />
 			<w:LoadingSpinner size="31px" ui:field="loadingPanel"/>
