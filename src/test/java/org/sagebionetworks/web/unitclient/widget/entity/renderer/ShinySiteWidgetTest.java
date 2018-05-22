@@ -33,7 +33,7 @@ public class ShinySiteWidgetTest {
 	@Mock
 	AuthenticationController mockAuthenticationController;
 	WikiPageKey wikiKey = new WikiPageKey("", ObjectType.ENTITY.toString(), null);
-	String validSiteUrl = "http://test.sagebase.org/something";
+	String validSiteUrl = "https://docs.google.com/a/sagebase.org/forms/myform";
 	String validSiteUrl2 = "https://s3.amazonaws.com/static.synapse.org/rstudio/faithful/";
 
 	String invalidSiteUrl = "http://glimmer.rstudio.com/rstudio/faithful/";
