@@ -6,7 +6,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
-    <b:Modal ui:field="modal" dataBackdrop="STATIC" size="LARGE" dataKeyboard="false">
+    <b:Modal ui:field="modal" dataBackdrop="STATIC" size="LARGE" dataKeyboard="true">
 		<b:ModalHeader closable="true">
 		    <b:Heading size="H4" text="Edit Team" addStyleNames="displayInline"/>
 		    <w:HelpWidget helpMarkdown="Teams are a way to easily manage groups of users for the purposes of project access, communication, and challenge participation." 

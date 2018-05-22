@@ -123,7 +123,7 @@
 		    </bh:Div>
 		</bh:Div>
 	    <bh:Div ui:field="selectTeamModalContainer"/>
-		<b:Modal ui:field="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="false" dataBackdrop="STATIC" dataKeyboard="false">
+		<b:Modal ui:field="formattingGuideModal" size="LARGE" title="Formatting Guide" closable="false" dataBackdrop="STATIC" dataKeyboard="true">
 		  <b:ModalBody>
 		    <g:SimplePanel ui:field="formattingGuideContainer" />
 		  </b:ModalBody>

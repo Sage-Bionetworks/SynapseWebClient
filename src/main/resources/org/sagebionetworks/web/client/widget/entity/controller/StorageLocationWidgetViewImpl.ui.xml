@@ -8,7 +8,7 @@
 	
 	<g:HTMLPanel>
 	    <b:Modal ui:field="modal" closable="true"
-			dataBackdrop="STATIC" dataKeyboard="false" size="LARGE">
+			dataBackdrop="STATIC" dataKeyboard="true" size="LARGE">
 			<b:ModalHeader>
 				<b:Heading size="H4" text="Storage Location" addStyleNames="displayInline" />
 				<w:HelpWidget helpMarkdown="Synapse can access files stored in multiple locations.&#10;By default content is stored in Synapse native storage but can alternatively be setup with other solutions." 

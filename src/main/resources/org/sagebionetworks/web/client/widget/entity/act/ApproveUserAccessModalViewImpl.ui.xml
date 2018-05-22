@@ -9,7 +9,7 @@
 
 	<bh:Div>
 		<!-- Dialog for previewing email message -->		
-		<b:Modal ui:field="previewModal" title="Email Message Preview" closable="true" dataBackdrop="STATIC" dataKeyboard="false">		
+		<b:Modal ui:field="previewModal" title="Email Message Preview" closable="true" dataBackdrop="STATIC" dataKeyboard="true">		
 			<b:ModalBody>		
 				<g:HTML ui:field="messageBody" addStyleNames="margin-top-10 margin-bottom-10" />		
 			</b:ModalBody>		
@@ -19,7 +19,7 @@
 		</b:Modal>
 	
 		<!-- Dialog for approving user -->
-		<b:Modal ui:field="modal" title="Approve User Access" closable="true" dataBackdrop="STATIC" dataKeyboard="false">
+		<b:Modal ui:field="modal" title="Approve User Access" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalBody>
 				<bh:Div addStyleNames="margin-top-10 margin-bottom-10">
 					<b:Heading size="H5" text="Access Requirement" addStyleNames="margin-left-10 margin-right-10 margin-top-20" />
