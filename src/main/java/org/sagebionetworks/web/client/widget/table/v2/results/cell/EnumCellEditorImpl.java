@@ -39,7 +39,7 @@ public class EnumCellEditorImpl implements EnumCellEditor {
 
 	@Override
 	public void setValue(String value) {
-		value = StringUtils.trimWithEmptyAsNull(value);
+		value = StringUtils.emptyAsNull(value);
 		if (value == null) {
 			// null means the first item: 'nothing selected'
 			view.setValue(0);

@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import static org.sagebionetworks.web.client.StringUtils.isValueChanged;
-import static org.sagebionetworks.web.client.StringUtils.trimWithEmptyAsNull;
+import static org.sagebionetworks.web.client.StringUtils.emptyAsNull;
 
 import java.util.HashMap;
 import java.util.Iterator;
@@ -113,10 +113,10 @@ public class RowSetUtils {
 			if (header != null && header.getId() != null) {
 				String updateValue =  toUpdate.getValues().get(i);
 				if(original == null){
-					map.put(header.getId(), trimWithEmptyAsNull(updateValue));
+					map.put(header.getId(), emptyAsNull(updateValue));
 				}else{
 					if(isValueChanged(original.getValues().get(i), updateValue)){
-						map.put(header.getId(), trimWithEmptyAsNull(updateValue));
+						map.put(header.getId(), emptyAsNull(updateValue));
 					}
 				}
 			}

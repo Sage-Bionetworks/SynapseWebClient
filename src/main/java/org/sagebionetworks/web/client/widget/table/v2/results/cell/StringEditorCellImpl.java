@@ -25,7 +25,7 @@ public class StringEditorCellImpl extends AbstractCellEditor implements StringEd
 
 	@Override
 	public boolean isValid() {
-		String value = StringUtils.trimWithEmptyAsNull(this.getValue());
+		String value = StringUtils.emptyAsNull(this.getValue());
 		if(value != null && maximumSize != null){
 			boolean valid = value.length() <= maximumSize;
 			if(!valid){

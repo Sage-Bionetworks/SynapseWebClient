@@ -36,7 +36,7 @@ public class EnumFormCellEditorImpl implements EnumFormCellEditor {
 
 	@Override
 	public void setValue(String value) {
-		value = StringUtils.trimWithEmptyAsNull(value);
+		value = StringUtils.emptyAsNull(value);
 		if (value == null) {
 			return;
 		}
