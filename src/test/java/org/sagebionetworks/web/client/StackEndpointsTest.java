@@ -41,7 +41,7 @@ public class StackEndpointsTest {
 		System.setProperty(PARAM4, param4);
 		System.setProperty(PARAM5, param5);
 		
-		String endpointPrefix = "https://repo-dev-800-1.prod.sagebase.org";
+		String endpointPrefix = "https://repo-dev-800-1.dev.sagebase.org";
 		assertEquals(endpointPrefix + FILE_SUFFIX, StackEndpoints.getFileServiceEndpoint());
 		assertEquals(endpointPrefix + AUTH_SUFFIX, StackEndpoints.getAuthenticationServicePublicEndpoint());
 		assertEquals(endpointPrefix + REPO_SUFFIX, StackEndpoints.getRepositoryServiceEndpoint());

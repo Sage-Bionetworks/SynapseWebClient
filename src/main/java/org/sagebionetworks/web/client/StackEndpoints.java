@@ -48,10 +48,12 @@ public class StackEndpoints {
 				try {
 					//override any properties with the m2 settings property values (if set)
 					Properties props = SettingsLoader.loadSettingsFile();
-					for (Object propertyName : props.keySet()) {
-						String value = (String)props.get(propertyName);
-						if (value!=null && value.length()>0) {
-							System.setProperty((String)propertyName,value);
+					if (props != null) {
+						for (Object propertyName : props.keySet()) {
+							String value = (String)props.get(propertyName);
+							if (value!=null && value.length()>0) {
+								System.setProperty((String)propertyName,value);
+							}
 						}
 					}
 				} catch (IOException e) {
@@ -84,7 +86,7 @@ public class StackEndpoints {
 				}
 	
 				// put it all together.  like https://repo-prod-222-0.prod.sagebase.org
-				endpointPrefix = "https://repo-" + stackName + "-" + stackInstance + "-" + stack + ".prod.sagebase.org";
+				endpointPrefix = "https://repo-" + stackName + "-" + stackInstance + "-" + stack + "." + stackName + ".sagebase.org";
 			}
 		}
 		return endpointPrefix;
