@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal.upload;
 
+import org.gwtbootstrap3.extras.bootbox.client.Bootbox;
 import org.sagebionetworks.web.client.DisplayUtils;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -45,6 +46,6 @@ public class UploadCSVAppendPageViewImpl implements UploadCSVAppendPageView {
 
 	@Override
 	public void showErrorDialog(String message) {
-		DisplayUtils.showErrorMessage(message);
+		Bootbox.alert(message);
 	}
 }
