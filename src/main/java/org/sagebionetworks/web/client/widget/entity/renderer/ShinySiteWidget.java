@@ -17,12 +17,8 @@ public class ShinySiteWidget implements WidgetRendererPresenter {
 	
 	//Note: *.synapse.org is also in the whitelist
 	private static final String[] VALID_URL_BASES = { 
-		"http://glimmer.rstudio.com/", 
 		"http://spark.rstudio.com/",
 		"https://s3.amazonaws.com/static.synapse.org/",
-		"https://belltown.fhcrc.org:9898/",
-		"http://pipeline.rice.edu/dream9/",
-		"https://fredcommo.shinyapps.io/",
 		"https://docs.google.com/a/sagebase.org/forms/",
 		"https://calendar.google.com/calendar/"
 		};
