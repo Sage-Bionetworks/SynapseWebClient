@@ -1353,6 +1353,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			do {
 				List<MembershipInvitation> newResults = synapseClient.getOpenMembershipInvitationSubmissions(teamId, null, LIMIT_50, currentOffset).getResults();
 				invitations.addAll(newResults);
+				currentOffset+=LIMIT_50;
 				isEmpty = newResults.isEmpty();
 			} while(!isEmpty);
 			//now go through and send the invitations (again)
@@ -1360,7 +1361,13 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			
 			for (MembershipInvitation membershipInvitation : invitations) {
+				String oldMembershipId = membershipInvitation.getId();
+				//clear system specified values
+				membershipInvitation.setCreatedBy(null);
+				membershipInvitation.setCreatedOn(null);
+				membershipInvitation.setId(null);
 				synapseClient.createMembershipInvitation(membershipInvitation, emailInvitationEndpoint, settingsEndpoint);
+				synapseClient.deleteMembershipInvitation(oldMembershipId);
 			}
 			
 		} catch (SynapseException e) {
