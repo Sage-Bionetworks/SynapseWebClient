@@ -117,7 +117,7 @@ public class AnnotationEditor implements Presenter {
 	}
 
 	public boolean isKeyValid() {
-		String value = StringUtils.trimWithEmptyAsNull(view.getKey());
+		String value = StringUtils.emptyAsNull(view.getKey());
 		if(!DisplayUtils.isDefined(value)){
 			view.setKeyValidationState(ValidationState.ERROR);
 			view.setKeyHelpText("You must provide a key");

@@ -39,7 +39,7 @@ public class FileCellRendererImpl implements FileCellRenderer {
 
 	@Override
 	public void setValue(String value) {
-		fileHandleId = StringUtils.trimWithEmptyAsNull(value);
+		fileHandleId = StringUtils.emptyAsNull(value);
 		if(fileHandleId == null){
 			view.setLoadingVisible(false);
 		}else{

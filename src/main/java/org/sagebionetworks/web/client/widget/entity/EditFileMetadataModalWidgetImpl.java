@@ -103,14 +103,14 @@ public class EditFileMetadataModalWidgetImpl implements EditFileMetadataModalVie
 	}
 	
 	private String getEntityNameFromView() {
-		return StringUtils.trimWithEmptyAsNull(view.getEntityName());
+		return StringUtils.emptyAsNull(view.getEntityName());
 	}
 	
 	private String getFileNameFromView() {
-		return StringUtils.trimWithEmptyAsNull(view.getFileName());
+		return StringUtils.emptyAsNull(view.getFileName());
 	}
 	private String getFileContentTypeFromView() {
-		return StringUtils.trimWithEmptyAsNull(view.getContentType());
+		return StringUtils.emptyAsNull(view.getContentType());
 	}
 	
 	private boolean isEntityChange() {

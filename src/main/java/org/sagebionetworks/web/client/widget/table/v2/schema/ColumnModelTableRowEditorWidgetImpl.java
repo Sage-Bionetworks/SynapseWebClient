@@ -346,7 +346,7 @@ public class ColumnModelTableRowEditorWidgetImpl implements ColumnModelTableRowE
 	 */
 	public boolean validateName() {
 		boolean isValid = true;
-		String name = StringUtils.trimWithEmptyAsNull(view.getColumnName());
+		String name = StringUtils.emptyAsNull(view.getColumnName());
 		if(name == null){
 			view.setNameError(NAME_CANNOT_BE_EMPTY);
 			isValid = false;

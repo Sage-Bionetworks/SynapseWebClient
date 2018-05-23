@@ -170,7 +170,7 @@ public class Synapse extends Place {
 	 * @return
 	 */
 	public static String getHrefForDotVersion(String dotNotation){
-		dotNotation = StringUtils.trimWithEmptyAsNull(dotNotation);
+		dotNotation = StringUtils.emptyAsNull(dotNotation);
 		if(dotNotation == null){
 			return null;
 		}
