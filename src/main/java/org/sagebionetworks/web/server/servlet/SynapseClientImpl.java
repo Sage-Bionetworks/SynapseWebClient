@@ -1343,33 +1343,19 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public void resendTeamInvitations(String teamId, String hostPageBaseURL) throws RestServiceException {
+	public void resendTeamInvitation(String teamId, String membershipInvitationId, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			// gather all team invitations
-			List<MembershipInvitation> invitations = new ArrayList<>();
-			boolean isEmpty = false;
-			int currentOffset = ZERO_OFFSET;
-			do {
-				List<MembershipInvitation> newResults = synapseClient.getOpenMembershipInvitationSubmissions(teamId, null, LIMIT_50, currentOffset).getResults();
-				invitations.addAll(newResults);
-				currentOffset+=LIMIT_50;
-				isEmpty = newResults.isEmpty();
-			} while(!isEmpty);
-			//now go through and send the invitations (again)
+			//resend the invitation
 			String emailInvitationEndpoint = getNotificationEndpoint(NotificationTokenType.EmailInvitation, hostPageBaseURL);
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
-			
-			for (MembershipInvitation membershipInvitation : invitations) {
-				String oldMembershipId = membershipInvitation.getId();
-				//clear system specified values
-				membershipInvitation.setCreatedBy(null);
-				membershipInvitation.setCreatedOn(null);
-				membershipInvitation.setId(null);
-				synapseClient.createMembershipInvitation(membershipInvitation, emailInvitationEndpoint, settingsEndpoint);
-				synapseClient.deleteMembershipInvitation(oldMembershipId);
-			}
-			
+			MembershipInvitation membershipInvitation = synapseClient.getMembershipInvitation(membershipInvitationId);
+			//clear system specified values
+			membershipInvitation.setCreatedBy(null);
+			membershipInvitation.setCreatedOn(null);
+			membershipInvitation.setId(null);
+			synapseClient.createMembershipInvitation(membershipInvitation, emailInvitationEndpoint, settingsEndpoint);
+			synapseClient.deleteMembershipInvitation(membershipInvitationId);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		} 

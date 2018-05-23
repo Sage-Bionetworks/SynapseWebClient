@@ -27,7 +27,7 @@ import com.google.inject.Inject;
 
 public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.Presenter {
 	public static final Integer INVITATION_BATCH_LIMIT = 10;
-	public static final String RESENT_INVITATIONS = "Invitations resent";
+	public static final String RESENT_INVITATIONS = "Invitation resent";
 	private OpenUserInvitationsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
@@ -139,7 +139,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 				// Invitee is an email address
 				EmailInvitationBadge emailInvitationBadge = ginInjector.getEmailInvitationBadgeWidget();
 				emailInvitationBadge.configure(mis.getInviteeEmail());
-				view.addInvitation(emailInvitationBadge, mis.getId(), mis.getMessage(), createdOn);
+				view.addInvitation(emailInvitationBadge, null, mis.getId(), mis.getMessage(), createdOn);
 			} else {
 				synAlert.showError("Membership invitation with ID " + mis.getId() + " is not in a valid state.");
 			}
@@ -155,21 +155,6 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 			synAlert.showError("Result size can't be greater than " + INVITATION_BATCH_LIMIT);
 		}
 	}
-	
-	@Override
-	public void resendInvitations() {
-		synapseClient.resendTeamInvitations(teamId, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
-			@Override
-			public void onSuccess(Void result) {
-				popupUtils.showInfo(RESENT_INVITATIONS, "");
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				synAlert.handleException(caught);
-			}
-		});
-	}
 
 	@Override
 	public void goTo(Place place) {
@@ -183,4 +168,21 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	public void setVisible(boolean visible) {
 		view.asWidget().setVisible(visible);
 	}
+	
+	@Override
+	public void resendInvitation(String membershipInvitationId) {
+		synapseClient.resendTeamInvitation(teamId, membershipInvitationId, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				popupUtils.showInfo(RESENT_INVITATIONS, "");
+				refresh();
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
+	}
+
 }

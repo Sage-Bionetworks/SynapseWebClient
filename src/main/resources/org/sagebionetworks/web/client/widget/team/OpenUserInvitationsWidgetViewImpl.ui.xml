@@ -8,7 +8,6 @@
 	<bh:Div>
 		<bh:Div ui:field="synAlertContainer"/>
 		<bh:Div ui:field="invitationsContainer" addStyleNames="highlight-box">
-			<b:Button ui:field="resendAllInvitationsButton" text="Resend All Invitations"/>
 			<table:Table ui:field="invitations" width="100%"/>
 			<bh:Div addStyleNames="text-center">
 				<b:Button ui:field="moreButton" text="More"/>
