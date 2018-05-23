@@ -306,5 +306,5 @@ public interface SynapseClient extends RemoteService{
 
 	ArrayList<String[]> parseCsv(String csvPreviewText, char delimiter) throws RestServiceException;
 
-	void resendTeamInvitation(String teamId, String membershipInvitationId, String hostPageBaseURL) throws RestServiceException;
+	void resendTeamInvitation(String membershipInvitationId, String hostPageBaseURL) throws RestServiceException;
 }

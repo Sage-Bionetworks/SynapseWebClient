@@ -31,15 +31,17 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	private Presenter presenter;
 	private ClickHandler removeInvitationClickHandler = event -> {
 		event.preventDefault();
-		Widget panel = (Widget)event.getSource();
-		String membershipInvitationId = panel.getElement().getAttribute(MEMBERSHIP_INVITATION_ID);
+		Button btn = (Button)event.getSource();
+		String membershipInvitationId = btn.getElement().getAttribute(MEMBERSHIP_INVITATION_ID);
+		btn.setEnabled(false);
 		presenter.removeInvitation(membershipInvitationId);
 	};
 	
 	private ClickHandler resendInvitationClickHandler = event -> {
 		event.preventDefault();
-		Widget panel = (Widget)event.getSource();
-		String membershipInvitationId = panel.getElement().getAttribute(MEMBERSHIP_INVITATION_ID);
+		Button btn = (Button)event.getSource();
+		String membershipInvitationId = btn.getElement().getAttribute(MEMBERSHIP_INVITATION_ID);
+		btn.setEnabled(false);
 		presenter.resendInvitation(membershipInvitationId);
 	};
 	

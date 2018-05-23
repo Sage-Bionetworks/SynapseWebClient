@@ -93,6 +93,7 @@ public class OpenUserInvitationsWidgetTest {
 		
 		AsyncMockStubber.callSuccessWith(testReturn).when(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(),anyInt(),any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).deleteMembershipInvitation(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).resendTeamInvitation(anyString(), anyString(),any(AsyncCallback.class));
 
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		when(mockGinInjector.getEmailInvitationBadgeWidget()).thenReturn(mockEmailInvitationBadge);
@@ -243,5 +244,35 @@ public class OpenUserInvitationsWidgetTest {
 		widget.getNextBatch();
 		verify(mockView, times(3)).hideMoreButton();
 		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), eq(OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT), eq(OpenUserInvitationsWidget.INVITATION_BATCH_LIMIT), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testResendOpenInvite() throws Exception {
+		int expectedOffset = 0;
+		String invitationId = "123";
+		widget.configure(teamId, mockTeamUpdatedCallback);
+		verify(mockView).clear();
+		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(), eq(expectedOffset), any(AsyncCallback.class));
+		
+		widget.resendInvitation(invitationId);
+		
+		verify(mockGWT).saveWindowPosition();
+		verify(mockSynapseClient).resendTeamInvitation(eq(invitationId), anyString(), any(AsyncCallback.class));
+		verify(mockPopupUtils).showInfo(OpenUserInvitationsWidget.RESENT_INVITATION, "");
+		verify(mockView, times(2)).clear();
+		verify(mockSynapseClient, times(2)).getOpenTeamInvitations(anyString(), anyInt(), eq(expectedOffset), any(AsyncCallback.class));
+	}
+
+	@Test
+	public void testResendOpenInviteFailure() throws Exception {
+		String invitationId = "123";
+		Exception ex = new Exception("unhandled exception");
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient).resendTeamInvitation(anyString(), anyString(), any(AsyncCallback.class));
+		widget.configure(teamId, mockTeamUpdatedCallback);
+		
+		widget.resendInvitation(invitationId);
+		
+		verify(mockSynapseClient).resendTeamInvitation(eq(invitationId), anyString(), any(AsyncCallback.class));
+		verify(mockSynapseAlert).handleException(ex);
 	}
 }

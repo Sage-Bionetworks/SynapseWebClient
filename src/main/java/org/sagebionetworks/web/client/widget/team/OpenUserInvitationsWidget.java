@@ -27,7 +27,7 @@ import com.google.inject.Inject;
 
 public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.Presenter {
 	public static final Integer INVITATION_BATCH_LIMIT = 10;
-	public static final String RESENT_INVITATIONS = "Invitation resent";
+	public static final String RESENT_INVITATION = "Invitation resent";
 	private OpenUserInvitationsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
@@ -87,6 +87,7 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
+				refresh();
 			}
 		});
 	}
@@ -171,16 +172,18 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 	
 	@Override
 	public void resendInvitation(String membershipInvitationId) {
-		synapseClient.resendTeamInvitation(teamId, membershipInvitationId, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
+		gwt.saveWindowPosition();
+		synapseClient.resendTeamInvitation(membershipInvitationId, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				popupUtils.showInfo(RESENT_INVITATIONS, "");
+				popupUtils.showInfo(RESENT_INVITATION, "");
 				refresh();
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
+				refresh();
 			}
 		});
 	}

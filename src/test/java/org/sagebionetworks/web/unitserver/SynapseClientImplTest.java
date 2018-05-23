@@ -46,6 +46,7 @@ import org.json.JSONException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -260,6 +261,13 @@ public class SynapseClientImplTest {
 	List<EntityHeader> entityChildrenPage;
 	@Mock
 	Challenge mockChallenge;
+	@Mock
+	MembershipInvitation mockMembershipInvitation;
+	@Captor
+	ArgumentCaptor<String> stringCaptor1;
+	@Captor
+	ArgumentCaptor<String> stringCaptor2;
+	
 	public static final String OLD_COLUMN_MODEL_ID1 = "4444";
 	public static final String OLD_COLUMN_MODEL_ID2 = "4445";
 	public static final String NEW_COLUMN_MODEL_ID = "837837";
@@ -2166,4 +2174,23 @@ public class SynapseClientImplTest {
 		assertEquals("b1, b2", parsed.get(0)[1]);
 		assertEquals("c1 \"c2\"", parsed.get(0)[2]);
 	}
+	
+	@Test
+	public void testResendTeamInvitation() throws RestServiceException, SynapseException{
+		String membershipInvitationId = "1212";
+		String hostPageBaseURL = "http://localhost/Portal.html";
+		when(mockSynapse.getMembershipInvitation(anyString())).thenReturn(mockMembershipInvitation);
+		
+		synapseClient.resendTeamInvitation(membershipInvitationId, hostPageBaseURL);
+		
+		verify(mockSynapse).getMembershipInvitation(membershipInvitationId);
+		verify(mockMembershipInvitation).setCreatedBy(null);
+		verify(mockMembershipInvitation).setCreatedOn(null);
+		verify(mockMembershipInvitation).setId(null);
+		verify(mockSynapse).createMembershipInvitation(eq(mockMembershipInvitation), stringCaptor1.capture(), stringCaptor2.capture());
+		assertTrue(stringCaptor1.getValue().startsWith(hostPageBaseURL));
+		assertTrue(stringCaptor2.getValue().startsWith(hostPageBaseURL));
+		verify(mockSynapse).deleteMembershipInvitation(membershipInvitationId);
+	}
+
 }

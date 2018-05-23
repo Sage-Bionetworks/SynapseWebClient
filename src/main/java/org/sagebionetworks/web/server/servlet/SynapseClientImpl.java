@@ -1343,14 +1343,13 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
-	public void resendTeamInvitation(String teamId, String membershipInvitationId, String hostPageBaseURL) throws RestServiceException {
+	public void resendTeamInvitation(String membershipInvitationId, String hostPageBaseURL) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			//resend the invitation
+			//resend the invitation.  get the invitation, clear out system specified values, re-create the invitation, and delete the old one.
 			String emailInvitationEndpoint = getNotificationEndpoint(NotificationTokenType.EmailInvitation, hostPageBaseURL);
 			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
 			MembershipInvitation membershipInvitation = synapseClient.getMembershipInvitation(membershipInvitationId);
-			//clear system specified values
 			membershipInvitation.setCreatedBy(null);
 			membershipInvitation.setCreatedOn(null);
 			membershipInvitation.setId(null);
