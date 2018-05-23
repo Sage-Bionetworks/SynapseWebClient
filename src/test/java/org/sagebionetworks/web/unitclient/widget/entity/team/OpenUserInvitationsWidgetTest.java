@@ -147,7 +147,7 @@ public class OpenUserInvitationsWidgetTest {
 		setupGetOpenTeamInvitations(0, emailInvitationCount);
 		widget.configure(teamId, mockTeamUpdatedCallback);
 		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
-		verify(mockView, times(emailInvitationCount)).addInvitation(eq(mockEmailInvitationBadge), eq(testEmailInvite.getId()), eq(testEmailInvite.getMessage()), anyString());
+		verify(mockView, times(emailInvitationCount)).addInvitation(eq(mockEmailInvitationBadge), eq(null), eq(testEmailInvite.getId()), eq(testEmailInvite.getMessage()), anyString());
 		verify(mockGWT).restoreWindowPosition();
 	}
 
@@ -159,7 +159,7 @@ public class OpenUserInvitationsWidgetTest {
 		widget.configure(teamId, mockTeamUpdatedCallback);
 		verify(mockSynapseClient).getOpenTeamInvitations(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		verify(mockView, times(userInvitationCount)).addInvitation(eq(mockUserBadge), eq(testInvite.getInviteeEmail()), eq(testInvite.getId()), eq(testInvite.getMessage()), anyString());
-		verify(mockView, times(emailInvitationCount)).addInvitation(eq(mockEmailInvitationBadge), eq(testEmailInvite.getId()), eq(testEmailInvite.getMessage()), anyString());
+		verify(mockView, times(emailInvitationCount)).addInvitation(eq(mockEmailInvitationBadge), eq(null), eq(testEmailInvite.getId()), eq(testEmailInvite.getMessage()), anyString());
 		verify(mockGWT).restoreWindowPosition();
 	}
 
