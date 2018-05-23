@@ -1343,6 +1343,32 @@ public class SynapseClientImpl extends SynapseClientBase implements
 	}
 
 	@Override
+	public void resendTeamInvitations(String teamId, String hostPageBaseURL) throws RestServiceException {
+		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+		try {
+			// gather all team invitations
+			List<MembershipInvitation> invitations = new ArrayList<>();
+			boolean isEmpty = false;
+			int currentOffset = ZERO_OFFSET;
+			do {
+				List<MembershipInvitation> newResults = synapseClient.getOpenMembershipInvitationSubmissions(teamId, null, LIMIT_50, currentOffset).getResults();
+				invitations.addAll(newResults);
+				isEmpty = newResults.isEmpty();
+			} while(!isEmpty);
+			//now go through and send the invitations (again)
+			String emailInvitationEndpoint = getNotificationEndpoint(NotificationTokenType.EmailInvitation, hostPageBaseURL);
+			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			
+			for (MembershipInvitation membershipInvitation : invitations) {
+				synapseClient.createMembershipInvitation(membershipInvitation, emailInvitationEndpoint, settingsEndpoint);
+			}
+			
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
+		} 
+	}
+	
+	@Override
 	public ArrayList<OpenTeamInvitationBundle> getOpenTeamInvitations(
 			String teamId, Integer limit, Integer offset)
 			throws RestServiceException {

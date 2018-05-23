@@ -27,7 +27,7 @@ import com.google.inject.Inject;
 
 public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.Presenter {
 	public static final Integer INVITATION_BATCH_LIMIT = 10;
-
+	public static final String RESENT_INVITATIONS = "Invitations resent";
 	private OpenUserInvitationsWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
@@ -154,6 +154,21 @@ public class OpenUserInvitationsWidget implements OpenUserInvitationsWidgetView.
 		} else {
 			synAlert.showError("Result size can't be greater than " + INVITATION_BATCH_LIMIT);
 		}
+	}
+	
+	@Override
+	public void resendInvitations() {
+		synapseClient.resendTeamInvitations(teamId, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
+			@Override
+			public void onSuccess(Void result) {
+				popupUtils.showInfo(RESENT_INVITATIONS, "");
+			}
+			
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+		});
 	}
 
 	@Override

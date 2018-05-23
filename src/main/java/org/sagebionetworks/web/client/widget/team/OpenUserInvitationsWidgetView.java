@@ -30,5 +30,6 @@ public interface OpenUserInvitationsWidgetView extends IsWidget {
 		void goTo(Place place);
 		void removeInvitation(String ownerId);
 		void getNextBatch();
+		void resendInvitations();
 	}
 }

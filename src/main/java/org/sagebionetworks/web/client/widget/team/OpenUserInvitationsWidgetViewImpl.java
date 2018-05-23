@@ -25,7 +25,8 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 	@UiField Div invitationsContainer;
 	@UiField Table invitations;
 	@UiField Button moreButton;
-
+	@UiField Button resendAllInvitationsButton;
+	
 	private Widget widget;
 	private Presenter presenter;
 
@@ -34,6 +35,7 @@ public class OpenUserInvitationsWidgetViewImpl implements OpenUserInvitationsWid
 		widget = binder.createAndBindUi(this);
 		invitationsContainer.getElement().setAttribute("highlight-box-title", DisplayConstants.PENDING_INVITATIONS);
 		moreButton.addClickHandler(event -> presenter.getNextBatch());
+		resendAllInvitationsButton.addClickHandler(event -> presenter.resendInvitations());
 	}
 	
 	@Override
