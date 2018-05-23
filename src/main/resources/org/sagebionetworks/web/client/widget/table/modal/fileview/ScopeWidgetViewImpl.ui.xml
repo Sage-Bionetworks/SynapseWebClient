@@ -10,7 +10,7 @@
 		<b:Button ui:field="editButton" icon="EDIT" addStyleNames="margin-top-10" visible="false" text="Edit Scope" type="INFO"/>
 		
 		<b:Modal ui:field="editModal" title="Edit Scope" closable="true"
-			dataBackdrop="STATIC" dataKeyboard="false" b:id="editScopeModal"
+			dataBackdrop="STATIC" dataKeyboard="true" b:id="editScopeModal"
 			size="LARGE">
 			<b:ModalBody>
 				<g:SimplePanel ui:field="editScopeContainer" addStyleNames="light-border padding-10" />

@@ -8,7 +8,7 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 
 	<bh:Span>
-		<b:Modal ui:field="s3DirectLoginDialog" title="Download" closable="true" dataKeyboard="false">
+		<b:Modal ui:field="s3DirectLoginDialog" title="Download" closable="true" dataKeyboard="true">
 			<b:ModalBody>
 				<bh:Div ui:field="s3DirectLoginDialogBody"/>
 			</b:ModalBody>
@@ -17,7 +17,7 @@
 				<b:Button type="LINK" dataDismiss="MODAL">Cancel</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
-		<b:Modal ui:field="s3DirectDownloadDialog" title="Ready to download" closable="true" dataKeyboard="false">
+		<b:Modal ui:field="s3DirectDownloadDialog" title="Ready to download" closable="true" dataKeyboard="true">
 			<b:ModalBody>
 				<b:Button ui:field="s3DirectDownloadButton" type="PRIMARY" size="LARGE" icon="DOWNLOAD" width="100%">Download</b:Button>
 			</b:ModalBody>

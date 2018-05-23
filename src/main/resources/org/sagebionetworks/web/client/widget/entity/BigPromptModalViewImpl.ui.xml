@@ -6,7 +6,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<b:Modal ui:field="modal" title="Title goes here" closable="true"
-		dataBackdrop="STATIC" dataKeyboard="false">
+		dataBackdrop="STATIC" dataKeyboard="true">
 		<b:ModalBody>
 			<bh:Div>
 				<b:FormGroup>

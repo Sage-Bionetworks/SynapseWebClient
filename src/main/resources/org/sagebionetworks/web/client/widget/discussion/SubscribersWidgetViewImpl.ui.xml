@@ -7,7 +7,7 @@
 		<g:FocusPanel ui:field="followersFocusPanel">
 			<bh:Span ui:field="followersLink" addStyleNames="imageButton link" />	
 		</g:FocusPanel>
-		<b:Modal ui:field="modal" closable="true" dataBackdrop="STATIC" dataKeyboard="false" title="Followers">
+		<b:Modal ui:field="modal" closable="true" dataBackdrop="STATIC" dataKeyboard="true" title="Followers">
 			<b:ModalBody>
 				<bh:Div ui:field="userListContainer" />
 				<bh:Div ui:field="synAlertContainer" />

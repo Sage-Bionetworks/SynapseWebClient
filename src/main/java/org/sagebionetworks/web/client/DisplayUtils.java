@@ -1,8 +1,12 @@
 package org.sagebionetworks.web.client;
 
 
-import static org.sagebionetworks.web.client.ClientProperties.*;
-import static org.sagebionetworks.web.client.DisplayConstants.*;
+import static org.sagebionetworks.web.client.ClientProperties.GB;
+import static org.sagebionetworks.web.client.ClientProperties.KB;
+import static org.sagebionetworks.web.client.ClientProperties.MB;
+import static org.sagebionetworks.web.client.ClientProperties.STYLE_DISPLAY_INLINE;
+import static org.sagebionetworks.web.client.ClientProperties.TB;
+import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_CANCEL;
 import static org.sagebionetworks.web.client.DisplayConstants.BUTTON_DELETE;
 import static org.sagebionetworks.web.client.DisplayConstants.CONFIRM_DELETE_DIALOG_TITLE;
 import static org.sagebionetworks.web.client.DisplayConstants.DANGER_BUTTON_STYLE;
@@ -133,6 +137,18 @@ public class DisplayUtils {
 		} 
 	}
 	
+	/**
+	 * This key down handler invokes the  when ESC is clicked.
+	 * @return
+	 */
+	public static KeyDownHandler getESCKeyDownHandler(ClickHandler callback) {
+		return event -> {
+			if (KeyCodes.KEY_ESCAPE == event.getNativeKeyCode()) {
+				event.preventDefault();
+				callback.onClick(null);
+			}
+		};
+	}
 	public static NotifySettings getDefaultSettings() {
 		NotifySettings notifySettings = NotifySettings.newSettings();
 		notifySettings.setTemplate("<div data-notify=\"container\" class=\"col-xs-11 alert alert-{0}\" role=\"alert\">\n" + 

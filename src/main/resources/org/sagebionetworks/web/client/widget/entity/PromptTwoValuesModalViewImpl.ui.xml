@@ -7,7 +7,7 @@
 
 	<!-- Dialog for creating a new table -->
 	<b:Modal ui:field="modal" title="Title goes here" closable="true"
-		dataBackdrop="STATIC" dataKeyboard="false">
+		dataBackdrop="STATIC" dataKeyboard="true">
 		<b:ModalBody>
 			<bh:Div>
 				<b:FormGroup>

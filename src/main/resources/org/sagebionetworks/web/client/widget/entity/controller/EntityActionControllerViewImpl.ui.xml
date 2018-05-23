@@ -6,7 +6,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<bh:Span>
-		<b:Modal ui:field="infoDialog" closable="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
+		<b:Modal ui:field="infoDialog" closable="true" dataBackdrop="STATIC" dataKeyboard="true" addStyleNames="modal-fullscreen">
 			<b:ModalBody>
 				<b:Pre ui:field="infoDialogText" /> 		
 			</b:ModalBody>

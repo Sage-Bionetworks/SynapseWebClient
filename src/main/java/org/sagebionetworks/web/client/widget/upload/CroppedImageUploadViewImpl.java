@@ -167,7 +167,6 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 	
 	public void cancelCropImage() {
 		loadingUI.setVisible(false);
-		previewModal.hide();
 		resetForm();
 	}
 
@@ -216,6 +215,7 @@ public class CroppedImageUploadViewImpl implements ImageUploadView {
 	public void resetForm() {
 		this.form.reset();
 		setUploadedFileText("");
+		previewModal.hide();
 	}
 
 	@Override

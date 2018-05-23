@@ -12,7 +12,7 @@
 			<w:LoadingSpinner ui:field="loadingUI" addStyleNames="center-block center" size="31px"/>
 			<!-- Confirm unsubscribe UI -->
 			<b:Modal ui:field="confirmUnsubscribeUI" title="Are you sure you want to stop receiving messages from Synapse?" closable="true"
-				dataBackdrop="STATIC" dataKeyboard="false" b:id="confirmUnsubscribeUI">
+				dataBackdrop="STATIC" dataKeyboard="true" b:id="confirmUnsubscribeUI">
 				<b:ModalBody>
 					<g:SimplePanel ui:field="unsubscribeUserBadgeContainer" />
 					<bh:Paragraph addStyleNames="margin-top-10">
