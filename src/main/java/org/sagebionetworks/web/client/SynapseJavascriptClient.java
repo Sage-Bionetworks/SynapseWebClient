@@ -448,6 +448,11 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.Team, callback);
 	}
 
+	public void createTeam(Team team, final AsyncCallback<Team> callback) {
+		String url = getRepoServiceUrl() + TEAM;
+		doPost(url, team, OBJECT_TYPE.Team, callback);
+	}
+	
 	public FluentFuture<Team> getTeam(String teamId) {
 		String url = getRepoServiceUrl() + TEAM + "/" + teamId;
 		return getFuture(cb -> doGet(url, OBJECT_TYPE.Team, cb));

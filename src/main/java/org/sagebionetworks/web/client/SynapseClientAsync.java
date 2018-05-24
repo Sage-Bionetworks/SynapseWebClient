@@ -125,7 +125,6 @@ public interface SynapseClientAsync {
 	 * TEAMS
 	 */
 	/////////////////
-	void createTeam(String teamName,AsyncCallback<String> callback);
 	void deleteTeam(String teamId,AsyncCallback<Void> callback);
 	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset,
 			AsyncCallback<PaginatedResults<Team>> callback);

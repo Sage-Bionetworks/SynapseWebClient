@@ -965,19 +965,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	public String createTeam(String teamName) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			Team t = new Team();
-			t.setName(teamName);
-			t.setCanPublicJoin(false);
-			t = synapseClient.createTeam(t);
-			return t.getId();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
-
 	public void deleteTeam(String teamId) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {

@@ -137,7 +137,6 @@ public interface SynapseClient extends RemoteService{
 
 	void removeFavorite(String entityId) throws RestServiceException;
 
-	String createTeam(String teamName) throws RestServiceException;
 	void deleteTeam(String teamId) throws RestServiceException;
 	PaginatedResults<Team> getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
 	TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;

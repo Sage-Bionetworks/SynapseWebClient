@@ -153,6 +153,8 @@ public class ProfilePresenterTest {
 	@Mock
 	UserBundle mockCurrentUserBundle;
 	@Mock
+	Team mockTeam;
+	@Mock
 	VerificationSubmissionWidget mockVerificationSubmissionModal;
 	@Mock
 	VerificationSubmission mockVerificationSubmission;
@@ -254,7 +256,8 @@ public class ProfilePresenterTest {
 		when(mockSynapseJavascriptClient.createEntity(any(Entity.class))).thenReturn(getDoneFuture(mockProject));
 		
 		//set up create team test
-		AsyncMockStubber.callSuccessWith("new team id").when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		when(mockTeam.getId()).thenReturn("new team id");
+		AsyncMockStubber.callSuccessWith(mockTeam).when(mockSynapseJavascriptClient).createTeam(any(Team.class), any(AsyncCallback.class));
 		
 		org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader> testBatchResults = new org.sagebionetworks.reflection.model.PaginatedResults<EntityHeader>();
 		List<EntityHeader> testEvaluationResults = new ArrayList<EntityHeader>();
@@ -877,7 +880,7 @@ public class ProfilePresenterTest {
 	public void testCreateTeam() {
 		when(mockPromptModalView.getValue()).thenReturn("valid name");
 		profilePresenter.createTeamAfterPrompt();
-		verify(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).createTeam(any(Team.class), any(AsyncCallback.class));
 		//inform user of success, and go to new team page
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockPlaceChanger).goTo(isA(org.sagebionetworks.web.client.place.Team.class));
@@ -887,19 +890,19 @@ public class ProfilePresenterTest {
 	public void testCreateTeamEmptyName() {
 		when(mockPromptModalView.getValue()).thenReturn("");
 		profilePresenter.createTeamAfterPrompt();
-		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).createTeam(any(Team.class), any(AsyncCallback.class));
 		verify(mockPromptModalView).showError(anyString());
 		Mockito.reset(mockPromptModalView);
 		when(mockPromptModalView.getValue()).thenReturn(null);
 		profilePresenter.createTeamAfterPrompt();
-		verify(mockSynapseClient, Mockito.times(0)).createTeam(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).createTeam(any(Team.class), any(AsyncCallback.class));
 		verify(mockPromptModalView).showError(anyString());
 	}
 
 	@Test
 	public void testCreateTeamError() {
 		String errorMessage = "unhandled";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseJavascriptClient).createTeam(any(Team.class), any(AsyncCallback.class));
 		when(mockPromptModalView.getValue()).thenReturn("valid name");
 		profilePresenter.createTeamAfterPrompt();
 		verify(mockPromptModalView).showError(errorMessage);
@@ -907,7 +910,7 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testCreateTeamNameConflictError() {
-		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseJavascriptClient).createTeam(any(Team.class), any(AsyncCallback.class));
 		when(mockPromptModalView.getValue()).thenReturn("valid name");
 		profilePresenter.createTeamAfterPrompt();
 		verify(mockPromptModalView).showError(DisplayConstants.WARNING_TEAM_NAME_EXISTS);

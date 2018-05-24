@@ -891,7 +891,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		});
 	}
 	
-	
 	@Override
 	public void createProject() {
 		//prompt for project name
@@ -945,13 +944,16 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			getPromptForTeamNameDialog().showError(DisplayConstants.PLEASE_ENTER_TEAM_NAME);
 			return;
 		}
-
-		synapseClient.createTeam(teamName, new AsyncCallback<String>() {
+		
+		Team newTeam = new Team();
+		newTeam.setName(teamName);
+		newTeam.setCanPublicJoin(false);
+		jsClient.createTeam(newTeam, new AsyncCallback<Team>() {
 			@Override
-			public void onSuccess(String newTeamId) {
+			public void onSuccess(Team team) {
 				getPromptForTeamNameDialog().hide();
 				view.showInfo(DisplayConstants.LABEL_TEAM_CREATED, teamName);
-				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(newTeamId));						
+				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(team.getId()));						
 			}
 			
 			@Override
