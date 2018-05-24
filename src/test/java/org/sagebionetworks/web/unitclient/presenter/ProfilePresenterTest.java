@@ -45,6 +45,8 @@ import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
@@ -58,7 +60,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.LinkedInServiceAsync;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
@@ -108,8 +109,6 @@ public class ProfilePresenterTest {
 	@Mock
 	UserAccountServiceAsync mockUserService;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
-	@Mock
 	LinkedInServiceAsync mockLinkedInServic;
 	@Mock
 	GWTWrapper mockGwt;
@@ -142,7 +141,10 @@ public class ProfilePresenterTest {
 	SynapseAlert mockSynAlert;
 	@Mock
 	OpenTeamInvitationsWidget mockTeamInviteWidget;
-	String targetUserId = "12345";
+	@Captor
+	ArgumentCaptor<PrincipalAliasRequest> principalAliasRequestCaptor;
+	Long targetUserIdLong = 12345L;
+	String targetUserId = targetUserIdLong.toString();
 	String targetUsername = "jediknight";
 	List<VerificationState> verificationStateList;
 	
@@ -176,6 +178,9 @@ public class ProfilePresenterTest {
 	PaginatedTeamIds mockPaginatedTeamIds;
 	@Mock
 	Project mockProject;
+	@Mock
+	PrincipalAliasResponse mockPrincipalAliasResponse;
+	
 	List<Team> myTeams;
 	List<String> teamIds;
 	public static final String NEXT_PAGE_TOKEN = "19282";
@@ -185,8 +190,7 @@ public class ProfilePresenterTest {
 		when(mockInjector.getSynapseAlertWidget()).thenReturn(mockSynAlert);
 		profilePresenter = new ProfilePresenter(mockView, 
 				mockAuthenticationController, 
-				mockGlobalApplicationState, 
-				mockSynapseClient, 
+				mockGlobalApplicationState,
 				mockCookies,
 				mockGwt, 
 				mockTeamListWidget, 
@@ -216,7 +220,8 @@ public class ProfilePresenterTest {
 		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockCurrentUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(targetUserId).when(mockSynapseClient).getUserIdFromUsername(eq(targetUsername), any(AsyncCallback.class));
+		when(mockPrincipalAliasResponse.getPrincipalId()).thenReturn(targetUserIdLong);
+		AsyncMockStubber.callSuccessWith(mockPrincipalAliasResponse).when(mockSynapseJavascriptClient).getPrincipalAlias(any(PrincipalAliasRequest.class), any(AsyncCallback.class));
 		when(mockUserBundle.getUserProfile()).thenReturn(userProfile);
 		when(mockUserBundle.getIsCertified()).thenReturn(true);
 		when(mockUserBundle.getIsVerified()).thenReturn(false);
@@ -271,6 +276,7 @@ public class ProfilePresenterTest {
 		setupTestChallengePagedResults();
 		
 		when(place.toToken()).thenReturn(targetUserId);
+		when(place.getUserId()).thenReturn(targetUserId);
 		when(mockUserBundle.getVerificationSubmission()).thenReturn(mockVerificationSubmission);
 		verificationStateList = new ArrayList<VerificationState>();
 		VerificationState oldState = new VerificationState();
@@ -369,9 +375,11 @@ public class ProfilePresenterTest {
 		userProfile.setOwnerId(targetUserId);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		when(place.toToken()).thenReturn(targetUsername);
+		when(place.getUserId()).thenReturn(null);
 		profilePresenter.setPlace(place);
 		
-		verify(mockSynapseClient).getUserIdFromUsername(eq(targetUsername), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getPrincipalAlias(principalAliasRequestCaptor.capture(), any(AsyncCallback.class));
+		assertEquals(targetUsername, principalAliasRequestCaptor.getValue().getAlias());
 		verify(mockSynapseJavascriptClient).getUserBundle(eq(Long.parseLong(targetUserId)), anyInt(), any(AsyncCallback.class));
 		verify(place).setUserId(targetUserId);
 	}
@@ -382,16 +390,15 @@ public class ProfilePresenterTest {
 		userProfile.setOwnerId(targetUserId);
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
 		when(place.toToken()).thenReturn(targetUsername);
+		when(place.getUserId()).thenReturn(null);
 		Exception ex = new Exception("an error");
-		AsyncMockStubber.callFailureWith(ex).when(mockSynapseClient)
-			.getUserIdFromUsername(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).getPrincipalAlias(any(PrincipalAliasRequest.class), any(AsyncCallback.class));
 		
 		profilePresenter.setPlace(place);
 		
-		verify(mockSynapseClient).getUserIdFromUsername(eq(targetUsername), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getPrincipalAlias(any(PrincipalAliasRequest.class), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(ex);
 	}
-
 	
 	private void invokeGetMyTeamsCallback() {
 		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
@@ -546,7 +553,6 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetAllMyProjects() {
-		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		//when setting the filter to all, it should ask for all of my projects
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
@@ -565,7 +571,6 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetAllTheirProjects() {
-		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(false);
 		//when setting the filter to all, it should ask for all of their projects
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.ALL, null);
@@ -576,7 +581,6 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetProjectsDefaultFilter() {
-		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(false);
 		//when setting the filter to all, it should ask for all of their projects
 		profilePresenter.setProjectFilterAndRefresh(null, null);
@@ -588,7 +592,6 @@ public class ProfilePresenterTest {
 	@Test
 	public void testGetProjectsDefaultFilterFailure() {
 		AsyncMockStubber.callFailureWith(new Exception("unhandled")).when(mockSynapseJavascriptClient).getUserProjects(anyString(), anyInt(), anyInt(), any(ProjectListSortColumn.class), any(SortDirection.class),   any(AsyncCallback.class));
-		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(false);
 		//when setting the filter to all, it should ask for all of their projects
 		profilePresenter.setProjectFilterAndRefresh(null, null);
@@ -599,7 +602,6 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetProjectsCreatedByMe() {
-		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
 		//when setting the filter to my projects, it should query for projects created by me
@@ -614,7 +616,6 @@ public class ProfilePresenterTest {
 
 	@Test
 	public void testGetFavorites() {
-		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.FAVORITES, null);
@@ -628,7 +629,6 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetSharedDirectlyWithMeProjects() {
-		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
 		profilePresenter.setProjectFilterAndRefresh(ProjectFilterEnum.SHARED_DIRECTLY_WITH_ME, null);
@@ -642,7 +642,6 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetFavoritesEmpty() {
-		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		profilePresenter.setCurrentUserId("125");
 		myFavorites.clear();
@@ -658,7 +657,6 @@ public class ProfilePresenterTest {
 	
 	@Test
 	public void testGetProjectsByTeam() {
-		profilePresenter.setPlace(place);
 		profilePresenter.setIsOwner(true);
 		String teamId = "39448";
 		
@@ -924,12 +922,11 @@ public class ProfilePresenterTest {
 		when(place.getArea()).thenReturn(ProfileArea.CHALLENGES);
 		profilePresenter.setPlace(place);
 		profilePresenter.getMoreChallenges();
-		verify(mockView).setTabSelected(ProfileArea.CHALLENGES);
+		verify(mockView, atLeastOnce()).setTabSelected(ProfileArea.CHALLENGES);
 	}
 
 	@Test
 	public void testRefreshChallenges() {
-		profilePresenter.setPlace(place);
 		profilePresenter.tabClicked(ProfileArea.CHALLENGES);
 		verify(mockView).clearChallenges();
 		assertEquals(ProfilePresenter.CHALLENGE_PAGE_SIZE, profilePresenter.getCurrentChallengeOffset());
@@ -1348,11 +1345,11 @@ public class ProfilePresenterTest {
 		
 		ArgumentCaptor<Callback> yesCallback = ArgumentCaptor.forClass(Callback.class);
 		verify(mockView).showConfirmDialog(anyString(), anyString(), yesCallback.capture());
-		verify(mockView, never()).setTabSelected(any(ProfileArea.class));
+		verify(mockView).setTabSelected(any(ProfileArea.class));
 		
 		//click yes
 		yesCallback.getValue().invoke();
-		verify(mockView).setTabSelected(any(ProfileArea.class));
+		verify(mockView, times(2)).setTabSelected(any(ProfileArea.class));
 	}
 	
 	
@@ -1377,7 +1374,7 @@ public class ProfilePresenterTest {
 		when(place.getArea()).thenReturn(ProfileArea.PROJECTS);
 		boolean pushState = false;
 		profilePresenter.updateArea(ProfileArea.CHALLENGES, pushState);
-		verify(mockGlobalApplicationState).replaceCurrentPlace(any(Profile.class));
+		verify(mockGlobalApplicationState, times(2)).replaceCurrentPlace(any(Profile.class));
 	}
 
 	@Test

@@ -264,8 +264,6 @@ public interface SynapseClient extends RemoteService{
 	
 	Entity moveEntity(String entityId, String newParentEntityId) throws RestServiceException;
 
-	String getUserIdFromUsername(String username) throws RestServiceException;
-
 	UserProfile getUserProfileFromUsername(String username) throws RestServiceException;
 
 	Entity updateFileEntity(FileEntity toUpdate, FileHandleCopyRequest copyRequest) throws RestServiceException;

@@ -17,6 +17,9 @@ import org.sagebionetworks.repo.model.ProjectListType;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
+import org.sagebionetworks.repo.model.principal.AliasType;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.verification.AttachmentMetadata;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
@@ -28,7 +31,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
@@ -80,7 +82,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private Profile place;
 	private ProfileView view;
-	private SynapseClientAsync synapseClient;
 	private UserProfileClientAsync userProfileClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
@@ -125,7 +126,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
 			GlobalApplicationState globalApplicationState,
-			SynapseClientAsync synapseClient,
 			CookieProvider cookies,
 			GWTWrapper gwt,
 			TeamListWidget myTeamsWidget,
@@ -139,8 +139,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
 		this.ginInjector = ginInjector;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
 		this.cookies = cookies;
 		this.gwt = gwt;
 		this.myTeamsWidget = myTeamsWidget;
@@ -843,10 +841,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			badge.configure(challenge);
 			Widget widget = badge.asWidget();
 			view.addChallengeWidget(widget);
-			if (currentArea != null && currentArea.equals(ProfileArea.CHALLENGES)) {
-				// SWC-3213: extra call to make sure challenge tab is currently shown
-				view.setTabSelected(ProfileArea.CHALLENGES);
-			}
+		}
+		if (!challenges.isEmpty() && currentArea != null && currentArea.equals(ProfileArea.CHALLENGES)) {
+			// SWC-3213: extra call to make sure challenge tab is currently shown
+			view.setTabSelected(ProfileArea.CHALLENGES);
 		}
 	}
 	
@@ -1035,9 +1033,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void getUserIdFromUsername(String userName) {
-		synapseClient.getUserIdFromUsername(userName, new AsyncCallback<String>() {
+		PrincipalAliasRequest request = new PrincipalAliasRequest();
+		request.setAlias(userName);
+		request.setType(AliasType.USER_NAME);
+		jsClient.getPrincipalAlias(request, new AsyncCallback<PrincipalAliasResponse>() {
 			@Override
-			public void onSuccess(String userId) {
+			public void onSuccess(PrincipalAliasResponse principalAlias) {
+				String userId = principalAlias.getPrincipalId().toString();
 				place.setUserId(userId);
 				updateProfileView(userId);
 			}

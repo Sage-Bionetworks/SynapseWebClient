@@ -1849,23 +1849,6 @@ public class SynapseClientImplTest {
 	}
 	
 	@Test
-	public void testGetUserIdFromUsername() throws UnsupportedEncodingException, SynapseException, RestServiceException {
-		//find the user id based on user name
-		Long targetUserId = 4L;
-		when(mockPrincipalAliasResponse.getPrincipalId()).thenReturn(targetUserId);
-		when(mockSynapse.getPrincipalAlias(any(PrincipalAliasRequest.class))).thenReturn(mockPrincipalAliasResponse);
-		String userId = synapseClient.getUserIdFromUsername("luke");
-		assertEquals(targetUserId.toString(), userId);
-	}
-	
-	@Test(expected = BadRequestException.class)
-	public void testGetUserIdFromUsernameBackendError() throws UnsupportedEncodingException, SynapseException, RestServiceException {
-		//test error from backend
-		when(mockSynapse.getPrincipalAlias(any(PrincipalAliasRequest.class))).thenThrow(new SynapseBadRequestException());
-		synapseClient.getUserIdFromUsername("bad-request");
-	}
-	
-	@Test
 	public void testGetTableUpdateTransactionRequestNoChange()  throws RestServiceException, SynapseException {
 		String tableId = "syn93939";
 		

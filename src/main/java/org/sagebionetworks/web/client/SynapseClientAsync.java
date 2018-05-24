@@ -264,7 +264,6 @@ public interface SynapseClientAsync {
 	void setIsTeamAdmin(String currentUserId, String targetUserId,
 			String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 
-	void getUserIdFromUsername(String username, AsyncCallback<String> callback);
 	void getUserProfileFromUsername(String username, AsyncCallback<UserProfile> callback);
 
 	void deleteAccessRequirement(Long accessRequirementId, AsyncCallback<Void> callback);

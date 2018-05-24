@@ -358,8 +358,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		}
 	}
 
-	@Override
-	public String getUserIdFromUsername(String username) throws RestServiceException {
+	private String getUserIdFromUsername(String username) throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			PrincipalAliasRequest request = new PrincipalAliasRequest();

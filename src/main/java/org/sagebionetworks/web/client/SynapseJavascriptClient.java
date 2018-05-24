@@ -76,6 +76,8 @@ import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.principal.AliasList;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
@@ -157,6 +159,7 @@ public class SynapseJavascriptClient {
 	public static final String GENERATED_PATH = "/generated";
 	public static final String GENERATED_BY_SUFFIX = "/generatedBy";
 	public static final String OPEN_MEMBERSHIP_REQUEST = "/openRequest";
+	public static final String PRINCIPAL = "/principal";
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	private static final String LOG = "/log";
@@ -1084,5 +1087,12 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + TEAM + "/" + teamId + OPEN_MEMBERSHIP_REQUEST + "?" + OFFSET_PARAMETER + "0&" + LIMIT_PARAMETER + "1";
 		doGet(url, OBJECT_TYPE.PaginatedResultsTotalNumberOfResults, callback);
 	}
+	
+	public void getPrincipalAlias(PrincipalAliasRequest request, AsyncCallback<PrincipalAliasResponse> callback) {
+		String url = getRepoServiceUrl() + PRINCIPAL+"/alias/";
+		doPost(url, request, OBJECT_TYPE.PrincipalAliasResponse, callback);
+	}
+	
+	
 }
 
