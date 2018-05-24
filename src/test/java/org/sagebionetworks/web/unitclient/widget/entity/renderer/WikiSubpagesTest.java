@@ -3,13 +3,14 @@ package org.sagebionetworks.web.unitclient.widget.entity.renderer;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -22,8 +23,6 @@ import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.Annotations;
-import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.Project;
@@ -79,7 +78,6 @@ public class WikiSubpagesTest {
 		adapterFactory = new AdapterFactoryImpl();
 		widget = new WikiSubpagesWidget(mockView, mockSynapseClient, mockAuthenticationController, mockSynapseJavascriptClient);
 		
-		AsyncMockStubber.callSuccessWith("entity id 1").when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
 		EntityBundle bundle = new EntityBundle();
 		permissions = new UserEntityPermissions();
 		permissions.setCanEdit(true);

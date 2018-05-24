@@ -21,4 +21,10 @@ public enum NotificationTokenType  {
 	NotificationTokenType(Class<? extends SignedTokenInterface> classType) {
 		this.classType = classType;
 	}
+	// If this method is modified, please also modify SIGNED_TOKEN_ENDPOINT in
+	// org.sagebionetworks.repo.model.ServiceConstants (PLFM)
+	
+	public String getNotificationEndpoint(String hostPageBaseURL) {
+		return hostPageBaseURL + "#!SignedToken:"+ this.toString() + "/";
+	}
 }

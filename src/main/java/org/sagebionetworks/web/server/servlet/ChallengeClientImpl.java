@@ -135,7 +135,7 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			String challengeEndpoint = SynapseClientImpl.getChallengeEndpoint(hostPageBaseURL);
-			String settingsEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			return synapseClient.createTeamSubmission(submission, etag, memberStateHash, challengeEndpoint, settingsEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -147,7 +147,7 @@ public class ChallengeClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			String challengeEndpoint = SynapseClientImpl.getChallengeEndpoint(hostPageBaseURL);
-			String settingsEndpoint = SynapseClientImpl.getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			return synapseClient.createIndividualSubmission(submission, etag, challengeEndpoint, settingsEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);

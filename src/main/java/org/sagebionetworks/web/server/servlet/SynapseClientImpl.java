@@ -276,43 +276,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
-		
 	}
-	/**
-	 * Create or update an entity
-	 * 
-	 * @param entity
-	 * @param annos
-	 * @param isNew
-	 * @return
-	 * @throws RestServiceException
-	 */
-	@Override
-	public String createOrUpdateEntity(Entity entity, Annotations annos,
-			boolean isNew) throws RestServiceException {
-		// First read the entity
-		try {
-			org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			if (isNew) {
-				// This is a create
-				entity = synapseClient.createEntity(entity);
-			} else {
-				// This is an update
-				entity = synapseClient.putEntity(entity);
-			}
-			// Update the annotations
-			if (annos != null) {
-				annos.setEtag(entity.getEtag());
-				annos.setId(entity.getId());
-				synapseClient.updateAnnotations(entity.getId(), annos);
-			}
-			return entity.getId();
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-
-	}
-
+	
 	@Override
 	public void deleteEntityVersionById(String entityId, Long versionNumber)
 			throws RestServiceException {
@@ -1104,7 +1069,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			// if we can join the team without creating the request (like if we
 			// are a team admin, or there is an open invitation), then just do
 			// that!
-			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			if (membershipStatus.getCanJoin()) {
 				synapseClient.addTeamMember(teamId, currentUserId, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
 			} else if (!membershipStatus.getHasOpenRequest()) {
@@ -1118,7 +1083,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				}
 
 				// make new Synapse call
-				String joinTeamEndpoint = getNotificationEndpoint(NotificationTokenType.JoinTeam, hostPageBaseURL);
+				String joinTeamEndpoint = NotificationTokenType.JoinTeam.getNotificationEndpoint(hostPageBaseURL);
 				synapseClient.createMembershipRequest(membershipRequest, joinTeamEndpoint, settingsEndpoint);
 			}
 			return synapseClient.getTeamMembershipStatus(teamId, currentUserId);
@@ -1133,7 +1098,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throws RestServiceException {
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
-			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			synapseClient.addTeamMember(teamId, userGroupId, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1147,7 +1112,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			TeamMembershipStatus membershipStatus = synapseClient
 					.getTeamMembershipStatus(teamId, userGroupId);
-			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			// if we can join the team without creating the invite (like if we
 			// are a team admin, or there is an open membership request), then
 			// just do that!
@@ -1161,7 +1126,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 				membershipInvite.setInviteeId(userGroupId);
 
 				// make new Synapse call
-				String joinTeamEndpoint = getNotificationEndpoint(NotificationTokenType.JoinTeam, hostPageBaseURL);
+				String joinTeamEndpoint = NotificationTokenType.JoinTeam.getNotificationEndpoint(hostPageBaseURL);
 				synapseClient.createMembershipInvitation(membershipInvite, joinTeamEndpoint, settingsEndpoint);
 			}
 		} catch (SynapseException e) {
@@ -1177,8 +1142,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			mis.setInviteeEmail(email);
 			mis.setTeamId(teamId);
 			mis.setMessage(message);
-			String emailInvitationEndpoint = getNotificationEndpoint(NotificationTokenType.EmailInvitation, hostPageBaseURL);
-			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			String emailInvitationEndpoint = NotificationTokenType.EmailInvitation.getNotificationEndpoint(hostPageBaseURL);
+			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			synapseClient.createMembershipInvitation(mis, emailInvitationEndpoint, settingsEndpoint);
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
@@ -1347,8 +1312,8 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
 		try {
 			//resend the invitation.  get the invitation, clear out system specified values, re-create the invitation, and delete the old one.
-			String emailInvitationEndpoint = getNotificationEndpoint(NotificationTokenType.EmailInvitation, hostPageBaseURL);
-			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			String emailInvitationEndpoint = NotificationTokenType.EmailInvitation.getNotificationEndpoint(hostPageBaseURL);
+			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			MembershipInvitation membershipInvitation = synapseClient.getMembershipInvitation(membershipInvitationId);
 			membershipInvitation.setCreatedBy(null);
 			membershipInvitation.setCreatedOn(null);
@@ -1586,7 +1551,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			if (signedToken instanceof JoinTeamSignedToken) {
 				JoinTeamSignedToken joinTeamSignedToken = (JoinTeamSignedToken) signedToken;
-				String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+				String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 				return synapseClient.addTeamMember(joinTeamSignedToken, getTeamEndpoint(hostPageBaseURL), settingsEndpoint);
 			} else if (signedToken instanceof NotificationSettingsSignedToken) {
 				NotificationSettingsSignedToken notificationSignedToken = (NotificationSettingsSignedToken) signedToken;
@@ -1644,12 +1609,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		return hostPageBaseURL + "#!Team:";
 	}
 
-	// If this method is modified, please also modify SIGNED_TOKEN_ENDPOINT in
-	// org.sagebionetworks.repo.model.ServiceConstants (PLFM)
-	public static String getNotificationEndpoint(NotificationTokenType type, String hostPageBaseURL) {
-		return hostPageBaseURL + "#!SignedToken:"+ type.toString() + "/";
-	}
-
 	// If this method is modified, please also modify CHALLENGE_ENDPOINT in
 	// org.sagebionetworks.repo.model.ServiceConstants (PLFM)
 	public static String getChallengeEndpoint(String hostPageBaseURL) {
@@ -1694,7 +1653,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			MessageToUser message = new MessageToUser();
 			message.setRecipients(recipients);
 			message.setSubject(subject);
-			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
 			String cleanedMessageBody = Jsoup.clean(messageBody, "", Whitelist.simpleText().addTags("br"), new OutputSettings().prettyPrint(false));
 			MessageToUser sentMessage = synapseClient.sendStringMessage(message, cleanedMessageBody);
@@ -1718,7 +1677,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			MessageToUser message = new MessageToUser();
 			message.setSubject(subject);
-			String settingsEndpoint = getNotificationEndpoint(NotificationTokenType.Settings, hostPageBaseURL);
+			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			message.setNotificationUnsubscribeEndpoint(settingsEndpoint);
 			String cleanedMessageBody = Jsoup.clean(messageBody, Whitelist.none());
 			MessageToUser sentMessage = synapseClient.sendStringMessage(message, entityId, cleanedMessageBody);

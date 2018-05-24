@@ -30,11 +30,11 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.Challenge;
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.PaginatedTeamIds;
+import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.ProjectHeader;
 import org.sagebionetworks.repo.model.ProjectListSortColumn;
 import org.sagebionetworks.repo.model.ProjectListType;
@@ -62,7 +62,6 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
-import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Home;
@@ -173,6 +172,8 @@ public class ProfilePresenterTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	PaginatedTeamIds mockPaginatedTeamIds;
+	@Mock
+	Project mockProject;
 	List<Team> myTeams;
 	List<String> teamIds;
 	public static final String NEXT_PAGE_TOKEN = "19282";
@@ -184,8 +185,7 @@ public class ProfilePresenterTest {
 				mockAuthenticationController, 
 				mockGlobalApplicationState, 
 				mockSynapseClient, 
-				mockCookies, 
-				mockLinkedInServic, 
+				mockCookies,
 				mockGwt, 
 				mockTeamListWidget, 
 				mockTeamInviteWidget, 
@@ -250,7 +250,8 @@ public class ProfilePresenterTest {
 		AsyncMockStubber.callSuccessWith(myFavorites).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		
 		//set up create project test
-		AsyncMockStubber.callSuccessWith("new entity id").when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
+		when(mockProject.getId()).thenReturn("syn88888888");
+		when(mockSynapseJavascriptClient.createEntity(any(Entity.class))).thenReturn(getDoneFuture(mockProject));
 		
 		//set up create team test
 		AsyncMockStubber.callSuccessWith("new team id").when(mockSynapseClient).createTeam(anyString(), any(AsyncCallback.class));
@@ -339,22 +340,6 @@ public class ProfilePresenterTest {
 		
 		profilePresenter.start(panel, eventBus);		
 		verify(panel).setWidget(mockView);
-	}
-	
-	@Test
-	public void testRedirectToLinkedIn() {
-		profilePresenter.redirectToLinkedIn();
-		verify(mockLinkedInServic).returnAuthUrl(anyString(), any(AsyncCallback.class));
-	}
-	
-	@Test
-	public void testUpdateProfileWithLinkedIn() {
-		String secret = "secret";
-		when(mockCookies.getCookie(CookieKeys.LINKEDIN)).thenReturn(secret);
-		String requestToken = "token";
-		String verifier = "12345";
-		profilePresenter.updateProfileWithLinkedIn(requestToken, verifier);
-		verify(mockLinkedInServic).getCurrentUserInfo(eq(requestToken), eq(secret), eq(verifier), anyString(), any(AsyncCallback.class));
 	}
 	
 	@Test
@@ -803,7 +788,7 @@ public class ProfilePresenterTest {
 	public void testCreateProject() {
 		when(mockPromptModalView.getValue()).thenReturn("valid name");
 		profilePresenter.createProjectAfterPrompt();
-		verify(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).createEntity(any(Entity.class));
 		//inform user of success, and go to new project page
 		verify(mockView).showInfo(anyString(), anyString());
 		verify(mockPlaceChanger).goTo(isA(Synapse.class));
@@ -813,13 +798,14 @@ public class ProfilePresenterTest {
 	public void testCreateProjectEmptyName() {
 		when(mockPromptModalView.getValue()).thenReturn("");
 		profilePresenter.createProjectAfterPrompt();
-		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).createEntity(any(Entity.class));
 		verify(mockPromptModalView).showError(anyString());
 		Mockito.reset(mockPromptModalView);
 		
 		when(mockPromptModalView.getValue()).thenReturn(null);
 		profilePresenter.createProjectAfterPrompt();
-		verify(mockSynapseClient, Mockito.times(0)).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
+
+		verify(mockSynapseJavascriptClient, never()).createEntity(any(Entity.class));
 		verify(mockPromptModalView).showError(anyString());
 	}
 
@@ -828,14 +814,15 @@ public class ProfilePresenterTest {
 		when(mockPromptModalView.getValue()).thenReturn("valid name");
 		profilePresenter.createProjectAfterPrompt();
 		String errorMessage = "unhandled";
-		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
+		when(mockSynapseJavascriptClient.createEntity(any(Entity.class))).thenReturn(getFailedFuture(new Exception(errorMessage)));
+		
 		profilePresenter.createProjectAfterPrompt();
 		verify(mockPromptModalView).showError(errorMessage);
 	}
 	
 	@Test
 	public void testCreateProjectNameConflictError() {
-		AsyncMockStubber.callFailureWith(new ConflictException("special handled exception type")).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), anyBoolean(), any(AsyncCallback.class));
+		when(mockSynapseJavascriptClient.createEntity(any(Entity.class))).thenReturn(getFailedFuture(new ConflictException("special handled exception type")));
 		when(mockPromptModalView.getValue()).thenReturn("valid name");
 		profilePresenter.createProjectAfterPrompt();
 		verify(mockPromptModalView).showError(eq(DisplayConstants.WARNING_PROJECT_NAME_EXISTS));

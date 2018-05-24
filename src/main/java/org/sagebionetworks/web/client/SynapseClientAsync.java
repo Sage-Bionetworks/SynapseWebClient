@@ -63,9 +63,6 @@ public interface SynapseClientAsync {
 
 	void search(SearchQuery searchQuery, AsyncCallback<SearchResults> callback);
  	
-	void createOrUpdateEntity(Entity entity, Annotations annos,
-			boolean isNew, AsyncCallback<String> callback);
-	
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);

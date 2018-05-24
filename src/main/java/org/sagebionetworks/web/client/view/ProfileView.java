@@ -72,7 +72,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 	public interface Presenter {
 		void showProfileButtonClicked();
 		void hideProfileButtonClicked();
-		void updateProfileWithLinkedIn(String requestToken, String verifier);
 		void createProject();
 		void createTeam();
 		void goTo(Place place);
@@ -83,7 +82,6 @@ public interface ProfileView extends IsWidget, SynapseView {
 		void getMoreChallenges();
 		void applyFilterClicked(ProjectFilterEnum filterType, Team team);
 		void onEditProfile();
-		void onImportLinkedIn();
 		void setGetCertifiedDismissed();
 		void resort(SortOptionEnum sortOption);
 		void newVerificationSubmissionClicked();
