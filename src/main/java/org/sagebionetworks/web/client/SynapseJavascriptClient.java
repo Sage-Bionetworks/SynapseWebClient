@@ -21,7 +21,6 @@ import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
 
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
