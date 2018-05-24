@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 import org.sagebionetworks.repo.model.UserBundle;
-import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.verification.VerificationPagedResults;
 import org.sagebionetworks.repo.model.verification.VerificationState;
 import org.sagebionetworks.repo.model.verification.VerificationStateEnum;
@@ -23,8 +22,4 @@ public interface UserProfileClientAsync {
 			VerificationState verificationState, String hostPageBaseURL, AsyncCallback<Void> callback);
 
 	void getMyOwnUserBundle(int mask, AsyncCallback<UserBundle> callback);
-
-	void unbindOAuthProvidersUserId(OAuthProvider provider, String alias,
-			AsyncCallback<Void> callback);
-
 }

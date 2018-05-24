@@ -21,6 +21,7 @@ import static org.sagebionetworks.web.shared.WebConstants.FILE_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.REPO_SERVICE_URL_KEY;
 import static org.sagebionetworks.web.shared.WebConstants.SYNAPSE_VERSION_KEY;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -75,6 +76,7 @@ import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
+import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
@@ -215,6 +217,8 @@ public class SynapseJavascriptClient {
 	
 	public static final String ASYNC_START = "/async/start";
 	public static final String ASYNC_GET = "/async/get/";
+	public static final String AUTH_OAUTH_2 = "/oauth2";
+	public static final String AUTH_OAUTH_2_ALIAS = AUTH_OAUTH_2+"/alias";
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	
@@ -1093,6 +1097,11 @@ public class SynapseJavascriptClient {
 		doPost(url, request, OBJECT_TYPE.PrincipalAliasResponse, callback);
 	}
 	
-	
+	public void unbindOAuthProvidersUserId(OAuthProvider provider, String alias, AsyncCallback<Void> callback) {
+		String url = getAuthServiceUrl() + AUTH_OAUTH_2_ALIAS + "?provider="+
+				gwt.encodeQueryString(provider.name())+
+				"&"+"alias="+gwt.encodeQueryString(alias);
+		doDelete(url, callback);
+	}
 }
 

@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.presenter;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,7 +31,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Home;
@@ -82,7 +80,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	
 	private Profile place;
 	private ProfileView view;
-	private UserProfileClientAsync userProfileClient;
 	private AuthenticationController authenticationController;
 	private GlobalApplicationState globalApplicationState;
 	private CookieProvider cookies;
@@ -131,7 +128,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			TeamListWidget myTeamsWidget,
 			OpenTeamInvitationsWidget openInvitesWidget,
 			PortalGinInjector ginInjector,
-			UserProfileClientAsync userProfileClient,
 			IsACTMemberAsyncHandler isACTMemberAsyncHandler,
 			DateTimeUtils dateTimeUtils,
 			SynapseJavascriptClient jsClient) {
@@ -144,8 +140,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		this.myTeamsWidget = myTeamsWidget;
 		this.openInvitesWidget = openInvitesWidget;
 		this.currentProjectSort = SortOptionEnum.LATEST_ACTIVITY;
-		this.userProfileClient = userProfileClient;
-		fixServiceEntryPoint(userProfileClient);
 		this.isACTMemberAsyncHandler = isACTMemberAsyncHandler;
 		this.dateTimeUtils = dateTimeUtils;
 		this.jsClient = jsClient;
@@ -371,7 +365,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void unbindOrcIdAfterConfirmation() {
-		userProfileClient.unbindOAuthProvidersUserId(OAuthProvider.ORCID, currentUserBundle.getORCID(), new AsyncCallback<Void>() {
+		jsClient.unbindOAuthProvidersUserId(OAuthProvider.ORCID, currentUserBundle.getORCID(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
 				//ORC id successfully removed.  refresh so that the user bundle and UI are up to date

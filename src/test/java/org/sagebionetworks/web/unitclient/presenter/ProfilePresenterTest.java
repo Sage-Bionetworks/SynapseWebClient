@@ -62,7 +62,6 @@ import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.UserAccountServiceAsync;
-import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Certificate;
 import org.sagebionetworks.web.client.place.Home;
@@ -149,8 +148,6 @@ public class ProfilePresenterTest {
 	List<VerificationState> verificationStateList;
 	
 	@Mock
-	UserProfileClientAsync mockUserProfileClient;
-	@Mock
 	UserBundle mockUserBundle;
 	@Mock
 	UserBundle mockCurrentUserBundle;
@@ -195,8 +192,7 @@ public class ProfilePresenterTest {
 				mockGwt, 
 				mockTeamListWidget, 
 				mockTeamInviteWidget, 
-				mockInjector, 
-				mockUserProfileClient,
+				mockInjector,
 				mockIsACTMemberAsyncHandler,
 				mockDateTimeUtils,
 				mockSynapseJavascriptClient
@@ -218,8 +214,7 @@ public class ProfilePresenterTest {
 		testUser.setIsSSO(false);
 		
 		AsyncMockStubber.callSuccessWith(mockUserBundle).when(mockSynapseJavascriptClient).getUserBundle(anyLong(), anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(mockCurrentUserBundle).when(mockUserProfileClient).getMyOwnUserBundle(anyInt(), any(AsyncCallback.class));
-		AsyncMockStubber.callSuccessWith(null).when(mockUserProfileClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseJavascriptClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
 		when(mockPrincipalAliasResponse.getPrincipalId()).thenReturn(targetUserIdLong);
 		AsyncMockStubber.callSuccessWith(mockPrincipalAliasResponse).when(mockSynapseJavascriptClient).getPrincipalAlias(any(PrincipalAliasRequest.class), any(AsyncCallback.class));
 		when(mockUserBundle.getUserProfile()).thenReturn(userProfile);
@@ -1685,8 +1680,6 @@ public class ProfilePresenterTest {
 		viewProfile("123", null);
 
 		verify(mockView).showVerifiedBadge(null, null, null, null, null, null);
-		//no need to check for act membership for anonymous
-		verify(mockUserProfileClient, never()).getMyOwnUserBundle(eq(ProfilePresenter.IS_ACT_MEMBER), any(AsyncCallback.class));
 		//validation details button is not visible to anonymous
 		verify(mockView, never()).setVerificationDetailsButtonVisible(anyBoolean());
 	}
@@ -1824,7 +1817,7 @@ public class ProfilePresenterTest {
 	@Test
 	public void testUnbindOrcIdFailure() {
 		Exception ex = new Exception("bad things happened");
-		AsyncMockStubber.callFailureWith(ex).when(mockUserProfileClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(ex).when(mockSynapseJavascriptClient).unbindOAuthProvidersUserId(any(OAuthProvider.class), anyString(), any(AsyncCallback.class));
 		viewProfile("123", "456");
 		profilePresenter.unbindOrcIdAfterConfirmation();
 		//error is shown
