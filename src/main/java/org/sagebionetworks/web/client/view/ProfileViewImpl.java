@@ -84,8 +84,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@UiField
 	Button linkORCIDButton;
 	@UiField
-	Button importLinkedIn;
-	@UiField
 	SimplePanel editUserProfilePanel;
 	
 	@UiField
@@ -415,13 +413,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		};
 		editProfileButton.addClickHandler(editProfileClickHandler);
 		reviewProfileLink.addClickHandler(editProfileClickHandler);
-		importLinkedIn.addClickHandler(new ClickHandler() {
-	
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onImportLinkedIn();
-			}
-		});
 		getCertifiedAlert.addClosedHandler(new AlertClosedHandler() {
 			@Override
 			public void onClosed(AlertClosedEvent evt) {

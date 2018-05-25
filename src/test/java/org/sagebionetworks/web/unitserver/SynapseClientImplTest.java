@@ -631,83 +631,6 @@ public class SynapseClientImplTest {
 	}
 
 	@Test
-	public void testCreateOrUpdateEntityFalse()
-			throws JSONObjectAdapterException, RestServiceException,
-			SynapseException {
-		ExampleEntity in = new ExampleEntity();
-		in.setName("some name");
-		in.setDescription("some description");
-		in.setEntityType(ExampleEntity.class.getName());
-
-		ExampleEntity out = new ExampleEntity();
-		out.setName("some name");
-		out.setDescription("some description");
-		out.setEntityType(ExampleEntity.class.getName());
-		out.setId("syn123");
-		out.setEtag("45");
-
-		// when in comes in then return out.
-		when(mockSynapse.putEntity(in)).thenReturn(out);
-		String result = synapseClient.createOrUpdateEntity(in, null, false);
-		assertEquals(out.getId(), result);
-		verify(mockSynapse).putEntity(in);
-	}
-
-	@Test
-	public void testCreateOrUpdateEntityTrue()
-			throws JSONObjectAdapterException, RestServiceException,
-			SynapseException {
-		ExampleEntity in = new ExampleEntity();
-		in.setName("some name");
-		in.setDescription("some description");
-		in.setEntityType(ExampleEntity.class.getName());
-
-		ExampleEntity out = new ExampleEntity();
-		out.setName("some name");
-		out.setDescription("some description");
-		out.setEntityType(ExampleEntity.class.getName());
-		out.setId("syn123");
-		out.setEtag("45");
-
-		// when in comes in then return out.
-		when(mockSynapse.createEntity(in)).thenReturn(out);
-		String result = synapseClient.createOrUpdateEntity(in, null, true);
-		assertEquals(out.getId(), result);
-		verify(mockSynapse).createEntity(in);
-	}
-
-	@Test
-	public void testCreateOrUpdateEntityTrueWithAnnos()
-			throws JSONObjectAdapterException, RestServiceException,
-			SynapseException {
-		ExampleEntity in = new ExampleEntity();
-		in.setName("some name");
-		in.setDescription("some description");
-		in.setEntityType(ExampleEntity.class.getName());
-
-		Annotations annos = new Annotations();
-		annos.addAnnotation("someString", "one");
-
-		ExampleEntity out = new ExampleEntity();
-		out.setName("some name");
-		out.setDescription("some description");
-		out.setEntityType(ExampleEntity.class.getName());
-		out.setId("syn123");
-		out.setEtag("45");
-
-		// when in comes in then return out.
-		when(mockSynapse.createEntity(in)).thenReturn(out);
-		String result = synapseClient.createOrUpdateEntity(in, annos, true);
-		assertEquals(out.getId(), result);
-		verify(mockSynapse).createEntity(in);
-		annos.setEtag(out.getEtag());
-		annos.setId(out.getId());
-		verify(mockSynapse).updateAnnotations(out.getId(), annos);
-	}
-
-	
-
-	@Test
 	public void testMoveEntity()
 			throws JSONObjectAdapterException, RestServiceException,
 			SynapseException {
@@ -1923,23 +1846,6 @@ public class SynapseClientImplTest {
 		versionInfoPaginatedResults.setResults(versionInfoList);
 		when(mockSynapse.getEntityVersions(anyString(), anyInt(), anyInt())).thenReturn(versionInfoPaginatedResults);
 		when(mockSynapse.getEntityById(anyString())).thenReturn(file);
-	}
-	
-	@Test
-	public void testGetUserIdFromUsername() throws UnsupportedEncodingException, SynapseException, RestServiceException {
-		//find the user id based on user name
-		Long targetUserId = 4L;
-		when(mockPrincipalAliasResponse.getPrincipalId()).thenReturn(targetUserId);
-		when(mockSynapse.getPrincipalAlias(any(PrincipalAliasRequest.class))).thenReturn(mockPrincipalAliasResponse);
-		String userId = synapseClient.getUserIdFromUsername("luke");
-		assertEquals(targetUserId.toString(), userId);
-	}
-	
-	@Test(expected = BadRequestException.class)
-	public void testGetUserIdFromUsernameBackendError() throws UnsupportedEncodingException, SynapseException, RestServiceException {
-		//test error from backend
-		when(mockSynapse.getPrincipalAlias(any(PrincipalAliasRequest.class))).thenThrow(new SynapseBadRequestException());
-		synapseClient.getUserIdFromUsername("bad-request");
 	}
 	
 	@Test

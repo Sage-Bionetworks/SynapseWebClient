@@ -63,9 +63,6 @@ public interface SynapseClientAsync {
 
 	void search(SearchQuery searchQuery, AsyncCallback<SearchResults> callback);
  	
-	void createOrUpdateEntity(Entity entity, Annotations annos,
-			boolean isNew, AsyncCallback<String> callback);
-	
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);
@@ -128,7 +125,6 @@ public interface SynapseClientAsync {
 	 * TEAMS
 	 */
 	/////////////////
-	void createTeam(String teamName,AsyncCallback<String> callback);
 	void deleteTeam(String teamId,AsyncCallback<Void> callback);
 	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset,
 			AsyncCallback<PaginatedResults<Team>> callback);
@@ -268,7 +264,6 @@ public interface SynapseClientAsync {
 	void setIsTeamAdmin(String currentUserId, String targetUserId,
 			String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 
-	void getUserIdFromUsername(String username, AsyncCallback<String> callback);
 	void getUserProfileFromUsername(String username, AsyncCallback<UserProfile> callback);
 
 	void deleteAccessRequirement(Long accessRequirementId, AsyncCallback<Void> callback);
