@@ -116,7 +116,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 
 	public void configurePicture() {
 		if (profile != null && profile.getProfilePicureFileHandleId() != null) {
-			String url = jsClient.getProfilePicturePreviewUrl(profile.getOwnerId());
+			String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getProfilePicureFileHandleId(), false);
 			if (!useCachedImage) {
 				url += DisplayUtils.getParamForNoCaching();
 			}

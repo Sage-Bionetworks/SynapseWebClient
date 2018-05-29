@@ -64,7 +64,7 @@ public class UserBadgeTest {
 	UserProfile profile;
 	
 	ClientCache mockCache;
-	String principalId = "id1";
+	String principalId = "id1", fileHandleId = "1234";
 	int max=10;
 	String displayName;
 	@Mock
@@ -79,7 +79,7 @@ public class UserBadgeTest {
 		profile.setFirstName(FIRST_NAME);
 		profile.setLastName(DOE);
 		profile.setUserName(DOEBOY);
-		profile.setProfilePicureFileHandleId("1234");
+		profile.setProfilePicureFileHandleId(fileHandleId);
 		displayName = DisplayUtils.getDisplayName(profile);
 		profile.setOwnerId(principalId);
 		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
@@ -89,7 +89,7 @@ public class UserBadgeTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		when(mockSynapseJavascriptClient.getProfilePicturePreviewUrl(anyString())).thenReturn(PICTURE_URL);
+		when(mockSynapseJSNIUtils.getBaseProfileAttachmentUrl()).thenReturn(PICTURE_URL);
 		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory, mockSynapseJavascriptClient);
 	}
 	
@@ -100,7 +100,7 @@ public class UserBadgeTest {
 		ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
 		verify(mockView).showCustomUserPicture(urlCaptor.capture());
 		String url = urlCaptor.getValue();
-		assertEquals(PICTURE_URL, url);
+		assertEquals(PICTURE_URL + "?userId="+principalId+"&imageId="+fileHandleId+"&preview=false", url);
 		assertFalse(url.contains(WebConstants.NOCACHE_PARAM));
 		
 		//simulate a load error

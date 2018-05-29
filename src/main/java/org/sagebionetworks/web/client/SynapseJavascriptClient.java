@@ -944,10 +944,6 @@ public class SynapseJavascriptClient {
 		return getFuture(cb -> doPost(url, idList, OBJECT_TYPE.ListWrapperTeam, cb));
 	}
 	
-	public String getProfilePicturePreviewUrl(String ownerId) {
-		return getRepoServiceUrl() + USER_PROFILE_PATH+"/"+ownerId+PROFILE_IMAGE_PREVIEW+"?"+REDIRECT_PARAMETER+"true";
-	}
-	
 	public String getTeamIconUrl(String teamId) {
 		return getRepoServiceUrl() + TEAM + "/" + teamId + ICON + "?" + REDIRECT_PARAMETER +"true";
 	}

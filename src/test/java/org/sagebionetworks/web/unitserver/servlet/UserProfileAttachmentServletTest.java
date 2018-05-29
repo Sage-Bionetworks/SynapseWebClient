@@ -15,7 +15,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.UnknownSynapseServerException;
@@ -27,10 +29,15 @@ import org.sagebionetworks.web.shared.WebConstants;
 
 public class UserProfileAttachmentServletTest {
 	
+	@Mock
 	HttpServletRequest mockRequest;
+	@Mock
 	HttpServletResponse mockResponse;
+	@Mock
 	SynapseClient mockClient;
+	@Mock
 	SynapseProvider mockSynapseProvider;
+	@Mock
 	ServletOutputStream mockOutStream;
 	Cookie sessionCookie;
 	
@@ -47,11 +54,7 @@ public class UserProfileAttachmentServletTest {
 	
 	@Before
 	public void before() throws IOException, SynapseException{
-		mockRequest = Mockito.mock(HttpServletRequest.class);
-		mockResponse = Mockito.mock(HttpServletResponse.class);
-		mockClient = Mockito.mock(SynapseClient.class);
-		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-		mockOutStream = Mockito.mock(ServletOutputStream.class);
+		MockitoAnnotations.initMocks(this);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockClient);
 		servlet = new UserProfileAttachmentServlet();
 		servlet.setSynapseProvider(mockSynapseProvider);
@@ -64,6 +67,7 @@ public class UserProfileAttachmentServletTest {
 		fileId = "444";
 		preview = "true";
 		applied = "true";
+		
 		rawFileHandleUrl = new URL("https://aws.com/filehandle"+fileId);
 		userImageUrl = new URL("https://aws.com/"+userId);
 		userImagePreveiwUrl = new URL("https://aws.com/"+userId+"/preview");
@@ -71,37 +75,9 @@ public class UserProfileAttachmentServletTest {
 		when(mockClient.getFileHandleTemporaryUrl(fileId)).thenReturn(rawFileHandleUrl);
 		when(mockClient.getUserProfilePictureUrl(userId)).thenReturn(userImageUrl);
 		when(mockClient.getUserProfilePicturePreviewUrl(userId)).thenReturn(userImagePreveiwUrl);
+		//no longer a redirect, it writes resulting url data to the output stream.  manually testing this functionality.
 	}
 	
-	@Test
-	public void testGetUserProfilePreview() throws ServletException, IOException{
-		// setup the parameters
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
-		// call under test
-		servlet.doGet(mockRequest, mockResponse);
-		verify(mockClient).setSessionToken(sessionCookie.getValue());
-		verify(mockResponse).sendRedirect(userImagePreveiwUrl.toString());
-	}
-	
-	@Test
-	public void testGetUserProfile() throws ServletException, IOException{
-		preview = "false";
-		// setup the parameters
-		servlet.setPreviewTimeoutMs(1);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
-		// call under test
-		servlet.doGet(mockRequest, mockResponse);
-		verify(mockClient).setSessionToken(sessionCookie.getValue());
-		verify(mockResponse).sendRedirect(userImageUrl.toString());
-	}
-	
-
 	@Test
 	public void testGetUserProfileSynapseException() throws ServletException, IOException, SynapseException{
 		int statusCode = 404;
@@ -115,22 +91,6 @@ public class UserProfileAttachmentServletTest {
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
 		servlet.doGet(mockRequest, mockResponse);
-		verify(mockClient).setSessionToken(sessionCookie.getValue());
 		verify(mockResponse).setStatus(statusCode);
 	}
-	
-	@Test
-	public void testGetUserProfileNotApplied() throws ServletException, IOException{
-		applied = "false";
-		// setup the parameters
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
-		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
-		// call under test
-		servlet.doGet(mockRequest, mockResponse);
-		verify(mockResponse).sendRedirect(rawFileHandleUrl.toString());
-		verify(mockClient).setSessionToken(sessionCookie.getValue());
-	}
-
 }

@@ -663,7 +663,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	public static Widget getProfilePicture(UserProfile profile, SynapseJSNIUtils synapseJSNIUtils) {
-		 Widget profilePicture; 
+		 Widget profilePicture;
 		 if (profile.getProfilePicureFileHandleId() != null) {
 			 //use preview
 			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getProfilePicureFileHandleId(), false);
