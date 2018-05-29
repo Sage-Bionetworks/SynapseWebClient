@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityInstanceFactory;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -90,6 +91,7 @@ public class SynapseJavascriptFactory {
 		Link,
 		Preview,
 		Entity, // used for services where we don't know what type of entity is returned (but object has concreteType set)
+		EntityId,
 		Forum,
 		DiscussionThreadBundle,
 		DiscussionReplyBundle,
@@ -211,6 +213,8 @@ public class SynapseJavascriptFactory {
 			return json.getLong("totalNumberOfResults");
 		case PrincipalAliasResponse :
 			return new PrincipalAliasResponse(json);
+		case EntityId :
+			return new EntityId(json).getId();
 		case ChallengePagedResults:
 			return new ChallengePagedResults(json).getResults();
 		case JSON :

@@ -166,7 +166,7 @@ public class UploaderTest {
 				mockSynapseProperties);
 		uploader.addCancelHandler(cancelHandler);
 		parentEntityId = "syn1234";
-		uploader.asWidget(parentEntityId);
+		uploader.configure(null, parentEntityId, null, true);
 		
 		// Simulate success.
 		multipartUploader.setFileHandle("99999");
@@ -223,7 +223,7 @@ public class UploaderTest {
 	
 	@Test
 	public void testSetExternalFileEntityPathWithFileEntity() throws Exception {
-		uploader.asWidget(testEntity);
+		uploader.configure(testEntity, null, null, true);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		verify(synapseClient).updateExternalFile(anyString(), anyString(), anyString(), anyString(), eq((Long)null), eq((String)null), eq(storageLocationId), any(AsyncCallback.class));
 		verify(view).showInfo(anyString(), anyString());
@@ -276,7 +276,7 @@ public class UploaderTest {
 	@Test
 	public void testSetSftpExternalFileEntityPathWithFileEntity() throws Exception {
 		String fileName = "test.txt";
-		uploader.asWidget(testEntity);
+		uploader.configure(testEntity, null, null, true);
 		uploader.setFileNames(new String[] {fileName});
 		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
 		verify(synapseClient).updateExternalFile(anyString(), anyString(), eq(fileName), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
@@ -338,7 +338,7 @@ public class UploaderTest {
 	@Test
 	public void testDirectUploadTeamIconHappyCase() throws Exception {
 		CallbackP callback = mock(CallbackP.class);
-		uploader.asWidget(null,  null, callback, false);
+		uploader.configure(null,  null, callback, false);
 		uploader.handleUploads();
 		verify(callback).invoke(anyString());
 	}
@@ -382,7 +382,7 @@ public class UploaderTest {
 	@Test
 	public void testDirectUploadStep1NoParentEntityId() throws Exception {
 		Callback mockCallback = mock(Callback.class);
-		uploader.asWidget(null, null, null, false);
+		uploader.configure(null, null, null, false);
 		uploader.checkForExistingFileName("newFile.txt", mockCallback);
 		verify(synapseClient, Mockito.never()).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockCallback).invoke();
@@ -576,7 +576,8 @@ public class UploaderTest {
 		fileEntity.setId(entityId);
 		
 		Mockito.reset(synapseClient);
-		uploader.asWidget(fileEntity);
+		uploader.configure(fileEntity, null, null, true);
+		
 		assertNull(uploader.getStorageLocationId());
 		ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
 		verify(synapseClient).getUploadDestinations(stringCaptor.capture(), any(AsyncCallback.class));
@@ -586,7 +587,7 @@ public class UploaderTest {
 	@Test
 	public void testQueryForUploadDestinationsWithNullEntity() {
 		Mockito.reset(synapseClient);
-		uploader.asWidget((FileEntity)null);
+		uploader.configure((FileEntity)null, null, null, true);
 		assertNull(uploader.getStorageLocationId());
 	}
 

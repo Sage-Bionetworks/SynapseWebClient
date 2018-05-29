@@ -50,6 +50,7 @@ public interface SynapseJSNIUtils {
 	public void getFilePartMd5(JavaScriptObject blob, int currentChunk, Long chunkSize, MD5Callback md5Callback);
 	public double getFileSize(JavaScriptObject blob);
 	String[] getMultipleUploadFileNames(JavaScriptObject fileList);
+	String getWebkitRelativePath(JavaScriptObject fileList, int index);
 	public void consoleLog(String message);
 	public void consoleError(String message);
 	

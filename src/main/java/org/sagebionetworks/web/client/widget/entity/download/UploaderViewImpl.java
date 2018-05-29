@@ -506,6 +506,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		fileInputPanel.addStyleName("uploadContainer center");
 		fileUploadInput = new Input(InputType.FILE);
 		fileUploadInput.setId(FILE_FIELD_ID);
+		fileUploadInput.getElement().setAttribute("webkitdirectory", "");
 		fileUploadInput.setName("uploads[]");
 		fileUploadInput.setVisible(false);
 		fileUploadLabel.addStyleName("displayInline margin-left-5");
