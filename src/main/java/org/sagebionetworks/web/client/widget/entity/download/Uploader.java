@@ -319,7 +319,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void uploadBasedOnConfiguration() {
 		// create necessary folders based on webkitRelativePath for the current item, and set parent entity id to correct parent
 		// reset the current file parent entity id to the original.
-		currentFileParentEntityId = parentEntityId;
 		String relativePath = synapseJsniUtils.getWebkitRelativePath(fileList, currIndex);
 		if (relativePath == null || relativePath.isEmpty()) {
 			uploadBasedOnConfigurationAfterFolderCreation();
@@ -598,7 +597,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	public void setFileEntityFileHandle(String fileHandleId) {
-		if (entityId != null || parentEntityId != null) {
+		if (entityId != null || currentFileParentEntityId != null) {
 			synapseClient.setFileEntityFileHandle(fileHandleId, entityId, currentFileParentEntityId, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String entityId) {
