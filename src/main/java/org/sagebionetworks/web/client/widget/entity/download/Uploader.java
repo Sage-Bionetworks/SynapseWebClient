@@ -372,25 +372,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			public void onFailure(Throwable caught) {
 				if (caught instanceof NotFoundException) {
 					// did not find this container, create it!
-					Folder f = new Folder();
-					f.setName(currentFilePath[currentFilePathElement]);
-					f.setParentId(currentFileParentEntityId);
-					jsClient.createEntity(f)
-						.addCallback(
-							new FutureCallback<Entity>() {
-								@Override
-								public void onSuccess(Entity entity) {
-									currentFileParentEntityId = entity.getId();
-									mkNextDir();
-								}
-			
-								@Override
-								public void onFailure(Throwable caught) {
-									uploadError("Unable to create target folder structure: " + synapseJsniUtils.getWebkitRelativePath(fileList, currIndex), caught);
-								}
-							},
-							directExecutor()
-				);
+					createCurrentPathElement();
 				} else {
 					uploadError("Unable to create target folder structure: " + synapseJsniUtils.getWebkitRelativePath(fileList, currIndex), caught);
 				}
@@ -401,6 +383,29 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 				mkNextDir();
 			}
 		});
+	}
+	
+	private void createCurrentPathElement() {
+		Folder f = new Folder();
+		f.setName(currentFilePath[currentFilePathElement]);
+		f.setParentId(currentFileParentEntityId);
+		jsClient.createEntity(f)
+			.addCallback(
+				new FutureCallback<Entity>() {
+					@Override
+					public void onSuccess(Entity entity) {
+						//update the current file parent (container) id to this new folder.
+						currentFileParentEntityId = entity.getId();
+						mkNextDir();
+					}
+
+					@Override
+					public void onFailure(Throwable caught) {
+						uploadError("Unable to create target folder structure: " + synapseJsniUtils.getWebkitRelativePath(fileList, currIndex), caught);
+					}
+				},
+				directExecutor()
+			);
 	}
 	
 	private void mkNextDir() {
@@ -705,7 +710,6 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	public void setUploaderLinkNameVisible(boolean visible) {
 		view.setUploaderLinkNameVisible(visible);
 	}
-
 	
 	public void addCancelHandler(CancelHandler handler) {
 		handlerManager.addHandler(CancelEvent.getType(), handler);
