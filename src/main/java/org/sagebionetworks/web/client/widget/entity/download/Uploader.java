@@ -593,7 +593,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	
 	public void setFileEntityFileHandle(String fileHandleId) {
 		if (entityId != null || parentEntityId != null) {
-			synapseClient.setFileEntityFileHandle(fileHandleId, entityId, parentEntityId, new AsyncCallback<String>() {
+			synapseClient.setFileEntityFileHandle(fileHandleId, entityId, currentFileParentEntityId, new AsyncCallback<String>() {
 				@Override
 				public void onSuccess(String entityId) {
 					fileHasBeenUploaded = true;

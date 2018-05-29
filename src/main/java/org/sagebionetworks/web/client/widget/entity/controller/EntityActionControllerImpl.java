@@ -1439,7 +1439,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				view.showInfo(DELETED, THE + enityTypeDisplay + WAS_SUCCESSFULLY_DELETED); 
 				// Go to entity's parent
 				Place gotoPlace = createDeletePlace();
-				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
+				if (gotoPlace instanceof Synapse) {
+					view.setPlace((Synapse)gotoPlace);
+				} else {
+					getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
+				}
 			}
 			
 			@Override
@@ -1459,6 +1463,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(parentId != null && !(entityBundle.getEntity() instanceof Project)) {					
 			if(entityBundle.getEntity() instanceof Table) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
 			else if(entityBundle.getEntity() instanceof DockerRepository) gotoPlace = new Synapse(parentId, null, EntityArea.DOCKER, null);
+			else if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof Folder) gotoPlace = new Synapse(parentId, null, EntityArea.FILES, null);
 			else gotoPlace = new Synapse(parentId);
 		} else {
 			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId());
