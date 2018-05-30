@@ -69,8 +69,6 @@ public class UserBadgeTest {
 	String displayName;
 	@Mock
 	UserProfileAsyncHandler mockUserProfileAsyncHandler;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
 	public static final String PICTURE_URL = "http://url.to.profile.picture";
 	@Before
 	public void before(){
@@ -89,8 +87,7 @@ public class UserBadgeTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		when(mockSynapseJSNIUtils.getBaseProfileAttachmentUrl()).thenReturn(PICTURE_URL);
-		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory, mockSynapseJavascriptClient);
+		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory);
 	}
 	
 	@Test

@@ -7,6 +7,7 @@ import java.util.Set;
 import org.sagebionetworks.repo.model.AccessControlList;
 import org.sagebionetworks.repo.model.ResourceAccess;
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.util.ModelConstants;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -39,9 +40,9 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 	SynapseClientAsync synapseClient;
 	ImageUploadWidget uploader;
 	String uploadedFileHandleId;
-	String baseImageURL;
 	Long authenticatedUserGroupId;
 	AuthenticationController authController;
+	SynapseJSNIUtils jsniUtils;
 	
 	@Inject
 	public TeamEditModalWidget(
@@ -58,8 +59,8 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.uploader = uploader;
+		this.jsniUtils = jsniUtils;
 		uploader.setView(ginInjector.getCroppedImageUploadView());
-		this.baseImageURL = jsniUtils.getBaseFileHandleUrl();
 		this.authController = authenticationController;
 		authenticatedUserGroupId = Long.parseLong(synapseProperties.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID));
 		uploader.configure(new CallbackP<FileUpload>() {
@@ -68,7 +69,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 				uploader.setUploadedFileText(fileUpload.getFileMeta().getFileName());
 				view.hideLoading();
 				uploadedFileHandleId = fileUpload.getFileHandleId();
-				view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, uploadedFileHandleId));
+				view.setImageURL(jsniUtils.getRawFileHandleUrl(uploadedFileHandleId));
 			}
 		});
 		uploader.setUploadingCallback(new Callback() {
@@ -139,7 +140,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 		view.clear();
 		view.configure(team);
 		if (team.getIcon() != null)
-			view.setImageURL(DisplayUtils.createRawFileHandleUrl(baseImageURL, team.getIcon()));
+			view.setImageURL(jsniUtils.getFileHandleAssociationUrl(team.getId(), FileHandleAssociateType.TeamAttachment, team.getIcon()));
 		else
 			view.setDefaultIconVisible();
 		

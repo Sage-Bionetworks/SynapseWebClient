@@ -944,10 +944,6 @@ public class SynapseJavascriptClient {
 		return getFuture(cb -> doPost(url, idList, OBJECT_TYPE.ListWrapperTeam, cb));
 	}
 	
-	public String getTeamIconUrl(String teamId) {
-		return getRepoServiceUrl() + TEAM + "/" + teamId + ICON + "?" + REDIRECT_PARAMETER +"true";
-	}
-	
 	public void login(LoginRequest loginRequest, AsyncCallback<LoginResponse> callback) {
 		String url = getAuthServiceUrl() + "/login";
 		doPost(url, loginRequest, OBJECT_TYPE.LoginResponse, callback);

@@ -90,15 +90,21 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 	
 	@Override
-	public String getBaseProfileAttachmentUrl() {
-		return GWTWrapperImpl.getRealGWTModuleBaseURL() + "profileAttachment";
-	}
-	
-	@Override
 	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId) {
 		return GWTWrapperImpl.getRealGWTModuleBaseURL() + WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET + "?" + 
 				WebConstants.ASSOCIATED_OBJECT_ID_PARAM_KEY + "=" + objectId + "&" +
 				WebConstants.ASSOCIATED_OBJECT_TYPE_PARAM_KEY + "=" + objectType.toString() + "&" + 
+				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId;
+	}
+
+	/**
+	 * Create the url to the raw file handle id (must be the owner to access)
+	 * @param rawFileHandleId
+	 * @return
+	 */
+	@Override
+	public String getRawFileHandleUrl(String fileHandleId) {
+		return GWTWrapperImpl.getRealGWTModuleBaseURL() + WebConstants.FILE_HANDLE_ASSOCIATION_SERVLET + "?" + 
 				WebConstants.FILE_HANDLE_ID_PARAM_KEY + "=" + fileHandleId;
 	}
 

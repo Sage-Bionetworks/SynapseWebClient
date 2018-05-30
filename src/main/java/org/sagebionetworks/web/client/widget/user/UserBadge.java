@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
@@ -46,7 +47,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 	private String principalId = null, username = null;
 	UserProfileAsyncHandler userProfileAsyncHandler;
 	private AdapterFactory adapterFactory;
-	private SynapseJavascriptClient jsClient;
 	
 	public static final ClickHandler DO_NOTHING_ON_CLICK = new ClickHandler() {
 		@Override
@@ -62,8 +62,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 			SynapseJSNIUtils synapseJSNIUtils,
 			ClientCache clientCache,
 			UserProfileAsyncHandler userProfileAsyncHandler,
-			AdapterFactory adapterFactory,
-			SynapseJavascriptClient jsClient) {
+			AdapterFactory adapterFactory) {
 		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
@@ -72,7 +71,6 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 		this.clientCache = clientCache;
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		this.adapterFactory = adapterFactory;
-		this.jsClient = jsClient;
 		view.setPresenter(this);
 		view.setSize(BadgeSize.DEFAULT);
 		clearState();
@@ -116,7 +114,7 @@ public class UserBadge implements UserBadgeView.Presenter, SynapseWidgetPresente
 
 	public void configurePicture() {
 		if (profile != null && profile.getProfilePicureFileHandleId() != null) {
-			String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getProfilePicureFileHandleId(), false);
+			String url = synapseJSNIUtils.getFileHandleAssociationUrl(profile.getOwnerId(), FileHandleAssociateType.UserProfileAttachment, profile.getProfilePicureFileHandleId());
 			if (!useCachedImage) {
 				url += DisplayUtils.getParamForNoCaching();
 			}

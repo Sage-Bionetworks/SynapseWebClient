@@ -15,15 +15,13 @@ public class ProfileImageWidgetImplTest {
 	SynapseJSNIUtils mockJniUtils;
 	ProfileImageWidgetImpl widget;
 	Callback callback;
-	String baseUrl;
 	
 	@Before
 	public void before(){
 		mockView = Mockito.mock(ProfileImageView.class);
 		mockJniUtils = Mockito.mock(SynapseJSNIUtils.class);
 		callback = Mockito.mock(Callback.class);
-		baseUrl = "baseUrl";
-		when(mockJniUtils.getBaseProfileAttachmentUrl()).thenReturn(baseUrl);
+		
 		widget = new ProfileImageWidgetImpl(mockView, mockJniUtils);
 		widget.setRemovePictureCallback(callback);
 	}

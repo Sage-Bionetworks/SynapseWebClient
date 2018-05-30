@@ -28,8 +28,8 @@ import org.sagebionetworks.web.shared.WebConstants;
 public class FileHandleAssociationServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
-	
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
+	public static final long CACHE_TIME_SECONDS=30;  //30 seconds
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
 		public String getSessionToken() {
@@ -72,11 +72,7 @@ public class FileHandleAssociationServlet extends HttpServlet {
 	@Override
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-
-		//instruct not to cache
-		response.setHeader(WebConstants.CACHE_CONTROL_KEY, WebConstants.CACHE_CONTROL_VALUE_NO_CACHE); // Set standard HTTP/1.1 no-cache headers.
-		response.setHeader(WebConstants.PRAGMA_KEY, WebConstants.NO_CACHE_VALUE); // Set standard HTTP/1.0 no-cache header.
-		response.setDateHeader(WebConstants.EXPIRES_KEY, 0L); // Proxy
+		response.setHeader(WebConstants.CACHE_CONTROL_KEY, "max-age="+CACHE_TIME_SECONDS);
 
 		String token = getSessionToken(request);
 		SynapseClient client = createNewClient(token);
@@ -86,11 +82,17 @@ public class FileHandleAssociationServlet extends HttpServlet {
 		String fileHandleId = request.getParameter(WebConstants.FILE_HANDLE_ID_PARAM_KEY);
 		
 		try {
-			FileHandleAssociation fha = new FileHandleAssociation();
-			fha.setAssociateObjectId(objectId);
-			fha.setAssociateObjectType(FileHandleAssociateType.valueOf(objectType));
-			fha.setFileHandleId(fileHandleId);
-			URL resolvedUrl = client.getFileURL(fha);
+			URL resolvedUrl;
+			if (fileHandleId != null && (objectId == null || objectType == null)) {
+				//try to return the raw file handle (will work if user owns the file handle
+				resolvedUrl = client.getFileHandleTemporaryUrl(fileHandleId);
+			} else {
+				FileHandleAssociation fha = new FileHandleAssociation();
+				fha.setAssociateObjectId(objectId);
+				fha.setAssociateObjectType(FileHandleAssociateType.valueOf(objectType));
+				fha.setFileHandleId(fileHandleId);
+				resolvedUrl = client.getFileURL(fha);
+			}
 			response.sendRedirect(resolvedUrl.toString());
 		} catch (SynapseException e) {
 			//redirect to error place with an entry

@@ -629,26 +629,6 @@ public class DisplayUtils {
 		return fullPlaceName;
 	}
 	
-	/**
-	 * Create the url to a profile attachment image.
-	 * @param baseURl
-	 * @param userId
-	 * @param tokenId
-	 * @param fileName
-	 * @return
-	 */
-	public static String createUserProfileAttachmentUrl(String baseURl, String userId, String fileHandleId, boolean preview){
-		StringBuilder builder = new StringBuilder();
-		builder.append(baseURl);
-		builder.append("?"+WebConstants.USER_PROFILE_USER_ID+"=");
-		builder.append(userId);
-		builder.append("&"+WebConstants.USER_PROFILE_IMAGE_ID+"=");
-		builder.append(fileHandleId);
-		builder.append("&"+WebConstants.USER_PROFILE_PREVIEW+"=");
-		builder.append(preview);
-		return builder.toString();
-	}
-	
 	public static Tooltip addTooltip(Widget widget, String tooltipText){
 		return addTooltip(widget, tooltipText, Placement.AUTO);
 	}
@@ -784,17 +764,6 @@ public class DisplayUtils {
 				WebConstants.TEAM_PARAM_KEY + "=" + teamId;
 	}
 	
-	/**
-	 * Create the url to the raw file handle id (must be the owner to access)
-	 * @param baseURl
-	 * @param rawFileHandleId
-	 * @return
-	 */
-	public static String createRawFileHandleUrl(String baseFileHandleUrl, String rawFileHandleId){
-		return baseFileHandleUrl + "?" +
-				WebConstants.RAW_FILE_HANDLE_PARAM + "=" + rawFileHandleId;
-	}
-
 	public static String createEntityVersionString(Reference ref) {
 		return createEntityVersionString(ref.getTargetId(), ref.getTargetVersionNumber());
 	}

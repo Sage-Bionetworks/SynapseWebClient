@@ -15,6 +15,7 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Quiz;
@@ -666,7 +667,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 Widget profilePicture;
 		 if (profile.getProfilePicureFileHandleId() != null) {
 			 //use preview
-			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getProfilePicureFileHandleId(), false);
+			 String url = synapseJSNIUtils.getFileHandleAssociationUrl(profile.getOwnerId(), FileHandleAssociateType.UserProfileAttachment, profile.getProfilePicureFileHandleId());
 			 profilePicture = new FitImage(url, 150, 150);
 		 } else {
 			 //use default picture
