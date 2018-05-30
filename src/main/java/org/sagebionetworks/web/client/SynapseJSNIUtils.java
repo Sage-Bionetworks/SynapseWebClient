@@ -22,10 +22,8 @@ public interface SynapseJSNIUtils {
 	
 	public String getBaseFileHandleUrl();
 	
-	public String getBaseProfileAttachmentUrl();
-	
 	public String getFileHandleAssociationUrl(String objectId, FileHandleAssociateType objectType, String fileHandleId);
-
+	public String getRawFileHandleUrl(String fileHandleId);
 	public int randomNextInt();
 	
 	public String getLocationPath();

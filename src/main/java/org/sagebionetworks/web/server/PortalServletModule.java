@@ -29,7 +29,6 @@ import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SubscriptionClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
-import org.sagebionetworks.web.server.servlet.UserProfileAttachmentServlet;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
 import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
@@ -127,10 +126,6 @@ public class PortalServletModule extends ServletModule {
 		// FileHandle upload
 		bind(FileEntityResolverServlet.class).in(Singleton.class);
 		serve("/Portal/"+WebConstants.FILE_ENTITY_RESOLVER_SERVLET).with(FileEntityResolverServlet.class);
-		
-		// User Profile Attachment (photo)
-		bind(UserProfileAttachmentServlet.class).in(Singleton.class);
-		serve("/Portal/profileAttachment").with(UserProfileAttachmentServlet.class);
 		
 		// Setup the LinkedIn service mapping
 		bind(LinkedInServiceImpl.class).in(Singleton.class);
