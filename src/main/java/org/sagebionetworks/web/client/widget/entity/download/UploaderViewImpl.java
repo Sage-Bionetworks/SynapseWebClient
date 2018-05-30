@@ -1,7 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.download;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.Column;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.FieldSet;
 import org.gwtbootstrap3.client.ui.Form;
 import org.gwtbootstrap3.client.ui.FormGroup;
@@ -25,6 +28,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.InputType;
 import org.gwtbootstrap3.client.ui.constants.ProgressBarType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.constants.Toggle;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
@@ -99,10 +103,12 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	private FlowPanel uploadPanel;
 	
-	private Button uploadBtn, cancelBtn, chooseFileBtn;
+	private Button uploadBtn, cancelBtn;
+	private ButtonGroup chooseFileButtonGroup;
+	AnchorListItem chooseFilesItem, chooseFolderItem;
+	
 	private Progress progressContainer;
 	private ProgressBar progressBar;
-
 	// external link panel
 	
 	private Div spinningProgressContainer;
@@ -143,9 +149,22 @@ public class UploaderViewImpl extends FlowPanel implements
 		
 		spinningProgressContainer = new Div();
 		
-		chooseFileBtn = new Button("Browse...");
+		chooseFileButtonGroup = new ButtonGroup();
+		
+		Button chooseFileBtn = new Button("Browse...");
 		chooseFileBtn.setType(ButtonType.INFO);
-		chooseFileBtn.setSize(ButtonSize.LARGE);		
+		chooseFileBtn.setSize(ButtonSize.LARGE);
+		chooseFileBtn.setToggleCaret(false);
+		chooseFileButtonGroup.add(chooseFileBtn);
+		chooseFilesItem = new AnchorListItem("Files");
+		chooseFilesItem.setIcon(IconType.FILES_O);
+		chooseFolderItem = new AnchorListItem("Folder");
+		chooseFolderItem.setIcon(IconType.FOLDER_O);
+		DropDownMenu dropdownMenu = new DropDownMenu();
+		dropdownMenu.add(chooseFilesItem);
+		dropdownMenu.add(chooseFolderItem);
+		chooseFileButtonGroup.add(dropdownMenu);
+		chooseFileBtn.setDataToggle(Toggle.DROPDOWN);
 		uploadBtn = new Button();
 		uploadBtn.setType(ButtonType.PRIMARY);
 		uploadBtn.setPull(Pull.RIGHT);
@@ -515,13 +534,17 @@ public class UploaderViewImpl extends FlowPanel implements
 				uploadBtn.click();
 			}
 		});
-		chooseFileBtn.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				//click file upload input field
-				fileUploadInput.getElement().<InputElement>cast().click();
-			}
+		chooseFilesItem.addClickHandler(event -> {
+			//click file upload input field
+			fileUploadInput.getElement().removeAttribute("webkitdirectory");
+			fileUploadInput.getElement().<InputElement>cast().click();
 		});
+		chooseFolderItem.addClickHandler(event -> {
+			//click file upload input field
+			fileUploadInput.getElement().setAttribute("webkitdirectory", "");
+			fileUploadInput.getElement().<InputElement>cast().click();
+		});
+		
 		fileInputPanel.add(fileUploadInput);
 		Span icon = new Span();
 		icon.add(new Icon(IconType.CLOUD_UPLOAD));
@@ -530,7 +553,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		Span dropText = new Span("Drop files to upload, or");
 		dropText.addStyleName("margin-right-5 font-size-20 movedown-2");
 		fileInputPanel.add(dropText);
-		fileInputPanel.add(chooseFileBtn);
+		fileInputPanel.add(chooseFileButtonGroup);
 		fileInputPanel.add(fileUploadLabel);
 		enableMultipleFileUploads(true);
 		formFieldsPanel = new FlowPanel();

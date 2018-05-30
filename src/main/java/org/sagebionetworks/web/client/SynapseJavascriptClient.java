@@ -32,6 +32,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
@@ -65,6 +66,7 @@ import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.repo.model.entity.Direction;
+import org.sagebionetworks.repo.model.entity.EntityLookupRequest;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.AddPartResponse;
@@ -1101,6 +1103,14 @@ public class SynapseJavascriptClient {
 				gwt.encodeQueryString(provider.name())+
 				"&"+"alias="+gwt.encodeQueryString(alias);
 		doDelete(url, callback);
+	}
+	
+	public void lookupChild(String entityName, String containerEntityId, AsyncCallback<String> callback) {
+		EntityLookupRequest request = new EntityLookupRequest();
+		request.setEntityName(entityName);
+		request.setParentId(containerEntityId);
+		String url = getRepoServiceUrl() + ENTITY+"/child";
+		doPost(url, request, OBJECT_TYPE.EntityId, callback);
 	}
 }
 

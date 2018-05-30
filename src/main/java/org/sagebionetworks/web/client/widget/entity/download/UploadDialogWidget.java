@@ -27,7 +27,7 @@ public class UploadDialogWidget implements UploadDialogWidgetView.Presenter, Syn
 	}
 
 	public void configure(String title, Entity entity, String parentEntityId, EntityUpdatedHandler handler, final CallbackP<String> fileHandleIdCallback, boolean isEntity){
-		Widget body = uploader.asWidget(entity, parentEntityId, fileHandleIdCallback,isEntity);
+		Widget body = uploader.configure(entity, parentEntityId, fileHandleIdCallback,isEntity);
 		view.configureDialog(title, body);
 		uploader.clearHandlers();
 		// add user defined handler

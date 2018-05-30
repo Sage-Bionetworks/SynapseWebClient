@@ -251,6 +251,15 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
+	public String getWebkitRelativePath(JavaScriptObject fileList, int index) {
+		return _getWebkitRelativePath(fileList, index);
+	}
+	
+	private final static native String _getWebkitRelativePath(JavaScriptObject fileList, int index) /*-{
+		return fileList[index].webkitRelativePath;
+	}-*/;
+	
+	@Override
 	public double getFileSize(JavaScriptObject blob) {
 		return _getFileSize(blob);
 	}

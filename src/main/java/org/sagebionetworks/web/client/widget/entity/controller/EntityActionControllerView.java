@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.controller;
 
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.web.client.ShowsErrors;
+import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -41,4 +42,6 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	void showPromptDialog(String title, PromptCallback callback);
 
 	void addWidget(IsWidget asWidget);
+
+	void setPlace(Synapse place);
 }
