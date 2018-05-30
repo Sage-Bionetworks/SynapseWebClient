@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -55,14 +56,19 @@ public class UserBadgeTest {
 	private static final String FIRST_NAME = "John";
 	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
 	UserBadgeView mockView;
 	UserBadge userBadge;
 	UserProfile profile;
-	
+	@Mock
 	ClientCache mockCache;
 	String principalId = "id1", fileHandleId = "1234";
 	int max=10;
@@ -80,13 +86,9 @@ public class UserBadgeTest {
 		profile.setProfilePicureFileHandleId(fileHandleId);
 		displayName = DisplayUtils.getDisplayName(profile);
 		profile.setOwnerId(principalId);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
-		mockView = mock(UserBadgeView.class);
-		mockCache = mock(ClientCache.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
+		when(mockSynapseJSNIUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(PICTURE_URL);
 		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory);
 	}
 	
@@ -97,7 +99,7 @@ public class UserBadgeTest {
 		ArgumentCaptor<String> urlCaptor = ArgumentCaptor.forClass(String.class);
 		verify(mockView).showCustomUserPicture(urlCaptor.capture());
 		String url = urlCaptor.getValue();
-		assertEquals(PICTURE_URL + "?userId="+principalId+"&imageId="+fileHandleId+"&preview=false", url);
+		assertEquals(PICTURE_URL, url);
 		assertFalse(url.contains(WebConstants.NOCACHE_PARAM));
 		
 		//simulate a load error
