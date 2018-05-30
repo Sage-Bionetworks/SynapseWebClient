@@ -6,7 +6,6 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -23,17 +22,16 @@ import javax.servlet.http.HttpServletResponse;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseForbiddenException;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.dao.WikiPageKey;
-import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.table.RowReference;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.server.servlet.FileHandleServlet;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
@@ -43,25 +41,26 @@ import org.sagebionetworks.web.unitserver.SynapseClientBaseTest;
 
 public class FileHandleServletTest {
 
+	@Mock
 	HttpServletRequest mockRequest;
+	@Mock
 	HttpServletResponse mockResponse;
+	@Mock
 	SynapseProvider mockSynapseProvider;
+	@Mock
 	TokenProvider mockTokenProvider;
+	@Mock
 	SynapseClient mockSynapse;
+	@Mock
 	ServletOutputStream responseOutputStream;
 	FileHandleServlet servlet;
 	
 	@Before
-	public void setup() throws IOException, SynapseException, JSONObjectAdapterException {
+	public void setup() throws IOException, SynapseException {
+		MockitoAnnotations.initMocks(this);
 		servlet = new FileHandleServlet();
-
-		// Mock synapse and provider so we don't need to worry about
-		// unintentionally testing those classes
-		mockSynapse = mock(SynapseClient.class);
-		mockSynapseProvider = mock(SynapseProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 
-		FileHandleResults testResults = new FileHandleResults();
 		WikiPage testPage = new WikiPage();
 		testPage.setAttachmentFileHandleIds(new ArrayList<String>());
 		when(mockSynapse.getWikiPage(any(WikiPageKey.class))).thenReturn(testPage);
@@ -78,18 +77,11 @@ public class FileHandleServletTest {
 
 		when(mockSynapse.getTeamIcon(anyString())).thenReturn(resolvedUrl);
 
-		mockTokenProvider = mock(TokenProvider.class);
-
 		servlet.setSynapseProvider(mockSynapseProvider);
 		servlet.setTokenProvider(mockTokenProvider);
 
 		// Setup output stream and response
-		responseOutputStream = mock(ServletOutputStream.class);
-		mockResponse = mock(HttpServletResponse.class);
 		when(mockResponse.getOutputStream()).thenReturn(responseOutputStream);
-
-		// Setup request
-		mockRequest = mock(HttpServletRequest.class);
 		SynapseClientBaseTest.setupTestEndpoints();
 	}
 	
@@ -116,8 +108,6 @@ public class FileHandleServletTest {
 		when(mockRequest.getParameter(WebConstants.TEAM_PARAM_KEY)).thenReturn("36");
 	}
 	
-	
-
 	@Test
 	public void testDoGetLoggedInWikiAttachmentPreview() throws Exception {
 		setupWiki();
