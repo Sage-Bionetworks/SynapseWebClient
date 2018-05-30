@@ -67,17 +67,45 @@ public class UserProfileAttachmentServletTest {
 		fileId = "444";
 		preview = "true";
 		applied = "true";
-		
-		rawFileHandleUrl = new URL("https://aws.com/filehandle"+fileId);
-		userImageUrl = new URL("https://aws.com/"+userId);
-		userImagePreveiwUrl = new URL("https://aws.com/"+userId+"/preview");
+		rawFileHandleUrl = new URL("https://www.synapse.org/Portal.html");
+		userImageUrl = new URL("https://docs.synapse.org");
+		userImagePreveiwUrl = new URL("https://rest.synapse.org");
 		
 		when(mockClient.getFileHandleTemporaryUrl(fileId)).thenReturn(rawFileHandleUrl);
 		when(mockClient.getUserProfilePictureUrl(userId)).thenReturn(userImageUrl);
 		when(mockClient.getUserProfilePicturePreviewUrl(userId)).thenReturn(userImagePreveiwUrl);
-		//no longer a redirect, it writes resulting url data to the output stream.  manually testing this functionality.
 	}
 	
+	@Test
+	public void testGetUserProfilePreview() throws ServletException, IOException{
+		// setup the parameters
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
+		// call under test
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockClient).setSessionToken(sessionCookie.getValue());
+		
+		verify(mockResponse).sendRedirect(userImagePreveiwUrl.toString());
+	}
+	
+	@Test
+	public void testGetUserProfile() throws ServletException, IOException{
+		preview = "false";
+		// setup the parameters
+		servlet.setPreviewTimeoutMs(1);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
+		// call under test
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockClient).setSessionToken(sessionCookie.getValue());
+		verify(mockResponse).sendRedirect(userImageUrl.toString());
+	}
+	
+
 	@Test
 	public void testGetUserProfileSynapseException() throws ServletException, IOException, SynapseException{
 		int statusCode = 404;
@@ -91,6 +119,22 @@ public class UserProfileAttachmentServletTest {
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
 		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
 		servlet.doGet(mockRequest, mockResponse);
+		verify(mockClient).setSessionToken(sessionCookie.getValue());
 		verify(mockResponse).setStatus(statusCode);
 	}
+	
+	@Test
+	public void testGetUserProfileNotApplied() throws ServletException, IOException{
+		applied = "false";
+		// setup the parameters
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_USER_ID)).thenReturn(userId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_IMAGE_ID)).thenReturn(fileId);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_PREVIEW)).thenReturn(preview);
+		when(mockRequest.getParameter(WebConstants.USER_PROFILE_APPLIED)).thenReturn(applied);
+		// call under test
+		servlet.doGet(mockRequest, mockResponse);
+		verify(mockResponse).sendRedirect(rawFileHandleUrl.toString());
+		verify(mockClient).setSessionToken(sessionCookie.getValue());
+	}
+
 }

@@ -1,8 +1,6 @@
 package org.sagebionetworks.web.server.servlet;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.util.concurrent.Callable;
 
@@ -11,7 +9,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.commons.io.IOUtils;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseServerException;
 import org.sagebionetworks.client.exceptions.UnknownSynapseServerException;
@@ -33,7 +30,7 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
-
+	public static final long CACHE_TIME_SECONDS=60*60*24;  //a day
 	private int previewTimeoutMs = WAIT_FOR_PREVIEW_MS;
 
 	/**
@@ -57,7 +54,8 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
 		// Now get the signed url
-		SynapseClient client = createNewClient();
+		String sessionToken = UserDataProvider.getThreadLocalUserToken(request);
+		SynapseClient client = createNewClient(sessionToken);
 		String userId = request
 				.getParameter(WebConstants.USER_PROFILE_USER_ID);
 		String fileId = request
@@ -92,17 +90,8 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 				 */
 				url = getFileHandleUrlWithWait(client, fileId);
 			}
-			InputStream in = null;
-			OutputStream out = null;
-			try {
-				response.setHeader("Cache-Control", "max-age="+GWTAllCacheFilter.CACHE_TIME_SECONDS);
-				in = url.openStream();
-				out = response.getOutputStream();
-				IOUtils.copy(in, out);
-			} finally {
-				IOUtils.closeQuietly(in);
-				IOUtils.closeQuietly(out);
-			}
+			response.setHeader("Cache-Control", "max-age="+CACHE_TIME_SECONDS);
+			response.sendRedirect(url.toString());
 		} catch(SynapseServerException sse) {
 			if (sse instanceof UnknownSynapseServerException) {
 				response.setStatus(((UnknownSynapseServerException)sse).getStatusCode());	
@@ -195,11 +184,12 @@ public class UserProfileAttachmentServlet extends HttpServlet {
 	 * 
 	 * @return
 	 */
-	private SynapseClient createNewClient() {
+	private SynapseClient createNewClient(String sessionToken) {
 		SynapseClient client = synapseProvider.createNewClient();
 		client.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		client.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
 		client.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
+		client.setSessionToken(sessionToken);
 		return client;
 	}
 
