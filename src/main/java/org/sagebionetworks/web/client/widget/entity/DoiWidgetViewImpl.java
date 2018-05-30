@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity;
 
 import org.gwtbootstrap3.client.ui.Alert;
-import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -31,7 +30,7 @@ public class DoiWidgetViewImpl implements DoiWidgetView {
 	@UiField
 	Span doiLabel;
 	@UiField
-	Div synAlertContainer;
+	Span synAlertContainer;
 	Widget widget;
 	
 	public interface Binder extends UiBinder<Widget, DoiWidgetViewImpl> {}
