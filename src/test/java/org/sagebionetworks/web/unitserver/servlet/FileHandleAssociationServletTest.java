@@ -106,10 +106,8 @@ public class FileHandleAssociationServletTest {
 		verify(mockSynapse).setFileEndpoint(anyString());
 		verify(mockSynapse).setSessionToken(sessionToken);
 		
-		//look for no cache headers
-		verify(mockResponse).setHeader(eq(WebConstants.CACHE_CONTROL_KEY), eq(WebConstants.CACHE_CONTROL_VALUE_NO_CACHE));
-		verify(mockResponse).setHeader(eq(WebConstants.PRAGMA_KEY), eq(WebConstants.NO_CACHE_VALUE));
-		verify(mockResponse).setDateHeader(eq(WebConstants.EXPIRES_KEY), eq(0L));
+		//look for 30 second cache header
+		verify(mockResponse).setHeader(WebConstants.CACHE_CONTROL_KEY, "max-age="+FileHandleAssociationServlet.CACHE_TIME_SECONDS);
 	}
 	
 	@Test
