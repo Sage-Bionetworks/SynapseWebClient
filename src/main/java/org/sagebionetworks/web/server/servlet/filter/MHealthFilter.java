@@ -9,6 +9,6 @@ public class MHealthFilter extends RedirectFilter {
 	
 	@Override
 	protected String getUrlPath() {
-		return "mhealth";
+		return "mHealth";
 	}
 }
