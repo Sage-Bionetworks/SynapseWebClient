@@ -27,7 +27,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class WikiSubpagesWidget implements IsWidget {
+public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter {
 	
 	private WikiSubpagesView view;
 	private SynapseClientAsync synapseClient;
@@ -46,10 +46,11 @@ public class WikiSubpagesWidget implements IsWidget {
 	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient,
 							AuthenticationController authenticationController,
 							SynapseJavascriptClient jsClient) {
-		this.view = view;		
+		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
+		view.setPresenter(this);
 	}
 
 	public void configure(
@@ -108,6 +109,7 @@ public class WikiSubpagesWidget implements IsWidget {
 		return view.asWidget();
 	}
 	
+	@Override
 	public void refreshTableOfContents() {
 		view.clear();
 		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {

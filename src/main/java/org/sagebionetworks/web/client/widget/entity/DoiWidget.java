@@ -17,7 +17,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class DoiWidget implements IsWidget {
-	public static final String DOI_PREFIX="doi:10.5072/FK2.";
+	public static final String DOI_PREFIX="doi:10.7303/";
 	public static final int REFRESH_TIME = 13 * 1000; //5 seconds
 	private DoiWidgetView view;
 	GlobalApplicationState globalApplicationState;
