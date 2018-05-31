@@ -546,12 +546,14 @@ public class UploaderViewImpl extends FlowPanel implements
 		});
 		chooseFolderItem.addClickHandler(event -> {
 			//click file upload input field
+			fileUploadInput.getElement().removeAttribute("multiple");
 			fileUploadInput.getElement().setAttribute("webkitdirectory", "");
 			fileUploadInput.getElement().<InputElement>cast().click();
 		});
 		
 		chooseSingleFileBtn.addClickHandler(event -> {
 			fileUploadInput.getElement().removeAttribute("multiple");
+			fileUploadInput.getElement().removeAttribute("webkitdirectory");
 			fileUploadInput.getElement().<InputElement>cast().click();	
 		});
 		
