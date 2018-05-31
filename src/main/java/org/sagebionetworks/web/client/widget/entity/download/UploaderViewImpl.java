@@ -103,7 +103,7 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	private FlowPanel uploadPanel;
 	
-	private Button uploadBtn, cancelBtn;
+	private Button uploadBtn, cancelBtn, chooseSingleFileBtn;
 	private ButtonGroup chooseFileButtonGroup;
 	AnchorListItem chooseFilesItem, chooseFolderItem;
 	
@@ -150,12 +150,15 @@ public class UploaderViewImpl extends FlowPanel implements
 		spinningProgressContainer = new Div();
 		
 		chooseFileButtonGroup = new ButtonGroup();
+		chooseSingleFileBtn = new Button("Browse...");
+		chooseSingleFileBtn.setType(ButtonType.INFO);
+		chooseSingleFileBtn.setSize(ButtonSize.LARGE);
 		
-		Button chooseFileBtn = new Button("Browse...");
-		chooseFileBtn.setType(ButtonType.INFO);
-		chooseFileBtn.setSize(ButtonSize.LARGE);
-		chooseFileBtn.setToggleCaret(false);
-		chooseFileButtonGroup.add(chooseFileBtn);
+		Button browseDropdownButton = new Button("Browse...");
+		browseDropdownButton.setType(ButtonType.INFO);
+		browseDropdownButton.setSize(ButtonSize.LARGE);
+		browseDropdownButton.setToggleCaret(false);
+		chooseFileButtonGroup.add(browseDropdownButton);
 		chooseFilesItem = new AnchorListItem("Files");
 		chooseFilesItem.setIcon(IconType.FILES_O);
 		chooseFolderItem = new AnchorListItem("Folder");
@@ -164,7 +167,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		dropdownMenu.add(chooseFilesItem);
 		dropdownMenu.add(chooseFolderItem);
 		chooseFileButtonGroup.add(dropdownMenu);
-		chooseFileBtn.setDataToggle(Toggle.DROPDOWN);
+		browseDropdownButton.setDataToggle(Toggle.DROPDOWN);
 		uploadBtn = new Button();
 		uploadBtn.setType(ButtonType.PRIMARY);
 		uploadBtn.setPull(Pull.RIGHT);
@@ -401,12 +404,13 @@ public class UploaderViewImpl extends FlowPanel implements
 	
 	@Override
 	public void enableMultipleFileUploads(boolean isEnabled) {
-		if (isEnabled)
-			fileUploadInput.getElement().setAttribute("multiple", null);
-		else
-			fileUploadInput.getElement().removeAttribute("multiple");
+		if (chooseFileButtonGroup != null && chooseSingleFileBtn != null) {
+			chooseFileButtonGroup.setVisible(isEnabled);
+			chooseSingleFileBtn.setVisible(!isEnabled);
+		}
+		
 	}
-
+	
 	/*
 	 * Private Methods
 	 */	
@@ -536,6 +540,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		});
 		chooseFilesItem.addClickHandler(event -> {
 			//click file upload input field
+			fileUploadInput.getElement().setAttribute("multiple", null);
 			fileUploadInput.getElement().removeAttribute("webkitdirectory");
 			fileUploadInput.getElement().<InputElement>cast().click();
 		});
@@ -543,6 +548,11 @@ public class UploaderViewImpl extends FlowPanel implements
 			//click file upload input field
 			fileUploadInput.getElement().setAttribute("webkitdirectory", "");
 			fileUploadInput.getElement().<InputElement>cast().click();
+		});
+		
+		chooseSingleFileBtn.addClickHandler(event -> {
+			fileUploadInput.getElement().removeAttribute("multiple");
+			fileUploadInput.getElement().<InputElement>cast().click();	
 		});
 		
 		fileInputPanel.add(fileUploadInput);
@@ -554,6 +564,7 @@ public class UploaderViewImpl extends FlowPanel implements
 		dropText.addStyleName("margin-right-5 font-size-20 movedown-2");
 		fileInputPanel.add(dropText);
 		fileInputPanel.add(chooseFileButtonGroup);
+		fileInputPanel.add(chooseSingleFileBtn);
 		fileInputPanel.add(fileUploadLabel);
 		enableMultipleFileUploads(true);
 		formFieldsPanel = new FlowPanel();
