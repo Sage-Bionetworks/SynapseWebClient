@@ -20,7 +20,7 @@ public class HSTSFilter implements Filter {
 	
 	public static final String MAX_AGE = "max-age=";
 	public static final String STRICT_TRANSPORT_SECURITY = "Strict-Transport-Security";
-	public static final long MAX_AGE_SECONDS=60*60*24;  //a day
+	public static final long MAX_AGE_SECONDS=31536000;  //a year
 	
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain filterChain) throws IOException, ServletException {
