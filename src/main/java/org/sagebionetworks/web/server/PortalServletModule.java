@@ -30,7 +30,9 @@ import org.sagebionetworks.web.server.servlet.SubscriptionClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
+import org.sagebionetworks.web.server.servlet.filter.DigitalHealthFilter;
 import org.sagebionetworks.web.server.servlet.filter.DreamFilter;
+import org.sagebionetworks.web.server.servlet.filter.MHealthFilter;
 import org.sagebionetworks.web.server.servlet.filter.PlacesRedirectFilter;
 import org.sagebionetworks.web.server.servlet.filter.RPCValidationFilter;
 import org.sagebionetworks.web.server.servlet.filter.RegisterAccountFilter;
@@ -68,6 +70,11 @@ public class PortalServletModule extends ServletModule {
 		
 		bind(DreamFilter.class).in(Singleton.class);
 		filter("/dream").through(DreamFilter.class);
+		
+		bind(DigitalHealthFilter.class).in(Singleton.class);
+		filter("/digitalhealth").through(DigitalHealthFilter.class);
+		bind(MHealthFilter.class).in(Singleton.class);
+		filter("/mHealth").through(MHealthFilter.class);
 		
 		bind(RegisterAccountFilter.class).in(Singleton.class);
 		filter("/" + RegisterAccountFilter.URL_PATH).through(RegisterAccountFilter.class);
