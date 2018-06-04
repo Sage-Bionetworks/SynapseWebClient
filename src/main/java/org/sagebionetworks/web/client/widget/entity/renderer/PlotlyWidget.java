@@ -4,9 +4,7 @@ import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_JS;
 import static org.sagebionetworks.web.client.ClientProperties.PLOTLY_REACT_JS;
 import static org.sagebionetworks.web.client.place.Synapse.EntityArea.TABLES;
 import static org.sagebionetworks.web.client.widget.entity.tabs.TablesTab.TABLE_QUERY_PREFIX;
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_COUNT;
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_RESULTS;
-import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.BUNDLE_MASK_QUERY_SELECT_COLUMNS;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
 import static org.sagebionetworks.web.shared.WidgetConstants.FILL_COLUMN_NAME;
 import static org.sagebionetworks.web.shared.WidgetConstants.IS_HORIZONTAL;
@@ -50,6 +48,7 @@ import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -73,13 +72,16 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	Query query;
 	Long currentOffset;
 	QueryBundleRequest qbr;
-	public static final Long LIMIT = 150L;
+	public static final Long DEFAULT_LIMIT = 150L;
 	Map<String, List<String>> graphData;
 	String xAxisColumnName, fillColumnName;
 	private ResourceLoader resourceLoader;
 	QueryTokenProvider queryTokenProvider;
 	public static final String X_AXIS_CATEGORY_TYPE = "category";
+	public static final Long DEFAULT_PART_MASK = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_MAX_ROWS_PER_PAGE;
 	boolean showLegend, isHorizontal;
+	long limit, partMask;
+	List<SelectColumn> selectColumns;
 	
 	@Inject
 	public PlotlyWidget(PlotlyWidgetView view,
@@ -132,10 +134,9 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		query = new Query();
 		query.setSql(sql);
 		query.setIsConsistent(false);
-		query.setLimit(LIMIT);
-		
+		limit = DEFAULT_LIMIT;
+		partMask = DEFAULT_PART_MASK;
 		qbr = new QueryBundleRequest();
-		qbr.setPartMask(BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_COUNT);
 		qbr.setQuery(query);
 		qbr.setEntityId(QueryBundleUtils.getTableId(query));
 		
@@ -152,11 +153,13 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	}
 	
 	public void getMoreResults() {
-		if (currentOffset > 0) {
+		if (currentOffset > 0 && !DEFAULT_LIMIT.equals(currentOffset)) {
 			view.setLoadingMessage("Loaded " + currentOffset+" rows. ");	
 		}
 		// run the job
+		query.setLimit(limit);
 		query.setOffset(currentOffset);
+		qbr.setPartMask(partMask);
 		jobTracker.startAndTrack(AsynchType.TableQuery, qbr, AsynchronousProgressWidget.WAIT_MS, new UpdatingAsynchProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
@@ -177,13 +180,19 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
 				QueryResultBundle result = (QueryResultBundle) response;
-				if (graphData == null) {
-					initializeGraphData(result);
-				}
+				currentOffset += limit;
 				List<Row> rows = result.getQueryResult().getQueryResults().getRows();
-				addRowData(result.getSelectColumns(), rows);
-				currentOffset += LIMIT;
-				if (rows.size() > 0 && currentOffset < result.getQueryCount()) {
+				// max number of rows returned, look for more data.
+				boolean isMore = rows.size() == limit;
+				if (graphData == null) {
+					selectColumns = result.getSelectColumns();
+					initializeGraphData(result);
+					limit = result.getMaxRowsPerPage();
+				}
+				
+				addRowData(selectColumns, rows);
+				partMask = BUNDLE_MASK_QUERY_RESULTS;
+				if (isMore) {
 					//get more results
 					getMoreResults();
 				} else {

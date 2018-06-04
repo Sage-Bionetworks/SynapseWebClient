@@ -14,7 +14,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.ClientProperties.*;
-import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.LIMIT;
+import static org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidget.*;
 import static org.sagebionetworks.web.shared.WidgetConstants.BAR_MODE;
 import static org.sagebionetworks.web.shared.WidgetConstants.*;
 import static org.sagebionetworks.web.shared.WidgetConstants.TABLE_QUERY_KEY;
@@ -22,6 +22,7 @@ import static org.sagebionetworks.web.shared.WidgetConstants.TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.TYPE;
 import static org.sagebionetworks.web.shared.WidgetConstants.X_AXIS_TITLE;
 import static org.sagebionetworks.web.shared.WidgetConstants.Y_AXIS_TITLE;
+import static org.sagebionetworks.web.client.widget.table.v2.results.TableQueryResultWidget.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -108,7 +109,7 @@ public class PlotlyWidgetTest {
 	public static final String X_COLUMN_NAME = "x";
 	public static final String Y1_COLUMN_NAME = "y1";
 	public static final String Y2_COLUMN_NAME = "y2";
-	
+	public static final Long MAX_ROWS_PER_PAGE = 400L;
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
@@ -125,6 +126,7 @@ public class PlotlyWidgetTest {
 		
 		when(mockQueryResultBundle.getSelectColumns()).thenReturn(selectColumns);
 		when(mockQueryResultBundle.getQueryResult()).thenReturn(mockQueryResult);
+		when(mockQueryResultBundle.getMaxRowsPerPage()).thenReturn(MAX_ROWS_PER_PAGE);
 		when(mockQueryResult.getQueryResults()).thenReturn(mockRowSet);
 		when(mockRowSet.getRows()).thenReturn(rows);
 		when(mockXColumn.getName()).thenReturn(X_COLUMN_NAME);
@@ -176,8 +178,10 @@ public class PlotlyWidgetTest {
 		rowValues.add("row1X");
 		rowValues.add("1.1");
 		rowValues.add("2.2");
-		rows.add(mockRow);
-		when(mockQueryResultBundle.getQueryCount()).thenReturn(LIMIT + 1);
+		// add DEFAULT_LIMIT rows to the result (the max, so the widget will attempt to look for a second page of data).
+		for (int i = 0; i < DEFAULT_LIMIT; i++) {
+			rows.add(mockRow);	
+		}
 		
 		widget.configure(pageKey, params, null, null);
 		
@@ -193,7 +197,7 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		//check query
 		QueryBundleRequest request = queryBundleRequestCaptor.getValue();
-		assertEquals(new Long(BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_COUNT), request.getPartMask());
+		assertEquals(DEFAULT_PART_MASK, request.getPartMask());
 		assertEquals("syn12345", request.getEntityId());
 		assertEquals((Long)0L, request.getQuery().getOffset());
 		assertEquals(sql, request.getQuery().getSql());
@@ -207,11 +211,11 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker, times(2)).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		//verify offset updated
 		request = queryBundleRequestCaptor.getValue();
-		assertEquals(LIMIT, request.getQuery().getOffset());
-		
-		verify(mockView, times(2)).setLoadingMessage(stringCaptor.capture());
-		String loadingMessage = stringCaptor.getValue();
-		assertTrue(loadingMessage.contains(LIMIT.toString()));
+		assertEquals(DEFAULT_LIMIT, request.getQuery().getOffset());
+		assertEquals(new Long(BUNDLE_MASK_QUERY_RESULTS), request.getPartMask());
+		assertEquals(MAX_ROWS_PER_PAGE, request.getQuery().getLimit());
+		//only sets the loading message on the third page (to avoid always showing "Loaded DEFAULT_LIMIT rows" message).
+		verify(mockView).setLoadingMessage("Loading...");
 		
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		verify(mockView).showChart(eq(plotTitle), eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()), anyString(), anyString(), eq(showLegend));
