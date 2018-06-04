@@ -822,8 +822,9 @@ public class SingleDiscussionThreadWidgetTest {
 		boolean isEdited = false;
 		boolean isPinned = false;
 		String messageKey = "messageKey22223";
+		String threadId = "123";
 		
-		DiscussionThreadBundle bundle = DiscussionTestUtils.createThreadBundle("123", "title", Arrays.asList("1"),
+		DiscussionThreadBundle bundle = DiscussionTestUtils.createThreadBundle(threadId, "title", Arrays.asList("1"),
 				1L, 1L, new Date(), messageKey, isDeleted, CREATED_BY, isEdited, isPinned);
 
 		String message = "message";
@@ -834,6 +835,7 @@ public class SingleDiscussionThreadWidgetTest {
 		
 		verifyZeroInteractions(mockSynapseJavascriptClient, mockRequestBuilder);
 		verify(mockMarkdownWidget).configure(message);
+		verify(mockSubscribeButtonWidget).configure(SubscriptionObjectType.THREAD, threadId, mockActionMenuWidget);
 	}
 
 	@Test
