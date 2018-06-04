@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
@@ -87,11 +88,14 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			view.setModifiedCreatedBy(modifiedCreatedBy);
 			tab.setContent(view.asWidget());
 			
-			tableListWidget.setTableClickedCallback(new CallbackP<String>() {
+			tableListWidget.setTableClickedCallback(new CallbackP<EntityHeader>() {
 				@Override
-				public void invoke(String entityId) {
+				public void invoke(EntityHeader entityHeader) {
 					areaToken = null;
-					entitySelectedCallback.invoke(entityId);
+					entitySelectedCallback.invoke(entityHeader.getId());
+					// selected a table/view, show title info immediately
+					tableTitleBar.configure(entityHeader);
+					view.setTitlebarVisible(true);
 				}
 			});
 			initBreadcrumbLinkClickedHandler();

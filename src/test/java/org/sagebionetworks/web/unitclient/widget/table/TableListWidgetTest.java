@@ -57,8 +57,9 @@ public class TableListWidgetTest {
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
-	CallbackP<String> mockTableClickedCallback;
-	
+	CallbackP<EntityHeader> mockTableClickedCallback;
+	@Mock
+	EntityHeader mockEntityHeader;
 	List<EntityHeader> searchResults;
 	
 	
@@ -120,10 +121,10 @@ public class TableListWidgetTest {
 	@Test
 	public void testOnTableClicked() {
 		widget.setTableClickedCallback(mockTableClickedCallback);
-		widget.onTableClicked(ENTITY_ID);
+		widget.onTableClicked(mockEntityHeader);
 		
 		verify(mockView).showLoading();
 		verify(mockView).clearTableWidgets();
-		verify(mockTableClickedCallback).invoke(ENTITY_ID);
+		verify(mockTableClickedCallback).invoke(mockEntityHeader);
 	}
 }
