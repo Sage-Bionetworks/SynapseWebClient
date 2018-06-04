@@ -333,6 +333,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	public void configureMessage() {
 		synAlert.clear();
 		markdownWidget.clear();
+		subscribeButtonWidget.configure(SubscriptionObjectType.THREAD, threadId, actionMenu);
 		//check cache for message
 		if (clientCache.contains(messageKey + WebConstants.MESSAGE_SUFFIX)) {
 			//cache hit
@@ -340,7 +341,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		} else {
 			//cache miss
 			view.setLoadingMessageVisible(true);
-			subscribeButtonWidget.configure(SubscriptionObjectType.THREAD, threadId, actionMenu);
 			jsClient.getThreadUrl(messageKey, new AsyncCallback<String>(){
 
 				@Override
