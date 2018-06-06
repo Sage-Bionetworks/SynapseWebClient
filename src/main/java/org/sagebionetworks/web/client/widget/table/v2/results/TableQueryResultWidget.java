@@ -172,8 +172,12 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 				@Override
 				public void onFailure(Throwable failure) {
 					if (currentJobIndex == jobIndex) {
-						showError(failure);	
-					}
+						if (!startingQuery.getIsConsistent()) {
+							retryConsistentQuery(failure.getMessage());
+						} else {
+							showError(failure);	
+						}
+					}	
 				}
 				
 				@Override
@@ -194,6 +198,16 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			verifyOldEtagIsNotInView(entityId, viewEtag);
 		}
 	}
+	
+	public void retryConsistentQuery(String message) {
+		if (!startingQuery.getIsConsistent()) {
+			// log, but try again with isConsistent = true.
+			synapseAlert.consoleError("Unexpected results when isConsistent=false, retrying with isConsistent=true.  " + message);
+			startingQuery.setIsConsistent(true);
+			runQuery(currentJobIndex);
+		}
+	}
+	
 	/**
 	 * Look for the given etag in the given file view.  If it is still there, wait a few seconds and try again.  
 	 * If the etag is not in the view, then remove the clientCache key and run the query (since this indicates that the user change was propagated to the replicated layer)
@@ -248,6 +262,10 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param bundle
 	 */
 	private void setQueryResults(final QueryResultBundle bundle){
+		if (!startingQuery.getIsConsistent() && bundle.getQueryResult().getQueryResults().getRows().isEmpty()) {
+			retryConsistentQuery("No rows returned.");
+			return;
+		}
 		if (cachedFullQueryResultBundle != null) {
 			bundle.setColumnModels(cachedFullQueryResultBundle.getColumnModels());
 			bundle.setFacets(cachedFullQueryResultBundle.getFacets());
