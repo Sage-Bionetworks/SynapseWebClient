@@ -20,6 +20,9 @@ public class StackEndpointsTest {
 		System.clearProperty(PARAM3);
 		System.clearProperty(PARAM4);
 		System.clearProperty(PARAM5);
+		System.clearProperty(STACK_PROPERTY_NAME);
+		System.clearProperty(STACK_INSTANCE_PROPERTY_NAME);
+		System.clearProperty(STACK_BEANSTALK_NUMBER_PROPERTY_NAME);
 		StackEndpoints.clear();
 	}
 	
@@ -42,6 +45,21 @@ public class StackEndpointsTest {
 		System.setProperty(PARAM5, param5);
 		
 		String endpointPrefix = "https://repo-dev-800-1.dev.sagebase.org";
+		assertEquals(endpointPrefix + FILE_SUFFIX, StackEndpoints.getFileServiceEndpoint());
+		assertEquals(endpointPrefix + AUTH_SUFFIX, StackEndpoints.getAuthenticationServicePublicEndpoint());
+		assertEquals(endpointPrefix + REPO_SUFFIX, StackEndpoints.getRepositoryServiceEndpoint());
+	}
+	
+	@Test
+	public void testEndpointConstructionFromNamedParams() {
+		String stackName = "prod";
+		String instance = "hill";
+		String beanstalkNumber = "2";
+		System.setProperty(STACK_PROPERTY_NAME, stackName);
+		System.setProperty(STACK_INSTANCE_PROPERTY_NAME, instance);
+		System.setProperty(STACK_BEANSTALK_NUMBER_PROPERTY_NAME, beanstalkNumber);
+		
+		String endpointPrefix = "https://repo-prod-hill-2.prod.sagebase.org";
 		assertEquals(endpointPrefix + FILE_SUFFIX, StackEndpoints.getFileServiceEndpoint());
 		assertEquals(endpointPrefix + AUTH_SUFFIX, StackEndpoints.getAuthenticationServicePublicEndpoint());
 		assertEquals(endpointPrefix + REPO_SUFFIX, StackEndpoints.getRepositoryServiceEndpoint());

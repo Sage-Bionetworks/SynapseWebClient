@@ -13,7 +13,8 @@ public class StackEndpoints {
 
 	public static final String STACK_INSTANCE_PROPERTY_NAME = "org.sagebionetworks.stack.instance";
 	public static final String STACK_PROPERTY_NAME = "org.sagebionetworks.stack";
-
+	public static final String STACK_BEANSTALK_NUMBER_PROPERTY_NAME = "org.sagebionetworks.stack.repo.beanstalk.number";
+	
 	public static final String PARAM3 = "PARAM3";
 	public static final String PARAM4 = "PARAM4";
 	public static final String PARAM5 = "PARAM5";
@@ -69,20 +70,23 @@ public class StackEndpoints {
 				endpointPrefix = repoEndpoint.substring(0, repoEndpoint.indexOf("/repo/"));
 			} else {
 				// get stack name, like "prod" or "dev"
-				String stackName = System.getProperty(PARAM3);
+				String stackName = System.getProperty(STACK_PROPERTY_NAME);
 				if (stackName == null) {
-					stackName = System.getProperty(STACK_PROPERTY_NAME);
+					stackName = System.getProperty(PARAM3);
 				}
 				// get stack instance, like "222"
-				String stackInstance = System.getProperty(PARAM4);
+				String stackInstance = System.getProperty(STACK_INSTANCE_PROPERTY_NAME);
 				if (stackInstance == null) {
-					stackInstance = System.getProperty(STACK_INSTANCE_PROPERTY_NAME);
+					stackInstance = System.getProperty(PARAM4);
 				}
 	
 				// get beanstalk number, like "0" or "1"
-				String stack = System.getProperty(PARAM5);
+				String stack = System.getProperty(STACK_BEANSTALK_NUMBER_PROPERTY_NAME);
 				if (stack == null) {
-					stack = "0";
+					stack = System.getProperty(PARAM5);
+					if (stack == null) {
+						stack = "0";
+					}
 				}
 	
 				// put it all together.  like https://repo-prod-222-0.prod.sagebase.org
