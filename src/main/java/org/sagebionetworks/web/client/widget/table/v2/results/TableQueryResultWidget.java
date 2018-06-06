@@ -11,7 +11,10 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
+import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -262,7 +265,11 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param bundle
 	 */
 	private void setQueryResults(final QueryResultBundle bundle){
-		if (!startingQuery.getIsConsistent() && bundle.getQueryResult().getQueryResults().getRows().isEmpty()) {
+		QueryResult result = bundle.getQueryResult();
+		RowSet rowSet = result.getQueryResults();
+		List<Row> rows = rowSet.getRows();
+		
+		if (!startingQuery.getIsConsistent() && rows.isEmpty()) {
 			retryConsistentQuery("No rows returned.");
 			return;
 		}
