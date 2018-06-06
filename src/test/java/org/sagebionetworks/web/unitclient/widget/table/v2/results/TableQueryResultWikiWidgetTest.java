@@ -1,15 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.results;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
-import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.atLeastOnce;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.Assert.*;
+import static org.mockito.Matchers.*;
+import static org.mockito.Mockito.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -104,6 +97,7 @@ public class TableQueryResultWikiWidgetTest {
 		assertEquals(sql, query.getSql());
 		assertEquals((Long)TableEntityWidget.DEFAULT_LIMIT, query.getLimit());
 		assertEquals((Long)TableEntityWidget.DEFAULT_OFFSET, query.getOffset());
+		assertFalse(query.getIsConsistent());
 		
 		boolean isCurrentVersion = true;
 		String wikiPageRootId = null;
