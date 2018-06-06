@@ -40,7 +40,7 @@ import com.google.inject.Inject;
 public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
 	public static final int ETAG_CHECK_DELAY_MS = 5000;
 	public static final String VERIFYING_ETAG_MESSAGE = "Verifying that the recent changes have propagated through the system...";
-	public static final String RUNNING_QUERY_MESSAGE = "Running query...";
+	public static final String RUNNING_QUERY_MESSAGE = ""; // while running, just show loading spinner (and cancel)
 	public static final String QUERY_CANCELED = "Query canceled";
 	/**
 	 * Masks for requesting what should be included in the query bundle.
