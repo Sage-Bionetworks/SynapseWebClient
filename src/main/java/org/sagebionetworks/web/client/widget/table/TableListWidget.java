@@ -32,7 +32,7 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	private SynapseJavascriptClient jsClient;
 	private EntityChildrenRequest query;
 	private EntityBundle parentBundle;
-	private CallbackP<String> onTableClickCallback;
+	private CallbackP<EntityHeader> onTableClickCallback;
 	private LoadMoreWidgetContainer loadMoreWidget;
 	private SynapseAlert synAlert;
 	public static final SortBy DEFAULT_SORT_BY = SortBy.CREATED_ON;
@@ -138,16 +138,16 @@ public class TableListWidget implements TableListWidgetView.Presenter, IsWidget 
 	 * Invokes callback when a table entity is clicked in the table list. 
 	 * @param callback
 	 */
-	public void setTableClickedCallback(CallbackP<String> callback) {
+	public void setTableClickedCallback(CallbackP<EntityHeader> callback) {
 		this.onTableClickCallback = callback;
 	}
 	
 	@Override
-	public void onTableClicked(String entityId) {
+	public void onTableClicked(EntityHeader entityHeader) {
 		if (onTableClickCallback != null) {
 			view.showLoading();
 			view.clearTableWidgets();
-			onTableClickCallback.invoke(entityId);
+			onTableClickCallback.invoke(entityHeader);
 		}
 	}
 	

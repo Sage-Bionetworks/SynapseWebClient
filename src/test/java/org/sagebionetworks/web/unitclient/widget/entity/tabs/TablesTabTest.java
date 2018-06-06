@@ -25,6 +25,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Project;
@@ -102,7 +103,8 @@ public class TablesTabTest {
 	ModifiedCreatedByWidget mockModifiedCreatedBy;
 	@Captor
 	ArgumentCaptor<CallbackP> callbackPCaptor;
-
+	@Mock
+	EntityHeader mockEntityHeader;
 	String projectEntityId = "syn666666";
 	String projectName = "a test project";
 	String tableEntityId = "syn22";
@@ -170,8 +172,9 @@ public class TablesTabTest {
 	public void testClickTable() {
 		//verify that clicking on an item in the tables list sends the event back to the entity page top (to get the new target entity)
 		String newEntityId = "syn9839838";
+		when(mockEntityHeader.getId()).thenReturn(newEntityId);
 		verify(mockTableListWidget).setTableClickedCallback(callbackPCaptor.capture());
-		callbackPCaptor.getValue().invoke(newEntityId);
+		callbackPCaptor.getValue().invoke(mockEntityHeader);
 		verify(mockEntitySelectedCallback).invoke(newEntityId);
 	}
 

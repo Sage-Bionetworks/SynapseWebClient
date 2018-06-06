@@ -59,7 +59,7 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 		tablesList.add(new TableEntityListGroupItem(HeadingSize.H4, header, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				presenter.onTableClicked(header.getId());
+				presenter.onTableClicked(header);
 			}
 		}));
 	}
