@@ -232,6 +232,7 @@ public class FilesTabTest {
 		//show project info
 		verify(mockView, times(2)).clearActionMenuContainer();
 		verify(mockView, times(2)).setProvenanceVisible(false);
+		verify(mockView).clearRefreshAlert();
 		verify(mockModifiedCreatedBy).configure(any(Date.class), anyString(), any(Date.class), anyString());
 		verify(mockView).setFileBrowserVisible(true);
 		verify(mockFilesBrowser).configure(projectEntityId);
@@ -244,7 +245,7 @@ public class FilesTabTest {
 		assertEquals(EntityArea.FILES, place.getArea());
 		assertNull(place.getAreaToken());
 		
-		verify(mockRefreshAlert, never()).configure(anyString(), any(ObjectType.class));
+		verify(mockRefreshAlert).configure(anyString(), any(ObjectType.class));
 
 		verify(mockView, atLeastOnce()).setDiscussionThreadListWidgetVisible(false);
 	}
@@ -405,6 +406,7 @@ public class FilesTabTest {
 		verify(mockView).setProvenanceVisible(false);
 		verify(mockModifiedCreatedBy).setVisible(false);
 		verify(mockView).setDiscussionThreadListWidgetVisible(false);
+		verify(mockView).clearRefreshAlert();
 	}
 	
 	@Test
