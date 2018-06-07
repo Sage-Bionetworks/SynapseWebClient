@@ -60,11 +60,17 @@ import com.google.gwt.user.client.ui.Widget;
 
 public class TableQueryResultWidgetTest {
 	
+	@Mock
 	TablePageWidget mockPageWidget;
+	@Mock
 	QueryResultsListener mockListner;
+	@Mock
 	TableQueryResultView mockView;
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	QueryResultEditorWidget mockQueryResultEditor;
+	@Mock
 	PortalGinInjector mockGinInjector;
 	TableQueryResultWidget widget;
 	Query query;
@@ -75,6 +81,7 @@ public class TableQueryResultWidgetTest {
 	RowSet rowSet;
 	QueryResult results;
 	SelectColumn select;
+	@Mock
 	SynapseAlert mockSynapseAlert;
 	TableType tableType;
 	@Captor
@@ -112,19 +119,13 @@ public class TableQueryResultWidgetTest {
 	@Before
 	public void before(){
 		MockitoAnnotations.initMocks(this);
-		mockListner = Mockito.mock(QueryResultsListener.class);
-		mockView = Mockito.mock(TableQueryResultView.class);
-		mockPageWidget = Mockito.mock(TablePageWidget.class);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockGinInjector = Mockito.mock(PortalGinInjector.class);
-		mockQueryResultEditor = Mockito.mock(QueryResultEditorWidget.class);
-		mockSynapseAlert = Mockito.mock(SynapseAlert.class);
 		when(mockGinInjector.creatNewAsynchronousProgressWidget()).thenReturn(mockJobTrackingWidget, mockJobTrackingWidget2);
 		when(mockGinInjector.createNewTablePageWidget()).thenReturn(mockPageWidget);
 		when(mockGinInjector.createNewQueryResultEditorWidget()).thenReturn(mockQueryResultEditor);
 		widget = new TableQueryResultWidget(mockView, mockSynapseClient, mockGinInjector, mockSynapseAlert, mockClientCache, mockGWT);
 		query = new Query();
 		query.setSql("select * from " + ENTITY_ID);
+		query.setIsConsistent(true);
 		row = new Row();
 		row.setRowId(123L);
 		select = new SelectColumn();
@@ -142,6 +143,7 @@ public class TableQueryResultWidgetTest {
 		bundle.setColumnModels(Collections.singletonList(mockColumnModel));
 		bundle.setSelectColumns(Collections.singletonList(mockSelectColumn));
 		
+		when(mockNewPageQueryResultBundle.getQueryResult()).thenReturn(results);
 		sortList = new ArrayList<SortItem>();
 		SortItem sort = new SortItem();
 		sort.setColumn("a");
@@ -283,6 +285,42 @@ public class TableQueryResultWidgetTest {
 		verify(mockPageWidget).setTableVisible(true);
 		verify(mockListner).queryExecutionFinished(true, true);
 		verify(mockView).setProgressWidgetVisible(false);	
+	}
+	
+	@Test
+	public void testConfigureEmptyResultsIsConsistentFalse(){
+		//no rows are returned, and isConsistent is false.  Verify it retries query in this case.
+		boolean isEditable = false;
+		tableType = TableType.fileview;
+		query.setIsConsistent(false);
+		rowSet.setRows(Collections.EMPTY_LIST);
+		
+		widget.configure(query, isEditable, tableType, mockListner);
+		
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
+		asyncProgressHandlerCaptor.getValue().onComplete(bundle);
+		
+		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), any(AsynchronousProgressHandler.class));
+		//verify isConsistent has been flipped to true due to the empty result
+		assertTrue(query.getIsConsistent());
+	}
+	
+	@Test
+	public void testConfigureErrorIsConsistentFalse(){
+		boolean isEditable = true;
+		// Make the call that changes it all.
+		widget.configure(query, isEditable, tableType, mockListner);
+		query.setIsConsistent(false);
+		
+		// Setup a failure
+		UnauthorizedException error = new UnauthorizedException("Failed!!");
+		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
+		// invoke the error
+		asyncProgressHandlerCaptor.getValue().onFailure(error);
+		
+		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), any(AsynchronousProgressHandler.class));
+		//verify isConsistent has been flipped to true due to the empty result
+		assertTrue(query.getIsConsistent());
 	}
 	
 	@Test

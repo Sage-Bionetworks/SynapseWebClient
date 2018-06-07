@@ -11,7 +11,10 @@ import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.QueryBundleRequest;
+import org.sagebionetworks.repo.model.table.QueryResult;
 import org.sagebionetworks.repo.model.table.QueryResultBundle;
+import org.sagebionetworks.repo.model.table.Row;
+import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.repo.model.table.SortItem;
 import org.sagebionetworks.web.client.GWTWrapper;
@@ -40,7 +43,7 @@ import com.google.inject.Inject;
 public class TableQueryResultWidget implements TableQueryResultView.Presenter, IsWidget, PagingAndSortingListener {
 	public static final int ETAG_CHECK_DELAY_MS = 5000;
 	public static final String VERIFYING_ETAG_MESSAGE = "Verifying that the recent changes have propagated through the system...";
-	public static final String RUNNING_QUERY_MESSAGE = "Running query...";
+	public static final String RUNNING_QUERY_MESSAGE = ""; // while running, just show loading spinner (and cancel)
 	public static final String QUERY_CANCELED = "Query canceled";
 	/**
 	 * Masks for requesting what should be included in the query bundle.
@@ -172,8 +175,12 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 				@Override
 				public void onFailure(Throwable failure) {
 					if (currentJobIndex == jobIndex) {
-						showError(failure);	
-					}
+						if (!startingQuery.getIsConsistent()) {
+							retryConsistentQuery(failure.getMessage());
+						} else {
+							showError(failure);	
+						}
+					}	
 				}
 				
 				@Override
@@ -194,6 +201,16 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			verifyOldEtagIsNotInView(entityId, viewEtag);
 		}
 	}
+	
+	public void retryConsistentQuery(String message) {
+		if (!startingQuery.getIsConsistent()) {
+			// log, but try again with isConsistent = true.
+			synapseAlert.consoleError("Unexpected results when isConsistent=false, retrying with isConsistent=true.  " + message);
+			startingQuery.setIsConsistent(true);
+			runQuery(currentJobIndex);
+		}
+	}
+	
 	/**
 	 * Look for the given etag in the given file view.  If it is still there, wait a few seconds and try again.  
 	 * If the etag is not in the view, then remove the clientCache key and run the query (since this indicates that the user change was propagated to the replicated layer)
@@ -248,6 +265,14 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	 * @param bundle
 	 */
 	private void setQueryResults(final QueryResultBundle bundle){
+		QueryResult result = bundle.getQueryResult();
+		RowSet rowSet = result.getQueryResults();
+		List<Row> rows = rowSet.getRows();
+		
+		if (!startingQuery.getIsConsistent() && rows.isEmpty()) {
+			retryConsistentQuery("No rows returned.");
+			return;
+		}
 		if (cachedFullQueryResultBundle != null) {
 			bundle.setColumnModels(cachedFullQueryResultBundle.getColumnModels());
 			bundle.setFacets(cachedFullQueryResultBundle.getFacets());

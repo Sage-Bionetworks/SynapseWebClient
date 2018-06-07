@@ -24,7 +24,7 @@ public class AsynchronousProgressWidget implements
 	/**
 	 * The number of milliseconds to wait between status checks.
 	 */
-	public static final int WAIT_MS = 1000;
+	public static final int WAIT_MS = 500;
 
 	private AsynchronousProgressView view;
 	private NumberFormatProvider numberFormatProvider;
