@@ -209,6 +209,7 @@
 					<sourceLevel>auto</sourceLevel>
 					<extraJvmArgs>-Xmx2048m -Xms2048m</extraJvmArgs>
 					<fragmentCount>1</fragmentCount>
+					<gwt-plugin.localWorkers>1</gwt-plugin.localWorkers>
 					<disableCastChecking>true</disableCastChecking>
 					<disableClassMetaData>true</disableClassMetaData>
 				</configuration>
