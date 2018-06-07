@@ -207,7 +207,7 @@
 					<!-- <compilerMetrics>true</compilerMetrics> -->
 					<logLevel>INFO</logLevel>
 					<sourceLevel>auto</sourceLevel>
-					<extraJvmArgs>-Xmx2048m -Xms2048m</extraJvmArgs>
+					<extraJvmArgs>-Xmx2048m -Xms2048m -XX:MaxDirectMemorySize=256m</extraJvmArgs>
 					<fragmentCount>1</fragmentCount>
 					<disableCastChecking>true</disableCastChecking>
 					<disableClassMetaData>true</disableClassMetaData>
