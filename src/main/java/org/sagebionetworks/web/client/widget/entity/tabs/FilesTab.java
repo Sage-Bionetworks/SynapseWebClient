@@ -145,6 +145,7 @@ public class FilesTab {
 			view.setWikiPageWidgetVisible(false);
 			view.setFileBrowserVisible(false);
 			view.clearActionMenuContainer();
+			view.clearRefreshAlert();
 			breadcrumb.clear();
 			view.setProvenanceVisible(false);
 			modifiedCreatedBy.setVisible(false);
@@ -213,14 +214,15 @@ public class FilesTab {
 		boolean isFile = currentEntity instanceof FileEntity;
 		boolean isFolder = currentEntity instanceof Folder;
 		boolean isProject = currentEntity instanceof Project;
+
+		RefreshAlert refreshAlert = ginInjector.getRefreshAlert();
+		view.setRefreshAlert(refreshAlert.asWidget());
+		refreshAlert.configure(currentEntity.getId(), ObjectType.ENTITY);
 		
 		if (!(isFile || isFolder)) {
 			//configure based on the project bundle
 			showProjectLevelUI();
 		} else {
-			RefreshAlert refreshAlert = ginInjector.getRefreshAlert();
-			view.setRefreshAlert(refreshAlert.asWidget());
-			refreshAlert.configure(currentEntity.getId(), ObjectType.ENTITY);
 			breadcrumb.configure(bundle.getPath(), EntityArea.FILES);
 		}
 		

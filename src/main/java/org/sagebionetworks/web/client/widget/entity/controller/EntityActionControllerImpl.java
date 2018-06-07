@@ -1439,11 +1439,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				view.showInfo(DELETED, THE + enityTypeDisplay + WAS_SUCCESSFULLY_DELETED); 
 				// Go to entity's parent
 				Place gotoPlace = createDeletePlace();
-				if (gotoPlace instanceof Synapse) {
-					view.setPlace((Synapse)gotoPlace);
-				} else {
-					getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
-				}
+				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
 			}
 			
 			@Override
