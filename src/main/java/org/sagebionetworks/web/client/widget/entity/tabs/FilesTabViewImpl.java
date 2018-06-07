@@ -231,6 +231,10 @@ public class FilesTabViewImpl implements FilesTabView {
 	public void setRefreshAlert(Widget w) {
 		refreshAlertContainer.setWidget(w);
 	};
+	@Override
+	public void clearRefreshAlert() {
+		refreshAlertContainer.clear();
+	}
 
 	@Override
 	public void setDiscussionThreadListWidget(Widget widget){

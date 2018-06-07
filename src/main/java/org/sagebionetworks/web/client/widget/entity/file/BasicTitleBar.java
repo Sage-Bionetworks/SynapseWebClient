@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
+import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -37,6 +39,15 @@ public class BasicTitleBar implements BasicTitleBarView.Presenter, SynapseWidget
 		view.setTitle(bundle.getEntity().getName());
 		view.setIconType(EntityTypeUtils.getIconTypeForEntity(bundle.getEntity()));
 		view.setContainerHelpWidgetVisible(bundle.getEntity() instanceof Folder);
+	}
+	
+	public void configure(EntityHeader entityHeader) {
+		containerDownloadHelp.configure(entityHeader.getId());
+		favWidget.configure(entityHeader.getId());
+		view.setFavoritesWidgetVisible(authenticationController.isLoggedIn());
+		view.setTitle(entityHeader.getName());
+		view.setIconType(EntityTypeUtils.getIconTypeForEntityClassName(entityHeader.getType()));
+		view.setContainerHelpWidgetVisible(Folder.class.getName().equals(entityHeader.getType()));
 	}
 	
 	public void clearState() {

@@ -7,13 +7,11 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import org.gwtbootstrap3.extras.bootbox.client.callback.PromptCallback;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -80,12 +78,6 @@ public class EntityActionControllerViewImpl implements
 			callback.callback(promptModalView.getValue());
 		});
 		promptModalView.show();
-	}
-	
-	@Override
-	public void setPlace(Synapse place) {
-		Window.Location.assign("#!Synapse:" + place.toToken());
-		Window.Location.reload();
 	}
 	
 	@Override
