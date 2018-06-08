@@ -5,7 +5,9 @@ import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.D
 import static org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget.DEFAULT_OFFSET;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.table.FacetColumnRequest;
@@ -71,6 +73,8 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 	int currentJobIndex = 0;
 	QueryResultBundle cachedFullQueryResultBundle = null;
 	boolean facetsVisible = true;
+	public static final Map<String, List<SortItem>> SQL_2_SORT_ITEMS_CACHE = new HashMap<>();
+	
 	@Inject
 	public TableQueryResultWidget(TableQueryResultView view, 
 			SynapseClientAsync synapseClient, 
@@ -256,20 +260,24 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 			cachedFullQueryResultBundle = bundle;
 		}
 		
-		// Get the sort info
-		this.synapseClient.getSortFromTableQuery(this.startingQuery.getSql(), new AsyncCallback<List<SortItem>>() {
-			
-			@Override
-			public void onSuccess(List<SortItem> sortItems) {
-				setQueryResultsAndSort(bundle, sortItems);
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				showError(caught);
-			}
-		});
-
+		if (SQL_2_SORT_ITEMS_CACHE.containsKey(this.startingQuery.getSql())) {
+			setQueryResultsAndSort(bundle, SQL_2_SORT_ITEMS_CACHE.get(this.startingQuery.getSql()));
+		} else  {
+			// Get the sort info
+			this.synapseClient.getSortFromTableQuery(this.startingQuery.getSql(), new AsyncCallback<List<SortItem>>() {
+				
+				@Override
+				public void onSuccess(List<SortItem> sortItems) {
+					SQL_2_SORT_ITEMS_CACHE.put(startingQuery.getSql(), sortItems);
+					setQueryResultsAndSort(bundle, sortItems);
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					showError(caught);
+				}
+			});
+		}
 	}
 	
 	private void setQueryResultsAndSort(QueryResultBundle bundle, List<SortItem> sortItems){
