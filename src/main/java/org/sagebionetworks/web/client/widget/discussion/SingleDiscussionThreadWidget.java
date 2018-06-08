@@ -48,7 +48,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	public static final String UNPIN_THREAD_ACTION_TEXT = "Unpin Thread";
 	private static final DiscussionReplyOrder DEFAULT_ORDER = DiscussionReplyOrder.CREATED_ON;
 	public static final Boolean DEFAULT_ASCENDING = true;
-	public static final Long LIMIT = 5L;
+	public static final Long LIMIT = 30L;
 	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
 
 	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";

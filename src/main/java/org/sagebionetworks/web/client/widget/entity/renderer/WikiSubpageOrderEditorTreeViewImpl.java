@@ -140,8 +140,10 @@ public class WikiSubpageOrderEditorTreeViewImpl extends FlowPanel implements Wik
 		l.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				event.preventDefault();
-				presenter.selectTreeItem(node);
+				if (!event.isMetaKeyDown()) {
+					event.preventDefault();
+					presenter.selectTreeItem(node);
+				}
 			}
 		});
 		return l;

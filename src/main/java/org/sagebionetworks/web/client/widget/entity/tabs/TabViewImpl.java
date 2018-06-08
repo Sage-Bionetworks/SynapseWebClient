@@ -46,8 +46,10 @@ public class TabViewImpl implements TabView {
 		tabClickedHandler = new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				event.preventDefault();
-				presenter.onTabClicked();
+				if (!event.isMetaKeyDown()) {
+					event.preventDefault();
+					presenter.onTabClicked();
+				}
 			}
 		};
 	}

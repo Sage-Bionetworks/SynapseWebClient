@@ -35,10 +35,12 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	public static final String ENTITY_ID_ATTRIBUTE = "data-entity-id";
 	public static PlaceChanger placeChanger = null;
 	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
-		event.preventDefault();
-		Widget panel = (Widget)event.getSource();
-		String entityId = panel.getElement().getAttribute(ENTITY_ID_ATTRIBUTE);
-		placeChanger.goTo(new Synapse(entityId));
+		if (!event.isMetaKeyDown()) {
+			event.preventDefault();
+			Widget panel = (Widget)event.getSource();
+			String entityId = panel.getElement().getAttribute(ENTITY_ID_ATTRIBUTE);
+			placeChanger.goTo(new Synapse(entityId));
+		}
 	};
 	HandlerRegistration handlerRegistration;
 	
@@ -73,8 +75,10 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	public void setClickHandler(ClickHandler clickHandler) {
 		handlerRegistration.removeHandler();
 		handlerRegistration = entityLink.addClickHandler(event -> {
-			event.preventDefault();
-			clickHandler.onClick(event);
+			if (!event.isMetaKeyDown()) {
+				event.preventDefault();
+				clickHandler.onClick(event);
+			}
 		});
 	}
 	

@@ -35,10 +35,12 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	public static PlaceChanger placeChanger = null;
 	public static final String TEAM_ID_ATTRIBUTE = "data-team-id";
 	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
-		event.preventDefault();
-		Widget panel = (Widget)event.getSource();
-		String teamId = panel.getElement().getAttribute(TEAM_ID_ATTRIBUTE);
-		placeChanger.goTo(new org.sagebionetworks.web.client.place.Team(teamId));
+		if (!event.isMetaKeyDown()) {
+			event.preventDefault();
+			Widget panel = (Widget)event.getSource();
+			String teamId = panel.getElement().getAttribute(TEAM_ID_ATTRIBUTE);
+			placeChanger.goTo(new org.sagebionetworks.web.client.place.Team(teamId));
+		}
 	};
 	
 	@Inject
@@ -65,8 +67,10 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			anchor.addClickHandler(STANDARD_CLICKHANDLER);
 		} else {
 			anchor.addClickHandler(event -> {
-				event.preventDefault();
-				customClickHandler.onClick(event);
+				if (!event.isMetaKeyDown()) {
+					event.preventDefault();
+					customClickHandler.onClick(event);
+				}
 			});
 		}
 		notificationsPanel.clear();

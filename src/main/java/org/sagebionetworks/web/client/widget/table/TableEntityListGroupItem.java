@@ -45,8 +45,10 @@ public class TableEntityListGroupItem extends ListGroupItem {
 		anchor.setHref("#!Synapse:"+header.getId());
 		anchor.setText(header.getName());
 		anchor.addClickHandler(event -> {
-			event.preventDefault();
-			clickHandler.onClick(event);
+			if (!event.isMetaKeyDown()) {
+				event.preventDefault();
+				clickHandler.onClick(event);
+			}
 		});
 		heading.add(anchor);
 		heading.addStyleName("displayInline");

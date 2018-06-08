@@ -22,10 +22,12 @@ public class ChallengeBadgeViewImpl implements ChallengeBadgeView {
 	public static PlaceChanger placeChanger;
 	public static final String CHALLENGE_PROJECT_ID = "data-challenge-project-id";
 	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
-		event.preventDefault();
-		Widget panel = (Widget)event.getSource();
-		String projectId = panel.getElement().getAttribute(CHALLENGE_PROJECT_ID);
-		placeChanger.goTo(new Synapse(projectId));
+		if (!event.isMetaKeyDown()) {
+			event.preventDefault();
+			Widget panel = (Widget)event.getSource();
+			String projectId = panel.getElement().getAttribute(CHALLENGE_PROJECT_ID);
+			placeChanger.goTo(new Synapse(projectId));
+		}
 	};
 	
 	
