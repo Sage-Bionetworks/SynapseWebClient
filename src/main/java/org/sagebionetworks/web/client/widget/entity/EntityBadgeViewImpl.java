@@ -70,10 +70,12 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public static final String ENTITY_ID_ATTRIBUTE = "data-entity-id";
 	
 	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
-		event.preventDefault();
-		Widget panel = (Widget)event.getSource();
-		String entityId = panel.getElement().getAttribute(ENTITY_ID_ATTRIBUTE);
-		placeChanger.goTo(new Synapse(entityId));
+		if (!event.isMetaKeyDown()) {
+			event.preventDefault();
+			Widget panel = (Widget)event.getSource();
+			String entityId = panel.getElement().getAttribute(ENTITY_ID_ATTRIBUTE);
+			placeChanger.goTo(new Synapse(entityId));
+		}
 	};
 	
 	@Inject
@@ -146,8 +148,10 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 			clickHandlerRegistration.removeHandler();	
 		}
 		clickHandlerRegistration = entityAnchor.addClickHandler(event -> {
-			event.preventDefault();
-			handler.onClick(event);
+			if (!event.isMetaKeyDown()) {
+				event.preventDefault();
+				handler.onClick(event);
+			}
 		});
 	}
 	

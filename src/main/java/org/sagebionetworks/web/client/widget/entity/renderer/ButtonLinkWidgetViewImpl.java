@@ -27,18 +27,20 @@ public class ButtonLinkWidgetViewImpl extends Div implements ButtonLinkWidgetVie
 	public static EventBus eventBus;
 	
 	public static final ClickHandler BUTTON_LINK_CLICK_HANDLER = event -> {
-		event.preventDefault();
-		Widget panel = (Widget)event.getSource();
-		String href = panel.getElement().getAttribute("href");
-		boolean openInNewWindow = panel.getElement().hasAttribute(ButtonLinkWidget.LINK_OPENS_NEW_WINDOW);
-		if (openInNewWindow) {
-			newWindow(href, "_blank", "");
-		} else {
-			if (href.contains("#!Synapse:")) {
-				Place newPlace = appPlaceHistoryMapper.getPlace(href.substring(href.indexOf('!')));
-				eventBus.fireEvent(new ChangeSynapsePlaceEvent((Synapse)newPlace));
+		if (!event.isMetaKeyDown()) {
+			event.preventDefault();
+			Widget panel = (Widget)event.getSource();
+			String href = panel.getElement().getAttribute("href");
+			boolean openInNewWindow = panel.getElement().hasAttribute(ButtonLinkWidget.LINK_OPENS_NEW_WINDOW);
+			if (openInNewWindow) {
+				newWindow(href, "_blank", "");
 			} else {
-				Window.Location.assign(href);	
+				if (href.contains("#!Synapse:")) {
+					Place newPlace = appPlaceHistoryMapper.getPlace(href.substring(href.indexOf('!')));
+					eventBus.fireEvent(new ChangeSynapsePlaceEvent((Synapse)newPlace));
+				} else {
+					Window.Location.assign(href);	
+				}
 			}
 		}
 	};
