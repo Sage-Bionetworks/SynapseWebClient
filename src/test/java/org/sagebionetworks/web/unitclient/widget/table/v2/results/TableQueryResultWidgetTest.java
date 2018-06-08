@@ -149,7 +149,7 @@ public class TableQueryResultWidgetTest {
 		sort.setColumn("a");
 		sort.setDirection(SortDirection.DESC);
 		sortList.add(sort);
-		AsyncMockStubber.callSuccessWith(Arrays.asList(sort)).when(mockSynapseClient).getSortFromTableQuery(any(String.class),  any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(sortList).when(mockSynapseClient).getSortFromTableQuery(any(String.class),  any(AsyncCallback.class));
 		
 		// delta
 		delta = new PartialRowSet();
@@ -224,20 +224,27 @@ public class TableQueryResultWidgetTest {
 		boolean isEditable = true;
 		widget.configure(query, isEditable, tableType, mockListner);
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
-
+		
 		//verify all parts are initially asked for
 		Long partsMask = qbrCaptor.getValue().getPartMask();
 		Long expectedPartsMask = BUNDLE_MASK_QUERY_RESULTS | BUNDLE_MASK_QUERY_COLUMN_MODELS | BUNDLE_MASK_QUERY_SELECT_COLUMNS | BUNDLE_MASK_QUERY_FACETS;
 		assertEquals(expectedPartsMask, partsMask);
 		
+		// verify the cache is being used:
+		// clear it, then verify the rpc to get SortItems is called only once for this sql (on page change)
+		TableQueryResultWidget.SQL_2_SORT_ITEMS_CACHE.clear();
+		
 		//simulate complete table query async job
 		AsynchronousProgressHandler progressHandler1 = asyncProgressHandlerCaptor.getValue();
 		progressHandler1.onComplete(bundle);
+		verify(mockSynapseClient).getSortFromTableQuery(any(String.class),  any(AsyncCallback.class));
 		
 		// go to the next page
 		Long newOffset = 25L;
 		widget.onPageChange(newOffset);
 		
+		//only called once (on previous page load) because sql was in the sql2SortItems cache
+		verify(mockSynapseClient).getSortFromTableQuery(any(String.class),  any(AsyncCallback.class));
 		verify(mockView).scrollTableIntoView();
 		verify(mockJobTrackingWidget2).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), qbrCaptor.capture(), asyncProgressHandlerCaptor.capture());
 		// verify we are not asking for the cached result values (column models, select columns, facets)
