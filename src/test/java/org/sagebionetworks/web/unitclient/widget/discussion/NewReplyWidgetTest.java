@@ -83,6 +83,7 @@ public class NewReplyWidgetTest {
 		verify(mockView).setReplyTextBoxVisible(false);
 		verify(mockView).setNewReplyContainerVisible(true);
 		verify(mockMarkdownEditor).setMarkdownFocus();
+		verify(mockView).scrollIntoView();
 	}
 
 	@Test
