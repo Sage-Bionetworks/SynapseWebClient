@@ -84,6 +84,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			checkForSavedReply();
 			view.setNewReplyContainerVisible(true);
 			markdownEditor.setMarkdownFocus();
+			view.scrollIntoView();
 		}
 	}
 	

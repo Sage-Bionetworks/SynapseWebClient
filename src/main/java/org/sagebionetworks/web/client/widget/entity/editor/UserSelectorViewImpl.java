@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client.widget.entity.editor;
 
-import org.gwtbootstrap3.client.shared.event.ModalShownEvent;
 import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
@@ -21,11 +20,11 @@ public class UserSelectorViewImpl implements UserSelectorView {
 	@Inject
 	public UserSelectorViewImpl(UserSelectorViewImplUiBinder binder) {
 		w = binder.createAndBindUi(this);
-		modal.addShownHandler(new ModalShownHandler() {
-			@Override
-			public void onShown(ModalShownEvent evt) {
-				presenter.onModalShown();
-			}
+		modal.addShownHandler(event -> {
+			presenter.onModalShown();
+		});
+		modal.addHiddenHandler(event -> {
+			presenter.onModalHidden();
 		});
 	}
 	
