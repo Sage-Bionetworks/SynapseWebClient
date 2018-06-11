@@ -6,12 +6,15 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserGroupHeader;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.editor.UserSelectorView;
 import org.sagebionetworks.web.client.widget.entity.editor.UserTeamSelector;
@@ -40,6 +43,9 @@ public class UserSelectorTest {
 	UserGroupHeader mockUserGroupHeader;
 	@Mock
 	GWTWrapper mockGWT;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
+	
 	public static final String SUGGESTION_ID = "Maythe4thBeWithYou";
 	public static final String USERNAME = "Y0da";
 	
@@ -67,6 +73,8 @@ public class UserSelectorTest {
 	@Test
 	public void testOnSynapseSuggestSelected() {
 		widget.onSynapseSuggestSelected(mockSuggestion);
+		verify(mockGWT).scheduleDeferred(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
 		verify(mockUsernameCallback).invoke(USERNAME);
 		verify(mockView).hide();
 	}
@@ -80,6 +88,8 @@ public class UserSelectorTest {
 		when(mockGWT.getUniqueAliasName(teamName)).thenReturn(teamAlias);
 		widget.onSynapseSuggestSelected(mockSuggestion);
 		
+		verify(mockGWT).scheduleDeferred(callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
 		verify(mockUsernameCallback).invoke(teamAlias);
 		verify(mockView).hide();
 	}

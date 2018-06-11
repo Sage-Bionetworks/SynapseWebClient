@@ -53,22 +53,33 @@ public class UserTeamSelector implements UserSelectorView.Presenter {
 		return view.asWidget();
 	}
 
-	public void onSynapseSuggestSelected(UserGroupSuggestion suggestion) {
-		String userName = suggestion.getHeader().getUserName();
-		if (!suggestion.getHeader().getIsIndividual()) {
-			// team name, convert to team alias
-			userName = gwt.getUniqueAliasName(userName);
-		}
-		aliasCallback.invoke(userName);
-		view.hide();
+	public void onSynapseSuggestSelected(final UserGroupSuggestion suggestion) {
+		// Callback (and hiding the modal) invoked later to disconnect from keyboard event.
+		// If user presses the Enter key, then event used to be propagated to parent component (markdown editor, for example), which could cause an unexpected Enter in the text editor.
+		gwt.scheduleDeferred(() -> {
+			String userName = suggestion.getHeader().getUserName();
+			if (!suggestion.getHeader().getIsIndividual()) {
+				// team name, convert to team alias
+				userName = gwt.getUniqueAliasName(userName);
+			}
+			aliasCallback.invoke(userName);
+			
+			view.hide();	
+		});
 	}
 	
 	@Override
 	public void onModalShown() {
-		suggestBox.setFocus(true);		
+		suggestBox.setFocus(true);
+	}
+	
+	@Override
+	public void onModalHidden() {
+		gwt.restoreWindowPosition();
 	}
 	
 	public void show() {
+		gwt.saveWindowPosition();
 		clear();
 		view.show();
 	}
