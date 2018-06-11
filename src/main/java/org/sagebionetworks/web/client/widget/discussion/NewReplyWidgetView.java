@@ -39,4 +39,5 @@ public interface NewReplyWidgetView {
 	void showErrorMessage(String error);
 
 	void showConfirmDialog(String restoreTitle, String restoreMessage, Callback yesCallback, Callback noCallback);
+	void scrollIntoView();
 }
