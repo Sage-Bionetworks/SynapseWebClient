@@ -86,7 +86,8 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				finishEditingOrderButton.addStyleName("btn btn-default margin-top-10 right");
 				add(finishEditingOrderButton);
 				finishEditingOrderButton.addClickHandler(e -> {
-					presenter.refreshTableOfContents();
+					clear();
+					presenter.refreshWikiHeaderTree();
 				});
 				DisplayUtils.scrollToTop();
 			}

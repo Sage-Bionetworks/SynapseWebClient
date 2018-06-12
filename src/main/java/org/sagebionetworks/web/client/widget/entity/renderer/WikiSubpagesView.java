@@ -33,6 +33,6 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	void setPresenter(Presenter p);
 	
 	public interface Presenter {
-		void refreshTableOfContents();
+		void refreshWikiHeaderTree();
 	}
 }
