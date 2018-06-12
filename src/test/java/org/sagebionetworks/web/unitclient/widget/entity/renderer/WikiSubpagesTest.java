@@ -4,13 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -198,6 +198,7 @@ public class WikiSubpagesTest {
 	@Test
 	public void testConfigureSameEntityViewContainsWikiPageId() throws Exception {
 		widget.configure(new WikiPageKey(entityId, ObjectType.ENTITY.toString(), null), false, null, mockActionMenuWidget);
+		verify(mockView, times(2)).clear();
 		verify(mockSynapseJavascriptClient).getEntityBundle(eq(entityId), anyInt(), any(AsyncCallback.class));		
 		
 		//widget has been configured for this entity id, let's reconfigure with a different page (same entity)
@@ -208,7 +209,8 @@ public class WikiSubpagesTest {
 		
 		//verify using existing tree (since wiki page is in the subpages nav tree)
 		verify(mockView).setPage(wikiPageId);
-		verifyNoMoreInteractions(mockSynapseJavascriptClient);
+		// no additional calls to clear the view
+		verify(mockView, times(2)).clear();
 	}
 
 

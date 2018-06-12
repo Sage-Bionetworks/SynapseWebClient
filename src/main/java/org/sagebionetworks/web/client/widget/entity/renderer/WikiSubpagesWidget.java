@@ -68,7 +68,7 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 			view.setPage(wikiKey.getWikiPageId());
 			view.showSubpages();
 			// SWC-4256: in the background, check to see if the wiki header tree is the same...
-			refreshWikiHeaderTree();
+			refreshRootObject();
 			return;
 		}
 		
@@ -80,6 +80,10 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 		
 		view.clear();
 		view.hideSubpages();
+		refreshRootObject();
+	}
+	
+	public void refreshRootObject() {
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
@@ -87,6 +91,10 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 			jsClient.getEntityBundle(wikiKey.getOwnerObjectId(), mask, new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onSuccess(EntityBundle bundle) {
+					//if the owner object name is different, clear old wiki headers (force reconfigure)
+					if (!bundle.getEntity().getName().equals(ownerObjectName)) {
+						currentWikiHeaders = null;
+					}
 					ownerObjectName = bundle.getEntity().getName();
 					ownerObjectLink = getLinkPlace(bundle.getEntity().getId(), wikiKey.getVersion(), null, isEmbeddedInOwnerPage);
 					canEdit = bundle.getPermissions().getCanEdit();
