@@ -144,7 +144,6 @@ public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter 
 							view.configure(wikiHeaders, ownerObjectName,
 									ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
 							currentWikiHeaders = wikiHeaders;
-							view.setPage(wikiKey.getWikiPageId());
 						}
 						
 						view.setEditOrderButtonVisible(canEdit);
