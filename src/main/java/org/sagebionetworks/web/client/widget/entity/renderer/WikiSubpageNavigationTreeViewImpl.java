@@ -102,7 +102,7 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 				expandClickHandler.onClick(null);
 			}
 			l.addClickHandler(event -> {
-				if (!event.isMetaKeyDown()) {
+				if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 					event.preventDefault();
 					expandClickHandler.onClick(null);
 					presenter.reloadWiki(root);
@@ -113,7 +113,7 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 			}
 		} else {
 			l.addClickHandler(event -> {
-				if (!event.isMetaKeyDown()) {
+				if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 					event.preventDefault();
 					presenter.reloadWiki(root);
 				}

@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.view;
 
+import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
 import org.gwtbootstrap3.client.shared.event.AlertClosedEvent;
 import org.gwtbootstrap3.client.shared.event.AlertClosedHandler;
 import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
@@ -94,19 +96,27 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	//////Tabs
 	@UiField
-	FocusPanel projectsLink;
+	FocusPanel projectsFocusPanel;
+	@UiField
+	Anchor projectsLink;
 	@UiField
 	LIElement projectsListItem;
 	@UiField
-	FocusPanel teamsLink;
+	FocusPanel teamsFocusPanel;
+	@UiField
+	Anchor teamsLink;
 	@UiField
 	LIElement teamsListItem;
 	@UiField
-	FocusPanel settingsLink;
+	FocusPanel settingsFocusPanel;
+	@UiField
+	Anchor settingsLink;
 	@UiField
 	LIElement settingsListItem;
 	@UiField
-	FocusPanel challengesLink;
+	FocusPanel challengesFocusPanel;
+	@UiField
+	Anchor challengesLink;
 	@UiField
 	LIElement challengesListItem;
 	
@@ -554,6 +564,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		if (!isOwner) {
 			setHighlightBoxUser(DisplayUtils.getDisplayName(profile));
 		}
+		updateHrefs(profile.getOwnerId());
 	}
 	
 	@Override
@@ -843,10 +854,23 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	private void initTabs() {
-		projectsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.PROJECTS));
-		teamsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.TEAMS));
-		settingsLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.SETTINGS));
-		challengesLink.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
+		projectsFocusPanel.addClickHandler(getTabClickHandler(Synapse.ProfileArea.PROJECTS));
+		teamsFocusPanel.addClickHandler(getTabClickHandler(Synapse.ProfileArea.TEAMS));
+		settingsFocusPanel.addClickHandler(getTabClickHandler(Synapse.ProfileArea.SETTINGS));
+		challengesFocusPanel.addClickHandler(getTabClickHandler(Synapse.ProfileArea.CHALLENGES));
+		
+		projectsLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
+		teamsLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
+		settingsLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
+		challengesLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
+	}
+	
+	private void updateHrefs(String userId) {
+		String place = "#!Profile:"+userId;
+		projectsLink.setHref(place + "/" + Synapse.ProfileArea.PROJECTS.toString().toLowerCase());
+		teamsLink.setHref(place + "/" + Synapse.ProfileArea.TEAMS.toString().toLowerCase());
+		settingsLink.setHref(place + "/" + Synapse.ProfileArea.SETTINGS.toString().toLowerCase());
+		challengesLink.setHref(place + "/" + Synapse.ProfileArea.CHALLENGES.toString().toLowerCase());
 	}
 	
 	private ClickHandler getTabClickHandler(final Synapse.ProfileArea targetTab) {
