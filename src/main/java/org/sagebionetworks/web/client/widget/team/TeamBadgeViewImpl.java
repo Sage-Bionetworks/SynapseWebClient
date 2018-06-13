@@ -35,7 +35,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	public static PlaceChanger placeChanger = null;
 	public static final String TEAM_ID_ATTRIBUTE = "data-team-id";
 	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
-		if (!event.isMetaKeyDown()) {
+		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 			event.preventDefault();
 			Widget panel = (Widget)event.getSource();
 			String teamId = panel.getElement().getAttribute(TEAM_ID_ATTRIBUTE);
@@ -67,7 +67,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 			anchor.addClickHandler(STANDARD_CLICKHANDLER);
 		} else {
 			anchor.addClickHandler(event -> {
-				if (!event.isMetaKeyDown()) {
+				if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 					event.preventDefault();
 					customClickHandler.onClick(event);
 				}
