@@ -299,22 +299,20 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		return Document.get().getElementById(elementId);
 	};
 	
-	/**
-	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to (progressively by slicing the file) calculate the md5.
-	 */
 	@Override
 	public void getFileMd5(JavaScriptObject blob, MD5Callback md5Callback) {
 		_getFileMd5(blob, md5Callback);
 	}
 
 	/**
-	 * Use CryptoJS to calculate the md5 of part of a file.
+	 * Use CryptoJS to calculate the md5 a file blob (might be the full file, or part of the file).
 	 */
 	private final static native void _getFileMd5(JavaScriptObject file, MD5Callback md5Callback) /*-{
 		$wnd.frOnload = function(e) {
+			console.log("Finished loading file blob to calculate md5.  Calculating md5...");
 			var hash = $wnd.CryptoJS.MD5($wnd.CryptoJS.enc.Latin1.parse(e.target.result));
 			var md5 = hash.toString($wnd.CryptoJS.enc.Hex)
-			console.log("Finished loading file blob to calculate md5");
+			console.log("Finished calculating md5.");
 			// Call instance method setMD5() on md5Callback with the final md5
 			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(md5);
 		};
@@ -323,7 +321,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
 		};
 		var cryptojs = $wnd.CryptoJS;
-		console.log("Loading file blob to calculate md5");
+		console.log("Loading file blob to calculate md5...");
 		var fileReader = new FileReader();
 		fileReader.onload = $wnd.frOnload;
 		fileReader.onerror = $wnd.frOnerror;
@@ -338,10 +336,10 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		_getFileMd5(_getFilePart(blob, currentChunk, chunkSize.doubleValue()), md5Callback);
 	}
 	private final static native JavaScriptObject _getFilePart(JavaScriptObject file, int currentChunk, double chunkSize) /*-{
-		console.log("Slicing file blob to get the md5 of chunk " + currentChunk);
 		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
 		var start = currentChunk * chunkSize,
 	            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+	    console.log("Slicing file blob to get the md5 of part " + currentChunk + "  (chunk size=" + chunkSize+", start="+start+", end="+end+")");
 		return blobSlice.call(file, start, end);
 	}-*/;
 	
