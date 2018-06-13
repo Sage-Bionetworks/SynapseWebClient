@@ -306,7 +306,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		//before finishing, verify that the file checksum has not changed during the upload.
 		synapseJsniUtils.getFileMd5(blob, md5 -> {
 			if (!request.getContentMD5Hex().equals(md5)) {
-				handler.uploadFailed("The file has changed during the upload! The starting md5 of the file (" + request.getContentMD5Hex() + ") differs from the current md5 (" + md5+")");
+				handler.uploadFailed("The file appears to have changed during the upload process.  The starting md5 of the file (" + request.getContentMD5Hex() + ") differs from the current md5 (" + md5+").");
 			} else {
 				completeMultipartUploadAfterMd5Verification();
 			}
