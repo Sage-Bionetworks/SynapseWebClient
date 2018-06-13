@@ -166,11 +166,14 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					}
 				}
 				EntityHeader projectHeader = DisplayUtils.getProjectHeader(bundle.getPath());
-				if(projectHeader == null) view.showErrorMessage(DisplayConstants.ERROR_GENERIC_RELOAD);
-				entityPageTop.configure(bundle.getEntity(), versionNumber, projectHeader, area, areaToken);
-				view.setEntityPageTopWidget(entityPageTop);
-				view.setEntityPageTopVisible(true);
-				headerWidget.configure(false, projectHeader);
+				if(projectHeader == null) {
+					synAlert.showError(DisplayConstants.ERROR_GENERIC_RELOAD);
+				} else {
+					entityPageTop.configure(bundle.getEntity(), versionNumber, projectHeader, area, areaToken);
+					view.setEntityPageTopWidget(entityPageTop);
+					view.setEntityPageTopVisible(true);
+					headerWidget.configure(false, projectHeader);	
+				}
 			}
 			
 			@Override

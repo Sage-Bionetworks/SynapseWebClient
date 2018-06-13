@@ -52,10 +52,6 @@ public class FilesBrowserTest {
 		mockCookies = mock(CookieProvider.class);
 		filesBrowser = new FilesBrowser(mockView,
 				mockGlobalApplicationState, mockAuthenticationController);
-		filesBrowser.configure(configuredEntityId);
-		String newId = "syn456";
-		AsyncMockStubber.callSuccessWith(newId).when(mockSynapseClient).createOrUpdateEntity(any(Entity.class), any(Annotations.class), eq(true), any(AsyncCallback.class));
-		reset(mockView);
 	}
 	
 	@Test

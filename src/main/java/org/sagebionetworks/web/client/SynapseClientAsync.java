@@ -63,9 +63,6 @@ public interface SynapseClientAsync {
 
 	void search(SearchQuery searchQuery, AsyncCallback<SearchResults> callback);
  	
-	void createOrUpdateEntity(Entity entity, Annotations annos,
-			boolean isNew, AsyncCallback<String> callback);
-	
 	void deleteEntityVersionById(String entityId, Long versionNumber, AsyncCallback<Void> callback);
 
 	void updateUserProfile(UserProfile userProfileJson, AsyncCallback<Void> callback);
@@ -128,14 +125,13 @@ public interface SynapseClientAsync {
 	 * TEAMS
 	 */
 	/////////////////
-	void createTeam(String teamName,AsyncCallback<String> callback);
 	void deleteTeam(String teamId,AsyncCallback<Void> callback);
 	void getTeamsBySearch(String searchTerm, Integer limit, Integer offset,
 			AsyncCallback<PaginatedResults<Team>> callback);
 	void getTeamBundle(String userId, String teamId, boolean isLoggedIn, AsyncCallback<TeamBundle> callback);
-	void getOpenRequestCount(String currentUserId, String teamId, AsyncCallback<Long> callback);
 	void getOpenInvitations(String userId, AsyncCallback<ArrayList<OpenUserInvitationBundle>> callback);
 	void getOpenTeamInvitations(String teamId, Integer limit, Integer offset, AsyncCallback<ArrayList<OpenTeamInvitationBundle>> callback);
+	void resendTeamInvitation(String membershipInvitationId, String hostPageBaseURL, AsyncCallback<Void> callback);
 	void getOpenRequests(String teamId, AsyncCallback<List<MembershipRequestBundle>> callback);
 	void updateTeam(Team team, AccessControlList teamAcl, AsyncCallback<Team> callback);
 	void deleteTeamMember(String currentUserId, String targetUserId, String teamId, AsyncCallback<Void> callback);
@@ -268,7 +264,6 @@ public interface SynapseClientAsync {
 	void setIsTeamAdmin(String currentUserId, String targetUserId,
 			String teamId, boolean isTeamAdmin, AsyncCallback<Void> callback);
 
-	void getUserIdFromUsername(String username, AsyncCallback<String> callback);
 	void getUserProfileFromUsername(String username, AsyncCallback<UserProfile> callback);
 
 	void deleteAccessRequirement(Long accessRequirementId, AsyncCallback<Void> callback);

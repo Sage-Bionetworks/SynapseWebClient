@@ -1,7 +1,8 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.widget.HasNotificationUI;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
@@ -21,19 +22,19 @@ public class TeamBadge implements SynapseWidgetPresenter, HasNotificationUI, IsW
 	private Integer maxNameLength;
 	private String teamName;
 	private ClickHandler customClickHandler = null;
-	private SynapseJavascriptClient jsClient;
 	String publicAclPrincipalId, authenticatedAclPrincipalId;
 	public static final String PUBLIC_GROUP_NAME = "Anyone on the web";
 	public static final String AUTHENTICATED_USERS_GROUP_NAME = "All registered Synapse users";
+	SynapseJSNIUtils synapseJsniUtils;
 	
 	@Inject
 	public TeamBadge(TeamBadgeView view, 
 			TeamAsyncHandler teamAsyncHandler,
-			SynapseJavascriptClient jsClient,
-			SynapseProperties synapseProperties) {
+			SynapseProperties synapseProperties,
+			SynapseJSNIUtils synapseJsniUtils) {
 		this.view = view;
 		this.teamAsyncHandler = teamAsyncHandler;
-		this.jsClient = jsClient;
+		this.synapseJsniUtils = synapseJsniUtils;
 		publicAclPrincipalId = synapseProperties.getSynapseProperty(WebConstants.PUBLIC_ACL_PRINCIPAL_ID);
 		authenticatedAclPrincipalId = synapseProperties.getSynapseProperty(WebConstants.AUTHENTICATED_ACL_PRINCIPAL_ID);
 	}
@@ -74,7 +75,7 @@ public class TeamBadge implements SynapseWidgetPresenter, HasNotificationUI, IsW
 	}
 	
 	public void configure(Team team) {
-		String teamIconUrl = jsClient.getTeamIconUrl(team.getId());
+		String teamIconUrl = synapseJsniUtils.getFileHandleAssociationUrl(team.getId(), FileHandleAssociateType.TeamAttachment, team.getIcon());
 		view.setTeam(team, maxNameLength, teamIconUrl, customClickHandler);
 	}
 	

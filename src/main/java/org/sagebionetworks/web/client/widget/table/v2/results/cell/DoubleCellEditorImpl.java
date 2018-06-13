@@ -22,7 +22,7 @@ public class DoubleCellEditorImpl extends AbstractCellEditor implements DoubleCe
 
 	@Override
 	public boolean isValid() {
-		String value = StringUtils.trimWithEmptyAsNull(this.getValue());
+		String value = StringUtils.emptyAsNull(this.getValue());
 		if(value != null){
 			try{
 				// if it parses it is valid.

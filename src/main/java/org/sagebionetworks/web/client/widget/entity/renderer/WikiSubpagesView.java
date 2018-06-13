@@ -30,18 +30,9 @@ public interface WikiSubpagesView extends IsWidget, SynapseView {
 	void setEditOrderButtonVisible(boolean visible);
 	boolean contains(String wikiPageKey);
 	void setPage(String wikiPageKey);
-
-	// List<String> getCurrentOrderHintIdList();
+	void setPresenter(Presenter p);
 	
-	/**
-	 * Presenter interface
-	 */
 	public interface Presenter {
-		void configure(WikiPageKey wikiKey, Callback widgetRefreshRequired,
-				boolean embeddedInOwnerPage,
-				CallbackP<WikiPageKey> reloadWikiPageCallback);
-
-		void setContainers(FlowPanel wikiSubpagesContainer,
-				FlowPanel wikiPageContainer);
+		void refreshWikiHeaderTree();
 	}
 }

@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.shared.EventBus;
@@ -33,6 +32,7 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 	private WikiSubpageNavigationTree navTree;
 	private GlobalApplicationState globalAppState;
 	private EventBus eventBus;
+	private Presenter presenter;
 	
 	@Inject
 	public WikiSubpagesViewImpl(WikiSubpagesOrderEditor orderEditor,
@@ -44,6 +44,11 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 		this.globalAppState = globalAppState;
 		this.eventBus = eventBus;
 		addStyleName("wikiSubpages");
+	}
+	
+	@Override
+	public void setPresenter(Presenter p) {
+		this.presenter = p;
 	}
 	
 	@Override
@@ -80,12 +85,9 @@ public class WikiSubpagesViewImpl extends FlowPanel implements WikiSubpagesView 
 				Button finishEditingOrderButton = DisplayUtils.createButton("Done");
 				finishEditingOrderButton.addStyleName("btn btn-default margin-top-10 right");
 				add(finishEditingOrderButton);
-				finishEditingOrderButton.addClickHandler(new ClickHandler() {
-					@Override
-					public void onClick(ClickEvent event) {
-						clear();
-						globalAppState.refreshPage();
-					}
+				finishEditingOrderButton.addClickHandler(e -> {
+					clear();
+					presenter.refreshWikiHeaderTree();
 				});
 				DisplayUtils.scrollToTop();
 			}

@@ -14,5 +14,6 @@ public interface UserSelectorView extends IsWidget {
 	void addModalShownHandler(ModalShownHandler modalShownHandler);
 	public interface Presenter {
 		void onModalShown();
+		void onModalHidden();
 	}
 }

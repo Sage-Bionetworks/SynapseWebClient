@@ -785,7 +785,8 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 	}
 
 	p {
-		margin: 0px;	
+		margin: 0px;
+		padding-bottom: 12px;
 	}
 	h1 {
 		padding: 35px 0 12px 0;
@@ -823,18 +824,6 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 
 .font-italic { font-style: italic; }
 .font-size-1-1em { font-size: 1.1em; }
-
-.public-acl-image {
-	background-image: url(images/icons/globe-green-16.png);
-	width: 16px;
-	height: 16px;
-}
-
-.private-acl-image {
-	background-image: url(images/icons/lock-grey-16.png);
-	width: 16px;
-	height: 16px;
-}
 
 .inline-block {
 	display:inline-block;

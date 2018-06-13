@@ -85,16 +85,6 @@ public interface SynapseClient extends RemoteService{
 	Entity updateEntity(Entity toUpdate) throws RestServiceException;
 	
 	/**
-	 * Create or update an entity
-	 * @param entity
-	 * @param annos
-	 * @param isNew
-	 * @return
-	 * @throws RestServiceException 
-	 */
-	String createOrUpdateEntity(Entity entity, Annotations annos, boolean isNew) throws RestServiceException;
-
-	/**
 	 * Updates the user's profile json object 
 	 * @param userProfile json object of the user's profile
 	 * @throws RestServiceException
@@ -147,11 +137,9 @@ public interface SynapseClient extends RemoteService{
 
 	void removeFavorite(String entityId) throws RestServiceException;
 
-	String createTeam(String teamName) throws RestServiceException;
 	void deleteTeam(String teamId) throws RestServiceException;
 	PaginatedResults<Team> getTeamsBySearch(String searchTerm, Integer limit, Integer offset) throws RestServiceException;
 	TeamBundle getTeamBundle(String userId, String teamId, boolean isLoggedIn) throws RestServiceException;
-	Long getOpenRequestCount(String currentUserId, String teamId) throws RestServiceException;
 	ArrayList<OpenUserInvitationBundle> getOpenInvitations(String userId) throws RestServiceException;
 	ArrayList<OpenTeamInvitationBundle> getOpenTeamInvitations(String teamId, Integer limit, Integer offset) throws RestServiceException;
 	List<MembershipRequestBundle> getOpenRequests(String teamId) throws RestServiceException;
@@ -276,8 +264,6 @@ public interface SynapseClient extends RemoteService{
 	
 	Entity moveEntity(String entityId, String newParentEntityId) throws RestServiceException;
 
-	String getUserIdFromUsername(String username) throws RestServiceException;
-
 	UserProfile getUserProfileFromUsername(String username) throws RestServiceException;
 
 	Entity updateFileEntity(FileEntity toUpdate, FileHandleCopyRequest copyRequest) throws RestServiceException;
@@ -306,4 +292,6 @@ public interface SynapseClient extends RemoteService{
 	void removeEmail(String email) throws RestServiceException;
 
 	ArrayList<String[]> parseCsv(String csvPreviewText, char delimiter) throws RestServiceException;
+
+	void resendTeamInvitation(String membershipInvitationId, String hostPageBaseURL) throws RestServiceException;
 }

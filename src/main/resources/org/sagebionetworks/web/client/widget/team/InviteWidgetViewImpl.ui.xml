@@ -5,7 +5,7 @@
 >
 	
 	<b:Modal ui:field="inviteUIModal" title="Invite User" closable="true"
-		dataBackdrop="STATIC" dataKeyboard="false">
+		dataBackdrop="STATIC" dataKeyboard="true">
 		<b:ModalBody>
 			<b:FormGroup>
 				<b:FormLabel>User Name or Email Address</b:FormLabel>

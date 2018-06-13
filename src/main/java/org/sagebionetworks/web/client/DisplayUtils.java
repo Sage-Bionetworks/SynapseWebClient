@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client;
 
 
-import static org.sagebionetworks.web.client.ClientProperties.DEFAULT_PLACE_TOKEN;
 import static org.sagebionetworks.web.client.ClientProperties.GB;
 import static org.sagebionetworks.web.client.ClientProperties.KB;
 import static org.sagebionetworks.web.client.ClientProperties.MB;
@@ -17,7 +16,6 @@ import static org.sagebionetworks.web.client.DisplayConstants.PRIMARY_BUTTON_STY
 
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.gwtbootstrap3.client.ui.Button;
@@ -51,9 +49,6 @@ import org.sagebionetworks.repo.model.VersionableEntity;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.place.Down;
-import org.sagebionetworks.web.client.place.Home;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.PeopleSearch;
 import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -69,13 +64,6 @@ import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 import org.sagebionetworks.web.shared.WikiPageKey;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
-import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
-import org.sagebionetworks.web.shared.exceptions.NotFoundException;
-import org.sagebionetworks.web.shared.exceptions.ReadOnlyModeException;
-import org.sagebionetworks.web.shared.exceptions.SynapseDownException;
-import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
-import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.core.client.JavaScriptObject;
 import com.google.gwt.dom.client.DivElement;
@@ -149,6 +137,18 @@ public class DisplayUtils {
 		} 
 	}
 	
+	/**
+	 * This key down handler invokes the  when ESC is clicked.
+	 * @return
+	 */
+	public static KeyDownHandler getESCKeyDownHandler(ClickHandler callback) {
+		return event -> {
+			if (KeyCodes.KEY_ESCAPE == event.getNativeKeyCode()) {
+				event.preventDefault();
+				callback.onClick(null);
+			}
+		};
+	}
 	public static NotifySettings getDefaultSettings() {
 		NotifySettings notifySettings = NotifySettings.newSettings();
 		notifySettings.setTemplate("<div data-notify=\"container\" class=\"col-xs-11 alert alert-{0}\" role=\"alert\">\n" + 
@@ -178,51 +178,6 @@ public class DisplayUtils {
         }
         return df.format(size) + " bytes";
     }
-	
-	/**
-	 * Handles the exception. Returns true if the user has been alerted to the exception already
-	 * @param ex
-	 * @param placeChanger
-	 * @return true if the user has been prompted
-	 */
-	public static boolean handleServiceException(Throwable ex, GlobalApplicationState globalApplicationState, boolean isLoggedIn, ShowsErrors view) {
-		//send exception to the javascript console
-		if (displayUtilsLogger != null && ex != null)
-			displayUtilsLogger.log(Level.SEVERE, ex.getMessage());
-		if(ex instanceof ReadOnlyModeException || ex instanceof SynapseDownException) {
-			globalApplicationState.getPlaceChanger().goTo(new Down(DEFAULT_PLACE_TOKEN));
-			return true;
-		} else if(ex instanceof UnauthorizedException) {
-			// send user to login page						
-			showInfo(DisplayConstants.SESSION_TIMEOUT, DisplayConstants.SESSION_HAS_TIMED_OUT);
-			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGOUT_TOKEN));
-			return true;
-		} else if(ex instanceof ForbiddenException) {			
-			if(!isLoggedIn) {				
-				view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
-				globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-			} else {
-				view.showErrorMessage(DisplayConstants.ERROR_FAILURE_PRIVLEDGES + " " + ex.getMessage());
-			}
-			return true;
-		} else if(ex instanceof BadRequestException) {
-			//show error (not to file a jira though)
-			view.showErrorMessage(ex.getMessage());
-			return true;
-		} else if(ex instanceof NotFoundException) {
-			view.showErrorMessage(DisplayConstants.ERROR_NOT_FOUND);
-			globalApplicationState.getPlaceChanger().goTo(new Home(DEFAULT_PLACE_TOKEN));
-			return true;
-		} else if (ex instanceof UnknownErrorException) {
-			//An unknown error occurred. 
-			//Exception handling on the backend now throws the reason into the exception message.  Easy!
-			showErrorMessage(ex, globalApplicationState.getJiraURLHelper(), isLoggedIn, ex.getMessage());
-			return true;
-		}
-		
-		// For other exceptions, allow the consumer to send a good message to the user
-		return false;
-	}
 		
 	/**
 	 * Returns a panel used to show a component is loading in the view
@@ -674,26 +629,6 @@ public class DisplayUtils {
 		return fullPlaceName;
 	}
 	
-	/**
-	 * Create the url to a profile attachment image.
-	 * @param baseURl
-	 * @param userId
-	 * @param tokenId
-	 * @param fileName
-	 * @return
-	 */
-	public static String createUserProfileAttachmentUrl(String baseURl, String userId, String fileHandleId, boolean preview){
-		StringBuilder builder = new StringBuilder();
-		builder.append(baseURl);
-		builder.append("?"+WebConstants.USER_PROFILE_USER_ID+"=");
-		builder.append(userId);
-		builder.append("&"+WebConstants.USER_PROFILE_IMAGE_ID+"=");
-		builder.append(fileHandleId);
-		builder.append("&"+WebConstants.USER_PROFILE_PREVIEW+"=");
-		builder.append(preview);
-		return builder.toString();
-	}
-	
 	public static Tooltip addTooltip(Widget widget, String tooltipText){
 		return addTooltip(widget, tooltipText, Placement.AUTO);
 	}
@@ -829,17 +764,6 @@ public class DisplayUtils {
 				WebConstants.TEAM_PARAM_KEY + "=" + teamId;
 	}
 	
-	/**
-	 * Create the url to the raw file handle id (must be the owner to access)
-	 * @param baseURl
-	 * @param rawFileHandleId
-	 * @return
-	 */
-	public static String createRawFileHandleUrl(String baseFileHandleUrl, String rawFileHandleId){
-		return baseFileHandleUrl + "?" +
-				WebConstants.RAW_FILE_HANDLE_PARAM + "=" + rawFileHandleId;
-	}
-
 	public static String createEntityVersionString(Reference ref) {
 		return createEntityVersionString(ref.getTargetId(), ref.getTargetVersionNumber());
 	}

@@ -1,13 +1,19 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.repo.model.table.Table;
+import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -15,6 +21,7 @@ import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.breadcrumb.Breadcrumb;
+import org.sagebionetworks.web.client.widget.breadcrumb.LinkData;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.ModifiedCreatedByWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.StuAlert;
@@ -65,7 +72,7 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			) {
 		this.tab = tab;
 		this.ginInjector = ginInjector;
-		tab.configure("Tables", TABLES_HELP, TABLES_HELP_URL);
+		tab.configure(DisplayConstants.TABLES, TABLES_HELP, TABLES_HELP_URL);
 	}
 	
 	public void lazyInject() {
@@ -87,11 +94,21 @@ public class TablesTab implements TablesTabView.Presenter, QueryChangeHandler{
 			view.setModifiedCreatedBy(modifiedCreatedBy);
 			tab.setContent(view.asWidget());
 			
-			tableListWidget.setTableClickedCallback(new CallbackP<String>() {
+			tableListWidget.setTableClickedCallback(new CallbackP<EntityHeader>() {
 				@Override
-				public void invoke(String entityId) {
+				public void invoke(EntityHeader entityHeader) {
 					areaToken = null;
-					entitySelectedCallback.invoke(entityId);
+					entitySelectedCallback.invoke(entityHeader.getId());
+					// selected a table/view, show title info immediately
+					tableTitleBar.configure(entityHeader);
+					
+					List<LinkData> links = new ArrayList<LinkData>();
+					Place projectPlace = new Synapse(projectEntityId, null, EntityArea.TABLES, null);
+					links.add(new LinkData(DisplayConstants.TABLES, EntityTypeUtils.getIconTypeForEntityClassName(TableEntity.class.getName()), projectPlace));
+					breadcrumb.configure(links, entityHeader.getName());
+					
+					view.setBreadcrumbVisible(true);
+					view.setTitlebarVisible(true);
 				}
 			});
 			initBreadcrumbLinkClickedHandler();

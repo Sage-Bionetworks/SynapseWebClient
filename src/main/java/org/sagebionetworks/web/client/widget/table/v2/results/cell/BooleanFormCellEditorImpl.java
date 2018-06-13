@@ -46,7 +46,7 @@ public class BooleanFormCellEditorImpl implements BooleanFormCellEditor {
 
 	@Override
 	public void setValue(String value) {
-		value = StringUtils.trimWithEmptyAsNull(value);
+		value = StringUtils.emptyAsNull(value);
 		if(value != null){
 			if(Boolean.parseBoolean(value)){
 				view.setValue(0);

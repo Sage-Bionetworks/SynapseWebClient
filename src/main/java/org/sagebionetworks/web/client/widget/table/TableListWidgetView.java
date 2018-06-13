@@ -22,7 +22,7 @@ public interface TableListWidgetView extends IsWidget, SynapseView {
 		/**
 		 * Report when a table is clicked
 		 */
-		void onTableClicked(String entityId);
+		void onTableClicked(EntityHeader header);
 	}
 	void clearTableWidgets();
 	void addTableListItem(EntityHeader header);

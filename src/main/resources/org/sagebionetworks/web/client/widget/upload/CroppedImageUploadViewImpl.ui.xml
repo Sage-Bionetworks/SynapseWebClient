@@ -20,6 +20,7 @@
 				percent="0" text="0%" />
 		</b:Progress>
 		<bh:Div ui:field="synAlertContainer" />
+		<!-- dataKeyboard must be false in this case since clicking ESC will also close the parent modal -->
 		<b:Modal ui:field="previewModal" closable="false" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="topLevelZIndex" title="Crop Image" >
 			<b:ModalBody ui:field="previewModalBody">
 			</b:ModalBody>

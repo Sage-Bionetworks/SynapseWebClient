@@ -8,13 +8,12 @@ import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.web.client.StackEndpoints;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
 import com.google.gwt.user.server.rpc.SerializationPolicy;
-import com.google.inject.Inject;
 
 @SuppressWarnings("serial")
 public class SynapseClientBase extends RemoteServiceServlet implements TokenProvider {
@@ -48,22 +47,6 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 	private TokenProvider tokenProvider = this;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	
-	/**
-	 * Injected with Gin
-	 */
-	private ServiceUrlProvider urlProvider;
-
-	/**
-	 * Essentially the constructor. Setup
-	 * org.sagebionetworks.client.SynapseClient client.
-	 * 
-	 * @param provider
-	 */
-	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider) {
-		this.urlProvider = provider;
-	}
-
 	/**
 	 * Injected with Gin
 	 */
@@ -108,7 +91,7 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 	}
 	
 	public String getRepositoryServiceUrl() {
-		return urlProvider.getRepositoryServiceUrl();
+		return StackEndpoints.getRepositoryServiceEndpoint();
 	}
 
 	protected org.sagebionetworks.client.SynapseClient createSynapseClient() {
@@ -128,11 +111,9 @@ public class SynapseClientBase extends RemoteServiceServlet implements TokenProv
 		org.sagebionetworks.client.SynapseClient synapseClient = synapseProvider
 				.createNewClient();
 		synapseClient.setSessionToken(sessionToken);
-		synapseClient.setRepositoryEndpoint(urlProvider
-				.getRepositoryServiceUrl());
-		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
-		synapseClient.setFileEndpoint(StackConfiguration
-				.getFileServiceEndpoint());
+		synapseClient.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
+		synapseClient.setFileEndpoint(StackEndpoints.getFileServiceEndpoint());
 		// Append the portal's version information to the user agent.
 		synapseClient.appendUserAgent(PORTAL_USER_AGENT);
 		if (this.getThreadLocalRequest() != null) {

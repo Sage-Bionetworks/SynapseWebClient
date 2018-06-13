@@ -1,8 +1,7 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
@@ -10,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.sagebionetworks.client.SynapseClient;
@@ -18,17 +16,12 @@ import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.repo.model.auth.Session;
-import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
-import org.sagebionetworks.repo.model.project.StorageLocationSetting;
-import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.StackConfigServiceImpl;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
-import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 
 public class StackConfigServiceTest {
@@ -36,8 +29,6 @@ public class StackConfigServiceTest {
 	SynapseProvider mockSynapseProvider;
 	@Mock
 	TokenProvider mockTokenProvider;
-	@Mock
-	ServiceUrlProvider mockUrlProvider;
 	@Mock
 	UserSessionData mockUserSessionData;
 	String testSessionToken = "12345abcde";
@@ -60,7 +51,6 @@ public class StackConfigServiceTest {
 		stackConfigService = new StackConfigServiceImpl();
 		stackConfigService.setSynapseProvider(mockSynapseProvider);
 		stackConfigService.setTokenProvider(mockTokenProvider);
-		stackConfigService.setServiceUrlProvider(mockUrlProvider);
 		Session testSession = new Session();
 		testSession.setSessionToken(testSessionToken);
 		testSession.setAcceptsTermsOfUse(true);

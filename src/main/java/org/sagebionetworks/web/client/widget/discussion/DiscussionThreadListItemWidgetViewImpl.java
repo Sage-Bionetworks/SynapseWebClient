@@ -37,8 +37,10 @@ public class DiscussionThreadListItemWidgetViewImpl implements DiscussionThreadL
 		threadLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				event.preventDefault();
-				presenter.onClickThread();
+				if (!event.isMetaKeyDown()) {
+					event.preventDefault();
+					presenter.onClickThread();
+				}
 			}
 		});
 	}

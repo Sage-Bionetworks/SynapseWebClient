@@ -2,10 +2,10 @@ package org.sagebionetworks.web.server.servlet;
 
 import java.util.HashMap;
 
-import org.sagebionetworks.StackConfiguration;
 import org.sagebionetworks.repo.model.status.StackStatus;
 import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.web.client.StackConfigService;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalPropertiesHolder;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl.PortalVersionHolder;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -23,11 +23,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 public class StackConfigServiceImpl extends SynapseClientBase implements StackConfigService {
 	
 	public static final long serialVersionUID = 46893767375462651L;
-
-	@Override
-	public String getDoiPrefix() {
-		return StackConfiguration.getEzidDoiPrefix();
-	}
 
 	@Override
 	public String getSynapseVersions() throws RestServiceException {
@@ -54,9 +49,9 @@ public class StackConfigServiceImpl extends SynapseClientBase implements StackCo
 	@Override
 	public HashMap<String, String> getSynapseProperties(){
 		HashMap<String, String> properties = PortalPropertiesHolder.getPropertiesMap();
-		properties.put(WebConstants.REPO_SERVICE_URL_KEY, StackConfiguration.getRepositoryServiceEndpoint());
-		properties.put(WebConstants.FILE_SERVICE_URL_KEY, StackConfiguration.getFileServiceEndpoint());
-		properties.put(WebConstants.AUTH_PUBLIC_SERVICE_URL_KEY, StackConfiguration.getAuthenticationServicePublicEndpoint());
+		properties.put(WebConstants.REPO_SERVICE_URL_KEY, StackEndpoints.getRepositoryServiceEndpoint());
+		properties.put(WebConstants.FILE_SERVICE_URL_KEY, StackEndpoints.getFileServiceEndpoint());
+		properties.put(WebConstants.AUTH_PUBLIC_SERVICE_URL_KEY, StackEndpoints.getAuthenticationServicePublicEndpoint());
 		properties.put(WebConstants.SYNAPSE_VERSION_KEY, PortalVersionHolder.getVersionInfo());
 		return properties;
 	}

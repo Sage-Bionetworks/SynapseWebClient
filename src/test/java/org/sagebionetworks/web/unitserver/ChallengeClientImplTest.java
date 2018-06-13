@@ -64,7 +64,6 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.schema.adapter.org.json.JSONObjectAdapterImpl;
 import org.sagebionetworks.web.server.servlet.ChallengeClientImpl;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseClientImpl;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
@@ -83,7 +82,6 @@ public class ChallengeClientImplTest {
 	public static final String TEST_HOME_PAGE_BASE = "http://mysynapse.org/";
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
-	ServiceUrlProvider mockUrlProvider;
 	SynapseClient mockSynapse;
 	ChallengeClientImpl synapseClient;
 	String entityId = "123";
@@ -134,14 +132,12 @@ public class ChallengeClientImplTest {
 	public void before() throws SynapseException, JSONObjectAdapterException{
 		mockSynapse = Mockito.mock(SynapseClient.class);
 		mockSynapseProvider = Mockito.mock(SynapseProvider.class);
-		mockUrlProvider = Mockito.mock(ServiceUrlProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 		mockTokenProvider = Mockito.mock(TokenProvider.class);
 		
 		synapseClient = new ChallengeClientImpl();
 		synapseClient.setSynapseProvider(mockSynapseProvider);
 		synapseClient.setTokenProvider(mockTokenProvider);
-		synapseClient.setServiceUrlProvider(mockUrlProvider);
 		
 		//user can change permissions on eval 2, but not on 1
 		userEvaluationPermissions = new UserEvaluationPermissions();

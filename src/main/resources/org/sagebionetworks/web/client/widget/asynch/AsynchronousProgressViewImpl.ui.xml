@@ -23,8 +23,7 @@
 				<w:LoadingSpinner size="40px"/>
 			</b:Column>			
 			<b:Column size="XS_1">
-				<b:Button ui:field="cancelButton" icon="BAN" type="DANGER"
-					size="SMALL" />
+				<b:Button ui:field="cancelButton" icon="BAN" type="DANGER" size="SMALL" marginTop="10" />
 			</b:Column>
 		</b:Row>
 		<b:Row>

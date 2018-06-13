@@ -52,6 +52,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityTreeItem;
 import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityTreeBrowserView;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -61,10 +62,6 @@ import com.google.gwt.user.client.ui.IsTreeItem;
 public class EntityTreeBrowserTest {
 	@Mock
 	EntityTreeBrowserView mockView;
-	@Mock
-	AuthenticationController mockAuthenticationController;
-	@Mock
-	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
 	IconsImageBundle mockIconsImageBundle;
 	@Mock
@@ -90,6 +87,8 @@ public class EntityTreeBrowserTest {
 	ArgumentCaptor<EntityChildrenRequest> entityChildrenRequestCaptor;
 	@Mock
 	EntityHeader mockEntityHeader;
+	@Mock
+	SynapseAlert mockSynAlert;
 	String parentId;
 
 	@Before
@@ -97,8 +96,8 @@ public class EntityTreeBrowserTest {
 		MockitoAnnotations.initMocks(this);
 		adapterFactory = new AdapterFactoryImpl();
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
-				mockSynapseJavascriptClient, mockAuthenticationController,  mockGlobalApplicationState,
-				mockIconsImageBundle, adapterFactory);
+				mockSynapseJavascriptClient,
+				mockIconsImageBundle, adapterFactory, mockSynAlert);
 		verify(mockView).setPresenter(entityTreeBrowser);
 		reset(mockView);
 		parentId = "testParentId";
@@ -171,8 +170,8 @@ public class EntityTreeBrowserTest {
 		mockSynapseJavascriptClient = mock(SynapseJavascriptClient.class);
 		AsyncCallback<List<EntityHeader>> mockCallback = mock(AsyncCallback.class);
 		entityTreeBrowser = new EntityTreeBrowser(mockInjector, mockView,
-				mockSynapseJavascriptClient, mockAuthenticationController, mockGlobalApplicationState,
-				mockIconsImageBundle, adapterFactory);
+				mockSynapseJavascriptClient,
+				mockIconsImageBundle, adapterFactory, mockSynAlert);
 		entityTreeBrowser.getChildren("123", null, null);
 		// capture the servlet call
 		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor

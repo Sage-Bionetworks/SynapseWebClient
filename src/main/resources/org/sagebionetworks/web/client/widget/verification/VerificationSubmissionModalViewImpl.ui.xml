@@ -5,7 +5,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
-	<b:Modal ui:field="dialog" closable="true" dataBackdrop="STATIC" dataKeyboard="false" addStyleNames="modal-fullscreen">
+	<b:Modal ui:field="dialog" closable="true" dataBackdrop="STATIC" dataKeyboard="true" addStyleNames="modal-fullscreen">
 		<b:ModalHeader>
 		    <b:Heading size="H4" ui:field="modalTitle" addStyleNames="displayInline"/>
 		    <w:HelpWidget helpMarkdown="Certified Users can apply to have their user profile validated. A Synapse user with a Validated Profile is eligible to request access to Bridge data (data collected in research studies conducted via self-guided mobile applications.)" 

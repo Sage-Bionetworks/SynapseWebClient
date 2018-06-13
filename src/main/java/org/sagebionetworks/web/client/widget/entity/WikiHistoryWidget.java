@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.shared.WikiPageKey;
 
@@ -35,15 +36,19 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 	private WikiPageKey wikiKey;
 	private Map<String, String> mapIdToName;
 	private SynapseJavascriptClient jsClient;
+	private SynapseAlert synAlert;
 	public interface ActionHandler{
 		public void previewClicked(Long versionToPreview, Long currentVersion);
 		public void restoreClicked(Long versionToRestore);
 	}
 	
 	@Inject
-	public WikiHistoryWidget(GlobalApplicationState globalApplicationState, WikiHistoryWidgetView view, 
-			SynapseClientAsync synapseClient, AuthenticationController authenticationController,
-			SynapseJavascriptClient jsClient) {
+	public WikiHistoryWidget(GlobalApplicationState globalApplicationState, 
+			WikiHistoryWidgetView view, 
+			SynapseClientAsync synapseClient, 
+			AuthenticationController authenticationController,
+			SynapseJavascriptClient jsClient,
+			SynapseAlert synAlert) {
 		super();
 		this.view = view;
 		this.synapseClient = synapseClient;
@@ -51,6 +56,8 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 		this.jsClient = jsClient;
 		this.globalApplicationState = globalApplicationState;
 		this.authenticationController = authenticationController;
+		this.synAlert = synAlert;
+		view.setSynAlert(synAlert);
 		view.setPresenter(this);
 	}
 
@@ -72,14 +79,16 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 	
 	@Override
 	public void configureNextPage(final Long offset, final Long limit) {
+		synAlert.clear();
 		synapseClient.getV2WikiHistory(wikiKey, limit, offset, new AsyncCallback<PaginatedResults<V2WikiHistorySnapshot>>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				if (caught.getMessage() != null && caught.getMessage().contains(NO_HISTORY_IS_FOUND_FOR_A_WIKI)) {
 					// exception should be something more reasonable (like a 404).
 					view.hideLoadMoreButton();
-				} else if(!DisplayUtils.handleServiceException(caught, globalApplicationState, authenticationController.isLoggedIn(), view))
-					view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_HISTORY_WIDGET_FAILED+caught.getMessage());
+				} else {
+					synAlert.handleException(caught);
+				}
 			}
 
 			@Override
@@ -102,11 +111,12 @@ public class WikiHistoryWidget implements WikiHistoryWidgetView.Presenter,
 						}
 					}
 					// Call to get user headers from the list of needed ids
+					synAlert.clear();
 					jsClient.getUserGroupHeadersById(idsToSearch, new AsyncCallback<UserGroupHeaderResponsePage>() {
 	
 						@Override
 						public void onFailure(Throwable caught) {
-							view.showErrorMessage(DisplayConstants.ERROR_LOADING_WIKI_HISTORY_WIDGET_FAILED+caught.getMessage());
+							synAlert.handleException(caught);
 						}
 						@Override
 						public void onSuccess(UserGroupHeaderResponsePage response) {

@@ -9,6 +9,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityInstanceFactory;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.Folder;
@@ -44,6 +45,7 @@ import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.subscription.Etag;
@@ -89,6 +91,7 @@ public class SynapseJavascriptFactory {
 		Link,
 		Preview,
 		Entity, // used for services where we don't know what type of entity is returned (but object has concreteType set)
+		EntityId,
 		Forum,
 		DiscussionThreadBundle,
 		DiscussionReplyBundle,
@@ -115,6 +118,8 @@ public class SynapseJavascriptFactory {
 		MultipartUploadStatus,
 		BatchPresignedUploadUrlResponse,
 		AddPartResponse,
+		PaginatedResultsTotalNumberOfResults,
+		PrincipalAliasResponse,
 		None,
 		String
 	}
@@ -204,6 +209,12 @@ public class SynapseJavascriptFactory {
 			return new UserProfile(json);
 		case FileHandleResults :
 			return new FileHandleResults(json).getList();
+		case PaginatedResultsTotalNumberOfResults :
+			return json.getLong("totalNumberOfResults");
+		case PrincipalAliasResponse :
+			return new PrincipalAliasResponse(json);
+		case EntityId :
+			return new EntityId(json).getId();
 		case ChallengePagedResults:
 			return new ChallengePagedResults(json).getResults();
 		case JSON :

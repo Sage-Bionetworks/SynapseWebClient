@@ -20,14 +20,13 @@ import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class WikiSubpagesWidget implements IsWidget {
+public class WikiSubpagesWidget implements IsWidget, WikiSubpagesView.Presenter {
 	
 	private WikiSubpagesView view;
 	private SynapseClientAsync synapseClient;
@@ -42,14 +41,16 @@ public class WikiSubpagesWidget implements IsWidget {
 	private boolean isEmbeddedInOwnerPage;
 	private CallbackP<WikiPageKey> reloadWikiPageCallback;
 	private SynapseJavascriptClient jsClient;
+	List<V2WikiHeader> currentWikiHeaders;
 	@Inject
 	public WikiSubpagesWidget(WikiSubpagesView view, SynapseClientAsync synapseClient,
 							AuthenticationController authenticationController,
 							SynapseJavascriptClient jsClient) {
-		this.view = view;		
+		this.view = view;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
+		view.setPresenter(this);
 	}
 
 	public void configure(
@@ -63,8 +64,11 @@ public class WikiSubpagesWidget implements IsWidget {
 			this.wikiKey.getOwnerObjectId().equals(wikiKey.getOwnerObjectId()) &&
 			view.contains(wikiKey.getWikiPageId())
 			) {
+			this.wikiKey = wikiKey;
 			view.setPage(wikiKey.getWikiPageId());
 			view.showSubpages();
+			// SWC-4256: in the background, check to see if the wiki header tree is the same...
+			refreshRootObject();
 			return;
 		}
 		
@@ -76,6 +80,10 @@ public class WikiSubpagesWidget implements IsWidget {
 		
 		view.clear();
 		view.hideSubpages();
+		refreshRootObject();
+	}
+	
+	public void refreshRootObject() {
 		//figure out owner object name/link
 		if (wikiKey.getOwnerObjectType().equalsIgnoreCase(ObjectType.ENTITY.toString())) {
 			//lookup the entity name based on the id
@@ -83,10 +91,14 @@ public class WikiSubpagesWidget implements IsWidget {
 			jsClient.getEntityBundle(wikiKey.getOwnerObjectId(), mask, new AsyncCallback<EntityBundle>() {
 				@Override
 				public void onSuccess(EntityBundle bundle) {
+					//if the owner object name is different, clear old wiki headers (force reconfigure)
+					if (!bundle.getEntity().getName().equals(ownerObjectName)) {
+						currentWikiHeaders = null;
+					}
 					ownerObjectName = bundle.getEntity().getName();
 					ownerObjectLink = getLinkPlace(bundle.getEntity().getId(), wikiKey.getVersion(), null, isEmbeddedInOwnerPage);
 					canEdit = bundle.getPermissions().getCanEdit();
-					refreshTableOfContents();
+					refreshWikiHeaderTree();
 				}
 				
 				@Override
@@ -108,8 +120,8 @@ public class WikiSubpagesWidget implements IsWidget {
 		return view.asWidget();
 	}
 	
-	public void refreshTableOfContents() {
-		view.clear();
+	@Override
+	public void refreshWikiHeaderTree() {
 		synapseClient.getV2WikiHeaderTree(wikiKey.getOwnerObjectId(), wikiKey.getOwnerObjectType(), new AsyncCallback<List<V2WikiHeader>>() {
 			@Override
 			public void onSuccess(final List<V2WikiHeader> wikiHeaders) {
@@ -118,15 +130,22 @@ public class WikiSubpagesWidget implements IsWidget {
 					public void onSuccess(V2WikiOrderHint result) {
 						// "Sort" stuff'
 						WikiOrderHintUtils.sortHeadersByOrderHint(wikiHeaders, result);
-						view.configure(wikiHeaders, ownerObjectName,
-										ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
-						view.setEditOrderButtonVisible(canEdit);
+						updateWikiHeaders(wikiHeaders);
 					}
 					@Override
 					public void onFailure(Throwable caught) {
 						// Failed to get order hint. Just ignore it.
-						view.configure(wikiHeaders, ownerObjectName,
-								ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
+						updateWikiHeaders(wikiHeaders);
+					}
+					
+					private void updateWikiHeaders(List<V2WikiHeader> wikiHeaders) {
+						if (currentWikiHeaders == null || !currentWikiHeaders.equals(wikiHeaders)) {
+							view.clear();
+							view.configure(wikiHeaders, ownerObjectName,
+									ownerObjectLink, wikiKey, isEmbeddedInOwnerPage, reloadWikiPageCallback, actionMenu);
+							currentWikiHeaders = wikiHeaders;
+						}
+						
 						view.setEditOrderButtonVisible(canEdit);
 					}
 				});

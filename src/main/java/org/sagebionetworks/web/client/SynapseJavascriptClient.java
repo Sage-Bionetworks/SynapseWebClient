@@ -32,6 +32,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
@@ -65,6 +66,7 @@ import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
 import org.sagebionetworks.repo.model.entity.Direction;
+import org.sagebionetworks.repo.model.entity.EntityLookupRequest;
 import org.sagebionetworks.repo.model.entity.SortBy;
 import org.sagebionetworks.repo.model.entity.query.SortDirection;
 import org.sagebionetworks.repo.model.file.AddPartResponse;
@@ -75,7 +77,10 @@ import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
+import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.principal.AliasList;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
+import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
@@ -156,6 +161,8 @@ public class SynapseJavascriptClient {
 	public static final String ETAG = "etag";
 	public static final String GENERATED_PATH = "/generated";
 	public static final String GENERATED_BY_SUFFIX = "/generatedBy";
+	public static final String OPEN_MEMBERSHIP_REQUEST = "/openRequest";
+	public static final String PRINCIPAL = "/principal";
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	private static final String LOG = "/log";
@@ -211,6 +218,8 @@ public class SynapseJavascriptClient {
 	
 	public static final String ASYNC_START = "/async/start";
 	public static final String ASYNC_GET = "/async/get/";
+	public static final String AUTH_OAUTH_2 = "/oauth2";
+	public static final String AUTH_OAUTH_2_ALIAS = AUTH_OAUTH_2+"/alias";
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	
@@ -447,6 +456,11 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.Team, callback);
 	}
 
+	public void createTeam(Team team, final AsyncCallback<Team> callback) {
+		String url = getRepoServiceUrl() + TEAM;
+		doPost(url, team, OBJECT_TYPE.Team, callback);
+	}
+	
 	public FluentFuture<Team> getTeam(String teamId) {
 		String url = getRepoServiceUrl() + TEAM + "/" + teamId;
 		return getFuture(cb -> doGet(url, OBJECT_TYPE.Team, cb));
@@ -932,14 +946,6 @@ public class SynapseJavascriptClient {
 		return getFuture(cb -> doPost(url, idList, OBJECT_TYPE.ListWrapperTeam, cb));
 	}
 	
-	public String getProfilePicturePreviewUrl(String ownerId) {
-		return getRepoServiceUrl() + USER_PROFILE_PATH+"/"+ownerId+PROFILE_IMAGE_PREVIEW+"?"+REDIRECT_PARAMETER+"true";
-	}
-	
-	public String getTeamIconUrl(String teamId) {
-		return getRepoServiceUrl() + TEAM + "/" + teamId + ICON + "?" + REDIRECT_PARAMETER +"true";
-	}
-	
 	public void login(LoginRequest loginRequest, AsyncCallback<LoginResponse> callback) {
 		String url = getAuthServiceUrl() + "/login";
 		doPost(url, loginRequest, OBJECT_TYPE.LoginResponse, callback);
@@ -1072,6 +1078,31 @@ public class SynapseJavascriptClient {
 	public void completeMultipartUpload(String uploadId, AsyncCallback<MultipartUploadStatus> callback) {
 		String url = getFileServiceUrl() + "/file/multipart/" + uploadId + "/complete";
 		doPut(url, null, OBJECT_TYPE.MultipartUploadStatus, callback);
+	}
+	
+	public void getOpenMembershipRequestCount(String teamId, AsyncCallback<Long> callback) {
+		String url = getRepoServiceUrl() + TEAM + "/" + teamId + OPEN_MEMBERSHIP_REQUEST + "?" + OFFSET_PARAMETER + "0&" + LIMIT_PARAMETER + "1";
+		doGet(url, OBJECT_TYPE.PaginatedResultsTotalNumberOfResults, callback);
+	}
+	
+	public void getPrincipalAlias(PrincipalAliasRequest request, AsyncCallback<PrincipalAliasResponse> callback) {
+		String url = getRepoServiceUrl() + PRINCIPAL+"/alias/";
+		doPost(url, request, OBJECT_TYPE.PrincipalAliasResponse, callback);
+	}
+	
+	public void unbindOAuthProvidersUserId(OAuthProvider provider, String alias, AsyncCallback<Void> callback) {
+		String url = getAuthServiceUrl() + AUTH_OAUTH_2_ALIAS + "?provider="+
+				gwt.encodeQueryString(provider.name())+
+				"&"+"alias="+gwt.encodeQueryString(alias);
+		doDelete(url, callback);
+	}
+	
+	public void lookupChild(String entityName, String containerEntityId, AsyncCallback<String> callback) {
+		EntityLookupRequest request = new EntityLookupRequest();
+		request.setEntityName(entityName);
+		request.setParentId(containerEntityId);
+		String url = getRepoServiceUrl() + ENTITY+"/child";
+		doPost(url, request, OBJECT_TYPE.EntityId, callback);
 	}
 }
 

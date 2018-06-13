@@ -15,6 +15,7 @@ import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Quiz;
@@ -83,8 +84,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button editProfileButton;
 	@UiField
 	Button linkORCIDButton;
-	@UiField
-	Button importLinkedIn;
 	@UiField
 	SimplePanel editUserProfilePanel;
 	
@@ -209,8 +208,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	LoadingSpinner challengesLoadingUI;
 	@UiField 
 	LoadingSpinner profilePictureLoadingUI;
-	@UiField 
-	LoadingSpinner dashboardLoadingUI;
 	
 	@UiField
 	FlowPanel favoritesHelpPanel;
@@ -415,13 +412,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		};
 		editProfileButton.addClickHandler(editProfileClickHandler);
 		reviewProfileLink.addClickHandler(editProfileClickHandler);
-		importLinkedIn.addClickHandler(new ClickHandler() {
-	
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onImportLinkedIn();
-			}
-		});
 		getCertifiedAlert.addClosedHandler(new AlertClosedHandler() {
 			@Override
 			public void onClosed(AlertClosedEvent evt) {
@@ -672,10 +662,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	}
 	
 	public static Widget getProfilePicture(UserProfile profile, SynapseJSNIUtils synapseJSNIUtils) {
-		 Widget profilePicture; 
+		 Widget profilePicture;
 		 if (profile.getProfilePicureFileHandleId() != null) {
 			 //use preview
-			 String url = DisplayUtils.createUserProfileAttachmentUrl(synapseJSNIUtils.getBaseProfileAttachmentUrl(), profile.getOwnerId(), profile.getProfilePicureFileHandleId(), false);
+			 String url = synapseJSNIUtils.getFileHandleAssociationUrl(profile.getOwnerId(), FileHandleAssociateType.UserProfileAttachment, profile.getProfilePicureFileHandleId());
 			 profilePicture = new FitImage(url, 150, 150);
 		 } else {
 			 //use default picture
@@ -748,13 +738,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void showLoading() {
 		profilePictureLoadingUI.setVisible(true);
-		dashboardLoadingUI.setVisible(true);
 	}
 
 	@Override
 	public void hideLoading() {
 		profilePictureLoadingUI.setVisible(false);
-		dashboardLoadingUI.setVisible(false);
 	}
 	
 	@Override
@@ -942,7 +930,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setProfileEditButtonVisible(boolean isVisible) {
 		this.editProfileButton.setVisible(isVisible);
-		this.importLinkedIn.setVisible(isVisible);
+//		this.importLinkedIn.setVisible(isVisible);
 	}
 	
 	@Override

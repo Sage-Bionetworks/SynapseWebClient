@@ -303,6 +303,17 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	}
 	
 	public void completeMultipartUpload() {
+		//before finishing, verify that the file checksum has not changed during the upload.
+		synapseJsniUtils.getFileMd5(blob, md5 -> {
+			if (!request.getContentMD5Hex().equals(md5)) {
+				handler.uploadFailed("The file appears to have changed during the upload process.  The starting md5 of the file (" + request.getContentMD5Hex() + ") differs from the current md5 (" + md5+").");
+			} else {
+				completeMultipartUploadAfterMd5Verification();
+			}
+		});
+	}
+	
+	public void completeMultipartUploadAfterMd5Verification() {
 		logFullUpload();
 		//combine
 		jsClient.completeMultipartUpload(currentStatus.getUploadId(), new AsyncCallback<MultipartUploadStatus>() {

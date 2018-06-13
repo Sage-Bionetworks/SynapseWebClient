@@ -1,31 +1,29 @@
 package org.sagebionetworks.web.unitserver;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.contains;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.mockito.internal.util.reflection.Whitebox;
 import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
 import org.sagebionetworks.repo.model.verification.VerificationSubmission;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
-import org.sagebionetworks.web.server.servlet.UserAccountServiceImpl;
 import org.sagebionetworks.web.server.servlet.UserProfileClientImpl;
 
 /**
@@ -37,8 +35,6 @@ public class UserProfileClientImplTest {
 	SynapseProvider mockSynapseProvider;
 	@Mock
 	TokenProvider mockTokenProvider;
-	@Mock
-	ServiceUrlProvider mockUrlProvider;
 	@Mock
 	UserProfileClientImpl userProfileClient;
 	@Mock
@@ -71,7 +67,6 @@ public class UserProfileClientImplTest {
 		userProfileClient = new UserProfileClientImpl();
 		userProfileClient.setSynapseProvider(mockSynapseProvider);
 		userProfileClient.setTokenProvider(mockTokenProvider);
-		userProfileClient.setServiceUrlProvider(mockUrlProvider);
 		Session testSession = new Session();
 		testSession.setSessionToken(testSessionToken);
 		testSession.setAcceptsTermsOfUse(true);

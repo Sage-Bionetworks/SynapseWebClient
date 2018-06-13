@@ -102,17 +102,21 @@ public class WikiSubpageNavigationTreeViewImpl extends FlowPanel implements Wiki
 				expandClickHandler.onClick(null);
 			}
 			l.addClickHandler(event -> {
-				event.preventDefault();
-				expandClickHandler.onClick(null);
-				presenter.reloadWiki(root);
+				if (!event.isMetaKeyDown()) {
+					event.preventDefault();
+					expandClickHandler.onClick(null);
+					presenter.reloadWiki(root);
+				}
 			});
 			for (SubpageNavTreeNode child : root.getChildren()) {
 				addTreeItemsRecursive(subList, child);
 			}
 		} else {
 			l.addClickHandler(event -> {
-				event.preventDefault();
-				presenter.reloadWiki(root);
+				if (!event.isMetaKeyDown()) {
+					event.preventDefault();
+					presenter.reloadWiki(root);
+				}
 			});
 		}
 	}

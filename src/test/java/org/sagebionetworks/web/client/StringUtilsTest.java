@@ -9,8 +9,9 @@ import org.junit.Test;
 public class StringUtilsTest {
 	
 	@Test
-	public void testTrimWithEmptyAsNull_Trim(){
-		assertEquals("a", StringUtils.trimWithEmptyAsNull(" a\n "));
+	public void testEmptyAsNullWithRealValues(){
+		//SWC-4099: whitespace no longer trimmed
+		assertNotEquals("a", StringUtils.emptyAsNull(" a\n "));
 	}
 
 	@Test
@@ -59,23 +60,25 @@ public class StringUtilsTest {
 	}
 	
 	@Test
-	public void testIsValueChangedRealSpaceRealSame(){
-		assertFalse(StringUtils.isValueChanged(" a ", "a"));
+	public void testIsValueChangedRealSpaceRealDifferent(){
+		//SWC-4099: whitespace changes (that would have been trimmed previously) count as a change
+		assertTrue(StringUtils.isValueChanged(" a ", "a"));
 	}
 	
 	@Test
-	public void testIsValueChangedRealRealSpaceSame(){
-		assertFalse(StringUtils.isValueChanged(" a ", " a\t"));
+	public void testIsValueChangedRealRealSpaceDifferent(){
+		//SWC-4099: whitespace changes (that would have been trimmed previously) count as a change
+		assertTrue(StringUtils.isValueChanged(" a ", " a\t"));
 	}
 	
 	@Test
 	public void testTrimWithEmptyAsNull_Null(){
-		assertEquals(null, StringUtils.trimWithEmptyAsNull(null));
+		assertEquals(null, StringUtils.emptyAsNull(null));
 	}
 	
 	@Test
 	public void testTrimWithEmptyAsNullOkay(){
-		assertEquals("a", StringUtils.trimWithEmptyAsNull("a"));
+		assertEquals("a", StringUtils.emptyAsNull("a"));
 	}
 	
 	@Test

@@ -9,7 +9,7 @@
 
 	<!-- Dialog for creating a new table -->
 	<b:Modal closable="true"
-		dataBackdrop="STATIC" dataKeyboard="false">
+		dataBackdrop="STATIC" dataKeyboard="true">
 		<b:ModalHeader>
 		    <b:Heading size="H4" ui:field="modalTitle" addStyleNames="displayInline" />
 		    <bh:Span ui:field="helpContainer" />

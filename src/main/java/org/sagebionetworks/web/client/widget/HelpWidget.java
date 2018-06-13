@@ -15,6 +15,7 @@ import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -74,6 +75,7 @@ public class HelpWidget implements IsWidget {
 				helpPopover.show();
 			}
 		});
+		helpPopover.asWidget().addDomHandler(DisplayUtils.getESCKeyDownHandler(event-> {hidePopover();}), KeyDownEvent.getType());
 	}
 
 	public void setText(String text) {

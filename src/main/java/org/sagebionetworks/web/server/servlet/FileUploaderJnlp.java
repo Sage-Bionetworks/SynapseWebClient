@@ -17,8 +17,6 @@ import org.sagebionetworks.repo.model.versionInfo.SynapseVersionInfo;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.inject.Inject;
-
 /**
  * Dynamically creates a JavaWebStart JNLP for the Synapse File Uploader Client
  */
@@ -30,11 +28,6 @@ public class FileUploaderJnlp extends HttpServlet {
 
 	protected static final ThreadLocal<HttpServletRequest> perThreadRequest = new ThreadLocal<HttpServletRequest>();
 
-	/**
-	 * Injected with Gin
-	 */
-	@SuppressWarnings("unused")
-	private ServiceUrlProvider urlProvider;
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 	private TokenProvider tokenProvider = new TokenProvider() {
 		@Override
@@ -50,16 +43,6 @@ public class FileUploaderJnlp extends HttpServlet {
 	 */
 	public void setSynapseProvider(SynapseProvider synapseProvider) {
 		this.synapseProvider = synapseProvider;
-	}
-
-	/**
-	 * Essentially the constructor. Setup synapse client.
-	 *
-	 * @param provider
-	 */
-	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider) {
-		this.urlProvider = provider;
 	}
 
 	/**

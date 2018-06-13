@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.auth.NewUser;
 import org.sagebionetworks.repo.model.auth.Session;
 import org.sagebionetworks.repo.model.principal.AccountSetupInfo;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
+import org.sagebionetworks.web.client.StackEndpoints;
 import org.sagebionetworks.web.client.UserAccountService;
 import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.shared.exceptions.ExceptionUtil;
@@ -15,31 +16,17 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.springframework.web.client.RestClientException;
 
 import com.google.gwt.user.server.rpc.RemoteServiceServlet;
-import com.google.inject.Inject;
 
 public class UserAccountServiceImpl extends RemoteServiceServlet implements UserAccountService, TokenProvider {
 	
 	public static final long serialVersionUID = 498269726L;
 	
-	/**
-	 * Injected with Gin
-	 */
-	private ServiceUrlProvider urlProvider;
-
 	private TokenProvider tokenProvider = this;
 	
 	private SynapseProvider synapseProvider = new SynapseProviderImpl();
 	
 	public static PublicPrincipalIds publicPrincipalIds = null;
 	
-	/**
-	 * Injected with Gin
-	 */
-	@Inject
-	public void setServiceUrlProvider(ServiceUrlProvider provider){
-		this.urlProvider = provider;
-	}
-
 	/**
 	 * This allows integration tests to override the token provider.
 	 */
@@ -61,9 +48,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	 * missing then it cannot run. Public for tests.
 	 */
 	private void validateService() {
-		if (urlProvider == null) {
-			throw new IllegalStateException("The org.sagebionetworks.rest.api.root.url was not set");
-		}
 		if (tokenProvider == null) {
 			throw new IllegalStateException("The token provider was not set");
 		}
@@ -203,17 +187,15 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 			sessionToken = tokenProvider.getSessionToken();
 		}
 		synapseClient.setSessionToken(sessionToken);
-		synapseClient.setRepositoryEndpoint(urlProvider
-				.getRepositoryServiceUrl());
-		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
+		synapseClient.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		return synapseClient;
 	}
 	
 	private SynapseClient createAnonymousSynapseClient() {
 		SynapseClient synapseClient = synapseProvider.createNewClient();
-		synapseClient.setRepositoryEndpoint(urlProvider
-				.getRepositoryServiceUrl());
-		synapseClient.setAuthEndpoint(urlProvider.getPublicAuthBaseUrl());
+		synapseClient.setRepositoryEndpoint(StackEndpoints.getRepositoryServiceEndpoint());
+		synapseClient.setAuthEndpoint(StackEndpoints.getAuthenticationServicePublicEndpoint());
 		return synapseClient;
 	}
 }

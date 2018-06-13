@@ -36,8 +36,10 @@ public class DockerRepoListGroupItem extends ListGroupItem {
 		anchor.setText(entity.getRepositoryName());
 		anchor.setHref("#!Synapse:" + entity.getId());
 		anchor.addClickHandler(event -> {
-			event.preventDefault();
-			entityClickedHandler.invoke(entity.getId());
+			if (!event.isMetaKeyDown()) {
+				event.preventDefault();
+				entityClickedHandler.invoke(entity.getId());
+			}
 		});
 		heading.add(anchor);
 		heading.addStyleName("displayInline");

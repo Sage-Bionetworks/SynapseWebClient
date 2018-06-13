@@ -10,6 +10,7 @@ import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.TopicUtils;
@@ -53,7 +54,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	private String message;
 	private boolean isThreadDeleted;
 	private DateTimeUtils dateTimeUtils;
-	
+	private ClientCache clientCache;
 	@Inject
 	public ReplyWidget(
 			ReplyWidgetView view,
@@ -67,7 +68,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			MarkdownWidget markdownWidget,
 			GWTWrapper gwt,
 			CopyTextModal copyTextModal,
-			SynapseJavascriptClient jsClient
+			SynapseJavascriptClient jsClient,
+			ClientCache clientCache
 			) {
 		this.view = view;
 		this.authorWidget = authorWidget;
@@ -82,6 +84,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.gwt = gwt;
 		this.copyTextModal = copyTextModal;
 		this.jsClient = jsClient;
+		this.clientCache = clientCache;
 		view.setPresenter(this);
 		view.setAuthor(authorWidget.asWidget());
 		view.setAlert(synAlert.asWidget());
@@ -119,21 +122,27 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	}
 
 	public void configureMessage() {
-		synAlert.clear();
-		view.setLoadingMessageVisible(true);
-		jsClient.getReplyUrl(messageKey, new AsyncCallback<String>(){
-
-			@Override
-			public void onFailure(Throwable caught) {
-				view.setLoadingMessageVisible(false);
-				synAlert.handleException(caught);
-			}
-
-			@Override
-			public void onSuccess(String result) {
-				getMessage(result);
-			}
-		});
+		if (clientCache.contains(messageKey + WebConstants.MESSAGE_SUFFIX)) {
+			// cache hit
+			setMessage(clientCache.get(messageKey + WebConstants.MESSAGE_SUFFIX));
+		} else {
+			// cache miss
+			synAlert.clear();
+			view.setLoadingMessageVisible(true);
+			jsClient.getReplyUrl(messageKey, new AsyncCallback<String>(){
+	
+				@Override
+				public void onFailure(Throwable caught) {
+					view.setLoadingMessageVisible(false);
+					synAlert.handleException(caught);
+				}
+	
+				@Override
+				public void onSuccess(String result) {
+					getMessage(result);
+				}
+			});
+		}
 	}
 
 	public void getMessage(String url) {
@@ -147,9 +156,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 						Response response) {
 					int statusCode = response.getStatusCode();
 					if (statusCode == Response.SC_OK) {
-						message = response.getText();
 						view.setLoadingMessageVisible(false);
-						markdownWidget.configure(message);
+						setMessage(response.getText());
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve message for reply " + replyId + ". Reason: " + response.getStatusText()));
 					}
@@ -165,6 +173,12 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			view.setLoadingMessageVisible(false);
 			synAlert.handleException(e);
 		}
+	}
+	
+	public void setMessage(String message) {
+		this.message = message;
+		markdownWidget.configure(message);
+		clientCache.put(messageKey + WebConstants.MESSAGE_SUFFIX, message);
 	}
 
 	private void configureEditReplyModal(String message) {

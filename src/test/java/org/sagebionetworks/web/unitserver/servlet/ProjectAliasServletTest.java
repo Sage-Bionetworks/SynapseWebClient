@@ -1,14 +1,13 @@
 package org.sagebionetworks.web.unitserver.servlet;
 
-import static org.mockito.Matchers.*;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.*;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
@@ -21,21 +20,15 @@ import org.sagebionetworks.client.SynapseClient;
 import org.sagebionetworks.client.exceptions.SynapseException;
 import org.sagebionetworks.client.exceptions.SynapseNotFoundException;
 import org.sagebionetworks.repo.model.EntityId;
-import org.sagebionetworks.repo.model.entity.query.EntityQuery;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResult;
-import org.sagebionetworks.repo.model.entity.query.EntityQueryResults;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.server.servlet.ProjectAliasServlet;
-import org.sagebionetworks.web.server.servlet.ServiceUrlProvider;
 import org.sagebionetworks.web.server.servlet.SynapseProvider;
 import org.sagebionetworks.web.server.servlet.TokenProvider;
-import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 public class ProjectAliasServletTest {
 
 	HttpServletRequest mockRequest;
 	HttpServletResponse mockResponse;
-	ServiceUrlProvider mockUrlProvider;
 	SynapseProvider mockSynapseProvider;
 	TokenProvider mockTokenProvider;
 	SynapseClient mockSynapse;
@@ -56,10 +49,8 @@ public class ProjectAliasServletTest {
 		mockSynapseProvider = mock(SynapseProvider.class);
 		when(mockSynapseProvider.createNewClient()).thenReturn(mockSynapse);
 
-		mockUrlProvider = mock(ServiceUrlProvider.class);
 		mockTokenProvider = mock(TokenProvider.class);
 
-		servlet.setServiceUrlProvider(mockUrlProvider);
 		servlet.setSynapseProvider(mockSynapseProvider);
 		servlet.setTokenProvider(mockTokenProvider);
 

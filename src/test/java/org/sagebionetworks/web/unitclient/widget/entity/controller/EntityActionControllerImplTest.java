@@ -835,7 +835,7 @@ public class EntityActionControllerImplTest {
 		// an attempt to delete should be made
 		verify(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
 		verify(mockView).showInfo(DELETED, THE + EntityTypeUtils.getDisplayName(EntityType.table) + WAS_SUCCESSFULLY_DELETED);
-		verify(mockPlaceChanger).goTo(new Synapse(parentId, null, EntityArea.TABLES, null) );
+		verify(mockPlaceChanger).goTo(new Synapse(parentId, null, EntityArea.TABLES, null));
 	}
 	
 	@Test
@@ -877,7 +877,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		// call under test
 		Place result = controller.createDeletePlace();
-		Place expected = new Synapse(parentId);
+		Place expected = new Synapse(parentId, null, EntityArea.FILES, null);
 		assertEquals(expected, result);
 	}
 

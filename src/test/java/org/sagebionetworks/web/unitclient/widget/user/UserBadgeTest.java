@@ -22,6 +22,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.UserProfile;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -55,22 +56,25 @@ public class UserBadgeTest {
 	private static final String FIRST_NAME = "John";
 	
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
+	@Mock
 	SynapseClientAsync mockSynapseClient;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
 	UserBadgeView mockView;
 	UserBadge userBadge;
 	UserProfile profile;
-	
+	@Mock
 	ClientCache mockCache;
-	String principalId = "id1";
+	String principalId = "id1", fileHandleId = "1234";
 	int max=10;
 	String displayName;
 	@Mock
 	UserProfileAsyncHandler mockUserProfileAsyncHandler;
-	@Mock
-	SynapseJavascriptClient mockSynapseJavascriptClient;
 	public static final String PICTURE_URL = "http://url.to.profile.picture";
 	@Before
 	public void before(){
@@ -79,18 +83,13 @@ public class UserBadgeTest {
 		profile.setFirstName(FIRST_NAME);
 		profile.setLastName(DOE);
 		profile.setUserName(DOEBOY);
-		profile.setProfilePicureFileHandleId("1234");
+		profile.setProfilePicureFileHandleId(fileHandleId);
 		displayName = DisplayUtils.getDisplayName(profile);
 		profile.setOwnerId(principalId);
-		mockSynapseClient = Mockito.mock(SynapseClientAsync.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
-		mockView = mock(UserBadgeView.class);
-		mockCache = mock(ClientCache.class);
-		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
-		when(mockSynapseJavascriptClient.getProfilePicturePreviewUrl(anyString())).thenReturn(PICTURE_URL);
-		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory, mockSynapseJavascriptClient);
+		when(mockSynapseJSNIUtils.getFileHandleAssociationUrl(anyString(), any(FileHandleAssociateType.class), anyString())).thenReturn(PICTURE_URL);
+		userBadge = new UserBadge(mockView, mockSynapseClient, mockGlobalApplicationState, mockSynapseJSNIUtils, mockCache, mockUserProfileAsyncHandler, adapterFactory);
 	}
 	
 	@Test

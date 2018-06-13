@@ -1,7 +1,5 @@
 package org.sagebionetworks.web.client.widget.team;
 
-import org.sagebionetworks.web.client.widget.user.UserBadge;
-
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.ui.IsWidget;
 
@@ -19,9 +17,7 @@ public interface OpenUserInvitationsWidgetView extends IsWidget {
 
 	void setSynAlert(IsWidget w);
 
-	void addInvitation(EmailInvitationBadge badge, String misId, String message, String createdOn);
-
-	void addInvitation(UserBadge userBadge, String inviteeEmail, String misId, String message, String createdOn);
+	void addInvitation(IsWidget userBadge, String inviteeEmail, String misId, String message, String createdOn);
 
 	void clear();
 	void setVisible(boolean visible);
@@ -30,5 +26,6 @@ public interface OpenUserInvitationsWidgetView extends IsWidget {
 		void goTo(Place place);
 		void removeInvitation(String ownerId);
 		void getNextBatch();
+		void resendInvitation(String membershipInvitationId);
 	}
 }

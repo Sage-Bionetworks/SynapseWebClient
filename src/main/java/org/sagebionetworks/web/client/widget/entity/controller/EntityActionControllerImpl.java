@@ -1308,8 +1308,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	            }
 	            @Override
 	            public void onFailure(Throwable caught) {
-	                if(!DisplayUtils.handleServiceException(caught, getGlobalApplicationState(), authenticationController.isLoggedIn(), view))
-	                    view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED + ": " + caught.getMessage());
+	            	view.showErrorMessage(DisplayConstants.ERROR_PAGE_CREATION_FAILED + ": " + caught.getMessage());
 	            }
 	        });
 		}
@@ -1445,9 +1444,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			
 			@Override
 			public void onFailure(Throwable caught) {
-				if(!DisplayUtils.handleServiceException(caught, getGlobalApplicationState(),isUserAuthenticated, view)) {
-					view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
-				}
+				view.showErrorMessage(DisplayConstants.ERROR_ENTITY_DELETE_FAILURE);			
 			}
 		});
 	}
@@ -1462,6 +1459,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if(parentId != null && !(entityBundle.getEntity() instanceof Project)) {					
 			if(entityBundle.getEntity() instanceof Table) gotoPlace = new Synapse(parentId, null, EntityArea.TABLES, null);
 			else if(entityBundle.getEntity() instanceof DockerRepository) gotoPlace = new Synapse(parentId, null, EntityArea.DOCKER, null);
+			else if(entityBundle.getEntity() instanceof FileEntity || entityBundle.getEntity() instanceof Folder) gotoPlace = new Synapse(parentId, null, EntityArea.FILES, null);
 			else gotoPlace = new Synapse(parentId);
 		} else {
 			gotoPlace = new Profile(authenticationController.getCurrentUserPrincipalId());

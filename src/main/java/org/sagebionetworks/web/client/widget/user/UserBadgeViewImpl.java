@@ -53,10 +53,12 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public static final String USER_ID_ATTRIBUTE = "data-profile-user-id";
 	public static PlaceChanger placeChanger = null;
 	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
-		event.preventDefault();
-		Widget panel = (Widget)event.getSource();
-		String userId = panel.getElement().getAttribute(USER_ID_ATTRIBUTE);
-		placeChanger.goTo(new Profile(userId));
+		if (!event.isMetaKeyDown()) {
+			event.preventDefault();
+			Widget panel = (Widget)event.getSource();
+			String userId = panel.getElement().getAttribute(USER_ID_ATTRIBUTE);
+			placeChanger.goTo(new Profile(userId));
+		}
 	};
 	
 	public static final ClickHandler NEW_WINDOW_CLICKHANDLER = event -> {
