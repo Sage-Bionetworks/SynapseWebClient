@@ -299,48 +299,82 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		return Document.get().getElementById(elementId);
 	};
 	
+	/**
+	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to (progressively by slicing the file) calculate the md5.
+	 */
 	@Override
 	public void getFileMd5(JavaScriptObject blob, MD5Callback md5Callback) {
 		_getFileMd5(blob, md5Callback);
 	}
-
-	/**
-	 * Use CryptoJS to calculate the md5 a file blob (might be the full file, or part of the file).
-	 */
 	private final static native void _getFileMd5(JavaScriptObject file, MD5Callback md5Callback) /*-{
-		$wnd.frOnload = function(e) {
-			console.log("Finished loading file blob to calculate md5.  Calculating md5...");
-			var hash = $wnd.CryptoJS.MD5($wnd.CryptoJS.enc.Latin1.parse(e.target.result));
-			var md5 = hash.toString($wnd.CryptoJS.enc.Hex)
-			console.log("Finished calculating md5.");
-			// Call instance method setMD5() on md5Callback with the final md5
-			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(md5);
+		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
+		chunkSize = 2097152; // read in chunks of 2MB
+        chunks = Math.ceil(file.size / chunkSize);
+        currentChunk = 0;
+        spark = new $wnd.SparkMD5.ArrayBuffer();
+        $wnd.frOnload = function(e) {
+            console.log("read chunk nr", currentChunk + 1, "of", chunks);
+            spark.append(e.target.result);                 // append array buffer
+            currentChunk++;
+
+            if (currentChunk < chunks) {
+                $wnd.loadNext();
+            }
+            else {
+               console.log("finished loading file (to calculate md5)");
+               // Call instance method setMD5() on md5Callback with the final md5
+    			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
+            }
+        };
+        $wnd.frOnerror = function () {
+        	console.warn("unable to calculate md5");
+            md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
+        };
+        
+        $wnd.loadNext = function() { 
+            var fileReader = new FileReader();
+	        fileReader.onload = $wnd.frOnload;
+	        fileReader.onerror = $wnd.frOnerror;
+	
+	        var start = currentChunk * chunkSize,
+	            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
+			console.log("MD5 full file: loading next chunk: start=", start, " end=", end);
+	        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
 		};
-		$wnd.frOnerror = function() {
-			console.warn("Unable to calculate file blob md5");
-			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
-		};
-		var cryptojs = $wnd.CryptoJS;
-		console.log("Loading file blob to calculate md5...");
-		var fileReader = new FileReader();
-		fileReader.onload = $wnd.frOnload;
-		fileReader.onerror = $wnd.frOnerror;
-		fileReader.readAsBinaryString(file);
+       $wnd.loadNext();
 	}-*/;
 
 	/**
-	 * Use CryptoJS to calculate the md5 of part of a file.
+	 * Using SparkMD5 (https://github.com/satazor/SparkMD5) to calculate the md5 of part of a file.
 	 */
 	@Override
 	public void getFilePartMd5(JavaScriptObject blob, int currentChunk, Long chunkSize, MD5Callback md5Callback) {
-		_getFileMd5(_getFilePart(blob, currentChunk, chunkSize.doubleValue()), md5Callback);
+		_getFilePartMd5(blob, currentChunk, chunkSize.doubleValue(), md5Callback);
 	}
-	private final static native JavaScriptObject _getFilePart(JavaScriptObject file, int currentChunk, double chunkSize) /*-{
+	private final static native void _getFilePartMd5(JavaScriptObject file, int currentChunk, double chunkSize, MD5Callback md5Callback) /*-{
 		var blobSlice = file.slice || file.mozSlice || file.webkitSlice;
-		var start = currentChunk * chunkSize,
+		spark = new $wnd.SparkMD5.ArrayBuffer();
+        $wnd.frOnload = function(e) {
+            spark.append(e.target.result); // append array buffer
+           // Call instance method setMD5() on md5Callback with the final md5
+			md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(spark.end());
+        };
+        $wnd.frOnerror = function () {
+        	console.warn("unable to calculate file part md5");
+            md5Callback.@org.sagebionetworks.web.client.callback.MD5Callback::setMD5(Ljava/lang/String;)(null);
+        };
+        
+        $wnd.loadPart = function() { 
+            var fileReader = new FileReader();
+	        fileReader.onload = $wnd.frOnload;
+	        fileReader.onerror = $wnd.frOnerror;
+			var start = currentChunk * chunkSize,
 	            end = ((start + chunkSize) >= file.size) ? file.size : start + chunkSize;
-	    console.log("Slicing file blob to get the md5 of part " + currentChunk + "  (chunk size=" + chunkSize+", start="+start+", end="+end+")");
-		return blobSlice.call(file, start, end);
+	        
+	        console.log("MD5 file part: loading chunk: start=", start, " end=", end);
+	        fileReader.readAsArrayBuffer(blobSlice.call(file, start, end));
+		};
+       $wnd.loadPart();
 	}-*/;
 	
 	@Override
