@@ -65,8 +65,11 @@ import com.google.gwt.xhr.client.XMLHttpRequest;
 
 public class MultipartUploaderTest {
 	
+	@Mock
 	ProgressingFileUploadHandler mockHandler;
+	@Mock
 	SynapseJSNIUtils synapseJsniUtils;
+	@Mock
 	GWTWrapper gwt;
 	MultipartUploaderImpl uploader;
 	String MD5;
@@ -101,9 +104,6 @@ public class MultipartUploaderTest {
 	@Before
 	public void before() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		mockHandler = mock(ProgressingFileUploadHandler.class);
-		synapseJsniUtils =mock(SynapseJSNIUtils.class);
-		gwt = mock(GWTWrapper.class);
 		ChunkedFileToken token = new ChunkedFileToken();
 		token.setFileName("testFile.txt");
 		
@@ -247,10 +247,16 @@ public class MultipartUploaderTest {
 		uploader.addCurrentPartToMultipartUpload();
 		verify(mockJsClient).addPartToMultipartUpload(anyString(), anyInt(), anyString(), any(AsyncCallback.class));
 		//should not have completed, since there's another part
+
+		// SWC-4262: check the file md5 once in the beginning
+		verify(synapseJsniUtils).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
 		verify(mockJsClient, never()).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 		
 		uploader.addCurrentPartToMultipartUpload();
 		verify(mockJsClient).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		// SWC-4262: check the file md5 once in the beginning, and once on complete.
+		verify(synapseJsniUtils, times(2)).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
+
 		// the handler should get the id.
 		verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
 	}
