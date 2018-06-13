@@ -261,6 +261,38 @@ public class MultipartUploaderTest {
 		verify(mockHandler).uploadSuccess(RESULT_FILE_HANDLE_ID);
 	}
 	
+
+	@Test
+	public void testDirectUploadMultiPartFileChanges() throws Exception {
+		setPartsState("00");
+		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
+		
+		//manually call the method that's invoked with a successful xhr put (upload)
+		uploader.addCurrentPartToMultipartUpload();
+		
+		// SWC-4262: check the file md5 once in the beginning
+		verify(synapseJsniUtils).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
+		verify(mockJsClient, never()).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+		
+		doAnswer(new Answer<Void>() {
+			@Override
+			public Void answer(InvocationOnMock invocation) throws Throwable {
+                final Object[] args = invocation.getArguments();
+                ((MD5Callback) args[args.length - 1]).setMD5("different md5!");
+				return null;
+			}
+		}).when(synapseJsniUtils).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
+		
+		uploader.addCurrentPartToMultipartUpload();
+		verify(mockJsClient, never()).completeMultipartUpload(anyString(), any(AsyncCallback.class));
+
+		// SWC-4262: check the file md5 once in the beginning, and once on complete.
+		verify(synapseJsniUtils, times(2)).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
+
+		// SWC-4262: the md5 check on complete caused the upload to fail (because the md5 changed)
+		verify(mockHandler).uploadFailed(anyString());
+	}
+	
 	//failure cases
 	
 	
