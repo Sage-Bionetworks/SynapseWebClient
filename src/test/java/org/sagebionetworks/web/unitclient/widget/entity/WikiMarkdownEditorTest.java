@@ -6,6 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,6 +17,8 @@ import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InOrder;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -23,6 +26,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.ObjectType;
 import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -30,6 +34,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
 import org.sagebionetworks.web.client.widget.entity.WikiMarkdownEditor;
@@ -49,7 +54,6 @@ public class WikiMarkdownEditorTest {
 	PlaceChanger mockPlaceChanger;
 	WikiMarkdownEditor presenter;
 	WikiPageKey wikiPageKey;
-	String initialMarkdown;
 	CallbackP<WikiPage> mockDescriptorUpdatedHandler;
 	GlobalApplicationState mockGlobalApplicationState;
 	WikiPage testPage;
@@ -66,6 +70,8 @@ public class WikiMarkdownEditorTest {
 	WikiPage mockWikiPage;
 	@Mock
 	PopupUtilsView mockPopupUtilsView;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -77,7 +83,6 @@ public class WikiMarkdownEditorTest {
 		presenter = new WikiMarkdownEditor(mockView, mockMarkdownEditorWidget, mockSynapseClient, mockGlobalApplicationState, mockSynapseJavascriptClient, mockPortalGinInjector, mockPopupUtilsView);
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		mockDescriptorUpdatedHandler = mock(CallbackP.class);
-		initialMarkdown = "Hello Markdown";
 		
 		String testPageMarkdownText = "my test markdown";
 		testPage = new WikiPage();
@@ -130,6 +135,22 @@ public class WikiMarkdownEditorTest {
 		//tests setActionHandler as well
 		reset(mockView);
 		presenter.cancelClicked();
+		verify(mockPopupUtilsView, never()).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
+		verify(mockView).hideEditorModal();
+	}
+	
+	@Test
+	public void testCancelWithUnsavedChanges() {
+		reset(mockView);
+		when(mockMarkdownEditorWidget.getMarkdown()).thenReturn("unsaved changes");
+		
+		presenter.cancelClicked();
+		
+		verify(mockPopupUtilsView).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
+		verify(mockView, never()).hideEditorModal();
+		
+		// simulate user confirmed
+		callbackCaptor.getValue().invoke();
 		verify(mockView).hideEditorModal();
 	}
 	

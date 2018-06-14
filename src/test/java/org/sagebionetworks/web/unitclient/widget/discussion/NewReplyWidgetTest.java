@@ -20,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.PopupUtilsView;
@@ -102,10 +103,28 @@ public class NewReplyWidgetTest {
 		verify(mockMarkdownEditor, never()).setMarkdownFocus();
 	}
 
-
 	@Test
 	public void testOnClickCancel() {
 		newReplyWidget.onCancel();
+		
+		//since no changes were made, verify confirmation dialog was not shown
+		verify(mockPopupUtilsView, never()).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
+		verify(mockView, times(2)).resetButton();
+		verify(mockView, times(2)).setReplyTextBoxVisible(true);
+		verify(mockView, times(2)).setNewReplyContainerVisible(false);
+	}
+	
+	@Test
+	public void testOnClickCancelWithUnsavedChanges() {
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("unsaved changes");
+		newReplyWidget.onCancel();
+		
+		verify(mockPopupUtilsView).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
+		
+		// simulate user confirmed
+		callbackCaptor.getValue().invoke();
+		
+		//verify cancel
 		verify(mockView, times(2)).resetButton();
 		verify(mockView, times(2)).setReplyTextBoxVisible(true);
 		verify(mockView, times(2)).setNewReplyContainerVisible(false);

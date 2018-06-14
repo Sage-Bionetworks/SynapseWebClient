@@ -20,6 +20,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -63,6 +64,7 @@ public class NewDiscussionThreadModalTest {
 		modal = new NewDiscussionThreadModal(mockView, mockDiscussionForumClient,
 				mockSynAlert, mockMarkdownEditor, mockAuthController, mockStorage, mockPopupUtilsView);
 		modal.configure(forumId, mockCallback);
+		when(mockMarkdownEditor.getMarkdown()).thenReturn(DEFAULT_MARKDOWN);
 	}
 
 	@Test
@@ -181,5 +183,26 @@ public class NewDiscussionThreadModalTest {
 		verify(mockMarkdownEditor).configure(DEFAULT_MARKDOWN);
 		verify(mockStorage, times(0)).removeItem(anyString());
 	}
+	@Test
+	public void testOnClickCancel() {
+		modal.onCancel();
+		
+		//since no changes were made, verify confirmation dialog was not shown
+		verify(mockPopupUtilsView, never()).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
+		verify(mockView).hideDialog();
+	}
 	
+	@Test
+	public void testOnClickCancelWithUnsavedChanges() {
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("unsaved changes");
+		modal.onCancel();
+		
+		//since no changes were made, verify confirmation dialog was not shown
+		verify(mockPopupUtilsView).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
+		verify(mockView, never()).hideDialog();
+		// simulate user confirmed
+		callbackCaptor.getValue().invoke();
+		
+		verify(mockView).hideDialog();
+	}
 }
