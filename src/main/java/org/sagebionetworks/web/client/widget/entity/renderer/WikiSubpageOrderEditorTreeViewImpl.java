@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.entity.renderer;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
 import org.sagebionetworks.web.client.utils.UnorderedListPanel;
@@ -140,7 +141,7 @@ public class WikiSubpageOrderEditorTreeViewImpl extends FlowPanel implements Wik
 		l.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				if (!event.isMetaKeyDown()) {
+				if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 					event.preventDefault();
 					presenter.selectTreeItem(node);
 				}

@@ -5,6 +5,7 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.Tooltip;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -35,7 +36,7 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	public static final String ENTITY_ID_ATTRIBUTE = "data-entity-id";
 	public static PlaceChanger placeChanger = null;
 	public static final ClickHandler STANDARD_CLICKHANDLER = event -> {
-		if (!event.isMetaKeyDown()) {
+		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 			event.preventDefault();
 			Widget panel = (Widget)event.getSource();
 			String entityId = panel.getElement().getAttribute(ENTITY_ID_ATTRIBUTE);
@@ -75,7 +76,7 @@ public class EntityIdCellRendererViewImpl implements EntityIdCellRendererView {
 	public void setClickHandler(ClickHandler clickHandler) {
 		handlerRegistration.removeHandler();
 		handlerRegistration = entityLink.addClickHandler(event -> {
-			if (!event.isMetaKeyDown()) {
+			if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 				event.preventDefault();
 				clickHandler.onClick(event);
 			}

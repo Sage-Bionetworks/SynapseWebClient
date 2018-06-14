@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.ClearFix;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.EntityHeader;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -45,7 +46,7 @@ public class TableEntityListGroupItem extends ListGroupItem {
 		anchor.setHref("#!Synapse:"+header.getId());
 		anchor.setText(header.getName());
 		anchor.addClickHandler(event -> {
-			if (!event.isMetaKeyDown()) {
+			if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 				event.preventDefault();
 				clickHandler.onClick(event);
 			}

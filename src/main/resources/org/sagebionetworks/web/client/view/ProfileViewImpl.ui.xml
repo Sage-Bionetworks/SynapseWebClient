@@ -125,8 +125,8 @@
 							    <ul class="nav nav-tabs entity-tabs margin-top-15 border-none">
 								    <li class="entity-tab active margin-left-15" ui:field="projectsListItem">
 								    		<a class="text-align-center link no-background">
-									    		<g:FocusPanel ui:field="projectsLink" addStyleNames="displayInline" tabIndex="-1">
-									    			<b:Anchor addStyleNames="textDecorationNone">Projects</b:Anchor>
+									    		<g:FocusPanel ui:field="projectsFocusPanel" addStyleNames="displayInline" tabIndex="-1">
+									    			<b:Anchor ui:field="projectsLink" addStyleNames="textDecorationNone">Projects</b:Anchor>
 										    </g:FocusPanel>
 										    <w:HelpWidget helpMarkdown="This tab shows you the Projects you have created, those that have been shared with you and your favorites.&#10;Start creating a project by giving it a name." 
 										    	href="http://docs.synapse.org/articles/making_a_project.html" placement="BOTTOM"/>
@@ -134,8 +134,8 @@
 								    </li>
 								    <li class="entity-tab" ui:field="challengesListItem">
 								    		<a class="text-align-center link no-background">
-									    		<g:FocusPanel ui:field="challengesLink" addStyleNames="displayInline" tabIndex="-1">
-									    			<b:Anchor addStyleNames="textDecorationNone">Challenges</b:Anchor>
+									    		<g:FocusPanel ui:field="challengesFocusPanel" addStyleNames="displayInline" tabIndex="-1">
+									    			<b:Anchor ui:field="challengesLink" addStyleNames="textDecorationNone">Challenges</b:Anchor>
 										    </g:FocusPanel>
 										    <w:HelpWidget helpMarkdown="This tab shows you challenges you have registered for.&#10;Challenges are computational contests organized through the Dream Challenges." 
 										    	href="http://dreamchallenges.org" placement="BOTTOM"/>
@@ -143,8 +143,8 @@
 								    </li>
 								    <li class="entity-tab" ui:field="teamsListItem">
 								    		<a class="text-align-center link no-background">
-									    		<g:FocusPanel ui:field="teamsLink" addStyleNames="displayInline" tabIndex="-1">
-									    			<b:Anchor addStyleNames="textDecorationNone">Teams</b:Anchor>
+									    		<g:FocusPanel ui:field="teamsFocusPanel" addStyleNames="displayInline" tabIndex="-1">
+									    			<b:Anchor ui:field="teamsLink" addStyleNames="textDecorationNone">Teams</b:Anchor>
 										    </g:FocusPanel>
 										    <bh:Span ui:field="teamNotifications" />
 										    <w:HelpWidget helpMarkdown="This tab lists Teams you have created and have been invited to join.&#10;Create a Team by providing a name and clicking “Create Team”." 
@@ -153,8 +153,8 @@
 								    </li>
 								    <li class="entity-tab" ui:field="settingsListItem">
 								    		<a class="text-align-center link no-background">
-									    		<g:FocusPanel ui:field="settingsLink" addStyleNames="displayInline" tabIndex="-1">
-									    			<b:Anchor addStyleNames="textDecorationNone">Settings</b:Anchor>
+									    		<g:FocusPanel ui:field="settingsFocusPanel" addStyleNames="displayInline" tabIndex="-1">
+									    			<b:Anchor ui:field="settingsLink" addStyleNames="textDecorationNone">Settings</b:Anchor>
 										    </g:FocusPanel>
 										</a>
 								    	</li>

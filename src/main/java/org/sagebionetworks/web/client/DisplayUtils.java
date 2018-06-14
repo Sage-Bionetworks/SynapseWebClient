@@ -106,7 +106,11 @@ public class DisplayUtils {
 		source.selectAll();
 	};
 	public static final ClickHandler DO_NOTHING_CLICKHANDLER = event -> {
-		event.preventDefault();
+		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+			event.preventDefault();	
+		} else {
+			event.stopPropagation();
+		}
 	};
 	
 	/**
@@ -1119,5 +1123,9 @@ public class DisplayUtils {
 		int elemTop = widget.getAbsoluteTop();
 //		int elemBottom = elemTop + widget.getOffsetHeight();
 		return docViewBottom >= elemTop && elemTop != 0;
+	}
+	
+	public static boolean isAnyModifierKeyDown(ClickEvent event) {
+		return event.isAltKeyDown() || event.isControlKeyDown() || event.isMetaKeyDown() || event.isShiftKeyDown();
 	}
 }
