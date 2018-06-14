@@ -46,7 +46,7 @@ public class DiscussionThreadModalViewImpl implements DiscussionThreadModalView 
 		cancelButton.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
-				threadModal.hide();
+				presenter.onCancel();
 			}
 		});
 	}

@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.wiki.WikiPage;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
@@ -63,7 +64,8 @@ public class WikiMarkdownEditorTest {
 	PortalGinInjector mockPortalGinInjector;
 	@Mock
 	WikiPage mockWikiPage;
-	
+	@Mock
+	PopupUtilsView mockPopupUtilsView;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -72,7 +74,7 @@ public class WikiMarkdownEditorTest {
 		mockGlobalApplicationState = mock(GlobalApplicationState.class);
 		mockPlaceChanger = mock(PlaceChanger.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		presenter = new WikiMarkdownEditor(mockView, mockMarkdownEditorWidget, mockSynapseClient, mockGlobalApplicationState, mockSynapseJavascriptClient, mockPortalGinInjector);
+		presenter = new WikiMarkdownEditor(mockView, mockMarkdownEditorWidget, mockSynapseClient, mockGlobalApplicationState, mockSynapseJavascriptClient, mockPortalGinInjector, mockPopupUtilsView);
 		wikiPageKey = new WikiPageKey("syn1111", ObjectType.ENTITY.toString(), null);
 		mockDescriptorUpdatedHandler = mock(CallbackP.class);
 		initialMarkdown = "Hello Markdown";

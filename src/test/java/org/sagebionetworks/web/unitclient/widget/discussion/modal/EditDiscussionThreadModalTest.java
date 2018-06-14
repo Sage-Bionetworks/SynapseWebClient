@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.DiscussionThreadModalView;
@@ -37,6 +38,8 @@ public class EditDiscussionThreadModalTest {
 	DiscussionThreadBundle mockDiscussionThreadBundle;
 	@Mock
 	MarkdownEditorWidget mockMarkdownEditor;
+	@Mock
+	PopupUtilsView mockPopupUtilsView;
 	String threadId = "123";
 	String title = "title";
 	String message = "message";
@@ -46,7 +49,7 @@ public class EditDiscussionThreadModalTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		modal = new EditDiscussionThreadModal(mockView, mockDiscussionForumClient,
-				mockSynAlert, mockMarkdownEditor);
+				mockSynAlert, mockMarkdownEditor, mockPopupUtilsView);
 		modal.configure(threadId, title, message, mockCallback);
 	}
 

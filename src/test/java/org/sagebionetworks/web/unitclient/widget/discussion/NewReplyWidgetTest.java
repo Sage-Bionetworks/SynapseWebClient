@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -55,6 +56,8 @@ public class NewReplyWidgetTest {
 	@Mock
 	private SessionStorage mockStorage;
 	@Mock
+	PopupUtilsView mockPopupUtilsView;
+	@Mock
 	Callback mockCallback;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
@@ -63,9 +66,10 @@ public class NewReplyWidgetTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		newReplyWidget = new NewReplyWidget(mockView, mockDiscussionForumClient, mockSynAlert,
-				mockMarkdownEditor, mockAuthController, mockGlobalApplicationState, mockStorage);
+				mockMarkdownEditor, mockAuthController, mockGlobalApplicationState, mockStorage, mockPopupUtilsView);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		when(mockMarkdownEditor.getMarkdown()).thenReturn(DEFAULT_MARKDOWN);
 		newReplyWidget.configure("1", mockCallback);
 	}
 
