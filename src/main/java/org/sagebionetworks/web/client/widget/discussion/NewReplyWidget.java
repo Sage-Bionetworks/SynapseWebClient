@@ -145,7 +145,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 				if (newReplyCallback != null) {
 					newReplyCallback.invoke();
 				}
-				onCancel();
+				reset();
 				storage.removeItem(key);
 			}
 		});
