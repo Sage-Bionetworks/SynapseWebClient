@@ -14,6 +14,7 @@ public interface ReplyModalView extends IsWidget{
 		Widget asWidget();
 
 		void onSave();
+		void onCancel();
 	}
 
 	void setPresenter(Presenter presenter);

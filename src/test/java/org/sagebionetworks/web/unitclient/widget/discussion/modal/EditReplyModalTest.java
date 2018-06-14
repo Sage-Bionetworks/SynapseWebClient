@@ -13,6 +13,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModal;
 import org.sagebionetworks.web.client.widget.discussion.modal.ReplyModalView;
@@ -36,6 +37,8 @@ public class EditReplyModalTest {
 	DiscussionReplyBundle mockDiscussionReplyBundle;
 	@Mock
 	MarkdownEditorWidget mockMarkdownEditor;
+	@Mock
+	PopupUtilsView mockPopupUtilsView;
 	String replyId = "123";
 	String message = "message";
 	EditReplyModal modal;
@@ -43,7 +46,7 @@ public class EditReplyModalTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		modal = new EditReplyModal(mockView, mockDiscussionForumClient, mockSynAlert, mockMarkdownEditor);
+		modal = new EditReplyModal(mockView, mockDiscussionForumClient, mockSynAlert, mockMarkdownEditor, mockPopupUtilsView);
 		modal.configure(replyId, message, mockCallback);
 	}
 

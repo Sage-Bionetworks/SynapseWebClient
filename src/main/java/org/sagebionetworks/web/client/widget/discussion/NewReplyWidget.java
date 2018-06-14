@@ -75,7 +75,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	}
 	
 	public void reset() {
-		onCancel();
+		onCancelAfterConfirm();
 	}
 
 	@Override
