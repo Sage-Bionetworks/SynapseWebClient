@@ -5,6 +5,8 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
@@ -26,6 +28,7 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
 	private MarkdownEditorWidget markdownEditor;
+	private PopupUtilsView popupUtils;
 	private String replyId;
 	private String message;
 	Callback editReplyCallback;
@@ -35,13 +38,15 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 			ReplyModalView view,
 			DiscussionForumClientAsync discussionForumClient,
 			SynapseAlert synAlert,
-			MarkdownEditorWidget markdownEditor
+			MarkdownEditorWidget markdownEditor,
+			PopupUtilsView popupUtils
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
 		fixServiceEntryPoint(discussionForumClient);
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
+		this.popupUtils = popupUtils;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(EDIT_REPLY_MODAL_TITLE);
@@ -68,6 +73,21 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 		view.hideDialog();
 	}
 
+	@Override
+	public void onCancel() {
+		if (!markdownEditor.getMarkdown().equals(message)) {
+			popupUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, () -> {
+				onCancelAfterConfirm();
+			});
+		} else {
+			onCancelAfterConfirm();
+		}
+	}
+	
+	public void onCancelAfterConfirm() {
+		view.hideDialog();
+	}
+	
 	@Override
 	public void onSave() {
 		synAlert.clear();

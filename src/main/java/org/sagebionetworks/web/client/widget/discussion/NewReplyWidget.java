@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -39,6 +40,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	private Callback newReplyCallback;
 	private String threadId;
 	private String key;
+	private PopupUtilsView popupUtils;
 
 	@Inject
 	public NewReplyWidget(
@@ -48,7 +50,8 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			MarkdownEditorWidget markdownEditor,
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState,
-			SessionStorage sessionStorage
+			SessionStorage sessionStorage,
+			PopupUtilsView popupUtils
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
@@ -58,6 +61,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
 		this.storage = sessionStorage;
+		this.popupUtils = popupUtils;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setMarkdownEditor(markdownEditor.asWidget());
@@ -71,7 +75,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	}
 	
 	public void reset() {
-		onCancel();
+		onCancelAfterConfirm();
 	}
 
 	@Override
@@ -141,7 +145,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 				if (newReplyCallback != null) {
 					newReplyCallback.invoke();
 				}
-				onCancel();
+				reset();
 				storage.removeItem(key);
 			}
 		});
@@ -149,6 +153,16 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	
 	@Override
 	public void onCancel() {
+		if (!markdownEditor.getMarkdown().isEmpty()) {
+			popupUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, () -> {
+				onCancelAfterConfirm();
+			});
+		} else {
+			onCancelAfterConfirm();
+		}
+	}
+	
+	public void onCancelAfterConfirm() {
 		view.resetButton();
 		view.setReplyTextBoxVisible(true);
 		view.setNewReplyContainerVisible(false);

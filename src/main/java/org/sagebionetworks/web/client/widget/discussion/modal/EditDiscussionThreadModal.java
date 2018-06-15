@@ -4,6 +4,8 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
 import org.sagebionetworks.web.client.widget.entity.MarkdownEditorWidget;
@@ -26,6 +28,7 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 	private DiscussionForumClientAsync discussionForumClient;
 	private SynapseAlert synAlert;
 	private MarkdownEditorWidget markdownEditor;
+	private PopupUtilsView popupUtils;
 	private String threadId;
 	private String title;
 	private String message;
@@ -36,13 +39,15 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 			DiscussionThreadModalView view,
 			DiscussionForumClientAsync discussionForumClient,
 			SynapseAlert synAlert,
-			MarkdownEditorWidget markdownEditor
+			MarkdownEditorWidget markdownEditor,
+			PopupUtilsView popupUtils
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
 		fixServiceEntryPoint(discussionForumClient);
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
+		this.popupUtils = popupUtils;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(EDIT_THREAD_MODAL_TITLE);
@@ -104,6 +109,17 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 			}
 
 		});
+	}
+	
+	@Override
+	public void onCancel() {
+		if (!markdownEditor.getMarkdown().equals(message)) {
+			popupUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, () -> {
+				view.hideDialog();
+			});
+		} else {
+			view.hideDialog();
+		}
 	}
 
 	@Override

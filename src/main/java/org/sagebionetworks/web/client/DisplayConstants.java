@@ -19,6 +19,7 @@ public class DisplayConstants {
 	
 	public static final String SINGLE_LINE_COMMAND_MESSAGE = "This command only supports single line operations.\nPlease select text within a single line and try again.";
 	
+	public static final String UNSAVED_CHANGES = "Unsaved Changes";
 	public static final String CLOSE_PORTAL_CONFIRMATION_MESSAGE = "Any unsaved changes will be lost. Are you sure that you would like to leave Synapse?";
 	public static final String NAVIGATE_AWAY_CONFIRMATION_MESSAGE = "Any unsaved changes may be lost. Are you sure that you would like to navigate away from this editor?";
 	

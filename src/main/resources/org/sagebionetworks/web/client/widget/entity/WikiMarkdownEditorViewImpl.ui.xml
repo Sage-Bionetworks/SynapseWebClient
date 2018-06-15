@@ -13,7 +13,7 @@
 			<b:ModalFooter>
 			    <b:Button ui:field="deleteButton" pull="LEFT" addStyleNames="text-danger" >Delete Page</b:Button>
 			    <b:Button ui:field="saveButton" type="PRIMARY" dataLoadingText="Saving..." pull="RIGHT">Save</b:Button>
-			    <b:Button ui:field="cancelButton" pull="RIGHT" dataDismiss="MODAL" type="LINK">Cancel</b:Button>
+			    <b:Button ui:field="cancelButton" pull="RIGHT" type="LINK">Cancel</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
 	</bh:Div>

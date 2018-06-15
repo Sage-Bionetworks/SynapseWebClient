@@ -8,6 +8,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -44,12 +45,11 @@ public class NewReplyWidgetViewImpl implements NewReplyWidgetView{
 				presenter.onClickNewReply();
 			}
 		});
-		cancelButton.addClickHandler(new ClickHandler(){
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onCancel();
-			}
-		});
+		ClickHandler onCancel = event -> {
+			presenter.onCancel();
+		};
+		cancelButton.addClickHandler(onCancel);
+		widget.addDomHandler(DisplayUtils.getESCKeyDownHandler(onCancel), KeyDownEvent.getType());
 		saveButton.addClickHandler(new ClickHandler(){
 			@Override
 			public void onClick(ClickEvent event) {
