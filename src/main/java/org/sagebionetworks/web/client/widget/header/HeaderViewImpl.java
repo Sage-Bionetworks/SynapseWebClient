@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.ButtonGroup;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Row;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -48,8 +49,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Anchor projectHeadingAnchor;
 	@UiField
 	Div headingPanel;
-
 	@UiField
+	Anchor dashboardLink;
 	Button dashboardButton;
 	@UiField
 	ButtonGroup headerFavButtonGroup;
@@ -123,6 +124,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		myDashboardButtonContents.add(userBadge.asWidget());
 		userBadgeText = new Span();
 		myDashboardButtonContents.add(userBadgeText);
+		dashboardButton = new Button();
+		dashboardButton.setSize(ButtonSize.EXTRA_SMALL);
+		dashboardButton.setHeight("28px");
+		dashboardButton.addStyleName("my-dashboard-header-button");
+		dashboardLink.add(dashboardButton);
 		addUserPicturePanel();
 		initClickHandlers();
 		refreshTestSiteHeader();
@@ -210,8 +216,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		logoutLink.addClickHandler(event -> {
 			presenter.onLogoutClick();
 		});
+		dashboardLink.addClickHandler(DisplayUtils.DO_NOTHING_CLICKHANDLER);
 		dashboardButton.addClickHandler(event -> {
-			presenter.onDashboardClick();
+			if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+				event.preventDefault();
+				presenter.onDashboardClick();
+			}
 		});
 		loginLink.addClickHandler(event -> {
 			presenter.onLoginClick();
@@ -274,6 +284,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			logoutLink.setVisible(true);
 			dashboardButtonUI.setVisible(true);
 			headerFavButtonGroup.setVisible(true);
+			dashboardLink.setHref("#!Profile:" + userData.getProfile().getOwnerId());
 		} else {
 			loginLinkUI.setVisible(true);
 			registerLinkUI.setVisible(true);
