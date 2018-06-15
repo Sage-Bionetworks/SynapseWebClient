@@ -6,6 +6,7 @@ import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 
+import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -117,7 +118,9 @@ public class NewReplyWidgetViewImpl implements NewReplyWidgetView{
 	
 	@Override
 	public void scrollIntoView() {
-		Window.scrollTo(0, markdownEditorContainer.getAbsoluteTop());
+		Scheduler.get().scheduleDeferred(() -> {
+			Window.scrollTo(0, markdownEditorContainer.getAbsoluteTop());
+		});
 	}
 
 }
