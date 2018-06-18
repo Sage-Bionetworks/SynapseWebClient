@@ -77,7 +77,6 @@ public class LoginWidgetTest {
 		usd.setSession(mockSession);
 		when(mockSession.getAcceptsTermsOfUse()).thenReturn(true);
 		AsyncMockStubber.callSuccessWith(usd).when(mockAuthController).loginUser(anyString(),anyString(),any(AsyncCallback.class));
-		verify(mockView).setPresenter(loginWidget);
 		verify(mockView).setSynAlert(mockSynAlert);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 	}
@@ -85,6 +84,7 @@ public class LoginWidgetTest {
 	@Test
 	public void testAsWidget(){
 		loginWidget.asWidget();
+		verify(mockView).setPresenter(loginWidget);
 	}
 	
 	@Test
