@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.accessrequirements.submission;
 
+import org.gwtbootstrap3.client.ui.BlockQuote;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.FormGroup;
@@ -7,6 +8,7 @@ import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -29,6 +31,8 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	Label stateField;
 	@UiField
 	Label stateField2;
+	@UiField
+	BlockQuote rejectedReasonField;
 	
 	@UiField
 	Label institutionField;
@@ -253,5 +257,14 @@ public class ACTDataAccessSubmissionWidgetViewImpl implements ACTDataAccessSubmi
 	public void setShowEmailButton(IsWidget w) {
 		showEmailsButtonContainer.clear();
 		showEmailsButtonContainer.add(w);
+	}
+	@Override
+	public void setRejectedReason(String reason) {
+		rejectedReasonField.clear();
+		rejectedReasonField.add(new Text(reason));
+	}
+	@Override
+	public void setRejectedReasonVisible(boolean visible) {
+		rejectedReasonField.setVisible(visible);
 	}
 }

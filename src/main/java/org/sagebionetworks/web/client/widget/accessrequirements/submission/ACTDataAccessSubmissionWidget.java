@@ -93,14 +93,18 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.hideActions();
 		// setup the view wrt submission state
 		view.setState(submission.getState().name());
+		view.setRejectedReasonVisible(SubmissionState.REJECTED.equals(submission.getState()));
+		
 		switch (submission.getState()) {
 			case SUBMITTED:
 				view.showApproveButton();
 				view.showRejectButton();
 				break;
+			case REJECTED:
+				view.setRejectedReason(submission.getRejectedReason());
+				break;
 			case APPROVED:
 			case CANCELLED:
-			case REJECTED:
 			default:
 		}
 		
