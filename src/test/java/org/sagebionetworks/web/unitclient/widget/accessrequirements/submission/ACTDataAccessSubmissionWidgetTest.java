@@ -259,17 +259,25 @@ public class ACTDataAccessSubmissionWidgetTest {
 		widget.configure(mockDataAccessSubmission);
 		verify(mockView).setRejectedReasonVisible(false);
 		
+		// rejected, with null reason
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.REJECTED);
-		String rejectedReason = "missing required signature";
+		String rejectedReason = null;
 		when(mockDataAccessSubmission.getRejectedReason()).thenReturn(rejectedReason);
 		widget.configure(mockDataAccessSubmission);
 		verify(mockView).setRejectedReasonVisible(true);
+		verify(mockView, never()).setRejectedReason(anyString());
+		
+		// rejected, with a reason
+		rejectedReason = "missing required signature";
+		when(mockDataAccessSubmission.getRejectedReason()).thenReturn(rejectedReason);
+		widget.configure(mockDataAccessSubmission);
+		verify(mockView, times(2)).setRejectedReasonVisible(true);
 		verify(mockView).setRejectedReason(rejectedReason);
 		
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.APPROVED);
 		widget.configure(mockDataAccessSubmission);
 		
-		verify(mockView, times(3)).hideActions();
+		verify(mockView, times(4)).hideActions();
 		verify(mockView, never()).showApproveButton();
 		verify(mockView, never()).showRejectButton();
 	}
