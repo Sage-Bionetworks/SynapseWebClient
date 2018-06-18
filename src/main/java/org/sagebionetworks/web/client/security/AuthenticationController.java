@@ -56,8 +56,6 @@ public interface AuthenticationController {
 	 */
 	void reloadUserSessionData();
 
-	public void getTermsOfUse(AsyncCallback<String> callback);
-	
 	/**
 	 * Signs the terms of use for a user
 	 */
