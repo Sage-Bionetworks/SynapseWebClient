@@ -101,9 +101,8 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 				view.showRejectButton();
 				break;
 			case REJECTED:
-				if (submission.getRejectedReason() != null) {
-					view.setRejectedReason(submission.getRejectedReason());	
-				}
+				String reason = submission.getRejectedReason() == null ? "" : submission.getRejectedReason();
+				view.setRejectedReason(reason);	
 				break;
 			case APPROVED:
 			case CANCELLED:
