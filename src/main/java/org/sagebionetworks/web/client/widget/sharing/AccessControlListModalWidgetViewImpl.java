@@ -7,6 +7,7 @@ import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayUtils;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyDownEvent;
@@ -43,6 +44,7 @@ public class AccessControlListModalWidgetViewImpl implements
 	@Inject
 	public AccessControlListModalWidgetViewImpl(Binder binder) {
 		modal = binder.createAndBindUi(this);
+		modal.addAttachHandler(DisplayUtils.getHideModalOnDetachHandler());
 		primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
 	}
 

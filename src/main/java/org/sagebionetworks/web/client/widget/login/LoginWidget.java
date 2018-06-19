@@ -35,10 +35,11 @@ public class LoginWidget implements LoginWidgetView.Presenter {
 		this.globalApplicationState = globalApplicationState;
 		this.synAlert = synAlert;
 		view.setSynAlert(synAlert);
-		view.setPresenter(this);
 	}
 
 	public Widget asWidget() {
+		// setPresenter in asWidget() is necessary to connect the singleton view to the current presenter (which contains the current UserListener)
+		view.setPresenter(this);
 		return view.asWidget();
 	}
 	
