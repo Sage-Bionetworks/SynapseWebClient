@@ -59,18 +59,10 @@
 					</div>
 					<div class="row margin-bottom-40">
 					    <div class="col-sm-offset-1 col-sm-10">
-							<g:Anchor ui:field="viewToULink" styleName="link left margin-top-10" text="Take me to the legal texts"/>
+							<b:Anchor styleName="link left margin-top-10" text="Take me to the legal texts" href="https://s3.amazonaws.com/static.synapse.org/governance/SageBionetworksSynapseTermsandConditionsofUse.pdf?v=5" target="_blank"/>
 							<g:Button ui:field="takePledgeButton" styleName="btn btn-lg btn-primary margin-top-10 right" text="Take the pledge, I do"/>
 						</div>
 					</div>
-					<b:Modal ui:field="termsOfUseDialog" title="" closable="true" dataBackdrop="STATIC" dataKeyboard="true" size="LARGE">
-						<b:ModalBody>
-							<g:SimplePanel ui:field="termsOfUseContainer" />
-						</b:ModalBody>
-						<b:ModalFooter>
-							<b:Button type="PRIMARY" dataDismiss="MODAL">OK</b:Button>
-						</b:ModalFooter>
-					</b:Modal>					
 				</g:HTMLPanel>
 				</div> <!-- close class="container" -->
 	</g:HTMLPanel>

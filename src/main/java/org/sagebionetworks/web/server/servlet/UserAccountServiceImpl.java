@@ -132,16 +132,6 @@ public class UserAccountServiceImpl extends RemoteServiceServlet implements User
 	}
 	
 	@Override
-	public String getTermsOfUse() {
-		SynapseClient client = createAnonymousSynapseClient();
-		try {
-			return client.getSynapseTermsOfUse();
-		} catch (SynapseException e) {
-			throw new RestClientException("Unable to get Synapse's terms of use", e);
-		}
-	}
-	
-	@Override
 	public String getSessionToken() {
 		// By default, we get the token from the request cookies.
 		return UserDataProvider.getThreadLocalUserToken(this
