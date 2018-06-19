@@ -18,6 +18,8 @@ import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
+import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -26,6 +28,7 @@ import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsLis
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalView;
 import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidget;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
@@ -43,7 +46,12 @@ public class EvaluationEditorModalTest {
 	SynapseAlert mockSynAlert;
 	@Mock
 	Callback mockEvaluationUpdatedCallback;
-	
+	@Mock
+	UserBadge mockUserBadge;
+	@Mock
+	AuthenticationController mockAuthenticationController;
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
 	Evaluation evaluation;
 	String evaluationName = "my existing evaluation queue";
 	String submissionInstruction = "Please submit your power of attorney to the Synapse developer";
@@ -52,7 +60,7 @@ public class EvaluationEditorModalTest {
 	@Before
 	public void setup() throws Exception{
 		MockitoAnnotations.initMocks(this);
-		modal = new EvaluationEditorModal(mockView, mockChallengeClient, mockSynAlert);
+		modal = new EvaluationEditorModal(mockView, mockChallengeClient, mockSynAlert, mockUserBadge, mockAuthenticationController, mockDateTimeUtils);
 		evaluation = new Evaluation();
 		evaluation.setId("3");
 		evaluation.setName(evaluationName);

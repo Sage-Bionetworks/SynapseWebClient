@@ -15,12 +15,24 @@
 					<b:TextBox ui:field="nameField" />
 				</b:FormGroup>
 				<b:FormGroup>
+					<b:FormLabel text="Description" />
+					<b:TextBox ui:field="descriptionField" />
+				</b:FormGroup>
+				<b:FormGroup>
 					<b:FormLabel text="Submission Instructions" />
 					<b:TextBox ui:field="submissionInstructionsField" />
 				</b:FormGroup>
 				<b:FormGroup>
 					<b:FormLabel text="Submission Receipt Message" />
 					<b:TextBox ui:field="submissionReceiptField" />
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel text="Created On" />
+					<bh:Div ui:field="createdOnDiv" />
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel text="Created By" />
+					<bh:Div ui:field="createdByDiv" />
 				</b:FormGroup>
 			</bh:Div>
 			<bh:Div ui:field="synAlertContainer"/>

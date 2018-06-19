@@ -4,6 +4,8 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -12,6 +14,7 @@ import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.inject.Inject;
 
 public class EvaluationEditorModalViewImpl implements EvaluationEditorModalView {
 	@UiField
@@ -22,6 +25,12 @@ public class EvaluationEditorModalViewImpl implements EvaluationEditorModalView 
 	TextBox submissionInstructionsField;
 	@UiField
 	TextBox submissionReceiptField;
+	@UiField
+	TextBox descriptionField;
+	@UiField
+	Div createdOnDiv;
+	@UiField
+	Div createdByDiv;
 	@UiField
 	Div synAlertContainer;
 	
@@ -35,8 +44,8 @@ public class EvaluationEditorModalViewImpl implements EvaluationEditorModalView 
 	
 	public interface Binder extends UiBinder<Widget, EvaluationEditorModalViewImpl> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
-	
-	public EvaluationEditorModalViewImpl() {
+	@Inject
+	public EvaluationEditorModalViewImpl(UserBadge createdByBadge) {
 		widget = uiBinder.createAndBindUi(this);
 		saveButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -97,5 +106,23 @@ public class EvaluationEditorModalViewImpl implements EvaluationEditorModalView 
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+	@Override
+	public void setCreatedByWidget(IsWidget w) {
+		createdByDiv.clear();
+		createdByDiv.add(w);
+	}
+	@Override
+	public void setDescription(String description) {
+		descriptionField.setText(description);
+	}
+	@Override
+	public String getDescription() {
+		return descriptionField.getText();
+	}
+	@Override
+	public void setCreatedOn(String createdOnString) {
+		createdOnDiv.clear();
+		createdOnDiv.add(new Text(createdOnString));
 	}
 }

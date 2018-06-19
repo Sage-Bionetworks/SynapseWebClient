@@ -12,6 +12,10 @@ public interface EvaluationEditorModalView extends IsWidget {
 	void setSubmissionReceiptMessage(String message);
 	String getSubmissionReceiptMessage();
 	void setSynAlert(IsWidget w);
+	void setCreatedByWidget(IsWidget w);
+	void setDescription(String description);
+	String getDescription();
+	void setCreatedOn(String createdOnString);
 	void show();
 	void hide();
 	/**
