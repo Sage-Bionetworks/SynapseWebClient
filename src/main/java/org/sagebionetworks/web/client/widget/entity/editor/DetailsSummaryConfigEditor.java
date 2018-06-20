@@ -42,7 +42,7 @@ public class DetailsSummaryConfigEditor implements WidgetEditorPresenter {
 	@Override
 	public String getTextToInsert() {
 		return "\n<details>\n\n" + 
-				"  <summary>"+view.getSummary()+"</summary>\n\n" +
+				"<summary>"+view.getSummary()+"</summary>\n\n" +
 				view.getDetails() +
 				"\n\n</details>\n";
 	}
