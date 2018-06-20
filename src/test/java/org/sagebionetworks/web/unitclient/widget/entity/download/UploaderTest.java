@@ -118,9 +118,15 @@ public class UploaderTest {
 	@Captor
 	ArgumentCaptor<CallbackP<JavaScriptObject>> dragAndDropHandlerCaptor;
 	@Mock
+	Callback mockCallback;
+	@Mock
 	Folder mockFolder;
 	@Captor
 	ArgumentCaptor<Entity> entityCaptor;
+	@Captor
+	ArgumentCaptor<Callback> callbackCaptor;
+	
+	public static final String SUCCESS_FILE_HANDLE = "99999";
 	
 	@Before
 	public void before() throws Exception {
@@ -174,7 +180,7 @@ public class UploaderTest {
 		uploader.configure(null, parentEntityId, null, true);
 		
 		// Simulate success.
-		multipartUploader.setFileHandle("99999");
+		multipartUploader.setFileHandle(SUCCESS_FILE_HANDLE);
 		
 		when(mockSynapseJsniUtils.getFileSize(any(JavaScriptObject.class))).thenReturn(1.0);
 		when(mockSynapseJsniUtils.isFileAPISupported()).thenReturn(true);
@@ -367,7 +373,6 @@ public class UploaderTest {
 	
 	@Test
 	public void testDirectUploadStep1Failure() throws Exception {
-		Callback mockCallback = mock(Callback.class);
 		AsyncMockStubber.callFailureWith(new IllegalArgumentException()).when(mockSynapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		uploader.checkForExistingFileName("newFile.txt", mockCallback);
 		verifyUploadError();
@@ -376,7 +381,6 @@ public class UploaderTest {
 	
 	@Test
 	public void testDirectUploadStep1SameNameFound() throws Exception {
-		Callback mockCallback = mock(Callback.class);
 		String duplicateNameEntityId = "syn007";
 		AsyncMockStubber.callSuccessWith(duplicateNameEntityId).when(mockSynapseClient).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
 		uploader.checkForExistingFileName("newFile.txt", mockCallback);
@@ -385,8 +389,28 @@ public class UploaderTest {
 	}
 	
 	@Test
+	public void testDirectUploadSameNameFoundMultipleFiles() throws Exception {
+		String file1 = "file1.txt";
+		String file2 = "file2.txt";
+		String[] fileNames = {file1, file2};
+		when(mockSynapseJsniUtils.getMultipleUploadFileNames(any(JavaScriptObject.class))).thenReturn(fileNames);
+		String duplicateNameEntityId = "syn128";
+		AsyncMockStubber.callSuccessWith(duplicateNameEntityId).when(mockSynapseClient).getFileEntityIdWithSameName(eq(file1), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getFileEntityIdWithSameName(eq(file2), anyString(), any(AsyncCallback.class));
+		uploader.handleUploads();
+		//capture the confirm callback, to simulate that user approves
+		verify(mockView).showConfirmDialog(anyString(), callbackCaptor.capture(), any(Callback.class));
+		callbackCaptor.getValue().invoke();
+
+		// SWC-4274: Verify the 2 rpcs.  The first adds a new file version to duplicateNameEntityId, and the second creates a new file entity.
+		verify(mockSynapseClient).setFileEntityFileHandle(anyString(), eq(duplicateNameEntityId),  eq(parentEntityId),  any(AsyncCallback.class));
+		verify(mockSynapseClient).setFileEntityFileHandle(anyString(), eq(null),  eq(parentEntityId),  any(AsyncCallback.class));
+	}
+
+	
+	
+	@Test
 	public void testDirectUploadStep1NoParentEntityId() throws Exception {
-		Callback mockCallback = mock(Callback.class);
 		uploader.configure(null, null, null, false);
 		uploader.checkForExistingFileName("newFile.txt", mockCallback);
 		verify(mockSynapseClient, Mockito.never()).getFileEntityIdWithSameName(anyString(), anyString(), any(AsyncCallback.class));
