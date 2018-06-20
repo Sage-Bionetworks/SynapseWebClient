@@ -247,7 +247,7 @@ public class EntityBadgeTest {
 	public void testEntityClickedCustomHandler() throws Exception {
 		configure();
 		ClickHandler mockEntityClicked = mock(ClickHandler.class);
-		widget.addClickHandler(mockEntityClicked);
+		widget.setClickHandler(mockEntityClicked);
 		verify(mockView).addClickHandler(mockEntityClicked);
 	}
 	

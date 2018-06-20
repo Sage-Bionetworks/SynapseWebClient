@@ -227,8 +227,11 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		return entityHeader;
 	}
 	
-	public void addClickHandler(ClickHandler handler) {
+	public void setModifiedByUserBadgeClickHandler(ClickHandler handler) {
 		modifiedByUserBadge.setCustomClickHandler(handler);
+	}
+	
+	public void setClickHandler(ClickHandler handler) {
 		view.addClickHandler(handler);
 	}
 	

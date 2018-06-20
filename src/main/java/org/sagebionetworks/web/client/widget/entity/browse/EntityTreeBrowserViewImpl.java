@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.widget.entity.MoreTreeItem;
 import org.sagebionetworks.web.client.widget.table.SortEntityChildrenDropdownButton;
 
 import com.google.gwt.core.client.GWT;
+import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.resources.client.ClientBundle;
 import com.google.gwt.resources.client.ClientBundleWithLookup;
 import com.google.gwt.resources.client.ImageResource;
@@ -160,9 +161,11 @@ public class EntityTreeBrowserViewImpl extends FlowPanel implements
 		childToAdd.asTreeItem().addItem(createDummyItem());
 		if (isSelectable) {
 			// Add select functionality.
-			childToAdd.setClickHandler(event -> {
+			ClickHandler selectClickHandler = event -> {
 				selectEntity(childToAdd);
-			});
+			};
+			childToAdd.setModifiedByUserBadgeClickHandler(selectClickHandler);
+			childToAdd.setClickHandler(selectClickHandler);
 		}
 		// Update fields.
 		getTreeItem2entityTreeItem().put(childToAdd.asTreeItem(), childToAdd);
