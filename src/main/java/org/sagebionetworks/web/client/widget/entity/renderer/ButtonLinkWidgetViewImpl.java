@@ -27,7 +27,7 @@ public class ButtonLinkWidgetViewImpl extends Div implements ButtonLinkWidgetVie
 	public static EventBus eventBus;
 	
 	public static final ClickHandler BUTTON_LINK_CLICK_HANDLER = event -> {
-		if (!event.isMetaKeyDown()) {
+		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 			event.preventDefault();
 			Widget panel = (Widget)event.getSource();
 			String href = panel.getElement().getAttribute("href");

@@ -20,8 +20,10 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionReply;
 import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -55,6 +57,8 @@ public class NewReplyWidgetTest {
 	@Mock
 	private SessionStorage mockStorage;
 	@Mock
+	PopupUtilsView mockPopupUtilsView;
+	@Mock
 	Callback mockCallback;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
@@ -63,9 +67,10 @@ public class NewReplyWidgetTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		newReplyWidget = new NewReplyWidget(mockView, mockDiscussionForumClient, mockSynAlert,
-				mockMarkdownEditor, mockAuthController, mockGlobalApplicationState, mockStorage);
+				mockMarkdownEditor, mockAuthController, mockGlobalApplicationState, mockStorage, mockPopupUtilsView);
 		when(mockAuthController.isLoggedIn()).thenReturn(true);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
+		when(mockMarkdownEditor.getMarkdown()).thenReturn(DEFAULT_MARKDOWN);
 		newReplyWidget.configure("1", mockCallback);
 	}
 
@@ -98,10 +103,28 @@ public class NewReplyWidgetTest {
 		verify(mockMarkdownEditor, never()).setMarkdownFocus();
 	}
 
-
 	@Test
 	public void testOnClickCancel() {
 		newReplyWidget.onCancel();
+		
+		//since no changes were made, verify confirmation dialog was not shown
+		verify(mockPopupUtilsView, never()).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
+		verify(mockView, times(2)).resetButton();
+		verify(mockView, times(2)).setReplyTextBoxVisible(true);
+		verify(mockView, times(2)).setNewReplyContainerVisible(false);
+	}
+	
+	@Test
+	public void testOnClickCancelWithUnsavedChanges() {
+		when(mockMarkdownEditor.getMarkdown()).thenReturn("unsaved changes");
+		newReplyWidget.onCancel();
+		
+		verify(mockPopupUtilsView).showConfirmDialog(eq(DisplayConstants.UNSAVED_CHANGES), eq(DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE), callbackCaptor.capture());
+		
+		// simulate user confirmed
+		callbackCaptor.getValue().invoke();
+		
+		//verify cancel
 		verify(mockView, times(2)).resetButton();
 		verify(mockView, times(2)).setReplyTextBoxVisible(true);
 		verify(mockView, times(2)).setNewReplyContainerVisible(false);

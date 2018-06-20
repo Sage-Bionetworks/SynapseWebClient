@@ -5,6 +5,8 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import org.sagebionetworks.repo.model.discussion.CreateDiscussionThread;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
+import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.cache.SessionStorage;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -32,6 +34,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 	private MarkdownEditorWidget markdownEditor;
 	private AuthenticationController authController;
 	private SessionStorage storage;
+	private PopupUtilsView popupUtils;
 	private String forumId;
 	private String titleKey;
 	private String messageKey;
@@ -44,7 +47,8 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 			SynapseAlert synAlert,
 			MarkdownEditorWidget markdownEditor,
 			AuthenticationController authController,
-			SessionStorage sessionStorage
+			SessionStorage sessionStorage,
+			PopupUtilsView popupUtils
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
@@ -53,6 +57,7 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 		this.markdownEditor = markdownEditor;
 		this.authController = authController;
 		this.storage = sessionStorage;
+		this.popupUtils = popupUtils;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(NEW_THREAD_MODAL_TITLE);
@@ -145,6 +150,17 @@ public class NewDiscussionThreadModal implements DiscussionThreadModalView.Prese
 			}
 
 		});
+	}
+	
+	@Override
+	public void onCancel() {
+		if (!markdownEditor.getMarkdown().isEmpty()) {
+			popupUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, () -> {
+				view.hideDialog();
+			});
+		} else {
+			view.hideDialog();
+		}
 	}
 
 	@Override

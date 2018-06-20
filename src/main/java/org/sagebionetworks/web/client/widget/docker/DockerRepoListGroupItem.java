@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.Synapse;
@@ -36,7 +37,7 @@ public class DockerRepoListGroupItem extends ListGroupItem {
 		anchor.setText(entity.getRepositoryName());
 		anchor.setHref("#!Synapse:" + entity.getId());
 		anchor.addClickHandler(event -> {
-			if (!event.isMetaKeyDown()) {
+			if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 				event.preventDefault();
 				entityClickedHandler.invoke(entity.getId());
 			}

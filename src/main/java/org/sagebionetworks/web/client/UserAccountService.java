@@ -24,8 +24,5 @@ public interface UserAccountService extends RemoteService {
 
 	String createUserStep2(String userName, String fName, String lName, String password, EmailValidationSignedToken emailValidationSignedToken) throws RestServiceException;
 
-	String getTermsOfUse();
-
 	PublicPrincipalIds getPublicAndAuthenticatedGroupPrincipalIds();
-
 }

@@ -74,6 +74,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -106,8 +107,18 @@ public class DisplayUtils {
 		source.selectAll();
 	};
 	public static final ClickHandler DO_NOTHING_CLICKHANDLER = event -> {
-		event.preventDefault();
+		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
+			event.preventDefault();	
+		} else {
+			event.stopPropagation();
+		}
 	};
+	
+	public static final Handler getHideModalOnDetachHandler() {
+		return event -> {
+			((Modal)event.getSource()).hide();
+		};
+	}
 	
 	/**
 	 * This key down handler prevents the user from tabbing forward off of the given Focusable widget.
@@ -1119,5 +1130,9 @@ public class DisplayUtils {
 		int elemTop = widget.getAbsoluteTop();
 //		int elemBottom = elemTop + widget.getOffsetHeight();
 		return docViewBottom >= elemTop && elemTop != 0;
+	}
+	
+	public static boolean isAnyModifierKeyDown(ClickEvent event) {
+		return event.isAltKeyDown() || event.isControlKeyDown() || event.isMetaKeyDown() || event.isShiftKeyDown();
 	}
 }

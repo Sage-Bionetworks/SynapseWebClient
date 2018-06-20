@@ -12,6 +12,7 @@
 				<b:FormGroup ui:field="currentStateUI">
 					<b:FormLabel>State</b:FormLabel>
 					<g:Label ui:field="stateField2"/>
+					<b:BlockQuote ui:field="rejectedReasonField" />
 				</b:FormGroup>
 				<b:FormGroup ui:field="submittedOnUI">
 					<b:FormLabel>Submitted On</b:FormLabel>

@@ -18,7 +18,6 @@ import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.HelpWidget;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRendererImpl;
 import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.shared.users.AclEntry;
@@ -38,7 +37,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	public static final String CREATE_ACL_HELP_TEXT = "By default the sharing settings are inherited from the parent folder or project. If you want to have different settings on a specific file, folder, or table you need to create local sharing settings and then modify them.";
 
 	private static final String CANNOT_MODIFY_ACL_TEXT = "You do not have sufficient privileges to modify the sharing settings.";
-	
+	private static final String CANNOT_MODIFY_ACL_ANONYMOUS_HTML = "You must be <a href=\"#!LoginPlace:0\">logged in</a> and have sufficient privileges to modify the sharing settings.";
 	private Presenter presenter;
 	private Map<PermissionLevel, String> permissionDisplay;
 	private Long publicAclPrincipalId, authenticatedPrincipalId;
@@ -134,7 +133,7 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	}
 	
 	@Override
-	public void buildWindow(boolean isProject, boolean isInherited, String aclEntityId, boolean canEnableInheritance, boolean canChangePermission, PermissionLevel defaultPermissionLevel) {		
+	public void buildWindow(boolean isProject, boolean isInherited, String aclEntityId, boolean canEnableInheritance, boolean canChangePermission, PermissionLevel defaultPermissionLevel, boolean isLoggedIn) {		
 		clear();
 		this.defaultPermissionLevel = defaultPermissionLevel;
 		// Display Permissions grid.
@@ -186,8 +185,12 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 		
 		if (!canChangePermission) {
 			// Inform user of restricted privileges.
-			Label canNotModify = new Label();
-			canNotModify.setText(CANNOT_MODIFY_ACL_TEXT);
+			IsWidget canNotModify;
+			if (isLoggedIn) {
+				canNotModify = new Label(CANNOT_MODIFY_ACL_TEXT);
+			} else {
+				canNotModify = new HTML(CANNOT_MODIFY_ACL_ANONYMOUS_HTML);
+			}
 			add(canNotModify);
 		} else {
 			if(isInherited) {

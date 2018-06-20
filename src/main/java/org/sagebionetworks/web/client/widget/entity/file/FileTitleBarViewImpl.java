@@ -90,7 +90,7 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 		favoritePanel.addStyleName("inline-block");
 		favoritePanel.setWidget(favoriteWidget.asWidget());
 		currentVersionLink.addClickHandler(event -> {
-			if (!event.isMetaKeyDown()) {
+			if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 				event.preventDefault();
 				globalAppState.getPlaceChanger().goTo(new Synapse(currentEntityId));
 			}

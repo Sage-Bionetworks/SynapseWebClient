@@ -43,7 +43,7 @@ public class ProjectBadgeViewImpl implements ProjectBadgeView {
 	String projectId;
 	public static PlaceChanger placeChanger = null;
 	public static final ClickHandler PROJECT_BADGE_CLICKHANDLER = event -> {
-		if (!event.isMetaKeyDown()) {
+		if (!DisplayUtils.isAnyModifierKeyDown(event)) {
 			Anchor anchor = (Anchor)event.getSource();
 			event.preventDefault();
 			String projectId = anchor.getElement().getAttribute(ATTRIBUTE_PROJECT_ID);

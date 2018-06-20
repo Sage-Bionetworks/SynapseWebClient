@@ -177,11 +177,6 @@ public class AuthenticationControllerImpl implements AuthenticationController {
 			localStorage.put(USER_SESSION_DATA_CACHE_KEY, getUserSessionDataString(currentUser), tomorrow.getTime());
 		}
 	}
-	
-	@Override
-	public void getTermsOfUse(AsyncCallback<String> callback) {
-		userAccountService.getTermsOfUse(callback);
-	}
 
 	@Override
 	public boolean isLoggedIn() {

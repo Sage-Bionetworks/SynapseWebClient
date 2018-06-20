@@ -36,6 +36,8 @@ public interface ACTDataAccessSubmissionWidgetView extends IsWidget {
 	void setRenewalColumnsVisible(boolean visible);
 	void hideActions();
 	void showMoreInfoDialog();
+	void setRejectedReasonVisible(boolean visible);
+	void setRejectedReason(String reason);
 	
 	/**
 	 * Presenter interface

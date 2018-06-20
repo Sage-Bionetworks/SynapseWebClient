@@ -58,7 +58,7 @@ public class BreadcrumbViewImpl implements BreadcrumbView {
 				anchor.setHref("#" + DisplayUtils.getSynapseHistoryTokenNoHash(synapsePlace.getEntityId(), synapsePlace.getVersionNumber(), synapsePlace.getArea(), synapsePlace.getAreaToken()));
 			}
 			anchor.addClickHandler(event -> {
-				if (!event.isMetaKeyDown()) {
+				if (!(DisplayUtils.isAnyModifierKeyDown(event))) {
 					event.preventDefault();
 					presenter.goTo(data.getPlace());
 				}

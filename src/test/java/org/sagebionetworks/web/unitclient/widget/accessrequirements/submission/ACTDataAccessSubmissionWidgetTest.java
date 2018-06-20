@@ -245,6 +245,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 		verify(mockView).hideActions();
 		verify(mockView).showApproveButton();
 		verify(mockView).showRejectButton();
+		verify(mockView).setRejectedReasonVisible(false);
 		
 		widget.onMoreInfo();
 		// no duc or irb, verify they are hidden
@@ -256,14 +257,27 @@ public class ACTDataAccessSubmissionWidgetTest {
 	public void testConfigureOtherStates() {
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.CANCELLED);
 		widget.configure(mockDataAccessSubmission);
+		verify(mockView).setRejectedReasonVisible(false);
 		
+		// rejected, with null reason
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.REJECTED);
+		String rejectedReason = null;
+		when(mockDataAccessSubmission.getRejectedReason()).thenReturn(rejectedReason);
 		widget.configure(mockDataAccessSubmission);
+		verify(mockView).setRejectedReasonVisible(true);
+		verify(mockView).setRejectedReason("");
+		
+		// rejected, with a reason
+		rejectedReason = "missing required signature";
+		when(mockDataAccessSubmission.getRejectedReason()).thenReturn(rejectedReason);
+		widget.configure(mockDataAccessSubmission);
+		verify(mockView, times(2)).setRejectedReasonVisible(true);
+		verify(mockView).setRejectedReason(rejectedReason);
 		
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.APPROVED);
 		widget.configure(mockDataAccessSubmission);
 		
-		verify(mockView, times(3)).hideActions();
+		verify(mockView, times(4)).hideActions();
 		verify(mockView, never()).showApproveButton();
 		verify(mockView, never()).showRejectButton();
 	}
