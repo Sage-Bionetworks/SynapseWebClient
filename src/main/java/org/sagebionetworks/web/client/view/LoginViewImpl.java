@@ -57,17 +57,11 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	CheckBox lawsCb;
 	@UiField
-	Anchor viewToULink;
-	@UiField
 	Button takePledgeButton;
 	@UiField
 	LoadingSpinner loadingUi;
 	@UiField
 	Heading loadingUiText;
-	@UiField
-	Modal termsOfUseDialog;
-	@UiField
-	SimplePanel termsOfUseContainer;
 	@UiField
 	Div synAlertContainer;
 	
@@ -179,7 +173,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	}
 	
 	@Override
-	public void showTermsOfUse(final String content, final Callback callback) {
+	public void showTermsOfUse(final Callback callback) {
 		hideViews();
 		//initialize checkboxes
 		actEthicallyCb.setValue(false);
@@ -201,13 +195,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 					} else {
 						showErrorMessage("To take the pledge, you must first agree to all of the statements.");
 					}
-				}
-			});
-			viewToULink.addClickHandler(new ClickHandler() {
-				@Override
-				public void onClick(ClickEvent event) {
-					termsOfUseContainer.setWidget(new HTML(content));
-					termsOfUseDialog.show();
 				}
 			});
 		}

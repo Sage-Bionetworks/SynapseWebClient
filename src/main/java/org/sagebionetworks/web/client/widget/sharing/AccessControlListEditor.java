@@ -21,7 +21,6 @@ import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
@@ -202,7 +201,7 @@ public class AccessControlListEditor implements AccessControlListEditorView.Pres
 		view.showLoading();
 		boolean isInherited = !acl.getId().equals(entity.getId());
 		boolean canEnableInheritance = uep.getCanEnableInheritance();
-		view.buildWindow(entity instanceof Project, isInherited, acl.getId(), canEnableInheritance, canChangePermission, PermissionLevel.CAN_DOWNLOAD);
+		view.buildWindow(entity instanceof Project, isInherited, acl.getId(), canEnableInheritance, canChangePermission, PermissionLevel.CAN_DOWNLOAD, authenticationController.isLoggedIn());
 		populateAclEntries();
 		updateIsPublicAccess();
 	}

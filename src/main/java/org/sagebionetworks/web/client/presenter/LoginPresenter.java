@@ -169,16 +169,8 @@ public class LoginPresenter extends AbstractActivity implements LoginView.Presen
 	
 	public void showTermsOfUse(final Callback callback) {
 		synAlert.clear();
-		authenticationController.getTermsOfUse(new AsyncCallback<String>() {
-			public void onSuccess(String termsOfUseContents) {
-				view.hideLoggingInLoader();
-				view.showTermsOfUse(termsOfUseContents, callback);		
-			}
-			public void onFailure(Throwable t) {
-				synAlert.handleException(t);
-				view.showLogin();									
-			}
-		});
+		view.hideLoggingInLoader();
+		view.showTermsOfUse(callback);		
 	}
 	
 	public void userAuthenticated() {

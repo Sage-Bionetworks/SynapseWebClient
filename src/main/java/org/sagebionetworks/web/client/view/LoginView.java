@@ -19,7 +19,7 @@ public interface LoginView extends IsWidget, SynapseView {
 	
 	void showLogin();	
 	
-	void showTermsOfUse(String content, Callback callback);
+	void showTermsOfUse(Callback callback);
 
 	void setSynAlert(IsWidget w);
 	

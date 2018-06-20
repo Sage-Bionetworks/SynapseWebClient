@@ -591,8 +591,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			}
 		} else {
 			//more files to upload
-			currIndex++;
-			handleUploads();
+			uploadNextFile();
 		}
 	}
 	
@@ -608,8 +607,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 						refreshAfterSuccessfulUpload(entityId);
 					} else {
 						//more files to upload
-						currIndex++;
-						handleUploads();
+						uploadNextFile();
 					}
 				}
 				@Override
@@ -622,6 +620,13 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			fileHandleIdCallback.invoke(fileHandleId);
 			uploadSuccess();
 		}
+	}
+	
+	public void uploadNextFile() {
+		currIndex++;
+		// SWC-4274: reset entity id
+		Uploader.this.entityId=null;
+		handleUploads();
 	}
 	
 	@Override

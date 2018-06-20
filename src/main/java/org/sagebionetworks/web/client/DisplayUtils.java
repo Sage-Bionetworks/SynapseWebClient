@@ -74,6 +74,7 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.logical.shared.AttachEvent.Handler;
 import com.google.gwt.i18n.client.NumberFormat;
 import com.google.gwt.safehtml.shared.SafeHtml;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
@@ -112,6 +113,12 @@ public class DisplayUtils {
 			event.stopPropagation();
 		}
 	};
+	
+	public static final Handler getHideModalOnDetachHandler() {
+		return event -> {
+			((Modal)event.getSource()).hide();
+		};
+	}
 	
 	/**
 	 * This key down handler prevents the user from tabbing forward off of the given Focusable widget.
