@@ -347,6 +347,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.DetailsSummaryConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.DetailsSummaryConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
@@ -1014,6 +1016,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AttachmentConfigView.class).to(AttachmentConfigViewImpl.class).in(Singleton.class);
 		bind(ProvenanceConfigView.class).to(ProvenanceConfigViewImpl.class);
 		bind(LinkConfigView.class).to(LinkConfigViewImpl.class);
+		bind(DetailsSummaryConfigView.class).to(DetailsSummaryConfigViewImpl.class);
 		bind(TabbedTableConfigView.class).to(TabbedTableConfigViewImpl.class);
 		bind(APITableConfigView.class).to(APITableConfigViewImpl.class);
 		bind(QueryTableConfigView.class).to(QueryTableConfigViewImpl.class);

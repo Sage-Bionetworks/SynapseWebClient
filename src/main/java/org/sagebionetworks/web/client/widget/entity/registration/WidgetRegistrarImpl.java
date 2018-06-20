@@ -91,6 +91,8 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 			presenter = ginInjector.getImageLinkConfigEditor();
 		} else if (contentTypeKey.equals(LINK_CONTENT_TYPE)) {
 			presenter = ginInjector.getLinkConfigEditor();
+		} else if (contentTypeKey.equals(DETAILS_SUMMARY_CONTENT_TYPE)) {
+			presenter = ginInjector.getDetailsSummaryConfigEditor();
 		} else if (contentTypeKey.equals(TABBED_TABLE_CONTENT_TYPE)) {
 			presenter = ginInjector.getTabbedTableConfigEditor();
 		} else if (contentTypeKey.equals(API_TABLE_CONTENT_TYPE)) {
@@ -316,6 +318,7 @@ public class WidgetRegistrarImpl implements WidgetRegistrar {
 		registerWidget(IMAGE_LINK_EDITOR_CONTENT_TYPE, IMAGE_LINK_FRIENDLY_NAME);
 		registerWidget(ATTACHMENT_PREVIEW_CONTENT_TYPE, ATTACHMENT_PREVIEW_FRIENDLY_NAME);
 		registerWidget(LINK_CONTENT_TYPE, LINK_FRIENDLY_NAME);
+		registerWidget(DETAILS_SUMMARY_CONTENT_TYPE, DETAILS_SUMMARY_FRIENDLY_NAME);
 		registerWidget(TABBED_TABLE_CONTENT_TYPE, TABBED_TABLE_FRIENDLY_NAME);
 		registerWidget(API_TABLE_CONTENT_TYPE, API_TABLE_FRIENDLY_NAME);
 		registerWidget(QUERY_TABLE_CONTENT_TYPE, QUERY_TABLE_FRIENDLY_NAME);
