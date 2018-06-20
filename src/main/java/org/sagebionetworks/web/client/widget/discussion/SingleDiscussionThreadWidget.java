@@ -93,7 +93,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	private SubscribersWidget threadSubscribersWidget;
 	Topic threadTopic = new Topic();
 	private ActionMenuWidget actionMenu;
-	ActionMenuWidget.ActionListener editActionListener, unpinActionListener, pinActionListener, deleteActionListener;
+	ActionMenuWidget.ActionListener editActionListener, unpinActionListener, pinActionListener, deleteActionListener, restoreActionListener;
 	Boolean isPinned;
 	PopupUtilsView popupUtils;
 	ClientCache clientCache;
@@ -174,30 +174,22 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			}
 		};
 		threadTopic.setObjectType(SubscriptionObjectType.THREAD);
-		editActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onClickEditThread();
-			}
+		editActionListener = action -> {
+			onClickEditThread();
 		};
-		pinActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onClickPinThread();
-			}
+		pinActionListener = action -> {
+			onClickPinThread();
 		};
-		unpinActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onClickUnpinThread();
-			}
+		unpinActionListener = action -> {
+			onClickUnpinThread();
 		};
 		
-		deleteActionListener = new ActionMenuWidget.ActionListener() {
-			@Override
-			public void onAction(Action action) {
-				onClickDeleteThread();
-			}
+		deleteActionListener = action -> {
+			onClickDeleteThread();
+		};
+		
+		restoreActionListener = action -> {
+			onClickRestore();
 		};
 	}
 
@@ -278,6 +270,15 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			view.setUnpinIconVisible(isCurrentUserModerator && isPinned);
 			view.setPinIconVisible(isCurrentUserModerator && !isPinned);
 			view.setEditIconVisible(bundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
+			if (actionMenu != null) {
+				actionMenu.setActionVisible(Action.RESTORE_THREAD, false);
+				actionMenu.setActionVisible(Action.DELETE_THREAD, isCurrentUserModerator);
+			}
+		} else {
+			if (actionMenu != null) {
+				actionMenu.setActionVisible(Action.RESTORE_THREAD, isCurrentUserModerator);
+				actionMenu.setActionVisible(Action.DELETE_THREAD, false);
+			}
 		}
 		configureActionMenu();
 	}
@@ -286,6 +287,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		if (actionMenu != null) {
 			actionMenu.setActionListener(Action.EDIT_THREAD, editActionListener);
 			actionMenu.setActionListener(Action.DELETE_THREAD, deleteActionListener);
+			actionMenu.setActionListener(Action.RESTORE_THREAD, restoreActionListener);
 			if (isPinned) {
 				// thread is pinned
 				actionMenu.setActionListener(Action.PIN_THREAD, unpinActionListener);
