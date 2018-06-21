@@ -15,7 +15,7 @@ import com.google.inject.Inject;
 
 public class SynapseSuggestBox implements SynapseSuggestBoxView.Presenter, SynapseWidgetPresenter, IsWidget, Focusable, HasKeyDownHandlers {
 	
-	public static final int DELAY = 750;	// milliseconds
+	public static final int DELAY = 250;	// milliseconds
 	public static final int PAGE_SIZE = 10;
 	private SynapseSuggestBoxView view;
 	private SynapseSuggestOracle oracle;
