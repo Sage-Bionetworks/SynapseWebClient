@@ -48,7 +48,7 @@ public class WidgetConstants {
 	public static final String LINK_FRIENDLY_NAME ="Link";
 	
 	public static final String DETAILS_SUMMARY_CONTENT_TYPE = "summarydetails";
-	public static final String DETAILS_SUMMARY_FRIENDLY_NAME ="Summary/Details";
+	public static final String DETAILS_SUMMARY_FRIENDLY_NAME ="Collapsed Section";
 	
 	
 	public static final String REFERENCE_CONTENT_TYPE = "reference";
