@@ -17,7 +17,7 @@
 				  <b:DropDownMenu>
 				    <b:AnchorListItem ui:field="attachmentLink" text="Attachment"/>
 				    <b:AnchorListItem ui:field="buttonLink" text="Button Link"/>
-				    <b:AnchorListItem ui:field="detailsSummaryLink" text="Collapsed Details with Summary"/>
+				    <b:AnchorListItem ui:field="detailsSummaryLink" text="Collapsed Section"/>
 				    <b:AnchorListItem ui:field="entityListLink" text="Entity List"/>
 				    <b:AnchorListItem ui:field="previewLink" text="File Preview"/>
 				    <b:AnchorListItem ui:field="genomeBrowserLink" text="Genome Browser"/>

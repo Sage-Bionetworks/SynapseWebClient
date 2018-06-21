@@ -8,7 +8,7 @@
 		<bh:Div>
 			<b:FieldSet>
 				<b:FormGroup>
-					<b:FormLabel>Summary</b:FormLabel>
+					<b:FormLabel>Label</b:FormLabel>
 					<g:FlowPanel>
 						<b:TextBox ui:field="summaryField" />
 					</g:FlowPanel>
