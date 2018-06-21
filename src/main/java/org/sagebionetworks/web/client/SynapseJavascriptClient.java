@@ -919,6 +919,9 @@ public class SynapseJavascriptClient {
 	public FluentFuture<Void> logError(String label, Throwable ex) {
 		LogEntry entry = new LogEntry();
 		String exceptionString = ex.getMessage();
+		if (exceptionString == null) {
+			exceptionString = ex.toString();
+		}
 		String outputExceptionString = exceptionString.substring(0, Math.min(exceptionString.length(), MAX_LOG_ENTRY_LABEL_SIZE));
 		entry.setLabel(getSynapseVersionInfo() + ": " + label + ": " + outputExceptionString);
 		entry.setMessage(gwt.getCurrentURL() + " : \n" + ex.getMessage());
