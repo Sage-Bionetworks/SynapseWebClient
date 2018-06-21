@@ -151,6 +151,8 @@ import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProvider;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProviderImpl;
+import org.sagebionetworks.web.client.widget.asynch.PresignedAndFileHandleURLAsyncHandler;
+import org.sagebionetworks.web.client.widget.asynch.PresignedAndFileHandleURLAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandler;
@@ -1335,8 +1337,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(GoogleMapView.class).to(GoogleMapViewImpl.class);
 		
 		bind(FileHandleAsyncHandler.class).to(FileHandleAsyncHandlerImpl.class).in(Singleton.class);
-		
 		bind(PresignedURLAsyncHandler.class).to(PresignedURLAsyncHandlerImpl.class).in(Singleton.class);
+		bind(PresignedAndFileHandleURLAsyncHandler.class).to(PresignedAndFileHandleURLAsyncHandlerImpl.class).in(Singleton.class);
 		
 		bind(UserProfileAsyncHandler.class).to(UserProfileAsyncHandlerImpl.class).in(Singleton.class);
 		
