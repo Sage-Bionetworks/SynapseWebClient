@@ -83,9 +83,13 @@ public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
 				callback.onFailure(caught);
 			}
 			public void onSuccess(FileResult fileResult) {
-				double fileSize = fileResult.getFileHandle().getContentSize().doubleValue();
-				String url = fileResult.getPreSignedURL();
-				testDownloadSpeedStep3(url, fileSize, callback);
+				if (fileResult.getFailureCode()  == null) {
+					double fileSize = fileResult.getFileHandle().getContentSize().doubleValue();
+					String url = fileResult.getPreSignedURL();
+					testDownloadSpeedStep3(url, fileSize, callback);	
+				} else {
+					onFailure(new Exception("Unable to get the test file presigned url and file handle: " + fileResult.getFailureCode().toString()));
+				}
 			};
 		});
 	}
