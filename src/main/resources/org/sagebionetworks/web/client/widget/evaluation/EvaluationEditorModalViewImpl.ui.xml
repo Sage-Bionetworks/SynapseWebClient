@@ -4,7 +4,9 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui" xmlns:t="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:a="urn:import:org.sagebionetworks.web.client.widget.table.v2"
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" 
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:bd="urn:import:org.gwtbootstrap3.extras.datetimepicker.client.ui"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<!-- Dialog for creating a new table -->
 	<b:Modal ui:field="modal" title="Edit Evaluation Queue" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
@@ -19,6 +21,12 @@
 					<b:TextBox ui:field="descriptionField" />
 				</b:FormGroup>
 				<b:FormGroup>
+					<b:FormLabel text="Created" addStyleNames="displayInline margin-right-5" />
+					<b:FormControlStatic ui:field="createdOnDiv"  addStyleNames="displayInline" />
+					<bh:Strong text="by" addStyleNames="margin-left-5 margin-right-5" /> 
+					<bh:Div ui:field="createdByDiv"  addStyleNames="displayInline" />
+				</b:FormGroup>
+				<b:FormGroup>
 					<b:FormLabel text="Submission Instructions" />
 					<b:TextBox ui:field="submissionInstructionsField" />
 				</b:FormGroup>
@@ -26,14 +34,28 @@
 					<b:FormLabel text="Submission Receipt Message" />
 					<b:TextBox ui:field="submissionReceiptField" />
 				</b:FormGroup>
-				<b:FormGroup>
-					<b:FormLabel text="Created On" />
-					<bh:Div ui:field="createdOnDiv" />
-				</b:FormGroup>
-				<b:FormGroup>
-					<b:FormLabel text="Created By" />
-					<bh:Div ui:field="createdByDiv" />
-				</b:FormGroup>
+				<b:FormLabel text="(Optional) Quota" />
+				<b:Panel addStyleNames="padding-10">
+					<b:FormGroup>
+						<b:FormLabel text="First Round Start Date/Time" />
+						<bd:DateTimePicker ui:field="roundStartPicker"
+							autoClose="true" highlightToday="true" showTodayButton="true"
+							showMeridian="false" format="mm/dd/yyyy hh:ii:ss" minView="MONTH"
+							hasKeyboardNavigation="true" />
+					</b:FormGroup>
+					<b:FormGroup>
+						<b:FormLabel text="Submission Limit" />
+						<w:NumberBox ui:field="submissionLimitField" />
+					</b:FormGroup>
+					<b:FormGroup>
+						<b:FormLabel text="Number of Rounds" />
+						<w:NumberBox ui:field="numberOfRoundsField" />
+					</b:FormGroup>
+					<b:FormGroup>
+						<b:FormLabel text="Round Duration (ms)" /> <w:HelpWidget helpMarkdown="This is in milliseconds. For a round of 7 days, use 604800000. For 1 hour, use 3600000." iconStyles="" />
+						<w:NumberBox ui:field="roundDurationField" />
+					</b:FormGroup>
+				</b:Panel>
 			</bh:Div>
 			<bh:Div ui:field="synAlertContainer"/>
 		</b:ModalBody>

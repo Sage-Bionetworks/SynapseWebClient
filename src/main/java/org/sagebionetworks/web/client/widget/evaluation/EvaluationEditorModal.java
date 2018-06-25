@@ -6,6 +6,7 @@ import java.util.Date;
 
 import org.sagebionetworks.evaluation.model.Evaluation;
 import org.sagebionetworks.evaluation.model.EvaluationStatus;
+import org.sagebionetworks.evaluation.model.SubmissionQuota;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -78,6 +79,7 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 	}
 	
 	private void configure(Evaluation evaluation, Callback evaluationUpdatedCallback, boolean isCreate) {
+		view.clear();
 		this.isCreate = isCreate;
 		this.evaluation = evaluation;
 		this.evaluationUpdatedCallback = evaluationUpdatedCallback;
@@ -87,6 +89,13 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 		createdByBadge.configure(evaluation.getOwnerId());
 		view.setDescription(evaluation.getDescription());
 		view.setCreatedOn(dateTimeUtils.getDateString(evaluation.getCreatedOn()));
+		if (evaluation.getQuota() != null) {
+			SubmissionQuota quota = evaluation.getQuota();
+			view.setRoundStart(quota.getFirstRoundStart());
+			view.setNumberOfRounds(quota.getNumberOfRounds());
+			view.setRoundDuration(quota.getRoundDurationMillis());
+			view.setSubmissionLimit(quota.getSubmissionLimit());
+		}
 	}
 	
 	public void show() {
@@ -101,6 +110,28 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 		evaluation.setSubmissionInstructionsMessage(view.getSubmissionInstructionsMessage());
 		evaluation.setSubmissionReceiptMessage(view.getSubmissionReceiptMessage());
 		evaluation.setDescription(view.getDescription());
+		// quota
+		Double submissionLimit = view.getSubmissionLimit();
+		Double numberOfRounds = view.getNumberOfRounds();
+		Double roundDuration = view.getRoundDuration();
+		Date roundStart = view.getRoundStart();
+		boolean isUserTryingToSetQuota = submissionLimit != null || numberOfRounds != null || roundDuration != null || roundStart != null;
+		boolean isValidQuotaDefinition = submissionLimit != null && numberOfRounds != null && roundDuration != null && roundStart != null;
+		if (isUserTryingToSetQuota && !isValidQuotaDefinition) {
+			synAlert.showError("All quota are required if any are set.");
+			return;
+		}
+		if (isUserTryingToSetQuota) {
+			// user is attempting to set quota
+			SubmissionQuota newQuota = new SubmissionQuota();
+			newQuota.setSubmissionLimit(submissionLimit.longValue());
+			newQuota.setFirstRoundStart(roundStart);
+			newQuota.setNumberOfRounds(numberOfRounds.longValue());
+			newQuota.setRoundDurationMillis(roundDuration.longValue());
+			evaluation.setQuota(newQuota);
+		} else {
+			evaluation.setQuota(null);
+		}
 		
 		if (isCreate) {
 			createEvaluationFromView();

@@ -22,20 +22,18 @@
 					<b:FormControlStatic ui:field="descriptionField" addStyleNames="displayInline" />
 				</b:FormGroup>
 				<b:FormGroup>
+					<b:FormLabel text="Created" addStyleNames="displayInline margin-right-5" />
+					<b:FormControlStatic ui:field="createdOnDiv"  addStyleNames="displayInline" />
+					<bh:Strong text="by" addStyleNames="margin-left-5 margin-right-5" /> 
+					<bh:Div ui:field="createdByDiv"  addStyleNames="displayInline" />
+				</b:FormGroup>
+				<b:FormGroup>
 					<b:FormLabel text="Submission Instructions" addStyleNames="displayInline  margin-right-5" />
 					<b:FormControlStatic ui:field="submissionInstructionsField" addStyleNames="displayInline" />
 				</b:FormGroup>
 				<b:FormGroup>
 					<b:FormLabel text="Submission Receipt Message" addStyleNames="displayInline margin-right-5" />
 					<b:FormControlStatic ui:field="submissionReceiptField" addStyleNames="displayInline" />
-				</b:FormGroup>
-				<b:FormGroup>
-					<b:FormLabel text="Created On" addStyleNames="displayInline margin-right-5" />
-					<b:FormControlStatic ui:field="createdOnDiv"  addStyleNames="displayInline" />
-				</b:FormGroup>
-				<b:FormGroup>
-					<b:FormLabel text="Created By"  addStyleNames="displayInline margin-right-5" />
-					<bh:Div ui:field="createdByDiv"  addStyleNames="displayInline" />
 				</b:FormGroup>
 			</b:Column>
 		</b:Row>
