@@ -101,6 +101,8 @@ import org.sagebionetworks.web.client.widget.Button;
 import org.sagebionetworks.web.client.widget.ButtonImpl;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.CopyTextModalImpl;
+import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
+import org.sagebionetworks.web.client.widget.DownloadSpeedTesterImpl;
 import org.sagebionetworks.web.client.widget.FileHandleWidgetView;
 import org.sagebionetworks.web.client.widget.FileHandleWidgetViewImpl;
 import org.sagebionetworks.web.client.widget.LoadMoreWidgetContainerView;
@@ -149,6 +151,8 @@ import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProvider;
 import org.sagebionetworks.web.client.widget.asynch.NumberFormatProviderImpl;
+import org.sagebionetworks.web.client.widget.asynch.PresignedAndFileHandleURLAsyncHandler;
+import org.sagebionetworks.web.client.widget.asynch.PresignedAndFileHandleURLAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.TeamAsyncHandler;
@@ -1336,8 +1340,8 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(GoogleMapView.class).to(GoogleMapViewImpl.class);
 		
 		bind(FileHandleAsyncHandler.class).to(FileHandleAsyncHandlerImpl.class).in(Singleton.class);
-		
 		bind(PresignedURLAsyncHandler.class).to(PresignedURLAsyncHandlerImpl.class).in(Singleton.class);
+		bind(PresignedAndFileHandleURLAsyncHandler.class).to(PresignedAndFileHandleURLAsyncHandlerImpl.class).in(Singleton.class);
 		
 		bind(UserProfileAsyncHandler.class).to(UserProfileAsyncHandlerImpl.class).in(Singleton.class);
 		
@@ -1402,5 +1406,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiDiffView.class).to(WikiDiffViewImpl.class);
 		bind(SynapseProperties.class).to(SynapsePropertiesImpl.class).in(Singleton.class);
 		bind(Moment.class).to(MomentImpl.class);
+		bind(DownloadSpeedTester.class).to(DownloadSpeedTesterImpl.class);
 	}
 }

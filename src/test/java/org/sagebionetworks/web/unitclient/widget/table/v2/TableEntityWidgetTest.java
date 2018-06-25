@@ -533,10 +533,8 @@ public class TableEntityWidgetTest {
 		// change to advanced (verify sql that has facet selection info sql used)
 		widget.onShowAdvancedSearch();
 		verifyAdvancedSearchUI();
-		verify(mockQueryResultsWidget).configure(queryCaptor.capture(), eq(canEdit), eq(TableType.fileview), eq(widget));
-		Query query = queryCaptor.getValue();
-		assertEquals(facetBasedSql, query.getSql());
-		assertNull(query.getSelectedFacets());
+		// SWC-4275: query results widget is not reconfigured when switching to advanced mode (since currently shown results are the same)
+		verify(mockQueryResultsWidget, never()).configure(any(Query.class), anyBoolean(), eq(TableType.fileview), eq(widget));
 	}
 	
 	@Test

@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -114,7 +115,9 @@ public class HomePresenter extends AbstractActivity implements HomeView.Presente
 	
 	public void checkAcceptToU() {
 		if (authenticationController.isLoggedIn() && !authenticationController.getCurrentUserSessionData().getSession().getAcceptsTermsOfUse()) {
-			authenticationController.logoutUser();
+			// SWC-4278: do not log user out (that will clear all state, and the user may be in the middle of signing the pledge!)
+			// Instead, redirect to the pledge.
+			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.SHOW_TOU));
 		}
 	}
 	

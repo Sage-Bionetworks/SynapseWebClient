@@ -8,12 +8,15 @@ import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -30,6 +33,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.cookie.CookieKeys;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
+import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
@@ -40,6 +44,7 @@ import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
 import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class HomePresenterTest {
@@ -68,6 +73,8 @@ public class HomePresenterTest {
 	UserSessionData testSessionData;
 	@Mock
 	ResourceLoader mockResourceLoader;
+	@Captor
+	ArgumentCaptor<Place> placeCaptor;
 	
 	@Before
 	public void setup() throws RestServiceException, JSONObjectAdapterException{
@@ -157,7 +164,10 @@ public class HomePresenterTest {
 		
 		verify(mockAuthenticationController).getCurrentUserSessionData();
 		//should automatically log you out
-		verify(mockAuthenticationController).logoutUser();
+		verify(mockPlaceChanger).goTo(placeCaptor.capture());
+		Place targetPlace = placeCaptor.getValue();
+		assertTrue(targetPlace instanceof LoginPlace);
+		assertEquals(((LoginPlace)targetPlace).toToken(), LoginPlace.SHOW_TOU);
 	}
 	
 	@Test
