@@ -197,6 +197,7 @@ public class TableQueryResultWidgetTest {
 		String facetColumnName = "country";
 		when(mockFacetColumnRequest.getColumnName()).thenReturn(facetColumnName);
 		facetChangeRequestHandler.invoke(mockFacetColumnRequest);
+		verify(mockListner).onStartingNewQuery(query);
 		assertEquals(1, query.getSelectedFacets().size());
 		assertEquals(mockFacetColumnRequest, query.getSelectedFacets().get(0));
 		

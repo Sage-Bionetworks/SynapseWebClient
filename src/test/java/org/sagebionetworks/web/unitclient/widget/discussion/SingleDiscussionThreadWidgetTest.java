@@ -144,7 +144,6 @@ public class SingleDiscussionThreadWidgetTest {
 	PopupUtilsView mockPopupUtils;
 	@Mock
 	ClientCache mockClientCache;
-
 	Set<String> moderatorIds;
 	SingleDiscussionThreadWidget discussionThreadWidget;
 	List<DiscussionReplyBundle> bundleList;
@@ -265,14 +264,22 @@ public class SingleDiscussionThreadWidgetTest {
 		//verify delete
 		verify(mockActionMenuWidget).setActionListener(eq(Action.DELETE_THREAD), actionListenerCaptor.capture());
 		actionListener = actionListenerCaptor.getValue();
-		actionListener.onAction(Action.EDIT_THREAD);
+		actionListener.onAction(Action.DELETE_THREAD);
 		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), any(Callback.class));
-
+		
+		//verify restore
+		verify(mockActionMenuWidget).setActionListener(eq(Action.RESTORE_THREAD), actionListenerCaptor.capture());
+		actionListener = actionListenerCaptor.getValue();
+		actionListener.onAction(Action.RESTORE_THREAD);
+		verify(mockPopupUtils, times(2)).showConfirmDialog(anyString(), anyString(), callbackCaptor.capture());
+		callbackCaptor.getValue().invoke();
+		verify(mockDiscussionForumClientAsync).restoreThread(anyString(), any(AsyncCallback.class));
+		
 		//verify pin thread
 		verify(mockActionMenuWidget).setActionText(eq(Action.PIN_THREAD), eq(PIN_THREAD_ACTION_TEXT));
 		verify(mockActionMenuWidget).setActionListener(eq(Action.PIN_THREAD), actionListenerCaptor.capture());
 		actionListener = actionListenerCaptor.getValue();
-		actionListener.onAction(Action.EDIT_THREAD);
+		actionListener.onAction(Action.PIN_THREAD);
 		verify(mockDiscussionForumClientAsync).pinThread(anyString(), any(AsyncCallback.class));
 	}
 	
@@ -427,6 +434,7 @@ public class SingleDiscussionThreadWidgetTest {
 				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
 				CREATED_BY, isEdited, isPinned);
 		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
+		
 		verify(mockView).clear();
 		verify(mockView).setTitle("title");
 		verify(mockView).setCreatedOn(anyString());
@@ -435,7 +443,27 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).setEditedLabelVisible(false);
 		verify(mockView).setPinIconVisible(true);
 		verify(mockView).setUnpinIconVisible(false);
+		// thread is not deleted, so Delete action should be visible.
+		verify(mockActionMenuWidget).setActionVisible(Action.DELETE_THREAD, true);
+		verify(mockActionMenuWidget).setActionVisible(Action.RESTORE_THREAD, false);
 	}
+	
+	@Test
+	public void testConfigureDeletedWithModerator() {
+		boolean isDeleted = true;
+		boolean canModerate = true;
+		boolean isEdited = false;
+		boolean isPinned = false;
+		DiscussionThreadBundle threadBundle = DiscussionTestUtils.createThreadBundle("1", "title",
+				Arrays.asList("123"), 1L, 2L, new Date(), "messageKey", isDeleted,
+				CREATED_BY, isEdited, isPinned);
+		discussionThreadWidget.configure(threadBundle, REPLY_ID_NULL, canModerate, moderatorIds, mockActionMenuWidget, mockCallback);
+		
+		// thread is deleted, so Restore action should be visible.
+		verify(mockActionMenuWidget).setActionVisible(Action.DELETE_THREAD, false);
+		verify(mockActionMenuWidget).setActionVisible(Action.RESTORE_THREAD, true);
+	}
+	
 	
 	@Test
 	public void testConfigurePinnedWithModerator() {

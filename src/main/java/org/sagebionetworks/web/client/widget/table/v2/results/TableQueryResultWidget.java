@@ -102,7 +102,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 				startingQuery.setSelectedFacets(null);
 				cachedFullQueryResultBundle = null;
 				startingQuery.setOffset(0L);
-				runQuery();
+				queryChanging();
 			}
 		};
 		facetChangedHandler = new CallbackP<FacetColumnRequest>() {
@@ -122,7 +122,7 @@ public class TableQueryResultWidget implements TableQueryResultView.Presenter, I
 				selectedFacets.add(request);
 				cachedFullQueryResultBundle = null;
 				startingQuery.setOffset(0L);
-				runQuery();
+				queryChanging();
 			}
 		};
 	}

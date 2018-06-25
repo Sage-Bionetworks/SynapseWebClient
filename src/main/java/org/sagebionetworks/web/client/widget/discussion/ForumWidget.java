@@ -405,8 +405,12 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 			actionMenu.setActionVisible(Action.SHOW_DELETED_THREADS, !isSingleThread && isCurrentUserModerator);
 			actionMenu.setActionVisible(Action.EDIT_THREAD, isSingleThread && currentThreadBundle.getCreatedBy().equals(authController.getCurrentUserPrincipalId()));
 			actionMenu.setActionVisible(Action.PIN_THREAD, isSingleThread && isCurrentUserModerator);
-			actionMenu.setActionVisible(Action.DELETE_THREAD, isSingleThread && isCurrentUserModerator);
+			if (!isSingleThread) {
+				actionMenu.setActionVisible(Action.RESTORE_THREAD, false);
+				actionMenu.setActionVisible(Action.DELETE_THREAD, false);	
+			}
 		}
+		updateActionMenuDeletedThreadsCommand();
 	}
 
 	@Override
@@ -441,16 +445,18 @@ public class ForumWidget implements ForumWidgetView.Presenter{
 	public void onClickDeletedThreadCommand() {
 		if (view.isDeletedThreadListVisible()) {
 			view.setDeletedThreadListVisible(false);
-			if (actionMenu != null) {
-				actionMenu.setActionText(Action.SHOW_DELETED_THREADS, "Show Deleted Threads");	
-			}
 		} else {
 			view.setDeletedThreadListVisible(true);
-			if (actionMenu != null) {
-				actionMenu.setActionText(Action.SHOW_DELETED_THREADS, "Hide Deleted Threads");
-			}
 			deletedThreadListWidget.configure(forumId, isCurrentUserModerator,
 					moderatorIds, null, DiscussionFilter.DELETED_ONLY);
+		}
+		updateActionMenuDeletedThreadsCommand();
+	}
+	
+	private void updateActionMenuDeletedThreadsCommand() {
+		if (actionMenu != null) {
+			String commandName = view.isDeletedThreadListVisible() ? "Hide Deleted Threads" : "Show Deleted Threads";
+			actionMenu.setActionText(Action.SHOW_DELETED_THREADS, commandName);
 		}
 	}
 	

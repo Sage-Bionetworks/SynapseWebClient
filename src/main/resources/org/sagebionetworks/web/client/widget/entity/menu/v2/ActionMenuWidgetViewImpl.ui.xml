@@ -52,6 +52,7 @@
 						<a:ActionMenuItem icon="EDIT" iconFixedWidth="true" action="EDIT_THREAD">Edit Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
 						<a:ActionMenuItem icon="THUMB_TACK" iconFixedWidth="true" action="PIN_THREAD">Pin Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
 						<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_THREAD">Delete Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
+						<a:ActionMenuItem iconFixedWidth="true" action="RESTORE_THREAD">Restore Thread</a:ActionMenuItem> <!-- text and icon updated by listener -->
 						<a:ActionMenuItem icon="PLUS_SQUARE_O" iconFixedWidth="true" action="CREATE_EXTERNAL_DOCKER_REPO">Add External Repository</a:ActionMenuItem>
 						<b:Divider ui:field="actDivider" visible="false" />
 						<b:DropDownHeader ui:field="actHeader">ACT Tools</b:DropDownHeader>

@@ -343,7 +343,8 @@ public class TableEntityWidget implements IsWidget,
 				Query q = getDefaultQuery();
 				q.setSql(sql);
 				showAdvancedSearchUI();
-				setQuery(q, false);	
+				// set the current query. results have not changed, so set isFromResults=true 
+				setQuery(q, true);	
 			}
 			
 			@Override
