@@ -6,6 +6,7 @@ import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
@@ -68,6 +69,11 @@ public class EvaluationEditorModalTest {
 		evaluation.setSubmissionReceiptMessage(submissionReceiptMessage);
 		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).createEvaluation(any(Evaluation.class), any(AsyncCallback.class));
+		
+		when(mockView.getSubmissionLimit()).thenReturn(null);
+		when(mockView.getNumberOfRounds()).thenReturn(null);
+		when(mockView.getRoundDuration()).thenReturn(null);
+		when(mockView.getRoundStart()).thenReturn(null);
 	}	
 	
 	@Test
