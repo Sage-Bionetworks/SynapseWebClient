@@ -171,6 +171,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -574,4 +575,5 @@ public interface PortalGinInjector extends Ginjector {
 	WikiVersionAnchorListItem getWikiVersionAnchorListItem();
 	SynapseProperties getSynapseProperties();
 	QuizInfoDialog getQuizInfoDialog();
+	EvaluationRowWidget getEvaluationRowWidget();
 }

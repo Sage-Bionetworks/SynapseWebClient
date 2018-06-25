@@ -7,7 +7,7 @@
 	<b:Container fluid="true" addStyleNames="border-bottom-1">
 		<b:Row>
 			<b:Column size="XS_12">
-				<b:Heading size="H5" >
+				<b:Heading size="H4" >
 					<bh:Text ui:field="evaluationNameText"/>
 					<b:Button ui:field="deleteButton" type="DANGER" icon="TIMES" pull="RIGHT" addStyleNames="margin-right-5" size="EXTRA_SMALL" height="22px"/>
 					<b:Button ui:field="shareButton" text="Share" pull="RIGHT" addStyleNames="margin-right-5" size="EXTRA_SMALL"/>
@@ -15,5 +15,30 @@
 				</b:Heading>
 			</b:Column>
 		</b:Row>
+		<b:Row>
+			<b:Column size="XS_12" addStyleNames="margin-top-10" >
+				<b:FormGroup>
+					<b:FormLabel text="Description" addStyleNames="displayInline margin-right-5" />
+					<b:FormControlStatic ui:field="descriptionField" addStyleNames="displayInline" />
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel text="Submission Instructions" addStyleNames="displayInline  margin-right-5" />
+					<b:FormControlStatic ui:field="submissionInstructionsField" addStyleNames="displayInline" />
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel text="Submission Receipt Message" addStyleNames="displayInline margin-right-5" />
+					<b:FormControlStatic ui:field="submissionReceiptField" addStyleNames="displayInline" />
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel text="Created On" addStyleNames="displayInline margin-right-5" />
+					<b:FormControlStatic ui:field="createdOnDiv"  addStyleNames="displayInline" />
+				</b:FormGroup>
+				<b:FormGroup>
+					<b:FormLabel text="Created By"  addStyleNames="displayInline margin-right-5" />
+					<bh:Div ui:field="createdByDiv"  addStyleNames="displayInline" />
+				</b:FormGroup>
+			</b:Column>
+		</b:Row>
+		
 	</b:Container>
 </ui:UiBinder>
