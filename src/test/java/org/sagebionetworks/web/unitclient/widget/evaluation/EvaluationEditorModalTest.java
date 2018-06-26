@@ -1,13 +1,13 @@
 package org.sagebionetworks.web.unitclient.widget.evaluation;
 
-import static org.mockito.Matchers.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,21 +16,15 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.evaluation.model.Evaluation;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
+import org.sagebionetworks.evaluation.model.SubmissionQuota;
 import org.sagebionetworks.web.client.ChallengeClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
-import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
-import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsListView;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModalView;
-import org.sagebionetworks.web.client.widget.sharing.EvaluationAccessControlListModalWidget;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
-import org.sagebionetworks.web.shared.exceptions.BadRequestException;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -53,10 +47,22 @@ public class EvaluationEditorModalTest {
 	AuthenticationController mockAuthenticationController;
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
+	@Mock
+	SubmissionQuota mockSubmissionQuota;
+	@Captor
+	ArgumentCaptor<Evaluation> evaluationCaptor;
+	
 	Evaluation evaluation;
 	String evaluationName = "my existing evaluation queue";
 	String submissionInstruction = "Please submit your power of attorney to the Synapse developer";
 	String submissionReceiptMessage = "Really?";
+	String description = "a description of the evaluation queue";
+	Date createdOnDate = new Date();
+	
+	Date quotaRoundStart = new Date();
+	Long numberOfRounds = 3L;
+	Long roundDurationMillis = 10000L;
+	Long submissionLimit = 20L;
 	
 	@Before
 	public void setup() throws Exception{
@@ -67,6 +73,8 @@ public class EvaluationEditorModalTest {
 		evaluation.setName(evaluationName);
 		evaluation.setSubmissionInstructionsMessage(submissionInstruction);
 		evaluation.setSubmissionReceiptMessage(submissionReceiptMessage);
+		evaluation.setDescription(description);
+		evaluation.setCreatedOn(createdOnDate);
 		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).createEvaluation(any(Evaluation.class), any(AsyncCallback.class));
 		
@@ -74,6 +82,11 @@ public class EvaluationEditorModalTest {
 		when(mockView.getNumberOfRounds()).thenReturn(null);
 		when(mockView.getRoundDuration()).thenReturn(null);
 		when(mockView.getRoundStart()).thenReturn(null);
+		
+		when(mockSubmissionQuota.getFirstRoundStart()).thenReturn(quotaRoundStart);
+		when(mockSubmissionQuota.getNumberOfRounds()).thenReturn(numberOfRounds);
+		when(mockSubmissionQuota.getRoundDurationMillis()).thenReturn(roundDurationMillis);
+		when(mockSubmissionQuota.getSubmissionLimit()).thenReturn(submissionLimit);
 	}	
 	
 	@Test
@@ -85,9 +98,11 @@ public class EvaluationEditorModalTest {
 	public void testConfigureNewEvaluation() {
 		String projectId = "syn983948";
 		modal.configure(projectId, mockEvaluationUpdatedCallback);
+		verify(mockView).clear();
 		verify(mockView).setEvaluationName(null);
 		verify(mockView).setSubmissionInstructionsMessage(null);
 		verify(mockView).setSubmissionReceiptMessage(null);
+		
 		
 		//save new evaluation
 		modal.onSave();
@@ -95,18 +110,46 @@ public class EvaluationEditorModalTest {
 		verify(mockView).hide();
 		verify(mockEvaluationUpdatedCallback).invoke();
 	}
+	
 	@Test
 	public void testConfigureExistingEvaluation() {
 		modal.configure(evaluation, mockEvaluationUpdatedCallback);
+		verify(mockView).clear();
 		verify(mockView).setEvaluationName(evaluationName);
 		verify(mockView).setSubmissionInstructionsMessage(submissionInstruction);
 		verify(mockView).setSubmissionReceiptMessage(submissionReceiptMessage);
-
+		verify(mockView).setDescription(description);
+		verify(mockView).setCreatedOn(anyString());
+		//verify no quota
+		verify(mockView, never()).setRoundStart(any(Date.class));
+		verify(mockView, never()).setNumberOfRounds(anyLong());
+		verify(mockView, never()).setRoundDuration(anyLong());
+		verify(mockView, never()).setSubmissionLimit(anyLong());
+		
 		//save existing evaluation
 		modal.onSave();
 		verify(mockChallengeClient).updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
 		verify(mockView).hide();
 		verify(mockEvaluationUpdatedCallback).invoke();
+	}
+	
+	@Test
+	public void testConfigureExistingEvaluationWithQuota() {
+		evaluation.setQuota(mockSubmissionQuota);
+		
+		modal.configure(evaluation, mockEvaluationUpdatedCallback);
+		
+		verify(mockView).clear();
+		verify(mockView).setEvaluationName(evaluationName);
+		verify(mockView).setSubmissionInstructionsMessage(submissionInstruction);
+		verify(mockView).setSubmissionReceiptMessage(submissionReceiptMessage);
+		verify(mockView).setDescription(description);
+		verify(mockView).setCreatedOn(anyString());
+		//verify quota
+		verify(mockView).setRoundStart(quotaRoundStart);
+		verify(mockView).setNumberOfRounds(numberOfRounds);
+		verify(mockView).setRoundDuration(roundDurationMillis);
+		verify(mockView).setSubmissionLimit(submissionLimit);
 	}
 	
 	@Test
@@ -128,4 +171,36 @@ public class EvaluationEditorModalTest {
 		verify(mockView, never()).hide();
 		verify(mockEvaluationUpdatedCallback, never()).invoke();
 	}
+	
+	@Test
+	public void testInvalidQuota() {
+		modal.configure(evaluation, mockEvaluationUpdatedCallback);
+
+		//only the round start is set, no other quota fields
+		when(mockView.getRoundStart()).thenReturn(quotaRoundStart);
+		
+		modal.onSave();
+		
+		verify(mockSynAlert).showError(EvaluationEditorModal.QUOTA_NOT_FULLY_DEFINED_ERROR);
+		verify(mockView, never()).hide();
+		verify(mockEvaluationUpdatedCallback, never()).invoke();
+	}
+	
+	@Test
+	public void testValidQuota() {
+		modal.configure(evaluation, mockEvaluationUpdatedCallback);
+
+		//only the round start is set, no other quota fields
+		when(mockView.getRoundStart()).thenReturn(new Date());
+		when(mockView.getSubmissionLimit()).thenReturn(22.0);
+		when(mockView.getNumberOfRounds()).thenReturn(10.0);
+		when(mockView.getRoundDuration()).thenReturn(2000000.0);
+		
+		modal.onSave();
+		
+		verify(mockChallengeClient).updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
+		verify(mockView).hide();
+		verify(mockEvaluationUpdatedCallback).invoke();
+	}
+
 }

@@ -21,6 +21,7 @@ import com.google.inject.Inject;
 
 public class EvaluationEditorModal implements EvaluationEditorModalView.Presenter, IsWidget {
 	
+	public static final String QUOTA_NOT_FULLY_DEFINED_ERROR = "All quota are required if any are set.";
 	private EvaluationEditorModalView view;
 	private ChallengeClientAsync challengeClient;
 	private Evaluation evaluation;
@@ -118,7 +119,7 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 		boolean isUserTryingToSetQuota = submissionLimit != null || numberOfRounds != null || roundDuration != null || roundStart != null;
 		boolean isValidQuotaDefinition = submissionLimit != null && numberOfRounds != null && roundDuration != null && roundStart != null;
 		if (isUserTryingToSetQuota && !isValidQuotaDefinition) {
-			synAlert.showError("All quota are required if any are set.");
+			synAlert.showError(QUOTA_NOT_FULLY_DEFINED_ERROR);
 			return;
 		}
 		if (isUserTryingToSetQuota) {

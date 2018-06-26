@@ -2,9 +2,11 @@ package org.sagebionetworks.web.client.widget.evaluation;
 
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.FormControlStatic;
+import org.gwtbootstrap3.client.ui.Panel;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.evaluation.model.SubmissionQuota;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -40,6 +42,17 @@ public class EvaluationRowWidget implements IsWidget {
 	FormControlStatic createdOnDiv;
 	@UiField
 	Div createdByDiv;
+	
+	@UiField
+	Panel quotaUI;
+	@UiField
+	FormControlStatic roundStart;
+	@UiField
+	FormControlStatic submissionLimitField;
+	@UiField
+	FormControlStatic numberOfRoundsField;
+	@UiField
+	FormControlStatic roundDurationField;
 	
 	Widget widget;
 	UserBadge userBadge;
@@ -98,6 +111,14 @@ public class EvaluationRowWidget implements IsWidget {
 		submissionInstructionsField.setText(evaluation.getSubmissionInstructionsMessage());
 		submissionReceiptField.setText(evaluation.getSubmissionReceiptMessage());
 		createdOnDiv.setText(dateTimeUtils.getDateString(evaluation.getCreatedOn()));
+		SubmissionQuota quota = evaluation.getQuota();
+		quotaUI.setVisible(quota != null);
+		if (quota != null) {
+			roundStart.setText(dateTimeUtils.getDateString(quota.getFirstRoundStart()));
+			submissionLimitField.setText(quota.getSubmissionLimit().toString());
+			numberOfRoundsField.setText(quota.getNumberOfRounds().toString());
+			roundDurationField.setText(quota.getRoundDurationMillis().toString());
+		}
 	}
 	
 	@Override

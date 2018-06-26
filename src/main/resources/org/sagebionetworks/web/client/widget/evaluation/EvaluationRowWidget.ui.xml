@@ -35,6 +35,29 @@
 					<b:FormLabel text="Submission Receipt Message" addStyleNames="displayInline margin-right-5" />
 					<b:FormControlStatic ui:field="submissionReceiptField" addStyleNames="displayInline" />
 				</b:FormGroup>
+				<b:Panel addStyleNames="padding-10" ui:field="quotaUI">
+					<b:PanelHeader>
+						<b:Heading size="H4" text="Quota"/>
+					</b:PanelHeader>
+					<b:PanelBody>
+						<b:FormGroup>
+							<b:FormLabel text="First Round Start Date/Time" addStyleNames="displayInline margin-right-5" />
+							<b:FormControlStatic ui:field="roundStart"  addStyleNames="displayInline" />
+						</b:FormGroup>
+						<b:FormGroup>
+							<b:FormLabel text="Submission Limit" addStyleNames="displayInline margin-right-5"/>
+							<b:FormControlStatic ui:field="submissionLimitField"  addStyleNames="displayInline" />
+						</b:FormGroup>
+						<b:FormGroup>
+							<b:FormLabel text="Number of Rounds" addStyleNames="displayInline margin-right-5"/>
+							<b:FormControlStatic ui:field="numberOfRoundsField"  addStyleNames="displayInline" />
+						</b:FormGroup>
+						<b:FormGroup>
+							<b:FormLabel text="Round Duration (ms)" addStyleNames="displayInline margin-right-5" />
+							<b:FormControlStatic ui:field="roundDurationField"  addStyleNames="displayInline" />
+						</b:FormGroup>
+					</b:PanelBody>
+				</b:Panel>
 			</b:Column>
 		</b:Row>
 		
