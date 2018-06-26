@@ -281,6 +281,9 @@ public class MarkdownEditorWidget implements MarkdownEditorWidgetView.Presenter,
 		case INSERT_LINK:
 			insertNewWidget(LINK_CONTENT_TYPE);
 			break;
+		case INSERT_DETAILS_SUMMARY:
+			insertNewWidget(DETAILS_SUMMARY_CONTENT_TYPE);
+			break;
 		case INSERT_PROV_GRAPH:
 			insertNewWidget(PROVENANCE_CONTENT_TYPE);
 			break;

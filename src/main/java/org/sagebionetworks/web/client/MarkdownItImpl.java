@@ -1,9 +1,19 @@
 package org.sagebionetworks.web.client;
 
+import com.google.inject.Inject;
+
 public class MarkdownItImpl implements MarkdownIt {
+	private SynapseJSNIUtils jsniUtils;
+	
+	@Inject
+	public MarkdownItImpl(SynapseJSNIUtils jsniUtils) {
+		this.jsniUtils = jsniUtils;
+	}
+	
 	@Override
 	public String markdown2Html(String md, String uniqueSuffix) {
-		return _markdown2Html(md, uniqueSuffix);
+		String sanitizedMd = jsniUtils.sanitizeHtml(md);
+		return _markdown2Html(sanitizedMd, uniqueSuffix);
 	}
 
 	private final static native String _markdown2Html(String md,

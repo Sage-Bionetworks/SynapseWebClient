@@ -72,6 +72,21 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
+	public void loadSummaryDetailsShim() {
+		_loadSummaryDetailsShim();
+	}
+	
+	public static native void _loadSummaryDetailsShim() /*-{
+		try {
+			$wnd.jQuery('summary').each(function(i, e) {
+				$wnd.details_shim(e)
+				});
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+	
+	@Override
 	public void loadTableSorters() {
 		_tablesorter();
 	}
@@ -567,6 +582,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    small:  [],
 				    span:   [],
 				    sub:    [],
+				    summary: [],
 				    sup:    [],
 				    strong: [],
 				    table:  ['width', 'border', 'align', 'valign'],
