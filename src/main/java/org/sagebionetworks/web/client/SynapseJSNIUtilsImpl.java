@@ -607,11 +607,13 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    }
 				},
 				safeAttrValue: function (tag, name, value) {
-					// returning nothing means keep the default behavior
+					// returning nothing removes the value
 					if (tag === 'img' && name === 'src') {
-						if (value && value.startsWith('data:image/')) {
+						if (value && (value.startsWith('data:image/') || value.startsWith('http'))) {
 							return value;
 						}
+					} else {
+						return value; 
 					}
 				}
 			};
