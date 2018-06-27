@@ -7,6 +7,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
@@ -74,11 +75,13 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 			String yTitle, 
 			List<PlotlyTraceWrapper> xyData, 
 			String barMode, 
-			String xAxisType, 
-			String yAxisType, 
+			AxisType xAxisType, 
+			AxisType yAxisType, 
 			boolean showLegend) {
 		chartContainer.clear();
-		_showChart(chartContainer.getElement(), getPlotlyTraceArray(xyData), barMode, title, xTitle, yTitle, xAxisType, yAxisType, showLegend);
+		String xAxisTypeString = AxisType.AUTO.equals(xAxisType) ? "-" : xAxisType.toString().toLowerCase();
+		String yAxisTypeString = AxisType.AUTO.equals(yAxisType) ? "-" : yAxisType.toString().toLowerCase();
+		_showChart(chartContainer.getElement(), getPlotlyTraceArray(xyData), barMode, title, xTitle, yTitle, xAxisTypeString, yAxisTypeString, showLegend);
 	}
 	
 	public static JavaScriptObject[] getPlotlyTraceArray(List<PlotlyTraceWrapper> l) {
@@ -103,18 +106,22 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 			String yAxisType, 
 			boolean showLegend) /*-{
 		var plot =  $wnd.createPlotlyComponent($wnd.Plotly);
+		
+		var xAxisLayoutObject = new $wnd.Object();
+		xAxisLayoutObject.title = xTitle;
+		xAxisLayoutObject.type = xAxisType;
+		
+		var yAxisLayoutObject = new $wnd.Object();
+		yAxisLayoutObject.title = yTitle;
+		yAxisLayoutObject.type = yAxisType;
+		
 		var props = {
 			data: xyData,
 			fit: true,
 			layout: {
-				  xaxis: {
-				  	title: xTitle,
-				  	type: xAxisType
-				  },
-				  yaxis: { 
-				  	title: yTitle,
-				  	type: yAxisType
-				  },
+				  title: plotTitle,
+				  xaxis: xAxisLayoutObject,
+				  yaxis: yAxisLayoutObject,
 				  barmode: barMode,
 				  showlegend: showLegend
 				},
