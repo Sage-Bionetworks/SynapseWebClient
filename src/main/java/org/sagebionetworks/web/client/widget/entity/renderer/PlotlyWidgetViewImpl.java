@@ -39,7 +39,6 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	@Inject
 	public PlotlyWidgetViewImpl(Binder binder) {
 		w=binder.createAndBindUi(this);
-		chartContainer.setWidth("100%");
 		w.addAttachHandler(event -> {
 			if (!event.isAttached()) {
 				//detach event, clean up react component
