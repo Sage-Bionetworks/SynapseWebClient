@@ -243,7 +243,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		long verificationId = Long.parseLong(submission.getId());
 		VerificationState newState = new VerificationState();
 		newState.setState(state);
-		GWT.debugger();
 		newState.setReason(reason);
 		userProfileClient.updateVerificationState(verificationId, newState, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
