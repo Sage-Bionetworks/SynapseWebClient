@@ -111,6 +111,7 @@ import org.sagebionetworks.web.client.widget.entity.editor.APITableConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.AttachmentConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigEditor;
+import org.sagebionetworks.web.client.widget.entity.editor.DetailsSummaryConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigEditor;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageLinkConfigEditor;
@@ -171,6 +172,7 @@ import org.sagebionetworks.web.client.widget.entity.tabs.TablesTabView;
 import org.sagebionetworks.web.client.widget.evaluation.AdministerEvaluationsList;
 import org.sagebionetworks.web.client.widget.evaluation.ChallengeWidget;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationEditorModal;
+import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationSubmitter;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -336,6 +338,7 @@ public interface PortalGinInjector extends Ginjector {
 	ImageLinkConfigEditor getImageLinkConfigEditor();
 	AttachmentConfigEditor getAttachmentConfigEditor();
 	LinkConfigEditor getLinkConfigEditor();
+	DetailsSummaryConfigEditor getDetailsSummaryConfigEditor();
 	APITableConfigEditor getSynapseAPICallConfigEditor();
 	QueryTableConfigEditor getSynapseQueryConfigEditor();
 	LeaderboardConfigEditor getLeaderboardConfigEditor();
@@ -574,4 +577,5 @@ public interface PortalGinInjector extends Ginjector {
 	WikiVersionAnchorListItem getWikiVersionAnchorListItem();
 	SynapseProperties getSynapseProperties();
 	QuizInfoDialog getQuizInfoDialog();
+	EvaluationRowWidget getEvaluationRowWidget();
 }

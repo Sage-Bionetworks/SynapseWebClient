@@ -33,6 +33,7 @@ import org.sagebionetworks.repo.model.table.QueryResultBundle;
 import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.web.client.ArrayUtils;
+import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
@@ -66,7 +67,7 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	private SynapseAlert synAlert;
 	private String sql, title, xTitle, yTitle;
 	GraphType graphType;
-	String xAxisType, yAxisType;
+	AxisType xAxisType, yAxisType;
 	BarMode barMode;
 	private AsynchronousJobTracker jobTracker;
 	Query query;
@@ -117,8 +118,8 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		yTitle = descriptor.get(Y_AXIS_TITLE);
 		graphType = GraphType.valueOf(descriptor.get(TYPE));
 		
-		xAxisType = descriptor.containsKey(X_AXIS_TYPE) ? descriptor.get(X_AXIS_TYPE) : "-"; 
-		yAxisType = descriptor.containsKey(Y_AXIS_TYPE) ? descriptor.get(Y_AXIS_TYPE) : "-";
+		xAxisType = descriptor.containsKey(X_AXIS_TYPE) ? AxisType.valueOf(descriptor.get(X_AXIS_TYPE)) : AxisType.AUTO; 
+		yAxisType = descriptor.containsKey(Y_AXIS_TYPE) ? AxisType.valueOf(descriptor.get(Y_AXIS_TYPE)) : AxisType.AUTO;
 		showLegend = descriptor.containsKey(SHOW_LEGEND) ? Boolean.valueOf(descriptor.get(SHOW_LEGEND)) : true;
 		isHorizontal = descriptor.containsKey(IS_HORIZONTAL) ? Boolean.valueOf(descriptor.get(IS_HORIZONTAL)) : false;
 		if (descriptor.containsKey(BAR_MODE)) {
@@ -273,13 +274,13 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 			trace.setIsHorizontal(isHorizontal);
 		}
 		if (isHorizontal) {
-			String temp = xAxisType;
+			AxisType temp = xAxisType;
 			xAxisType = yAxisType;
 			yAxisType = temp;
 
-			temp = xTitle;
+			String tempTitle = xTitle;
 			xTitle = yTitle;
-			yTitle = temp;
+			yTitle = tempTitle;
 		}
 	}
 	

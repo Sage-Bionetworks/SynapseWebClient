@@ -1,5 +1,5 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" dir="ltr" lang="en-US">
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
 	<head>
 		<title>Synapse | Sage Bionetworks</title>
 		<meta name="description" content="Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges." />
@@ -34,12 +34,12 @@
 		<meta http-equiv="pragma" content="no-cache" />
 		<!-- end cache control -->
 		
-		<link rel="icon" type="image/png"  href="favicon.png?v=3" />
+		<link rel="icon" href="favicon.png?v=3" />
 		<link href="/opensearch.xml" rel="search" title="Synapse" type="application/opensearchdescription+xml" />
 		<link rel="manifest" href="manifest.json" />
 		
 		<!-- Google Analytics -->
-		<script type="text/javascript">
+		<script>
 			window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
 			ga('create', 'UA-29804340-1', 'auto');
 			ga('send', 'pageview');
@@ -58,7 +58,6 @@
 			
 			var link = document.createElement( "link" );
 			link.href = cdnEndpoint + "loading.css";
-			link.type = "text/css";
 			link.rel = "stylesheet";
 			document.head.appendChild(link);
 
@@ -76,8 +75,10 @@
 				head.load(cdnEndpoint + "js/init-nchart.js");
 				head.load("//cdn.jsdelivr.net/npm/moment@2.22.1/min/moment.min.js");
 				head.load("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js");
-				head.load(cdnEndpoint + "js/markdown-it-plugins-12.min.js");
+				head.load(cdnEndpoint + "js/markdown-it-plugins-13.min.js");
 				head.load(cdnEndpoint + "js/polyfill-2.js");
+				head.load(cdnEndpoint + "js/details-shim.min.js");
+				head.load(cdnEndpoint + "css/details-shim.min.css");
 				head.load(cdnEndpoint + "js/xss.min.js");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/pica/4.1.1/pica.min.js");
 				head.load("//www.google-analytics.com/analytics.js");
@@ -153,9 +154,7 @@
 					<div class="sk-circle11 sk-child"></div>
 					<div class="sk-circle12 sk-child"></div>
 				</div>
-				<center>
-					<h4 style="color: #1e7098; margin-top: 10px; font-family: Sans-serif">Loading...</h4>
-				</center>
+				<h4 style="color: #1e7098; margin-top: 10px; font-family: Sans-serif; text-align:center">Loading...</h4>
 			</div>
 			<div id="headerPanel"></div>
 			<div id="rootPanel"></div>

@@ -23,7 +23,6 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	private MemberListWidgetView view;
 	private GlobalApplicationState globalApplicationState;
 	private SynapseClientAsync synapseClient;
-	private TeamMemberPagedResults memberList;
 	private AuthenticationController authenticationController;
 	private Callback teamUpdatedCallback;
 	private LoadMoreWidgetContainer membersContainer;
@@ -71,11 +70,10 @@ public class MemberListWidget implements MemberListWidgetView.Presenter {
 	public void loadMore() {
 		synapseClient.getTeamMembers(teamId, searchTerm, MEMBER_LIMIT, offset, new AsyncCallback<TeamMemberPagedResults>() {
 			@Override
-			public void onSuccess(TeamMemberPagedResults results) {
-				memberList = results;
+			public void onSuccess(TeamMemberPagedResults memberList) {
 				offset += MEMBER_LIMIT;
 				
-				long numberOfMembers = results.getTotalNumberOfResults();
+				long numberOfMembers = memberList.getTotalNumberOfResults();
 				membersContainer.setIsMore(offset < numberOfMembers);
 				view.addMembers(memberList.getResults(), isAdmin);
 			}

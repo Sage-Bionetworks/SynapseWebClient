@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.evaluation;
 
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.evaluation.model.Evaluation;
+import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.evaluation.EvaluationRowWidget.EvaluationActionHandler;
 
 import com.google.gwt.uibinder.client.UiBinder;
@@ -18,16 +19,17 @@ public class AdministerEvaluationsListViewImpl implements AdministerEvaluationsL
 	Div rows;
 	@UiField
 	Div widgetsContainer;
-	
+	PortalGinInjector ginInjector;
 	Widget widget;
 	@Inject
-	public AdministerEvaluationsListViewImpl(Binder binder) {
+	public AdministerEvaluationsListViewImpl(Binder binder, PortalGinInjector ginInjector) {
+		this.ginInjector = ginInjector;
 		widget = binder.createAndBindUi(this);
 	}
 	
 	@Override
 	public void addRow(Evaluation evaluation) {
-		EvaluationRowWidget newRow = new EvaluationRowWidget();
+		EvaluationRowWidget newRow = ginInjector.getEvaluationRowWidget();
 		newRow.configure(evaluation, presenter);
 		rows.add(newRow.asWidget());
 	}

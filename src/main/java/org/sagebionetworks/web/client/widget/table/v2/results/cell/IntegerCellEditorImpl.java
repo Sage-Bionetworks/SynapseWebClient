@@ -16,7 +16,7 @@ public class IntegerCellEditorImpl extends AbstractCellEditor implements Integer
 	public static final String VALUE_MUST_BE_AN_INTEGER = "Value must be an integer.";
 
 	@Inject
-	public IntegerCellEditorImpl(CellEditorView view) {
+	public IntegerCellEditorImpl(NumberCellEditorView view) {
 		super(view);
 	}
 

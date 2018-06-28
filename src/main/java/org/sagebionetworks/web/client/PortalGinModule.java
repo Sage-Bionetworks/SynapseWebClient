@@ -351,6 +351,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.ButtonLinkConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.CytoscapeConfigViewImpl;
+import org.sagebionetworks.web.client.widget.entity.editor.DetailsSummaryConfigView;
+import org.sagebionetworks.web.client.widget.entity.editor.DetailsSummaryConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.EntityListConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.editor.ImageConfigView;
@@ -652,6 +654,8 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRende
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.FileCellRendererViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditor;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.IntegerCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.NumberCellEditorView;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.NumberCellEditorViewImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRenderer;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.LinkCellRendererImpl;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.ListCellEditorViewImpl;
@@ -1018,6 +1022,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(AttachmentConfigView.class).to(AttachmentConfigViewImpl.class).in(Singleton.class);
 		bind(ProvenanceConfigView.class).to(ProvenanceConfigViewImpl.class);
 		bind(LinkConfigView.class).to(LinkConfigViewImpl.class);
+		bind(DetailsSummaryConfigView.class).to(DetailsSummaryConfigViewImpl.class);
 		bind(TabbedTableConfigView.class).to(TabbedTableConfigViewImpl.class);
 		bind(APITableConfigView.class).to(APITableConfigViewImpl.class);
 		bind(QueryTableConfigView.class).to(QueryTableConfigViewImpl.class);
@@ -1128,6 +1133,7 @@ public class PortalGinModule extends AbstractGinModule {
 		 * TableEntity cell bindings.
 		 */
 		bind(CellEditorView.class).to(CellEditorViewImpl.class);
+		bind(NumberCellEditorView.class).to(NumberCellEditorViewImpl.class);
 		bind(StringEditorCell.class).to(StringEditorCellImpl.class);
 		bind(StringRendererCell.class).to(StringRendererCellImpl.class);
 		bind(EntityIdCellEditor.class).to(EntityIdCellEditorImpl.class);

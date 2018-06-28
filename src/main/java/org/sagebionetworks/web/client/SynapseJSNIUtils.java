@@ -17,7 +17,7 @@ public interface SynapseJSNIUtils {
 	public String getCurrentHistoryToken();
 	
 	public void highlightCodeBlocks();
-	
+	void loadSummaryDetailsShim();
 	public void loadTableSorters();
 	
 	public String getBaseFileHandleUrl();

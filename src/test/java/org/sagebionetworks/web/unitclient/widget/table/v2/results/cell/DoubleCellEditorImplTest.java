@@ -10,15 +10,16 @@ import org.junit.Test;
 import org.mockito.Mockito;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellEditorView;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.DoubleCellEditorImpl;
+import org.sagebionetworks.web.client.widget.table.v2.results.cell.NumberCellEditorView;
 
 public class DoubleCellEditorImplTest {
 
-	CellEditorView mockView;
+	NumberCellEditorView mockView;
 	DoubleCellEditorImpl editor;
 	
 	@Before
 	public void before(){
-		mockView = Mockito.mock(CellEditorView.class);
+		mockView = Mockito.mock(NumberCellEditorView.class);
 		editor = new DoubleCellEditorImpl(mockView);
 	}
 	

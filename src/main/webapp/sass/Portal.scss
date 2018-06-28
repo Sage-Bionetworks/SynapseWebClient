@@ -2496,3 +2496,6 @@ div.colborder {
 	-webkit-filter: blur(4px);
 	filter: blur(4px);
 }
+
+#rootPanel summary { color:$synapse-blue; }
+#rootPanel summary:hover { text-decoration: underline; cursor:pointer; }
