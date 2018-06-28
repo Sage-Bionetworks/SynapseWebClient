@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.inject.Inject;
 
 public class MarkdownItImpl implements MarkdownIt {
@@ -12,8 +13,8 @@ public class MarkdownItImpl implements MarkdownIt {
 	
 	@Override
 	public String markdown2Html(String md, String uniqueSuffix) {
-		String sanitizedMd = jsniUtils.sanitizeHtml(md);
-		return _markdown2Html(sanitizedMd, uniqueSuffix);
+		String html = _markdown2Html(md, uniqueSuffix);
+		return jsniUtils.sanitizeHtml(html);
 	}
 
 	private final static native String _markdown2Html(String md,
