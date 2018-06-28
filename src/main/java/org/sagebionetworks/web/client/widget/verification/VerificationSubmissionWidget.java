@@ -18,10 +18,11 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.PromptModalView;
+import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -37,7 +38,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	private String orcId;
 	private List<AttachmentMetadata> existingAttachments;
 	private VerificationSubmissionWidgetView view;
-	private PromptModalView promptModal;
+	private BigPromptModalView promptModal;
 	private GlobalApplicationState globalAppState;
 	private PortalGinInjector ginInjector;
 	private GWTWrapper gwt;
@@ -53,7 +54,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			UserProfileClientAsync userProfileClient,
 			SynapseAlert synAlert,
 			FileHandleList fileHandleList,
-			PromptModalView promptModalView,
+			BigPromptModalView promptModalView,
 			GlobalApplicationState globalAppState,
 			GWTWrapper gwt
 			) {
@@ -65,13 +66,6 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		this.promptModal = promptModalView;
 		this.globalAppState = globalAppState;
 		this.gwt = gwt;
-		promptModal.configure("", "Reason", "OK", "");
-		promptModal.setPresenter(new PromptModalView.Presenter() {
-			@Override
-			public void onPrimary() {
-				updateVerificationState(actRejectState, promptModal.getValue());
-			}
-		});
 	}
 	
 	public void initView(boolean isModal) {
@@ -249,6 +243,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 		long verificationId = Long.parseLong(submission.getId());
 		VerificationState newState = new VerificationState();
 		newState.setState(state);
+		GWT.debugger();
 		newState.setReason(reason);
 		userProfileClient.updateVerificationState(verificationId, newState, gwt.getHostPageBaseURL(), new AsyncCallback<Void>() {
 			@Override
@@ -271,7 +266,10 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	@Override
 	public void rejectVerification() {
 		//get reason, and update state
-		promptModal.clear();
+		promptModal.configure("", "Reason", "", () -> {
+			promptModal.hide();
+			updateVerificationState(actRejectState, promptModal.getValue());
+		});
 		actRejectState = VerificationStateEnum.REJECTED;
 		promptModal.show();
 	}
