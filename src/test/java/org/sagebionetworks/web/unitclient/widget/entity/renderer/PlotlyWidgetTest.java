@@ -45,6 +45,7 @@ import org.sagebionetworks.repo.model.table.Row;
 import org.sagebionetworks.repo.model.table.RowSet;
 import org.sagebionetworks.repo.model.table.SelectColumn;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
+import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
@@ -158,6 +159,8 @@ public class PlotlyWidgetTest {
 		String yAxisLabel = "Y Axis";
 		GraphType type = GraphType.BAR;
 		BarMode mode = BarMode.STACK;
+		AxisType xAxisType = AxisType.LINEAR;
+		AxisType yAxisType = AxisType.CATEGORY;
 		String plotTitle = "Plot Title";
 		String tableId = "syn12345";
 		boolean showLegend = false;
@@ -171,6 +174,8 @@ public class PlotlyWidgetTest {
 		params.put(BAR_MODE, mode.toString());
 		params.put(SHOW_LEGEND, Boolean.toString(showLegend));
 		params.put(IS_HORIZONTAL, Boolean.toString(isHorizontal));
+		params.put(X_AXIS_TYPE, xAxisType.toString());
+		params.put(Y_AXIS_TYPE, yAxisType.toString());
 		
 		selectColumns.add(mockXColumn);
 		selectColumns.add(mockY1Column);
@@ -204,7 +209,7 @@ public class PlotlyWidgetTest {
 		// complete first page load
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView, never()).showChart(eq(plotTitle), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
+		verify(mockView, never()).showChart(eq(plotTitle), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
 		
 		//test final page
 		rows.clear();
@@ -218,7 +223,7 @@ public class PlotlyWidgetTest {
 		verify(mockView).setLoadingMessage("Loading...");
 		
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
-		verify(mockView).showChart(eq(plotTitle), eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()), anyString(), anyString(), eq(showLegend));
+		verify(mockView).showChart(eq(plotTitle), eq(xAxisLabel), eq(yAxisLabel), plotlyTraceArrayCaptor.capture(), eq(mode.toString().toLowerCase()), eq(xAxisType), eq(yAxisType), eq(showLegend));
 		List traces = plotlyTraceArrayCaptor.getValue();
 		assertTrue(traces.size() > 0);
 		assertEquals(type.toString().toLowerCase(), ((PlotlyTraceWrapper)traces.get(0)).getType());
@@ -275,7 +280,7 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
 		
 		verify(mockResourceLoader).isLoaded(eq(PLOTLY_JS));
 		verify(mockResourceLoader).requires(eq(PLOTLY_JS), webResourceLoadedCallbackCaptor.capture());
@@ -284,11 +289,11 @@ public class PlotlyWidgetTest {
 		Exception ex = new Exception();
 		callback.onFailure(ex);
 		verify(mockSynAlert).handleException(ex);
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
 		
 		when(mockResourceLoader.isLoaded(eq(PLOTLY_JS))).thenReturn(true);
 		callback.onSuccess(null);
-		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), eq(showLegend));
+		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), eq(AxisType.AUTO), eq(AxisType.AUTO), eq(showLegend));
 	}
 	
 	@Test
@@ -304,7 +309,7 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
 		
 		verify(mockResourceLoader).isLoaded(eq(PLOTLY_REACT_JS));
 		verify(mockResourceLoader).requires(eq(PLOTLY_REACT_JS), webResourceLoadedCallbackCaptor.capture());
@@ -313,11 +318,11 @@ public class PlotlyWidgetTest {
 		Exception ex = new Exception();
 		callback.onFailure(ex);
 		verify(mockSynAlert).handleException(ex);
-		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), anyBoolean());
+		verify(mockView, never()).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), anyBoolean());
 		
 		when(mockResourceLoader.isLoaded(eq(PLOTLY_REACT_JS))).thenReturn(true);
 		callback.onSuccess(null);
-		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), anyString(), anyString(), eq(showLegend));
+		verify(mockView).showChart(anyString(), anyString(), anyString(), anyList(), anyString(), any(), any(), eq(showLegend));
 	}	
 
 	@Test
@@ -391,7 +396,7 @@ public class PlotlyWidgetTest {
 		verify(mockJobTracker).startAndTrack(eq(AsynchType.TableQuery), queryBundleRequestCaptor.capture(), eq(AsynchronousProgressWidget.WAIT_MS), jobTrackerCallbackCaptor.capture());
 		jobTrackerCallbackCaptor.getValue().onComplete(mockQueryResultBundle);
 		
-		verify(mockView).showChart(anyString(), eq(yAxisTitle), eq(xAxisTitle), plotlyTraceArrayCaptor.capture(), anyString(), anyString(), anyString(), anyBoolean());
+		verify(mockView).showChart(anyString(), eq(yAxisTitle), eq(xAxisTitle), plotlyTraceArrayCaptor.capture(), anyString(), any(), any(), anyBoolean());
 		List traces = plotlyTraceArrayCaptor.getValue();
 		assertTrue(traces.size() > 0);
 		assertEquals(isHorizontal, ((PlotlyTraceWrapper)traces.get(0)).isHorizontal());

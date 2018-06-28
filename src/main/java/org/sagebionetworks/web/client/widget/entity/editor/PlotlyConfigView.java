@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.entity.editor;
 
 import java.util.List;
 
+import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 
@@ -39,6 +40,11 @@ public interface PlotlyConfigView extends IsWidget {
 	void setAdvancedUIVisible(boolean visible);
 	void setShowLegend(boolean value);
 	boolean isShowLegend();
+	AxisType getXAxisType();
+	AxisType getYAxisType();
+	void setXAxisType(AxisType axisType);
+	void setYAxisType(AxisType axisType);
+
 	public interface Presenter {
 		void onFindTable();
 		void onXColumnChanged();

@@ -11,6 +11,7 @@ import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
+import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.BarMode;
 import org.sagebionetworks.web.client.plotly.GraphType;
 
@@ -62,6 +63,10 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	CheckBox showLegendCb;
 	@UiField
 	CheckBox isHorizontalBarCb;
+	@UiField
+	ListBox xAxisTypeDropdownMenu;
+	@UiField
+	ListBox yAxisTypeDropdownMenu;
 	
 	public interface PlotlyConfigViewImplUiBinder extends UiBinder<Widget, PlotlyConfigViewImpl> {}
 	Widget widget;
@@ -82,6 +87,11 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 		
 		for (BarMode mode : BarMode.values()) {
 			barModeDropdownMenu.addItem(mode.getDisplayName(), mode.name());
+		}
+		
+		for (AxisType axisType : AxisType.values()) {
+			xAxisTypeDropdownMenu.addItem(axisType.getDisplayName(), axisType.name());
+			yAxisTypeDropdownMenu.addItem(axisType.getDisplayName(), axisType.name());
 		}
 		
 		typeDropdownMenu.addChangeHandler(new ChangeHandler() {
@@ -160,6 +170,37 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 			}
 		}
 	}
+	
+	@Override
+	public AxisType getXAxisType() {
+		return AxisType.valueOf(xAxisTypeDropdownMenu.getSelectedValue());
+	}
+	
+	@Override
+	public AxisType getYAxisType() {
+		return AxisType.valueOf(yAxisTypeDropdownMenu.getSelectedValue());
+	}
+	
+	@Override
+	public void setXAxisType(AxisType axisType) {
+		setAxisType(axisType, xAxisTypeDropdownMenu);
+	}
+
+	@Override
+	public void setYAxisType(AxisType axisType) {
+		setAxisType(axisType, yAxisTypeDropdownMenu);
+	}
+
+	private void setAxisType(AxisType axisType, ListBox menu) {
+		for (int i = 0; i < menu.getItemCount(); i++) {
+			if (axisType.name().equals(menu.getValue(i))) {
+				//found
+				menu.setSelectedIndex(i);
+				break;
+			}
+		}
+	}
+
 	
 	@Override
 	public GraphType getGraphType() {
