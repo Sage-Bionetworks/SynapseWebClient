@@ -7,6 +7,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.plotly.AxisType;
 import org.sagebionetworks.web.client.plotly.PlotlyTraceWrapper;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
@@ -45,6 +46,7 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 				_unmountComponentAtNode(chartContainer.getElement());
 			}
 		});
+		_addPlotlyClickEventListener(chartContainer.getElement(), this);
 	}
 	
 	@Override
@@ -113,6 +115,8 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 		var xAxisLayoutObject = new $wnd.Object();
 		xAxisLayoutObject.title = xTitle;
 		xAxisLayoutObject.type = xAxisType;
+		xAxisLayoutObject.tickangle = 45;
+		
 		
 		var yAxisLayoutObject = new $wnd.Object();
 		yAxisLayoutObject.title = yTitle;
@@ -139,7 +143,23 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 				el
 			);
 	}-*/;
-
+	
+	private static native void _addPlotlyClickEventListener (
+			Element el, PlotlyWidgetViewImpl thisWidget) /*-{
+		//after plot is drawn, add handler for click events
+		$wnd.jQuery(el).on('plotly_afterplot', function() {
+			this.children[0].on('plotly_click', function(data) {
+				data.event.stopPropagation();
+				var pnt = data.points[0];				
+				thisWidget.@org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetViewImpl::onClick(Ljava/lang/String;Ljava/lang/String;)(pnt.x, pnt.y);
+			});
+		});
+	}-*/;
+	
+	private void onClick(String x, String y) {
+		presenter.onClick(x, y);
+	}
+	
 	@Override
 	public void setLoadingVisible(boolean visible) {
 		loadingUI.setVisible(visible);
@@ -162,5 +182,9 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 	@Override
 	public void setSourceDataLinkVisible(boolean visible) {
 		sourceDataAnchor.setVisible(visible);
+	}
+	@Override
+	public void newWindow(String url) {
+		DisplayUtils.newWindow(url, "_blank", "");
 	}
 }

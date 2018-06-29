@@ -25,6 +25,8 @@ public interface PlotlyWidgetView extends IsWidget {
 	boolean isAttached();
 	void setSourceDataLink(String url);
 	void setSourceDataLinkVisible(boolean visible);
+	void newWindow(String url);
 	public interface Presenter {
+		void onClick(String x, String y);
 	}
 }
