@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.client.view;
 
 import static org.sagebionetworks.web.client.DisplayUtils.DO_NOTHING_CLICKHANDLER;
+
+import java.util.Date;
+
 import org.gwtbootstrap3.client.shared.event.AlertClosedEvent;
 import org.gwtbootstrap3.client.shared.event.AlertClosedHandler;
 import org.gwtbootstrap3.client.ui.Alert;
@@ -15,9 +18,11 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
+import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Quiz;
@@ -41,6 +46,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -55,6 +61,7 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class ProfileViewImpl extends Composite implements ProfileView {
@@ -271,18 +278,22 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Span teamNotifications;
 	private Presenter presenter;
 	private Header headerWidget;
-	
+	@UiField
+	Text createdOnText;
 	//View profile widgets
 	private static HTML defaultProfilePicture = new HTML(DisplayUtils.getFontAwesomeIcon("user font-size-150 lightGreyText"));
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private DateTimeUtils dateTimeUtils;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
 			Header headerWidget,
-			SynapseJSNIUtils synapseJSNIUtils) {		
+			SynapseJSNIUtils synapseJSNIUtils,
+			DateTimeUtils dateTimeUtils) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.dateTimeUtils = dateTimeUtils;
 		headerWidget.configure(false);
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 		picturePanel.clear();
@@ -687,10 +698,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	 }
 	 
 	 public void fillInProfileView(UserProfile profile) {
-		 fillInProfileView(profile.getFirstName(), profile.getLastName(), profile.getUserName(), profile.getIndustry(), profile.getLocation(), profile.getSummary(), profile.getCompany(), profile.getPosition(), profile.getUrl());
+		 fillInProfileView(profile.getFirstName(), profile.getLastName(), profile.getUserName(), profile.getIndustry(), profile.getLocation(), profile.getSummary(), profile.getCompany(), profile.getPosition(), profile.getUrl(), profile.getCreatedOn());
 	 }
 	 
-	 public void fillInProfileView(String fName, String lName, String userName, String industry, String location, String summary, String company, String position, String url) {
+	 public void fillInProfileView(String fName, String lName, String userName, String industry, String location, String summary, String company, String position, String url, Date createdOn) {
 		 String name = DisplayUtils.getDisplayName(fName, lName, userName);
 		 url = DisplayUtils.replaceWithEmptyStringIfNull(url);
 		 company = DisplayUtils.replaceWithEmptyStringIfNull(company);
@@ -718,6 +729,11 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 urlField.setText(url);
 		 urlField.setHref(url);
 		 synapseEmailField.setText(userName+"@synapse.org");
+		 if (createdOn != null) {
+			 createdOnText.setText(dateTimeUtils.getRelativeTime(createdOn, true));			 
+		 } else {
+			 createdOnText.setText("");
+		 }
 	}
 	
 	@Override

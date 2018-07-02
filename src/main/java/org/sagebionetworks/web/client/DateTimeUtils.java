@@ -11,6 +11,14 @@ public interface DateTimeUtils {
 	 * @return
 	 */
 	String getRelativeTime(Date toFormat);
+	
+	/**
+	 * 
+	 * @param toFormat
+	 * @param forceRelative  if true, even if the date is far into the future or past it will return the relative time
+	 * @return
+	 */
+	String getRelativeTime(Date toFormat, boolean forceRelative);
 	/**
 	 * Return a friendly calendar date string.  Like "Yesterday at 3:32 PM"
 	 * @param toFormat
