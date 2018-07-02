@@ -48,6 +48,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.asynch.UpdatingAsynchProgressHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.table.v2.QueryTokenProvider;
+import org.sagebionetworks.web.client.widget.table.v2.TableEntityWidget;
 import org.sagebionetworks.web.client.widget.table.v2.results.QueryBundleUtils;
 import org.sagebionetworks.web.shared.WikiPageKey;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
@@ -358,16 +359,24 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 	
 	@Override
 	public void onClick(String x, String y) {
-		String sql ="select * from " + qbr.getEntityId() + " where " + " \"" + xAxisColumnName + "\"='" + x + "'";
-		// Go to source data table, but modify query sql to only show data that was clicked on
-		Query newQuery = new Query();
-		newQuery.setSql(sql);
-		String queryToken = queryTokenProvider.queryToToken(newQuery);
-		String url = "#!Synapse:" + 
-				qbr.getEntityId() + "/" + 
-				TABLES.toString().toLowerCase() + "/" + 
-				TABLE_QUERY_PREFIX + 
-				queryToken;
-		view.newWindow(url);
+		boolean xNameIsAlias = sql.substring(0, sql.indexOf(',')).toUpperCase().contains(" AS ");
+		if (!xNameIsAlias) {
+			String val = isHorizontal ? y : x;
+			String sql ="select * from " + qbr.getEntityId() + " where " + " \"" + xAxisColumnName + "\"='" + val + "'";
+			// Go to source data table, but modify query sql to only show data that was clicked on
+			Query query = new Query();
+			query.setIncludeEntityEtag(true);
+			query.setSql(sql);
+			query.setOffset(TableEntityWidget.DEFAULT_OFFSET);
+			query.setLimit(TableEntityWidget.DEFAULT_LIMIT);
+			query.setIsConsistent(true);
+			String queryToken = queryTokenProvider.queryToToken(query);
+			String url = "#!Synapse:" + 
+					qbr.getEntityId() + "/" + 
+					TABLES.toString().toLowerCase() + "/" + 
+					TABLE_QUERY_PREFIX + 
+					queryToken;
+			view.newWindow(url);
+		}
 	}
 }
