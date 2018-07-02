@@ -68,7 +68,12 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 	
 	@Override
 	public String getRelativeTime(Date toFormat) {
-		if (toFormat.before(getDaysFromNow(-1)) || toFormat.after(getDaysFromNow(1))) {
+		return getRelativeTime(toFormat, false);
+	}
+	
+	@Override
+	public String getRelativeTime(Date toFormat, boolean forceRelative) {
+		if (!forceRelative && (toFormat.before(getDaysFromNow(-1)) || toFormat.after(getDaysFromNow(1)))) {
 			//older than a day (or more than a day into the future), show a long date (show in UTC if user wants)
 			return getDateString(toFormat);
 		} else {

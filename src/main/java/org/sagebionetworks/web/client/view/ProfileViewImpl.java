@@ -22,6 +22,7 @@ import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.Team;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.place.Quiz;
@@ -60,12 +61,12 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
+import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class ProfileViewImpl extends Composite implements ProfileView {
 
 	public interface ProfileViewImplUiBinder extends UiBinder<Widget, ProfileViewImpl> {}
-	public static DateTimeFormat CREATED_ON_DATE_FORMATTER = DateTimeFormat.getFormat("MMMM yyyy");
 	@UiField
 	 Div viewProfilePanel;
 	 @UiField
@@ -282,14 +283,17 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	//View profile widgets
 	private static HTML defaultProfilePicture = new HTML(DisplayUtils.getFontAwesomeIcon("user font-size-150 lightGreyText"));
 	private SynapseJSNIUtils synapseJSNIUtils;
+	private DateTimeUtils dateTimeUtils;
 	
 	@Inject
 	public ProfileViewImpl(ProfileViewImplUiBinder binder,
 			Header headerWidget,
-			SynapseJSNIUtils synapseJSNIUtils) {		
+			SynapseJSNIUtils synapseJSNIUtils,
+			DateTimeUtils dateTimeUtils) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
+		this.dateTimeUtils = dateTimeUtils;
 		headerWidget.configure(false);
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 		picturePanel.clear();
@@ -726,7 +730,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 urlField.setHref(url);
 		 synapseEmailField.setText(userName+"@synapse.org");
 		 if (createdOn != null) {
-			 createdOnText.setText(CREATED_ON_DATE_FORMATTER.format(createdOn));			 
+			 createdOnText.setText(dateTimeUtils.getRelativeTime(createdOn, true));			 
 		 } else {
 			 createdOnText.setText("");
 		 }
