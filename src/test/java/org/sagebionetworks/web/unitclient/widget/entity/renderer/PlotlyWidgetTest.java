@@ -251,6 +251,7 @@ public class PlotlyWidgetTest {
 		String sql = q.getSql();
 		assertTrue(sql.contains("\"" + X_COLUMN_NAME + "\"='"+xValue+"'"));
 		assertTrue(sql.contains(TABLE_ID));
+		verify(mockView).newWindow(anyString());
 	}
 	
 	@Test
@@ -433,5 +434,28 @@ public class PlotlyWidgetTest {
 		Query q = queryCaptor.getValue();
 		String sql = q.getSql();
 		assertTrue(sql.contains("\"" + X_COLUMN_NAME + "\"='"+yValue+"'"));
+		verify(mockView).newWindow(anyString());
+	}
+	
+	@Test
+	public void testXColumnIsAlias() {
+		params.put(TYPE, GraphType.BAR.toString());
+		params.put(BAR_MODE, BarMode.STACK.toString());
+		selectColumns.add(mockXColumn);
+		selectColumns.add(mockY1Column);
+		rowValues.add("1.1");
+		rowValues.add("2.2");
+		rows.add(mockRow);
+		sql = "select hour(FROM_UNIXTIME(\"createdOn\"/1000)) as \"x\", y1, y2 from "+TABLE_ID+" where x>10";
+		params.put(TABLE_QUERY_KEY, sql);
+		
+		widget.configure(null, params, null, null);
+		
+		// test onclick when x column is an alias.  should do nothing
+		reset(mockQueryTokenProvider);
+		widget.onClick("20", "A");
+		
+		verify(mockQueryTokenProvider, never()).queryToToken(any(Query.class));
+		verify(mockView, never()).newWindow(anyString());
 	}
 }
