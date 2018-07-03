@@ -118,8 +118,6 @@ public interface SynapseClient extends RemoteService{
 	AccessRequirement createOrUpdateAccessRequirement(AccessRequirement arEW) throws RestServiceException;
 	
 	List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException;
-
-	String getRootWikiId(String ownerId, String ownerType) throws RestServiceException;
 	FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	 // V2 Wiki crud

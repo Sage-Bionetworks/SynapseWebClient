@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.ACTAccessRequirementWidget;
@@ -52,7 +53,7 @@ public class ACTAccessRequirementWidgetTest {
 	@Mock
 	ACTAccessRequirementWidgetView mockView; 
 	@Mock
-	SynapseClientAsync mockSynapseClient;
+	SynapseJavascriptClient mockJsClient;
 	@Mock
 	DataAccessClientAsync mockDataAccessClient;
 	@Mock
@@ -107,7 +108,7 @@ public class ACTAccessRequirementWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		widget = new ACTAccessRequirementWidget(
 				mockView, 
-				mockSynapseClient, 
+				mockJsClient, 
 				mockWikiPageWidget, 
 				mockSynAlert, 
 				mockGinInjector, 
@@ -123,7 +124,7 @@ public class ACTAccessRequirementWidgetTest {
 				mockConvertACTAccessRequirementButton);
 		when(mockGinInjector.getCreateDataAccessRequestWizard()).thenReturn(mockCreateDataAccessRequestWizard);
 		when(mockACTAccessRequirement.getSubjectIds()).thenReturn(mockSubjectIds);
-		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(ROOT_WIKI_ID).when(mockJsClient).getRootWikiPageKey(anyString(), anyString(), any(AsyncCallback.class));
 		verify(mockLazyLoadHelper).configure(callbackCaptor.capture(), eq(mockView));
 		lazyLoadDataCallback = callbackCaptor.getValue();
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmissionStatus).when(mockDataAccessClient).getAccessRequirementStatus(anyString(), any(AsyncCallback.class));
@@ -144,7 +145,7 @@ public class ACTAccessRequirementWidgetTest {
 
 	@Test
 	public void testSetRequirementWithContactInfoTerms() {
-		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockSynapseClient).getRootWikiId(anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new NotFoundException()).when(mockJsClient).getRootWikiPageKey(anyString(), anyString(), any(AsyncCallback.class));
 		String tou = "must do things before access is allowed";
 		when(mockACTAccessRequirement.getActContactInfo()).thenReturn(tou);
 		widget.setRequirement(mockACTAccessRequirement, mockRefreshCallback);

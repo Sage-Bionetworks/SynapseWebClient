@@ -1588,16 +1588,22 @@ public class SynapseClientImplTest {
 	public void testGetRootWikiId() throws JSONObjectAdapterException,
 			SynapseException, RestServiceException {
 		org.sagebionetworks.repo.model.dao.WikiPageKey key = new org.sagebionetworks.repo.model.dao.WikiPageKey();
-		key.setOwnerObjectId("1");
-		key.setOwnerObjectType(ObjectType.ENTITY);
+		String ownerObjectId = "1";
+		ObjectType objectType = ObjectType.ENTITY;
+		key.setOwnerObjectId(ownerObjectId);
+		key.setOwnerObjectType(objectType);
 		String expectedId = "123";
 		key.setWikiPageId(expectedId);
 		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class)))
 				.thenReturn(key);
 
-		String actualId = synapseClient.getRootWikiId("1",
-				ObjectType.ENTITY.toString());
+		String actualId = synapseClient.getRootWikiId(ownerObjectId, objectType.toString());
 		assertEquals(expectedId, actualId);
+		verify(mockSynapse).getRootWikiPageKey(anyString(), any(ObjectType.class));
+		
+		//test cache.  Call again, verify that it doesn't attempt to call the Synapse client again for the same wiki key
+		synapseClient.getRootWikiId(ownerObjectId, objectType.toString());
+		verify(mockSynapse).getRootWikiPageKey(anyString(), any(ObjectType.class));
 	}
 		
 	@Test(expected = BadRequestException.class)
