@@ -28,7 +28,6 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
@@ -227,16 +226,7 @@ public interface SynapseClient extends RemoteService{
 	 */
 	List<ColumnModel> createTableColumns(List<ColumnModel> value) throws RestServiceException;
 	
-	/**
-	 * Return the upload destinations associated with this parent entity (container)
-	 * @param parentEntityId
-	 * @return
-	 * @throws RestServiceException
-	 */
-	List<UploadDestination> getUploadDestinations(String parentEntityId) throws RestServiceException;
-	
 	String getHost(String urlString) throws RestServiceException;
-
 
 	void updateAnnotations(String entityId, Annotations annotations) throws RestServiceException;
 

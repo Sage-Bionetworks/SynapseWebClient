@@ -18,8 +18,8 @@ import com.google.inject.Inject;
 
 public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 	public static final int SECOND_MS = 1000;
-	//check back every 10s if down.
-	public static final int DELAY_MS = 10000;
+	//check back every 20s if down.
+	public static final int DELAY_MS = 20000;
 	public int timeToNextRefresh;
 	private DownView view;
 	GlobalApplicationState globalAppState;

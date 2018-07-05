@@ -31,6 +31,7 @@ import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -64,11 +65,9 @@ public class EntityMetadataTest {
 	@Mock
 	Doi mockDoi;
 	@Mock
-	SynapseClientAsync mockSynapseClient;
+	SynapseJavascriptClient mockJsClient;
 	@Mock
 	SynapseJSNIUtils mockJSNI;
-	@Mock
-	CookieProvider mockCookies;
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
 	String entityId = "syn123";
@@ -80,7 +79,7 @@ public class EntityMetadataTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		widget = new EntityMetadata(mockView, mockDoiWidget, mockAnnotationsWidget, 
-				mockFileHistoryWidget, mockSynapseClient, mockJSNI, mockRestrictionWidgetV2, mockCookies);
+				mockFileHistoryWidget, mockJsClient, mockJSNI, mockRestrictionWidgetV2);
 	}
 	
 	@Test
@@ -201,7 +200,7 @@ public class EntityMetadataTest {
 		exS3Destination.setBucket("testBucket");
 		exS3Destination.setBaseKey("testBaseKey");
 		uploadDestinations.add(exS3Destination);
-		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockJsClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		widget.configureStorageLocation(en);
 		verify(mockView).setUploadDestinationText("s3://testBucket/testBaseKey");
 		verify(mockView).setUploadDestinationPanelVisible(false);
@@ -215,7 +214,7 @@ public class EntityMetadataTest {
 		exS3Destination.setUrl("sftp://testUrl.com/abcdef");
 		exS3Destination.setUploadType(UploadType.SFTP);
 		uploadDestinations.add(exS3Destination);
-		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockJsClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		widget.configureStorageLocation(en);
 		verify(mockView).setUploadDestinationText("sftp://testUrl.com");
 		verify(mockView).setUploadDestinationPanelVisible(false);
@@ -229,7 +228,7 @@ public class EntityMetadataTest {
 		exS3Destination.setUploadType(UploadType.HTTPS);
 		exS3Destination.setUrl("testUrl.com");
 		uploadDestinations.add(exS3Destination);
-		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockJsClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		widget.configureStorageLocation(en);
 		verify(mockView).setUploadDestinationText("testUrl.com");
 		verify(mockView).setUploadDestinationPanelVisible(false);
@@ -246,7 +245,7 @@ public class EntityMetadataTest {
 		exS3Destination.setEndpointUrl(endpointUrl);
 		exS3Destination.setBucket(bucket);
 		uploadDestinations.add(exS3Destination);
-		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(uploadDestinations).when(mockJsClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		widget.configureStorageLocation(en);
 		verify(mockView).setUploadDestinationText(endpointUrl + "/" + bucket);
 		verify(mockView).setUploadDestinationPanelVisible(false);
@@ -255,7 +254,7 @@ public class EntityMetadataTest {
 	
 	@Test
 	public void testConfigureStorageLocationSynapseStorage() {
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		widget.configureStorageLocation(en);
 		verify(mockView).setUploadDestinationText("Synapse Storage");
 		verify(mockView).setUploadDestinationPanelVisible(false);
@@ -264,7 +263,7 @@ public class EntityMetadataTest {
 	
 	@Test
 	public void testConfigureStorageLocationFailure() {
-		AsyncMockStubber.callFailureWith(new Exception("This is an exception!")).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callFailureWith(new Exception("This is an exception!")).when(mockJsClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		widget.configureStorageLocation(en);
 		verify(mockJSNI).consoleLog("This is an exception!");
 		verify(mockView).setUploadDestinationPanelVisible(false);
@@ -273,7 +272,7 @@ public class EntityMetadataTest {
 	
 	@Test
 	public void testConfigureStorageLocationFile() {
-		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		widget.configureStorageLocation(new FileEntity());
 		verify(mockView).setUploadDestinationPanelVisible(false);
 		verify(mockView, Mockito.never()).setUploadDestinationPanelVisible(true);

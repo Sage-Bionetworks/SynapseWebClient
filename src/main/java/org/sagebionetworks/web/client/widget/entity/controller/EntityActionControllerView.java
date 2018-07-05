@@ -39,6 +39,6 @@ public interface EntityActionControllerView extends ShowsErrors, IsWidget {
 	 * @param callback
 	 */
 	void showPromptDialog(String title, PromptCallback callback);
-
+	void setUploadDialogWidget(IsWidget w);
 	void addWidget(IsWidget asWidget);
 }

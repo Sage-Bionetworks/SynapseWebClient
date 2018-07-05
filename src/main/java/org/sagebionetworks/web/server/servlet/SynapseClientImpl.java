@@ -1903,16 +1903,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		} 
 	}
-
-	@Override
-	public List<UploadDestination> getUploadDestinations(String parentEntityId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try{
-			return synapseClient.getUploadDestinations(parentEntityId);
-		}catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	}
 	
 	public static int safeLongToInt(long l) {
 	   if (l < Integer.MIN_VALUE || l > Integer.MAX_VALUE) {

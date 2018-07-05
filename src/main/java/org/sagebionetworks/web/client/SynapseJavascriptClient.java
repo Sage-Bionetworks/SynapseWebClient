@@ -77,6 +77,7 @@ import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
+import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.oauth.OAuthProvider;
 import org.sagebionetworks.repo.model.principal.AliasList;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasRequest;
@@ -162,6 +163,7 @@ public class SynapseJavascriptClient {
 	public static final String GENERATED_PATH = "/generated";
 	public static final String GENERATED_BY_SUFFIX = "/generatedBy";
 	public static final String OPEN_MEMBERSHIP_REQUEST = "/openRequest";
+	public static final String UPLOAD_DESTINATIONS = "/uploadDestinations";
 	public static final String PRINCIPAL = "/principal";
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
@@ -1106,6 +1108,12 @@ public class SynapseJavascriptClient {
 		request.setParentId(containerEntityId);
 		String url = getRepoServiceUrl() + ENTITY+"/child";
 		doPost(url, request, OBJECT_TYPE.EntityId, callback);
+	}
+	
+
+	public void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback) {
+		String url = getFileServiceUrl() + ENTITY + "/" + parentEntityId + UPLOAD_DESTINATIONS;
+		doGet(url, OBJECT_TYPE.ListWrapperUploadDestinations, callback);
 	}
 }
 

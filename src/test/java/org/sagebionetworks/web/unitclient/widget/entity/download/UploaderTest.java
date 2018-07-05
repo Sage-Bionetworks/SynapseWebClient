@@ -144,7 +144,7 @@ public class UploaderTest {
 		d.setUploadType(UploadType.S3);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		
 		UploadDaemonStatus status = new UploadDaemonStatus();
 		status.setState(State.COMPLETED);
@@ -462,7 +462,7 @@ public class UploaderTest {
 		d.setUploadType(UploadType.HTTPS);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertNull(uploader.getStorageLocationId());
 		verifyUploadError();
@@ -474,7 +474,7 @@ public class UploaderTest {
 		d.setUploadType(UploadType.S3);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertNull(uploader.getStorageLocationId());
 		verifyUploadError();
@@ -487,7 +487,7 @@ public class UploaderTest {
 		d.setStorageLocationId(storageLocationId);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertEquals(uploader.getStorageLocationId(), storageLocationId);
 	}
@@ -498,7 +498,7 @@ public class UploaderTest {
 		//add an invalid upload destination
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(mock(UploadDestination.class));
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertNull(uploader.getStorageLocationId());
 		verifyUploadError();
@@ -517,7 +517,7 @@ public class UploaderTest {
 		d.setStorageLocationId(storageLocationId);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith("ok.net").when(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
 		
 		uploader.queryForUploadDestination();
@@ -545,7 +545,7 @@ public class UploaderTest {
 		d.setStorageLocationId(storageLocationId);
 		List<UploadDestination> destinations = new ArrayList<UploadDestination>();
 		destinations.add(d);
-		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(destinations).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertEquals(uploader.getStorageLocationId(), storageLocationId);
 	}
@@ -565,7 +565,7 @@ public class UploaderTest {
 		when(mockExternalObjectStoreUploadDestination.getBucket()).thenReturn(bucket);
 		when(mockExternalObjectStoreUploadDestination.getKeyPrefixUUID()).thenReturn(keyPrefixUUID);
 		
-		AsyncMockStubber.callSuccessWith(Collections.singletonList(mockExternalObjectStoreUploadDestination)).when(mockSynapseClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(Collections.singletonList(mockExternalObjectStoreUploadDestination)).when(mockSynapseJavascriptClient).getUploadDestinations(anyString(), any(AsyncCallback.class));
 		uploader.queryForUploadDestination();
 		assertEquals(uploader.getStorageLocationId(), storageLocationId);
 		assertEquals(uploader.getCurrentUploadType(), uploadType);
@@ -604,12 +604,12 @@ public class UploaderTest {
 		FileEntity fileEntity = new FileEntity();
 		fileEntity.setId(entityId);
 		
-		Mockito.reset(mockSynapseClient);
+		Mockito.reset(mockSynapseJavascriptClient);
 		uploader.configure(fileEntity, null, null, true);
 		
 		assertNull(uploader.getStorageLocationId());
 		ArgumentCaptor<String> stringCaptor = ArgumentCaptor.forClass(String.class);
-		verify(mockSynapseClient).getUploadDestinations(stringCaptor.capture(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).getUploadDestinations(stringCaptor.capture(), any(AsyncCallback.class));
 		assertEquals(entityId, stringCaptor.getValue());
 	}
 
