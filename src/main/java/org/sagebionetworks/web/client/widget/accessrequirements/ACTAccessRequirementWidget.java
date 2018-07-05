@@ -11,7 +11,7 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
@@ -28,7 +28,7 @@ import com.google.inject.Inject;
 public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetView.Presenter, IsWidget {
 	
 	private ACTAccessRequirementWidgetView view;
-	SynapseClientAsync synapseClient;
+	SynapseJavascriptClient jsClient;
 	DataAccessClientAsync dataAccessClient;
 	SynapseAlert synAlert;
 	WikiPageWidget wikiPageWidget;
@@ -47,7 +47,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	
 	@Inject
 	public ACTAccessRequirementWidget(ACTAccessRequirementWidgetView view, 
-			SynapseClientAsync synapseClient,
+			SynapseJavascriptClient jsClient,
 			WikiPageWidget wikiPageWidget,
 			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
@@ -62,8 +62,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 			ReviewAccessorsButton manageAccessButton,
 			ConvertACTAccessRequirementButton convertACTAccessRequirementButton) {
 		this.view = view;
-		this.synapseClient = synapseClient;
-		fixServiceEntryPoint(synapseClient);
+		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.wikiPageWidget = wikiPageWidget;
 		this.ginInjector = ginInjector;
@@ -99,7 +98,7 @@ public class ACTAccessRequirementWidget implements ACTAccessRequirementWidgetVie
 	
 	public void setRequirement(final ACTAccessRequirement ar, Callback refreshCallback) {
 		this.ar = ar;
-		synapseClient.getRootWikiId(ar.getId().toString(), ObjectType.ACCESS_REQUIREMENT.toString(), new AsyncCallback<String>() {
+		jsClient.getRootWikiPageKey(ObjectType.ACCESS_REQUIREMENT.toString(), ar.getId().toString(), new AsyncCallback<String>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setTerms(ar.getActContactInfo());

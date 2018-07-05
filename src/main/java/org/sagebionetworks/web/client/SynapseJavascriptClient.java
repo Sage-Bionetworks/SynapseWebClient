@@ -32,7 +32,6 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityChildrenRequest;
 import org.sagebionetworks.repo.model.EntityChildrenResponse;
 import org.sagebionetworks.repo.model.EntityHeader;
-import org.sagebionetworks.repo.model.EntityId;
 import org.sagebionetworks.repo.model.EntityType;
 import org.sagebionetworks.repo.model.IdList;
 import org.sagebionetworks.repo.model.InviteeVerificationSignedToken;
@@ -729,6 +728,23 @@ public class SynapseJavascriptClient {
 			url += REPO_SUFFIX_VERSION + "/" + versionNumber;
 		}
 		doGet(url, type , callback);
+	}
+	
+	public void isWiki(String projectId, AsyncCallback<Boolean> callback) {
+		getRootWikiPageKey(ObjectType.ENTITY.toString(), projectId, new AsyncCallback<String>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				if (caught instanceof NotFoundException) {
+					callback.onSuccess(false);
+				} else {
+					callback.onFailure(caught);
+				}
+			}
+			@Override
+			public void onSuccess(String result) {
+				callback.onSuccess(true);
+			}
+		});
 	}
 	
 	public void isDocker(String projectId, AsyncCallback<Boolean> callback) {

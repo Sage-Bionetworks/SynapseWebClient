@@ -117,8 +117,6 @@ public interface SynapseClient extends RemoteService{
 	AccessRequirement createOrUpdateAccessRequirement(AccessRequirement arEW) throws RestServiceException;
 	
 	List<AccessRequirement> getTeamAccessRequirements(String teamId) throws RestServiceException;
-
-	String getRootWikiId(String ownerId, String ownerType) throws RestServiceException;
 	FileHandleResults getWikiAttachmentHandles(WikiPageKey key) throws RestServiceException;
 	
 	 // V2 Wiki crud
@@ -269,8 +267,6 @@ public interface SynapseClient extends RemoteService{
 
 	long getTeamMemberCount(String teamId) throws RestServiceException;
 	
-	boolean isWiki(String projectId) throws RestServiceException;
-
 	boolean isChallenge(String projectId) throws RestServiceException;
 
 	void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException;

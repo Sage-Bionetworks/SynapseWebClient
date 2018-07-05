@@ -98,8 +98,6 @@ public interface SynapseClientAsync {
 	void updateExternalFile(String entityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
 
 	void createExternalFile(String parentEntityId, String externalUrl, String name, String contentType, Long fileSize, String md5, Long storageLocationId, AsyncCallback<Entity> callback) throws RestServiceException;
-
-	void getRootWikiId(String ownerId, String ownerType, AsyncCallback<String> callback);
 	void getWikiAttachmentHandles(WikiPageKey key, AsyncCallback<FileHandleResults> callback);
 	
 	void restoreV2WikiPage(String ownerId, String ownerType, String wikiId,
@@ -269,8 +267,6 @@ public interface SynapseClientAsync {
 
 	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
 	
-	void isWiki(String id, AsyncCallback<Boolean> callback);
-
 	void isChallenge(String id, AsyncCallback<Boolean> callback);
 
 	void addTeamMember(String userGroupId, String teamId, String message, String hostPageBaseURL,

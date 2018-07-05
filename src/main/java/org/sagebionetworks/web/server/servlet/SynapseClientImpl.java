@@ -755,21 +755,11 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			org.sagebionetworks.client.SynapseClient synapseClient,
 			String ownerId, ObjectType ownerType) throws RestServiceException {
 		try {
-			WikiPageKey key= synapseClient.getRootWikiPageKey(ownerId, ownerType);
-			return key.getWikiPageId();
+			return synapseClient.getRootWikiPageKey(ownerId,
+					ownerType).getWikiPageId();
 		} catch (SynapseException e) {
 			throw ExceptionUtil.convertSynapseException(e);
 		}
-	}
-
-	@Override
-	public String getRootWikiId(String ownerObjectId, String ownerObjectType) throws RestServiceException{
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			// asking for the root. find the root id first
-			String rootWikiPageId = getRootWikiId(synapseClient,
-					ownerObjectId,
-					ObjectType.valueOf(ownerObjectType));
-			return rootWikiPageId;
 	}
 	
 	@Override
@@ -2086,22 +2076,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
-	@Override
-	public boolean isWiki(String projectId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		return isWiki(projectId, synapseClient);
-	}
-
-	private boolean isWiki(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws RestServiceException {
-		try {
-			getRootWikiId(synapseClient, projectId, ObjectType.ENTITY); 
-			return true;
-		} catch (NotFoundException ex) {
-			return false;
-		}
-	}
-	
+		
 	private boolean isChallenge(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
 		// are there any evaluations that the current user can edit?
 		try {
