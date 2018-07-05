@@ -277,8 +277,6 @@ public interface SynapseClient extends RemoteService{
 
 	long getTeamMemberCount(String teamId) throws RestServiceException;
 	
-	boolean isWiki(String projectId) throws RestServiceException;
-
 	boolean isChallenge(String projectId) throws RestServiceException;
 
 	void deleteAccessRequirement(Long accessRequirementId) throws RestServiceException;

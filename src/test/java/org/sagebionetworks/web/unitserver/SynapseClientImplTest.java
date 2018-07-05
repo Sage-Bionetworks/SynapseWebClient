@@ -1583,28 +1583,6 @@ public class SynapseClientImplTest {
 	public void testGetHostBadUrl() throws RestServiceException {
 		synapseClient.getHost("foobar");
 	}
-
-	@Test
-	public void testGetRootWikiId() throws JSONObjectAdapterException,
-			SynapseException, RestServiceException {
-		org.sagebionetworks.repo.model.dao.WikiPageKey key = new org.sagebionetworks.repo.model.dao.WikiPageKey();
-		String ownerObjectId = "1";
-		ObjectType objectType = ObjectType.ENTITY;
-		key.setOwnerObjectId(ownerObjectId);
-		key.setOwnerObjectType(objectType);
-		String expectedId = "123";
-		key.setWikiPageId(expectedId);
-		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class)))
-				.thenReturn(key);
-
-		String actualId = synapseClient.getRootWikiId(ownerObjectId, objectType.toString());
-		assertEquals(expectedId, actualId);
-		verify(mockSynapse).getRootWikiPageKey(anyString(), any(ObjectType.class));
-		
-		//test cache.  Call again, verify that it doesn't attempt to call the Synapse client again for the same wiki key
-		synapseClient.getRootWikiId(ownerObjectId, objectType.toString());
-		verify(mockSynapse).getRootWikiPageKey(anyString(), any(ObjectType.class));
-	}
 		
 	@Test(expected = BadRequestException.class)
 	public void testHandleSignedTokenNull() throws RestServiceException, SynapseException{
@@ -2023,19 +2001,6 @@ public class SynapseClientImplTest {
 		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("http://some.really.long.com/path/to/a/file/" + name + "?param1=value&param2=value"));
 		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("/root/" + name));
 		assertEquals(name, SynapseClientImpl.getFileNameFromExternalUrl("http://google.com/" + name));
-	}
-	
-	@Test
-	public void testIsWiki() throws RestServiceException, SynapseException {
-		org.sagebionetworks.repo.model.dao.WikiPageKey key = new org.sagebionetworks.repo.model.dao.WikiPageKey();
-		key.setOwnerObjectId("2");
-		key.setOwnerObjectType(ObjectType.ENTITY);
-		key.setWikiPageId("456");
-		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class))).thenReturn(key);
-
-		assertTrue(synapseClient.isWiki("2"));
-		when(mockSynapse.getRootWikiPageKey(anyString(), any(ObjectType.class))).thenThrow(new SynapseNotFoundException());
-		assertFalse(synapseClient.isWiki("3"));
 	}
 	
 	@Test

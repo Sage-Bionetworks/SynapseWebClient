@@ -199,7 +199,7 @@ public class EntityPageTopTest {
 		when(mockProjectBundle.getAccessControlList()).thenReturn(mockACL);
 		when(mockCookies.getCookie(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY)).thenReturn("fake cookie");
 		
-		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isWiki(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isWiki(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isFileOrFolder(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseJavascriptClient).isTable(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
@@ -663,7 +663,7 @@ public class EntityPageTopTest {
 	
 	@Test
 	public void testConfigureProjectNoWiki() {
-		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClientAsync).isWiki(anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(false).when(mockSynapseJavascriptClient).isWiki(anyString(), any(AsyncCallback.class));
 		when(mockWikiInnerTab.isTabListItemVisible()).thenReturn(false);
 		// we are asking for an invalid wiki id for a project that contains no wiki.
 		Synapse.EntityArea area = null;
@@ -706,7 +706,7 @@ public class EntityPageTopTest {
 		
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
 		
-		verify(mockSynapseClientAsync, never()).isWiki(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient, never()).isWiki(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient, never()).isFileOrFolder(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient, never()).isTable(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));
@@ -734,7 +734,7 @@ public class EntityPageTopTest {
 		
 		pageTop.configure(mockProjectEntity, versionNumber, mockProjectHeader, area, areaToken);
 		
-		verify(mockSynapseClientAsync).isWiki(anyString(), any(AsyncCallback.class));
+		verify(mockSynapseJavascriptClient).isWiki(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient).isFileOrFolder(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseJavascriptClient).isTable(anyString(), any(AsyncCallback.class));
 		verify(mockSynapseClientAsync).isChallenge(anyString(), any(AsyncCallback.class));

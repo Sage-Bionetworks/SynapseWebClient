@@ -19,7 +19,6 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
@@ -134,9 +133,6 @@ import org.sagebionetworks.web.shared.exceptions.UnknownErrorException;
 
 import com.google.gwt.thirdparty.guava.common.base.Supplier;
 import com.google.gwt.thirdparty.guava.common.base.Suppliers;
-import com.google.gwt.thirdparty.guava.common.cache.CacheBuilder;
-import com.google.gwt.thirdparty.guava.common.cache.CacheLoader;
-import com.google.gwt.thirdparty.guava.common.cache.LoadingCache;
 
 import au.com.bytecode.opencsv.CSVReader;
 
@@ -189,19 +185,6 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			}
 		};
 	}
-
-	private LoadingCache<WikiPageKey, String> wikiPageIdsCache = CacheBuilder.newBuilder()
-			.maximumSize(500).build(new CacheLoader<WikiPageKey, String>() {
-				public String load(WikiPageKey key) throws RestServiceException {
-					org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-					try {
-						return synapseClient.getRootWikiPageKey(key.getOwnerObjectId(),
-								key.getOwnerObjectType()).getWikiPageId();
-					} catch (SynapseException e) {
-						throw ExceptionUtil.convertSynapseException(e);
-					}
-				}
-			});
 
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	private volatile HashMap<String, org.sagebionetworks.web.shared.WikiPageKey> pageName2WikiKeyMap;
@@ -772,26 +755,11 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			org.sagebionetworks.client.SynapseClient synapseClient,
 			String ownerId, ObjectType ownerType) throws RestServiceException {
 		try {
-			WikiPageKey key = new WikiPageKey();
-			key.setOwnerObjectId(ownerId);
-			key.setOwnerObjectType(ownerType);
-			return wikiPageIdsCache.get(key);
-		} catch (ExecutionException e) {
-			if (e.getCause() instanceof RestServiceException) {
-				throw (RestServiceException) e.getCause();
-			} else {
-				throw ExceptionUtil.convertSynapseException(e);
-			}
+			return synapseClient.getRootWikiPageKey(ownerId,
+					ownerType).getWikiPageId();
+		} catch (SynapseException e) {
+			throw ExceptionUtil.convertSynapseException(e);
 		}
-	}
-
-	public String getRootWikiId(String ownerObjectId, String ownerObjectType) throws RestServiceException{
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-			// asking for the root. find the root id first
-			String rootWikiPageId = getRootWikiId(synapseClient,
-					ownerObjectId,
-					ObjectType.valueOf(ownerObjectType));
-			return rootWikiPageId;
 	}
 	
 	@Override
@@ -2118,22 +2086,7 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			throw ExceptionUtil.convertSynapseException(e);
 		}
 	}
-	
-	@Override
-	public boolean isWiki(String projectId) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		return isWiki(projectId, synapseClient);
-	}
-
-	private boolean isWiki(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws RestServiceException {
-		try {
-			getRootWikiId(synapseClient, projectId, ObjectType.ENTITY); 
-			return true;
-		} catch (NotFoundException ex) {
-			return false;
-		}
-	}
-	
+		
 	private boolean isChallenge(String projectId, org.sagebionetworks.client.SynapseClient synapseClient) throws SynapseException {
 		// are there any evaluations that the current user can edit?
 		try {

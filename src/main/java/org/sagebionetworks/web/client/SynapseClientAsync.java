@@ -276,8 +276,6 @@ public interface SynapseClientAsync {
 
 	void isUserAllowedToRenderHTML(String userId, AsyncCallback<Boolean> callback);
 	
-	void isWiki(String id, AsyncCallback<Boolean> callback);
-
 	void isChallenge(String id, AsyncCallback<Boolean> callback);
 
 	void addTeamMember(String userGroupId, String teamId, String message, String hostPageBaseURL,
