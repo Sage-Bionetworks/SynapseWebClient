@@ -236,7 +236,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 		} else {
 			//we have a parent entity, check to see where we are suppose to upload the file(s)
 			String uploadDestinationsEntityId = parentEntityId != null ? parentEntityId : entity.getId();
-			synapseClient.getUploadDestinations(uploadDestinationsEntityId, new AsyncCallback<List<UploadDestination>>() {
+			jsClient.getUploadDestinations(uploadDestinationsEntityId, new AsyncCallback<List<UploadDestination>>() {
 				public void onSuccess(List<UploadDestination> uploadDestinations) {
 
 					if (uploadDestinations == null || uploadDestinations.isEmpty()) {

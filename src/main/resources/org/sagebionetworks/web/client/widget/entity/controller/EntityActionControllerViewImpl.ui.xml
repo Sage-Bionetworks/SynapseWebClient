@@ -14,6 +14,7 @@
 				<b:Button ui:field="okButton" type="PRIMARY"  dataDismiss="MODAL">OK</b:Button>
 			</b:ModalFooter>
 		</b:Modal>
+		<bh:Div ui:field="uploadDialogWidgetContainer" />
 		<bh:Div ui:field="extraWidgetsContainer" />
 	</bh:Span>
 </ui:UiBinder>

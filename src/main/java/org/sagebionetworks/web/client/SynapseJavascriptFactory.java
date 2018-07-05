@@ -45,6 +45,8 @@ import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
+import org.sagebionetworks.repo.model.file.UploadDestination;
+import org.sagebionetworks.repo.model.file.UploadDestinationInstanceFactory;
 import org.sagebionetworks.repo.model.principal.PrincipalAliasResponse;
 import org.sagebionetworks.repo.model.principal.UserGroupHeaderResponse;
 import org.sagebionetworks.repo.model.provenance.Activity;
@@ -73,6 +75,7 @@ public class SynapseJavascriptFactory {
 		WikiPage,
 		ListWrapperUserProfile,
 		ListWrapperTeam,
+		ListWrapperUploadDestinations,
 		UserGroupHeaderResponse,
 		UserBundle,
 		Count,
@@ -281,6 +284,18 @@ public class SynapseJavascriptFactory {
 				teamList.add(new Team(jsonObject));
 			}
 			return teamList;
+		case ListWrapperUploadDestinations :
+			List<UploadDestination> uploadDestinationList = new ArrayList<>();
+			UploadDestinationInstanceFactory uploadDestinationFactory = UploadDestinationInstanceFactory.singleton();
+			JSONArrayAdapter jsonUploadDestinationsArray = json.getJSONArray("list");
+			for (int i = 0; i < jsonUploadDestinationsArray.length(); i++) {
+				JSONObjectAdapter jsonObject = jsonUploadDestinationsArray.getJSONObject(i);
+				String concreteType = jsonObject.getString("concreteType");
+				UploadDestination response = uploadDestinationFactory.newInstance(concreteType);
+				response.initializeFromJSONObject(jsonObject);
+				uploadDestinationList.add(response);
+			}
+			return uploadDestinationList;
 		case MembershipInvitation:
 			return new MembershipInvitation(json);
 		case InviteeVerificationSignedToken:

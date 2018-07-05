@@ -127,7 +127,6 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	boolean isCurrentVersion;
 	ActionMenuWidget actionMenu;
 	EntityUpdatedHandler entityUpdateHandler;
-	UploadDialogWidget uploader;
 	WikiMarkdownEditor wikiEditor;
 	ProvenanceEditorWidget provenanceEditor;
 	StorageLocationWidget storageLocationEditor;
@@ -302,12 +301,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return submitter;
 	}
 	
-	private UploadDialogWidget getUploadDialogWidget() {
-		if (uploader == null) {
-			uploader = ginInjector.getUploadDialogWidget();
-			view.addWidget(uploader.asWidget());
-		}
-		return uploader;
+	private UploadDialogWidget getNewUploadDialogWidget() {
+		UploadDialogWidget uploadDialogWidget = ginInjector.getUploadDialogWidget();
+		view.setUploadDialogWidget(uploadDialogWidget.asWidget());
+		return uploadDialogWidget;
 	}
 	private WikiMarkdownEditor getWikiMarkdownEditor() {
 		if (wikiEditor == null) {
@@ -1037,7 +1034,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		preflightController.checkUploadToEntity(this.entityBundle, new Callback() {
 			@Override
 			public void invoke() {
-				UploadDialogWidget uploader = getUploadDialogWidget();
+				UploadDialogWidget uploader = getNewUploadDialogWidget();
 				uploader.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, null,
 						entityBundle.getEntity().getId(), entityUpdateHandler, null, true);
 				uploader.setUploaderLinkNameVisible(true);
@@ -1108,10 +1105,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void postCheckUploadFile(){
-		getUploadDialogWidget().configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, entityUpdateHandler, null, true);
-		getUploadDialogWidget().disableMultipleFileUploads();
-		getUploadDialogWidget().setUploaderLinkNameVisible(false);
-		getUploadDialogWidget().show();
+		UploadDialogWidget uploadDialogWidget = getNewUploadDialogWidget();
+		uploadDialogWidget.configure(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, entityBundle.getEntity(), null, entityUpdateHandler, null, true);
+		uploadDialogWidget.disableMultipleFileUploads();
+		uploadDialogWidget.setUploaderLinkNameVisible(false);
+		uploadDialogWidget.show();
 	}
 
 	private void onSubmit() {

@@ -26,7 +26,6 @@ import org.sagebionetworks.repo.model.doi.Doi;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleCopyRequest;
 import org.sagebionetworks.repo.model.file.FileHandleResults;
-import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.principal.AccountCreationToken;
 import org.sagebionetworks.repo.model.principal.EmailValidationSignedToken;
 import org.sagebionetworks.repo.model.project.StorageLocationSetting;
@@ -227,14 +226,6 @@ public interface SynapseClientAsync {
 
 	void createTableColumns(List<ColumnModel> value,
 			AsyncCallback<List<ColumnModel>> asyncCallback);
-	
-	/**
-	 * Return the upload destinations associated with this parent entity (container)
-	 * @param parentEntityId
-	 * @return
-	 * @throws RestServiceException
-	 */
-	void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback);
 	
 	void getHost(String urlString, AsyncCallback<String> callback);
 
