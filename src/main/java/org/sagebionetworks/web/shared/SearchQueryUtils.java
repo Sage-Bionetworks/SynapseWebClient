@@ -5,6 +5,9 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
+import org.sagebionetworks.repo.model.search.query.FacetSort;
+import org.sagebionetworks.repo.model.search.query.FacetSortOptions;
+import org.sagebionetworks.repo.model.search.query.FacetTopN;
 import org.sagebionetworks.repo.model.search.query.KeyValue;
 import org.sagebionetworks.repo.model.search.query.SearchQuery;
 
@@ -22,7 +25,6 @@ public class SearchQueryUtils {
 		kv.setValue("project"); 
 		bq.add(kv);
 		query.setBooleanQuery(bq);
-		
 		query.setFacet(FACETS_DISPLAY_ORDER);
 		query.setSize(LIMIT);
 		
@@ -40,9 +42,7 @@ public class SearchQueryUtils {
 		kv.setNot(true);
 		bq.add(kv);
 		query.setBooleanQuery(bq);
-		
 		query.setFacet(FACETS_DISPLAY_ORDER);
-		
 		return query;
 	}
 
@@ -51,6 +51,23 @@ public class SearchQueryUtils {
 		// start with a blank, valid query
 		query.setQueryTerm(Collections.singletonList(""));
 		query.setReturnFields(Arrays.asList("name", "description", "node_type", "created_by", "created_on", "modified_by", "modified_on"));
+		
+		List<FacetTopN> facetFieldTopN = new ArrayList<>();
+		List<FacetSort> facetFieldSort = new ArrayList<>();
+		for (String facetName : FACETS_DISPLAY_ORDER) {
+			FacetTopN facetTopN = new FacetTopN();
+			facetTopN.setKey(facetName);
+			facetTopN.setValue(100L);
+			facetFieldTopN.add(facetTopN);
+			
+			FacetSort facetSort = new FacetSort();
+			facetSort.setFacetName(facetName);
+			facetSort.setSortType(FacetSortOptions.COUNT);
+			facetFieldSort.add(facetSort);
+		}
+		query.setFacetFieldTopN(facetFieldTopN);
+		query.setFacetFieldSort(facetFieldSort);
+		
 		return query;
 	}
 

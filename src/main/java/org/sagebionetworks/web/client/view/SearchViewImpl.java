@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
+import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
@@ -61,7 +62,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class SearchViewImpl extends Composite implements SearchView {
-
+	private static final int MAX_FACET_VALUES_SHOWN = 10;
 	private static final int HIT_DESCRIPTION_LENGTH_CHAR = 270;
 	private static final int FACET_NAME_LENGTH_CHAR = 21;
 	private static final int MINUTE_IN_SEC = 60;
@@ -532,55 +533,80 @@ public class SearchViewImpl extends Composite implements SearchView {
 		if(facet != null && facet.getConstraints() != null && facet.getConstraints().size() > 0) {
 			lc = new FlowPanel();
 			String displayName = facetToDisplay.containsKey(facet.getName()) ? formatFacetName(facetToDisplay.get(facet.getName())) : formatFacetName(facet.getName());
-			//special case.  if this is the created_by facet, then add a UserBadge
-			boolean isModifiedByFacet = "modified_by".equalsIgnoreCase(facet.getName());
-			boolean isCreatedByFacet = "created_by".equalsIgnoreCase(facet.getName());
 			lc.add(new HTML("<h6 style=\"margin-top: 15px;\">" + displayName + "</h6>"));
-			FlowPanel flowPanel = new FlowPanel();
-			//FlexTable flexTable = new FlexTable();
-			int i=0;
+			final FlowPanel flowPanel = new FlowPanel();
 			
-			for(final FacetConstraint constraint : facet.getConstraints()) {
+			for (int i = 0; i < facet.getConstraints().size(); i++) {
 				// show top 10
-				if(i>=10) {
+				if(i>=MAX_FACET_VALUES_SHOWN) {
+					// add a button to show the rest of the facet values
+					Button showAll = new Button();
+					showAll.setText("Show all " + facet.getConstraints().size());
+					showAll.setSize(ButtonSize.EXTRA_SMALL);
+					lc.add(showAll);
+					showAll.addClickHandler(event -> {
+						showAll.setVisible(false);
+						showAllFacetValues(flowPanel, facet);
+					});
 					break;
 				}
 				
-				// skip the prefixed facet values
-				if(constraint.getValue().contains(":")) {
-					continue;
+				FlowPanel valueContainer = getFacetValue(facet, i);
+				if (valueContainer != null) {
+					flowPanel.add(valueContainer);	
 				}
-				FlowPanel valueContainer = new FlowPanel();
-				String stub = DisplayUtils.stubStr(constraint.getValue(), FACET_NAME_LENGTH_CHAR);
-				ClickHandler clickHandler = new ClickHandler() {				
-					@Override
-					public void onClick(ClickEvent event) {
-						Window.scrollTo(0, 0);
-						presenter.addFacet(facet.getName(), constraint.getValue());				
-					}
-				};
-				if (isCreatedByFacet || isModifiedByFacet) {
-					stub = "";
-					UserBadge badge = ginInjector.getUserBadgeWidget();
-					badge.configure(getSearchUserId(constraint.getValue()));
-					badge.setCustomClickHandler(clickHandler);
-					Widget widget = badge.asWidget();
-					valueContainer.add(widget);
-				}
-				Anchor a = new Anchor(stub + " (" + constraint.getCount() + ")");
-				if (!stub.equalsIgnoreCase(constraint.getValue()) && !isCreatedByFacet && !isModifiedByFacet) {
-					valueContainer.add(DisplayUtils.addTooltip(a, constraint.getValue(), Placement.RIGHT));
-				} else {
-					valueContainer.add(a);
-				}
-				
-				a.addClickHandler(clickHandler);	
-				flowPanel.add(valueContainer);
-				i++;
 			}		
 			lc.add(flowPanel);
 		}
 		return lc;
+	}
+	
+	private void showAllFacetValues(FlowPanel p, Facet facet) {
+		for (int i = MAX_FACET_VALUES_SHOWN; i < facet.getConstraints().size(); i++) {
+			FlowPanel valueContainer = getFacetValue(facet, i);
+			if (valueContainer != null) {
+				p.add(valueContainer);	
+			}
+		}
+	}
+	
+	private FlowPanel getFacetValue(Facet facet, int i) {
+		//special case.  if this is the created_by facet, then add a UserBadge
+		boolean isModifiedByFacet = "modified_by".equalsIgnoreCase(facet.getName());
+		boolean isCreatedByFacet = "created_by".equalsIgnoreCase(facet.getName());
+		
+		FacetConstraint constraint  = facet.getConstraints().get(i);
+		
+		// skip the prefixed facet values
+		if(constraint.getValue().contains(":")) {
+			return null;
+		}
+		FlowPanel valueContainer = new FlowPanel();
+		String stub = DisplayUtils.stubStr(constraint.getValue(), FACET_NAME_LENGTH_CHAR);
+		ClickHandler clickHandler = new ClickHandler() {				
+			@Override
+			public void onClick(ClickEvent event) {
+				Window.scrollTo(0, 0);
+				presenter.addFacet(facet.getName(), constraint.getValue());				
+			}
+		};
+		if (isCreatedByFacet || isModifiedByFacet) {
+			stub = "";
+			UserBadge badge = ginInjector.getUserBadgeWidget();
+			badge.configure(getSearchUserId(constraint.getValue()));
+			badge.setCustomClickHandler(clickHandler);
+			Widget widget = badge.asWidget();
+			valueContainer.add(widget);
+		}
+		Anchor a = new Anchor(stub + " (" + constraint.getCount() + ")");
+		if (!stub.equalsIgnoreCase(constraint.getValue()) && !isCreatedByFacet && !isModifiedByFacet) {
+			valueContainer.add(DisplayUtils.addTooltip(a, constraint.getValue(), Placement.RIGHT));
+		} else {
+			valueContainer.add(a);
+		}
+		
+		a.addClickHandler(clickHandler);
+		return valueContainer;
 	}
 
 	private String formatFacetName(String name) {
