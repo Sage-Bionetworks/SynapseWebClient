@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -129,19 +128,16 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		if (isStillUploading()) {
 			retryRequired = false;
 			
-			synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
-				@Override
-				public void setMD5(String md5) {
-					if (md5 == null) {
-						handler.uploadFailed(DisplayConstants.MD5_CALCULATION_ERROR);
-						return;
-					}
-					if (request.getContentMD5Hex() != null && !md5.equals(request.getContentMD5Hex())) {
-						logFileChangedMessage(request.getContentMD5Hex(), md5);
-						retryUpload();
-					} else {
-						startMultipartUpload(md5);
-					}
+			synapseJsniUtils.getFileMd5(blob, md5 -> {
+				if (md5 == null) {
+					handler.uploadFailed(DisplayConstants.MD5_CALCULATION_ERROR);
+					return;
+				}
+				if (request.getContentMD5Hex() != null && !md5.equals(request.getContentMD5Hex())) {
+					logFileChangedMessage(request.getContentMD5Hex(), md5);
+					retryUpload();
+				} else {
+					startMultipartUpload(md5);
 				}
 			});
 			
@@ -356,26 +352,24 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	public void addCurrentPartToMultipartUpload() {
 		//calculate the md5 of this file part
 		if (isStillUploading()) {
-			synapseJsniUtils.getFilePartMd5(blob, currentPartNumber-1, request.getPartSizeBytes(), new MD5Callback() {
-				@Override
-				public void setMD5(String partMd5) {
-					log("partNumber="+currentPartNumber + " partNumberMd5="+partMd5);
-					jsClient.addPartToMultipartUpload(currentStatus.getUploadId(), currentPartNumber, partMd5, new AsyncCallback<AddPartResponse>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							partFailure(caught.getMessage());
+			synapseJsniUtils.getFilePartMd5(blob, currentPartNumber-1, request.getPartSizeBytes(), partMd5 -> {
+				log("partNumber="+currentPartNumber + " partNumberMd5="+partMd5);
+				jsClient.addPartToMultipartUpload(currentStatus.getUploadId(), currentPartNumber, partMd5, new AsyncCallback<AddPartResponse>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						partFailure(caught.getMessage());
+					}
+					
+					public void onSuccess(AddPartResponse addPartResponse) {
+						if (addPartResponse.getAddPartState().equals(AddPartState.ADD_SUCCESS)) {
+							completedPartCount++;
+							partSuccess();
+						} else {
+							partFailure(addPartResponse.getErrorMessage());
 						}
-						
-						public void onSuccess(AddPartResponse addPartResponse) {
-							if (addPartResponse.getAddPartState().equals(AddPartState.ADD_SUCCESS)) {
-								completedPartCount++;
-								partSuccess();
-							} else {
-								partFailure(addPartResponse.getErrorMessage());
-							}
-						};
-					});
-				}});
+					};
+				});
+			});
 		}
 	}
 	
