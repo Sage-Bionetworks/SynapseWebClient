@@ -84,6 +84,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 			view.showErrorMessage(DisplayConstants.ERROR_LOGIN_REQUIRED);
 			globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
 		} else {
+			globalApplicationState.setIsEditing(true);
 			view.setReplyTextBoxVisible(false);
 			checkForSavedReply();
 			view.setNewReplyContainerVisible(true);
@@ -163,6 +164,7 @@ public class NewReplyWidget implements NewReplyWidgetView.Presenter{
 	}
 	
 	public void onCancelAfterConfirm() {
+		globalApplicationState.setIsEditing(false);
 		view.resetButton();
 		view.setReplyTextBoxVisible(true);
 		view.setNewReplyContainerVisible(false);
