@@ -10,14 +10,13 @@ import org.sagebionetworks.repo.model.dataaccess.Submission;
 import org.sagebionetworks.repo.model.dataaccess.SubmissionState;
 import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
-import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.DateTimeUtils;
-import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.*;
+import org.sagebionetworks.web.client.presenter.RejectReasonWidget;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
-import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
+import org.sagebionetworks.web.client.widget.asynch.AsyncHandlerImpl;
+import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -34,7 +33,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	DataAccessClientAsync dataAccessClient;
 	SynapseAlert synAlert;
 	Submission submission;
-	BigPromptModalView promptDialog;
+	RejectReasonWidget promptDialog;
 	FileHandleList otherDocuments;
 	FileHandleWidget ducFileRenderer;
 	FileHandleWidget irbFileRenderer;
@@ -42,12 +41,12 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	PortalGinInjector ginInjector;
 	DateTimeUtils dateTimeUtils;
 	ShowEmailsButton showEmailsButton;
-	
+
 	@Inject
 	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, 
 			SynapseAlert synAlert,
 			DataAccessClientAsync dataAccessClient,
-			final BigPromptModalView promptDialog,
+			final RejectReasonWidget promptDialog,
 			FileHandleWidget ducFileRenderer,
 			FileHandleWidget irbFileRenderer,
 			FileHandleList otherDocuments,
@@ -79,13 +78,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setOtherAttachmentWidget(otherDocuments);
 		view.setSynAlert(synAlert);
 		view.setShowEmailButton(showEmailsButton);
-		promptDialog.configure("Reason", "Rejection reason:", "", new Callback() {
-			@Override
-			public void invoke() {
-				updateDataAccessSubmissionState(SubmissionState.REJECTED, promptDialog.getValue());
-				promptDialog.hide();
-			}
-		});
+
 	}
 	
 	public void configure(Submission submission) {
@@ -199,7 +192,11 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	@Override
 	public void onReject() {
 		//prompt for reason
-		promptDialog.show();
+		String userID = submission.getId();
+		promptDialog.show(userID, (String param) -> {
+			updateDataAccessSubmissionState(SubmissionState.REJECTED, promptDialog.getValue());
+			}
+		);
 	}
 	
 	public void addStyleNames(String styleNames) {

@@ -21,6 +21,7 @@
 		<h2>Coming Soon</h2>
 		
 		<b:Button ui:field="testDownloadSpeedButton" text="Test Download Speed" />
+		<b:Button ui:field="testProfileValidation" text="Test Profile Validation" />
 		<b:Heading size="H3" ui:field="downloadSpeedResult"/>
 		<bh:Div ui:field="reactWidget" />
 		<g:FlowPanel addStyleNames="margin-bottom-60 margin-top-100">

@@ -9,13 +9,13 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.presenter.RejectReasonWidget;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.header.Header;
-
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -38,6 +38,8 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@UiField
 	Button testDownloadSpeedButton;
 	@UiField
+	Button testProfileValidation;
+	@UiField
 	Heading downloadSpeedResult;
 	
 	private Presenter presenter;
@@ -53,6 +55,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 			AuthenticationController authenticationController,
 			GoogleMap map,
 			JSONObjectAdapter jsonObjectAdapter,
+			RejectReasonWidget rejectReasonWidget,
 			DownloadSpeedTester downloadSpeedTester) {		
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
@@ -73,6 +76,9 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		};
 		testDownloadSpeedButton.addClickHandler(event -> {
 			downloadSpeedTester.testDownloadSpeed(downloadSpeedCallback);
+		});
+		testProfileValidation.addClickHandler(event -> {
+			rejectReasonWidget.show("0");
 		});
 	}
 	

@@ -41,25 +41,12 @@ public class BigPromptModalViewImpl implements BigPromptModalView {
 	@Inject
 	public BigPromptModalViewImpl(Binder binder){
 		widget = binder.createAndBindUi(this);
-		modal.addShownHandler(new ModalShownHandler() {
-			@Override
-			public void onShown(ModalShownEvent evt) {
-				nameField.setFocus(true);
-				nameField.selectAll();
-			}
+		modal.addShownHandler(evt -> {
+			nameField.setFocus(true);
+			nameField.selectAll();
 		});
-		defaultButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				modal.hide();
-			}
-		});
-		primaryButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent arg0) {
-				callback.invoke();
-			}
-		});
+		defaultButton.addClickHandler(event -> modal.hide());
+		primaryButton.addClickHandler(arg0 -> callback.invoke());
 		primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
 	}
 	
