@@ -61,6 +61,7 @@ public class HelpWidget implements IsWidget {
 	public interface Binder extends UiBinder<Widget, HelpWidget> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
 	String text="", basicHelpText="", moreHelpHTML="", iconStyles="lightGreyText", closeHTML = "";
+	
 	public HelpWidget() {
 		widget = uiBinder.createAndBindUi(this);
 		anchor.getElement().setAttribute("tabindex", "0");
@@ -144,5 +145,23 @@ public class HelpWidget implements IsWidget {
 	
 	public void focus() {
 		anchor.setFocus(true);
+	}
+	
+	// SWC-4292: On static initialization of class, add a listener for the bootstrap modal close event.  If the event fires, make sure all popovers are hidden.
+	static {
+		_addModalHideListener();
+	}
+
+	private static native void _addModalHideListener() /*-{
+		$wnd.jQuery($doc.body).on('hidden.bs.modal', function () {
+		    //call static method when modal is hidden
+		    @org.sagebionetworks.web.client.widget.HelpWidget::hideAllPopovers()();
+		});
+	}-*/;
+	
+	public static void hideAllPopovers() {
+		for (HelpWidget h : POPOVERS) {
+			h.getHelpPopover().hide();	
+		}
 	}
 }
