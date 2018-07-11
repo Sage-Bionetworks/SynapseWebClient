@@ -78,10 +78,10 @@ public class RejectReasonViewImpl implements RejectReasonView {
         ClickHandler handler = event -> presenter.getResponse();
 
         generateButton.addClickHandler(handler);
-        optionOne.setText(RejectReasonWidget.response[0]);
-        optionTwo.setText(RejectReasonWidget.response[1]);
-        optionThree.setText(RejectReasonWidget.response[2]);
-        optionFour.setText(RejectReasonWidget.response[3]);
+        optionOne.setText(RejectReasonWidget.RESPONSE[0]);
+        optionTwo.setText(RejectReasonWidget.RESPONSE[1]);
+        optionThree.setText(RejectReasonWidget.RESPONSE[2]);
+        optionFour.setText(RejectReasonWidget.RESPONSE[3]);
 
     }
 

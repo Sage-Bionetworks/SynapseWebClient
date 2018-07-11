@@ -14,14 +14,17 @@ import org.sagebionetworks.web.client.widget.entity.RejectReasonView;
 public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget {
 
 
-    static String templateHeaderHi = "Hi ";
+    public static String TEMPLATE_HEADER_HELLO = "Hi ";
 
-    static String templateHeaderThanks = ",\n\nThank you for submitting your Synapse" +
+    public static String TEMPLATE_HEADER_THANKS = ",\n\nThank you for submitting your Synapse" +
             " profile for validation. Before I can accept your request, you need to:\n";
 
-    static String templateSignature = "Let us know if you have any questions.\n\nRegards,\nact@sagebase.org";
+    public static String TEMPLATE_HEADER_SIGNATURE = "Let us know if you have any questions.\n\nRegards,\nact@sagebase.org";
 
-    public static String [] response = new String[]{
+    public static String ERROR_MESSAGE = "Error: Please select at least one checkbox and generate a response or manually enter a response";
+
+    // TODO: Change out response to individual strings
+    public static String [] RESPONSE = new String[]{
             "Take and pass the Synapse Certification quiz. ",
             "Add at least one piece of information (education, employment, etc.) to your ORCID profile and set it to “public. ",
             "Physically initial each box, sign and date the Synapse Oath. ",
@@ -48,8 +51,16 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
         this.userName = DisplayUtils.getDisplayName(user);
     }
 
+    /*
+        For testing purposes only relay the userName to assert
+        that its being properly found.
+     */
+    private String getUserName() {
+        return this.userName;
+    }
+
     // TODO: Remove when feature is in prod
-    private void setUserProfileName(String user) {
+    public void setUserProfileName(String user) {
         this.userName = user;
     }
 
@@ -57,7 +68,7 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
         handler.getUserProfile(userID, new AsyncCallback<UserProfile>() {
             @Override
             public void onFailure(Throwable throwable) {
-                 view.showError("Could not find user name");
+                view.showError("Could not find user id -- " + userID + "\n Error -- " +  throwable.getMessage());
                 view.show();
             }
 
@@ -92,29 +103,29 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
         String output = "";
 
         if (view.optionOneIsUsed()) {
-            output += "\n\t" + response[0] + "\n";
+            output += "\n\t" + RESPONSE[0] + "\n";
         }
         if (view.optionTwoIsUsed()) {
-            output += "\n\t" + response[1] + "\n";
+            output += "\n\t" + RESPONSE[1] + "\n";
         }
         if (view.optionThreeIsUsed()) {
-            output += "\n\t" + response[2] + "\n";
+            output += "\n\t" + RESPONSE[2] + "\n";
         }
         if (view.optionFourIsUsed()) {
-            output += "\n\t" + response[3] + "\n";
+            output += "\n\t" + RESPONSE[3] + "\n";
         }
         if (view.optionFiveIsUsed()) {
             output += "\n\t" + view.getCustomTextResponse() + "\n";
         }
 
         if (output.equals("") && view.getValue().equals("")) {
-            view.showError("Error: Please select at least one checkbox and generate a response or manually enter a response");
+            view.showError(ERROR_MESSAGE);
             return;
         } else {
             view.clear();
         }
 
-        view.setValue(templateHeaderHi + this.userName + templateHeaderThanks + output + "\n" + templateSignature);
+        view.setValue(TEMPLATE_HEADER_HELLO + this.getUserName() + TEMPLATE_HEADER_THANKS + output + "\n" + TEMPLATE_HEADER_SIGNATURE);
     }
 
     public String getValue () {
@@ -124,7 +135,7 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
     @Override
     public void onSave () {
         if (view.getValue().equals("")) {
-            view.showError("Error: Please select at least one checkbox and generate a response or manually enter a response");
+            view.showError(ERROR_MESSAGE);
         } else {
             // TODO: Remove when feature is in prod
             if (callback != null) {
