@@ -17,7 +17,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.ProgressCallback;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.callback.MD5Callback;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 
@@ -103,31 +102,23 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		}
 		
 		uploadLog = new StringBuilder();
-		log(gwt.getUserAgent() + "\n" + gwt.getAppVersion() + "\nDirectly uploading " + fileName + " - calculating MD5\n");
-		synapseJsniUtils.getFileMd5(blob, new MD5Callback() {
-			@Override
-			public void setMD5(String md5) {
-				if (md5 == null) {
-					handler.uploadFailed(DisplayConstants.MD5_CALCULATION_ERROR);
-					return;
-				}
-				long fileSize = (long)synapseJsniUtils.getFileSize(blob);
-				long partSizeBytes = PartUtils.choosePartSize(fileSize);
-				long numberOfParts = PartUtils.calculateNumberOfParts(
-						fileSize, partSizeBytes);
-				String fileStats = "fileName="+fileName+"MD5=" + md5+" contentType="+contentType+" fileSize="+fileSize + " partSizeBytes=" + partSizeBytes + " numberOfParts=" + numberOfParts+"\n"; 
-				log(fileStats);
-				//create request
-				request = new MultipartUploadRequest();
-				request.setContentMD5Hex(md5);
-				request.setContentType(contentType);
-				request.setFileName(fileName);
-				request.setFileSizeBytes(fileSize);
-				request.setPartSizeBytes(partSizeBytes);
-				request.setStorageLocationId(storageLocationId);
-				startMultipartUpload();
-			}
-		});
+		log(gwt.getUserAgent() + "\n" + gwt.getAppVersion() + "\nDirectly uploading " + fileName + "\n");
+		long partSizeBytes = PartUtils.choosePartSize(fileSize);
+		//create request
+		request = new MultipartUploadRequest();
+		request.setContentType(contentType);
+		request.setFileName(fileName);
+		request.setFileSizeBytes(fileSize);
+		request.setPartSizeBytes(partSizeBytes);
+		request.setStorageLocationId(storageLocationId);
+		startMultipartUpload();
+	}
+	
+	/**
+	 * Restart from the beginning.
+	 */
+	private void retryUpload() {
+		uploadFile(request.getFileName(), request.getContentType(), blob, handler, request.getStorageLocationId(), view);
 	}
 	
 	/**
@@ -136,27 +127,47 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	public void startMultipartUpload() {
 		if (isStillUploading()) {
 			retryRequired = false;
-			//update the status and process
-			jsClient.startMultipartUpload(request, false, new AsyncCallback<MultipartUploadStatus>() {
-				@Override
-				public void onFailure(Throwable t) {
-					logError(t.getMessage());
-					handler.uploadFailed(t.getMessage());
+			
+			synapseJsniUtils.getFileMd5(blob, md5 -> {
+				if (md5 == null) {
+					handler.uploadFailed(DisplayConstants.MD5_CALCULATION_ERROR);
+					return;
 				}
-				
-				@Override
-				public void onSuccess(MultipartUploadStatus status) {
-					currentStatus = status;
-					currentPartNumber = 0;
-					startTime = new Date().getTime();
-					nextProgressPoint = 2000;
-					uploadSpeed = "";
-					totalPartCount = currentStatus.getPartsState().length();
-					completedPartCount = getCompletedPartCount(currentStatus.getPartsState());
-					attemptToUploadNextPart();
+				if (request.getContentMD5Hex() != null && !md5.equals(request.getContentMD5Hex())) {
+					uploadFailedDueToFileModification(request.getContentMD5Hex(), md5);
+				} else {
+					startMultipartUpload(md5);
 				}
 			});
+			
 		}
+	}
+	
+	private void startMultipartUpload(String md5) {
+		request.setContentMD5Hex(md5);
+		String fileStats = "fileName="+request.getFileName()+" MD5="+request.getContentMD5Hex()+" contentType="+request.getContentType()+" fileSize="+request.getFileSizeBytes() + " partSizeBytes=" + request.getPartSizeBytes() + "\n"; 
+		log(fileStats);
+		
+		//update the status and process
+		jsClient.startMultipartUpload(request, false, new AsyncCallback<MultipartUploadStatus>() {
+			@Override
+			public void onFailure(Throwable t) {
+				logError(t.getMessage());
+				handler.uploadFailed(t.getMessage());
+			}
+			
+			@Override
+			public void onSuccess(MultipartUploadStatus status) {
+				currentStatus = status;
+				currentPartNumber = 0;
+				startTime = new Date().getTime();
+				nextProgressPoint = 2000;
+				uploadSpeed = "";
+				totalPartCount = currentStatus.getPartsState().length();
+				completedPartCount = getCompletedPartCount(currentStatus.getPartsState());
+				attemptToUploadNextPart();
+			}
+		});
 	}
 	
 	public int getCompletedPartCount(String partState) {
@@ -306,11 +317,15 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		//before finishing, verify that the file checksum has not changed during the upload.
 		synapseJsniUtils.getFileMd5(blob, md5 -> {
 			if (!request.getContentMD5Hex().equals(md5)) {
-				handler.uploadFailed("The file appears to have changed during the upload process.  The starting md5 of the file (" + request.getContentMD5Hex() + ") differs from the current md5 (" + md5+").");
+				uploadFailedDueToFileModification(request.getContentMD5Hex(), md5);
 			} else {
 				completeMultipartUploadAfterMd5Verification();
 			}
 		});
+	}
+	
+	private void uploadFailedDueToFileModification(String startMd5, String newMd5) {
+		handler.uploadFailed("Unable to upload the file \"" + request.getFileName() + "\" because it's been modified during the upload.  The starting md5 of the file (" + startMd5 + ") differs from the current md5 (" + newMd5+").");
 	}
 	
 	public void completeMultipartUploadAfterMd5Verification() {
@@ -335,26 +350,24 @@ public class MultipartUploaderImpl implements MultipartUploader {
 	public void addCurrentPartToMultipartUpload() {
 		//calculate the md5 of this file part
 		if (isStillUploading()) {
-			synapseJsniUtils.getFilePartMd5(blob, currentPartNumber-1, request.getPartSizeBytes(), new MD5Callback() {
-				@Override
-				public void setMD5(String partMd5) {
-					log("partNumber="+currentPartNumber + " partNumberMd5="+partMd5);
-					jsClient.addPartToMultipartUpload(currentStatus.getUploadId(), currentPartNumber, partMd5, new AsyncCallback<AddPartResponse>() {
-						@Override
-						public void onFailure(Throwable caught) {
-							partFailure(caught.getMessage());
+			synapseJsniUtils.getFilePartMd5(blob, currentPartNumber-1, request.getPartSizeBytes(), partMd5 -> {
+				log("partNumber="+currentPartNumber + " partNumberMd5="+partMd5);
+				jsClient.addPartToMultipartUpload(currentStatus.getUploadId(), currentPartNumber, partMd5, new AsyncCallback<AddPartResponse>() {
+					@Override
+					public void onFailure(Throwable caught) {
+						partFailure(caught.getMessage());
+					}
+					
+					public void onSuccess(AddPartResponse addPartResponse) {
+						if (addPartResponse.getAddPartState().equals(AddPartState.ADD_SUCCESS)) {
+							completedPartCount++;
+							partSuccess();
+						} else {
+							partFailure(addPartResponse.getErrorMessage());
 						}
-						
-						public void onSuccess(AddPartResponse addPartResponse) {
-							if (addPartResponse.getAddPartState().equals(AddPartState.ADD_SUCCESS)) {
-								completedPartCount++;
-								partSuccess();
-							} else {
-								partFailure(addPartResponse.getErrorMessage());
-							}
-						};
-					});
-				}});
+					};
+				});
+			});
 		}
 	}
 	
