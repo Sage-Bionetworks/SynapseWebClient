@@ -18,6 +18,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditReplyModal;
@@ -44,6 +45,8 @@ public class EditReplyModalTest {
 	MarkdownEditorWidget mockMarkdownEditor;
 	@Mock
 	PopupUtilsView mockPopupUtilsView;
+	@Mock
+	GlobalApplicationState mockGlobalAppState;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
 	String replyId = "123";
@@ -53,7 +56,7 @@ public class EditReplyModalTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		modal = new EditReplyModal(mockView, mockDiscussionForumClient, mockSynAlert, mockMarkdownEditor, mockPopupUtilsView);
+		modal = new EditReplyModal(mockView, mockDiscussionForumClient, mockSynAlert, mockMarkdownEditor, mockPopupUtilsView, mockGlobalAppState);
 		modal.configure(replyId, message, mockCallback);
 		when(mockMarkdownEditor.getMarkdown()).thenReturn(message);
 	}
@@ -74,12 +77,14 @@ public class EditReplyModalTest {
 		verify(mockMarkdownEditor).hideUploadRelatedCommands();
 		verify(mockMarkdownEditor).showExternalImageButton();
 		verify(mockView).showDialog();
+		verify(mockGlobalAppState).setIsEditing(true);
 	}
 
 	@Test
 	public void testHideDialog() {
 		modal.hide();
 		verify(mockView).hideDialog();
+		verify(mockGlobalAppState).setIsEditing(false);
 	}
 
 	@Test

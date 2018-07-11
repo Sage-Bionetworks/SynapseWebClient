@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.repo.model.discussion.UpdateReplyMessage;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
@@ -32,14 +33,15 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 	private String replyId;
 	private String message;
 	Callback editReplyCallback;
-
+	GlobalApplicationState globalAppState;
 	@Inject
 	public EditReplyModal(
 			ReplyModalView view,
 			DiscussionForumClientAsync discussionForumClient,
 			SynapseAlert synAlert,
 			MarkdownEditorWidget markdownEditor,
-			PopupUtilsView popupUtils
+			PopupUtilsView popupUtils,
+			GlobalApplicationState globalAppState
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
@@ -47,6 +49,7 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
 		this.popupUtils = popupUtils;
+		this.globalAppState = globalAppState;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(EDIT_REPLY_MODAL_TITLE);
@@ -65,11 +68,13 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 		markdownEditor.hideUploadRelatedCommands();
 		markdownEditor.showExternalImageButton();
 		markdownEditor.configure(message);
+		globalAppState.setIsEditing(true);
 		view.showDialog();
 	}
 
 	@Override
 	public void hide() {
+		globalAppState.setIsEditing(false);
 		view.hideDialog();
 	}
 
@@ -85,7 +90,7 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 	}
 	
 	public void onCancelAfterConfirm() {
-		view.hideDialog();
+		hide();
 	}
 	
 	@Override
@@ -110,7 +115,7 @@ public class EditReplyModal implements ReplyModalView.Presenter{
 
 			@Override
 			public void onSuccess(DiscussionReplyBundle result) {
-				view.hideDialog();
+				hide();
 				view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
 				if (editReplyCallback != null) {
 					editReplyCallback.invoke();
