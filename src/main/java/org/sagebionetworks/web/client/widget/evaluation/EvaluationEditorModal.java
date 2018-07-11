@@ -20,8 +20,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class EvaluationEditorModal implements EvaluationEditorModalView.Presenter, IsWidget {
-	
-	public static final String QUOTA_NOT_FULLY_DEFINED_ERROR = "All quota are required if any are set.";
 	private EvaluationEditorModalView view;
 	private ChallengeClientAsync challengeClient;
 	private Evaluation evaluation;
@@ -117,18 +115,21 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 		Double roundDuration = view.getRoundDuration();
 		Date roundStart = view.getRoundStart();
 		boolean isUserTryingToSetQuota = submissionLimit != null || numberOfRounds != null || roundDuration != null || roundStart != null;
-		boolean isValidQuotaDefinition = submissionLimit != null && numberOfRounds != null && roundDuration != null && roundStart != null;
-		if (isUserTryingToSetQuota && !isValidQuotaDefinition) {
-			synAlert.showError(QUOTA_NOT_FULLY_DEFINED_ERROR);
-			return;
-		}
 		if (isUserTryingToSetQuota) {
 			// user is attempting to set quota
 			SubmissionQuota newQuota = new SubmissionQuota();
-			newQuota.setSubmissionLimit(submissionLimit.longValue());
-			newQuota.setFirstRoundStart(roundStart);
-			newQuota.setNumberOfRounds(numberOfRounds.longValue());
-			newQuota.setRoundDurationMillis(roundDuration.longValue());
+			if (submissionLimit != null) {
+				newQuota.setSubmissionLimit(submissionLimit.longValue());
+			}
+			if (roundStart != null) {
+				newQuota.setFirstRoundStart(roundStart);	
+			}
+			if (numberOfRounds != null) {
+				newQuota.setNumberOfRounds(numberOfRounds.longValue());
+			}
+			if (roundDuration != null) {
+				newQuota.setRoundDurationMillis(roundDuration.longValue());
+			}
 			evaluation.setQuota(newQuota);
 		} else {
 			evaluation.setQuota(null);
