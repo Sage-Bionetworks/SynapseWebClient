@@ -77,12 +77,14 @@ public class EditReplyModalTest {
 		verify(mockMarkdownEditor).hideUploadRelatedCommands();
 		verify(mockMarkdownEditor).showExternalImageButton();
 		verify(mockView).showDialog();
+		verify(mockGlobalAppState).setIsEditing(true);
 	}
 
 	@Test
 	public void testHideDialog() {
 		modal.hide();
 		verify(mockView).hideDialog();
+		verify(mockGlobalAppState).setIsEditing(false);
 	}
 
 	@Test
