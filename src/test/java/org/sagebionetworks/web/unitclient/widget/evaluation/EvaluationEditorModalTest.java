@@ -173,20 +173,6 @@ public class EvaluationEditorModalTest {
 	}
 	
 	@Test
-	public void testInvalidQuota() {
-		modal.configure(evaluation, mockEvaluationUpdatedCallback);
-
-		//only the round start is set, no other quota fields
-		when(mockView.getRoundStart()).thenReturn(quotaRoundStart);
-		
-		modal.onSave();
-		
-		verify(mockSynAlert).showError(EvaluationEditorModal.QUOTA_NOT_FULLY_DEFINED_ERROR);
-		verify(mockView, never()).hide();
-		verify(mockEvaluationUpdatedCallback, never()).invoke();
-	}
-	
-	@Test
 	public void testValidQuota() {
 		modal.configure(evaluation, mockEvaluationUpdatedCallback);
 
@@ -195,6 +181,20 @@ public class EvaluationEditorModalTest {
 		when(mockView.getSubmissionLimit()).thenReturn(22.0);
 		when(mockView.getNumberOfRounds()).thenReturn(10.0);
 		when(mockView.getRoundDuration()).thenReturn(2000000.0);
+		
+		modal.onSave();
+		
+		verify(mockChallengeClient).updateEvaluation(any(Evaluation.class), any(AsyncCallback.class));
+		verify(mockView).hide();
+		verify(mockEvaluationUpdatedCallback).invoke();
+	}
+
+	@Test
+	public void testPartiallyFilledInQuota() {
+		modal.configure(evaluation, mockEvaluationUpdatedCallback);
+
+		//only the round start is set, no other quota fields
+		when(mockView.getRoundStart()).thenReturn(quotaRoundStart);
 		
 		modal.onSave();
 		
