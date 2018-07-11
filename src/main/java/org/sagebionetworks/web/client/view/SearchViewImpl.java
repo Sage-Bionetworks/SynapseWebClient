@@ -147,16 +147,14 @@ public class SearchViewImpl extends Composite implements SearchView {
 
 	@Override
 	public void setSearchResults(SearchResults searchResults,
-			String searchTerm, boolean newQuery) {
+			String searchTerm) {
 		// set searchTerm into search box
 		searchField.setText(searchTerm);
 		facetButtons = new ArrayList<Button>();
-		// show existing facets			
+		// show existing facets
 		String facetNames = createShownFacets(searchResults);
-		Long start = presenter.getStart();
-		String pageTitleStartNumber = start != null && start > 0 ? " (from result " + (start+1) + ")" : ""; 
 		String pageTitleSearchTerm = searchTerm != null && searchTerm.length() > 0 ? "'"+searchTerm + "' " : "";
-		synapseJSNIUtils.setPageTitle("Search: " + pageTitleSearchTerm + facetNames + pageTitleStartNumber);
+		synapseJSNIUtils.setPageTitle("Search: " + pageTitleSearchTerm + facetNames);
 		narrowResultsPanel.setVisible(true);
 		currentFacetsPanel.setVisible(true);
 	}
@@ -168,17 +166,17 @@ public class SearchViewImpl extends Composite implements SearchView {
 	}
 	
 	@Override
-	public Widget getResults(SearchResults searchResults, String searchTerm) {
+	public Widget getResults(SearchResults searchResults, String searchTerm, boolean isFirstPage) {
 		// create search result list
 		List<Hit> hits = searchResults.getHits();
 		Panel searchResultsPanel;				
 		if (hits != null && hits.size() > 0) {
 			searchResultsPanel = createSearchResults(hits, searchResults.getStart().intValue());			
-
-			// create facet widgets
-			createFacetWidgets(searchResults);			
-			
-		} else if (searchResults.getStart() == 0) {
+			if (isFirstPage) {
+				// create facet widgets
+				createFacetWidgets(searchResults);			
+			}
+		} else if (isFirstPage) {
 			searchResultsPanel = new HTMLPanel(new SafeHtmlBuilder().appendHtmlConstant("<h4>" + DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART1)
 			.appendEscaped(searchTerm)
 			.appendHtmlConstant(DisplayConstants.LABEL_NO_SEARCH_RESULTS_PART2 + "</h4>").toSafeHtml());
@@ -534,8 +532,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 			lc = new FlowPanel();
 			String displayName = facetToDisplay.containsKey(facet.getName()) ? formatFacetName(facetToDisplay.get(facet.getName())) : formatFacetName(facet.getName());
 			lc.add(new HTML("<h6 style=\"margin-top: 15px;\">" + displayName + "</h6>"));
-			final FlowPanel flowPanel = new FlowPanel();
-			
+			FlowPanel flowPanel = new FlowPanel();
+			lc.add(flowPanel);
 			for (int i = 0; i < facet.getConstraints().size(); i++) {
 				// show top 10
 				if(i>=MAX_FACET_VALUES_SHOWN) {
@@ -543,6 +541,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 					Button showAll = new Button();
 					showAll.setText("Show all " + facet.getConstraints().size());
 					showAll.setSize(ButtonSize.EXTRA_SMALL);
+					showAll.setMarginTop(10);
 					lc.add(showAll);
 					showAll.addClickHandler(event -> {
 						showAll.setVisible(false);
@@ -556,7 +555,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 					flowPanel.add(valueContainer);	
 				}
 			}		
-			lc.add(flowPanel);
 		}
 		return lc;
 	}
