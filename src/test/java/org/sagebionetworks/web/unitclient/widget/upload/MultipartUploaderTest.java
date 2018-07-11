@@ -267,6 +267,8 @@ public class MultipartUploaderTest {
 		setPartsState("00");
 		uploader.uploadFile(FILE_NAME, CONTENT_TYPE, mockFileBlob, mockHandler, storageLocationId, mockView);
 		
+		verify(mockJsClient).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		
 		//manually call the method that's invoked with a successful xhr put (upload)
 		uploader.addCurrentPartToMultipartUpload();
 		
@@ -286,10 +288,10 @@ public class MultipartUploaderTest {
 		uploader.addCurrentPartToMultipartUpload();
 		verify(mockJsClient, never()).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 
-		// SWC-4262: check the file md5 once in the beginning, and once on complete.
+		// SWC-4262: check the file md5 once in the beginning, once on complete (to verify)
 		verify(synapseJsniUtils, times(2)).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
-
-		// SWC-4262: the md5 check on complete caused the upload to fail (because the md5 changed)
+		
+		// SWC-4262: the md5 check on complete caused upload to start from the beginning (recreating the request)
 		verify(mockHandler).uploadFailed(anyString());
 	}
 	
