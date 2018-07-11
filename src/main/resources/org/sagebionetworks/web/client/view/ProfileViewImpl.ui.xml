@@ -104,7 +104,7 @@
 						        		</b:Tooltip>
 					        		</bh:Span>
 					        	</bh:Div>
-					        	<bh:Div addStyleNames="margin-top-5">
+					        	<bh:Div addStyleNames="margin-top-5" ui:field="createdOnUI">
 					        		<bh:Text>Joined&nbsp;</bh:Text><bh:Text ui:field="createdOnText"/>
 					        	</bh:Div>
 					        	<g:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15 margin-left-neg-2" readOnly="true" />
