@@ -134,8 +134,7 @@ public class MultipartUploaderImpl implements MultipartUploader {
 					return;
 				}
 				if (request.getContentMD5Hex() != null && !md5.equals(request.getContentMD5Hex())) {
-					logFileChangedMessage(request.getContentMD5Hex(), md5);
-					retryUpload();
+					uploadFailedDueToFileModification(request.getContentMD5Hex(), md5);
 				} else {
 					startMultipartUpload(md5);
 				}
@@ -318,16 +317,15 @@ public class MultipartUploaderImpl implements MultipartUploader {
 		//before finishing, verify that the file checksum has not changed during the upload.
 		synapseJsniUtils.getFileMd5(blob, md5 -> {
 			if (!request.getContentMD5Hex().equals(md5)) {
-				logFileChangedMessage(request.getContentMD5Hex(), md5);
-				retryUpload();
+				uploadFailedDueToFileModification(request.getContentMD5Hex(), md5);
 			} else {
 				completeMultipartUploadAfterMd5Verification();
 			}
 		});
 	}
 	
-	private void logFileChangedMessage(String startMd5, String newMd5) {
-		log("The file appears to have changed during the upload process.  The starting md5 of the file (" + startMd5 + ") differs from the current md5 (" + newMd5+"). \nRestarting...");
+	private void uploadFailedDueToFileModification(String startMd5, String newMd5) {
+		handler.uploadFailed("Unable to upload the file \"" + request.getFileName() + "\" because it's been modified during the upload.  The starting md5 of the file (" + startMd5 + ") differs from the current md5 (" + newMd5+").");
 	}
 	
 	public void completeMultipartUploadAfterMd5Verification() {

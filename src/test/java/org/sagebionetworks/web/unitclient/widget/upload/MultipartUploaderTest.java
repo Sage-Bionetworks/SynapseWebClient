@@ -288,11 +288,11 @@ public class MultipartUploaderTest {
 		uploader.addCurrentPartToMultipartUpload();
 		verify(mockJsClient, never()).completeMultipartUpload(anyString(), any(AsyncCallback.class));
 
-		// SWC-4262: check the file md5 once in the beginning, once on complete (to verify), and once more when it restarts the upload request.
-		verify(synapseJsniUtils, times(3)).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
-
+		// SWC-4262: check the file md5 once in the beginning, once on complete (to verify)
+		verify(synapseJsniUtils, times(2)).getFileMd5(any(JavaScriptObject.class), any(MD5Callback.class));
+		
 		// SWC-4262: the md5 check on complete caused upload to start from the beginning (recreating the request)
-		verify(mockJsClient, times(2)).startMultipartUpload(any(MultipartUploadRequest.class), anyBoolean(), any(AsyncCallback.class));
+		verify(mockHandler).uploadFailed(anyString());
 	}
 	
 	//failure cases
