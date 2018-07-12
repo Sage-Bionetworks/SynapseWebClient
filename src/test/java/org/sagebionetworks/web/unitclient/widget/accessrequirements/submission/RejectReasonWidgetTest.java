@@ -37,18 +37,11 @@ public class RejectReasonWidgetTest {
     @Mock
     Throwable mockThrowable;
 
-    static String MOCK_TEMPLATE_HEADER_HELLO = RejectReasonWidget.TEMPLATE_HEADER_HELLO;
-    static String MOCK_TEMPLATE_HEADER_THANKS = RejectReasonWidget.TEMPLATE_HEADER_THANKS;
-    static String MOCK_TEMPLATE_HEADER_SIGNATURE = RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
-
-    static String MOCK_REJECT_TAKE_SYNAPSE_QZ =  RejectReasonWidget.REJECT_TAKE_SYNAPSE_QZ;
-    static String MOCK_REJECT_ADD_INFO = RejectReasonWidget.REJECT_ADD_INFO;
-    static String MOCK_ERROR_MESSAGE = RejectReasonWidget.ERROR_MESSAGE;
-
     public static final String MOCK_USER_ID = "0";
     public static final String MOCK_USER_DISPLAY_NAME = "JOHN DOE";
     public static final String MOCK_CUSTOM_RESPONSE = "Fill out paperwork";
-    
+    public static final String MOCK_CANNED_RESPONSE = "canned response";
+
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -83,6 +76,15 @@ public class RejectReasonWidgetTest {
         verify(mockHandler).getUserProfile(eq(MOCK_USER_ID), any(AsyncCallback.class));
         verify(mockView).show();
         assertEquals(MOCK_USER_DISPLAY_NAME, widget.getUserName());
+
+        // verify save onSave callback
+        when(mockView.getValue()).thenReturn(MOCK_CANNED_RESPONSE);
+
+        widget.onSave();
+
+        verify(mockView).clear();
+        verify(mockView).hide();
+        verify(getReasonCallback).invoke(MOCK_CANNED_RESPONSE);
     }
 
     @Test
@@ -93,7 +95,7 @@ public class RejectReasonWidgetTest {
         // call
         widget.show(MOCK_USER_ID, getReasonCallback);
         // verify/assert
-        verify(mockView).showError(eq( "Could not find user id -- " + MOCK_USER_ID + "\nError -- " + mockThrowable.getMessage()));
+        verify(mockView).showError( "Could not find user id -- " + MOCK_USER_ID + "\nError -- " + mockThrowable.getMessage());
         verify(mockView).show();
     }
 
@@ -103,11 +105,11 @@ public class RejectReasonWidgetTest {
     @Test
     public void testUpdateResponseWithOneOptions() {
         // setup
-        String exp = MOCK_TEMPLATE_HEADER_HELLO +  MOCK_TEMPLATE_HEADER_THANKS;
+        String exp = RejectReasonWidget.TEMPLATE_HEADER_HELLO  +  RejectReasonWidget.TEMPLATE_HEADER_THANKS;
         // add response one
-        exp += "\n\t" + MOCK_REJECT_TAKE_SYNAPSE_QZ + "\n";
+        exp += "\n\t" + RejectReasonWidget.REJECT_TAKE_SYNAPSE_QZ  + "\n";
         // add signature
-        exp += "\n" + MOCK_TEMPLATE_HEADER_SIGNATURE;
+        exp += "\n" + RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
         // first checkbox used
         when(mockView.optionOneIsUsed()).thenReturn(true);
         when(mockView.getValue()).thenReturn(exp);
@@ -115,7 +117,7 @@ public class RejectReasonWidgetTest {
         widget.updateResponse();
 
         // verify that clear and get value were called
-        verify(mockView).setValue(eq(exp));
+        verify(mockView).setValue(exp);
         verify(mockView).clear();
     }
 
@@ -126,13 +128,13 @@ public class RejectReasonWidgetTest {
      */
     @Test
     public void testUpdateResponseWithThreeOptions() {
-        String exp = MOCK_TEMPLATE_HEADER_HELLO + MOCK_TEMPLATE_HEADER_THANKS;
+        String exp = RejectReasonWidget.TEMPLATE_HEADER_HELLO + RejectReasonWidget.TEMPLATE_HEADER_THANKS;
         // add response one
-        exp += "\n\t" + MOCK_REJECT_TAKE_SYNAPSE_QZ + "\n";
-        exp += "\n\t" + MOCK_REJECT_ADD_INFO + "\n";
+        exp += "\n\t" + RejectReasonWidget.REJECT_TAKE_SYNAPSE_QZ + "\n";
+        exp += "\n\t" + RejectReasonWidget.REJECT_ADD_INFO + "\n";
         exp += "\n\t" + MOCK_CUSTOM_RESPONSE + "\n";
         // add signature
-        exp += "\n"  + MOCK_TEMPLATE_HEADER_SIGNATURE;
+        exp += "\n"  + RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
         // first two checkboxes are used
         when(mockView.optionOneIsUsed()).thenReturn(true);
         when(mockView.optionTwoIsUsed()).thenReturn(true);
@@ -142,7 +144,7 @@ public class RejectReasonWidgetTest {
 
         widget.updateResponse();
 
-        verify(mockView).setValue(eq(exp));
+        verify(mockView).setValue(exp);
         verify(mockView).clear();
     }
 
@@ -152,25 +154,16 @@ public class RejectReasonWidgetTest {
 
         widget.updateResponse();
 
-        verify(mockView).showError(MOCK_ERROR_MESSAGE);
-    }
-
-    @Test
-    public void testOnSaveWithText() {
-        when(mockView.getValue()).thenReturn("");
-
-        widget.onSave();
-
-        verify(mockView).showError(eq(MOCK_ERROR_MESSAGE));
+        verify(mockView).showError(RejectReasonWidget.ERROR_MESSAGE);
     }
 
     @Test
     public void testOnSaveNoText() {
-        when(mockView.getValue()).thenReturn("canned response");
+        when(mockView.getValue()).thenReturn("");
 
         widget.onSave();
 
-        verify(mockView).clear();
-        verify(mockView).hide();
+        verify(mockView).showError(RejectReasonWidget.ERROR_MESSAGE);
     }
+
 }
