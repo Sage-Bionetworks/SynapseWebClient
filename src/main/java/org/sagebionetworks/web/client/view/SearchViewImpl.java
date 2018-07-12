@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
+import org.sagebionetworks.web.shared.SearchQueryUtils;
 import org.sagebionetworks.web.shared.WebConstants;
 
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -539,7 +540,9 @@ public class SearchViewImpl extends Composite implements SearchView {
 				if(i>=MAX_FACET_VALUES_SHOWN) {
 					// add a button to show the rest of the facet values
 					Button showAll = new Button();
-					showAll.setText("Show all " + facet.getConstraints().size());
+					boolean isMax = facet.getConstraints().size() == SearchQueryUtils.MAX_FACET_VALUES_COUNT;
+					String buttonText = isMax ? "Show " : "Show all ";
+					showAll.setText(buttonText + facet.getConstraints().size());
 					showAll.setSize(ButtonSize.EXTRA_SMALL);
 					showAll.setMarginTop(10);
 					lc.add(showAll);

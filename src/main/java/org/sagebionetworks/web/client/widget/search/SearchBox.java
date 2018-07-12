@@ -24,19 +24,15 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 	
 	private SearchBoxView view;
 	private GlobalApplicationState globalApplicationState;
-	private AdapterFactory adapterFactory;
 	private SynapseClientAsync synapseClient;
-	private boolean searchAll = false;
 	public static final RegExp DOI_REGEX = RegExp.compile("10[.]{1}[0-9]+[/]{1}(syn([0-9]+[.]?[0-9]*)+)$", "i");
 	
 	@Inject
 	public SearchBox(SearchBoxView view, 
 			GlobalApplicationState globalApplicationState,
-			AdapterFactory adapterFactory,
 			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
-		this.adapterFactory = adapterFactory;
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		view.setPresenter(this);
@@ -62,33 +58,13 @@ public class SearchBox implements SearchBoxView.Presenter, SynapseWidgetPresente
 				if (matcher != null && matcher.getGroupCount() > 0){
 					globalApplicationState.getPlaceChanger().goTo(new Synapse(matcher.getGroup(1)));
 				} else {
-					if(searchAll) {
-						SearchQuery query = SearchQueryUtils.getAllTypesSearchQuery();
-						query.setQueryTerm(Arrays.asList(value.split(" ")));
-						try {
-							value = query.writeToJSONObject(adapterFactory.createNew()).toJSONString();
-						} catch (JSONObjectAdapterException e) {
-							// if fail, fall back on regular search
-						}
-					}
 					SearchUtil.searchForTerm(value, globalApplicationState, synapseClient);
 				}
 			}
 		}
 	}
 
-
-	@Override
-	public void setSearchAll(boolean searchAll) {
-		this.searchAll = searchAll;
-	}
-
 	public void setVisible(boolean isVisible) {
 		view.setVisible(isVisible);
 	}
-
-	
-	/*
-	 * Private Methods
-	 */
 }
