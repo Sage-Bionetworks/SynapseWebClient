@@ -12,9 +12,9 @@
 				<b:Column size="XS_12">
 					<bh:Span ui:field="entityActionMenuContainer" addStyleNames="right"/>
 					<bh:Span ui:field="projectActionMenuContainer" addStyleNames="right"/>
-					<bh:Span addStyleNames="margin-left-15 margin-right-15">
+					<bh:Div addStyleNames="margin-left-15 margin-right-15">
 						<g:SimplePanel ui:field="projectMetadataContainer"/>
-					</bh:Span>
+					</bh:Div>
 					<w:LoadingSpinner size="40px" ui:field="loadingUI" addStyleNames="center-block center" />
 				</b:Column>
 			</b:Row>
