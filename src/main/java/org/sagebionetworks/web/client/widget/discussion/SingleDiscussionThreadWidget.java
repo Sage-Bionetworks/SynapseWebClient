@@ -70,7 +70,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	RequestBuilderWrapper requestBuilder;
 	AuthenticationController authController;
 	GlobalApplicationState globalApplicationState;
-	EditDiscussionThreadModal editThreadModal;
 	MarkdownWidget markdownWidget;
 	LoadMoreWidgetContainer repliesContainer;
 	SubscribeButtonWidget subscribeButtonWidget;
@@ -97,6 +96,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	Boolean isPinned;
 	PopupUtilsView popupUtils;
 	ClientCache clientCache;
+	String message;
 	
 	@Inject
 	public SingleDiscussionThreadWidget(
@@ -109,7 +109,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 			RequestBuilderWrapper requestBuilder,
 			AuthenticationController authController,
 			GlobalApplicationState globalApplicationState,
-			EditDiscussionThreadModal editThreadModal,
 			MarkdownWidget markdownWidget,
 			LoadMoreWidgetContainer loadMoreWidgetContainer,
 			SubscribeButtonWidget subscribeButtonWidget,
@@ -130,7 +129,7 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		this.requestBuilder = requestBuilder;
 		this.authController = authController;
 		this.globalApplicationState = globalApplicationState;
-		this.editThreadModal = editThreadModal;
+		
 		this.markdownWidget = markdownWidget;
 		this.repliesContainer = loadMoreWidgetContainer;
 		this.subscribeButtonWidget = subscribeButtonWidget;
@@ -144,7 +143,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setAuthor(authorWidget.asWidget());
-		view.setEditThreadModal(editThreadModal.asWidget());
 		view.setMarkdownWidget(markdownWidget.asWidget());
 		view.setSubscribeButtonWidget(subscribeButtonWidget.asWidget());
 		view.setNewReplyContainer(newReplyWidget.asWidget());
@@ -391,19 +389,9 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	}
 	
 	public void setMessage(String message) {
+		this.message = message;
 		markdownWidget.configure(message);
-		configureEditThreadModal(message);
 		clientCache.put(messageKey + WebConstants.MESSAGE_SUFFIX, message);
-	}
-
-	private void configureEditThreadModal(String message) {
-		editThreadModal.configure(threadId, title, message, new Callback(){
-
-			@Override
-			public void invoke() {
-				reconfigureThread();
-			}
-		});
 	}
 
 	public void configureReplies() {
@@ -520,6 +508,11 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 
 	@Override
 	public void onClickEditThread() {
+		EditDiscussionThreadModal editThreadModal = ginInjector.getEditDiscussionThreadModal();
+		view.setEditThreadModal(editThreadModal.asWidget());
+		editThreadModal.configure(threadId, title, message, () -> {
+			reconfigureThread();
+		});
 		editThreadModal.show();
 	}
 

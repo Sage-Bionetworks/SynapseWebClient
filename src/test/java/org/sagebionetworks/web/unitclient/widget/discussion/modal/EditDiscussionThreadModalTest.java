@@ -17,6 +17,7 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.discussion.modal.EditDiscussionThreadModal;
@@ -46,6 +47,8 @@ public class EditDiscussionThreadModalTest {
 	PopupUtilsView mockPopupUtilsView;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
+	@Mock
+	GlobalApplicationState mockGlobalApplicationState;
 
 	String threadId = "123";
 	String title = "title";
@@ -56,7 +59,7 @@ public class EditDiscussionThreadModalTest {
 	public void before() {
 		MockitoAnnotations.initMocks(this);
 		modal = new EditDiscussionThreadModal(mockView, mockDiscussionForumClient,
-				mockSynAlert, mockMarkdownEditor, mockPopupUtilsView);
+				mockSynAlert, mockMarkdownEditor, mockPopupUtilsView, mockGlobalApplicationState);
 		modal.configure(threadId, title, message, mockCallback);
 		when(mockMarkdownEditor.getMarkdown()).thenReturn(message);
 	}
@@ -78,12 +81,14 @@ public class EditDiscussionThreadModalTest {
 		verify(mockMarkdownEditor).hideUploadRelatedCommands();
 		verify(mockMarkdownEditor).showExternalImageButton();
 		verify(mockView).showDialog();
+		verify(mockGlobalApplicationState).setIsEditing(true);
 	}
 
 	@Test
 	public void testHideDialog() {
 		modal.hide();
 		verify(mockView).hideDialog();
+		verify(mockGlobalApplicationState).setIsEditing(false);
 	}
 
 	@Test

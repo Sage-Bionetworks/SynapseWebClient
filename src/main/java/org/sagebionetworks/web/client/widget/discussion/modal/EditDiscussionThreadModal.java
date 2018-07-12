@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.validation.ValidationResult;
@@ -33,6 +34,7 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 	private String title;
 	private String message;
 	Callback editThreadCallback;
+	GlobalApplicationState globalAppState;
 
 	@Inject
 	public EditDiscussionThreadModal(
@@ -40,7 +42,8 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 			DiscussionForumClientAsync discussionForumClient,
 			SynapseAlert synAlert,
 			MarkdownEditorWidget markdownEditor,
-			PopupUtilsView popupUtils
+			PopupUtilsView popupUtils,
+			GlobalApplicationState globalAppState
 			) {
 		this.view = view;
 		this.discussionForumClient = discussionForumClient;
@@ -48,6 +51,7 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 		this.synAlert = synAlert;
 		this.markdownEditor = markdownEditor;
 		this.popupUtils = popupUtils;
+		this.globalAppState = globalAppState;
 		view.setPresenter(this);
 		view.setAlert(synAlert.asWidget());
 		view.setModalTitle(EDIT_THREAD_MODAL_TITLE);
@@ -68,11 +72,13 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 		markdownEditor.hideUploadRelatedCommands();
 		markdownEditor.showExternalImageButton();
 		markdownEditor.configure(message);
+		globalAppState.setIsEditing(true);
 		view.showDialog();
 	}
 
 	@Override
 	public void hide() {
+		globalAppState.setIsEditing(false);
 		view.hideDialog();
 	}
 
@@ -101,7 +107,7 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 
 			@Override
 			public void onSuccess(DiscussionThreadBundle result) {
-				view.hideDialog();
+				hide();
 				view.showSuccess(SUCCESS_TITLE, SUCCESS_MESSAGE);
 				if (editThreadCallback != null) {
 					editThreadCallback.invoke();
@@ -115,10 +121,10 @@ public class EditDiscussionThreadModal implements DiscussionThreadModalView.Pres
 	public void onCancel() {
 		if (!markdownEditor.getMarkdown().equals(message)) {
 			popupUtils.showConfirmDialog(DisplayConstants.UNSAVED_CHANGES, DisplayConstants.NAVIGATE_AWAY_CONFIRMATION_MESSAGE, () -> {
-				view.hideDialog();
+				hide();
 			});
 		} else {
-			view.hideDialog();
+			hide();
 		}
 	}
 

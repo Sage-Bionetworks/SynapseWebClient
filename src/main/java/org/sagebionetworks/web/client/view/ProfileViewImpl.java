@@ -46,7 +46,6 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.safehtml.shared.SafeHtmlBuilder;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -61,7 +60,6 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
-import com.google.gwt.user.datepicker.client.CalendarUtil;
 import com.google.inject.Inject;
 
 public class ProfileViewImpl extends Composite implements ProfileView {
@@ -280,6 +278,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	private Header headerWidget;
 	@UiField
 	Text createdOnText;
+	@UiField
+	Div createdOnUI;
 	//View profile widgets
 	private static HTML defaultProfilePicture = new HTML(DisplayUtils.getFontAwesomeIcon("user font-size-150 lightGreyText"));
 	private SynapseJSNIUtils synapseJSNIUtils;
@@ -730,8 +730,10 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		 urlField.setHref(url);
 		 synapseEmailField.setText(userName+"@synapse.org");
 		 if (createdOn != null) {
+			 createdOnUI.setVisible(true);
 			 createdOnText.setText(dateTimeUtils.getRelativeTime(createdOn, true));			 
 		 } else {
+			 createdOnUI.setVisible(false);
 			 createdOnText.setText("");
 		 }
 	}
