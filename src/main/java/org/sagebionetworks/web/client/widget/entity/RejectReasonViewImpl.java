@@ -1,17 +1,12 @@
 package org.sagebionetworks.web.client.widget.entity;
 
-import org.gwtbootstrap3.client.shared.event.ModalShownEvent;
-import org.gwtbootstrap3.client.shared.event.ModalShownHandler;
 import org.gwtbootstrap3.client.ui.*;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.presenter.RejectReasonWidget;
 import org.sagebionetworks.web.client.utils.Callback;
 
-import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -75,14 +70,14 @@ public class RejectReasonViewImpl implements RejectReasonView {
         primaryButton.addClickHandler(event -> presenter.onSave());
         primaryButton.addDomHandler(DisplayUtils.getPreventTabHandler(primaryButton), KeyDownEvent.getType());
 
-        ClickHandler handler = event -> presenter.getResponse();
+        ClickHandler handler = event -> presenter.updateResponse();
 
         generateButton.addClickHandler(handler);
-        optionOne.setText(RejectReasonWidget.RESPONSE[0]);
-        optionTwo.setText(RejectReasonWidget.RESPONSE[1]);
-        optionThree.setText(RejectReasonWidget.RESPONSE[2]);
-        optionFour.setText(RejectReasonWidget.RESPONSE[3]);
-
+        optionOne.setText(RejectReasonWidget.REJECT_TAKE_SYNAPSE_QZ);
+        optionTwo.setText(RejectReasonWidget.REJECT_ADD_INFO);
+        optionThree.setText(RejectReasonWidget.REJECT_INITIAL_BOX);
+        optionFour.setText(RejectReasonWidget.REJECT_SUBMIT_DOCS);
+        optionFive.setText(RejectReasonWidget.REJECT_CUSTOM_REASON);
     }
 
 

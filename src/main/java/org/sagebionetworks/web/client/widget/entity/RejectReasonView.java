@@ -68,7 +68,7 @@ public interface RejectReasonView extends IsWidget {
      * Presenter interface
      */
     public interface Presenter {
-        void getResponse();
+        void updateResponse();
         void onSave();
     }
 

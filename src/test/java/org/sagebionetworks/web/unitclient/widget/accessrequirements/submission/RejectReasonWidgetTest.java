@@ -37,15 +37,17 @@ public class RejectReasonWidgetTest {
     @Mock
     Throwable mockThrowable;
 
-    String MOCK_TEMPLATE_HEADER_HELLO = RejectReasonWidget.TEMPLATE_HEADER_HELLO;
-    String MOCK_TEMPLATE_HEADER_THANKS = RejectReasonWidget.TEMPLATE_HEADER_THANKS;
-    String MOCK_TEMPLATE_HEADER_SIGNATURE = RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
-    String [] MOCK_TEMPLATE_RESPONSE = RejectReasonWidget.RESPONSE;
-    String MOCK_ERROR_MESSAGE = RejectReasonWidget.ERROR_MESSAGE;
+    static String MOCK_TEMPLATE_HEADER_HELLO = RejectReasonWidget.TEMPLATE_HEADER_HELLO;
+    static String MOCK_TEMPLATE_HEADER_THANKS = RejectReasonWidget.TEMPLATE_HEADER_THANKS;
+    static String MOCK_TEMPLATE_HEADER_SIGNATURE = RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
 
+    static String MOCK_REJECT_TAKE_SYNAPSE_QZ =  RejectReasonWidget.REJECT_TAKE_SYNAPSE_QZ;
+    static String MOCK_REJECT_ADD_INFO = RejectReasonWidget.REJECT_ADD_INFO;
+    static String MOCK_ERROR_MESSAGE = RejectReasonWidget.ERROR_MESSAGE;
 
     public static final String USER_ID = "0";
     public static final String USER_DISPLAY_NAME = "JOHN DOE";
+    public static final String MOCK_CUSTOM_RESPONSE = "Fill out paperwork";
 
 
     @Before
@@ -57,7 +59,6 @@ public class RejectReasonWidgetTest {
         when(mockView.optionThreeIsUsed()).thenReturn(false);
         when(mockView.optionFourIsUsed()).thenReturn(false);
         when(mockView.optionFiveIsUsed()).thenReturn(false);
-
         widget = new RejectReasonWidget(
             mockHandler,
             mockView
@@ -79,6 +80,7 @@ public class RejectReasonWidgetTest {
         // call
         widget.show(USER_ID, getReasonCallback);
         // verify/assert
+        // TODO: Find a way to verify username is set to JOHN DOE
         verify(mockHandler).getUserProfile(eq(USER_ID), any(AsyncCallback.class));
         verify(mockView).show();
     }
@@ -91,7 +93,7 @@ public class RejectReasonWidgetTest {
         // call
         widget.show(USER_ID, getReasonCallback);
         // verify/assert
-        verify(mockView).showError(eq( "Could not find user with id --" + USER_ID));
+        verify(mockView).showError(eq( "Could not find user id -- " + USER_ID + "\nError -- " + mockThrowable.getMessage()));
         verify(mockView).show();
     }
 
@@ -99,18 +101,18 @@ public class RejectReasonWidgetTest {
         Test functionality clicking single checkboxes
     */
     @Test
-    public void testGetResponseWithOneOptions() {
+    public void testUpdateResponseWithOneOptions() {
         // setup
         String exp = MOCK_TEMPLATE_HEADER_HELLO +  MOCK_TEMPLATE_HEADER_THANKS;
         // add response one
-        exp += "\n\t" + MOCK_TEMPLATE_RESPONSE[0] + "\n";
+        exp += "\n\t" + MOCK_REJECT_TAKE_SYNAPSE_QZ + "\n";
         // add signature
         exp += "\n" + MOCK_TEMPLATE_HEADER_SIGNATURE;
         // first checkbox used
         when(mockView.optionOneIsUsed()).thenReturn(true);
         when(mockView.getValue()).thenReturn(exp);
 
-        widget.getResponse();
+        widget.updateResponse();
 
         // verify that clear and get value were called
         verify(mockView).setValue(eq(exp));
@@ -123,38 +125,52 @@ public class RejectReasonWidgetTest {
         the textarea
      */
     @Test
-    public void testGetResponseWithThreeOptions() {
+    public void testUpdateResponseWithThreeOptions() {
         String exp = MOCK_TEMPLATE_HEADER_HELLO + MOCK_TEMPLATE_HEADER_THANKS;
         // add response one
-        exp += "\n\t" + MOCK_TEMPLATE_RESPONSE[0] + "\n";
-        exp += "\n\t" + MOCK_TEMPLATE_RESPONSE[1] + "\n";
-        exp += "\n\tFill out paperwork\n"; // TODO: change to const
+        exp += "\n\t" + MOCK_REJECT_TAKE_SYNAPSE_QZ + "\n";
+        exp += "\n\t" + MOCK_REJECT_ADD_INFO + "\n";
+        exp += "\n\t" + MOCK_CUSTOM_RESPONSE + "\n";
         // add signature
         exp += "\n"  + MOCK_TEMPLATE_HEADER_SIGNATURE;
         // first two checkboxes are used
         when(mockView.optionOneIsUsed()).thenReturn(true);
         when(mockView.optionTwoIsUsed()).thenReturn(true);
         when(mockView.optionFiveIsUsed()).thenReturn(true);
-        when(mockView.getCustomTextResponse()).thenReturn("Fill out paperwork");
+        when(mockView.getCustomTextResponse()).thenReturn(MOCK_CUSTOM_RESPONSE);
         when(mockView.getValue()).thenReturn(exp);
 
-        widget.getResponse();
+        widget.updateResponse();
 
-
-        // TODO: verify set value called and called with exp
         verify(mockView).setValue(eq(exp));
         verify(mockView).clear();
     }
 
     @Test
-    public void testGetResponseNone() {
+    public void testUpdateResponseNone() {
         when(mockView.getValue()).thenReturn("");
-        widget.getResponse();
+
+        widget.updateResponse();
+
         verify(mockView).showError(MOCK_ERROR_MESSAGE);
     }
 
     @Test
-    public void testOnSave() {
+    public void testOnSaveWithText() {
+        when(mockView.getValue()).thenReturn("");
 
+        widget.onSave();
+
+        verify(mockView).showError(eq(MOCK_ERROR_MESSAGE));
+    }
+
+    @Test
+    public void testOnSaveNoText() {
+        when(mockView.getValue()).thenReturn("canned response");
+
+        widget.onSave();
+
+        verify(mockView).clear();
+        verify(mockView).hide();
     }
 }

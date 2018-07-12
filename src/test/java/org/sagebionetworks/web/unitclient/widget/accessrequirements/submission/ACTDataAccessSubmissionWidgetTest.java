@@ -284,16 +284,19 @@ public class ACTDataAccessSubmissionWidgetTest {
 	
 	@Test
 	public void testUpdateDataAccessSubmissionState() {
+	    // initially they are not rejected
 		widget.configure(mockDataAccessSubmission);
+		// they now get rejected
 		widget.onReject();
-		verify(mockPromptModalRenderer).show(anyString(),  promptModalPresenterCaptor.capture());
-		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 
+		verify(mockPromptModalRenderer).show(anyString(),  promptModalPresenterCaptor.capture());
+
+		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 		String rejectionReason = "missing info";
+
 		when(mockPromptModalRenderer.getValue()).thenReturn(rejectionReason);
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.REJECTED);
 		when(mockDataAccessSubmission.getRejectedReason()).thenReturn(rejectionReason);
-
 
 		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 		confirmRejectionCallback.invoke(rejectionReason);

@@ -14,24 +14,21 @@ import org.sagebionetworks.web.client.widget.entity.RejectReasonView;
 public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget {
 
 
+    // Template rejection format
     public static String TEMPLATE_HEADER_HELLO = "Hi ";
-
     public static String TEMPLATE_HEADER_THANKS = ",\n\nThank you for submitting your Synapse" +
             " profile for validation. Before I can accept your request, you need to:\n";
-
     public static String TEMPLATE_HEADER_SIGNATURE = "Let us know if you have any questions.\n\nRegards,\nact@sagebase.org";
 
+    // If no options are shown for rejected reason
     public static String ERROR_MESSAGE = "Error: Please select at least one checkbox and generate a response or manually enter a response";
 
-    // TODO: Change out response to individual strings
-    public static String [] RESPONSE = new String[]{
-            "Take and pass the Synapse Certification quiz. ",
-            "Add at least one piece of information (education, employment, etc.) to your ORCID profile and set it to “public. ",
-            "Physically initial each box, sign and date the Synapse Oath. ",
-            "Submit an accepted form of identity attestation documentation (e.g., letter from a signing official). ",
-            "custom text to insert"
-    };
-
+    // Common reasons for user rejection
+    public static String REJECT_TAKE_SYNAPSE_QZ = "Take and pass the Synapse Certification quiz. ";
+    public static String REJECT_ADD_INFO = "Add at least one piece of information (education, employment, etc.) to your ORCID profile and set it to “public. ";
+    public static String REJECT_INITIAL_BOX = "Add at least one piece of information (education, employment, etc.) to your ORCID profile and set it to “public. ";
+    public static String REJECT_SUBMIT_DOCS = "Submit an accepted form of identity attestation documentation (e.g., letter from a signing official). ";
+    public static String REJECT_CUSTOM_REASON = "custom text to insert";
 
     private String userName;
     private RejectReasonView view;
@@ -59,7 +56,7 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
         return this.userName;
     }
 
-    // TODO: Remove when feature is in prod
+    // TODO: Remove when feature is in prod, used for demo purposes in ComingSoon
     public void setUserProfileName(String user) {
         this.userName = user;
     }
@@ -68,7 +65,7 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
         handler.getUserProfile(userID, new AsyncCallback<UserProfile>() {
             @Override
             public void onFailure(Throwable throwable) {
-                view.showError("Could not find user id -- " + userID + "\n Error -- " +  throwable.getMessage());
+                view.showError("Could not find user id -- " + userID + "\nError -- " +  throwable.getMessage());
                 view.show();
             }
 
@@ -81,12 +78,12 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
         this.callback = callback;
     }
 
-    // TODO: Remove when feature is in prod
+    // TODO: Remove when feature is in prod, used for demo purposes in ComingSoon
     public void show(String userID) {
         handler.getUserProfile(userID, new AsyncCallback<UserProfile>() {
             @Override
             public void onFailure(Throwable throwable) {
-                setUserProfileName("John Doe"); // TODO: Change in prod
+                setUserProfileName("John Doe");
                 view.show();
             }
 
@@ -99,20 +96,20 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
     }
 
     @Override
-    public void getResponse() {
+    public void updateResponse() {
         String output = "";
 
         if (view.optionOneIsUsed()) {
-            output += "\n\t" + RESPONSE[0] + "\n";
+            output += "\n\t" + REJECT_TAKE_SYNAPSE_QZ + "\n";
         }
         if (view.optionTwoIsUsed()) {
-            output += "\n\t" + RESPONSE[1] + "\n";
+            output += "\n\t" + REJECT_ADD_INFO + "\n";
         }
         if (view.optionThreeIsUsed()) {
-            output += "\n\t" + RESPONSE[2] + "\n";
+            output += "\n\t" + REJECT_INITIAL_BOX + "\n";
         }
         if (view.optionFourIsUsed()) {
-            output += "\n\t" + RESPONSE[3] + "\n";
+            output += "\n\t" + REJECT_SUBMIT_DOCS + "\n";
         }
         if (view.optionFiveIsUsed()) {
             output += "\n\t" + view.getCustomTextResponse() + "\n";
