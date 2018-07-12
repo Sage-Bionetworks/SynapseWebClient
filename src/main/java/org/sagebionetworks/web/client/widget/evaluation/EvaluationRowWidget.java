@@ -114,10 +114,18 @@ public class EvaluationRowWidget implements IsWidget {
 		SubmissionQuota quota = evaluation.getQuota();
 		quotaUI.setVisible(quota != null);
 		if (quota != null) {
-			roundStart.setText(dateTimeUtils.getDateString(quota.getFirstRoundStart()));
-			submissionLimitField.setText(quota.getSubmissionLimit().toString());
-			numberOfRoundsField.setText(quota.getNumberOfRounds().toString());
-			roundDurationField.setText(quota.getRoundDurationMillis().toString());
+			if (quota.getFirstRoundStart() != null ) {
+				roundStart.setText(dateTimeUtils.getDateString(quota.getFirstRoundStart()));	
+			}
+			if (quota.getSubmissionLimit() != null) {
+				submissionLimitField.setText(quota.getSubmissionLimit().toString());	
+			}
+			if (quota.getNumberOfRounds() != null) {
+				numberOfRoundsField.setText(quota.getNumberOfRounds().toString());	
+			}
+			if (quota.getRoundDurationMillis() != null) {
+				roundDurationField.setText(quota.getRoundDurationMillis().toString());	
+			}
 		}
 	}
 	

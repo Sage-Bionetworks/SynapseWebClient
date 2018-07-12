@@ -159,10 +159,11 @@ public class SingleDiscussionThreadWidgetTest {
 		when(mockGinInjector.getUserBadgeWidget()).thenReturn(mockUserBadge);
 		when(mockGinInjector.getReplyCountAlert()).thenReturn(mockRefreshAlert);
 		when(mockGinInjector.getSynapseProperties()).thenReturn(mockSynapseProperties);
+		when(mockGinInjector.getEditDiscussionThreadModal()).thenReturn(mockEditThreadModal);
 		discussionThreadWidget = new SingleDiscussionThreadWidget(mockView, mockSynAlert,
 				mockAuthorWidget, mockDiscussionForumClientAsync, mockGinInjector,
 				mockDateTimeUtils, mockRequestBuilder, mockAuthController,
-				mockGlobalApplicationState, mockEditThreadModal, mockMarkdownWidget,
+				mockGlobalApplicationState, mockMarkdownWidget,
 				mockRepliesContainer, mockSubscribeButtonWidget, mockNewReplyWidget,
 				mockNewReplyWidget, mockSubscribersWidget, mockSynapseJavascriptClient,
 				mockPopupUtils, mockClientCache);
@@ -176,7 +177,6 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockView).setPresenter(discussionThreadWidget);
 		verify(mockView).setAlert(any(Widget.class));
 		verify(mockView).setAuthor(any(Widget.class));
-		verify(mockView).setEditThreadModal(any(Widget.class));
 		verify(mockView).setSubscribeButtonWidget(any(Widget.class));
 		verify(mockView).setSubscribersWidget(any(Widget.class));
 		verify(mockSubscribeButtonWidget).showIconOnly();
@@ -838,9 +838,14 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockSynAlert, never()).handleException(any(Throwable.class));
 		verify(mockMarkdownWidget).configure(anyString());
 		verify(mockView).setDeleteIconVisible(false);
-		verify(mockEditThreadModal).configure(anyString(), anyString(), anyString(), any(Callback.class));
+		// edit thread modal is not configured until edit
+		verify(mockEditThreadModal, never()).configure(anyString(), anyString(), anyString(), any(Callback.class));
 		verify(mockView).setLoadingMessageVisible(true);
 		verify(mockView).setLoadingMessageVisible(false);
+		
+		discussionThreadWidget.onClickEditThread();
+		verify(mockView).setEditThreadModal(any());
+		verify(mockEditThreadModal).configure(anyString(), anyString(), eq(message), any(Callback.class));
 	}
 	
 	@Test
