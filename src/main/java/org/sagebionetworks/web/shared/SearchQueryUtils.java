@@ -14,7 +14,7 @@ import static org.sagebionetworks.repo.model.search.query.SearchFieldName.*;
 public class SearchQueryUtils {
 
 	public static final String PROJECT_NODE_TYPE = "project";
-	public static final long MAX_FACET_VALUES_COUNT = 100L;
+	public static final long MAX_FACET_VALUES_COUNT = 300L;
 	public static final Long LIMIT = 30L;
 	public static SearchQuery getDefaultSearchQuery() {		
 		SearchQuery query = getBaseSearchQuery();
