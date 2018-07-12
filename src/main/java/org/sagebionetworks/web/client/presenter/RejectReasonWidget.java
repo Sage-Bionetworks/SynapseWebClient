@@ -52,7 +52,7 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
         For testing purposes only relay the userName to assert
         that its being properly found.
      */
-    private String getUserName() {
+    public String getUserName() {
         return this.userName;
     }
 

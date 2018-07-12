@@ -45,11 +45,10 @@ public class RejectReasonWidgetTest {
     static String MOCK_REJECT_ADD_INFO = RejectReasonWidget.REJECT_ADD_INFO;
     static String MOCK_ERROR_MESSAGE = RejectReasonWidget.ERROR_MESSAGE;
 
-    public static final String USER_ID = "0";
-    public static final String USER_DISPLAY_NAME = "JOHN DOE";
+    public static final String MOCK_USER_ID = "0";
+    public static final String MOCK_USER_DISPLAY_NAME = "JOHN DOE";
     public static final String MOCK_CUSTOM_RESPONSE = "Fill out paperwork";
-
-
+    
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
@@ -76,24 +75,25 @@ public class RejectReasonWidgetTest {
     public void testShowOnSuccess() {
         // verify username
         // setup
+        when(mockUserProfile.getUserName()).thenReturn(MOCK_USER_DISPLAY_NAME);
         AsyncMockStubber.callSuccessWith(mockUserProfile).when(mockHandler).getUserProfile(anyString(), any(AsyncCallback.class));
         // call
-        widget.show(USER_ID, getReasonCallback);
+        widget.show(MOCK_USER_ID, getReasonCallback);
         // verify/assert
-        // TODO: Find a way to verify username is set to JOHN DOE
-        verify(mockHandler).getUserProfile(eq(USER_ID), any(AsyncCallback.class));
+        verify(mockHandler).getUserProfile(eq(MOCK_USER_ID), any(AsyncCallback.class));
         verify(mockView).show();
+        assertEquals(MOCK_USER_DISPLAY_NAME, widget.getUserName());
     }
 
     @Test
     public void testShowOnFailure() {
         // setup
-        when(mockThrowable.getMessage()).thenReturn(USER_ID);
+        when(mockThrowable.getMessage()).thenReturn(MOCK_USER_ID);
         AsyncMockStubber.callFailureWith(mockThrowable).when(mockHandler).getUserProfile(anyString(), any(AsyncCallback.class));
         // call
-        widget.show(USER_ID, getReasonCallback);
+        widget.show(MOCK_USER_ID, getReasonCallback);
         // verify/assert
-        verify(mockView).showError(eq( "Could not find user id -- " + USER_ID + "\nError -- " + mockThrowable.getMessage()));
+        verify(mockView).showError(eq( "Could not find user id -- " + MOCK_USER_ID + "\nError -- " + mockThrowable.getMessage()));
         verify(mockView).show();
     }
 
