@@ -948,7 +948,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(RenameEntityModalWidget.class).to(RenameEntityModalWidgetImpl.class);
 
 		// Rejected Reason
-        bind(RejectReasonView.class).to(RejectReasonViewImpl.class);
+		bind(RejectReasonView.class).to(RejectReasonViewImpl.class);
 
 		// FileBox
 		bind(FileTitleBarView.class).to(FileTitleBarViewImpl.class).in(Singleton.class);

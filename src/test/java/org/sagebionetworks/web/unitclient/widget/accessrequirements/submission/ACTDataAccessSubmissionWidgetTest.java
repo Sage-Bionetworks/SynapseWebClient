@@ -33,7 +33,6 @@ import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.presenter.RejectReasonWidget;
-import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
@@ -58,7 +57,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	DataAccessClientAsync mockClient;
 	@Mock
-	RejectReasonWidget mockPromptModalRenderer;
+	RejectReasonWidget mockPromptModalWidget;
 	@Mock
 	FileHandleWidget mockDucFileRenderer;
 	@Mock
@@ -111,8 +110,8 @@ public class ACTDataAccessSubmissionWidgetTest {
 		
 		widget = new ACTDataAccessSubmissionWidget(mockView, 
 				mockSynapseAlert, 
-				mockClient, 
-				mockPromptModalRenderer,
+				mockClient,
+				mockPromptModalWidget,
 				mockDucFileRenderer, 
 				mockIrbFileRenderer, 
 				mockFileHandleList, 
@@ -289,12 +288,11 @@ public class ACTDataAccessSubmissionWidgetTest {
 		// they now get rejected
 		widget.onReject();
 
-		verify(mockPromptModalRenderer).show(anyString(),  promptModalPresenterCaptor.capture());
+		verify(mockPromptModalWidget).show(anyString(),  promptModalPresenterCaptor.capture());
 
 		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 		String rejectionReason = "missing info";
 
-		when(mockPromptModalRenderer.getValue()).thenReturn(rejectionReason);
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.REJECTED);
 		when(mockDataAccessSubmission.getRejectedReason()).thenReturn(rejectionReason);
 

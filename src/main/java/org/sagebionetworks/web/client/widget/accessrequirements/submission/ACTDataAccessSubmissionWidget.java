@@ -193,8 +193,8 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	public void onReject() {
 		//prompt for reason
 		String userID = submission.getId();
-		promptDialog.show(userID, (String param) -> {
-			updateDataAccessSubmissionState(SubmissionState.REJECTED, promptDialog.getValue());
+		promptDialog.show(userID, rejectionReason -> {
+			updateDataAccessSubmissionState(SubmissionState.REJECTED, rejectionReason);
 			}
 		);
 	}

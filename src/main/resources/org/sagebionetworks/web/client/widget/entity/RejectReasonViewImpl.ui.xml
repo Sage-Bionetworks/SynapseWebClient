@@ -10,20 +10,20 @@
         <b:ModalBody>
             <bh:Div>
                 <b:FormGroup>
-                    <b:CheckBox ui:field="optionOne"   text="Take and pass the Synapse Certification quiz. "/>
-                    <b:CheckBox ui:field="optionTwo"   text="Add at least one piece of information (education, employment, etc.) to your ORCID profile and set it to “public. "/>
-                    <b:CheckBox ui:field="optionThree" text="Physically initial each box, sign and date the Synapse Oath. "/>
-                    <b:CheckBox ui:field="optionFour"  text="Submit an accepted form of identity attestation documentation (e.g., letter from a signing official). "/>
-                    <b:CheckBox ui:field="optionFive"  text="custom text to insert"/>
+                    <b:CheckBox ui:field="optionOne"/>
+                    <b:CheckBox ui:field="optionTwo"/>
+                    <b:CheckBox ui:field="optionThree"/>
+                    <b:CheckBox ui:field="optionFour"/>
+                    <b:CheckBox ui:field="optionFive"/>
                     <bh:Div>
-                        <b:TextArea b:id="formName" ui:field="customText" visibleLines="5"/>
+                        <b:TextArea ui:field="customText" visibleLines="5"/>
                     </bh:Div>
                 </b:FormGroup>
             </bh:Div>
             <bh:Div>
                 <b:FormGroup>
                     <b:Button ui:field="generateButton" type="PRIMARY" text="Generate Response"></b:Button>
-                    <b:TextArea b:id="formName" ui:field="nameField" visibleLines="8"/>
+                    <b:TextArea ui:field="nameField" visibleLines="9"/>
                 </b:FormGroup>
             </bh:Div>
             <b:Alert ui:field="alert" type="DANGER" visible="false"></b:Alert>

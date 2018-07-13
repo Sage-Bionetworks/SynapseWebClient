@@ -41,26 +41,20 @@ public interface RejectReasonView extends IsWidget {
     void clear();
 
     /**
-     * Set loading state.
-     * @param isLoading
-     */
-    void setLoading(boolean isLoading);
-
-    /**
      * Set Presenter
      * @param presenter
      */
     void setPresenter (Presenter presenter);
 
-    boolean optionOneIsUsed();
+    boolean isOptionOneUsed();
 
-    boolean optionTwoIsUsed();
+    boolean isOptionTwoUsed();
 
-    boolean optionThreeIsUsed();
+    boolean isOptionThreeUsed();
 
-    boolean optionFourIsUsed();
+    boolean isOptionFourUsed();
 
-    boolean optionFiveIsUsed();
+    boolean isOptionFiveUsed();
 
     String getCustomTextResponse();
 

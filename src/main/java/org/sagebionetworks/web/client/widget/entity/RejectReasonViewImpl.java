@@ -75,30 +75,30 @@ public class RejectReasonViewImpl implements RejectReasonView {
         generateButton.addClickHandler(handler);
         optionOne.setText(RejectReasonWidget.REJECT_TAKE_SYNAPSE_QZ);
         optionTwo.setText(RejectReasonWidget.REJECT_ADD_INFO);
-        optionThree.setText(RejectReasonWidget.REJECT_INITIAL_BOX);
+        optionThree.setText(RejectReasonWidget.REJECT_PHYSICALLY_INITIAL);
         optionFour.setText(RejectReasonWidget.REJECT_SUBMIT_DOCS);
         optionFive.setText(RejectReasonWidget.REJECT_CUSTOM_REASON);
     }
 
 
-    public boolean optionOneIsUsed () {
+    public boolean isOptionOneUsed() {
         return optionOne.getValue();
     }
 
 
-    public boolean optionTwoIsUsed () {
+    public boolean isOptionTwoUsed() {
         return optionTwo.getValue();
     }
 
-    public boolean optionThreeIsUsed () {
+    public boolean isOptionThreeUsed() {
         return optionThree.getValue();
     }
 
-    public boolean optionFourIsUsed () {
+    public boolean isOptionFourUsed() {
         return optionFour.getValue();
     }
 
-    public boolean optionFiveIsUsed () {
+    public boolean isOptionFiveUsed() {
         return optionFive.getValue();
     }
 
@@ -146,15 +146,6 @@ public class RejectReasonViewImpl implements RejectReasonView {
     public void clear() {
         this.alert.setVisible(false);
         this.primaryButton.state().reset();
-    }
-
-    @Override
-    public void setLoading(boolean isLoading) {
-        if(isLoading){
-            this.primaryButton.state().loading();
-        }else{
-            this.primaryButton.state().reset();
-        }
     }
 
 }

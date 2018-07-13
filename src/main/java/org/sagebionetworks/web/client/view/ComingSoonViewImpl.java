@@ -38,8 +38,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 	@UiField
 	Button testDownloadSpeedButton;
 	@UiField
-	Button testProfileValidation;
-	@UiField
 	Heading downloadSpeedResult;
 	
 	private Presenter presenter;
@@ -55,8 +53,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 			AuthenticationController authenticationController,
 			GoogleMap map,
 			JSONObjectAdapter jsonObjectAdapter,
-			RejectReasonWidget rejectReasonWidget,
-			DownloadSpeedTester downloadSpeedTester) {		
+			DownloadSpeedTester downloadSpeedTester) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.jsonObjectAdapter = jsonObjectAdapter;
@@ -76,9 +73,6 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		};
 		testDownloadSpeedButton.addClickHandler(event -> {
 			downloadSpeedTester.testDownloadSpeed(downloadSpeedCallback);
-		});
-		testProfileValidation.addClickHandler(event -> {
-			rejectReasonWidget.show("0");
 		});
 	}
 	

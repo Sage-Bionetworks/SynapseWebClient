@@ -25,8 +25,8 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
 
     // Common reasons for user rejection
     public static String REJECT_TAKE_SYNAPSE_QZ = "Take and pass the Synapse Certification quiz. ";
-    public static String REJECT_ADD_INFO = "Add at least one piece of information (education, employment, etc.) to your ORCID profile and set it to “public. ";
-    public static String REJECT_INITIAL_BOX = "Add at least one piece of information (education, employment, etc.) to your ORCID profile and set it to “public. ";
+    public static String REJECT_ADD_INFO = "Add at least one piece of information (education, employment, etc.) to your ORCID profile and set it to \"public.\" ";
+    public static String REJECT_PHYSICALLY_INITIAL = "Physically initial each box, sign and date the Synapse Oath. ";
     public static String REJECT_SUBMIT_DOCS = "Submit an accepted form of identity attestation documentation (e.g., letter from a signing official). ";
     public static String REJECT_CUSTOM_REASON = "custom text to insert";
 
@@ -40,8 +40,6 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
         this.handler = handler;
         this.view = view;
         this.view.setPresenter(this);
-        this.userName = "";
-        this.callback = null;
     }
 
     private void setUserProfileName(UserProfile user) {
@@ -62,6 +60,10 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
     }
 
     public void show(String userID, CallbackP<String> callback) {
+        this.userName = "";
+        this.callback = null;
+        this.view.clear();
+
         handler.getUserProfile(userID, new AsyncCallback<UserProfile>() {
             @Override
             public void onFailure(Throwable throwable) {
@@ -80,6 +82,10 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
 
     // TODO: Remove when feature is in prod, used for demo purposes in ComingSoon
     public void show(String userID) {
+        this.userName = "";
+        this.callback = null;
+        this.view.clear();
+
         handler.getUserProfile(userID, new AsyncCallback<UserProfile>() {
             @Override
             public void onFailure(Throwable throwable) {
@@ -99,19 +105,19 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
     public void updateResponse() {
         String output = "";
 
-        if (view.optionOneIsUsed()) {
+        if (view.isOptionOneUsed()) {
             output += "\n\t" + REJECT_TAKE_SYNAPSE_QZ + "\n";
         }
-        if (view.optionTwoIsUsed()) {
+        if (view.isOptionTwoUsed()) {
             output += "\n\t" + REJECT_ADD_INFO + "\n";
         }
-        if (view.optionThreeIsUsed()) {
-            output += "\n\t" + REJECT_INITIAL_BOX + "\n";
+        if (view.isOptionThreeUsed()) {
+            output += "\n\t" + REJECT_PHYSICALLY_INITIAL + "\n";
         }
-        if (view.optionFourIsUsed()) {
+        if (view.isOptionFourUsed()) {
             output += "\n\t" + REJECT_SUBMIT_DOCS + "\n";
         }
-        if (view.optionFiveIsUsed()) {
+        if (view.isOptionFiveUsed()) {
             output += "\n\t" + view.getCustomTextResponse() + "\n";
         }
 
@@ -123,10 +129,6 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
         }
 
         view.setValue(TEMPLATE_HEADER_HELLO + this.getUserName() + TEMPLATE_HEADER_THANKS + output + "\n" + TEMPLATE_HEADER_SIGNATURE);
-    }
-
-    public String getValue () {
-        return view.getValue();
     }
 
     @Override

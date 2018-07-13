@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -46,22 +47,14 @@ public class RejectReasonWidgetTest {
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
 
-        when(mockView.optionOneIsUsed()).thenReturn(false);
-        when(mockView.optionTwoIsUsed()).thenReturn(false);
-        when(mockView.optionThreeIsUsed()).thenReturn(false);
-        when(mockView.optionFourIsUsed()).thenReturn(false);
-        when(mockView.optionFiveIsUsed()).thenReturn(false);
-        widget = new RejectReasonWidget(
-            mockHandler,
-            mockView
-        );
+        when(mockView.isOptionOneUsed()).thenReturn(false);
+        when(mockView.isOptionTwoUsed()).thenReturn(false);
+        when(mockView.isOptionThreeUsed()).thenReturn(false);
+        when(mockView.isOptionFourUsed()).thenReturn(false);
+        when(mockView.isOptionFiveUsed()).thenReturn(false);
 
-    }
+        widget = new RejectReasonWidget(mockHandler, mockView);
 
-    // Test Interface
-    @Test
-    public void testConstruction() {
-        verify(mockView).setPresenter(widget);
     }
 
     @Test
@@ -73,6 +66,7 @@ public class RejectReasonWidgetTest {
         // call
         widget.show(MOCK_USER_ID, getReasonCallback);
         // verify/assert
+        verify(mockView).setPresenter(widget);
         verify(mockHandler).getUserProfile(eq(MOCK_USER_ID), any(AsyncCallback.class));
         verify(mockView).show();
         assertEquals(MOCK_USER_DISPLAY_NAME, widget.getUserName());
@@ -82,7 +76,7 @@ public class RejectReasonWidgetTest {
 
         widget.onSave();
 
-        verify(mockView).clear();
+        verify(mockView, times(2)).clear(); // called once for show, second for onSave
         verify(mockView).hide();
         verify(getReasonCallback).invoke(MOCK_CANNED_RESPONSE);
     }
@@ -105,13 +99,13 @@ public class RejectReasonWidgetTest {
     @Test
     public void testUpdateResponseWithOneOptions() {
         // setup
-        String exp = RejectReasonWidget.TEMPLATE_HEADER_HELLO  +  RejectReasonWidget.TEMPLATE_HEADER_THANKS;
+        String exp = RejectReasonWidget.TEMPLATE_HEADER_HELLO  + "null" +  RejectReasonWidget.TEMPLATE_HEADER_THANKS;
         // add response one
         exp += "\n\t" + RejectReasonWidget.REJECT_TAKE_SYNAPSE_QZ  + "\n";
         // add signature
         exp += "\n" + RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
         // first checkbox used
-        when(mockView.optionOneIsUsed()).thenReturn(true);
+        when(mockView.isOptionOneUsed()).thenReturn(true);
         when(mockView.getValue()).thenReturn(exp);
 
         widget.updateResponse();
@@ -128,7 +122,7 @@ public class RejectReasonWidgetTest {
      */
     @Test
     public void testUpdateResponseWithThreeOptions() {
-        String exp = RejectReasonWidget.TEMPLATE_HEADER_HELLO + RejectReasonWidget.TEMPLATE_HEADER_THANKS;
+        String exp = RejectReasonWidget.TEMPLATE_HEADER_HELLO + "null" +  RejectReasonWidget.TEMPLATE_HEADER_THANKS;
         // add response one
         exp += "\n\t" + RejectReasonWidget.REJECT_TAKE_SYNAPSE_QZ + "\n";
         exp += "\n\t" + RejectReasonWidget.REJECT_ADD_INFO + "\n";
@@ -136,9 +130,9 @@ public class RejectReasonWidgetTest {
         // add signature
         exp += "\n"  + RejectReasonWidget.TEMPLATE_HEADER_SIGNATURE;
         // first two checkboxes are used
-        when(mockView.optionOneIsUsed()).thenReturn(true);
-        when(mockView.optionTwoIsUsed()).thenReturn(true);
-        when(mockView.optionFiveIsUsed()).thenReturn(true);
+        when(mockView.isOptionOneUsed()).thenReturn(true);
+        when(mockView.isOptionTwoUsed()).thenReturn(true);
+        when(mockView.isOptionFiveUsed()).thenReturn(true);
         when(mockView.getCustomTextResponse()).thenReturn(MOCK_CUSTOM_RESPONSE);
         when(mockView.getValue()).thenReturn(exp);
 
