@@ -9,9 +9,9 @@
 			<bh:Strong ui:field="columnName"/>
 		</bh:Div>
 		<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE">
-			<b:TextBox ui:field="minField" width="105px"/>
+			<b:TextBox ui:field="minField" width="95px"/>
 			<bh:Span text="to" addStyleNames="margin-left-5 margin-right-5"/>
-			<b:TextBox ui:field="maxField" width="105px"/>
+			<b:TextBox ui:field="maxField" width="95px"/>
 			<b:Button ui:field="applyButton" type="PRIMARY" addStyleNames="margin-left-5" icon="FILTER" />
 		</g:HorizontalPanel>
 		<bh:Div ui:field="synAlertContainer"/>
