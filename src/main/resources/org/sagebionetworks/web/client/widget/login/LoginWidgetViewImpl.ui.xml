@@ -12,9 +12,11 @@
 					in with Google</b:Button>
 			</g:SimplePanel>
 			<div class="signin-panel panel panel-body margin-top-15">
-				<h4 class="form-signin-heading">Sign in with a Synapse account</h4>
-				<g:FlowPanel ui:field="synapseLoginFieldsContainer" />
-				<b:Row ui:field="synAlertContainer" />
+				<div class="margin-left-20 margin-right-20">
+					<h4 class="form-signin-heading">Sign in with a Synapse account</h4>
+					<g:FlowPanel ui:field="synapseLoginFieldsContainer" />
+					<b:Row ui:field="synAlertContainer" />
+				</div>
 			</div>
 			<g:Button ui:field="registerBtn" styleName="btn btn-default" />
 		</div>
