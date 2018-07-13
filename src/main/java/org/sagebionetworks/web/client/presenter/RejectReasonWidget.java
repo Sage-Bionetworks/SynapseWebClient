@@ -54,11 +54,6 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
         return this.userName;
     }
 
-    // TODO: Remove when feature is in prod, used for demo purposes in ComingSoon
-    public void setUserProfileName(String user) {
-        this.userName = user;
-    }
-
     public void show(String userID, CallbackP<String> callback) {
         this.userName = "";
         this.callback = null;
@@ -78,27 +73,6 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
             }
         });
         this.callback = callback;
-    }
-
-    // TODO: Remove when feature is in prod, used for demo purposes in ComingSoon
-    public void show(String userID) {
-        this.userName = "";
-        this.callback = null;
-        this.view.clear();
-
-        handler.getUserProfile(userID, new AsyncCallback<UserProfile>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                setUserProfileName("John Doe");
-                view.show();
-            }
-
-            @Override
-            public void onSuccess(UserProfile user) {
-                setUserProfileName(user);
-                view.show();
-            }
-        });
     }
 
     @Override
@@ -136,10 +110,7 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
         if (view.getValue().equals("")) {
             view.showError(ERROR_MESSAGE);
         } else {
-            // TODO: Remove when feature is in prod
-            if (callback != null) {
-                callback.invoke(view.getValue());
-            }
+            callback.invoke(view.getValue());
             view.clear();
             view.hide();
         }
