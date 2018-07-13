@@ -11,7 +11,7 @@
     <ui:with field='sageImageBundle' type='org.sagebionetworks.web.client.SageImageBundle'/>
     
 	<g:HTMLPanel>
-		<div class="separator margin-top-10-imp"></div>
+		<div class="margin-top-10-imp"></div>
 		<g:HTMLPanel>
 			<b:Alert addStyleNames="getCertifiedAlert" type="INFO" ui:field="getCertifiedAlert" dismissable="true">
 				<g:FocusPanel ui:field="alertFocusPanel" addStyleNames="imageButton">
