@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.entity;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -7,9 +10,6 @@ import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.sagebionetworks.schema.adapter.AdapterFactory;
-import org.sagebionetworks.schema.adapter.JSONArrayAdapter;
-import org.sagebionetworks.schema.adapter.JSONObjectAdapter;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -18,30 +18,16 @@ import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.search.SearchBoxView;
-import static org.junit.Assert.*;
+
 import com.google.gwt.place.shared.Place;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 
 public class SearchBoxTest {
-
 	@Mock
 	SearchBoxView mockView;
-	
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
-	
-	@Mock
-	AdapterFactory mockAdapterFactory;
-	
-	@Mock
-	JSONObjectAdapter mockJSONObjectAdapter;
-	
-	@Mock
-	JSONArrayAdapter mockJSONArrayAdapter;
-	
 	@Mock
 	SynapseClientAsync mockSynapseClient;
-	
 	@Mock
 	PlaceChanger mockPlaceChanger;
 	@Captor
@@ -51,11 +37,8 @@ public class SearchBoxTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		presenter = new SearchBox(mockView, mockGlobalApplicationState, mockAdapterFactory, mockSynapseClient);
+		presenter = new SearchBox(mockView, mockGlobalApplicationState, mockSynapseClient);
 		Mockito.when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
-		Mockito.when(mockAdapterFactory.createNew()).thenReturn(mockJSONObjectAdapter);
-		Mockito.when(mockJSONObjectAdapter.createNew()).thenReturn(mockJSONObjectAdapter);
-		Mockito.when(mockJSONObjectAdapter.createNewArray()).thenReturn(mockJSONArrayAdapter);
 	}
 	
 	@Test
@@ -67,25 +50,9 @@ public class SearchBoxTest {
 	
 	@Test
 	public void testSearch() {
-		presenter.setSearchAll(false);
 		presenter.search("Test");
-		Mockito.verify(mockAdapterFactory, Mockito.never()).createNew();
 		Mockito.verify(mockGlobalApplicationState).getPlaceChanger();
 		Mockito.verify(mockPlaceChanger).goTo(Mockito.any(Search.class));
-	}
-	
-	@Test
-	public void testSearchRegular() {
-		presenter.setSearchAll(false);
-		presenter.search("syn123");
-	}
-	
-	@Test
-	public void testSearchEnhanced() {
-		Mockito.when(mockJSONObjectAdapter.toJSONString()).thenReturn("syn456");
-		presenter.setSearchAll(true);
-		presenter.search("syn123");
-		Mockito.verify(mockJSONObjectAdapter, Mockito.atLeastOnce()).createNew();
 	}
 	
 	@Test
@@ -99,12 +66,9 @@ public class SearchBoxTest {
 		assertEquals(synId, ((Synapse)place).toToken());
 	}
 
-	
 	@Test
 	public void testSearchEmpty() {
 		presenter.search("");
-		Mockito.verify(mockJSONObjectAdapter, Mockito.never()).createNew();
 		Mockito.verify(mockGlobalApplicationState, Mockito.never()).getPlaceChanger();
 	}
-	
 }

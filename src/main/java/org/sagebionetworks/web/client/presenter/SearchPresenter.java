@@ -45,7 +45,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 	
 	private SearchQuery currentSearch;
 	private SearchResults currentResult;
-	private boolean newQuery = false;
 	private Map<String,String> timeValueToDisplay = new HashMap<String, String>();
 	private Date searchStartTime;
 	
@@ -301,7 +300,6 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		SearchQuery query = SearchQueryUtils.getDefaultSearchQuery();
 		timeValueToDisplay.clear();
 		searchStartTime = new Date();		
-		newQuery = true;		
 		return query;
 	}
 	
@@ -311,8 +309,7 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 		if (isEmptyQuery()) {
 			currentResult = new SearchResults();
 			currentResult.setFound(new Long(0));
-			view.setSearchResults(currentResult, "", newQuery);
-			newQuery = false;
+			view.setSearchResults(currentResult, "");
 			loadMoreWidgetContainer.setIsMore(false);
 			return;
 		}
@@ -321,11 +318,13 @@ public class SearchPresenter extends AbstractActivity implements SearchView.Pres
 			public void onSuccess(SearchResults result) {
 				currentResult = result;
 				String searchTerm = join(currentSearch.getQueryTerm(), " ");
-				view.setSearchResults(currentResult, searchTerm, newQuery);
-				newQuery = false;
+				boolean isFirstPage = currentSearch.getStart() == null || currentSearch.getStart() == 0L;
+				if (isFirstPage) {
+					view.setSearchResults(currentResult, searchTerm);
+				}
 				Long limit = currentSearch.getSize() == null ? 10L : currentSearch.getSize();
 				currentSearch.setStart(currentResult.getStart() + limit);
-				loadMoreWidgetContainer.add(view.getResults(currentResult, searchTerm));
+				loadMoreWidgetContainer.add(view.getResults(currentResult, searchTerm, isFirstPage));
 				List<Hit> hits = currentResult.getHits();
 				boolean isMore = limit.equals(new Long(hits.size()));
 				loadMoreWidgetContainer.setIsMore(isMore);
