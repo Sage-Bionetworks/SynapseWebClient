@@ -174,7 +174,19 @@ public class EvaluationEditorModalTest {
 	
 	@Test
 	public void testPartiallyFilledInQuota() {
+		when(mockSubmissionQuota.getFirstRoundStart()).thenReturn(null);
+		when(mockSubmissionQuota.getNumberOfRounds()).thenReturn(null);
+		when(mockSubmissionQuota.getRoundDurationMillis()).thenReturn(null);
+		when(mockSubmissionQuota.getSubmissionLimit()).thenReturn(null);
+		evaluation.setQuota(mockSubmissionQuota);
+		
 		modal.configure(evaluation, mockEvaluationUpdatedCallback);
+		
+		//verify quota
+		verify(mockView, never()).setRoundStart(any(Date.class));
+		verify(mockView, never()).setNumberOfRounds(any(Long.class));
+		verify(mockView, never()).setRoundDuration(any(Long.class));
+		verify(mockView, never()).setSubmissionLimit(any(Long.class));
 
 		//only the round start is set, no other quota fields
 		when(mockView.getRoundStart()).thenReturn(quotaRoundStart);
