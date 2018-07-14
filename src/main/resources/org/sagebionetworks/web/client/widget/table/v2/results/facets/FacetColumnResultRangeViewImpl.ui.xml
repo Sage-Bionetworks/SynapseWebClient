@@ -10,9 +10,9 @@
 		</bh:Div>
 		<g:HorizontalPanel verticalAlignment="ALIGN_MIDDLE">
 			<b:TextBox ui:field="minField" width="105px"/>
-			<bh:Span text="to" addStyleNames="margin-left-5 margin-right-5"/>
+			<bh:Span text="to" addStyleNames="margin-left-2 margin-right-2"/>
 			<b:TextBox ui:field="maxField" width="105px"/>
-			<b:Button ui:field="applyButton" type="PRIMARY" addStyleNames="margin-left-5" icon="FILTER" />
+			<b:Button ui:field="applyButton" type="PRIMARY" addStyleNames="margin-left-2" icon="FILTER" />
 		</g:HorizontalPanel>
 		<bh:Div ui:field="synAlertContainer"/>
 	</bh:Div>
