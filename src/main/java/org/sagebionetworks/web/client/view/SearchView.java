@@ -19,14 +19,14 @@ public interface SearchView extends IsWidget, SynapseView {
 	 * Sets the search results to display
 	 * @param searchResults
 	 */
-	public void setSearchResults(SearchResults searchResults, String searchTerm, boolean newQuery);
+	public void setSearchResults(SearchResults searchResults, String searchTerm);
 	
 	/**
 	 * Get widget representing search result hits
 	 * @param searchResults
 	 * @return
 	 */
-	Widget getResults(SearchResults searchResults, String searchTerm);
+	Widget getResults(SearchResults searchResults, String searchTerm, boolean isFirstPage);
 	
 	/**
 	 * Set this view's presenter

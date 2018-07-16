@@ -90,10 +90,18 @@ public class EvaluationEditorModal implements EvaluationEditorModalView.Presente
 		view.setCreatedOn(dateTimeUtils.getDateString(evaluation.getCreatedOn()));
 		if (evaluation.getQuota() != null) {
 			SubmissionQuota quota = evaluation.getQuota();
-			view.setRoundStart(quota.getFirstRoundStart());
-			view.setNumberOfRounds(quota.getNumberOfRounds());
-			view.setRoundDuration(quota.getRoundDurationMillis());
-			view.setSubmissionLimit(quota.getSubmissionLimit());
+			if (quota.getFirstRoundStart() != null) {
+				view.setRoundStart(quota.getFirstRoundStart());	
+			}
+			if (quota.getNumberOfRounds() != null) {
+				view.setNumberOfRounds(quota.getNumberOfRounds());	
+			}
+			if (quota.getRoundDurationMillis() != null) {
+				view.setRoundDuration(quota.getRoundDurationMillis());	
+			}
+			if (quota.getSubmissionLimit() != null) {
+				view.setSubmissionLimit(quota.getSubmissionLimit());	
+			}
 		}
 	}
 	
