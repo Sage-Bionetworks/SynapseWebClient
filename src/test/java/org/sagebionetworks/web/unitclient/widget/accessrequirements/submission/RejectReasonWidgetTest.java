@@ -30,8 +30,6 @@ public class RejectReasonWidgetTest {
     @Mock
     UserProfileAsyncHandler mockHandler;
     @Mock
-    ArgumentCaptor<CallbackP<String>> promptCaptor;
-    @Mock
     CallbackP<String> getReasonCallback;
     @Mock
     UserProfile mockUserProfile;
@@ -54,7 +52,11 @@ public class RejectReasonWidgetTest {
         when(mockView.isOptionFiveUsed()).thenReturn(false);
 
         widget = new RejectReasonWidget(mockHandler, mockView);
+    }
 
+    @Test
+    public void testConstructor() {
+        verify(mockView).setPresenter(widget);
     }
 
     @Test
@@ -66,7 +68,7 @@ public class RejectReasonWidgetTest {
         // call
         widget.show(MOCK_USER_ID, getReasonCallback);
         // verify/assert
-        verify(mockView).setPresenter(widget);
+        verify(mockView).clear();
         verify(mockHandler).getUserProfile(eq(MOCK_USER_ID), any(AsyncCallback.class));
         verify(mockView).show();
         assertEquals(MOCK_USER_DISPLAY_NAME, widget.getUserName());
@@ -76,7 +78,6 @@ public class RejectReasonWidgetTest {
 
         widget.onSave();
 
-        verify(mockView, times(2)).clear(); // called once for show, second for onSave
         verify(mockView).hide();
         verify(getReasonCallback).invoke(MOCK_CANNED_RESPONSE);
     }
@@ -112,7 +113,7 @@ public class RejectReasonWidgetTest {
 
         // verify that clear and get value were called
         verify(mockView).setValue(exp);
-        verify(mockView).clear();
+        verify(mockView).clearError();
     }
 
 
@@ -139,7 +140,7 @@ public class RejectReasonWidgetTest {
         widget.updateResponse();
 
         verify(mockView).setValue(exp);
-        verify(mockView).clear();
+        verify(mockView).clearError();
     }
 
     @Test

@@ -41,6 +41,11 @@ public interface RejectReasonView extends IsWidget {
     void clear();
 
     /**
+       * clear error state
+     */
+    void clearError();
+
+    /**
      * Set Presenter
      * @param presenter
      */

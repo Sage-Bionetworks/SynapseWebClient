@@ -52,6 +52,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 			JiraURLHelper jiraErrorHelper, 
 			AuthenticationController authenticationController,
 			GoogleMap map,
+			RejectReasonWidget rejectReasonWidget,
 			JSONObjectAdapter jsonObjectAdapter,
 			DownloadSpeedTester downloadSpeedTester) {
 		initWidget(binder.createAndBindUi(this));

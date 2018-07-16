@@ -56,8 +56,8 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
 
     public void show(String userID, CallbackP<String> callback) {
         this.userName = "";
-        this.callback = null;
         this.view.clear();
+        this.callback = callback;
 
         handler.getUserProfile(userID, new AsyncCallback<UserProfile>() {
             @Override
@@ -72,7 +72,6 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
                 view.show();
             }
         });
-        this.callback = callback;
     }
 
     @Override
@@ -99,7 +98,7 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
             view.showError(ERROR_MESSAGE);
             return;
         } else {
-            view.clear();
+            view.clearError();
         }
 
         view.setValue(TEMPLATE_HEADER_HELLO + this.getUserName() + TEMPLATE_HEADER_THANKS + output + "\n" + TEMPLATE_HEADER_SIGNATURE);

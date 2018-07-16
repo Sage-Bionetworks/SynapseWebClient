@@ -16,7 +16,6 @@ public class RejectReasonViewImpl implements RejectReasonView {
 
     public interface Binder extends UiBinder<Modal, RejectReasonViewImpl> {}
 
-
     @UiField
     Modal modal;
 
@@ -60,7 +59,6 @@ public class RejectReasonViewImpl implements RejectReasonView {
     // Presenter
     Presenter presenter;
 
-
     @Inject
     public RejectReasonViewImpl(Binder binder){
         widget = binder.createAndBindUi(this);
@@ -80,11 +78,9 @@ public class RejectReasonViewImpl implements RejectReasonView {
         optionFive.setText(RejectReasonWidget.REJECT_CUSTOM_REASON);
     }
 
-
     public boolean isOptionOneUsed() {
         return optionOne.getValue();
     }
-
 
     public boolean isOptionTwoUsed() {
         return optionTwo.getValue();
@@ -109,7 +105,6 @@ public class RejectReasonViewImpl implements RejectReasonView {
     public void setPresenter (Presenter presenter) {
         this.presenter = presenter;
     }
-
 
     public void setValue(String value) {
         nameField.setText(value);
@@ -144,8 +139,22 @@ public class RejectReasonViewImpl implements RejectReasonView {
 
     @Override
     public void clear() {
-        this.alert.setVisible(false);
+        this.clearError();
         this.primaryButton.state().reset();
+        this.defaultButton.state().reset();
+        this.defaultButton.state().reset();
+        this.customText.clear();
+        this.nameField.clear();
+        this.optionOne.setValue(false);
+        this.optionTwo.setValue(false);
+        this.optionThree.setValue(false);
+        this.optionFour.setValue(false);
+        this.optionFive.setValue(false);
+    }
+
+    @Override
+    public void clearError() {
+        this.alert.setVisible(false);
     }
 
 }
