@@ -9,13 +9,13 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.presenter.RejectReasonWidget;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
 import org.sagebionetworks.web.client.widget.entity.JiraURLHelper;
 import org.sagebionetworks.web.client.widget.footer.Footer;
 import org.sagebionetworks.web.client.widget.googlemap.GoogleMap;
 import org.sagebionetworks.web.client.widget.header.Header;
-
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -52,8 +52,9 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 			JiraURLHelper jiraErrorHelper, 
 			AuthenticationController authenticationController,
 			GoogleMap map,
+			RejectReasonWidget rejectReasonWidget,
 			JSONObjectAdapter jsonObjectAdapter,
-			DownloadSpeedTester downloadSpeedTester) {		
+			DownloadSpeedTester downloadSpeedTester) {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.jsonObjectAdapter = jsonObjectAdapter;

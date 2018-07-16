@@ -209,6 +209,8 @@ import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalVi
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalViewImpl;
+import org.sagebionetworks.web.client.widget.entity.RejectReasonView;
+import org.sagebionetworks.web.client.widget.entity.RejectReasonViewImpl;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeView;
 import org.sagebionetworks.web.client.widget.entity.ChallengeBadgeViewImpl;
 import org.sagebionetworks.web.client.widget.entity.DoiWidgetView;
@@ -944,7 +946,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(BigPromptModalView.class).to(BigPromptModalViewImpl.class);
 		bind(PromptTwoValuesModalView.class).to(PromptTwoValuesModalViewImpl.class);
 		bind(RenameEntityModalWidget.class).to(RenameEntityModalWidgetImpl.class);
-		
+
+		// Rejected Reason
+		bind(RejectReasonView.class).to(RejectReasonViewImpl.class);
+
 		// FileBox
 		bind(FileTitleBarView.class).to(FileTitleBarViewImpl.class).in(Singleton.class);
 		bind(BasicTitleBarView.class).to(BasicTitleBarViewImpl.class);

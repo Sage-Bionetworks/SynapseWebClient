@@ -32,12 +32,12 @@ import org.sagebionetworks.web.client.DataAccessClientAsync;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
-import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.presenter.RejectReasonWidget;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.submission.ACTDataAccessSubmissionWidgetView;
-import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -57,7 +57,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	DataAccessClientAsync mockClient;
 	@Mock
-	BigPromptModalView mockPromptModalView;
+	RejectReasonWidget mockPromptModalWidget;
 	@Mock
 	FileHandleWidget mockDucFileRenderer;
 	@Mock
@@ -73,8 +73,8 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	ResearchProject mockResearchProjectSnapshot;
 	@Captor
-	ArgumentCaptor<Callback> promptModalPresenterCaptor;
-	Callback confirmRejectionCallback;
+	ArgumentCaptor<CallbackP<String>> promptModalPresenterCaptor;
+	CallbackP<String> confirmRejectionCallback;
 	@Captor
 	ArgumentCaptor<FileHandleAssociation> fhaCaptor;
 	@Mock
@@ -86,7 +86,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 	@Mock
 	ShowEmailsButton mockShowEmailsButton;
 	public static final String SUBMISSION_ID = "9876545678987";
-	public static final String INSTITUTION = "Univerisity of Washington";
+	public static final String INSTITUTION = "University of Washington";
 	public static final String INTENDED_DATA_USE = "lorem ipsum";
 	public static final String PROJECT_LEAD = "Mr. Rogers";
 	public static final String SMALL_DATE_STRING = "1/2/33";
@@ -110,8 +110,8 @@ public class ACTDataAccessSubmissionWidgetTest {
 		
 		widget = new ACTDataAccessSubmissionWidget(mockView, 
 				mockSynapseAlert, 
-				mockClient, 
-				mockPromptModalView, 
+				mockClient,
+				mockPromptModalWidget,
 				mockDucFileRenderer, 
 				mockIrbFileRenderer, 
 				mockFileHandleList, 
@@ -120,8 +120,7 @@ public class ACTDataAccessSubmissionWidgetTest {
 				mockDateTimeUtils, 
 				mockShowEmailsButton);
 		AsyncMockStubber.callSuccessWith(mockDataAccessSubmission).when(mockClient).updateDataAccessSubmissionState(anyString(), any(SubmissionState.class), anyString(), any(AsyncCallback.class));
-		verify(mockPromptModalView).configure(anyString(),  anyString(), anyString(),  promptModalPresenterCaptor.capture());
-		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
+
 	}
 
 	@Test
@@ -284,18 +283,26 @@ public class ACTDataAccessSubmissionWidgetTest {
 	
 	@Test
 	public void testUpdateDataAccessSubmissionState() {
+	    // initially they are not rejected
 		widget.configure(mockDataAccessSubmission);
+		// they now get rejected
+		widget.onReject();
+
+		verify(mockPromptModalWidget).show(anyString(),  promptModalPresenterCaptor.capture());
+
+		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
 		String rejectionReason = "missing info";
-		when(mockPromptModalView.getValue()).thenReturn(rejectionReason);
+
 		when(mockDataAccessSubmission.getState()).thenReturn(SubmissionState.REJECTED);
+		when(mockDataAccessSubmission.getRejectedReason()).thenReturn(rejectionReason);
+
+		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
+		confirmRejectionCallback.invoke(rejectionReason);
 		
-		confirmRejectionCallback.invoke();
-		
-		verify(mockPromptModalView).hide();
 		verify(mockClient).updateDataAccessSubmissionState(eq(SUBMISSION_ID), eq(SubmissionState.REJECTED), eq(rejectionReason), any(AsyncCallback.class));
 		verify(mockView).setState(SubmissionState.REJECTED.name());
 	}
-	
+
 	@Test
 	public void testUpdateDataAccessSubmissionStateFailure() {
 		widget.configure(mockDataAccessSubmission);
