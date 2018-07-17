@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.search;
 
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
 
@@ -9,6 +11,7 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
+import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -22,7 +25,10 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	Button searchButton;
 	@UiField
 	TextBox searchField;
-	
+	@UiField
+	Icon searchIcon;
+	@UiField
+	InputGroup searchUI;
 	@Inject
 	public SearchBoxViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
@@ -36,6 +42,7 @@ public class SearchBoxViewImpl implements SearchBoxView {
 			public void onClick(ClickEvent event) {
 				presenter.search(searchField.getValue());
 				searchField.setValue("");
+				showSearchIcon(true);
 			}
 		});
 	    searchField.addKeyDownHandler(new KeyDownHandler() {				
@@ -45,7 +52,25 @@ public class SearchBoxViewImpl implements SearchBoxView {
 					searchButton.click();
 	            }					
 			}
-		});				
+		});
+	    
+	    searchIcon.addClickHandler(event -> {
+	    	showSearchIcon(false);
+	    });
+	    searchIcon.addDomHandler(event -> {
+	    	showSearchIcon(false);
+	    }, MouseOverEvent.getType());
+	    searchField.addBlurHandler(event -> {
+	    	showSearchIcon(true);
+	    });
+	}
+	
+	private void showSearchIcon(boolean isShowIcon) {
+		searchIcon.setVisible(isShowIcon);
+		searchUI.setVisible(!isShowIcon);
+		if (!isShowIcon) {
+			searchField.setFocus(true);
+		}
 	}
 	
 	@Override

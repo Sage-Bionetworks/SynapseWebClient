@@ -6,10 +6,9 @@ import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
-import org.gwtbootstrap3.client.ui.ButtonGroup;
+import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Row;
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -24,13 +23,10 @@ import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FlowPanel;
-import com.google.gwt.user.client.ui.HasVerticalAlignment;
-import com.google.gwt.user.client.ui.HorizontalPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -50,12 +46,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Div headingPanel;
 	@UiField
-	Anchor dashboardLink;
-	Button dashboardButton;
+	DropDown headerFavButtonGroup;
 	@UiField
-	ButtonGroup headerFavButtonGroup;
-	@UiField
-	Button headerFavButton;
+	Anchor headerFavButton;
 	@UiField
 	DropDownMenu headerFavList;
 
@@ -99,8 +92,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	SageImageBundle sageImageBundle;
 	private GlobalApplicationState globalAppState;
 	UserBadge userBadge;
-	Span userBadgeText;
-	HorizontalPanel myDashboardButtonContents;
 	@Inject
 	public HeaderViewImpl(Binder binder,
 			SageImageBundle sageImageBundle,
@@ -113,23 +104,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		this.cookies = cookies;
 		this.sageImageBundle = sageImageBundle;
 		this.userBadge = userBadge;
+		userBadge.setStyleNames("img-circle");
 		this.globalAppState = globalAppState;
 		userBadge.setSize(BadgeSize.SMALL_PICTURE_ONLY);
 		// add search panel first
 		searchBox.setVisible(true);
 		searchBoxContainer.setWidget(searchBox.asWidget());
-		myDashboardButtonContents = new HorizontalPanel();
-		myDashboardButtonContents.addStyleName("moveup-1");
-		myDashboardButtonContents.setVerticalAlignment(HasVerticalAlignment.ALIGN_MIDDLE);
-		myDashboardButtonContents.add(userBadge.asWidget());
-		userBadgeText = new Span();
-		myDashboardButtonContents.add(userBadgeText);
-		dashboardButton = new Button();
-		dashboardButton.setSize(ButtonSize.EXTRA_SMALL);
-		dashboardButton.setHeight("28px");
-		dashboardButton.addStyleName("my-dashboard-header-button");
-		dashboardLink.add(dashboardButton);
-		addUserPicturePanel();
+		dashboardButtonUI.add(userBadge.asWidget());
 		initClickHandlers();
 		refreshTestSiteHeader();
 		clear();
@@ -188,19 +169,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		headerButtons.setMarginTop(0);
 	}
 	
-	/**
-	 * Clear the divider/caret from the user button, and add the picture container
-	 * @param button
-	 */
-	public void addUserPicturePanel() {
-		Scheduler.get().scheduleDeferred(new Scheduler.ScheduledCommand() {
-            @Override
-            public void execute() {
-            	dashboardButton.add(myDashboardButtonContents);
-            }
-        });
-	}
-
 	public void initClickHandlers() {
 		documentationLink.addClickHandler(event -> {
 			event.preventDefault();
@@ -215,13 +183,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		});
 		logoutLink.addClickHandler(event -> {
 			presenter.onLogoutClick();
-		});
-		dashboardLink.addClickHandler(DisplayUtils.DO_NOTHING_CLICKHANDLER);
-		dashboardButton.addClickHandler(event -> {
-			if (!DisplayUtils.isAnyModifierKeyDown(event)) {
-				event.preventDefault();
-				presenter.onDashboardClick();
-			}
 		});
 		loginLink.addClickHandler(event -> {
 			presenter.onLoginClick();
@@ -274,17 +235,14 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 	 	trashLink.setVisible(isInTestWebsite);
 	 	userBadge.clearState();
-	 	userBadge.setDoNothingOnClick();
 	 	if (userData != null && userData.getProfile() != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
 	 		userBadge.configure(userData.getProfile());
-	 		userBadgeText.setText(DisplayUtils.getDisplayName(userData.getProfile()));
-			loginLinkUI.setVisible(false);
+	 		loginLinkUI.setVisible(false);
 			registerLinkUI.setVisible(false);
 			logoutLink.setVisible(true);
 			dashboardButtonUI.setVisible(true);
 			headerFavButtonGroup.setVisible(true);
-			dashboardLink.setHref("#!Profile:" + userData.getProfile().getOwnerId());
 		} else {
 			loginLinkUI.setVisible(true);
 			registerLinkUI.setVisible(true);
