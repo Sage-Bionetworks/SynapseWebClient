@@ -17,9 +17,6 @@
 		        	</b:Heading>
 			  	</bh:Div>
 			  	<bh:Span ui:field="headerButtons" addStyleNames="right">
-					<b:Tooltip placement="BOTTOM" title="Sign out">
-						<b:Button size="EXTRA_SMALL" ui:field="logoutLink" icon="SIGN_OUT" iconSize="LARGE" pull="RIGHT" addStyleNames="margin-left-5 margin-top-5" height="28px" />	
-					</b:Tooltip>
 					<b:DropDown addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
 						<b:Anchor dataToggle="DROPDOWN" icon="QUESTION_CIRCLE" iconSize="TIMES2" addStyleNames="color-white"/>
 						<b:DropDownMenu ui:field="helpDropdownMenu" addStyleNames="dropdown-menu-right">
@@ -35,7 +32,13 @@
 				    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" visible="false">
 						<b:Button ui:field="registerLink" size="EXTRA_SMALL" height="28px">Register</b:Button>
 					</g:SimplePanel>
-					<g:SimplePanel ui:field="dashboardButtonUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" visible="false" />
+					<b:DropDown addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
+						<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" visible="false"/>
+						<b:DropDownMenu addStyleNames="dropdown-menu-right">
+							<b:AnchorListItem ui:field="myDashboardLink" iconFixedWidth="true" iconPosition="RIGHT">My Dashboard</b:AnchorListItem>
+							<b:AnchorListItem ui:field="logoutLink" icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
+						</b:DropDownMenu>
+					</b:DropDown>
 					<b:Tooltip placement="BOTTOM" title="Favorites">
 						<b:DropDown ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5" visible="false">
 							<b:Anchor ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white" />

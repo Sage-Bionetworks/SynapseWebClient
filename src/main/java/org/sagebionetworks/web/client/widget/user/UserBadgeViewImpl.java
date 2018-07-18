@@ -130,6 +130,8 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public void doNothingOnClick() {
 		handlerRegistration.removeHandler();
 		handlerRegistration = usernameLink.addClickHandler(DO_NOTHING_CLICKHANDLER);
+		pictureHandlerRegistration.removeHandler();
+		pictureHandlerRegistration = pictureFocusPanel.addClickHandler(DO_NOTHING_CLICKHANDLER);
 	}
 	
 	@Override

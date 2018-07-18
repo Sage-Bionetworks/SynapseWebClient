@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
@@ -59,7 +60,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	SimplePanel registerLinkUI;
 	@UiField
-	SimplePanel dashboardButtonUI;
+	Anchor dashboardDropdownAnchor;
 	@UiField
 	Button registerLink;
 	@UiField
@@ -73,7 +74,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Anchor trashLink;
 	@UiField
-	Button logoutLink;
+	AnchorListItem logoutLink;
+	@UiField
+	AnchorListItem myDashboardLink;
 
 	@UiField
 	FlowPanel testSitePanel;
@@ -92,6 +95,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	SageImageBundle sageImageBundle;
 	private GlobalApplicationState globalAppState;
 	UserBadge userBadge;
+	String userId;
 	@Inject
 	public HeaderViewImpl(Binder binder,
 			SageImageBundle sageImageBundle,
@@ -110,7 +114,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		// add search panel first
 		searchBox.setVisible(true);
 		searchBoxContainer.setWidget(searchBox.asWidget());
-		dashboardButtonUI.add(userBadge.asWidget());
+		dashboardDropdownAnchor.add(userBadge.asWidget());
 		initClickHandlers();
 		refreshTestSiteHeader();
 		clear();
@@ -179,7 +183,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			globalAppState.refreshPage();
 		});
 		trashLink.addClickHandler(event -> {
-    			presenter.onTrashClick();
+    		presenter.onTrashClick();
 		});
 		logoutLink.addClickHandler(event -> {
 			presenter.onLogoutClick();
@@ -196,6 +200,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		});
 		synapseLogo.addClickHandler(event -> {
 			presenter.onLogoClick();
+		});
+		myDashboardLink.addClickHandler(event -> {
+			Profile place = new Profile(userId);
+			globalAppState.getPlaceChanger().goTo(place);
 		});
 	}
 
@@ -238,16 +246,19 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	 	if (userData != null && userData.getProfile() != null) {
 			//has user data, update the user name and add user commands (and set to the current user name)
 	 		userBadge.configure(userData.getProfile());
+	 		userBadge.setDoNothingOnClick();
+	 		userId = userData.getProfile().getOwnerId();
 	 		loginLinkUI.setVisible(false);
 			registerLinkUI.setVisible(false);
 			logoutLink.setVisible(true);
-			dashboardButtonUI.setVisible(true);
+			dashboardDropdownAnchor.setVisible(true);
 			headerFavButtonGroup.setVisible(true);
 		} else {
+			userId = null;
 			loginLinkUI.setVisible(true);
 			registerLinkUI.setVisible(true);
 			logoutLink.setVisible(false);
-			dashboardButtonUI.setVisible(false);
+			dashboardDropdownAnchor.setVisible(false);
 			headerFavButtonGroup.setVisible(false);
 		}
 	}
