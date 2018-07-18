@@ -62,11 +62,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Anchor dashboardDropdownAnchor;
 	@UiField
-	Button registerLink;
+	Anchor registerLink;
 	@UiField
 	SimplePanel loginLinkUI;
 	@UiField
-	Button loginLink;
+	Anchor loginLink;
 	
 	@UiField
 	Span headerButtons;
@@ -167,8 +167,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		projectHeadingAnchor.removeStyleName("font-size-67");
 		synapseLogo.removeStyleName("margin-bottom-40");
 		synapseLogo.addStyleName("margin-bottom-15");
-		synapseLogo.setHeight("25px");
-		synapseLogo.setWidth("25px");
+		synapseLogo.setHeight("35px");
+		synapseLogo.setWidth("35px");
 		headerDiv.setPaddingTop(9);
 		headerButtons.setMarginTop(0);
 	}

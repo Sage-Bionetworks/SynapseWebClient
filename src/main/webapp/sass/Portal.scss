@@ -39,6 +39,9 @@ a:focus{color:$synapse-blue; text-decoration:underline;}
 .synapse-purple-bg, #body .synapse-purple-bg {background-color:$synapse-purple;}
 .synapse-green-bg, #body .synapse-green-bg {background-color:$synapse-green;}
 
+.synapse-blue-bg-gradient, #body .synapse-blue-bg-gradient {
+	background: linear-gradient(180deg, #2B688F 0%, #164B6E 100%);
+}
 .pagination>li>a, .pagination>li>span {
 	color: $synapse-blue;
 }

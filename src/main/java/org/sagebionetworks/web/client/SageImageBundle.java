@@ -37,8 +37,6 @@ public interface SageImageBundle extends ClientBundle {
 	ImageResource dream();
 	@Source("resource/images/lock.png")
 	ImageResource unlock();
-	@Source("resource/images/logo.png")
-	ImageResource logo();
 	@Source("resource/images/people.png")
 	ImageResource people();
 	@Source("resource/images/prov.png")

@@ -6,18 +6,18 @@
 	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
 	
 	<b:Container addStyleNames="header" fluid="true">
-		<b:Row ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg">
+		<b:Row ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg-gradient">
 			<b:Column size="XS_12">
 		        <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 displayInline">
-		        	<g:Image ui:field="synapseLogo" resource="{sageImages.logo}" 
-		        	    addStyleNames="imageButton margin-bottom-15 margin-right-5" width="25px" height="25px"/>
+		        	<g:Image ui:field="synapseLogo" url="images/logo.svg" 
+		        	    addStyleNames="imageButton margin-bottom-15 margin-right-5" width="35px" height="35px"/>
 		            <b:Heading size="H2" addStyleNames="displayInline color-white">
 		            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone"/>
 		        		<g:SimplePanel ui:field="projectFavoritePanel" addStyleNames="displayInline favoriteIcon margin-left-5" visible="false"/>
 		        	</b:Heading>
 			  	</bh:Div>
 			  	<bh:Span ui:field="headerButtons" addStyleNames="right">
-					<b:DropDown addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
+			  		<b:DropDown addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
 						<b:Anchor dataToggle="DROPDOWN" icon="QUESTION_CIRCLE" iconSize="TIMES2" addStyleNames="color-white"/>
 						<b:DropDownMenu ui:field="helpDropdownMenu" addStyleNames="dropdown-menu-right">
 							<b:AnchorListItem ui:field="documentationLink" icon="EXTERNAL_LINK" iconFixedWidth="true" iconPosition="RIGHT" href="http://docs.synapse.org">Documentation</b:AnchorListItem>
@@ -26,11 +26,12 @@
 							<b:AnchorListItem ui:field="emailSynapseSupportLink" icon="ENVELOPE_O" href="mailto:synapseinfo@sagebionetworks.org" iconFixedWidth="true" iconPosition="RIGHT">Contact Us</b:AnchorListItem>
 						</b:DropDownMenu>
 					</b:DropDown>
-				    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" visible="false">
-						<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="28px">Sign in</b:Button>
+			  	
+			  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-10 margin-top-10" visible="false">
+						<b:Anchor ui:field="loginLink" text="Sign in" addStyleNames="color-white strong" />
 					</g:SimplePanel>
-				    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" visible="false">
-						<b:Button ui:field="registerLink" size="EXTRA_SMALL" height="28px">Register</b:Button>
+				    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-10" visible="false">
+				    	<b:Anchor ui:field="registerLink" text="Register" addStyleNames="color-white strong" />
 					</g:SimplePanel>
 					<b:DropDown addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
 						<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" visible="false"/>
