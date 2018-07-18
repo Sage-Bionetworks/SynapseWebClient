@@ -77,28 +77,18 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.removeMenuItemActive(menuItem);
 	}
 	
-	public void configure(boolean largeLogo) {
+	public void configure() {
 		view.setProjectHeaderText("Synapse");
 		view.setProjectHeaderAnchorTarget("#");
 		view.hideProjectFavoriteWidget();
-		setLogo(largeLogo);
 	}
 	
-	public void setLogo(boolean largeLogo) {
-		if (largeLogo) {
-			view.showLargeLogo();
-		} else {
-			view.showSmallLogo();
-		}
-	}
-	
-	public void configure(boolean largeLogo, EntityHeader projectHeader) {
+	public void configure(EntityHeader projectHeader) {
 		String projectId = projectHeader.getId();
 		favWidget.configure(projectId);
 		view.setProjectHeaderAnchorTarget("#!Synapse:" + projectId);
 		view.setProjectHeaderText(projectHeader.getName());
 		view.showProjectFavoriteWidget();
-		setLogo(largeLogo);
 	}
 
 	public Widget asWidget() {

@@ -83,7 +83,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		
-		headerWidget.configure(false);
+		headerWidget.configure();
 		init();
 		
 		loadingPanel.setVisible(false);
@@ -235,7 +235,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 		DisplayUtils.hideFormError(emailAddress, emailAddressError);
 		DisplayUtils.hideFormError(password1, password1Error);
 		DisplayUtils.hideFormError(password2, password2Error);
-		headerWidget.configure(false);
+		headerWidget.configure();
 	}
 
 	@Override

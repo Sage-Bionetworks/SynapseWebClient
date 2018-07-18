@@ -77,7 +77,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.certificateWidget = certificateWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		successContainer.setWidget(certificateWidget.asWidget());
 		tryAgainLink.addClickHandler(new ClickHandler() {
 			@Override
@@ -102,7 +102,7 @@ public class QuizViewImpl extends Composite implements QuizView {
 	@Override
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}

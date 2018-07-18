@@ -294,7 +294,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.headerWidget = headerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.dateTimeUtils = dateTimeUtils;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 		picturePanel.clear();
 		initTabs();
@@ -546,7 +546,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

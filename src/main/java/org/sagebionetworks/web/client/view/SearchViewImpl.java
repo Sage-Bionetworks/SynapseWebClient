@@ -120,7 +120,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		this.ginInjector = ginInjector;
 		this.dateTimeUtils = dateTimeUtils;
 		this.markdownIt = markdownIt;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		searchButton.addClickHandler(new ClickHandler() {				
 			@Override
 			public void onClick(ClickEvent event) {					
@@ -140,7 +140,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

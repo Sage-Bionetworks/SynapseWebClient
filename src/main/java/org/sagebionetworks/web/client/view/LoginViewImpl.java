@@ -79,7 +79,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.loginWidget = loginWidget;
 		this.headerWidget = headerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		toUInitialized = false;
 		termsOfServiceHighlightBox.setAttribute(WebConstants.HIGHLIGHT_BOX_TITLE, "Awareness and Ethics Pledge");
 	}
@@ -87,7 +87,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@Override
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}
 

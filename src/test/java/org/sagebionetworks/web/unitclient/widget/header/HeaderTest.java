@@ -209,19 +209,6 @@ public class HeaderTest {
 	}
 	
 	@Test
-	public void testShowLargeLogo() {
-		header.configure(true);
-		verify(mockView).showLargeLogo();
-		verify(mockView, never()).showSmallLogo();
-	}
-	@Test
-	public void testShowSmallLogo() {
-		header.configure(false);
-		verify(mockView, never()).showLargeLogo();
-		verify(mockView).showSmallLogo();
-	}
-	
-	@Test
 	public void testInitStagingAlert() {
 		//case insensitive
 		Mockito.reset(mockView);

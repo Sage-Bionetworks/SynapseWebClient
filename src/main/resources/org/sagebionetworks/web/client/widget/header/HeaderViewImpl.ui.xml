@@ -6,7 +6,7 @@
 	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
 	
 	<b:Container addStyleNames="header" fluid="true">
-		<b:Row ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg-gradient">
+		<b:Row ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg-gradient" paddingTop="9">
 			<b:Column size="XS_12">
 		        <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 displayInline">
 		        	<g:Image ui:field="synapseLogo" url="images/logo.svg" 

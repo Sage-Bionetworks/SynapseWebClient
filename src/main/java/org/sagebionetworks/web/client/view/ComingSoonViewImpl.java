@@ -58,7 +58,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.jsonObjectAdapter = jsonObjectAdapter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		widgetContainer.add(map.asWidget());
 		AsyncCallback<Double> downloadSpeedCallback = new AsyncCallback<Double>() {
 			@Override
@@ -83,7 +83,7 @@ public class ComingSoonViewImpl extends Composite implements ComingSoonView {
 		//provenanceWidget.setHeight(400);
 //		((LayoutContainer)provenanceWidget.asWidget()).setAutoHeight(true);
 		
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

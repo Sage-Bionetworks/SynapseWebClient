@@ -31,7 +31,7 @@ public class SynapseStandaloneWikiViewImpl implements SynapseStandaloneWikiView 
 		
 		this.headerWidget = headerWidget;
 		this.markdownWidget = markdownWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		markdownContainer.add(markdownWidget.asWidget());
 	}
 
@@ -39,7 +39,7 @@ public class SynapseStandaloneWikiViewImpl implements SynapseStandaloneWikiView 
 	public void configure(String markdown, WikiPageKey wikiKey) {
 		markdownWidget.configure(markdown, wikiKey, null);
 		markdownContainer.setVisible(true);
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

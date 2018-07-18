@@ -35,8 +35,6 @@ public interface HeaderView extends IsWidget {
 		void onFavoriteClick();
 		void onLogoClick();
 	}
-	public void showLargeLogo();
-	public void showSmallLogo();
 	public void clearFavorite();
 	public void setEmptyFavorite();
 	public void addFavorite(List<EntityHeader> headers);
