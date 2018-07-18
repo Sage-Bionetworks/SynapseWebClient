@@ -48,18 +48,10 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	    	searchField.setFocus(true);
 	    	if (searchField.getStyleName().contains(ACTIVE_STYLE)) {
 	    		executeSearch();
+	    	} else {
+	    		searchFieldActive();	
 	    	}
-	    	searchFieldActive();
 	    });
-	    searchField.addBlurHandler(event -> {
-			Timer timer = new Timer() { 
-			    public void run() { 
-			    	searchFieldInactive();    	
-			    } 
-			};
-			timer.schedule(200);
-	    });
-
 	}
 	
 	private void searchFieldInactive() {

@@ -142,7 +142,6 @@ public class SearchViewImpl extends Composite implements SearchView {
 		this.presenter = presenter;		
 		headerWidget.configure(false);
 		headerWidget.refresh();
-		headerWidget.setSearchVisible(false);		
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 
