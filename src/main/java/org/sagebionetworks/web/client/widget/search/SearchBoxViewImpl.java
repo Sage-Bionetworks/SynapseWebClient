@@ -33,7 +33,7 @@ public class SearchBoxViewImpl implements SearchBoxView {
 		searchField.getElement().setAttribute("placeholder", " Search");
 		initClickHandlers();
 	}
-		
+
 	private void initClickHandlers() {
 	    searchField.addKeyDownHandler(new KeyDownHandler() {				
 			@Override
@@ -45,18 +45,12 @@ public class SearchBoxViewImpl implements SearchBoxView {
 		});
 	    
 	    searchButton.addClickHandler(event -> {
+	    	searchField.setFocus(true);
 	    	if (searchField.getStyleName().contains(ACTIVE_STYLE)) {
 	    		executeSearch();
-	    		searchFieldInactive();
-	    	} else {
-		    	searchField.setFocus(true);
-		    	searchFieldActive();
 	    	}
-	    });
-	    searchButton.addDomHandler(event -> {
 	    	searchFieldActive();
-	    	searchField.setFocus(true);
-	    }, MouseOverEvent.getType());
+	    });
 	    searchField.addBlurHandler(event -> {
 			Timer timer = new Timer() { 
 			    public void run() { 
@@ -65,6 +59,7 @@ public class SearchBoxViewImpl implements SearchBoxView {
 			};
 			timer.schedule(200);
 	    });
+
 	}
 	
 	private void searchFieldInactive() {
@@ -77,8 +72,11 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	}
 	
 	private void executeSearch() {
-		presenter.search(searchField.getValue());
-		searchField.setValue("");
+		if (!"".equals(searchField.getValue())) {
+			presenter.search(searchField.getValue());
+			searchField.setValue("");
+			searchFieldInactive();
+		}
 	}
 	
 	@Override
