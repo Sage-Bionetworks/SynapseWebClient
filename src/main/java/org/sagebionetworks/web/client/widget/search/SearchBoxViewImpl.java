@@ -1,19 +1,17 @@
 package org.sagebionetworks.web.client.widget.search;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Icon;
-import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -22,13 +20,13 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	private Presenter presenter;
 	Widget widget;
 	@UiField
-	Button searchButton;
+	Icon searchButton;
 	@UiField
 	TextBox searchField;
-	@UiField
-	Icon searchIcon;
-	@UiField
-	InputGroup searchUI;
+	
+	public static final String INACTIVE_STYLE = "searchTextField";
+	public static final String ACTIVE_STYLE = "searchTextField-active";
+	
 	@Inject
 	public SearchBoxViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
@@ -37,40 +35,50 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	}
 		
 	private void initClickHandlers() {
-		searchButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.search(searchField.getValue());
-				searchField.setValue("");
-				showSearchIcon(true);
-			}
-		});
 	    searchField.addKeyDownHandler(new KeyDownHandler() {				
 			@Override
 			public void onKeyDown(KeyDownEvent event) {
 				if (event.getNativeEvent().getKeyCode() == KeyCodes.KEY_ENTER) {
-					searchButton.click();
+					executeSearch();
 	            }					
 			}
 		});
 	    
-	    searchIcon.addClickHandler(event -> {
-	    	showSearchIcon(false);
+	    searchButton.addClickHandler(event -> {
+	    	if (searchField.getStyleName().contains(ACTIVE_STYLE)) {
+	    		executeSearch();
+	    		searchFieldInactive();
+	    	} else {
+		    	searchField.setFocus(true);
+		    	searchFieldActive();
+	    	}
 	    });
-	    searchIcon.addDomHandler(event -> {
-	    	showSearchIcon(false);
+	    searchButton.addDomHandler(event -> {
+	    	searchFieldActive();
+	    	searchField.setFocus(true);
 	    }, MouseOverEvent.getType());
 	    searchField.addBlurHandler(event -> {
-	    	showSearchIcon(true);
+			Timer timer = new Timer() { 
+			    public void run() { 
+			    	searchFieldInactive();    	
+			    } 
+			};
+			timer.schedule(200);
 	    });
 	}
 	
-	private void showSearchIcon(boolean isShowIcon) {
-		searchIcon.setVisible(isShowIcon);
-		searchUI.setVisible(!isShowIcon);
-		if (!isShowIcon) {
-			searchField.setFocus(true);
-		}
+	private void searchFieldInactive() {
+		searchField.removeStyleName(ACTIVE_STYLE);
+		searchField.addStyleName(INACTIVE_STYLE);
+	}
+	private void searchFieldActive() {
+		searchField.removeStyleName(INACTIVE_STYLE);
+		searchField.addStyleName(ACTIVE_STYLE);
+	}
+	
+	private void executeSearch() {
+		presenter.search(searchField.getValue());
+		searchField.setValue("");
 	}
 	
 	@Override

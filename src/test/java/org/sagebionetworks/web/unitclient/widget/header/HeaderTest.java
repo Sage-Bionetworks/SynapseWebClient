@@ -36,7 +36,6 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
-import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Trash;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
@@ -106,21 +105,6 @@ public class HeaderTest {
 	@Test
 	public void testAsWidget(){
 		header.asWidget();
-	}
-
-	@Test
-	public void testOnDashboardClickLoggedIn() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		when(mockAuthenticationController.getCurrentUserPrincipalId()).thenReturn("008");
-		header.onDashboardClick();
-		verify(mockPlaceChanger).goTo(isA(Profile.class));
-	}
-
-	@Test
-	public void testOnDashboardClickAnonymous() {
-		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		header.onDashboardClick();
-		verify(mockPlaceChanger).goTo(isA(LoginPlace.class));
 	}
 
 	@Test

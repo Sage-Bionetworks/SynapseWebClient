@@ -29,6 +29,13 @@
 							<b:AnchorListItem ui:field="emailSynapseSupportLink" icon="ENVELOPE_O" href="mailto:synapseinfo@sagebionetworks.org" iconFixedWidth="true" iconPosition="RIGHT">Contact Us</b:AnchorListItem>
 						</b:DropDownMenu>
 					</b:DropDown>
+				    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" visible="false">
+						<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="28px">Sign in</b:Button>
+					</g:SimplePanel>
+				    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" visible="false">
+						<b:Button ui:field="registerLink" size="EXTRA_SMALL" height="28px">Register</b:Button>
+					</g:SimplePanel>
+					<g:SimplePanel ui:field="dashboardButtonUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" visible="false" />
 					<b:Tooltip placement="BOTTOM" title="Favorites">
 						<b:DropDown ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5" visible="false">
 							<b:Anchor ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white" />
@@ -36,13 +43,6 @@
 							</b:DropDownMenu>
 						</b:DropDown>
 					</b:Tooltip>
-				    <g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" visible="false">
-						<b:Button ui:field="loginLink" size="EXTRA_SMALL" height="28px">Sign in</b:Button>
-					</g:SimplePanel>
-				    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-5" visible="false">
-						<b:Button ui:field="registerLink" size="EXTRA_SMALL" height="28px">Register</b:Button>
-					</g:SimplePanel>
-					<g:SimplePanel ui:field="dashboardButtonUI" addStyleNames="img-circle right margin-left-5 margin-right-5 margin-top-5" visible="false" />
 				    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-5 margin-right-5 margin-top-5 margin-bottom-20"/>
 				    <g:SimplePanel ui:field="stuAnnouncementsContainer" addStyleNames="right margin-left-5 "/>
 				</bh:Span>

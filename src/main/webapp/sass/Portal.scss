@@ -1940,21 +1940,13 @@ SWC-3997: tidy up search bar in header
 **/
 #body {
 	.searchBox {
-		.input-group>input, .input-group>input:focus {
-			border-radius: .2em 0em 0em .2em;
+		input, input:focus {
 			border: 0px;
 			background-color: #ffffff;
 			background-image: none;
-			box-shadow: none;
-		}
-
-		.input-group-btn>.btn, .input-group-btn>.btn:hover {
-			background-image: none;
-			border: 0px;
-			box-shadow: none;
-		}
-		.input-group-btn>.btn-default, .input-group-btn>.btn-default:hover  {
-			background-color: #ffffff;
+            box-shadow: none;
+			display: inline-block;
+			margin-right: 5px;
 		}
 	}
 }
@@ -2522,3 +2514,18 @@ div.colborder {
 
 #rootPanel summary { color:$synapse-blue; }
 #rootPanel summary:hover { text-decoration: underline; cursor:pointer; }
+
+#headerPanel {
+	.searchTextField {
+		width: 0px;
+		opacity: 0;
+	}
+	.searchTextField-active {
+		width: 200px;
+		transition: width 0.4s ease-in-out;
+		opacity: 1;
+	}
+	.userProfileImage {
+		border-radius: 50%;
+	}
+}
