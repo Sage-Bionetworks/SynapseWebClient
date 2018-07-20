@@ -277,21 +277,6 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 		this.isEditing = isEditing;
 	}
 	
-	public void initSynapseVersions(final Callback c) {
-		stackConfigService.getSynapseVersions(new AsyncCallback<String>() {			
-			@Override
-			public void onSuccess(String versions) {
-				synapseVersion = versions;
-				c.invoke();
-			}
-			
-			@Override
-			public void onFailure(Throwable caught) {
-				c.invoke();
-			}
-		});
-	}
-	
 	@Override
 	public void pushCurrentPlace(Place targetPlace) {
 		//only push this place into the history if it is a place change
@@ -462,11 +447,11 @@ public class GlobalApplicationStateImpl implements GlobalApplicationState {
 	}
 	
 	private void initStep2(Callback finalCallback) {
-		initSynapseVersions(finalCallback);
 		view.initGlobalViewProperties();
 		String showInUTC = cookieProvider.getCookie(SHOW_DATETIME_IN_UTC);
 		if (showInUTC != null) {
 			setShowUTCTime(Boolean.parseBoolean(showInUTC));
 		}
+		finalCallback.invoke();
 	}
 }
