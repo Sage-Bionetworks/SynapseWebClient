@@ -95,19 +95,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			}
 		});
 	}
-	public static TableType getTableType(Entity entity) {
-		if (entity instanceof TableEntity) {
-			return TableType.table;
-		} else if (entity instanceof EntityView) {
-			EntityView view = (EntityView)entity;
-			Long typeMask = view.getViewTypeMask();
-			if (typeMask == null) {
-				typeMask = ViewTypeMask.getMaskForDepricatedType(view.getType());
-			}
-			return TableType.getTableType(typeMask);	
-		}
-		return null;
-	}
+	
 	@Override
 	public void configure(EntityBundle bundle, boolean isEditable, EntityUpdatedHandler updateHandler) {
 		this.isEditable = isEditable;
@@ -116,7 +104,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		this.updateHandler = updateHandler;
 		viewer.configure(ViewType.VIEWER, this.isEditable);
 		boolean isEditableView = isEditable && bundle.getEntity() instanceof EntityView;
-		tableType = getTableType(bundle.getEntity());
+		tableType = TableType.getTableType(bundle.getEntity());
 		editor.setAddDefaultViewColumnsButtonVisible(isEditableView);
 		editor.setAddAnnotationColumnsButtonVisible(isEditableView);
 		for(ColumnModel cm: startingModels){

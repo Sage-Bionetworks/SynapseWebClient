@@ -363,15 +363,15 @@ public class ColumnModelsWidgetTest {
 	@Test
 	public void testGetTableType() {
 		when(mockView.getViewTypeMask()).thenReturn(ViewTypeMask.getMaskForDepricatedType(org.sagebionetworks.repo.model.table.ViewType.file));
-		assertEquals(TableType.files, ColumnModelsWidget.getTableType(mockView));
+		assertEquals(TableType.files, TableType.getTableType(mockView));
 		
 		when(mockView.getViewTypeMask()).thenReturn(ViewTypeMask.getMaskForDepricatedType(org.sagebionetworks.repo.model.table.ViewType.file_and_table));
-		assertEquals(TableType.files_tables, ColumnModelsWidget.getTableType(mockView));
+		assertEquals(TableType.files_tables, TableType.getTableType(mockView));
 		
 		when(mockView.getViewTypeMask()).thenReturn(ViewTypeMask.getMaskForDepricatedType(org.sagebionetworks.repo.model.table.ViewType.project));
-		assertEquals(TableType.projects, ColumnModelsWidget.getTableType(mockView));
+		assertEquals(TableType.projects, TableType.getTableType(mockView));
 		
-		assertEquals(TableType.table, ColumnModelsWidget.getTableType(table));
+		assertEquals(TableType.table, TableType.getTableType(table));
 	}
 	
 }

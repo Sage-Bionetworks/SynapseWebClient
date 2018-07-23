@@ -1,9 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
-import static org.sagebionetworks.web.shared.WebConstants.FILE;
-import static org.sagebionetworks.web.shared.WebConstants.FOLDER;
-import static org.sagebionetworks.web.shared.WebConstants.TABLE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,22 +52,9 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 	
 	@Override
 	public void updateViewTypeMask() {
-		tableType = getTableType(view.isFileSelected(), view.isFolderSelected(), view.isTableSelected());
+		tableType = TableType.getTableType(view.isFileSelected(), view.isFolderSelected(), view.isTableSelected());
 	}
 	
-	public static TableType getTableType(boolean isFileSelected, boolean isFolderSelected, boolean isTableSelected) {
-		int viewTypeMask = 0;
-		if (isFileSelected) {
-			viewTypeMask = FILE;
-		}
-		if (isFolderSelected) {
-			viewTypeMask = viewTypeMask | FOLDER;
-		}
-		if (isTableSelected) {
-			viewTypeMask = viewTypeMask | TABLE;
-		}
-		return TableType.getTableType(new Long(viewTypeMask));
-	}
 	/**
 	 * Configure this widget before use.
 	 * 

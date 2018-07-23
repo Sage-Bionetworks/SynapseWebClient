@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.getTableType;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -91,9 +89,12 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 		boolean isVisible = bundle.getEntity() instanceof EntityView;
 		if (isVisible) {
 			currentView = (EntityView) bundle.getEntity();
-			tableType = getTableType(currentView);
+			tableType = TableType.getTableType(currentView);
 			viewScopeWidget.configure(currentView.getScopeIds(), false, tableType);
-			view.setEditButtonVisible(isEditable);
+			view.setEditButtonVisible(isEditable && tableType != null);
+			if (tableType == null) {
+				synAlert.consoleError("View type mask is not supported by web client, blocking edit." + currentView.getViewTypeMask());
+			}
 		}
 		view.setVisible(isVisible);
 	}
@@ -106,7 +107,7 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 	
 	@Override
 	public void updateViewTypeMask() {
-		tableType = CreateTableViewWizardStep1.getTableType(view.isFileSelected(), view.isFolderSelected(), view.isTableSelected());
+		tableType = TableType.getTableType(view.isFileSelected(), view.isFolderSelected(), view.isTableSelected());
 	}
 	
 	@Override

@@ -8,6 +8,11 @@ import static org.sagebionetworks.web.shared.WebConstants.TABLE;
 
 import java.util.HashSet;
 
+import org.sagebionetworks.repo.model.Entity;
+import org.sagebionetworks.repo.model.table.EntityView;
+import org.sagebionetworks.repo.model.table.TableEntity;
+import org.sagebionetworks.repo.model.table.ViewTypeMask;
+
 import com.google.gwt.core.client.GWT;
 
 public enum TableType {
@@ -55,6 +60,20 @@ public enum TableType {
 		return fileBit > 0;
 	}
 	
+	public static TableType getTableType(boolean isFileSelected, boolean isFolderSelected, boolean isTableSelected) {
+		int viewTypeMask = 0;
+		if (isFileSelected) {
+			viewTypeMask = FILE;
+		}
+		if (isFolderSelected) {
+			viewTypeMask = viewTypeMask | FOLDER;
+		}
+		if (isTableSelected) {
+			viewTypeMask = viewTypeMask | TABLE;
+		}
+		return getTableType(new Long(viewTypeMask));
+	}
+
 	public static TableType getTableType(Long viewTypeMask) {
 		if (viewTypeMask == null) {
 			return TableType.table;
@@ -71,21 +90,18 @@ public enum TableType {
 		}
 		return null;
 	}
-	private static final HashSet<Integer> SUPPORTED_MASKS = new HashSet<>();
-	static {
-		for (TableType type : TableType.values()) {
-			if (type.getViewTypeMask() == null) {
-				continue;
-			}
-			
-			SUPPORTED_MASKS.add(type.getViewTypeMask());
-		}
-	}
-	public static boolean isSupportedViewTypeMask(Long viewTypeMask) {
-		if (viewTypeMask == null) {
-			return false;
-		}
-		return SUPPORTED_MASKS.contains(viewTypeMask.intValue());
-	}
 	
+	public static TableType getTableType(Entity entity) {
+		if (entity instanceof TableEntity) {
+			return TableType.table;
+		} else if (entity instanceof EntityView) {
+			EntityView view = (EntityView)entity;
+			Long typeMask = view.getViewTypeMask();
+			if (typeMask == null) {
+				typeMask = ViewTypeMask.getMaskForDepricatedType(view.getType());
+			}
+			return getTableType(typeMask);	
+		}
+		return null;
+	}
 }
