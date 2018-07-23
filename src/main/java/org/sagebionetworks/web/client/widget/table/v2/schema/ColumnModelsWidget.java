@@ -13,6 +13,7 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
+import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -99,7 +100,11 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			return TableType.table;
 		} else if (entity instanceof EntityView) {
 			EntityView view = (EntityView)entity;
-			return TableType.getTableType(view.getViewTypeMask());
+			Long typeMask = view.getViewTypeMask();
+			if (typeMask == null) {
+				typeMask = ViewTypeMask.getMaskForDepricatedType(view.getType());
+			}
+			return TableType.getTableType(typeMask);	
 		}
 		return null;
 	}
