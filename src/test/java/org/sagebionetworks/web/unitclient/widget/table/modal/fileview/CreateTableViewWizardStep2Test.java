@@ -1,7 +1,7 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
 import static org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2.*;
-import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyList;
@@ -31,6 +31,7 @@ import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
 import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -169,7 +170,8 @@ public class CreateTableViewWizardStep2Test {
 		//verify scope
 		ViewScope viewScope = viewScopeCaptor.getValue();
 		assertEquals(mockViewScopeIds, viewScope.getScope());
-		assertEquals(ViewType.file, viewScope.getViewType());
+		assertNull(viewScope.getViewType());
+		assertEquals((Long)ViewTypeMask.File.getMask(), viewScope.getViewTypeMask());
 		
 		verify(mockEditor).addColumns(mockAnnotationColumnsPage1);
 		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(any(ViewScope.class), eq(NEXT_PAGE_TOKEN), any(AsyncCallback.class));
@@ -187,7 +189,8 @@ public class CreateTableViewWizardStep2Test {
 		//verify scope
 		ViewScope viewScope = viewScopeCaptor.getValue();
 		assertEquals(mockViewScopeIds, viewScope.getScope());
-		assertEquals(ViewType.project, viewScope.getViewType());
+		assertNull(viewScope.getViewType());
+		assertEquals((Long)ViewTypeMask.Project.getMask(), viewScope.getViewTypeMask());
 	}
 	
 	@Test

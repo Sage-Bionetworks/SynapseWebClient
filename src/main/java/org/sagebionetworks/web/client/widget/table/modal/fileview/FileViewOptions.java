@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.InlineCheckBox;
 
 import com.google.gwt.event.dom.client.ClickHandler;
@@ -13,11 +14,11 @@ public class FileViewOptions implements IsWidget {
 	public interface Binder extends UiBinder<Widget, FileViewOptions> {}
 	Widget widget;
 	@UiField
-	InlineCheckBox includeFilesCb;
+	CheckBox includeFilesCb;
 	@UiField
-	InlineCheckBox includeFoldersCb;
+	CheckBox includeFoldersCb;
 	@UiField
-	InlineCheckBox includeTablesCb;
+	CheckBox includeTablesCb;
 	
 	@Inject
 	public FileViewOptions(Binder binder){

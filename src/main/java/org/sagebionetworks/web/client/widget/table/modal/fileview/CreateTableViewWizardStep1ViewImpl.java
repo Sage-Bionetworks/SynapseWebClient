@@ -29,6 +29,7 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	@Inject
 	public CreateTableViewWizardStep1ViewImpl(Binder binder, FileViewOptions viewOptions){
 		widget = binder.createAndBindUi(this);
+		this.viewOptions = viewOptions;
 		viewOptionsContainer.add(viewOptions);
 		viewOptions.addClickHandler(event -> {
 			p.updateViewTypeMask();

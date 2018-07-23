@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -64,7 +65,11 @@ public class ScopeWidgetTest {
 		when(mockEntityView.getScopeIds()).thenReturn(mockScopeIds);
 		when(mockBundle.getEntity()).thenReturn(mockEntityView);
 		when(mockEntityView.getType()).thenReturn(ViewType.file);
+		when(mockEntityView.getViewTypeMask()).thenReturn(null);
 		AsyncMockStubber.callSuccessWith(mockUpdatedEntityView).when(mockSynapseClient).updateEntity(any(Table.class), any(AsyncCallback.class));
+		when(mockView.isFileSelected()).thenReturn(false);
+		when(mockView.isFolderSelected()).thenReturn(false);
+		when(mockView.isTableSelected()).thenReturn(false);
 	}
 	@Test
 	public void testConstruction() {
@@ -91,7 +96,9 @@ public class ScopeWidgetTest {
 		verify(mockView).showModal();
 		
 		//update file view to file+table view
-		widget.onSelectFilesAndTablesView();
+		when(mockView.isFileSelected()).thenReturn(true);
+		when(mockView.isTableSelected()).thenReturn(true);
+		widget.updateViewTypeMask();
 		
 		// save new scope
 		widget.onSave();
@@ -99,7 +106,9 @@ public class ScopeWidgetTest {
 		verify(mockSynapseAlert).clear();
 		verify(mockView).setLoading(true);
 		//verify view type has been updated
-		verify(mockEntityView).setType(ViewType.file_and_table);
+		// clears out old ViewType, replaced with mask
+		verify(mockEntityView).setType(null);
+		verify(mockEntityView).setViewTypeMask(ViewTypeMask.getMaskForDepricatedType(ViewType.file_and_table));
 		verify(mockSynapseClient).updateEntity(any(Table.class), any(AsyncCallback.class));
 		verify(mockView).setLoading(false);
 		verify(mockView).hideModal();
@@ -133,7 +142,9 @@ public class ScopeWidgetTest {
 		
 		// Show File View options for project view
 		verify(mockView).setViewTypeOptionsVisible(true);
-		verify(mockView).setIsIncludeTables(false);
+		verify(mockView).setIsFileSelected(true);
+		verify(mockView).setIsFolderSelected(false);
+		verify(mockView).setIsTableSelected(false);
 	}
 	
 	@Test
@@ -146,13 +157,16 @@ public class ScopeWidgetTest {
 		
 		// Show File View options for project view
 		verify(mockView).setViewTypeOptionsVisible(true);
-		verify(mockView).setIsIncludeTables(true);
-		
+		verify(mockView).setIsFileSelected(true);
+		verify(mockView).setIsFolderSelected(false);
+		verify(mockView).setIsTableSelected(true);
+
 		//verify update view type from file+table to file
-		widget.onSelectFilesOnlyView();
+		when(mockView.isFileSelected()).thenReturn(true);
+		widget.updateViewTypeMask();
 		widget.onSave();
 		
-		verify(mockEntityView).setType(ViewType.file);
+		verify(mockEntityView).setViewTypeMask(ViewTypeMask.File.getMask());
 	}
 	
 	@Test

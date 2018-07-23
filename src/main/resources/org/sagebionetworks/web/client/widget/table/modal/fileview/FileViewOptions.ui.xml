@@ -11,9 +11,9 @@
 		<w:HelpWidget helpMarkdown="A view is a type of Synapse Table that queries across metadata (Annotations) for particular items (files, folders, tables) with a particular “scope”." 
 			href="http://docs.synapse.org/articles/views.html" addStyleNames="margin-left-5"/>
 		<bh:Div addStyleNames="margin-left-15">
-			<b:InlineCheckBox ui:field="includeFilesCb" text="Files" value="true"/>
-			<b:InlineCheckBox ui:field="includeFoldersCb" text="Folders" />
-			<b:InlineCheckBox ui:field="includeTablesCb" text="Tables" />
+			<b:CheckBox ui:field="includeFilesCb" text="Files" value="true"/>
+			<b:CheckBox ui:field="includeFoldersCb" text="Folders" />
+			<b:CheckBox ui:field="includeTablesCb" text="Tables" />
 		</bh:Div>
 	</b:FormGroup>
 </ui:UiBinder>
