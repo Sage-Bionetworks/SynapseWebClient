@@ -89,7 +89,7 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 	}
 	
 	@Override
-	public void setFileViewTypeSelectionVisible(boolean visible) {
+	public void setViewTypeOptionsVisible(boolean visible) {
 		viewOptionsContainer.setVisible(visible);
 	}
 	@Override

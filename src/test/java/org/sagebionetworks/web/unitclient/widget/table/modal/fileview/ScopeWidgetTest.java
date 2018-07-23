@@ -119,7 +119,7 @@ public class ScopeWidgetTest {
 		// edit
 		widget.onEdit();
 		// Do not show File View options for project view
-		verify(mockView).setFileViewTypeSelectionVisible(false);
+		verify(mockView).setViewTypeOptionsVisible(false);
 		verify(mockEditScopeWidget).configure(mockScopeIds, true, TableType.projects);
 	}
 	
@@ -132,7 +132,7 @@ public class ScopeWidgetTest {
 		widget.onEdit();
 		
 		// Show File View options for project view
-		verify(mockView).setFileViewTypeSelectionVisible(true);
+		verify(mockView).setViewTypeOptionsVisible(true);
 		verify(mockView).setIsIncludeTables(false);
 	}
 	
@@ -145,7 +145,7 @@ public class ScopeWidgetTest {
 		widget.onEdit();
 		
 		// Show File View options for project view
-		verify(mockView).setFileViewTypeSelectionVisible(true);
+		verify(mockView).setViewTypeOptionsVisible(true);
 		verify(mockView).setIsIncludeTables(true);
 		
 		//verify update view type from file+table to file

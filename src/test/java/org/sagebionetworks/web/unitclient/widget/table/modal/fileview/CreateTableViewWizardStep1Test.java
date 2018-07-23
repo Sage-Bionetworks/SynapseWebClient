@@ -74,7 +74,7 @@ public class CreateTableViewWizardStep1Test {
 		verify(mockView).setName("");
 		verify(mockView).setScopeWidgetVisible(true);
 		
-		verify(mockView).setFileViewTypeSelectionVisible(true);
+		verify(mockView).setViewTypeOptionsVisible(true);
 		String tableName = "a name";
 		EntityView table = new EntityView();
 		table.setName(tableName);
@@ -110,7 +110,7 @@ public class CreateTableViewWizardStep1Test {
 		widget.configure(parentId, TableType.projects);
 		verify(mockView).setName("");
 		verify(mockView).setScopeWidgetVisible(true);
-		verify(mockView).setFileViewTypeSelectionVisible(false);
+		verify(mockView).setViewTypeOptionsVisible(false);
 		String tableName = "a name";
 		EntityView table = new EntityView();
 		table.setName(tableName);
@@ -131,7 +131,7 @@ public class CreateTableViewWizardStep1Test {
 	public void testCreateTable(){
 		widget.configure(parentId, TableType.table);
 		verify(mockView).setScopeWidgetVisible(false);
-		verify(mockView).setFileViewTypeSelectionVisible(false);
+		verify(mockView).setViewTypeOptionsVisible(false);
 		String tableName = "a name";
 		TableEntity table = new TableEntity();
 		table.setName(tableName);

@@ -1,6 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import static com.google.common.util.concurrent.MoreExecutors.directExecutor;
+import static org.sagebionetworks.web.shared.WebConstants.FILE;
+import static org.sagebionetworks.web.shared.WebConstants.FOLDER;
+import static org.sagebionetworks.web.shared.WebConstants.TABLE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +18,6 @@ import org.sagebionetworks.web.client.widget.table.modal.wizard.ModalPage;
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import static org.sagebionetworks.web.shared.WebConstants.FILE;
-import static org.sagebionetworks.web.shared.WebConstants.FOLDER;
-import static org.sagebionetworks.web.shared.WebConstants.PROJECT;
-import static org.sagebionetworks.web.shared.WebConstants.TABLE;
 
 
 /**
@@ -56,19 +55,22 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 	
 	@Override
 	public void updateViewTypeMask() {
-		int viewTypeMask = 0;
-		if (view.isFileSelected()) {
-			viewTypeMask = FILE;
-		}
-		if (view.isFolderSelected()) {
-			viewTypeMask = viewTypeMask | FOLDER;
-		}
-		if (view.isTableSelected()) {
-			viewTypeMask = viewTypeMask | TABLE;
-		}
-		tableType = TableType.getTableType(new Long(viewTypeMask));
+		tableType = getTableType(view.isFileSelected(), view.isFolderSelected(), view.isTableSelected());
 	}
 	
+	public static TableType getTableType(boolean isFileSelected, boolean isFolderSelected, boolean isTableSelected) {
+		int viewTypeMask = 0;
+		if (isFileSelected) {
+			viewTypeMask = FILE;
+		}
+		if (isFolderSelected) {
+			viewTypeMask = viewTypeMask | FOLDER;
+		}
+		if (isTableSelected) {
+			viewTypeMask = viewTypeMask | TABLE;
+		}
+		return TableType.getTableType(new Long(viewTypeMask));
+	}
 	/**
 	 * Configure this widget before use.
 	 * 
@@ -81,9 +83,9 @@ public class CreateTableViewWizardStep1 implements ModalPage, CreateTableViewWiz
 		view.setScopeWidgetVisible(!TableType.table.equals(type));
 		
 		if (TableType.table.equals(type) || TableType.projects.equals(type)) {
-			view.setFileViewTypeSelectionVisible(false);
+			view.setViewTypeOptionsVisible(false);
 		} else {
-			view.setFileViewTypeSelectionVisible(true);
+			view.setViewTypeOptionsVisible(true);
 			//update the checkbox state based on the view type mask
 			view.setIsFileSelected(type.isIncludeFiles());
 			view.setIsFolderSelected(type.isIncludeFolders());
