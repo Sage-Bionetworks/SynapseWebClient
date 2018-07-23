@@ -31,12 +31,35 @@ public class CreateTableViewWizardStep1ViewImpl implements CreateTableViewWizard
 		widget = binder.createAndBindUi(this);
 		viewOptionsContainer.add(viewOptions);
 		viewOptions.addClickHandler(event -> {
-			if (viewOptions.isIncludeTables()) {
-				p.onSelectFilesAndTablesView();
-			} else {
-				p.onSelectFilesOnlyView();
-			}
+			p.updateViewTypeMask();
 		});
+	}
+
+	@Override
+	public boolean isFileSelected() {
+		return viewOptions.isIncludeFiles();
+	}
+	@Override
+	public void setIsFileSelected(boolean value) {
+		viewOptions.setIsIncludeFiles(value);
+	}
+	
+	@Override
+	public boolean isFolderSelected() {
+		return viewOptions.isIncludeFolders();
+	}
+	@Override
+	public void setIsFolderSelected(boolean value) {
+		viewOptions.setIsIncludeFolders(value);
+	}
+
+	@Override
+	public boolean isTableSelected() {
+		return viewOptions.isIncludeTables();
+	}
+	@Override
+	public void setIsTableSelected(boolean value) {
+		viewOptions.setIsIncludeTables(value);
 	}
 
 	@Override

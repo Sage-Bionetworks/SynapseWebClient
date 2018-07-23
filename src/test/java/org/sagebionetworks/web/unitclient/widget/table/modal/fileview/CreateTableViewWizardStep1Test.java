@@ -61,7 +61,7 @@ public class CreateTableViewWizardStep1Test {
 	
 	@Test
 	public void testNullName(){
-		widget.configure(parentId, TableType.fileview);
+		widget.configure(parentId, TableType.files);
 		when(mockView.getName()).thenReturn(null);
 		widget.onPrimary();
 		verify(mockWizardPresenter).setErrorMessage(CreateTableViewWizardStep1.NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
@@ -70,7 +70,7 @@ public class CreateTableViewWizardStep1Test {
 	
 	@Test
 	public void testCreateFileView(){
-		widget.configure(parentId, TableType.fileview);
+		widget.configure(parentId, TableType.files);
 		verify(mockView).setName("");
 		verify(mockView).setScopeWidgetVisible(true);
 		
@@ -87,13 +87,13 @@ public class CreateTableViewWizardStep1Test {
 		assertEquals(scopeIds, capturedFileView.getScopeIds());
 		assertEquals(ViewType.file, capturedFileView.getType());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
-		verify(mockStep2).configure(table, TableType.fileview);
+		verify(mockStep2).configure(table, TableType.files);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);
 	}
 	
 	@Test
 	public void testCreateFileViewEmptyScope(){
-		widget.configure(parentId, TableType.fileview);
+		widget.configure(parentId, TableType.files);
 		String tableName = "a name";
 		EntityView table = new EntityView();
 		table.setName(tableName);
@@ -107,7 +107,7 @@ public class CreateTableViewWizardStep1Test {
 	
 	@Test
 	public void testCreateProjectView(){
-		widget.configure(parentId, TableType.projectview);
+		widget.configure(parentId, TableType.projects);
 		verify(mockView).setName("");
 		verify(mockView).setScopeWidgetVisible(true);
 		verify(mockView).setFileViewTypeSelectionVisible(false);
@@ -123,7 +123,7 @@ public class CreateTableViewWizardStep1Test {
 		assertEquals(scopeIds, capturedFileView.getScopeIds());
 		assertEquals(ViewType.project, capturedFileView.getType());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
-		verify(mockStep2).configure(table, TableType.projectview);
+		verify(mockStep2).configure(table, TableType.projects);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);
 	}
 	
@@ -148,7 +148,7 @@ public class CreateTableViewWizardStep1Test {
 	
 	@Test
 	public void testCreateFailed(){
-		widget.configure(parentId, TableType.fileview);
+		widget.configure(parentId, TableType.files);
 		String tableName = "a name";
 		String error = "name already exists";
 		when(mockJsClient.createEntity(any(Entity.class))).thenReturn(getFailedFuture(new Throwable(error)));

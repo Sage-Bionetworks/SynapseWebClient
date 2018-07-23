@@ -25,9 +25,15 @@ public interface CreateTableViewWizardStep1View extends IsWidget {
 	void setScopeWidgetVisible(boolean visible);
 	void setFileViewTypeSelectionVisible(boolean visible);
 	
+	boolean isFileSelected();
+	void setIsFileSelected(boolean selected);
+	boolean isTableSelected();
+	void setIsTableSelected(boolean selected);
+	boolean isFolderSelected();
+	void setIsFolderSelected(boolean selected);
+	
 	public interface Presenter {
-		void onSelectFilesOnlyView();
-		void onSelectFilesAndTablesView();
+		void updateViewTypeMask();
 	}
 
 	void setPresenter(Presenter presenter);

@@ -7,11 +7,13 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<b:FormGroup addStyleNames="margin-top-10">
-		<b:FormLabel>Options</b:FormLabel>
+		<b:FormLabel>Include in View</b:FormLabel>
+		<w:HelpWidget helpMarkdown="A view is a type of Synapse Table that queries across metadata (Annotations) for particular items (files, folders, tables) with a particular “scope”." 
+			href="http://docs.synapse.org/articles/views.html" addStyleNames="margin-left-5"/>
 		<bh:Div addStyleNames="margin-left-15">
-			<b:InlineCheckBox ui:field="includeTablesCb" value="false" text="Include Tables in File View" />
-			<w:HelpWidget helpMarkdown="Synapse Tables is a feature designed to provide users the ability to create web-accessible, sharable, and queryable data where columns can have a user-specified structured schema." 
-				href="http://docs.synapse.org/articles/tables.html" addStyleNames="margin-left-5"/>
+			<b:InlineCheckBox ui:field="includeFilesCb" text="Files" value="true"/>
+			<b:InlineCheckBox ui:field="includeFoldersCb" text="Folders" />
+			<b:InlineCheckBox ui:field="includeTablesCb" text="Tables" />
 		</bh:Div>
 	</b:FormGroup>
 </ui:UiBinder>

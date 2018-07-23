@@ -81,13 +81,13 @@ public class ScopeWidgetTest {
 		widget.configure(mockBundle, isEditable, mockEntityUpdatedHandler);
 		
 		// The view scope widget does not allow edit of the scope.  That occurs in the modal (with the editScopeWidget)
-		verify(mockViewScopeWidget).configure(mockScopeIds, false, TableType.fileview);
+		verify(mockViewScopeWidget).configure(mockScopeIds, false, TableType.files);
 		verify(mockView).setEditButtonVisible(true);
 		verify(mockView).setVisible(true);
 		
 		// edit
 		widget.onEdit();
-		verify(mockEditScopeWidget).configure(mockScopeIds, true, TableType.fileview);
+		verify(mockEditScopeWidget).configure(mockScopeIds, true, TableType.files);
 		verify(mockView).showModal();
 		
 		//update file view to file+table view
@@ -114,13 +114,13 @@ public class ScopeWidgetTest {
 		widget.configure(mockBundle, isEditable, mockEntityUpdatedHandler);
 		
 		// The view scope widget does not allow edit of the scope.  That occurs in the modal (with the editScopeWidget)
-		verify(mockViewScopeWidget).configure(mockScopeIds, false, TableType.projectview);
+		verify(mockViewScopeWidget).configure(mockScopeIds, false, TableType.projects);
 		
 		// edit
 		widget.onEdit();
 		// Do not show File View options for project view
 		verify(mockView).setFileViewTypeSelectionVisible(false);
-		verify(mockEditScopeWidget).configure(mockScopeIds, true, TableType.projectview);
+		verify(mockEditScopeWidget).configure(mockScopeIds, true, TableType.projects);
 	}
 	
 	@Test
@@ -169,7 +169,7 @@ public class ScopeWidgetTest {
 		boolean isEditable = false;
 		widget.configure(mockBundle, isEditable, mockEntityUpdatedHandler);
 		
-		verify(mockViewScopeWidget).configure(mockScopeIds, false, TableType.fileview);
+		verify(mockViewScopeWidget).configure(mockScopeIds, false, TableType.files);
 		verify(mockView).setEditButtonVisible(false);
 		verify(mockView).setVisible(true);
 	}

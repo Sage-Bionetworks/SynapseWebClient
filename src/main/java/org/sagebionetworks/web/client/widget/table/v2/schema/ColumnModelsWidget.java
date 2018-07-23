@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -100,15 +99,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			return TableType.table;
 		} else if (entity instanceof EntityView) {
 			EntityView view = (EntityView)entity;
-			org.sagebionetworks.repo.model.table.ViewType targetType = view.getType();
-			if (targetType == null) {
-				return TableType.table;
-			}
-			for (TableType tableType : TableType.values()) {
-				if (targetType.equals(tableType.getViewType())) {
-					return tableType;
-				}
-			}
+			return TableType.getTableType(view.getViewTypeMask());
 		}
 		return null;
 	}
@@ -135,7 +126,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	public void getDefaultColumnsForView() {
 		baseView.hideErrors();
 		boolean isClearIds = true;
-		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.getViewType(), isClearIds);
+		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles(), isClearIds);
 		editor.addColumns(defaultColumns); 
 	}
 	

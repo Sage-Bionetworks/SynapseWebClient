@@ -1,8 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2.schema;
 
-import static org.junit.Assert.*;
-import static org.mockito.Matchers.*;
-import static org.mockito.Mockito.*;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
+import static org.mockito.Matchers.anyList;
+import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.inOrder;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
@@ -20,13 +28,12 @@ import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ColumnModelPage;
 import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.repo.model.table.Table;
 import org.sagebionetworks.repo.model.table.TableBundle;
 import org.sagebionetworks.repo.model.table.TableEntity;
-import org.sagebionetworks.repo.model.table.TableSchemaChangeRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateRequest;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
+import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
@@ -36,7 +43,6 @@ import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
-import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep2;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ViewDefaultColumns;
 import org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelTableRow;
@@ -184,7 +190,7 @@ public class ColumnModelsWidgetTest {
 	public void testGetDefaultColumnsForView() {
 		boolean isEditable = true;
 		
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(org.sagebionetworks.repo.model.table.ViewType.class), anyBoolean())).thenReturn(mockDefaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean(), anyBoolean())).thenReturn(mockDefaultColumnModels);
 		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.file);
 		when(mockBundle.getEntity()).thenReturn(mockView);
 		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
@@ -196,7 +202,7 @@ public class ColumnModelsWidgetTest {
 	@Test
 	public void testGetDefaultColumnsForProjectView() {
 		boolean isEditable = true;
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(org.sagebionetworks.repo.model.table.ViewType.class), anyBoolean())).thenReturn(mockDefaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean(), anyBoolean())).thenReturn(mockDefaultColumnModels);
 		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.project);
 		when(mockBundle.getEntity()).thenReturn(mockView);
 		tableBundle.setColumnModels(TableModelTestUtils.createOneOfEachType(true));
@@ -354,14 +360,14 @@ public class ColumnModelsWidgetTest {
 	
 	@Test
 	public void testGetTableType() {
-		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.file);
-		assertEquals(TableType.fileview, ColumnModelsWidget.getTableType(mockView));
+		when(mockView.getViewTypeMask()).thenReturn(ViewTypeMask.getMaskForDepricatedType(org.sagebionetworks.repo.model.table.ViewType.file));
+		assertEquals(TableType.files, ColumnModelsWidget.getTableType(mockView));
 		
-		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.file_and_table);
-		assertEquals(TableType.file_and_table_view, ColumnModelsWidget.getTableType(mockView));
+		when(mockView.getViewTypeMask()).thenReturn(ViewTypeMask.getMaskForDepricatedType(org.sagebionetworks.repo.model.table.ViewType.file_and_table));
+		assertEquals(TableType.files_tables, ColumnModelsWidget.getTableType(mockView));
 		
-		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.project);
-		assertEquals(TableType.projectview, ColumnModelsWidget.getTableType(mockView));
+		when(mockView.getViewTypeMask()).thenReturn(ViewTypeMask.getMaskForDepricatedType(org.sagebionetworks.repo.model.table.ViewType.project));
+		assertEquals(TableType.projects, ColumnModelsWidget.getTableType(mockView));
 		
 		assertEquals(TableType.table, ColumnModelsWidget.getTableType(table));
 	}
