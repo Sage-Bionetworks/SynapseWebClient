@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
@@ -85,7 +86,8 @@ public class CreateTableViewWizardStep1Test {
 		widget.onPrimary();
 		EntityView capturedFileView = (EntityView)captor.getValue();
 		assertEquals(scopeIds, capturedFileView.getScopeIds());
-		assertEquals(ViewType.file, capturedFileView.getType());
+		assertNull(capturedFileView.getType());
+		assertEquals((Long)ViewTypeMask.File.getMask(), capturedFileView.getViewTypeMask());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
 		verify(mockStep2).configure(table, TableType.files);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);
@@ -121,7 +123,8 @@ public class CreateTableViewWizardStep1Test {
 		widget.onPrimary();
 		EntityView capturedFileView = (EntityView)captor.getValue();
 		assertEquals(scopeIds, capturedFileView.getScopeIds());
-		assertEquals(ViewType.project, capturedFileView.getType());
+		assertNull(capturedFileView.getType());
+		assertEquals((Long)ViewTypeMask.Project.getMask(), capturedFileView.getViewTypeMask());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
 		verify(mockStep2).configure(table, TableType.projects);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);

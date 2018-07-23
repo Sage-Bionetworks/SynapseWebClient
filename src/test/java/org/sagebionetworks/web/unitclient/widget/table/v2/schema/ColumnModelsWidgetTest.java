@@ -144,6 +144,8 @@ public class ColumnModelsWidgetTest {
 		AsyncMockStubber.callSuccessWith(mockTableSchemaChangeRequest).when(mockSynapseClient).getTableUpdateTransactionRequest(anyString(), anyList(), anyList(), any(AsyncCallback.class));
 		
 		when(mockView.getScopeIds()).thenReturn(mockViewScopeIds);
+		when(mockView.getType()).thenReturn(org.sagebionetworks.repo.model.table.ViewType.file);
+		when(mockView.getViewTypeMask()).thenReturn(null);
 		when(mockColumnModelPage1.getNextPageToken()).thenReturn(NEXT_PAGE_TOKEN);
 		when(mockColumnModelPage1.getResults()).thenReturn(mockAnnotationColumnsPage1);
 		when(mockColumnModelPage2.getNextPageToken()).thenReturn(null);
