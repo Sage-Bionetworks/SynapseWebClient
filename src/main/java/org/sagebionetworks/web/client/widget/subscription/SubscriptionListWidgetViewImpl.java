@@ -1,14 +1,14 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.RadioButton;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
+import org.sagebionetworks.repo.model.subscription.SortDirection;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.web.client.view.bootstrap.table.Table;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -32,6 +32,12 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 	LoadingSpinner loadingUI;
 	@UiField
 	Table subscriptionsContainer;
+	@UiField
+	AnchorListItem sortAscending;
+	@UiField
+	AnchorListItem sortDescending;
+	@UiField
+	Button sortButton;
 	public interface Binder extends UiBinder<Widget, SubscriptionListWidgetViewImpl> {
 	}
 	
@@ -41,17 +47,17 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 	@Inject
 	public SubscriptionListWidgetViewImpl(Binder binder){
 		this.w = binder.createAndBindUi(this);
-		projectFilter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onFilter(SubscriptionObjectType.FORUM);
-			}
+		projectFilter.addClickHandler(event -> {
+			presenter.onFilter(SubscriptionObjectType.FORUM);
 		});
-		threadFilter.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onFilter(SubscriptionObjectType.THREAD);
-			}
+		threadFilter.addClickHandler(event -> {
+			presenter.onFilter(SubscriptionObjectType.THREAD);
+		});
+		sortAscending.addClickHandler(event -> {
+			presenter.onSort(SortDirection.ASC);
+		});
+		sortDescending.addClickHandler(event -> {
+			presenter.onSort(SortDirection.DESC);
 		});
 	}
 	
@@ -81,6 +87,7 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 	public void clearFilter() {
 		projectFilter.setValue(true, false);
 		projectFilter.setActive(true);
+		sortButton.setText(sortAscending.getText());
 	}
 	
 	@Override

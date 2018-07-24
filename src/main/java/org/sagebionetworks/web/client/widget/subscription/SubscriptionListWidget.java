@@ -2,6 +2,8 @@ package org.sagebionetworks.web.client.widget.subscription;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
+import org.sagebionetworks.repo.model.subscription.SortByType;
+import org.sagebionetworks.repo.model.subscription.SortDirection;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
@@ -27,7 +29,7 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 	AuthenticationController authController;
 	public static final Long LIMIT = 10L;
 	BasicPaginationWidget paginationWidget;
-	
+	SortDirection sortDirection;
 	@Inject
 	public SubscriptionListWidget(SubscriptionListWidgetView view, 
 			SubscriptionClientAsync subscribeClient,
@@ -48,9 +50,11 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 	}
 	
 	public void configure() {
+		sortDirection = SortDirection.ASC;
 		filter = SubscriptionObjectType.FORUM;
 		view.clearFilter();
 		view.clearSubscriptions();
+		
 		if (authController.isLoggedIn()) {
 			onPageChange(0L);
 		}
@@ -62,7 +66,7 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 		view.clearSubscriptions();
 		view.setNoItemsMessageVisible(false);
 		view.setLoadingVisible(true);
-		subscribeClient.getAllSubscriptions(filter, LIMIT, newOffset, new AsyncCallback<SubscriptionPagedResults>() {
+		subscribeClient.getAllSubscriptions(filter, LIMIT, newOffset, SortByType.CREATED_ON, sortDirection, new AsyncCallback<SubscriptionPagedResults>() {
 			@Override
 			public void onSuccess(SubscriptionPagedResults results) {
 				view.setLoadingVisible(false);
@@ -82,6 +86,12 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 				synAlert.handleException(caught);
 			}
 		});
+	}
+	
+	@Override
+	public void onSort(SortDirection sortDirection) {
+		this.sortDirection = sortDirection;
+		onPageChange(0L);
 	}
 	
 	@Override

@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client;
 
+import org.sagebionetworks.repo.model.subscription.SortByType;
+import org.sagebionetworks.repo.model.subscription.SortDirection;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
@@ -12,7 +14,7 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("subscriptionclient")
 public interface SubscriptionClientAsync{
 
-	void getAllSubscriptions(SubscriptionObjectType objectType, Long limit, Long offset, AsyncCallback<SubscriptionPagedResults> callback);
+	void getAllSubscriptions(SubscriptionObjectType objectType, Long limit, Long offset,  SortByType sortByType, SortDirection sortDirection, AsyncCallback<SubscriptionPagedResults> callback);
 
 	void subscribe(Topic toSubscribe, AsyncCallback<Subscription> callback);
 

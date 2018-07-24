@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -40,6 +41,8 @@ public class TopicRowWidgetTest {
 	SubscribeButtonWidget mockSubscribeButtonWidget;
 	@Mock
 	Subscription mockSubscription;
+	@Mock
+	DateTimeUtils mockDateTimeUtils;
 	
 	private static final String TEST_OBJECT_ID = "3";
 	private static final String TEST_SUBSCRIPTION_ID = "8837";
@@ -48,7 +51,7 @@ public class TopicRowWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new TopicRowWidget(mockView, mockTopicWidget, mockSubscribeButtonWidget);
+		widget = new TopicRowWidget(mockView, mockTopicWidget, mockSubscribeButtonWidget, mockDateTimeUtils);
 		
 		when(mockSubscription.getSubscriptionId()).thenReturn(TEST_SUBSCRIPTION_ID);
 		when(mockSubscription.getObjectId()).thenReturn(TEST_OBJECT_ID);

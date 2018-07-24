@@ -14,6 +14,7 @@ public interface TopicRowWidgetView extends IsWidget {
 	void setPresenter(Presenter presenter);
 	void setTopicWidget(Widget w);
 	void setSubscribeButtonWidget(Widget w);
+	void setPostedOn(String postedOn);
 	/**
 	 * Presenter interface
 	 */

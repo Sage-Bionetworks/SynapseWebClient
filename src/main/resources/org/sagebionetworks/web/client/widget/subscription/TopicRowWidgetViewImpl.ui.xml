@@ -11,5 +11,8 @@
 		<t:TableData>
 			<bh:Span ui:field="topicContainer" />
 		</t:TableData>
+		<t:TableData width="120px">
+			<bh:Span ui:field="postedDateSpan" />
+		</t:TableData>
 	</t:TableRow>
 </ui:UiBinder>

@@ -11,6 +11,13 @@
 				<b:RadioButton name="filters" ui:field="projectFilter">Project Forums</b:RadioButton>
 				<b:RadioButton name="filters" ui:field="threadFilter">Threads</b:RadioButton>
 			</b:ButtonGroup>
+			<b:ButtonGroup pull="RIGHT">
+				<b:Button ui:field="sortButton" dataToggle="DROPDOWN" size="SMALL" text="Date posted"/>
+				<b:DropDownMenu>
+					<b:AnchorListItem ui:field="sortAscending" text="Date posted"/>
+					<b:AnchorListItem ui:field="sortDescending" text="Most recent"/>
+				</b:DropDownMenu>
+			</b:ButtonGroup>
 		</bh:Div>
 		<w:LoadingSpinner ui:field="loadingUI" visible="false" size="16px"/>
 		<bh:Div ui:field="synAlertContainer"/>
