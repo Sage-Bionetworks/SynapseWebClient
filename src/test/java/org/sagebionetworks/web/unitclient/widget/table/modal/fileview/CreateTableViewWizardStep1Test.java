@@ -94,6 +94,38 @@ public class CreateTableViewWizardStep1Test {
 	}
 	
 	@Test
+	public void testCreateFileFolderTableView(){
+		//initially configured with Files only
+		widget.configure(parentId, TableType.files);
+		verify(mockView).setName("");
+		verify(mockView).setScopeWidgetVisible(true);
+		verify(mockView).setViewTypeOptionsVisible(true);
+		
+		// simulate updating view type mask (clicking on check boxes for folder and table)
+		when(mockView.isFileSelected()).thenReturn(true);
+		when(mockView.isFolderSelected()).thenReturn(true);
+		when(mockView.isTableSelected()).thenReturn(true);
+		
+		widget.updateViewTypeMask();
+		
+		String tableName = "a name";
+		EntityView table = new EntityView();
+		table.setName(tableName);
+		table.setId("syn57");
+		ArgumentCaptor<Entity> captor = ArgumentCaptor.forClass(Entity.class);
+		when(mockJsClient.createEntity(captor.capture())).thenReturn(getDoneFuture(table));
+		when(mockView.getName()).thenReturn(tableName);
+		widget.onPrimary();
+		EntityView capturedFileView = (EntityView)captor.getValue();
+		assertEquals(scopeIds, capturedFileView.getScopeIds());
+		assertNull(capturedFileView.getType());
+		assertEquals(new Long(TableType.files_folders_tables.getViewTypeMask()), capturedFileView.getViewTypeMask());
+		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
+		verify(mockStep2).configure(table, TableType.files_folders_tables);
+		verify(mockWizardPresenter).setNextActivePage(mockStep2);
+	}
+	
+	@Test
 	public void testCreateFileViewEmptyScope(){
 		widget.configure(parentId, TableType.files);
 		String tableName = "a name";

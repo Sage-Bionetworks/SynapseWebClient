@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.table.modal.fileview.EntityContaine
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidget;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.ScopeWidgetView;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.TableType;
+import org.sagebionetworks.web.shared.WebConstants;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -113,6 +114,19 @@ public class ScopeWidgetTest {
 		verify(mockView).setLoading(false);
 		verify(mockView).hideModal();
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
+	}
+	
+	@Test
+	public void testConfigureUnsupportedViewTypeMask() {
+		//should be editable, but it isn't because the web client does not support the view type mask
+		when(mockEntityView.getViewTypeMask()).thenReturn(new Long(WebConstants.PROJECT | WebConstants.FILE));
+		boolean isEditable = true;
+		widget.configure(mockBundle, isEditable, mockEntityUpdatedHandler);
+		
+		// The view scope widget does not allow edit of the scope.  That occurs in the modal (with the editScopeWidget)
+		verify(mockViewScopeWidget).configure(mockScopeIds, false, null);
+		verify(mockView).setEditButtonVisible(false);
+		verify(mockView).setVisible(true);
 	}
 	
 	@Test
