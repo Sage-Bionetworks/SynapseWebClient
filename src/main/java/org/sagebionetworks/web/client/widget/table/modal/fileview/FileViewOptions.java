@@ -1,9 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
+import org.gwtbootstrap3.client.ui.CheckBox;
 import org.gwtbootstrap3.client.ui.InlineCheckBox;
 
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -14,7 +14,11 @@ public class FileViewOptions implements IsWidget {
 	public interface Binder extends UiBinder<Widget, FileViewOptions> {}
 	Widget widget;
 	@UiField
-	InlineCheckBox includeTablesCb;
+	CheckBox includeFilesCb;
+	@UiField
+	CheckBox includeFoldersCb;
+	@UiField
+	CheckBox includeTablesCb;
 	
 	@Inject
 	public FileViewOptions(Binder binder){
@@ -26,6 +30,22 @@ public class FileViewOptions implements IsWidget {
 		return widget;
 	}
 	
+	public boolean isIncludeFiles() {
+		return includeFilesCb.getValue();
+	}
+
+	public void setIsIncludeFiles(boolean value) {
+		includeFilesCb.setValue(value);
+	}
+
+	public boolean isIncludeFolders() {
+		return includeFoldersCb.getValue();
+	}
+
+	public void setIsIncludeFolders(boolean value) {
+		includeFoldersCb.setValue(value);
+	}
+	
 	public boolean isIncludeTables() {
 		return includeTablesCb.getValue();
 	}
@@ -34,7 +54,9 @@ public class FileViewOptions implements IsWidget {
 		includeTablesCb.setValue(value);
 	}
 	
-	public HandlerRegistration addClickHandler(ClickHandler handler) {
-		return includeTablesCb.addClickHandler(handler);
+	public void addClickHandler(ClickHandler handler) {
+		includeFilesCb.addClickHandler(handler);
+		includeFoldersCb.addClickHandler(handler);
+		includeTablesCb.addClickHandler(handler);
 	}
 }

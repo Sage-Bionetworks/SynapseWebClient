@@ -154,7 +154,7 @@ public class TablePageWidgetTest {
 			}
 		});
 		defaultColumnModels = new ArrayList<ColumnModel>();
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(org.sagebionetworks.repo.model.table.ViewType.class), anyBoolean())).thenReturn(defaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean(), anyBoolean())).thenReturn(defaultColumnModels);
 		widget = new TablePageWidget(mockView, mockGinInjector, mockPaginationWidget,mockFacetsWidget);
 		
 		schema = TableModelTestUtils.createOneOfEachType();

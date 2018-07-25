@@ -14,8 +14,6 @@ import org.sagebionetworks.web.client.widget.table.v2.results.cell.CellFactory;
 import org.sagebionetworks.web.client.widget.table.v2.results.cell.TakesAddressCell;
 import org.sagebionetworks.web.shared.table.CellAddress;
 
-import com.google.gwt.core.shared.GWT;
-import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -66,7 +64,7 @@ public class RowWidget implements IsWidget, RowView.Presenter, KeyboardNavigatio
 		List<ColumnModel> defaultColumns = null;
 		if (isEditor) {
 			boolean clearIds = false;
-			defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.getViewType(), clearIds);
+			defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles(), clearIds);
 		}
 		for(ColumnModel type: types){
 			// Create each cell

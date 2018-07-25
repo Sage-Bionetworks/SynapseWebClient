@@ -276,7 +276,7 @@ public class TableQueryResultWidgetTest {
 	@Test
 	public void testConfigureSuccessNotEditable(){
 		boolean isEditable = false;
-		tableType = TableType.fileview;
+		tableType = TableType.files;
 		// Make the call that changes it all.
 		widget.configure(query, isEditable, tableType, mockListner);
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(TableQueryResultWidget.RUNNING_QUERY_MESSAGE), eq(false), eq(AsynchType.TableQuery), any(QueryBundleRequest.class), asyncProgressHandlerCaptor.capture());
@@ -299,7 +299,7 @@ public class TableQueryResultWidgetTest {
 	public void testConfigureEmptyResultsIsConsistentFalse(){
 		//no rows are returned, and isConsistent is false.  Verify it retries query in this case.
 		boolean isEditable = false;
-		tableType = TableType.fileview;
+		tableType = TableType.files;
 		query.setIsConsistent(false);
 		rowSet.setRows(Collections.EMPTY_LIST);
 		

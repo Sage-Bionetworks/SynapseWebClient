@@ -1,12 +1,10 @@
 package org.sagebionetworks.web.client.widget.table.modal.fileview;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-import static org.sagebionetworks.web.client.widget.table.v2.schema.ColumnModelsWidget.getTableType;
 
 import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.table.EntityView;
-import org.sagebionetworks.repo.model.table.ViewType;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -59,7 +57,7 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 	EntityContainerListWidget viewScopeWidget, editScopeWidget;
 	SynapseAlert synAlert;
 	EntityView currentView;
-	ViewType currentViewType;
+	TableType tableType;
 	
 	/**
 	 * New presenter with its view.
@@ -91,25 +89,25 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 		boolean isVisible = bundle.getEntity() instanceof EntityView;
 		if (isVisible) {
 			currentView = (EntityView) bundle.getEntity();
-			viewScopeWidget.configure(currentView.getScopeIds(), false, getTableType(currentView));
-			view.setEditButtonVisible(isEditable);
+			tableType = TableType.getTableType(currentView);
+			viewScopeWidget.configure(currentView.getScopeIds(), false, tableType);
+			view.setEditButtonVisible(isEditable && tableType != null);
+			if (tableType == null) {
+				synAlert.consoleError("View type mask is not supported by web client, blocking edit." + currentView.getViewTypeMask());
+			}
 		}
 		view.setVisible(isVisible);
 	}
 
-	@Override
-	public void onSelectFilesAndTablesView() {
-		currentViewType = ViewType.file_and_table;
-	}
-	
-	@Override
-	public void onSelectFilesOnlyView() {
-		currentViewType = ViewType.file;
-	}
 	
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	@Override
+	public void updateViewTypeMask() {
+		tableType = TableType.getTableType(view.isFileSelected(), view.isFolderSelected(), view.isTableSelected());
 	}
 	
 	@Override
@@ -118,7 +116,8 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 		synAlert.clear();
 		view.setLoading(true);
 		currentView.setScopeIds(editScopeWidget.getEntityIds());
-		currentView.setType(currentViewType);
+		currentView.setViewTypeMask(tableType.getViewTypeMask().longValue());
+		currentView.setType(null);
 		synapseClient.updateEntity(currentView, new AsyncCallback<Entity>() {
 			@Override
 			public void onSuccess(Entity entity) {
@@ -137,14 +136,15 @@ public class ScopeWidget implements SynapseWidgetPresenter, ScopeWidgetView.Pres
 	@Override
 	public void onEdit() {
 		// configure edit list, and show modal
-		editScopeWidget.configure(currentView.getScopeIds(), true, getTableType(currentView));
-		
-		currentViewType = currentView.getType();
-		boolean isFileView = ViewType.file.equals(currentViewType) || ViewType.file_and_table.equals(currentViewType);
-		view.setFileViewTypeSelectionVisible(isFileView);
-		if (isFileView) {
-			boolean isIncludeTables = ViewType.file_and_table.equals(currentViewType);
-			view.setIsIncludeTables(isIncludeTables);	
+		editScopeWidget.configure(currentView.getScopeIds(), true, tableType);
+		if (TableType.table.equals(tableType) || TableType.projects.equals(tableType)) {
+			view.setViewTypeOptionsVisible(false);
+		} else {
+			view.setViewTypeOptionsVisible(true);
+			//update the checkbox state based on the view type mask
+			view.setIsFileSelected(tableType.isIncludeFiles());
+			view.setIsFolderSelected(tableType.isIncludeFolders());
+			view.setIsTableSelected(tableType.isIncludeTables());
 		}
 		
 		view.showModal();

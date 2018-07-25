@@ -64,35 +64,19 @@ public class ViewDefaultColumns {
 		return defaultColumnNames;
 	}
 
-	public Set<String> getDefaultViewColumnNames(ViewType type) {
-		if (type == null) {
-			return null;
-		}
-		switch(type) {
-			case file:
-			case file_and_table:
-				return getColumnNames(defaultFileViewColumns);
-			case project:
-				return getColumnNames(defaultProjectViewColumns);
-			default :
-				popupUtils.showErrorMessage("Unrecognized view type when retrieving column names:" + type);
-				return null;
+	public Set<String> getDefaultViewColumnNames(boolean includesFiles) {
+		if (includesFiles) {
+			return getColumnNames(defaultFileViewColumns);
+		} else {
+			return getColumnNames(defaultProjectViewColumns);
 		}
 	}
 
-	public List<ColumnModel> getDefaultViewColumns(ViewType type, boolean isClearIds) {
-		if (type == null) {
-			return null;
-		}
-		switch(type) {
-			case file:
-			case file_and_table:
-				return isClearIds ? clearIds(defaultFileViewColumns) : defaultFileViewColumns;
-			case project:
-				return isClearIds ? clearIds(defaultProjectViewColumns) : defaultProjectViewColumns;
-			default :
-				popupUtils.showErrorMessage("Unrecognized view type:" + type);
-				return null;
+	public List<ColumnModel> getDefaultViewColumns(boolean includesFiles, boolean isClearIds) {
+		if (includesFiles) {
+			return isClearIds ? clearIds(defaultFileViewColumns) : defaultFileViewColumns;
+		} else {
+			return isClearIds ? clearIds(defaultProjectViewColumns) : defaultProjectViewColumns;
 		}
 	}
 	

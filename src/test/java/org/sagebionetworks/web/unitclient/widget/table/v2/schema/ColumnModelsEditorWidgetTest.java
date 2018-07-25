@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -110,7 +111,7 @@ public class ColumnModelsEditorWidgetTest {
 		nonEditableColumnNames.add(colName1);
 		nonEditableColumnNames.add(ETAG_COLUMN_NAME);
 		
-		when(mockFileViewDefaultColumns.getDefaultViewColumnNames(any(org.sagebionetworks.repo.model.table.ViewType.class))).thenReturn(nonEditableColumnNames);
+		when(mockFileViewDefaultColumns.getDefaultViewColumnNames(anyBoolean())).thenReturn(nonEditableColumnNames);
 		widget = new ColumnModelsEditorWidget(mockGinInjector, adapterFactory, mockFileViewDefaultColumns);
 		schema = TableModelTestUtils.createOneOfEachType(true);
 	}
@@ -164,7 +165,7 @@ public class ColumnModelsEditorWidgetTest {
 	public void testFileView() {
 		//try to add non-editable column
 		when(mockGinInjector.createColumnModelEditorWidget()).thenReturn(mockColumnModelTableRowEditorWidget1, mockColumnModelTableRowEditorWidget2);
-		widget.configure(TableType.fileview, nonEditableColumns);
+		widget.configure(TableType.files, nonEditableColumns);
 		verify(mockGinInjector,  times(nonEditableColumns.size())).createColumnModelEditorWidget();
 		verify(mockColumnModelTableRowEditorWidget1).setToBeDefaultFileViewColumn();
 		verify(mockColumnModelTableRowEditorWidget2).setToBeDefaultFileViewColumn();

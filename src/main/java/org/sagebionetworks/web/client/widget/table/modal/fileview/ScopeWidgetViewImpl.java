@@ -53,11 +53,7 @@ public class ScopeWidgetViewImpl implements ScopeWidgetView {
 			}
 		});
 		viewOptions.addClickHandler(event -> {
-			if (viewOptions.isIncludeTables()) {
-				presenter.onSelectFilesAndTablesView();
-			} else {
-				presenter.onSelectFilesOnlyView();
-			}
+			presenter.updateViewTypeMask();
 		});
 	}
 	@Override
@@ -111,12 +107,35 @@ public class ScopeWidgetViewImpl implements ScopeWidgetView {
 	}
 
 	@Override
-	public void setFileViewTypeSelectionVisible(boolean visible) {
+	public void setViewTypeOptionsVisible(boolean visible) {
 		viewOptionsContainer.setVisible(visible);
 	}
 	
 	@Override
-	public void setIsIncludeTables(boolean value) {
+	public boolean isFileSelected() {
+		return viewOptions.isIncludeFiles();
+	}
+	@Override
+	public void setIsFileSelected(boolean value) {
+		viewOptions.setIsIncludeFiles(value);
+	}
+	
+	@Override
+	public boolean isFolderSelected() {
+		return viewOptions.isIncludeFolders();
+	}
+	@Override
+	public void setIsFolderSelected(boolean value) {
+		viewOptions.setIsIncludeFolders(value);
+	}
+
+	@Override
+	public boolean isTableSelected() {
+		return viewOptions.isIncludeTables();
+	}
+	@Override
+	public void setIsTableSelected(boolean value) {
 		viewOptions.setIsIncludeTables(value);
 	}
+
 }

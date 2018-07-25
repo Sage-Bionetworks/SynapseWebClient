@@ -1738,7 +1738,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		controller.onAction(Action.ADD_FILE_VIEW);
-		verify(mockCreateTableViewWizard).configure(entityId, TableType.fileview);
+		verify(mockCreateTableViewWizard).configure(entityId, TableType.files);
 		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
 	}
 	@Test
@@ -1746,7 +1746,7 @@ public class EntityActionControllerImplTest {
 		AsyncMockStubber.callWithInvoke().when(mockPreflightController).checkCreateEntity(any(EntityBundle.class), anyString(), any(Callback.class));
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		controller.onAction(Action.ADD_PROJECT_VIEW);
-		verify(mockCreateTableViewWizard).configure(entityId, TableType.projectview);
+		verify(mockCreateTableViewWizard).configure(entityId, TableType.projects);
 		verify(mockCreateTableViewWizard).showModal(any(WizardCallback.class));
 	}
 	@Test
