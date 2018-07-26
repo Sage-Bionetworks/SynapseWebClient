@@ -14,8 +14,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("subscriptionclient")
 public interface SubscriptionClientAsync{
 
-	void getAllSubscriptions(SubscriptionObjectType objectType, Long limit, Long offset,  SortByType sortByType, SortDirection sortDirection, AsyncCallback<SubscriptionPagedResults> callback);
-
 	void subscribe(Topic toSubscribe, AsyncCallback<Subscription> callback);
 
 	void unsubscribe(Long subscriptionId, AsyncCallback<Void> callback);

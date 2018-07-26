@@ -1,12 +1,7 @@
 package org.sagebionetworks.web.server.servlet;
 
-import java.util.Collections;
-
 import org.sagebionetworks.client.exceptions.SynapseException;
-import org.sagebionetworks.repo.model.subscription.SortByType;
-import org.sagebionetworks.repo.model.subscription.SortDirection;
 import org.sagebionetworks.repo.model.subscription.Subscription;
-import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.repo.model.subscription.SubscriptionRequest;
 import org.sagebionetworks.repo.model.subscription.Topic;
@@ -18,16 +13,6 @@ import org.sagebionetworks.web.shared.exceptions.RestServiceException;
 public class SubscriptionClientImpl extends SynapseClientBase implements
 		SubscriptionClient{
 
-	@Override
-	public org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults getAllSubscriptions(SubscriptionObjectType objectType, Long limit, Long offset,  SortByType sortByType, SortDirection sortDirection) throws RestServiceException {
-		org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
-		try {
-			return synapseClient.getAllSubscriptions(objectType, limit, offset, sortByType, sortDirection);
-		} catch (SynapseException e) {
-			throw ExceptionUtil.convertSynapseException(e);
-		}
-	};
-	
 	@Override
 	public Subscription subscribe(Topic toSubscribe)
 			throws RestServiceException {

@@ -15,8 +15,6 @@ import com.google.gwt.user.client.rpc.RemoteServiceRelativePath;
 @RemoteServiceRelativePath("subscriptionclient")	
 public interface SubscriptionClient extends RemoteService {
 	
-	SubscriptionPagedResults getAllSubscriptions(SubscriptionObjectType objectType, Long limit, Long offset,  SortByType sortByType, SortDirection sortDirection) throws RestServiceException;
-	
 	Subscription getSubscription(Long subscriptionId) throws RestServiceException;
 	
 	Subscription subscribe(Topic toSubscribe) throws RestServiceException;

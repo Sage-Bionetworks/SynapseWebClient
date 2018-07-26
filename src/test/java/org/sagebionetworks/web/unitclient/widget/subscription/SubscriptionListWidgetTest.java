@@ -24,7 +24,7 @@ import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SubscriptionClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -44,7 +44,7 @@ public class SubscriptionListWidgetTest {
 	@Mock
 	SubscriptionListWidgetView mockView; 
 	@Mock
-	SubscriptionClientAsync mockSubscriptionClient;
+	SynapseJavascriptClient mockJsClient;
 	@Mock
 	SynapseAlert mockSynAlert;
 	@Mock
@@ -63,8 +63,8 @@ public class SubscriptionListWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new SubscriptionListWidget(mockView, mockSubscriptionClient, mockPortalGinInjector, mockSynAlert, mockAuthenticationController, mockDetailedPaginationWidget);
-		AsyncMockStubber.callSuccessWith(mockSubscriptionPagedResults).when(mockSubscriptionClient)
+		widget = new SubscriptionListWidget(mockView, mockJsClient, mockPortalGinInjector, mockSynAlert, mockAuthenticationController, mockDetailedPaginationWidget);
+		AsyncMockStubber.callSuccessWith(mockSubscriptionPagedResults).when(mockJsClient)
 			.getAllSubscriptions(any(SubscriptionObjectType.class), anyLong(), anyLong(), any(SortByType.class), any(SortDirection.class), any(AsyncCallback.class));
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		when(mockPortalGinInjector.getTopicRowWidget()).thenReturn(mockTopicRowWidget);
@@ -83,7 +83,7 @@ public class SubscriptionListWidgetTest {
 		widget.configure();
 		verify(mockView).clearFilter();
 		verify(mockView).clearSubscriptions();
-		verify(mockSubscriptionClient, never())
+		verify(mockJsClient, never())
 			.getAllSubscriptions(any(SubscriptionObjectType.class), anyLong(), anyLong(), any(SortByType.class), any(SortDirection.class), any(AsyncCallback.class));
 	}
 	
@@ -105,7 +105,7 @@ public class SubscriptionListWidgetTest {
 		verify(mockView, times(2)).clearSubscriptions();
 		verify(mockView, times(2)).setNoItemsMessageVisible(false);
 		verify(mockView).setLoadingVisible(true);
-		verify(mockSubscriptionClient)
+		verify(mockJsClient)
 			.getAllSubscriptions(eq(expectedFilter), eq(SubscriptionListWidget.LIMIT), eq(expectedOffset), any(SortByType.class), any(SortDirection.class), any(AsyncCallback.class));
 		verify(mockSynAlert).clear();
 		
@@ -121,7 +121,7 @@ public class SubscriptionListWidgetTest {
 		reset(mockTopicRowWidget);
 		//simulate the pagination widget going to the second page
 		widget.onPageChange(expectedOffset);
-		verify(mockSubscriptionClient)
+		verify(mockJsClient)
 			.getAllSubscriptions(eq(expectedFilter), eq(SubscriptionListWidget.LIMIT), eq(expectedOffset), eq(SortByType.CREATED_ON), eq(SortDirection.ASC), any(AsyncCallback.class));
 	
 		verify(mockTopicRowWidget, never()).configure(any(Subscription.class));
@@ -141,7 +141,7 @@ public class SubscriptionListWidgetTest {
 		verify(mockView).clearSubscriptions();
 		verify(mockView).setNoItemsMessageVisible(false);
 		verify(mockView).setNoItemsMessageVisible(true);
-		verify(mockSubscriptionClient)
+		verify(mockJsClient)
 			.getAllSubscriptions(eq(expectedFilter), eq(SubscriptionListWidget.LIMIT), eq(expectedOffset), eq(SortByType.CREATED_ON), eq(expectedSortDirection), any(AsyncCallback.class));
 		verify(mockSynAlert).clear();
 		
@@ -164,7 +164,7 @@ public class SubscriptionListWidgetTest {
 		verify(mockView).clearSubscriptions();
 		verify(mockView).setNoItemsMessageVisible(false);
 		verify(mockView).setNoItemsMessageVisible(true);
-		verify(mockSubscriptionClient)
+		verify(mockJsClient)
 			.getAllSubscriptions(eq(expectedFilter), eq(SubscriptionListWidget.LIMIT), eq(expectedOffset), eq(SortByType.CREATED_ON), eq(expectedSortDirection), any(AsyncCallback.class));
 		verify(mockSynAlert).clear();
 	}
@@ -172,7 +172,7 @@ public class SubscriptionListWidgetTest {
 	@Test
 	public void testGetAllSubscriptionsError() {
 		Exception ex = new Exception("nope");
-		AsyncMockStubber.callFailureWith(ex).when(mockSubscriptionClient)
+		AsyncMockStubber.callFailureWith(ex).when(mockJsClient)
 			.getAllSubscriptions(any(SubscriptionObjectType.class), anyLong(), anyLong(), any(SortByType.class), any(SortDirection.class), any(AsyncCallback.class));
 		widget.configure();
 		verify(mockSynAlert).clear();
