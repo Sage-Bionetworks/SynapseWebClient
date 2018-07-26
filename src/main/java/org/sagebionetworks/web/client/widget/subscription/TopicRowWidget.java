@@ -8,7 +8,7 @@ import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class TopicRowWidget implements TopicRowWidgetView.Presenter, SynapseWidgetPresenter {
+public class TopicRowWidget implements SynapseWidgetPresenter {
 	
 	private TopicRowWidgetView view;
 	TopicWidget topic;
@@ -18,22 +18,18 @@ public class TopicRowWidget implements TopicRowWidgetView.Presenter, SynapseWidg
 	@Inject
 	public TopicRowWidget(TopicRowWidgetView view, 
 			TopicWidget topic,
-			SubscribeButtonWidget subscribeButton,
-			DateTimeUtils dateTimeUtils) {
+			SubscribeButtonWidget subscribeButton) {
 		this.view = view;
 		this.topic = topic;
 		this.subscribeButton = subscribeButton;
-		this.dateTimeUtils = dateTimeUtils;
 		view.setSubscribeButtonWidget(subscribeButton.asWidget());
 		view.setTopicWidget(topic.asWidget());
-		view.setPresenter(this);
 		subscribeButton.setButtonSize(ButtonSize.EXTRA_SMALL);
 	}
 	
 	public void configure(Subscription subscription) {
 		subscribeButton.configure(subscription);
 		topic.configure(subscription.getObjectType(), subscription.getObjectId());
-		view.setPostedOn(dateTimeUtils.getDateString(subscription.getCreatedOn()));
 	}
 	
 	@Override

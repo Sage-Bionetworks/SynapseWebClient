@@ -11,23 +11,15 @@ public class TopicRowWidgetViewImpl implements TopicRowWidgetView{
 	Span subscribeButtonContainer;
 	@UiField
 	Span topicContainer;
-	@UiField
-	Span postedDateSpan;
 	
 	public interface Binder extends UiBinder<Widget, TopicRowWidgetViewImpl> {
 	}
 	
 	Widget w;
-	Presenter presenter;
 	
 	@Inject
 	public TopicRowWidgetViewImpl(Binder binder){
 		this.w = binder.createAndBindUi(this);
-	}
-	
-	@Override
-	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;
 	}
 	
 	@Override
@@ -44,9 +36,4 @@ public class TopicRowWidgetViewImpl implements TopicRowWidgetView{
 		topicContainer.clear();
 		topicContainer.add(w);
 	};
-	
-	@Override
-	public void setPostedOn(String postedOn) {
-		postedDateSpan.setText(postedOn);
-	}
 }

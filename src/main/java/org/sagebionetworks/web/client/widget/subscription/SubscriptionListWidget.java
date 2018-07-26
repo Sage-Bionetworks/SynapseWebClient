@@ -15,6 +15,7 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.pagination.PageChangeListener;
 import org.sagebionetworks.web.client.widget.pagination.countbased.BasicPaginationWidget;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -66,7 +67,7 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 		view.clearSubscriptions();
 		view.setNoItemsMessageVisible(false);
 		view.setLoadingVisible(true);
-		subscribeClient.getAllSubscriptions(filter, LIMIT, newOffset, SortByType.CREATED_ON, sortDirection, new AsyncCallback<SubscriptionPagedResults>() {
+		subscribeClient.getAllSubscriptions(filter, LIMIT, newOffset, SortByType.OBJECT_ID, sortDirection, new AsyncCallback<SubscriptionPagedResults>() {
 			@Override
 			public void onSuccess(SubscriptionPagedResults results) {
 				view.setLoadingVisible(false);

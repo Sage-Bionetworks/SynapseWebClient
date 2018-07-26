@@ -41,8 +41,6 @@ public class TopicRowWidgetTest {
 	SubscribeButtonWidget mockSubscribeButtonWidget;
 	@Mock
 	Subscription mockSubscription;
-	@Mock
-	DateTimeUtils mockDateTimeUtils;
 	
 	private static final String TEST_OBJECT_ID = "3";
 	private static final String TEST_SUBSCRIPTION_ID = "8837";
@@ -51,7 +49,7 @@ public class TopicRowWidgetTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new TopicRowWidget(mockView, mockTopicWidget, mockSubscribeButtonWidget, mockDateTimeUtils);
+		widget = new TopicRowWidget(mockView, mockTopicWidget, mockSubscribeButtonWidget);
 		
 		when(mockSubscription.getSubscriptionId()).thenReturn(TEST_SUBSCRIPTION_ID);
 		when(mockSubscription.getObjectId()).thenReturn(TEST_OBJECT_ID);
@@ -60,7 +58,6 @@ public class TopicRowWidgetTest {
 
 	@Test
 	public void testConstruction() {
-		verify(mockView).setPresenter(widget);
 		verify(mockView).setSubscribeButtonWidget(any(Widget.class));
 		verify(mockView).setTopicWidget(any(Widget.class));
 		verify(mockSubscribeButtonWidget).setButtonSize(ButtonSize.EXTRA_SMALL);

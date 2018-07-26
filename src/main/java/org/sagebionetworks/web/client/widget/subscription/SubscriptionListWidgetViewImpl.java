@@ -54,9 +54,11 @@ public class SubscriptionListWidgetViewImpl implements SubscriptionListWidgetVie
 			presenter.onFilter(SubscriptionObjectType.THREAD);
 		});
 		sortAscending.addClickHandler(event -> {
+			sortButton.setText(sortAscending.getText());
 			presenter.onSort(SortDirection.ASC);
 		});
 		sortDescending.addClickHandler(event -> {
+			sortButton.setText(sortDescending.getText());
 			presenter.onSort(SortDirection.DESC);
 		});
 	}
