@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.modal.fileview;
 
-import static junit.framework.Assert.assertEquals;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.never;
@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.ViewType;
+import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1;
 import org.sagebionetworks.web.client.widget.table.modal.fileview.CreateTableViewWizardStep1View;
@@ -61,7 +62,7 @@ public class CreateTableViewWizardStep1Test {
 	
 	@Test
 	public void testNullName(){
-		widget.configure(parentId, TableType.fileview);
+		widget.configure(parentId, TableType.files);
 		when(mockView.getName()).thenReturn(null);
 		widget.onPrimary();
 		verify(mockWizardPresenter).setErrorMessage(CreateTableViewWizardStep1.NAME_MUST_INCLUDE_AT_LEAST_ONE_CHARACTER);
@@ -70,11 +71,11 @@ public class CreateTableViewWizardStep1Test {
 	
 	@Test
 	public void testCreateFileView(){
-		widget.configure(parentId, TableType.fileview);
+		widget.configure(parentId, TableType.files);
 		verify(mockView).setName("");
 		verify(mockView).setScopeWidgetVisible(true);
 		
-		verify(mockView).setFileViewTypeSelectionVisible(true);
+		verify(mockView).setViewTypeOptionsVisible(true);
 		String tableName = "a name";
 		EntityView table = new EntityView();
 		table.setName(tableName);
@@ -85,15 +86,48 @@ public class CreateTableViewWizardStep1Test {
 		widget.onPrimary();
 		EntityView capturedFileView = (EntityView)captor.getValue();
 		assertEquals(scopeIds, capturedFileView.getScopeIds());
-		assertEquals(ViewType.file, capturedFileView.getType());
+		assertNull(capturedFileView.getType());
+		assertEquals((Long)ViewTypeMask.File.getMask(), capturedFileView.getViewTypeMask());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
-		verify(mockStep2).configure(table, TableType.fileview);
+		verify(mockStep2).configure(table, TableType.files);
+		verify(mockWizardPresenter).setNextActivePage(mockStep2);
+	}
+	
+	@Test
+	public void testCreateFileFolderTableView(){
+		//initially configured with Files only
+		widget.configure(parentId, TableType.files);
+		verify(mockView).setName("");
+		verify(mockView).setScopeWidgetVisible(true);
+		verify(mockView).setViewTypeOptionsVisible(true);
+		
+		// simulate updating view type mask (clicking on check boxes for folder and table)
+		when(mockView.isFileSelected()).thenReturn(true);
+		when(mockView.isFolderSelected()).thenReturn(true);
+		when(mockView.isTableSelected()).thenReturn(true);
+		
+		widget.updateViewTypeMask();
+		
+		String tableName = "a name";
+		EntityView table = new EntityView();
+		table.setName(tableName);
+		table.setId("syn57");
+		ArgumentCaptor<Entity> captor = ArgumentCaptor.forClass(Entity.class);
+		when(mockJsClient.createEntity(captor.capture())).thenReturn(getDoneFuture(table));
+		when(mockView.getName()).thenReturn(tableName);
+		widget.onPrimary();
+		EntityView capturedFileView = (EntityView)captor.getValue();
+		assertEquals(scopeIds, capturedFileView.getScopeIds());
+		assertNull(capturedFileView.getType());
+		assertEquals(new Long(TableType.files_folders_tables.getViewTypeMask()), capturedFileView.getViewTypeMask());
+		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
+		verify(mockStep2).configure(table, TableType.files_folders_tables);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);
 	}
 	
 	@Test
 	public void testCreateFileViewEmptyScope(){
-		widget.configure(parentId, TableType.fileview);
+		widget.configure(parentId, TableType.files);
 		String tableName = "a name";
 		EntityView table = new EntityView();
 		table.setName(tableName);
@@ -107,10 +141,10 @@ public class CreateTableViewWizardStep1Test {
 	
 	@Test
 	public void testCreateProjectView(){
-		widget.configure(parentId, TableType.projectview);
+		widget.configure(parentId, TableType.projects);
 		verify(mockView).setName("");
 		verify(mockView).setScopeWidgetVisible(true);
-		verify(mockView).setFileViewTypeSelectionVisible(false);
+		verify(mockView).setViewTypeOptionsVisible(false);
 		String tableName = "a name";
 		EntityView table = new EntityView();
 		table.setName(tableName);
@@ -121,9 +155,10 @@ public class CreateTableViewWizardStep1Test {
 		widget.onPrimary();
 		EntityView capturedFileView = (EntityView)captor.getValue();
 		assertEquals(scopeIds, capturedFileView.getScopeIds());
-		assertEquals(ViewType.project, capturedFileView.getType());
+		assertNull(capturedFileView.getType());
+		assertEquals((Long)ViewTypeMask.Project.getMask(), capturedFileView.getViewTypeMask());
 		verify(mockWizardPresenter, never()).setErrorMessage(anyString());
-		verify(mockStep2).configure(table, TableType.projectview);
+		verify(mockStep2).configure(table, TableType.projects);
 		verify(mockWizardPresenter).setNextActivePage(mockStep2);
 	}
 	
@@ -131,7 +166,7 @@ public class CreateTableViewWizardStep1Test {
 	public void testCreateTable(){
 		widget.configure(parentId, TableType.table);
 		verify(mockView).setScopeWidgetVisible(false);
-		verify(mockView).setFileViewTypeSelectionVisible(false);
+		verify(mockView).setViewTypeOptionsVisible(false);
 		String tableName = "a name";
 		TableEntity table = new TableEntity();
 		table.setName(tableName);
@@ -148,7 +183,7 @@ public class CreateTableViewWizardStep1Test {
 	
 	@Test
 	public void testCreateFailed(){
-		widget.configure(parentId, TableType.fileview);
+		widget.configure(parentId, TableType.files);
 		String tableName = "a name";
 		String error = "name already exists";
 		when(mockJsClient.createEntity(any(Entity.class))).thenReturn(getFailedFuture(new Throwable(error)));

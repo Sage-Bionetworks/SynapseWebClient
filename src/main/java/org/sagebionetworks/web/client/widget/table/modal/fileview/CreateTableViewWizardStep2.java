@@ -112,14 +112,14 @@ public class CreateTableViewWizardStep2 implements ModalPage, IsWidget {
 	
 	public void getDefaultColumnsForView() {
 		boolean clearIds = true;
-		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.getViewType(), clearIds);
+		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles(), clearIds);
 		editor.addColumns(defaultColumns);
 	}
 	
 	public void getPossibleColumnModelsForViewScope(String nextPageToken) {
 		ViewScope scope = new ViewScope();
 		scope.setScope(((EntityView)entity).getScopeIds());
-		scope.setViewType(tableType.getViewType());
+		scope.setViewTypeMask(tableType.getViewTypeMask().longValue());
 		synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken, new AsyncCallback<ColumnModelPage>() {
 			@Override
 			public void onFailure(Throwable caught) {

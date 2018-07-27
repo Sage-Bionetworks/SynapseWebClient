@@ -1002,7 +1002,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), new Callback() {
 			@Override
 			public void invoke() {
-				postCheckCreateTableOrView(TableType.fileview);
+				postCheckCreateTableOrView(TableType.files);
 			}
 		});
 	}
@@ -1011,7 +1011,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		preflightController.checkCreateEntity(entityBundle, EntityView.class.getName(), new Callback() {
 			@Override
 			public void invoke() {
-				postCheckCreateTableOrView(TableType.projectview);
+				postCheckCreateTableOrView(TableType.projects);
 			}
 		});
 	}

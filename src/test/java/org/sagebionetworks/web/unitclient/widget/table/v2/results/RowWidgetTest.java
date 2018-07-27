@@ -75,7 +75,7 @@ public class RowWidgetTest {
 		when(mockCellFactory.createEditor(any(ColumnModel.class))).thenAnswer(answer);
 		when(mockCellFactory.createRenderer(any(ColumnModel.class))).thenAnswer(answer);
 		defaultColumnModels = new ArrayList<ColumnModel>();
-		when(mockFileViewDefaultColumns.getDefaultViewColumns(any(org.sagebionetworks.repo.model.table.ViewType.class), anyBoolean())).thenReturn(defaultColumnModels);
+		when(mockFileViewDefaultColumns.getDefaultViewColumns(anyBoolean(), anyBoolean())).thenReturn(defaultColumnModels);
 		types = TableModelTestUtils.createOneOfEachType();
 		// Create a row that matches the type.
 		aRow = TableModelTestUtils.createRows(types, 1).get(0);
@@ -123,7 +123,7 @@ public class RowWidgetTest {
 	@Test
 	public void testViewSelectNotVisible(){
 		boolean isEditor = true;
-		tableType = TableType.fileview;
+		tableType = TableType.files;
 		rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
 		// selection must be shown when given a listener.
 		verify(mockView).setSelectVisible(false);
@@ -150,7 +150,7 @@ public class RowWidgetTest {
 	
 	@Test
 	public void testTakesAddressCellIsView(){
-		tableType = TableType.projectview;
+		tableType = TableType.projects;
 		TakesAddressCell mockTakesAddress = Mockito.mock(TakesAddressCell.class);
 		when(mockCellFactory.createRenderer(any(ColumnModel.class))).thenReturn(mockTakesAddress);
 		boolean isEditor = false;
@@ -161,7 +161,7 @@ public class RowWidgetTest {
 	@Test
 	public void testEditDefaultColumnModelsIsView(){
 		defaultColumnModels.addAll(types);
-		tableType = TableType.fileview;
+		tableType = TableType.files;
 		boolean isEditor = true;
 		rowWidget.configure(tableId, types, isEditor, tableType, aRow, mockListner);
 		verify(mockCellFactory, times(types.size())).createRenderer(any(ColumnModel.class));

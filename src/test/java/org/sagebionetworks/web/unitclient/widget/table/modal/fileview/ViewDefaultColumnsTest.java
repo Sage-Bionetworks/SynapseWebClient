@@ -58,16 +58,16 @@ public class ViewDefaultColumnsTest {
 	@Test
 	public void testGetDefaultColumnsWithIds() {
 		boolean isClearIds = false;
-		assertEquals(columns, fileViewDefaultColumns.getDefaultViewColumns(ViewType.file, isClearIds));
-		assertEquals(projectColumns, fileViewDefaultColumns.getDefaultViewColumns(ViewType.project,isClearIds));
+		assertEquals(columns, fileViewDefaultColumns.getDefaultViewColumns(true, isClearIds));
+		assertEquals(projectColumns, fileViewDefaultColumns.getDefaultViewColumns(false,isClearIds));
 	}
 	
 	@Test
 	public void testGetDefaultColumnNames() {
 		String colName = "default column name";
 		columnModel.setName(colName);
-		Set<String> columnNames = fileViewDefaultColumns.getDefaultViewColumnNames(ViewType.file);
-		Set<String> projectColumnNames = fileViewDefaultColumns.getDefaultViewColumnNames(ViewType.project);
+		Set<String> columnNames = fileViewDefaultColumns.getDefaultViewColumnNames(true);
+		Set<String> projectColumnNames = fileViewDefaultColumns.getDefaultViewColumnNames(false);
 		assertTrue(columnNames.contains(colName));
 		assertTrue(projectColumnNames.contains(colName));
 	}
