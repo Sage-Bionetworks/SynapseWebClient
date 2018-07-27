@@ -85,7 +85,10 @@ import org.sagebionetworks.repo.model.principal.TypeFilter;
 import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.request.ReferenceList;
 import org.sagebionetworks.repo.model.subscription.Etag;
+import org.sagebionetworks.repo.model.subscription.SortByType;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
+import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
+import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.repo.model.subscription.Topic;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.ViewType;
@@ -199,6 +202,7 @@ public class SynapseJavascriptClient {
 	public static final String DOCKER_COMMIT = "/dockerCommit";
 	public static final String OFFSET_PARAMETER = "offset=";
 	public static final String LIMIT_PARAMETER = "limit=";
+	public static final String OBJECT_TYPE_PARAMETER = "objectType=";
 	private static final String NEXT_PAGE_TOKEN_PARAM = "nextPageToken=";
 	public static final String SKIP_TRASH_CAN_PARAM = "skipTrashCan";
 	private static final String ASCENDING_PARAM = "ascending=";
@@ -1126,10 +1130,20 @@ public class SynapseJavascriptClient {
 		doPost(url, request, OBJECT_TYPE.EntityId, callback);
 	}
 	
-
 	public void getUploadDestinations(String parentEntityId, AsyncCallback<List<UploadDestination>> callback) {
 		String url = getFileServiceUrl() + ENTITY + "/" + parentEntityId + UPLOAD_DESTINATIONS;
 		doGet(url, OBJECT_TYPE.ListWrapperUploadDestinations, callback);
+	}
+	
+	public void getAllSubscriptions(SubscriptionObjectType objectType, Long limit, Long offset, SortByType sortByType, org.sagebionetworks.repo.model.subscription.SortDirection sortDirection, AsyncCallback<SubscriptionPagedResults> callback) {
+		String url = getRepoServiceUrl() + SUBSCRIPTION+"/all?" + OBJECT_TYPE_PARAMETER + objectType.name() + "&" + LIMIT_PARAMETER+limit + "&" + OFFSET_PARAMETER+offset;
+		if (sortByType!=null) {
+			url += "&sortBy="+sortByType.name();
+		}
+		if (sortDirection!=null) {
+			url += "&sortDirection="+sortDirection.name();
+		}
+		doGet(url, OBJECT_TYPE.SubscriptionPagedResults, callback);
 	}
 }
 

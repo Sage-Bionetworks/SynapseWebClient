@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
+import org.sagebionetworks.repo.model.subscription.SortDirection;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 
 import com.google.gwt.user.client.ui.IsWidget;
@@ -21,6 +22,6 @@ public interface SubscriptionListWidgetView extends IsWidget {
 	 */
 	public interface Presenter {
 		void onFilter(SubscriptionObjectType type);
+		void onSort(SortDirection sortDirection);
 	}
-
 }

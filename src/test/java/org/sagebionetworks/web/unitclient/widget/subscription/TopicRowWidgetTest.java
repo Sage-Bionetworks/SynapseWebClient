@@ -15,6 +15,7 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
+import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.utils.TopicUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -57,7 +58,6 @@ public class TopicRowWidgetTest {
 
 	@Test
 	public void testConstruction() {
-		verify(mockView).setPresenter(widget);
 		verify(mockView).setSubscribeButtonWidget(any(Widget.class));
 		verify(mockView).setTopicWidget(any(Widget.class));
 		verify(mockSubscribeButtonWidget).setButtonSize(ButtonSize.EXTRA_SMALL);
