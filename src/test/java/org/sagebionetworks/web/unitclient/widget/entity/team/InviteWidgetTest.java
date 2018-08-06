@@ -1,10 +1,10 @@
 package org.sagebionetworks.web.unitclient.widget.entity.team;
 
-import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.*;
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -66,12 +66,12 @@ public class InviteWidgetTest {
 		when(mockGWTWrapper.getHostPageBaseURL()).thenReturn(EvaluationSubmitterTest.HOST_PAGE_URL);
 		when(mockHeader.getOwnerId()).thenReturn(userId);
 		when(mockTeam.getId()).thenReturn(teamId);
+		when(mockSuggestion.getId()).thenReturn(userId);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Test
 	public void testSendInvitation() throws Exception {		
-		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isTeamMember(anyString(), anyLong(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).inviteMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
 		when(mockSuggestion.getHeader()).thenReturn(mockHeader);
@@ -79,23 +79,17 @@ public class InviteWidgetTest {
 		verify(mockSynapseClient).inviteMember(eq(userId), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
-	}
-	
-	@Test
-	public void testSendToMember() {
-		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
-		when(mockSuggestion.getHeader()).thenReturn(mockHeader);
-		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isTeamMember(anyString(), anyLong(), any(AsyncCallback.class));
-		inviteWidget.doSendInvites(invitationMessage);
-		verify(mockSynAlert).showError("This user is already a member.");
-	}
+	}	
 	
 	@Test
 	public void testSendNoUserSelected() {
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
 		when(mockSuggestBox.getText()).thenReturn("notAnEmailAddress");
+		
 		inviteWidget.doSendInvites(invitationMessage);
-		verify(mockSynAlert).showError("Please select a user or an email address to send an invite to.");
+		
+		// no users added, so it's a no-op
+		verifyZeroInteractions(mockSynapseClient);
 	}
 
 	@Test
