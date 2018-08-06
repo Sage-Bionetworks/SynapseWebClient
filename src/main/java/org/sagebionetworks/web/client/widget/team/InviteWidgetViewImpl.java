@@ -8,14 +8,11 @@ import org.gwtbootstrap3.client.ui.constants.ButtonType;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.FlowPanel;
@@ -45,9 +42,7 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 	@UiField
 	Button cancelButton;
 	@UiField
-	Div emailsContainer;
-	@UiField
-	Div usersContainer;
+	Div inviteesContainer;
 	@UiField
 	LoadingSpinner loadingUI;
 	private InviteWidgetView.Presenter presenter;
@@ -74,8 +69,7 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 	@Override
 	public void clear() {
 		inviteTextArea.setText("");
-		emailsContainer.clear();
-		usersContainer.clear();
+		inviteesContainer.clear();
 	}
 
 	@Override
@@ -111,9 +105,10 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 	@Override
 	public void addEmailToInvite(String emailInvite) {
 		Div d = new Div();
+		d.addStyleName("margin-top-5");
 		d.add(new Span(emailInvite));
 		Button button = new Button("", IconType.TIMES, event -> {
-			emailsContainer.remove(d);
+			inviteesContainer.remove(d);
 			presenter.removeEmailToInvite(emailInvite);		
 		});
 		button.setSize(ButtonSize.EXTRA_SMALL);
@@ -121,7 +116,7 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 		button.addStyleName("displayInline margin-left-5");
 		
 		d.add(button);
-		emailsContainer.add(d);
+		inviteesContainer.add(d);
 	}
 	
 	@Override
@@ -131,7 +126,7 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 		badge.configure(userId);
 		d.add(badge);
 		Button button = new Button("", IconType.TIMES, event -> {
-			usersContainer.remove(d);
+			inviteesContainer.remove(d);
 			presenter.removeUserToInvite(userId);		
 		});
 		button.setSize(ButtonSize.EXTRA_SMALL);
@@ -140,10 +135,11 @@ public class InviteWidgetViewImpl extends FlowPanel implements InviteWidgetView 
 		
 		d.add(badge);
 		d.add(button);
-		usersContainer.add(d);
+		inviteesContainer.add(d);
 	}
 	@Override
 	public void setLoading(boolean isLoading) {
 		loadingUI.setVisible(isLoading);
+		sendInviteButton.setEnabled(!isLoading);
 	}
 }

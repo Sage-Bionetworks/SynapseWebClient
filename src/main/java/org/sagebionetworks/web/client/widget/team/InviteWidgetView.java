@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
-import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;

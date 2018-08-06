@@ -15,7 +15,6 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.search.SynapseSuggestBox;
 import org.sagebionetworks.web.client.widget.search.UserGroupSuggestionProvider;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -82,12 +81,13 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		if (isValidEmail(input)) {
 			inviteEmails.add(input);
 			view.addEmailToInvite(input);
-		} else {
+			peopleSuggestWidget.clear();
+		} else if (peopleSuggestWidget.getSelectedSuggestion() != null) {
 			String userId = peopleSuggestWidget.getSelectedSuggestion().getId();
 			inviteUsers.add(userId);
 			view.addUserToInvite(userId);
+			peopleSuggestWidget.clear();
 		}
-		peopleSuggestWidget.clear();
 	}
 	
 	@Override

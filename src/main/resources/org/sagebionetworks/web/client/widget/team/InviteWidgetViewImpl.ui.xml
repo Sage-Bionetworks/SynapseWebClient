@@ -12,9 +12,8 @@
 				<b:FormLabel>User Name or Email Address</b:FormLabel>
 				<g:SimplePanel ui:field="suggestBoxPanel"/>
 			</b:FormGroup>
-			<bh:Div ui:field="emailsContainer" />
-			<bh:Div ui:field="usersContainer" />
-			<b:FormGroup>
+			<bh:Div ui:field="inviteesContainer" />
+			<b:FormGroup addStyleNames="margin-top-10">
 				<b:FormLabel for="inviteText">Invitation Message (Optional)</b:FormLabel>
 				<b:TextArea b:id="inviteText" ui:field="inviteTextArea" addStyleNames=" margin-top-5 hide-resize" width="100%">Enter optional invitation message...</b:TextArea>
 			</b:FormGroup>
@@ -23,7 +22,7 @@
 		</b:ModalBody>
 		<b:ModalFooter>
 			<b:Button text="Cancel" ui:field="cancelButton" type="LINK" addStyleNames="margin-right-5"/>
-			<b:Button ui:field="sendInviteButton" text="Send Invitation" type="PRIMARY"/>
+			<b:Button ui:field="sendInviteButton" text="Send Invitation(s)" type="PRIMARY"/>
 		</b:ModalFooter>
 	</b:Modal>
 
