@@ -1,6 +1,7 @@
 package org.sagebionetworks.web.client.widget.team;
 
 import org.sagebionetworks.repo.model.Team;
+import org.sagebionetworks.web.client.widget.search.UserGroupSuggestion;
 
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -13,15 +14,20 @@ public interface InviteWidgetView extends IsWidget {
 	 */
 	public void setPresenter(Presenter presenter);
 	public interface Presenter {
-		void validateAndSendInvite(String invitationMessage);
+		void doSendInvites(String invitationMessage);
 		void configure(Team team);
 		void show();
 		void hide();
+		void removeEmailToInvite(String email);
+		void removeUserToInvite(String userId);
 	}
+	void addEmailToInvite(String emailInvite);
+	void addUserToInvite(String userId);
 	public void setSynAlertWidget(Widget asWidget);
 	void setSuggestWidget(Widget suggestWidget);
 	public void clear();
 	public void showInfo(String string, String string2);
 	void show();
 	void hide();
+	void setLoading(boolean isLoading);
 }

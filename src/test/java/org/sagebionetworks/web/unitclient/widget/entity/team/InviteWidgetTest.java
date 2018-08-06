@@ -75,7 +75,7 @@ public class InviteWidgetTest {
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).inviteMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
 		when(mockSuggestion.getHeader()).thenReturn(mockHeader);
-		inviteWidget.validateAndSendInvite(invitationMessage);
+		inviteWidget.doSendInvites(invitationMessage);
 		verify(mockSynapseClient).inviteMember(eq(userId), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
@@ -86,7 +86,7 @@ public class InviteWidgetTest {
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
 		when(mockSuggestion.getHeader()).thenReturn(mockHeader);
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isTeamMember(anyString(), anyLong(), any(AsyncCallback.class));
-		inviteWidget.validateAndSendInvite(invitationMessage);
+		inviteWidget.doSendInvites(invitationMessage);
 		verify(mockSynAlert).showError("This user is already a member.");
 	}
 	
@@ -94,7 +94,7 @@ public class InviteWidgetTest {
 	public void testSendNoUserSelected() {
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
 		when(mockSuggestBox.getText()).thenReturn("notAnEmailAddress");
-		inviteWidget.validateAndSendInvite(invitationMessage);
+		inviteWidget.doSendInvites(invitationMessage);
 		verify(mockSynAlert).showError("Please select a user or an email address to send an invite to.");
 	}
 
@@ -104,7 +104,7 @@ public class InviteWidgetTest {
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
 		when(mockSuggestBox.getText()).thenReturn(email);
 		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).inviteNewMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
-		inviteWidget.validateAndSendInvite(invitationMessage);
+		inviteWidget.doSendInvites(invitationMessage);
 		verify(mockSynapseClient).inviteNewMember(eq(email), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
@@ -118,7 +118,7 @@ public class InviteWidgetTest {
 		AsyncMockStubber.callFailureWith(caught).when(mockSynapseClient).inviteMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
 		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
 		when(mockSuggestion.getHeader()).thenReturn(mockHeader);
-		inviteWidget.validateAndSendInvite("You are invited!");
+		inviteWidget.doSendInvites("You are invited!");
 		verify(mockSynapseClient).inviteMember(eq(userId), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(caught);
 	}
