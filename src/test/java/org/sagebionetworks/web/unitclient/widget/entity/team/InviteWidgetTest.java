@@ -116,4 +116,42 @@ public class InviteWidgetTest {
 		verify(mockSynapseClient).inviteMember(eq(userId), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
 		verify(mockSynAlert).handleException(caught);
 	}
+	
+	@Test
+	public void testInviteMultipleUsers() {
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).inviteMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(null).when(mockSynapseClient).inviteNewMember(anyString(), anyString(), anyString(), anyString(), any(AsyncCallback.class));
+		
+		//add 2 emails (and verify that it's added to the view)
+		String email1 = "emailAddress1@synapse.org";
+		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
+		when(mockSuggestBox.getText()).thenReturn(email1);
+		inviteWidget.addSuggestion();
+		verify(mockView).addEmailToInvite(email1);
+		verify(mockSuggestBox, times(2)).clear();
+		
+		String email2 = "emailAddress2@synapse.org";
+		when(mockSuggestBox.getText()).thenReturn(email2);
+		inviteWidget.addSuggestion();
+		verify(mockView).addEmailToInvite(email2);
+				
+		//add user (and verify that it's added to the view)
+		when(mockSuggestBox.getText()).thenReturn("");
+		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(mockSuggestion);
+		
+		inviteWidget.addSuggestion();
+		
+		verify(mockView).addUserToInvite(userId);
+		verify(mockSuggestBox, times(4)).clear();
+		when(mockSuggestBox.getSelectedSuggestion()).thenReturn(null);
+		
+		//verify that after this setup, we create 3 invitations when we click the Invite button
+		inviteWidget.doSendInvites(invitationMessage);
+		
+		verify(mockSynapseClient).inviteNewMember(eq(email1), eq(teamId), eq(invitationMessage), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
+		verify(mockSynapseClient).inviteNewMember(eq(email2), eq(teamId), eq(invitationMessage), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
+		verify(mockSynapseClient).inviteMember(eq(userId), eq(teamId), eq(invitationMessage), eq(EvaluationSubmitterTest.HOST_PAGE_URL), any(AsyncCallback.class));
+		verify(mockRefreshCallback).invoke();
+		verify(mockView).hide();
+	}
 }
