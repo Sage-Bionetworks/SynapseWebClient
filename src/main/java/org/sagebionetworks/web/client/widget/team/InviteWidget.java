@@ -118,6 +118,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		// if anything is in the invitation field, then pick it up before processing
 		addSuggestion();
 		view.setLoading(true);
+		synAlert.clear();
 		this.invitationMessage = invitationMessage;
 		doSendInvites();
 	}
