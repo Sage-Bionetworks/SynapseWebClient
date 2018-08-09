@@ -20,33 +20,45 @@
 						<b:TabListItem ui:field="rTabListItem" text="R" />
 					</b:NavTabs>
 					<b:TabContent>
-						<b:TabPane active="true" ui:field="cliTabPane">
-				  			<b:Code addStyleNames="nohighlight">
-				  				synapse get <span ui:field="id1"/> <span ui:field="versionUI1">--version <span ui:field="version1"/></span>
-				  			</b:Code>
+						<b:TabPane ui:field="cliTabPane" active="true">
+							<g:HTMLPanel>
+								<pre>
+									<code class="nohighlight">
+										synapse get <span ui:field="id1"/> <span ui:field="versionUI1">--version <span ui:field="version1"/></span>
+									</code>
+								</pre>
+							</g:HTMLPanel>
 						</b:TabPane>
 						<b:TabPane ui:field="pythonTabPane">
-				  			<b:Code addStyleNames="nohighlight">
-				  					import synapseclient
-									
-									syn = synapseclient.Synapse()
-									syn.login('synapse_username','password')
-									
-									# Obtain a pointer and download the data
-									<span ui:field="id2"/> = syn.get(entity='<span ui:field="id3"/>'<span ui:field="versionUI2">, version=<span ui:field="version2"/></span>)
-									
-									# Get the path to the local copy of the data file
-									filepath = <span ui:field="id4"/>.path
-							</b:Code>
+							<g:HTMLPanel>
+								<pre>
+									<code class="nohighlight">
+					  					import synapseclient<br/>
+										<br/>
+										syn = synapseclient.Synapse()<br/>
+										syn.login('synapse_username','password')<br/>
+										<br/>
+										# Obtain a pointer and download the data<br/>
+										<span ui:field="id2"/> = syn.get(entity='<span ui:field="id3"/>'<span ui:field="versionUI2">, version=<span ui:field="version2"/></span>)<br/>
+										<br/>
+										# Get the path to the local copy of the data file<br/>
+										filepath = <span ui:field="id4"/>.path
+									</code>
+								</pre>
+							</g:HTMLPanel>
 						</b:TabPane>
 						<b:TabPane ui:field="rTabPane">
-				  			<b:Code addStyleNames="nohighlight">
-									library(synapser)
-									synLogin('username','password')
-									 
-									# Obtain a pointer and download the data
-									<span ui:field="id5"/> &#60;- synGet(id='<span ui:field="id6"/>'<span ui:field="versionUI3">, version=<span ui:field="version3"/></span>)
-							</b:Code>
+				  			<g:HTMLPanel>
+				  				<pre>
+									<code class="nohighlight">
+					  					library(synapser)<br/>
+										synLogin('username','password')<br/>
+										<br/>
+										# Obtain a pointer and download the data<br/>
+										<span ui:field="id5"/> &#60;- synGet(id='<span ui:field="id6"/>'<span ui:field="versionUI3">, version=<span ui:field="version3"/></span>)
+									</code>
+								</pre>
+							</g:HTMLPanel>
 						</b:TabPane>
 					</b:TabContent>
 				</b:TabPanel>
