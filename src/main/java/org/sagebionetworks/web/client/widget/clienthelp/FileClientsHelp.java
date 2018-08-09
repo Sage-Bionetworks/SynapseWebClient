@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.clienthelp;
 
+import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
+
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -18,6 +20,7 @@ public class FileClientsHelp implements IsWidget {
 			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		fixServiceEntryPoint(synapseClient);
 	}
 	
 	public void configure(String entityId, Long version) {
