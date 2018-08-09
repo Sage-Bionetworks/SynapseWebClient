@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.file;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
@@ -111,6 +112,7 @@ public class FileDownloadButtonTest {
 	public static final String SFTP_ENDPOINT = "https://sftp.org/sftp";
 	public static final String SFTP_HOST = "my.sftp.server";
 	public static final String ENTITY_ID = "syn210";
+	public static final Long VERSION = 32L;
 	public static final String fileHandleAssociationUrl="http://mytestfilehandleassociationurl/filehandleassociation";
 	@Before
 	public void setUp() throws Exception {
@@ -120,6 +122,7 @@ public class FileDownloadButtonTest {
 		when(mockSynapseProperties.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(SFTP_ENDPOINT);
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);
 		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);
+		when(mockFileEntity.getVersionNumber()).thenReturn(VERSION);
 		fileHandles = new ArrayList<FileHandle>();
 		when(mockEntityBundle.getFileHandles()).thenReturn(fileHandles);
 		when(mockGinInjector.getFileClientsHelp()).thenReturn(mockFileClientsHelp);
@@ -174,7 +177,7 @@ public class FileDownloadButtonTest {
 		verify(mockView).setIsDirectDownloadLink(fileHandleAssociationUrl);
 		
 		verify(mockView).addWidget(mockFileClientsHelp);
-		verify(mockFileClientsHelp).configure(ENTITY_ID);
+		verify(mockFileClientsHelp).configure(ENTITY_ID, VERSION);
 	}
 	
 	@Test
@@ -227,7 +230,7 @@ public class FileDownloadButtonTest {
 		when(mockFileHandle.getExternalURL()).thenReturn(fileUrl);
 		widget.configure(mockEntityBundle, mockRestrictionInformation);
 		verify(mockView).setIsAuthorizedDirectDownloadLink();
-		verify(mockFileClientsHelp, never()).configure(anyString()); //no client help for sftp download
+		verify(mockFileClientsHelp, never()).configure(anyString(), anyLong()); //no client help for sftp download
 		verify(mockLoginModalWidget).configure(fileUrl,  FormPanel.METHOD_POST, FormPanel.ENCODING_MULTIPART);
 		verify(mockSynapseClient).getHost(anyString(), any(AsyncCallback.class));
 		verify(mockLoginModalWidget).setInstructionMessage(DisplayConstants.DOWNLOAD_CREDENTIALS_REQUIRED + SFTP_HOST);

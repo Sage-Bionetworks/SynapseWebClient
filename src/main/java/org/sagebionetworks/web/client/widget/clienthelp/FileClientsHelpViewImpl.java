@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TabListItem;
 import org.gwtbootstrap3.client.ui.TabPane;
+import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -11,10 +12,11 @@ import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.HTMLPanel;
+import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FileClientsHelpImpl implements FileClientsHelp {
+public class FileClientsHelpViewImpl implements FileClientsHelpView {
 	@UiField
 	SpanElement id1;
 	@UiField
@@ -27,6 +29,18 @@ public class FileClientsHelpImpl implements FileClientsHelp {
 	SpanElement id5;
 	@UiField
 	SpanElement id6;
+	@UiField
+	SpanElement versionUI1;
+	@UiField
+	SpanElement versionUI2;
+	@UiField
+	SpanElement versionUI3;
+	@UiField
+	SpanElement version1;
+	@UiField
+	SpanElement version2;
+	@UiField
+	SpanElement version3;
 	@UiField
 	Anchor link;
 	@UiField
@@ -45,11 +59,10 @@ public class FileClientsHelpImpl implements FileClientsHelp {
 	TabPane rTabPane;
 	
 	Widget widget;
-	String entityId = null;
-	public interface Binder extends UiBinder<Widget, FileClientsHelpImpl> {}
+	public interface Binder extends UiBinder<Widget, FileClientsHelpViewImpl> {}
 
 	@Inject
-	public FileClientsHelpImpl(Binder binder) {
+	public FileClientsHelpViewImpl(Binder binder) {
 		this.widget = binder.createAndBindUi(this);
 		link.addClickHandler(new ClickHandler() {
 			@Override
@@ -58,9 +71,9 @@ public class FileClientsHelpImpl implements FileClientsHelp {
 			}
 		});
 		
-		FileClientsHelpImpl.setId(cliTabListItem, cliTabPane);
-		FileClientsHelpImpl.setId(pythonTabListItem, pythonTabPane);
-		FileClientsHelpImpl.setId(rTabListItem, rTabPane);
+		FileClientsHelpViewImpl.setId(cliTabListItem, cliTabPane);
+		FileClientsHelpViewImpl.setId(pythonTabListItem, pythonTabPane);
+		FileClientsHelpViewImpl.setId(rTabListItem, rTabPane);
 	}
 	
 	public static void setId(TabListItem tabListItem, TabPane tabPane) {
@@ -75,13 +88,23 @@ public class FileClientsHelpImpl implements FileClientsHelp {
 	}
 	
 	@Override
-	public void configure(String entityId) {
-		this.entityId = entityId;
+	public void configure(String entityId, Long version) {
 		id1.setInnerHTML(entityId);
 		id2.setInnerHTML(entityId);
 		id3.setInnerHTML(entityId);
 		id4.setInnerHTML(entityId);
 		id5.setInnerHTML(entityId);
 		id6.setInnerHTML(entityId);
+		String versionString = version.toString();
+		version1.setInnerHTML(versionString);
+		version2.setInnerHTML(versionString);
+		version3.setInnerHTML(versionString);
+	}
+	
+	@Override
+	public void setVersionVisible(boolean visible) {
+		UIObject.setVisible(versionUI1, visible);
+		UIObject.setVisible(versionUI2, visible);
+		UIObject.setVisible(versionUI3, visible);
 	}
 }
