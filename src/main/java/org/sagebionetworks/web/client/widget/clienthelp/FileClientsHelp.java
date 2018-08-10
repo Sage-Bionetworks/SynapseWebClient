@@ -4,6 +4,7 @@ import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEn
 
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -14,12 +15,16 @@ import com.google.inject.Inject;
 public class FileClientsHelp implements IsWidget {
 	private FileClientsHelpView view;
 	private SynapseClientAsync synapseClient;
+	private SynapseJSNIUtils jsniUtils;
 	
 	@Inject
-	public FileClientsHelp(FileClientsHelpView view,
-			SynapseClientAsync synapseClient) {
+	public FileClientsHelp(
+			FileClientsHelpView view,
+			SynapseClientAsync synapseClient,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.synapseClient = synapseClient;
+		this.jsniUtils = jsniUtils;
 		fixServiceEntryPoint(synapseClient);
 	}
 	
@@ -38,6 +43,7 @@ public class FileClientsHelp implements IsWidget {
 			
 			@Override
 			public void onFailure(Throwable caught) {
+				jsniUtils.consoleError(caught.getMessage());
 				view.setVersionVisible(false);
 			}
 		});
