@@ -44,8 +44,8 @@ public class ContainerClientsHelpImpl implements ContainerClientsHelp {
 				modal.show();
 			}
 		});
-		FileClientsHelpImpl.setId(cliTabListItem, cliTabPane);
-		FileClientsHelpImpl.setId(pythonTabListItem, pythonTabPane);
+		FileClientsHelpViewImpl.setId(cliTabListItem, cliTabPane);
+		FileClientsHelpViewImpl.setId(pythonTabListItem, pythonTabPane);
 	}
 	@Override
 	public Widget asWidget() {

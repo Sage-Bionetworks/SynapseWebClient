@@ -31,7 +31,7 @@ public class FileViewClientsHelpImpl implements FileViewClientsHelp {
 	@Inject
 	public FileViewClientsHelpImpl(Binder binder) {
 		this.widget = binder.createAndBindUi(this);
-		FileClientsHelpImpl.setId(cliTabListItem, cliTabPane);
+		FileClientsHelpViewImpl.setId(cliTabListItem, cliTabPane);
 //		FileClientsHelpImpl.setId(pythonTabListItem, pythonTabPane);
 	}
 	@Override
