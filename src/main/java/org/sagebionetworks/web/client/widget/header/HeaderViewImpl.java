@@ -58,15 +58,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	SimplePanel stuAnnouncementsContainer;
 	@UiField
-	SimplePanel registerLinkUI;
-	@UiField
 	Anchor dashboardDropdownAnchor;
-	@UiField
-	Anchor registerLink;
 	@UiField
 	SimplePanel loginLinkUI;
 	@UiField
-	Anchor loginLink;
+	Button loginLink;
 	
 	@UiField
 	Span headerButtons;
@@ -110,7 +106,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		this.userBadge = userBadge;
 		userBadge.setStyleNames("moveup-5");
 		this.globalAppState = globalAppState;
-		userBadge.setSize(BadgeSize.LARGE_PICTURE_ONLY);
+		userBadge.setSize(BadgeSize.LARGE);
+		userBadge.addUsernameLinkStyle("color-white");
 		// add search panel first
 		searchBox.setVisible(true);
 		searchBoxContainer.setWidget(searchBox.asWidget());
@@ -168,9 +165,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		loginLink.addClickHandler(event -> {
 			presenter.onLoginClick();
 		});
-		registerLink.addClickHandler(event -> {
-			presenter.onRegisterClick();
-		});
 		
 		headerFavButton.addClickHandler(event -> {
 			presenter.onFavoriteClick();
@@ -226,14 +220,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	 		userBadge.setDoNothingOnClick();
 	 		userId = userData.getProfile().getOwnerId();
 	 		loginLinkUI.setVisible(false);
-			registerLinkUI.setVisible(false);
 			logoutLink.setVisible(true);
 			dashboardDropdownAnchor.setVisible(true);
 			headerFavButtonGroup.setVisible(true);
 		} else {
 			userId = null;
 			loginLinkUI.setVisible(true);
-			registerLinkUI.setVisible(true);
 			logoutLink.setVisible(false);
 			dashboardDropdownAnchor.setVisible(false);
 			headerFavButtonGroup.setVisible(false);

@@ -12,7 +12,6 @@ import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Trash;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
@@ -78,7 +77,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	}
 	
 	public void configure() {
-		view.setProjectHeaderText("Synapse");
+		view.setProjectHeaderText("SYNAPSE");
 		view.setProjectHeaderAnchorTarget("#");
 		view.hideProjectFavoriteWidget();
 	}
@@ -134,11 +133,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	@Override
 	public void onLoginClick() {
 		globalApplicationState.getPlaceChanger().goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));	
-	}
-
-	@Override
-	public void onRegisterClick() {
-		globalApplicationState.getPlaceChanger().goTo(new RegisterAccount(ClientProperties.DEFAULT_PLACE_TOKEN));	
 	}
 
 	@Override

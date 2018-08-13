@@ -220,4 +220,8 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	public void setHeight(String height) {
 		widget.setHeight(height);
 	}
+	@Override
+	public void addUsernameLinkStyle(String style) {
+		usernameLink.addStyleName(style);
+	}
 }

@@ -27,11 +27,8 @@
 						</b:DropDownMenu>
 					</b:DropDown>
 			  	
-			  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-10 margin-top-10" visible="false">
-						<b:Anchor ui:field="loginLink" text="Sign in" addStyleNames="color-white strong" />
-					</g:SimplePanel>
-				    <g:SimplePanel ui:field="registerLinkUI" addStyleNames="right margin-left-5 margin-right-5 margin-top-10" visible="false">
-				    	<b:Anchor ui:field="registerLink" text="Register" addStyleNames="color-white strong" />
+			  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-5 margin-right-10 margin-top-10 padding-left-15 border-left-1 moveup-5" visible="false">
+						<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="PRIMARY" />
 					</g:SimplePanel>
 					<b:DropDown addStyleNames="right margin-left-5 margin-right-5 margin-top-5">
 						<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" visible="false"/>
@@ -41,7 +38,7 @@
 						</b:DropDownMenu>
 					</b:DropDown>
 					<b:Tooltip placement="BOTTOM" title="Favorites">
-						<b:DropDown ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5" visible="false">
+						<b:DropDown ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="margin-left-5 margin-right-5 margin-top-5 border-right-1 padding-right-15" visible="false">
 							<b:Anchor ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white" />
 							<b:DropDownMenu ui:field="headerFavList" addStyleNames="dropdown-menu-right">
 							</b:DropDownMenu>

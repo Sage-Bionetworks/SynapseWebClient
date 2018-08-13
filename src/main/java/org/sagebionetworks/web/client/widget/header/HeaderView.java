@@ -31,7 +31,6 @@ public interface HeaderView extends IsWidget {
 		void onTrashClick();
 		void onLogoutClick();
 		void onLoginClick();
-		void onRegisterClick();
 		void onFavoriteClick();
 		void onLogoClick();
 	}
