@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.client.widget.subscription;
 
-import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
-
+import org.sagebionetworks.repo.model.subscription.SortByType;
+import org.sagebionetworks.repo.model.subscription.SortDirection;
 import org.sagebionetworks.repo.model.subscription.Subscription;
 import org.sagebionetworks.repo.model.subscription.SubscriptionObjectType;
 import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SubscriptionClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -20,25 +20,24 @@ import com.google.inject.Inject;
 public class SubscriptionListWidget implements SubscriptionListWidgetView.Presenter, SynapseWidgetPresenter, PageChangeListener {
 	
 	private SubscriptionListWidgetView view;
-	SubscriptionClientAsync subscribeClient;
 	SynapseAlert synAlert;
 	SubscriptionObjectType filter;
 	PortalGinInjector ginInjector;
 	AuthenticationController authController;
 	public static final Long LIMIT = 10L;
 	BasicPaginationWidget paginationWidget;
-	
+	SortDirection sortDirection;
+	SynapseJavascriptClient jsClient;
 	@Inject
 	public SubscriptionListWidget(SubscriptionListWidgetView view, 
-			SubscriptionClientAsync subscribeClient,
+			SynapseJavascriptClient jsClient,
 			PortalGinInjector ginInjector,
 			SynapseAlert synAlert,
 			AuthenticationController authController,
 			BasicPaginationWidget paginationWidget) {
 		this.view = view;
 		this.synAlert = synAlert;
-		this.subscribeClient = subscribeClient;
-		fixServiceEntryPoint(subscribeClient);
+		this.jsClient = jsClient;
 		this.authController = authController;
 		this.ginInjector = ginInjector;
 		this.paginationWidget = paginationWidget;
@@ -48,9 +47,11 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 	}
 	
 	public void configure() {
+		sortDirection = SortDirection.ASC;
 		filter = SubscriptionObjectType.FORUM;
 		view.clearFilter();
 		view.clearSubscriptions();
+		
 		if (authController.isLoggedIn()) {
 			onPageChange(0L);
 		}
@@ -62,7 +63,7 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 		view.clearSubscriptions();
 		view.setNoItemsMessageVisible(false);
 		view.setLoadingVisible(true);
-		subscribeClient.getAllSubscriptions(filter, LIMIT, newOffset, new AsyncCallback<SubscriptionPagedResults>() {
+		jsClient.getAllSubscriptions(filter, LIMIT, newOffset, SortByType.CREATED_ON, sortDirection, new AsyncCallback<SubscriptionPagedResults>() {
 			@Override
 			public void onSuccess(SubscriptionPagedResults results) {
 				view.setLoadingVisible(false);
@@ -82,6 +83,12 @@ public class SubscriptionListWidget implements SubscriptionListWidgetView.Presen
 				synAlert.handleException(caught);
 			}
 		});
+	}
+	
+	@Override
+	public void onSort(SortDirection sortDirection) {
+		this.sortDirection = sortDirection;
+		onPageChange(0L);
 	}
 	
 	@Override

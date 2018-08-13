@@ -294,4 +294,7 @@ public class WebConstants {
 	public static final String FILE_SERVICE_URL_KEY = "fileServiceUrl";
 	public static final String AUTH_PUBLIC_SERVICE_URL_KEY = "authPublicServiceUrl";
 	public static final String SYNAPSE_VERSION_KEY = "synapseVersionInfo";
+	
+	//View mask constants
+	public static final int FILE = 0x01, PROJECT=0x02, TABLE=0x04, FOLDER=0x08, VIEW=0x10, DOCKER=0x20;
 }

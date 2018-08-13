@@ -367,7 +367,7 @@ public class TableEntityWidgetTest {
 
 	@Test
 	public void testOnExecuteViewQuery(){
-		TableType tableType = TableType.projectview;
+		TableType tableType = TableType.projects;
 		configureBundleWithView(ViewType.project);
 		boolean canEdit = true;
 		// Start with a query that is not on the first page
@@ -534,7 +534,7 @@ public class TableEntityWidgetTest {
 		widget.onShowAdvancedSearch();
 		verifyAdvancedSearchUI();
 		// SWC-4275: query results widget is not reconfigured when switching to advanced mode (since currently shown results are the same)
-		verify(mockQueryResultsWidget, never()).configure(any(Query.class), anyBoolean(), eq(TableType.fileview), eq(widget));
+		verify(mockQueryResultsWidget, never()).configure(any(Query.class), anyBoolean(), eq(TableType.files), eq(widget));
 	}
 	
 	@Test
@@ -583,7 +583,7 @@ public class TableEntityWidgetTest {
 		callbackCaptor.getValue().invoke();
 		verifySimpleSearchUI();
 		// reset query
-		verify(mockQueryResultsWidget).configure(startQuery, canEdit, TableType.projectview, widget);
+		verify(mockQueryResultsWidget).configure(startQuery, canEdit, TableType.projects, widget);
 	}
 	
 	@Test

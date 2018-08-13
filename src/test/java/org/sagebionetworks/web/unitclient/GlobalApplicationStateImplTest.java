@@ -184,7 +184,7 @@ public class GlobalApplicationStateImplTest {
 		
 		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
 		globalApplicationState.checkVersionCompatibility(callback);
-		verify(mockStackConfigService, times(2)).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView, never()).showVersionOutOfDateGlobalMessage();
 		//verify callback was given the correct version
 		ArgumentCaptor<VersionState> captor = ArgumentCaptor.forClass(VersionState.class);
@@ -218,7 +218,7 @@ public class GlobalApplicationStateImplTest {
 		verifyAndInvokeSynapsePropertiesInitCallback();
 		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
 		globalApplicationState.checkVersionCompatibility(callback);
-		verify(mockStackConfigService, times(2)).getSynapseVersions(any(AsyncCallback.class));
+		verify(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
 		verify(mockView).showGetVersionError(ex.getMessage());
 		verify(callback).onFailure(ex);
 	}
@@ -228,10 +228,8 @@ public class GlobalApplicationStateImplTest {
 	public void testCheckVersionCompatibilityCheckedRecently() {
 		when(mockLocalStorage.get(GlobalApplicationStateImpl.RECENTLY_CHECKED_SYNAPSE_VERSION)).thenReturn(Boolean.TRUE.toString());
 		AsyncCallback<VersionState> callback = mock(AsyncCallback.class);
-		globalApplicationState.init(new Callback() {
-			@Override
-			public void invoke() {}
-		});
+		globalApplicationState.init(() -> {});
+		globalApplicationState.checkVersionCompatibility(mock(AsyncCallback.class));
 		verifyAndInvokeSynapsePropertiesInitCallback();
 		reset(mockStackConfigService);
 		globalApplicationState.checkVersionCompatibility(callback);
@@ -253,9 +251,6 @@ public class GlobalApplicationStateImplTest {
 		verifyAndInvokeSynapsePropertiesInitCallback();
 		
 		verify(mockView).initGlobalViewProperties();
-		//also sets synapse versions on app load
-		verify(mockStackConfigService).getSynapseVersions(any(AsyncCallback.class));
-		assertEquals("v1", globalApplicationState.getSynapseVersion());
 		verify(mockCallback).invoke();
 	}
 	

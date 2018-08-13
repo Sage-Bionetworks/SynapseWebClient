@@ -1088,6 +1088,9 @@ public class SynapseClientImpl extends SynapseClientBase implements
 		try {
 			TeamMembershipStatus membershipStatus = synapseClient
 					.getTeamMembershipStatus(teamId, userGroupId);
+			if (membershipStatus.getIsMember()) {
+				return;
+			}
 			String settingsEndpoint = NotificationTokenType.Settings.getNotificationEndpoint(hostPageBaseURL);
 			// if we can join the team without creating the invite (like if we
 			// are a team admin, or there is an open membership request), then

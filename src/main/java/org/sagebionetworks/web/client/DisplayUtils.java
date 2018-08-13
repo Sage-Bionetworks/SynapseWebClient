@@ -424,7 +424,6 @@ public class DisplayUtils {
 			DisplayUtils.MessagePopup iconStyle,
 			final Callback primaryButtonCallback,
 			final Callback secondaryButtonCallback) {
-		
 		SafeHtml popupHtml = getPopupSafeHtml(title, message, iconStyle);
 		boolean isSecondaryButton = secondaryButtonCallback != null;
 		

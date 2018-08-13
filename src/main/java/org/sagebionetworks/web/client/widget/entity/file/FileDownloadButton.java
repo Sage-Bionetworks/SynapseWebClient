@@ -142,7 +142,8 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 						if (!isHidingClientHelp) {
 							FileClientsHelp clientsHelp = ginInjector.getFileClientsHelp();
 							view.addWidget(clientsHelp);
-							clientsHelp.configure(entityBundle.getEntity().getId());
+							FileEntity entity = (FileEntity)entityBundle.getEntity();
+							clientsHelp.configure(entity.getId(), entity.getVersionNumber());
 						}
 					}
 				}

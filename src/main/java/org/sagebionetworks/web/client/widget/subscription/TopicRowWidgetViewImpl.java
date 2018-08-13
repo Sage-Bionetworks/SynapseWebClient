@@ -16,16 +16,10 @@ public class TopicRowWidgetViewImpl implements TopicRowWidgetView{
 	}
 	
 	Widget w;
-	Presenter presenter;
 	
 	@Inject
 	public TopicRowWidgetViewImpl(Binder binder){
 		this.w = binder.createAndBindUi(this);
-	}
-	
-	@Override
-	public void setPresenter(final Presenter presenter) {
-		this.presenter = presenter;
 	}
 	
 	@Override

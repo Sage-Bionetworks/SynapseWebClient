@@ -53,6 +53,7 @@ import org.sagebionetworks.repo.model.provenance.Activity;
 import org.sagebionetworks.repo.model.subscription.Etag;
 import org.sagebionetworks.repo.model.subscription.SubscriberCount;
 import org.sagebionetworks.repo.model.subscription.SubscriberPagedResults;
+import org.sagebionetworks.repo.model.subscription.SubscriptionPagedResults;
 import org.sagebionetworks.repo.model.table.ColumnModel;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -76,6 +77,7 @@ public class SynapseJavascriptFactory {
 		ListWrapperUserProfile,
 		ListWrapperTeam,
 		ListWrapperUploadDestinations,
+		SubscriptionPagedResults,
 		UserGroupHeaderResponse,
 		UserBundle,
 		Count,
@@ -220,6 +222,8 @@ public class SynapseJavascriptFactory {
 			return new EntityId(json).getId();
 		case ChallengePagedResults:
 			return new ChallengePagedResults(json).getResults();
+		case SubscriptionPagedResults :
+			return new SubscriptionPagedResults(json);
 		case JSON :
 			return json;
 		case PaginatedResultsEntityHeader :

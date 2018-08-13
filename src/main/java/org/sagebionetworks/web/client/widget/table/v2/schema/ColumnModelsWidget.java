@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.table.v2.schema;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.sagebionetworks.repo.model.Entity;
@@ -14,6 +13,7 @@ import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
 import org.sagebionetworks.repo.model.table.TableUpdateTransactionRequest;
 import org.sagebionetworks.repo.model.table.ViewScope;
+import org.sagebionetworks.repo.model.table.ViewTypeMask;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
@@ -95,23 +95,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 			}
 		});
 	}
-	public static TableType getTableType(Entity entity) {
-		if (entity instanceof TableEntity) {
-			return TableType.table;
-		} else if (entity instanceof EntityView) {
-			EntityView view = (EntityView)entity;
-			org.sagebionetworks.repo.model.table.ViewType targetType = view.getType();
-			if (targetType == null) {
-				return TableType.table;
-			}
-			for (TableType tableType : TableType.values()) {
-				if (targetType.equals(tableType.getViewType())) {
-					return tableType;
-				}
-			}
-		}
-		return null;
-	}
+	
 	@Override
 	public void configure(EntityBundle bundle, boolean isEditable, EntityUpdatedHandler updateHandler) {
 		this.isEditable = isEditable;
@@ -120,7 +104,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		this.updateHandler = updateHandler;
 		viewer.configure(ViewType.VIEWER, this.isEditable);
 		boolean isEditableView = isEditable && bundle.getEntity() instanceof EntityView;
-		tableType = getTableType(bundle.getEntity());
+		tableType = TableType.getTableType(bundle.getEntity());
 		editor.setAddDefaultViewColumnsButtonVisible(isEditableView);
 		editor.setAddAnnotationColumnsButtonVisible(isEditableView);
 		for(ColumnModel cm: startingModels){
@@ -135,7 +119,7 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 	public void getDefaultColumnsForView() {
 		baseView.hideErrors();
 		boolean isClearIds = true;
-		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.getViewType(), isClearIds);
+		List<ColumnModel> defaultColumns = fileViewDefaultColumns.getDefaultViewColumns(tableType.isIncludeFiles(), isClearIds);
 		editor.addColumns(defaultColumns); 
 	}
 	

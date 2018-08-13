@@ -6,10 +6,17 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Div>
-		<bh:Div addStyleNames="light-border-bottom">
+		<bh:Div>
 			<b:ButtonGroup dataToggle="BUTTONS">
 				<b:RadioButton name="filters" ui:field="projectFilter">Project Forums</b:RadioButton>
 				<b:RadioButton name="filters" ui:field="threadFilter">Threads</b:RadioButton>
+			</b:ButtonGroup>
+			<b:ButtonGroup pull="RIGHT">
+				<b:Button ui:field="sortButton" dataToggle="DROPDOWN" size="SMALL" text="Date posted"/>
+				<b:DropDownMenu ui:field="sortDropDown">
+					<b:AnchorListItem ui:field="sortAscending" text="Date posted"/>
+					<b:AnchorListItem ui:field="sortDescending" text="Most recent"/>
+				</b:DropDownMenu>
 			</b:ButtonGroup>
 		</bh:Div>
 		<w:LoadingSpinner ui:field="loadingUI" visible="false" size="16px"/>
