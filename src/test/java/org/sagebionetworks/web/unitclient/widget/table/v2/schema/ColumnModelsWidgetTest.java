@@ -212,16 +212,45 @@ public class ColumnModelsWidgetTest {
 		when(mockBundle.getEntity()).thenReturn(mockView);
 		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
 		tableBundle.setColumnModels(schema);
+		when(mockView.getType()).thenReturn(null);
+		Long viewScopeMask = 1234L;
+		when(mockView.getViewTypeMask()).thenReturn(viewScopeMask);
+
 		widget.configure(mockBundle, isEditable, mockUpdateHandler);
 		
 		String firstPageToken = null;
 		widget.getPossibleColumnModelsForViewScope(firstPageToken);
+		
 		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(viewScopeCaptor.capture(), eq(firstPageToken), any(AsyncCallback.class));
 		//verify scope
-		assertEquals(mockViewScopeIds, viewScopeCaptor.getValue().getScope());
+		ViewScope viewScope = viewScopeCaptor.getValue();
+		assertEquals(mockViewScopeIds, viewScope.getScope());
+		assertEquals(viewScopeMask, viewScope.getViewTypeMask());
 		verify(mockEditor).addColumns(mockAnnotationColumnsPage1);
 		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(any(ViewScope.class), eq(NEXT_PAGE_TOKEN), any(AsyncCallback.class));
 		verify(mockEditor).addColumns(mockAnnotationColumnsPage2);
+	}
+	
+	@Test
+	public void testGetPossibleColumnModelsForViewScopeWithViewType() {
+		boolean isEditable = true;
+		when(mockBundle.getEntity()).thenReturn(mockView);
+		List<ColumnModel> schema = TableModelTestUtils.createOneOfEachType(true);
+		tableBundle.setColumnModels(schema);
+		org.sagebionetworks.repo.model.table.ViewType viewtype = org.sagebionetworks.repo.model.table.ViewType.file_and_table;
+		when(mockView.getType()).thenReturn(viewtype);
+		when(mockView.getViewTypeMask()).thenReturn(null);
+		
+		widget.configure(mockBundle, isEditable, mockUpdateHandler);
+		
+		String firstPageToken = null;
+		widget.getPossibleColumnModelsForViewScope(firstPageToken);
+		
+		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(viewScopeCaptor.capture(), eq(firstPageToken), any(AsyncCallback.class));
+		//verify scope
+		ViewScope viewScope = viewScopeCaptor.getValue();
+		assertEquals(mockViewScopeIds, viewScope.getScope());
+		assertEquals(viewtype, viewScope.getViewType());
 	}
 	
 	@Test
