@@ -216,11 +216,11 @@ public class ColumnModelsWidgetTest {
 		Long viewScopeMask = 1234L;
 		when(mockView.getViewTypeMask()).thenReturn(viewScopeMask);
 
-		
 		widget.configure(mockBundle, isEditable, mockUpdateHandler);
 		
 		String firstPageToken = null;
 		widget.getPossibleColumnModelsForViewScope(firstPageToken);
+		
 		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(viewScopeCaptor.capture(), eq(firstPageToken), any(AsyncCallback.class));
 		//verify scope
 		ViewScope viewScope = viewScopeCaptor.getValue();
@@ -240,10 +240,12 @@ public class ColumnModelsWidgetTest {
 		org.sagebionetworks.repo.model.table.ViewType viewtype = org.sagebionetworks.repo.model.table.ViewType.file_and_table;
 		when(mockView.getType()).thenReturn(viewtype);
 		when(mockView.getViewTypeMask()).thenReturn(null);
+		
 		widget.configure(mockBundle, isEditable, mockUpdateHandler);
 		
 		String firstPageToken = null;
 		widget.getPossibleColumnModelsForViewScope(firstPageToken);
+		
 		verify(mockSynapseClient).getPossibleColumnModelsForViewScope(viewScopeCaptor.capture(), eq(firstPageToken), any(AsyncCallback.class));
 		//verify scope
 		ViewScope viewScope = viewScopeCaptor.getValue();
