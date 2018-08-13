@@ -37,7 +37,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Trash;
-import org.sagebionetworks.web.client.place.users.RegisterAccount;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -141,12 +140,6 @@ public class HeaderTest {
 		verify(mockPlaceChanger).goTo(captor.capture());
 		Place place = captor.getValue();
 		assertTrue(place instanceof Home);
-	}
-
-	@Test
-	public void testOnRegisterClick() {
-		header.onRegisterClick();
-		verify(mockPlaceChanger).goTo(isA(RegisterAccount.class));
 	}
 
 	@Test

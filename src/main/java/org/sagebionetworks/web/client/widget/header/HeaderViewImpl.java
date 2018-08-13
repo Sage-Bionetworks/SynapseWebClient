@@ -73,6 +73,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	AnchorListItem logoutLink;
 	@UiField
 	AnchorListItem myDashboardLink;
+	@UiField
+	DropDown dashboardDropdown;
 
 	@UiField
 	FlowPanel testSitePanel;
@@ -107,7 +109,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		userBadge.setStyleNames("moveup-5");
 		this.globalAppState = globalAppState;
 		userBadge.setSize(BadgeSize.LARGE);
-		userBadge.addUsernameLinkStyle("color-white");
+		userBadge.addUsernameLinkStyle("color-white textDecorationNone");
 		// add search panel first
 		searchBox.setVisible(true);
 		searchBoxContainer.setWidget(searchBox.asWidget());
@@ -221,13 +223,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	 		userId = userData.getProfile().getOwnerId();
 	 		loginLinkUI.setVisible(false);
 			logoutLink.setVisible(true);
-			dashboardDropdownAnchor.setVisible(true);
+			dashboardDropdown.setVisible(true);
 			headerFavButtonGroup.setVisible(true);
 		} else {
 			userId = null;
 			loginLinkUI.setVisible(true);
 			logoutLink.setVisible(false);
-			dashboardDropdownAnchor.setVisible(false);
+			dashboardDropdown.setVisible(false);
 			headerFavButtonGroup.setVisible(false);
 		}
 	}
