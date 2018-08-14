@@ -17,23 +17,23 @@
 		        	</b:Heading>
 			  	</bh:Div>
 			  	<bh:Span ui:field="headerButtons" addStyleNames="right">
-			  		<b:DropDown addStyleNames="right padding-left-10 padding-right-10 padding-top-22">
-						<b:Anchor dataToggle="DROPDOWN" icon="QUESTION_CIRCLE" iconSize="TIMES2" addStyleNames="color-white"/>
-						<b:DropDownMenu ui:field="helpDropdownMenu" addStyleNames="dropdown-menu-right">
-							<b:AnchorListItem ui:field="documentationLink" icon="EXTERNAL_LINK" iconFixedWidth="true" iconPosition="RIGHT" href="http://docs.synapse.org">Documentation</b:AnchorListItem>
-							<b:AnchorListItem href="#!SynapseForum:default">Help Forum</b:AnchorListItem>
-							<b:AnchorListItem addStyleNames="submit-feedback-command">Submit Feedback</b:AnchorListItem>
-							<b:AnchorListItem ui:field="emailSynapseSupportLink" icon="ENVELOPE_O" href="mailto:synapseinfo@sagebionetworks.org" iconFixedWidth="true" iconPosition="RIGHT">Contact Us</b:AnchorListItem>
-						</b:DropDownMenu>
-					</b:DropDown>
-			  	
 			  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 margin-top-22 padding-left-15" visible="false">
 						<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="PRIMARY" />
 					</g:SimplePanel>
 					<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 padding-top-22" visible="false" height="70px">
 						<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
 						<b:DropDownMenu ui:field="dashboardDropdownMenu">
-							<b:AnchorListItem ui:field="myDashboardLink" iconFixedWidth="true" iconPosition="RIGHT">My Dashboard</b:AnchorListItem>
+							<b:AnchorListItem ui:field="myDashboardLink">Projects</b:AnchorListItem>
+							<b:AnchorListItem ui:field="myTeamsLink">Teams</b:AnchorListItem>
+							<b:AnchorListItem ui:field="myChallengesLink">Challenges</b:AnchorListItem>
+							<b:Divider/>
+							<b:AnchorListItem ui:field="mySettingsLink">Settings</b:AnchorListItem>
+							<b:Divider/>
+							<b:AnchorListItem addStyleNames="submit-feedback-command">Send Feedback</b:AnchorListItem>
+							<b:AnchorListItem ui:field="documentationLink" icon="EXTERNAL_LINK" iconFixedWidth="true" iconPosition="RIGHT" href="http://docs.synapse.org">Documentation</b:AnchorListItem>
+							<b:AnchorListItem href="#!SynapseForum:default">Help Forum</b:AnchorListItem>
+							<b:AnchorListItem ui:field="emailSynapseSupportLink" icon="ENVELOPE_O" href="mailto:synapseinfo@sagebionetworks.org" iconFixedWidth="true" iconPosition="RIGHT">Contact Us</b:AnchorListItem>
+							<b:Divider/>
 							<b:AnchorListItem ui:field="logoutLink" icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
 						</b:DropDownMenu>
 					</b:DropDown>
@@ -46,11 +46,6 @@
 				    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-10 margin-right-10 margin-top-22 margin-bottom-20"/>
 				    <g:SimplePanel ui:field="stuAnnouncementsContainer" addStyleNames="right margin-left-10 "/>
 				</bh:Span>
-				<b:Alert ui:field="stagingAlert" type="WARNING" visible="false">
-					<b:Heading size="H3" text="This website is for testing only." addStyleNames="color-white margin-right-10" />
-					<b:Heading size="H4" text="Any data created will be deleted shortly.  To do your work please visit " addStyleNames="color-white displayInline margin-right-10" />
-					<b:Anchor href="https://www.synapse.org" text="www.synapse.org" addStyleNames="font-size-20" />
-				</b:Alert>
 				<g:FlowPanel ui:field="testSitePanel" visible="false" addStyleNames="margin-left-10 margin-right-10 margin-top-5">
 					<bh:Span addStyleNames="smallerText color-white">Alpha features&nbsp;</bh:Span>
 					<bh:Span addStyleNames="smallerText color-white strong">on</bh:Span>
@@ -60,5 +55,10 @@
 				</g:FlowPanel>
 			</b:Column>
 		</b:Row>
+		<b:Alert ui:field="stagingAlert" type="WARNING" visible="false">
+			<b:Heading size="H4" text="This website is for testing only." addStyleNames="color-white margin-right-10" />
+			<b:Heading size="H5" text="Any data created will be deleted shortly.  To do your work please visit " addStyleNames="color-white displayInline margin-right-10" />
+			<b:Anchor href="https://www.synapse.org" text="www.synapse.org" addStyleNames="font-size-20" />
+		</b:Alert>
 	</bh:Div>
 </ui:UiBinder>

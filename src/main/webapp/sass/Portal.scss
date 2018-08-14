@@ -2542,7 +2542,7 @@ div.colborder {
 		border-radius: 50%;
 		background: white;
 	}
-	.dropdown:hover ul.dropdown-menu {
+	.dropdown ul.dropdown-menu.hover {
 		display: block;
 	}
 	a.menu:after, .dropdown-toggle:after {

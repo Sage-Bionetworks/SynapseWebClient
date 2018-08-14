@@ -68,14 +68,6 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		view.setStagingAlertVisible(visible);
 	}
 	
-	public void setMenuItemActive(MenuItems menuItem) {
-		view.setMenuItemActive(menuItem);
-	}
-
-	public void removeMenuItemActive(MenuItems menuItem) {
-		view.removeMenuItemActive(menuItem);
-	}
-	
 	public void configure() {
 		view.setProjectHeaderText("SYNAPSE");
 		view.setProjectHeaderAnchorTarget("#");

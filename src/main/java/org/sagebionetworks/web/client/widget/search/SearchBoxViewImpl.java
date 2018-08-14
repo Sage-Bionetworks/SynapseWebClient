@@ -30,7 +30,7 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	@Inject
 	public SearchBoxViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		searchField.getElement().setAttribute("placeholder", " Search");
+		searchField.getElement().setAttribute("placeholder", " Search all of Synapse");
 		initClickHandlers();
 	}
 

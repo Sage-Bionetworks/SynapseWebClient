@@ -18,12 +18,16 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Synapse;
+import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -74,6 +78,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	AnchorListItem logoutLink;
 	@UiField
 	AnchorListItem myDashboardLink;
+	@UiField
+	AnchorListItem myTeamsLink;
+	@UiField
+	AnchorListItem myChallengesLink;
+	@UiField
+	AnchorListItem mySettingsLink;
+
 	@UiField
 	DropDown dashboardDropdown;
 	@UiField
@@ -171,29 +182,53 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			presenter.onLoginClick();
 		});
 		headerFavButton.addDomHandler(event-> {
+			headerFavList.addStyleName("hover");
+			dashboardDropdownMenu.removeStyleName("hover");
 			presenter.onFavoriteClick();
 		}, MouseOverEvent.getType());
+		headerFavList.addDomHandler(event-> {
+			headerFavList.removeStyleName("hover");
+		}, MouseOutEvent.getType());
+		searchBoxContainer.addDomHandler(event-> {
+			headerFavList.removeStyleName("hover");
+			dashboardDropdownMenu.removeStyleName("hover");
+		}, MouseOverEvent.getType());
+		dashboardDropdownAnchor.addDomHandler(event-> {
+			dashboardDropdownMenu.addStyleName("hover");
+			headerFavList.removeStyleName("hover");
+		}, MouseOverEvent.getType());
+		dashboardDropdownMenu.addDomHandler(event-> {
+			dashboardDropdownMenu.removeStyleName("hover");
+		}, MouseOutEvent.getType());
 		synapseLogo.addClickHandler(event -> {
 			presenter.onLogoClick();
 		});
 		myDashboardLink.addClickHandler(event -> {
-			Profile place = new Profile(userId);
+			dashboardDropdownMenu.removeStyleName("hover");
+			Profile place = new Profile(userId, ProfileArea.PROJECTS);
 			globalAppState.getPlaceChanger().goTo(place);
 		});
-	}
+		myTeamsLink.addClickHandler(event -> {
+			dashboardDropdownMenu.removeStyleName("hover");
+			Profile place = new Profile(userId, ProfileArea.TEAMS);
+			globalAppState.getPlaceChanger().goTo(place);
+		});
+		myChallengesLink.addClickHandler(event -> {
+			dashboardDropdownMenu.removeStyleName("hover");
+			Profile place = new Profile(userId, ProfileArea.CHALLENGES);
+			globalAppState.getPlaceChanger().goTo(place);
+		});
+		mySettingsLink.addClickHandler(event -> {
+			dashboardDropdownMenu.removeStyleName("hover");
+			Profile place = new Profile(userId, ProfileArea.SETTINGS);
+			globalAppState.getPlaceChanger().goTo(place);
+		});
 
+	}
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 		refresh();
-	}
-
-	@Override
-	public void setMenuItemActive(MenuItems menuItem) {
-	}
-
-	@Override
-	public void removeMenuItemActive(MenuItems menuItem) {
 	}
 
 	@Override
@@ -251,7 +286,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public void addFavorite(List<EntityHeader> headers) {
 		for (final EntityHeader header : headers) {
 			AnchorListItem favItem = new AnchorListItem(header.getName());
-			favItem.setHref(DisplayUtils.getSynapseHistoryToken(header.getId()));
+			favItem.addClickHandler(event -> {
+				headerFavList.removeStyleName("hover");
+				Synapse place = new Synapse(header.getId());
+				globalAppState.getPlaceChanger().goTo(place);
+			});
 			headerFavList.add(favItem);
 		}
 	}

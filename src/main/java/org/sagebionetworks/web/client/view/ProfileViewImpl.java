@@ -295,7 +295,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.dateTimeUtils = dateTimeUtils;
 		headerWidget.configure();
-		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
 		picturePanel.clear();
 		initTabs();
 		projectSearchTextBox.getElement().setAttribute("placeholder", "Project name");

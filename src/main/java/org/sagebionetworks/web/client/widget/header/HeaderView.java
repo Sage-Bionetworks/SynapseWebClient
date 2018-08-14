@@ -15,8 +15,6 @@ public interface HeaderView extends IsWidget {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	public void setMenuItemActive(MenuItems menuItem);
-	public void removeMenuItemActive(MenuItems menuItem);
 	void setStuAnnouncementWidget(Widget w);
 	public void refresh();
 	/**
