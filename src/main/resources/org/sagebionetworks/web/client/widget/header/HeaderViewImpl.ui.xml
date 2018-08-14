@@ -8,16 +8,16 @@
 	<bh:Div addStyleNames="header">
 		<b:Row ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg-gradient">
 			<b:Column size="XS_12">
-		        <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 inline-block" paddingTop="10">
+		        <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 inline-block" paddingTop="18">
 		        	<g:Image ui:field="synapseLogo" url="images/logo.svg" 
-		        	    addStyleNames="imageButton margin-bottom-15 margin-right-10" width="35px" height="35px"/>
+		        	    addStyleNames="imageButton margin-bottom-15 margin-right-10 moveup-3" width="35px" height="35px"/>
 		            <b:Heading size="H2" addStyleNames="displayInline color-white">
 		            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone"/>
 		        		<g:SimplePanel ui:field="projectFavoritePanel" addStyleNames="displayInline favoriteIcon margin-left-10" visible="false"/>
 		        	</b:Heading>
 			  	</bh:Div>
 			  	<bh:Span ui:field="headerButtons" addStyleNames="right">
-			  		<b:DropDown addStyleNames="right padding-left-10 padding-right-10 padding-top-10">
+			  		<b:DropDown addStyleNames="right padding-left-10 padding-right-10 padding-top-22">
 						<b:Anchor dataToggle="DROPDOWN" icon="QUESTION_CIRCLE" iconSize="TIMES2" addStyleNames="color-white"/>
 						<b:DropDownMenu ui:field="helpDropdownMenu" addStyleNames="dropdown-menu-right">
 							<b:AnchorListItem ui:field="documentationLink" icon="EXTERNAL_LINK" iconFixedWidth="true" iconPosition="RIGHT" href="http://docs.synapse.org">Documentation</b:AnchorListItem>
@@ -27,24 +27,25 @@
 						</b:DropDownMenu>
 					</b:DropDown>
 			  	
-			  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 margin-top-10 padding-left-15 border-left-1" visible="false">
+			  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 margin-top-22 padding-left-15" visible="false">
 						<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="PRIMARY" />
 					</g:SimplePanel>
-					<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 padding-top-10 border-left-1" visible="false">
+					<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 padding-top-22" visible="false" height="70px">
 						<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
 						<b:DropDownMenu addStyleNames="dropdown-menu-right">
 							<b:AnchorListItem ui:field="myDashboardLink" iconFixedWidth="true" iconPosition="RIGHT">My Dashboard</b:AnchorListItem>
 							<b:AnchorListItem ui:field="logoutLink" icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
 						</b:DropDownMenu>
 					</b:DropDown>
+					<bh:Span addStyleNames="border-left-1 right margin-top-22" height="25px"/>
 					<b:Tooltip placement="BOTTOM" title="Favorites">
-						<b:DropDown ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="padding-left-10 padding-right-15 padding-top-10" visible="false">
+						<b:DropDown ui:field="headerFavButtonGroup" pull="RIGHT" addStyleNames="padding-left-10 padding-right-15 padding-top-22" visible="false" height="70px">
 							<b:Anchor ui:field="headerFavButton" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white" />
 							<b:DropDownMenu ui:field="headerFavList" addStyleNames="dropdown-menu-right">
 							</b:DropDownMenu>
 						</b:DropDown>
 					</b:Tooltip>
-				    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-10 margin-right-10 margin-top-10 margin-bottom-20"/>
+				    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-10 margin-right-10 margin-top-22 margin-bottom-20"/>
 				    <g:SimplePanel ui:field="stuAnnouncementsContainer" addStyleNames="right margin-left-10 "/>
 				</bh:Span>
 				<b:Alert ui:field="stagingAlert" type="WARNING" visible="false">
