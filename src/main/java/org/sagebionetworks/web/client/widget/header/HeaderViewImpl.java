@@ -24,6 +24,7 @@ import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -75,6 +76,8 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	AnchorListItem myDashboardLink;
 	@UiField
 	DropDown dashboardDropdown;
+	@UiField
+	DropDownMenu dashboardDropdownMenu;
 
 	@UiField
 	FlowPanel testSitePanel;
@@ -167,10 +170,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		loginLink.addClickHandler(event -> {
 			presenter.onLoginClick();
 		});
-		
-		headerFavButton.addClickHandler(event -> {
+		headerFavButton.addDomHandler(event-> {
 			presenter.onFavoriteClick();
-		});
+		}, MouseOverEvent.getType());
 		synapseLogo.addClickHandler(event -> {
 			presenter.onLogoClick();
 		});
