@@ -580,7 +580,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    s:      [],
 				    section:[],
 				    small:  [],
-				    span:   ['widgetparams', 'class', 'id'],
+				    span:   ['data-widgetparams', 'class', 'id'],
 				    sub:    [],
 				    summary: [],
 				    sup:    [],

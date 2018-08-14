@@ -30,9 +30,9 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 	private RegExp widgetExistsRegEx = RegExp.compile("(widget[-]{1})\\d+([-]{1})", "i");
 	// Matches widget parameters.  Group 1 contains full param definition minus the end quote.  Group 2 contains end quote.
 	// Used to insert new isTOC parameter into widget definition (badge will ignore clicks).
-	private RegExp widgetParamsRegEx = RegExp.compile("(widgetparams[=]{1}[\"]{1}[^\"]*)([\"]{1})", "i");
+	private RegExp widgetParamsRegEx = RegExp.compile("(data[-]widgetparams[=]{1}[\"]{1}[^\"]*)([\"]{1})", "i");
 	// Matches any html inside of the widget span.  Used to remove any other html (for example, mentioning adds a child user/team anchor, used in notification emails).
-	private RegExp widgetInnerHtmlRegEx = RegExp.compile("(<span widgetparams[^>]*>).*(<\\/span>)", "i");
+	private RegExp widgetInnerHtmlRegEx = RegExp.compile("(<span data[-]widgetparams[^>]*>).*(<\\/span>)", "i");
 	
 	@Inject
 	public TableOfContentsWidgetViewImpl() {
