@@ -2542,11 +2542,12 @@ div.colborder {
 		border-radius: 50%;
 		background: white;
 	}
-	
-	.dropdown:hover ul.dropdown-menu{
-		display: block;    
+	.dropdown:hover ul.dropdown-menu {
+		display: block;
 	}
 	a.menu:after, .dropdown-toggle:after {
 		content: none;
 	}
+	.dropdown:hover {background-color: green;}
+	.dropdown {background-color: none;}
 }
