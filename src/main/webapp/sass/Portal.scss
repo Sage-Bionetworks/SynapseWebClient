@@ -1157,6 +1157,9 @@ h1, h2, h3, h4, h5, h6 {
 .max-height-200 {
 	max-height: 200px;
 }
+.max-width-350, #rootPanel .max-width-350 {
+	max-width: 350px;
+}
 
 .max-height-100 {
 	max-height: 100px;
@@ -1176,15 +1179,15 @@ h1, h2, h3, h4, h5, h6 {
 .noBackground {
 	background: none !important;
 }
-.whiteBackground {
+.whiteBackground, #rootPanel .whiteBackground {
 	background-color: #fff;
 }
 
-.greyBackground {
+.greyBackground, #rootPanel .greyBackground {
 	background-color: #ccc;
 }
 
-.lightGreyBackground {
+.lightGreyBackground, #rootPanel .lightGreyBackground{
 	background-color: #F9F9F9;
 }
 
