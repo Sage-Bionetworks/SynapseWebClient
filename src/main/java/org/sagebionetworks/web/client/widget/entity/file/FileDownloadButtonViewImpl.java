@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.dom.client.ButtonElement;
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.HandlerRegistration;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -36,6 +37,7 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 	private static FileDownloadButtonViewImplUiBinder uiBinder = GWT.create(FileDownloadButtonViewImplUiBinder.class);
 	Widget widget;
 	ClickHandler licensedDownloadClickHandler, authorizedDirectDownloadClickHandler;
+	HandlerRegistration downloadLinkHandlerRegistration, downloadLink2HandlerRegistration;
 	
 	@Inject
 	public FileDownloadButtonViewImpl(PortalGinInjector ginInjector) {
@@ -61,22 +63,36 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 		otherWidgets.clear();
 	}
 	
+	private void clearClickHandlers() {
+		if (downloadLinkHandlerRegistration != null) {
+			downloadLinkHandlerRegistration.removeHandler();
+		}
+		if (downloadLink2HandlerRegistration != null) {
+			downloadLink2HandlerRegistration.removeHandler();
+		}
+		downloadLink.setHref("#");
+		downloadLink2.setHref("#");
+	}
+	
 	@Override
 	public void setIsAuthorizedDirectDownloadLink() {
-		downloadLink.addClickHandler(authorizedDirectDownloadClickHandler);
-		downloadLink2.addClickHandler(authorizedDirectDownloadClickHandler);
+		clearClickHandlers();
+		downloadLinkHandlerRegistration = downloadLink.addClickHandler(authorizedDirectDownloadClickHandler);
+		downloadLink2HandlerRegistration = downloadLink2.addClickHandler(authorizedDirectDownloadClickHandler);
 		downloadLink.setVisible(!isExtraSmall);
 		downloadLink2.setVisible(isExtraSmall);
 	}
 	@Override
 	public void setIsUnauthenticatedS3DirectDownload() {
-		downloadLink.addClickHandler(licensedDownloadClickHandler);
-		downloadLink2.addClickHandler(licensedDownloadClickHandler);
+		clearClickHandlers();
+		downloadLinkHandlerRegistration = downloadLink.addClickHandler(licensedDownloadClickHandler);
+		downloadLink2HandlerRegistration = downloadLink2.addClickHandler(licensedDownloadClickHandler);
 		updateDownloadLinkVisibility();
 	}
 	
 	@Override
 	public void setIsDirectDownloadLink(String href) {
+		clearClickHandlers();
 		downloadLink.setHref(href);
 		downloadLink2.setHref(href);
 		updateDownloadLinkVisibility();
