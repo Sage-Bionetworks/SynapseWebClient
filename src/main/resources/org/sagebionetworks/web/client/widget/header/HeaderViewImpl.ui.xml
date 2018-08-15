@@ -18,7 +18,7 @@
 			  	</bh:Div>
 			  	<bh:Span ui:field="headerButtons" addStyleNames="right">
 			  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 margin-top-22 padding-left-15" visible="false">
-						<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="PRIMARY" />
+						<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" />
 					</g:SimplePanel>
 					<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 padding-top-22" visible="false" height="70px">
 						<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
