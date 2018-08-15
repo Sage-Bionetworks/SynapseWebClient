@@ -210,16 +210,16 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	public void showRequestForm() {
 		clear();
 		pageTitle.setText(DisplayConstants.SEND_PASSWORD_CHANGE_REQUEST);
+		submitBtn.setText("Reset my password");
 		DisplayUtils.show(sendPasswordChangeForm);
 		isShowingResetUI = false;
 		submitBtn.setVisible(true);
 	}
-
-
 	@Override
 	public void showResetForm() {
 		clear();
 		pageTitle.setText(DisplayConstants.SET_PASSWORD);
+		submitBtn.setText("Set my password");
 		DisplayUtils.show(resetPasswordForm);
 		isShowingResetUI = true;
 		submitBtn.setVisible(true);
@@ -229,6 +229,7 @@ public class PasswordResetViewImpl extends Composite implements PasswordResetVie
 	public void clear() {
 		if(contentHtml != null) contentHtml.setInnerHTML("");
 		loadingPanel.setVisible(false);
+		submitBtn.setText("Submit");
 		DisplayUtils.hide(sendPasswordChangeForm);
 		DisplayUtils.hide(resetPasswordForm);
 		submitBtn.setEnabled(true);
