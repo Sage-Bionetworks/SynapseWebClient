@@ -70,8 +70,8 @@ public class FileDownloadButtonViewImpl implements FileDownloadButtonView {
 		if (downloadLink2HandlerRegistration != null) {
 			downloadLink2HandlerRegistration.removeHandler();
 		}
-		downloadLink.setHref(null);
-		downloadLink2.setHref(null);
+		downloadLink.setHref("#");
+		downloadLink2.setHref("#");
 	}
 	
 	@Override
