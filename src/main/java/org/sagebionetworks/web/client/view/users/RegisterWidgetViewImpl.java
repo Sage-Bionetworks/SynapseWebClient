@@ -28,7 +28,7 @@ public class RegisterWidgetViewImpl implements RegisterWidgetView {
 	@Inject
 	public RegisterWidgetViewImpl(Binder binder) {
 		widget = binder.createAndBindUi(this);
-		emailAddressField.getElement().setAttribute("placeholder", "Your email");
+		emailAddressField.getElement().setAttribute("placeholder", "Your email address");
 		initClickHandlers();
 	}
 

@@ -191,7 +191,7 @@ public class DisplayConstants {
 	public static final String THANK_YOU_FOR_SUBMISSION = "Thank you for your submission!";
 	public static final String SUBMISSION_RECEIVED_TEXT = "Your submission will be scored and results posted to the challenge leaderboard.";
 	public static final String NOT_PARTICIPATING_IN_ANY_EVALUATIONS = "You are not currently participating in an Evaluation/Challenge. Please join one and try again.";
-	public static final String SEND_PASSWORD_CHANGE_REQUEST = "Send Password Change Request";
+	public static final String SEND_PASSWORD_CHANGE_REQUEST = "Reset your Password";
 	public static final String EMAIL_ADDRESS = "Username or Email Address";
 	public static final String SET_PASSWORD = "Set Password";
 	public static final String SUCCESS = "Success";
