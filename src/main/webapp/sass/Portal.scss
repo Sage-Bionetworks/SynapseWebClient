@@ -21,6 +21,7 @@ $synapse-blue: #2B688F;
 $synapse-blue-end-gradient: #164B6E;
 $synapse-purple: #7772b4;
 $synapse-yellow: #F2C94C;
+$synapse-orange: #E8762B;
 $synapse-accent-primary: #56CCF2;
 
 .colored { color:$synapse-blue;}
@@ -40,12 +41,20 @@ a:focus{color:$synapse-blue; text-decoration:underline;}
 .synapse-blue-bg, #body .synapse-blue-bg {background-color:$synapse-blue;}
 .synapse-purple-bg, #body .synapse-purple-bg {background-color:$synapse-purple;}
 .synapse-green-bg, #body .synapse-green-bg {background-color:$synapse-green;}
+.synapse-orange-bg, #body .synapse-orange-bg {background-color:$synapse-orange;}
 
 .synapse-blue-bg-gradient, #body .synapse-blue-bg-gradient {
 	background: linear-gradient(180deg, $synapse-blue 0%, $synapse-blue-end-gradient 100%);
 }
 .pagination>li>a, .pagination>li>span {
 	color: $synapse-blue;
+}
+
+.dot {
+	height: 10px;
+	width: 10px;
+	border-radius: 50%;
+	display: inline-block;
 }
 
 body {

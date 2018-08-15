@@ -10,7 +10,7 @@
 			<b:Column size="XS_12">
 		        <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 inline-block" paddingTop="18">
 		        	<g:Image ui:field="synapseLogo" url="images/logo.svg" 
-		        	    addStyleNames="imageButton margin-bottom-15 margin-right-10 moveup-3" width="35px" height="35px"/>
+		        	    addStyleNames="imageButton margin-bottom-15 margin-right-5 moveup-2" width="35px" height="35px"/>
 		            <b:Heading size="H2" addStyleNames="displayInline color-white">
 		            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone"/>
 		        		<g:SimplePanel ui:field="projectFavoritePanel" addStyleNames="displayInline favoriteIcon margin-left-10" visible="false"/>
@@ -26,6 +26,7 @@
 							<b:AnchorListItem ui:field="myDashboardLink">Projects</b:AnchorListItem>
 							<b:AnchorListItem ui:field="myTeamsLink">Teams</b:AnchorListItem>
 							<b:AnchorListItem ui:field="myChallengesLink">Challenges</b:AnchorListItem>
+							<b:AnchorListItem ui:field="trashLink" icon="TRASH_O" visible="false">Trash can</b:AnchorListItem>
 							<b:Divider/>
 							<b:AnchorListItem ui:field="mySettingsLink">Settings</b:AnchorListItem>
 							<b:Divider/>
@@ -46,13 +47,6 @@
 				    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-10 margin-right-10 margin-top-22 margin-bottom-20"/>
 				    <g:SimplePanel ui:field="stuAnnouncementsContainer" addStyleNames="right margin-left-10 "/>
 				</bh:Span>
-				<g:FlowPanel ui:field="testSitePanel" visible="false" addStyleNames="margin-left-10 margin-right-10 margin-top-5">
-					<bh:Span addStyleNames="smallerText color-white">Alpha features&nbsp;</bh:Span>
-					<bh:Span addStyleNames="smallerText color-white strong">on</bh:Span>
-					<bh:Span addStyleNames="smallerText color-white">&nbsp;/&nbsp;</bh:Span>
-					<b:Anchor addStyleNames="smallerText color-white" ui:field="goToStandardSite" text="off" />
-					<b:Anchor ui:field="trashLink" icon="TRASH_O" addStyleNames="margin-left-20 smallerText color-white" text="Trash can" visible="false" />
-				</g:FlowPanel>
 			</b:Column>
 		</b:Row>
 		<b:Alert ui:field="stagingAlert" type="WARNING" visible="false">

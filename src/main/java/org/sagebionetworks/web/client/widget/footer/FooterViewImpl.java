@@ -59,7 +59,7 @@ public class FooterViewImpl implements FooterView {
 			
 			initDebugModeLink();
 			hideACTActionsContainer.add(hideACTActionsButton);
-			copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " Sage Bionetworks");
+			copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " SAGE BIONETWORKS");
 			reportAbuseLink.addClickHandler(new ClickHandler() {
 				
 				@Override

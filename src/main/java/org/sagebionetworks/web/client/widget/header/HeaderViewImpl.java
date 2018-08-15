@@ -20,13 +20,11 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
-import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -73,7 +71,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Span headerButtons;
 	
 	@UiField
-	Anchor trashLink;
+	AnchorListItem trashLink;
 	@UiField
 	AnchorListItem logoutLink;
 	@UiField
@@ -90,10 +88,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	DropDownMenu dashboardDropdownMenu;
 
-	@UiField
-	FlowPanel testSitePanel;
-	@UiField
-	Anchor goToStandardSite;
 	@UiField
 	SimplePanel searchBoxContainer;
 	@UiField
@@ -129,7 +123,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		searchBoxContainer.setWidget(searchBox.asWidget());
 		dashboardDropdownAnchor.add(userBadge.asWidget());
 		initClickHandlers();
-		refreshTestSiteHeader();
 		clear();
 	}
 	
@@ -167,10 +160,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		documentationLink.addClickHandler(event -> {
 			event.preventDefault();
 			DisplayUtils.newWindow(WebConstants.DOCS_BASE_URL, "", "");
-		});
-		goToStandardSite.addClickHandler(event -> {
-			DisplayUtils.setTestWebsite(false, cookies);
-			globalAppState.refreshPage();
 		});
 		trashLink.addClickHandler(event -> {
     		presenter.onTrashClick();
@@ -233,7 +222,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void refresh() {
-		refreshTestSiteHeader();
 		boolean isInTestWebsite = DisplayUtils.isInTestWebsite(cookies);
 		trashLink.setVisible(isInTestWebsite);
 	}
@@ -303,10 +291,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	/*
 	 * Private Methods
 	 */
-
-	private void refreshTestSiteHeader() {
-		testSitePanel.setVisible(DisplayUtils.isInTestWebsite(cookies));
-	}
 	
 	@Override
 	public void showFavoritesLoading() {
