@@ -16,10 +16,12 @@
 /***************
 Synapse color scheme
 ****************/
-$synapse-green: #0ea862;
-$synapse-blue: #1e7098;
+$synapse-green: #62AC62;
+$synapse-blue: #2B688F;
+$synapse-blue-end-gradient: #164B6E;
 $synapse-purple: #7772b4;
-$synapse-yellow: #68b2bb;
+$synapse-yellow: #F2C94C;
+$synapse-accent-primary: #56CCF2;
 
 .colored { color:$synapse-blue;}
 .link { color:$synapse-blue;}
@@ -40,7 +42,7 @@ a:focus{color:$synapse-blue; text-decoration:underline;}
 .synapse-green-bg, #body .synapse-green-bg {background-color:$synapse-green;}
 
 .synapse-blue-bg-gradient, #body .synapse-blue-bg-gradient {
-	background: linear-gradient(180deg, #2B688F 0%, #164B6E 100%);
+	background: linear-gradient(180deg, $synapse-blue 0%, $synapse-blue-end-gradient 100%);
 }
 .pagination>li>a, .pagination>li>span {
 	color: $synapse-blue;
@@ -1281,9 +1283,6 @@ ol.lowerroman {
 	list-style: lower-roman outside;
 	padding: 0 0 0 30px;
 }
-.blackText {
-	color: #000000;
-}
 
 .blackText-imp {
 	color: #000000 !important;
@@ -1305,9 +1304,6 @@ ol.lowerroman {
 	padding: 0px;
 }
 
-.padding-top-10 {
-	padding-top: 10px;
-}
 .padding-top-15 {
 	padding-top: 15px;
 }
@@ -1323,10 +1319,6 @@ ol.lowerroman {
 
 .padding-bottom-15 {
 	padding-bottom: 15px;
-}
-
-.padding-bottom-4-imp {
-	padding-bottom: 4px !important;
 }
 
 .padding-5, #body .padding-5 {
@@ -2396,16 +2388,6 @@ img::-moz-selection {
 /*-------------------------------------------------------*/
 	/*Typography*/
 /*-------------------------------------------------------*/
-h1, h2, h3, h4, h5, h6 {
-	font-weight: 200;
-	color:#000000; }
-h1 a, h2 a, h3 a, h4 a, h5 a, h6 a { font-weight: inherit; }
-h1 { font-size: 36px; line-height: 50px; margin-bottom: 10px;}
-h2 { font-size: 32px; line-height: 40px; margin-bottom: 10px; }
-h3 { font-size: 26px; line-height: 23px; margin-bottom: 10px; }
-h4 { font-size: 22px; line-height: 30px; margin-bottom: 4px; }
-h5 { font-size: 16px; line-height: 24px; margin-bottom: 4px; }
-h6 { font-size: 14px; line-height: 21px; }
 
 p { margin: 0 0 20px 0; }
 .small { font-size:90%;}
