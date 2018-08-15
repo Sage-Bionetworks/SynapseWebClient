@@ -2533,6 +2533,6 @@ div.colborder {
 	a.menu:after, .dropdown-toggle:after {
 		content: none;
 	}
-	.dropdown:hover {background-color: green;}
+	.dropdown:hover {background-color: $synapse-green}
 	.dropdown {background-color: none;}
 }
