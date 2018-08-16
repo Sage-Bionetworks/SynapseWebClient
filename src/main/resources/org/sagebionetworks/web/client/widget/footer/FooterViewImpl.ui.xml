@@ -51,7 +51,7 @@
 				<b:Column size="SM_12">
 					<bh:Span addStyleNames="left">
 					    <g:Image url="images/logo.svg" addStyleNames="margin-bottom-15 margin-right-5 moveup-2" width="35px" height="35px"/>
-			        	<b:Heading size="H2" addStyleNames="displayInline color-white lato" text="SYNAPSE" />
+			        	<b:Heading size="H3" addStyleNames="displayInline color-white lato letter-spacing-6" text="SYNAPSE" />
 					</bh:Span>
 					<bh:Span addStyleNames="right">
     					<bh:Span ui:field="hideACTActionsContainer"/>
