@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -167,6 +168,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			event.preventDefault();
 			DisplayUtils.newWindow(WebConstants.DOCS_BASE_URL, "", "");
 		});
+		
 		trashLink.addClickHandler(event -> {
     		presenter.onTrashClick();
 		});

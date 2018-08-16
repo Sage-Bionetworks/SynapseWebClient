@@ -13,13 +13,10 @@
 		</g:SimplePanel>
 		<b:Heading size="H4" subText="or" addStyleNames="text-align-center margin-top-20"/>
 		<b:Heading size="H4" subText="Sign in with your Synapse account" addStyleNames="text-align-center margin-top-20"/>
-		<bh:Div addStyleNames="signin-panel margin-top-15">
-			<g:FlowPanel ui:field="synapseLoginFieldsContainer" />
-		</bh:Div>
+		<bh:Div ui:field="loginFormContainer" />
 		<b:Row>
-			<bh:Div ui:field="synAlertContainer" />
-		</b:Row>
-		<b:Button ui:field="submitBtn" text="Sign in" size="LARGE" type="SUCCESS" width="100%"  addStyleNames="margin-top-15"/>
+				<bh:Div ui:field="synAlertContainer" />
+			</b:Row>
 		<b:Heading size="H5" addStyleNames="margin-top-20">
 			<b:Anchor text="Forgot password?" addStyleNames="synapse-green left" href="#!PasswordReset:0"/>
 			<b:Heading size="H5" subText="It's free!" addStyleNames="displayInlineBlock margin-top-0 margin-bottom-0-imp right"/>

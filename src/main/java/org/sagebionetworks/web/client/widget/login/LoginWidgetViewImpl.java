@@ -1,22 +1,22 @@
 package org.sagebionetworks.web.client.widget.login;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.event.dom.client.KeyCodes;
-import com.google.gwt.event.dom.client.KeyDownEvent;
-import com.google.gwt.event.dom.client.KeyDownHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.DOM;
+import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
+import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.PasswordTextBox;
+import com.google.gwt.user.client.ui.RootPanel;
 import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -27,24 +27,23 @@ public class LoginWidgetViewImpl extends Composite implements
 	public static final String GOOGLE_OAUTH_CALLBACK_URL = "/Portal/oauth2callback?oauth2provider=GOOGLE_OAUTH_2_0";
 
 	public interface LoginWidgetViewImplUiBinder extends UiBinder<Widget, LoginWidgetViewImpl> {}
-	
 	@UiField
-	FlowPanel synapseLoginFieldsContainer;
-	
-	@UiField
-	Button submitBtn;
+	Div loginFormContainer;
 	@UiField
 	org.gwtbootstrap3.client.ui.Button googleSignInButton;
 	@UiField
 	Div synAlertContainer;
 	PasswordTextBox password = null;
 	TextBox username = null;
+	Button submitButton = null;
+	FormPanel loginForm = null;
 	
 	private Presenter presenter;
 	
 	@Inject
 	public LoginWidgetViewImpl(LoginWidgetViewImplUiBinder binder) {
 		initWidget(binder.createAndBindUi(this));
+		loginForm = FormPanel.wrap(DOM.getElementById("login_form"));
 		
 		googleSignInButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -52,13 +51,13 @@ public class LoginWidgetViewImpl extends Composite implements
 				DisplayUtils.newWindow(GOOGLE_OAUTH_CALLBACK_URL, "_self", "");
 			}
 		});
-		
+		RootPanel.detachNow(loginForm);
 		username = TextBox.wrap(DOM.getElementById("synapse_username"));
 	    username.getElement().setAttribute("placeholder", DisplayConstants.EMAIL_ADDRESS);
 	    username.addStyleName("form-control margin-top-20 whiteBackground");
 	    username.addKeyDownHandler(event -> {
 	        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-	        	loginUser();
+	        	loginForm.submit();
 	        }
 		});
 		username.setFocus(true);
@@ -68,18 +67,21 @@ public class LoginWidgetViewImpl extends Composite implements
 		password.addStyleName("form-control margin-top-20 whiteBackground");
 		password.addKeyDownHandler(event -> {
 	        if (event.getNativeKeyCode() == KeyCodes.KEY_ENTER) {
-	        	loginUser();
+	        	loginForm.submit();
 	        }
 		});
-	
-		FlowPanel loginFieldsPanel = new FlowPanel();
-		loginFieldsPanel.add(username);
-		loginFieldsPanel.add(password);
-		synapseLoginFieldsContainer.add(loginFieldsPanel);
-		submitBtn.addClickHandler(event -> {
+		
+		submitButton = Button.wrap(DOM.getElementById("synapse_signin_btn"));
+		submitButton.addStyleName("btn margin-top-15 btn-lg btn-success");
+		submitButton.setWidth("100%");
+		
+		loginForm.addSubmitHandler(event -> {
+			event.cancel();
 			loginUser();
 		});
 		
+		loginFormContainer.clear();
+		loginFormContainer.add(loginForm);
 	}
 
 	@Override
@@ -106,16 +108,16 @@ public class LoginWidgetViewImpl extends Composite implements
 	@Override
 	public void clear() {		
 		password.setValue("");
-		submitBtn.setEnabled(true);
-		submitBtn.setText(DisplayConstants.SIGN_IN);
+		submitButton.setEnabled(true);
+		submitButton.setText(DisplayConstants.SIGN_IN);
 	}
 
 	/*
 	 * Private Methods
 	 */
 	private void loginUser() {
-		submitBtn.setEnabled(false);
-		submitBtn.setText(DisplayConstants.SIGNING_IN);
+		submitButton.setEnabled(false);
+		submitButton.setText(DisplayConstants.SIGNING_IN);
 		presenter.setUsernameAndPassword(username.getValue(), password.getValue());
 	}
 

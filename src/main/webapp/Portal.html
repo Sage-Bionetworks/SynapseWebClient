@@ -127,12 +127,12 @@
 			</noscript>
             
             <div style="display:none;">
-              <form id="login_form" method="post" target='hiddeniframe'>
-                <input id="synapse_username" name="username"/>
-                <input id="synapse_password" name="password" type="password"/>
-                <input id="synapse_signin_btn" name="signInBtn" type="submit" />
-                <iframe name='hiddeniframe'></iframe>
-              </form>
+				<form id="login_form" target="hiddeniframe" role="form" class="signin-panel margin-top-15" method="post" action="/expect_405">
+					<input id="synapse_username" type="text" name="uname">
+					<input id="synapse_password" name="psw" type="password">
+					<button id="synapse_signin_btn" type="submit">Sign in</button>
+					<iframe name='hiddeniframe' style="display:none;"></iframe>
+				</form>
             </div>
             
             <!-- This is the GWT-generated body -->
