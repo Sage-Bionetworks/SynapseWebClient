@@ -49,11 +49,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	Div headingPanel;
 	@UiField
-	DropDown headerFavButtonGroup;
+	DropDown headerFavDropdown;
 	@UiField
-	Anchor headerFavButton;
+	Anchor headerFavAnchor;
 	@UiField
-	DropDownMenu headerFavList;
+	DropDownMenu headerFavDropdownMenu;
 
 	@UiField
 	SimplePanel projectFavoritePanel;
@@ -176,45 +176,23 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		loginLink.addClickHandler(event -> {
 			presenter.onLoginClick();
 		});
-		headerFavButtonGroup.addDomHandler(event-> {
-			headerFavList.addStyleName("hover");
-			dashboardDropdownMenu.removeStyleName("hover");
-			presenter.refreshFavorites();
-		}, MouseOverEvent.getType());
-		headerFavList.addDomHandler(event-> {
-			headerFavList.removeStyleName("hover");
-		}, MouseOutEvent.getType());
-		searchBoxContainer.addDomHandler(event-> {
-			headerFavList.removeStyleName("hover");
-			dashboardDropdownMenu.removeStyleName("hover");
-		}, MouseOverEvent.getType());
-		dashboardDropdown.addDomHandler(event-> {
-			dashboardDropdownMenu.addStyleName("hover");
-			headerFavList.removeStyleName("hover");
-		}, MouseOverEvent.getType());
-		dashboardDropdownMenu.addDomHandler(event-> {
-			dashboardDropdownMenu.removeStyleName("hover");
-		}, MouseOutEvent.getType());
 		synapseLogo.addClickHandler(event -> {
 			presenter.onLogoClick();
 		});
+		
 		myDashboardLink.addClickHandler(event -> {
-			dashboardDropdownMenu.removeStyleName("hover");
 			Profile place = new Profile(userId, ProfileArea.PROJECTS);
 			globalAppState.getPlaceChanger().goTo(place);
 		});
 		myTeamsLink.addClickHandler(event -> {
-			dashboardDropdownMenu.removeStyleName("hover");
 			Profile place = new Profile(userId, ProfileArea.TEAMS);
 			globalAppState.getPlaceChanger().goTo(place);
 		});
 		myChallengesLink.addClickHandler(event -> {
-			dashboardDropdownMenu.removeStyleName("hover");
 			Profile place = new Profile(userId, ProfileArea.CHALLENGES);
 			globalAppState.getPlaceChanger().goTo(place);
 		});
 		mySettingsLink.addClickHandler(event -> {
-			dashboardDropdownMenu.removeStyleName("hover");
 			Profile place = new Profile(userId, ProfileArea.SETTINGS);
 			globalAppState.getPlaceChanger().goTo(place);
 		});
@@ -255,24 +233,24 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	 		loginLinkUI.setVisible(false);
 			logoutLink.setVisible(true);
 			dashboardDropdown.setVisible(true);
-			headerFavButtonGroup.setVisible(true);
+			headerFavDropdown.setVisible(true);
 		} else {
 			userId = null;
 			loginLinkUI.setVisible(true);
 			logoutLink.setVisible(false);
 			dashboardDropdown.setVisible(false);
-			headerFavButtonGroup.setVisible(false);
+			headerFavDropdown.setVisible(false);
 		}
 	}
 
 	@Override
 	public void clearFavorite() {
-		headerFavList.clear();
+		headerFavDropdownMenu.clear();
 	}
 
 	@Override
 	public void setEmptyFavorite() {
-		headerFavList.add(defaultItem);
+		headerFavDropdownMenu.add(defaultItem);
 	}
 
 	@Override
@@ -280,11 +258,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		for (final EntityHeader header : headers) {
 			AnchorListItem favItem = new AnchorListItem(header.getName());
 			favItem.addClickHandler(event -> {
-				headerFavList.removeStyleName("hover");
+				headerFavDropdownMenu.removeStyleName("hover");
 				Synapse place = new Synapse(header.getId());
 				globalAppState.getPlaceChanger().goTo(place);
 			});
-			headerFavList.add(favItem);
+			headerFavDropdownMenu.add(favItem);
 		}
 	}
 

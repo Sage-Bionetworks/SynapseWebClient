@@ -2536,7 +2536,7 @@ div.colborder {
 		border-radius: 50%;
 		background: white;
 	}
-	.dropdown ul.dropdown-menu.hover {
+	.dropdown:hover ul.dropdown-menu {
 		display: block;
 	}
 	.dropdown ul.dropdown-menu {
