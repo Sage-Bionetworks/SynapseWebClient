@@ -2539,9 +2539,24 @@ div.colborder {
 	.dropdown ul.dropdown-menu.hover {
 		display: block;
 	}
+	.dropdown ul.dropdown-menu {
+		border-radius: 0px;
+		margin-top: 0px;
+	}
 	a.menu:after, .dropdown-toggle:after {
 		content: none;
 	}
 	.dropdown:hover {background-color: $synapse-green}
 	.dropdown {background-color: none;}
+	.alert {
+		border-radius: 0px;
+	}
+}
+#footerPanel {
+	.alert {
+		border-radius: 0px;
+	}
+}
+.lato {
+	font-family: Lato;
 }

@@ -21,7 +21,9 @@
 					</t:TableData>
 					<t:TableData paddingRight="10" paddingLeft="10" width="150px">
 						<b:Heading size="H5" addStyleNames="right">
-							<b:Anchor ui:field="debugOffLink" text="TURN OFF" addStyleNames="color-white underline" />
+							<b:Anchor ui:field="debugOffLink" text="TURN OFF" addStyleNames="color-white underline margin-right-10" />
+							<w:HelpWidget helpMarkdown="This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade." 
+										addStyleNames="margin-left-5 right" iconStyles="color-white" placement="TOP"/>
 						</b:Heading>
 					</t:TableData>
 				</t:TableRow>
@@ -49,7 +51,7 @@
 				<b:Column size="SM_12">
 					<bh:Span addStyleNames="left">
 					    <g:Image url="images/logo.svg" addStyleNames="margin-bottom-15 margin-right-5 moveup-2" width="35px" height="35px"/>
-			        	<b:Heading size="H2" addStyleNames="displayInline color-white" text="SYNAPSE" />
+			        	<b:Heading size="H2" addStyleNames="displayInline color-white lato" text="SYNAPSE" />
 					</bh:Span>
 					<bh:Span addStyleNames="right">
     					<bh:Span ui:field="hideACTActionsContainer"/>
@@ -76,8 +78,6 @@
 								</t:TableData>
 								<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="text-align-center">
 									<b:Anchor href="http://creativecommons.org/licenses/by/4.0/legalcode" text="Creative Commons License" addStyleNames="color-white" target="_blank"/>
-									<w:HelpWidget helpMarkdown="Content on this page other than software, data, and registration data is licensed to the public under the [CC BY 4.0 license](http://creativecommons.org/licenses/by/4.0/legalcode), as per the [Terms and Conditions of Use](http://docs.synapse.org/articles/governance.html)." 
-										addStyleNames="margin-left-5" iconStyles="color-white" placement="TOP"/>
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>

@@ -170,7 +170,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		loginLink.addClickHandler(event -> {
 			presenter.onLoginClick();
 		});
-		headerFavButton.addDomHandler(event-> {
+		headerFavButtonGroup.addDomHandler(event-> {
 			headerFavList.addStyleName("hover");
 			dashboardDropdownMenu.removeStyleName("hover");
 			presenter.onFavoriteClick();
@@ -182,7 +182,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			headerFavList.removeStyleName("hover");
 			dashboardDropdownMenu.removeStyleName("hover");
 		}, MouseOverEvent.getType());
-		dashboardDropdownAnchor.addDomHandler(event-> {
+		dashboardDropdown.addDomHandler(event-> {
 			dashboardDropdownMenu.addStyleName("hover");
 			headerFavList.removeStyleName("hover");
 		}, MouseOverEvent.getType());
