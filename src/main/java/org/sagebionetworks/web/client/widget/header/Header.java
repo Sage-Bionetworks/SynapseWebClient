@@ -2,6 +2,7 @@ package org.sagebionetworks.web.client.widget.header;
 
 import java.util.List;
 
+import org.gwtbootstrap3.client.ui.Button;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;

@@ -8,10 +8,28 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	
 	<g:HTMLPanel addStyleNames="footer">
-		<!-- FOOTER -->	
+		<!-- FOOTER -->
 		<bh:ClearFix />
+		<b:Alert ui:field="debugModeAlert" type="DANGER" visible="false" marginRight="0" marginLeft="0" marginBottom="0">
+			<t:Table width="100%">
+				<t:TableRow>
+					<t:TableData paddingRight="10" paddingLeft="10">
+						<g:Image url="images/helmet.svg" width="30px" height="30px"/>
+					</t:TableData>
+					<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="center">
+						<b:Heading size="H5" text="ALPHA TEST MODE ACTIVE" addStyleNames="displayInlineBlock color-white"/>
+					</t:TableData>
+					<t:TableData paddingRight="10" paddingLeft="10" width="150px">
+						<b:Heading size="H5" addStyleNames="right">
+							<b:Anchor ui:field="debugOffLink" text="TURN OFF" addStyleNames="color-white underline" />
+						</b:Heading>
+					</t:TableData>
+				</t:TableRow>
+			</t:Table>
+		</b:Alert>
+	
 		<b:Container fluid="true">
-	        <b:Row addStyleNames="synapse-blue-bg-gradient padding-15">
+			<b:Row addStyleNames="synapse-blue-bg-gradient padding-15">
 	        		<bh:Div ui:field="sponsorsUI">
 		        		<b:Column size="SM_12" addStyleNames="margin-bottom-10">
 						<g:HTMLPanel>
@@ -36,7 +54,9 @@
 					<bh:Span addStyleNames="right">
     					<bh:Span ui:field="hideACTActionsContainer"/>
 						<b:Tooltip title="Website alpha test mode">
-							<b:Anchor ui:field="debugLink" text="@" addStyleNames="color-white margin-left-15"/>
+							<g:FocusPanel ui:field="debugLink">
+								<g:Image url="images/helmet.svg"  addStyleNames="btn-success imageButton padding-5 rounded" width="30px" height="30px"/>
+							</g:FocusPanel>
 						</b:Tooltip>
     				</bh:Span>
 					<bh:Span addStyleNames="clearleft clearright">
@@ -67,7 +87,7 @@
 		    		<b:Row>
 		    			<b:Column size="SM_2" />
 		    			<b:Column size="SM_8">
-		    				<bh:Div>
+		    				<bh:Div addStyleNames="margin-left-20">
 				    			<g:Image url="images/sagebionetworks-logo.svg" addStyleNames="imageButton center-in-div"/>
 				    		</bh:Div>
 				    		<bh:Div addStyleNames="center margin-top-10">
