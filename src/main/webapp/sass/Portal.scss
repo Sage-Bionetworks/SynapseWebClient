@@ -2523,6 +2523,10 @@ div.colborder {
 #rootPanel summary:hover { text-decoration: underline; cursor:pointer; }
 
 #headerPanel {
+	.searchBox input, .searchBox input:focus {
+		background-color:#274660;
+		color: white;
+	}
 	.searchTextField {
 		width: 0px;
 		opacity: 0;
