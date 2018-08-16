@@ -173,7 +173,7 @@ public class DisplayConstants {
 	
 	public static final String API_TABLE_MISSING_URI = "SuperTable: Endpoint path not specified.";
 	
-	public static final String TEST_MODE_WARNING = "<h5>Alpha Test Mode</h5>This mode is for alpha testing features only. Please note that the <a target=\"blank\" href=\"https://s3.amazonaws.com/static.synapse.org/stu/party/stuparty.html\"> developer</a> does not guarantee an absence of errors, "
+	public static final String TEST_MODE_WARNING = "<h5>Alpha Test Mode</h5>This mode is for alpha testing features only. Please note that the <a target=\"blank\" href=\"https://github.com/Sage-Bionetworks/SynapseWebClient\"> developers</a> do not guarantee an absence of errors, "
 				+ "and that the data created using alpha features may be lost during product upgrade.<br><br><strong>Are you sure you want to switch into this mode?</strong>";
 	
 	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
