@@ -21,7 +21,7 @@
 					</t:TableData>
 					<t:TableData paddingRight="10" paddingLeft="10" width="150px">
 						<b:Heading size="H5" addStyleNames="right">
-							<b:Anchor ui:field="debugOffLink" text="TURN OFF" addStyleNames="color-white underline margin-right-10" />
+							<b:Anchor ui:field="debugOffLink" text="TURN OFF" addStyleNames="color-white margin-right-10" />
 							<w:HelpWidget helpMarkdown="This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade." 
 										addStyleNames="margin-left-5 right" iconStyles="color-white" placement="TOP"/>
 						</b:Heading>

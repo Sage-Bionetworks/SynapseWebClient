@@ -2556,6 +2556,10 @@ div.colborder {
 		border-radius: 0px;
 	}
 }
+#body .alert a {
+	font-weight: inherit;
+	text-decoration: underline;
+}
 #footerPanel {
 	.alert {
 		border-radius: 0px;
