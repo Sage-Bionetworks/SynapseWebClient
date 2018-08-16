@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.header;
 
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
 import org.sagebionetworks.web.client.ClientProperties;
@@ -24,6 +23,7 @@ import com.google.inject.Inject;
 
 public class Header implements HeaderView.Presenter, IsWidget {
 
+	public static final String SYNAPSE = "SYNAPSE";
 	public static final String N_A = "n/a";
 	public static final String ANONYMOUS = "VISITOR_UNIQUE_ID";
 	public static final String SYNAPSE_ORG = "@synapse.org";
@@ -70,7 +70,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	}
 	
 	public void configure() {
-		view.setProjectHeaderText("SYNAPSE");
+		view.setProjectHeaderText(SYNAPSE);
 		view.setProjectHeaderAnchorTarget("#");
 		view.hideProjectFavoriteWidget();
 	}
@@ -101,6 +101,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		if (authenticationController.isLoggedIn() && userSessionData.getProfile() != null) {
 			String userName = userSessionData.getProfile().getUserName();
 			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
+			refreshFavorites();
 		} else {
 			pendoSdk.initialize(ANONYMOUS, N_A);
 		}
@@ -129,9 +130,8 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	}
 
 	@Override
-	public void onFavoriteClick() {
+	public void refreshFavorites() {
 		if(authenticationController.isLoggedIn()) {
-			view.showFavoritesLoading();
 			jsClient.getFavorites(new AsyncCallback<List<EntityHeader>>() {
 				@Override
 				public void onSuccess(List<EntityHeader> favorites) {

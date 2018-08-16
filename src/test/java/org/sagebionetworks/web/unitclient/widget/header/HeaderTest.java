@@ -145,7 +145,7 @@ public class HeaderTest {
 	@Test
 	public void testOnFavoriteClickEmptyCase() {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
-		header.onFavoriteClick();
+		header.refreshFavorites();
 		verify(mockView).clearFavorite();
 		verify(mockView).setEmptyFavorite();
 	}
@@ -159,7 +159,7 @@ public class HeaderTest {
 		entityHeader2.setId("syn012345");
 		entityHeaders.add(entityHeader1);
 		entityHeaders.add(entityHeader2);
-		header.onFavoriteClick();
+		header.refreshFavorites();
 		verify(mockView).clearFavorite();
 		verify(mockView).addFavorite(entityHeaders);
 	}
@@ -170,8 +170,7 @@ public class HeaderTest {
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(true);
 		UserSessionData userSessionData = new UserSessionData();
 		when(mockAuthenticationController.getCurrentUserSessionData()).thenReturn(userSessionData);
-		header.onFavoriteClick();
-		verify(mockView).showFavoritesLoading();
+		header.refreshFavorites();
 		verify(mockView).clearFavorite();
 		verify(mockSynapseJavascriptClient, times(1)).getFavorites(any(AsyncCallback.class));
 		//initially empty
@@ -183,8 +182,7 @@ public class HeaderTest {
 		entityHeaders.add(entityHeader1);
 		
 		// User should ask for favorites each time favorites button is clicked
-		header.onFavoriteClick();
-		verify(mockView, times(2)).showFavoritesLoading();
+		header.refreshFavorites();
 		verify(mockView, times(2)).clearFavorite();
 		verify(mockSynapseJavascriptClient, times(2)).getFavorites(any(AsyncCallback.class));
 		verify(mockView).addFavorite(entityHeaders);
@@ -195,8 +193,7 @@ public class HeaderTest {
 		// SWC-2805: User is not logged in.  This is an odd case, since the favorites menu should not be shown.
 		// in this case, do not even try to update the favorites, will show whatever we had (possibly stale, like the rest of the page).
 		when(mockAuthenticationController.isLoggedIn()).thenReturn(false);
-		header.onFavoriteClick();
-		verify(mockView, never()).showFavoritesLoading();
+		header.refreshFavorites();
 		verify(mockView, never()).clearFavorite();
 		verify(mockSynapseJavascriptClient, never()).getFavorites(any(AsyncCallback.class));
 	}

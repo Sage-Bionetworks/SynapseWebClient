@@ -30,7 +30,6 @@ import com.google.gwt.event.dom.client.MouseOverEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.FlowPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -102,6 +101,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	private GlobalApplicationState globalAppState;
 	UserBadge userBadge;
 	String userId;
+	AnchorListItem defaultItem = new AnchorListItem("Empty");
 	@Inject
 	public HeaderViewImpl(Binder binder,
 			SageImageBundle sageImageBundle,
@@ -133,6 +133,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	
 	@Override
 	public void setProjectHeaderText(String text) {
+		boolean isDefault = Header.SYNAPSE.equals(text);
+		if (isDefault) {
+			projectHeadingAnchor.addStyleName("letter-spacing-6");
+		} else {
+			projectHeadingAnchor.removeStyleName("letter-spacing-6");
+		}
 		projectHeadingAnchor.setText(text);
 	}
 	
@@ -173,7 +179,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		headerFavButtonGroup.addDomHandler(event-> {
 			headerFavList.addStyleName("hover");
 			dashboardDropdownMenu.removeStyleName("hover");
-			presenter.onFavoriteClick();
+			presenter.refreshFavorites();
 		}, MouseOverEvent.getType());
 		headerFavList.addDomHandler(event-> {
 			headerFavList.removeStyleName("hover");
@@ -266,7 +272,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 
 	@Override
 	public void setEmptyFavorite() {
-		AnchorListItem defaultItem = new AnchorListItem("Empty");
 		headerFavList.add(defaultItem);
 	}
 
@@ -288,17 +293,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		stagingAlert.setVisible(visible);	
 	}
 	
-	/*
-	 * Private Methods
-	 */
-	
-	@Override
-	public void showFavoritesLoading() {
-		headerFavList.clear();
-		AnchorListItem loading = new AnchorListItem("Loading...");
-		loading.setEnabled(false);
-		headerFavList.add(loading);
-	}
 	@Override
 	public void setStuAnnouncementWidget(Widget w) {
 		stuAnnouncementsContainer.clear();

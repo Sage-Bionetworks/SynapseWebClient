@@ -12,7 +12,7 @@
 		        	<g:Image ui:field="synapseLogo" url="images/logo.svg" 
 		        	    addStyleNames="imageButton margin-bottom-15 margin-right-5 moveup-2" width="35px" height="35px"/>
 		            <b:Heading size="H3" addStyleNames="displayInline color-white">
-		            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone lato letter-spacing-6"/>
+		            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone lato notransition"/>
 		        		<g:SimplePanel ui:field="projectFavoritePanel" addStyleNames="displayInline favoriteIcon margin-left-10" visible="false"/>
 		        	</b:Heading>
 			  	</bh:Div>

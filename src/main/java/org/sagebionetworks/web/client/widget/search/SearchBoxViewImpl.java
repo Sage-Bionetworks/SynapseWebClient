@@ -4,14 +4,12 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.MouseOverEvent;
+import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.Timer;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -43,7 +41,9 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	            }					
 			}
 		});
-	    
+	    searchField.addDomHandler(event -> {
+	    	searchFieldInactive();
+	    }, MouseOutEvent.getType());
 	    searchButton.addClickHandler(event -> {
 	    	searchField.setFocus(true);
 	    	if (searchField.getStyleName().contains(ACTIVE_STYLE)) {
@@ -55,12 +55,12 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	}
 	
 	private void searchFieldInactive() {
-		searchField.removeStyleName(ACTIVE_STYLE);
 		searchField.addStyleName(INACTIVE_STYLE);
+		searchField.removeStyleName(ACTIVE_STYLE);
 	}
 	private void searchFieldActive() {
-		searchField.removeStyleName(INACTIVE_STYLE);
 		searchField.addStyleName(ACTIVE_STYLE);
+		searchField.removeStyleName(INACTIVE_STYLE);
 	}
 	
 	private void executeSearch() {

@@ -29,13 +29,12 @@ public interface HeaderView extends IsWidget {
 		void onTrashClick();
 		void onLogoutClick();
 		void onLoginClick();
-		void onFavoriteClick();
+		void refreshFavorites();
 		void onLogoClick();
 	}
 	public void clearFavorite();
 	public void setEmptyFavorite();
 	public void addFavorite(List<EntityHeader> headers);
-	public void showFavoritesLoading();
 	void setUser(UserSessionData userData);
 	void setProjectHeaderText(String text);
 	void setProjectHeaderAnchorTarget(String href);
