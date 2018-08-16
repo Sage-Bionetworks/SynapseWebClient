@@ -55,12 +55,12 @@
 					</bh:Span>
 					<bh:Span addStyleNames="right" width="200px">
     					<bh:Span ui:field="hideACTActionsContainer"/>
-						<b:Tooltip title="Website alpha test mode">
-							<g:FocusPanel ui:field="debugLink">
+						<g:FocusPanel ui:field="debugLink">
+							<b:Tooltip title="Website alpha test mode">
 								<g:Image url="images/helmet.svg"  addStyleNames="btn-success imageButton padding-5 rounded right" width="30px" height="30px"/>
-							</g:FocusPanel>
-						</b:Tooltip>
-    				</bh:Span>
+							</b:Tooltip>
+						</g:FocusPanel>
+					</bh:Span>
 					<bh:Span addStyleNames="clearleft clearright">
 						<t:Table align="center" height="40px">
 							<t:TableRow>
