@@ -41,9 +41,6 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	            }					
 			}
 		});
-	    searchField.addDomHandler(event -> {
-	    	searchFieldInactive();
-	    }, MouseOutEvent.getType());
 	    searchButton.addClickHandler(event -> {
 	    	searchField.setFocus(true);
 	    	if (searchField.getStyleName().contains(ACTIVE_STYLE)) {

@@ -53,11 +53,11 @@
 					    <g:Image url="images/logo.svg" addStyleNames="margin-bottom-15 margin-right-5 moveup-2" width="35px" height="35px"/>
 			        	<b:Heading size="H3" addStyleNames="displayInline color-white lato letter-spacing-6" text="SYNAPSE" />
 					</bh:Span>
-					<bh:Span addStyleNames="right">
+					<bh:Span addStyleNames="right" width="200px">
     					<bh:Span ui:field="hideACTActionsContainer"/>
 						<b:Tooltip title="Website alpha test mode">
 							<g:FocusPanel ui:field="debugLink">
-								<g:Image url="images/helmet.svg"  addStyleNames="btn-success imageButton padding-5 rounded" width="30px" height="30px"/>
+								<g:Image url="images/helmet.svg"  addStyleNames="btn-success imageButton padding-5 rounded right" width="30px" height="30px"/>
 							</g:FocusPanel>
 						</b:Tooltip>
     				</bh:Span>
