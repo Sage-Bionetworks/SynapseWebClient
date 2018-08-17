@@ -48,6 +48,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	FacetsWidget facetsWidget;
 	Callback resetFacetsHandler;
 	boolean facetsVisible = true;
+	boolean isTableVisible = true;
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
@@ -316,6 +317,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	
 	public void setFacetsVisible(boolean visible) {
 		facetsVisible = visible;
+		view.setFacetsVisible(facetsVisible && isTableVisible);
 	}
 	@Override
 	public void onClearFacets() {
@@ -324,7 +326,8 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}
 	}
 	public void setTableVisible(boolean visible) {
+		this.isTableVisible = visible;
 		view.setTableVisible(visible);
-		view.setFacetsVisible(visible);
+		view.setFacetsVisible(facetsVisible && isTableVisible);
 	}
 }
