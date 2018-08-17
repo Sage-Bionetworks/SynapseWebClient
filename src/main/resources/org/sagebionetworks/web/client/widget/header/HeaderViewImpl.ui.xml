@@ -29,9 +29,9 @@
 		</b:Alert>
 		<b:Row ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg-gradient">
 			<b:Column size="XS_12">
-		        <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 inline-block" paddingTop="8">
+		        <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 inline-block" paddingTop="15">
 		        	<g:Image ui:field="synapseLogo" url="images/logo.svg" 
-		        	    addStyleNames="imageButton margin-bottom-15 margin-right-5 moveup-2" width="35px" height="35px"/>
+		        	    addStyleNames="imageButton margin-right-5 moveup-7" width="35px" height="35px"/>
 		            <b:Heading size="H3" addStyleNames="displayInline color-white">
 		            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone lato notransition"/>
 		        		<g:SimplePanel ui:field="projectFavoritePanel" addStyleNames="displayInline favoriteIcon margin-left-10" visible="false"/>
