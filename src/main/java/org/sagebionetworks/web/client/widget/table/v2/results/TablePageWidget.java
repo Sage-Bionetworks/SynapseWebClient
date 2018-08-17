@@ -316,7 +316,6 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	
 	public void setFacetsVisible(boolean visible) {
 		facetsVisible = visible;
-		view.setFacetsVisible(visible);
 	}
 	@Override
 	public void onClearFacets() {
@@ -326,5 +325,6 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	}
 	public void setTableVisible(boolean visible) {
 		view.setTableVisible(visible);
+		view.setFacetsVisible(visible);
 	}
 }

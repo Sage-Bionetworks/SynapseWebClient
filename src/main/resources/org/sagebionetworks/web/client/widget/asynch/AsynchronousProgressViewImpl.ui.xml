@@ -13,17 +13,18 @@
 			</b:Column>
 		</b:Row>
 		<b:Row>
-			<b:Column size="XS_5" offset="XS_5" ui:field="progressColumn" visible="false">
+			<b:Column size="XS_12" ui:field="progressColumn" visible="false" addStyleNames="center">
 				<b:Progress>
 					<b:ProgressBar ui:field="progressBar" type="INFO"
 						percent="0" text="0%" />
 				</b:Progress>
 			</b:Column>
-			<b:Column size="XS_1" offset="XS_5" ui:field="spinnerColumn" visible="false">
-				<w:LoadingSpinner size="40px"/>
+			<b:Column size="XS_12" ui:field="spinnerColumn" visible="false" addStyleNames="center">
+				<w:LoadingSpinner size="45px" addStyleNames="center-in-div"/>
+				<bh:Span text="Loading..." addStyleNames="margin-top-10"/>
 			</b:Column>			
-			<b:Column size="XS_1">
-				<b:Button ui:field="cancelButton" icon="BAN" type="DANGER" size="SMALL" marginTop="10" />
+			<b:Column size="XS_12" addStyleNames="center">
+				<b:Button ui:field="cancelButton" type="LINK" size="SMALL" marginTop="10" text="CANCEL" />
 			</b:Column>
 		</b:Row>
 		<b:Row>
