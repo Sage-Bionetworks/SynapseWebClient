@@ -132,7 +132,8 @@ public class AwsSdk {
             params: {
                 Bucket: bucketName
             },
-            credentials: creds
+            credentials: creds,
+            s3ForcePathStyle: true
         });
         return s3;
 	}-*/;
