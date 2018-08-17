@@ -23,7 +23,13 @@
 						<div class="padding-15">
 							<g:SimplePanel ui:field="loginWidgetPanel" />						
 							<!-- Logout View -->
-							<g:SimplePanel ui:field="logoutPanel" />
+							<bh:Div ui:field="logoutPanel">
+								<b:Heading size="H2" text="You have signed out of Synapse" addStyleNames="text-align-center margin-top-20"/>
+								<!--  <b:Heading size="H4" subText="" addStyleNames="flexcontainer-justify-center margin-top-20"/> -->
+								<b:Heading size="H5" addStyleNames="text-align-center margin-top-20">
+									<b:Anchor text="&lt; Back to Sign In" addStyleNames="synapse-green" href="#!LoginPlace:0"/>
+								</b:Heading>
+							</bh:Div>
 						</div>
 					</div>
 					<br/>

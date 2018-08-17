@@ -1,14 +1,11 @@
 package org.sagebionetworks.web.client.view;
 
 import org.gwtbootstrap3.client.ui.CheckBox;
+import org.gwtbootstrap3.client.ui.Container;
 import org.gwtbootstrap3.client.ui.Heading;
-import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.DisplayUtils.ButtonType;
-import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
@@ -21,10 +18,8 @@ import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Anchor;
 import com.google.gwt.user.client.ui.Button;
 import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -35,7 +30,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	SimplePanel loginWidgetPanel;
 	@UiField
-	SimplePanel logoutPanel;
+	Div logoutPanel;
 	@UiField
 	HTMLPanel loginView;
 	
@@ -108,26 +103,9 @@ public class LoginViewImpl extends Composite implements LoginView {
 	public void showLogout() {
 		clear();
 		headerWidget.refresh();
-		
-		Div cp = new Div();
-		cp.addStyleName("padding-15");
-		HTML message = new HTML();
-		message.setHTML("<h4>" + DisplayConstants.LOGOUT_TEXT + "</h4>");
-		cp.add(message);
-		
-		com.google.gwt.user.client.ui.Button loginAgain = DisplayUtils.createButton(DisplayConstants.BUTTON_LOGIN_AGAIN, ButtonType.PRIMARY);
-		loginAgain.getElement().setId(DisplayConstants.ID_BTN_LOGIN_AGAIN);
-		loginAgain.addClickHandler(new ClickHandler() {			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.goTo(new LoginPlace(LoginPlace.LOGIN_TOKEN));
-			}
-		});
-		cp.add(loginAgain);
-		
-		logoutPanel.add(cp);
-		hideViews();
+		logoutPanel.setVisible(true);
 		loginView.setVisible(true);
+		hideLoggingInLoader();
 	}
 
 	@Override
@@ -169,7 +147,7 @@ public class LoginViewImpl extends Composite implements LoginView {
 	public void clear() {
 		loginWidget.clear();
 		loginWidgetPanel.clear();
-		logoutPanel.clear();
+		logoutPanel.setVisible(false);
 	}
 	
 	@Override

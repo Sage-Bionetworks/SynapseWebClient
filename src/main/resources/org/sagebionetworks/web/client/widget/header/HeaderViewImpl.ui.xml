@@ -29,7 +29,7 @@
 		</b:Alert>
 		<b:Row ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg-gradient">
 			<b:Column size="XS_12">
-		        <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 inline-block" paddingTop="18">
+		        <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 inline-block" paddingTop="8">
 		        	<g:Image ui:field="synapseLogo" url="images/logo.svg" 
 		        	    addStyleNames="imageButton margin-bottom-15 margin-right-5 moveup-2" width="35px" height="35px"/>
 		            <b:Heading size="H3" addStyleNames="displayInline color-white">
@@ -38,10 +38,10 @@
 		        	</b:Heading>
 			  	</bh:Div>
 			  	<bh:Span ui:field="headerButtons" addStyleNames="right">
-			  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 margin-top-22 padding-left-15" visible="false">
+			  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 margin-top-15 padding-left-15" visible="false">
 						<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" />
 					</g:SimplePanel>
-					<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 padding-top-22 imageButton" visible="false" height="70px">
+					<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 padding-top-15 imageButton min-width-200" visible="false" height="58px">
 						<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
 						<b:DropDownMenu ui:field="dashboardDropdownMenu">
 							<b:AnchorListItem ui:field="myDashboardLink">Projects</b:AnchorListItem>
@@ -60,12 +60,12 @@
 						</b:DropDownMenu>
 					</b:DropDown>
 					<bh:Span addStyleNames="border-left-1 right margin-top-22" height="25px"/>
-					<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="padding-left-10 padding-right-15 padding-top-22 imageButton" visible="false" height="70px">
+					<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="padding-left-10 padding-right-15 padding-top-15 imageButton" visible="false" height="58px">
 						<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white" />
 						<b:DropDownMenu ui:field="headerFavDropdownMenu" addStyleNames="dropdown-menu-right">
 						</b:DropDownMenu>
 					</b:DropDown>
-				    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-10 margin-right-10 margin-top-22 margin-bottom-20"/>
+				    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-10 margin-right-10 margin-top-15 margin-bottom-10"/>
 				    <g:SimplePanel ui:field="stuAnnouncementsContainer" addStyleNames="right margin-left-10 "/>
 				</bh:Span>
 			</b:Column>

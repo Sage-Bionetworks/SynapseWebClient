@@ -23,7 +23,6 @@ public class DisplayConstants {
 	public static final String CLOSE_PORTAL_CONFIRMATION_MESSAGE = "Any unsaved changes will be lost. Are you sure that you would like to leave Synapse?";
 	public static final String NAVIGATE_AWAY_CONFIRMATION_MESSAGE = "Any unsaved changes may be lost. Are you sure that you would like to navigate away from this editor?";
 	
-	public static final String LOGOUT_TEXT = "You have signed out of Synapse.";
 	public static final String PASSWORD_RESET_TEXT = "Your password has been set.";
 
 	/*
