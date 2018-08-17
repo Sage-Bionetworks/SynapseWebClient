@@ -30,8 +30,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 	@UiField
 	SimplePanel loginWidgetPanel;
 	@UiField
-	Div logoutPanel;
-	@UiField
 	HTMLPanel loginView;
 	
 	//terms of service view
@@ -100,15 +98,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 	}
 
 	@Override
-	public void showLogout() {
-		clear();
-		headerWidget.refresh();
-		logoutPanel.setVisible(true);
-		loginView.setVisible(true);
-		hideLoggingInLoader();
-	}
-
-	@Override
 	public void showLogin() {
 		clear();
 		hideViews();
@@ -147,7 +136,6 @@ public class LoginViewImpl extends Composite implements LoginView {
 	public void clear() {
 		loginWidget.clear();
 		loginWidgetPanel.clear();
-		logoutPanel.setVisible(false);
 	}
 	
 	@Override
