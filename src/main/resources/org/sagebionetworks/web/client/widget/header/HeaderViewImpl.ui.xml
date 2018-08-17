@@ -2,10 +2,31 @@
 <ui:UiBinder xmlns:ui="urn:ui:com.google.gwt.uibinder"
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
-	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
+	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
+	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
+	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
 	
 	<bh:Div addStyleNames="header">
+		<b:Alert ui:field="stagingAlert" type="WARNING" visible="false" marginRight="0" marginLeft="0" marginBottom="0">
+			<t:Table width="100%">
+				<t:TableRow>
+					<t:TableData paddingRight="10" paddingLeft="10">
+						<g:Image url="images/helmet.svg" width="30px" height="30px"/>
+					</t:TableData>
+					<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="center">
+						<b:Heading size="H5" text="THIS WEBSITE IS FOR TESTING ONLY! Any data created will be deleted. To do your work, please use Production site." addStyleNames="displayInlineBlock color-white"/>
+					</t:TableData>
+					<t:TableData paddingRight="10" paddingLeft="10" width="250px">
+						<b:Heading size="H5" addStyleNames="right">
+							<b:Anchor text="GO TO PRODUCTION" addStyleNames="color-white margin-right-10" href="https://www.synapse.org" />
+							<w:HelpWidget helpMarkdown="This is not the official Sage Bionetworks Synapse Production website." 
+										addStyleNames="margin-left-5 right" iconStyles="color-white" placement="LEFT"/>
+						</b:Heading>
+					</t:TableData>
+				</t:TableRow>
+			</t:Table>
+		</b:Alert>
 		<b:Row ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg-gradient">
 			<b:Column size="XS_12">
 		        <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 inline-block" paddingTop="18">
@@ -49,10 +70,5 @@
 				</bh:Span>
 			</b:Column>
 		</b:Row>
-		<b:Alert ui:field="stagingAlert" type="WARNING" visible="false" marginTop="0">
-			<b:Heading size="H4" text="This website is for testing only." addStyleNames="color-white margin-right-10" />
-			<b:Heading size="H5" text="Any data created will be deleted shortly.  To do your work please visit " addStyleNames="color-white displayInline margin-right-10" />
-			<b:Anchor href="https://www.synapse.org" text="www.synapse.org" addStyleNames="font-size-20" />
-		</b:Alert>
 	</bh:Div>
 </ui:UiBinder>
