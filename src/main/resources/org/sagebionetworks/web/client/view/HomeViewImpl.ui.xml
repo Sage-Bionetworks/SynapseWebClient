@@ -412,16 +412,13 @@
 				<bh:Div ui:field="sponsorsUI">
 	        		<b:Column size="SM_12" addStyleNames="margin-bottom-20">
 	        			<b:Heading size="H3" subText="OUR PARTNERS" />
-						<g:HTMLPanel>
-							<div>
-								<span class="margin-bottom-5 margin-right-15"><a href="http://www.lsdfa.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/LSDF_logo.jpg' styleName='padding-5' /></a></span>                            
-								<!-- image needs to be updated <div class="img-thumbnail margin-bottom-5"><a href="http://www.cancer.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/NCI_logo.jpg' styleName='padding-5' /></a></div> -->                                                       
-								<span class="margin-bottom-5 margin-right-15"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/NHLBI_logo.jpg' styleName='padding-5' /></a></span>                                                       
-								<span class="margin-bottom-5 margin-right-15"><a href="http://www.sloan.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/Sloan_logo.jpg' styleName='padding-5' /></a></span>
-								<span class="margin-bottom-5 margin-right-15"><a href="http://www.nia.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/NIA_logo.jpg' styleName='padding-5' /></a></span>
-								<span class="margin-bottom-5 margin-right-15"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/NIMH_logo.jpg' styleName='padding-5' /></a></span>
-								<span class="margin-bottom-5 margin-right-15"><a href="http://www.ctf.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/CTF_logo.png' styleName='padding-5' /></a></span>
-							</div>
+						<g:HTMLPanel addStyleNames="center">
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.lsdfa.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-heart.svg' height="80px" /></a></span>                            
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-mental.svg' height="80px"  /></a></span>                                                       
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.sloan.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/sloan.svg' height="80px"  /></a></span>
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nia.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-aging.svg' height="80px"  /></a></span>
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/life-sciences.svg' height="80px"  /></a></span>
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.ctf.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/ctf.svg' height="80px"  /></a></span>
 						</g:HTMLPanel>
 					</b:Column>
 				</bh:Div>
