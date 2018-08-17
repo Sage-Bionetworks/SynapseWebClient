@@ -42,6 +42,7 @@ a:focus{color:$synapse-blue; text-decoration:underline;}
 .synapse-purple-bg, #body .synapse-purple-bg {background-color:$synapse-purple;}
 .synapse-green-bg, #body .synapse-green-bg {background-color:$synapse-green;}
 .synapse-orange-bg, #body .synapse-orange-bg {background-color:$synapse-orange;}
+.synapse-accent-primary-bg, #body .synapse-accent-primary-bg {background-color:$synapse-accent-primary;}
 
 .synapse-blue-bg-gradient, #body .synapse-blue-bg-gradient {
 	background: linear-gradient(180deg, $synapse-blue 0%, $synapse-blue-end-gradient 100%);

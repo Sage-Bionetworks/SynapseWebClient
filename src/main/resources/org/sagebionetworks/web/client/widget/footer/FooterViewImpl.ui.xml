@@ -55,13 +55,19 @@
 									<bh:Span addStyleNames="dot synapse-green-bg" />
 								</t:TableData>
 								<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="text-align-center">
-									<b:Anchor ui:field="reportAbuseLink" text="Report Abuse" addStyleNames="color-white" />
+									<b:Anchor href="https://docs.synapse.org" text="Documentation" addStyleNames="color-white"/>	
 								</t:TableData>
 								<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="text-align-center">
 									<bh:Span addStyleNames="dot synapse-orange-bg" />
 								</t:TableData>
 								<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="text-align-center">
 									<b:Anchor href="http://creativecommons.org/licenses/by/4.0/legalcode" text="Creative Commons License" addStyleNames="color-white" target="_blank"/>
+								</t:TableData>
+								<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="text-align-center">
+									<bh:Span addStyleNames="dot synapse-accent-primary-bg" />
+								</t:TableData>
+								<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="text-align-center">
+									<b:Anchor ui:field="reportAbuseLink" text="Report Abuse" addStyleNames="color-white" />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
@@ -71,8 +77,8 @@
 		    		<b:Row>
 		    			<b:Column size="SM_2" />
 		    			<b:Column size="SM_8">
-		    				<bh:Div addStyleNames="margin-left-20">
-				    			<g:Image url="images/sagebionetworks-logo.svg" addStyleNames="imageButton center-in-div"/>
+		    				<bh:Div>
+				    			<g:Image url="images/sagebionetworks-logo.svg" addStyleNames="center-in-div"/>
 				    		</bh:Div>
 				    		<bh:Div addStyleNames="center margin-top-10">
 				    			<b:Anchor ui:field="copyrightYear" href="http://sagebionetworks.org/" addStyleNames="margin-top-5 margin-bottom-5 color-white" />
