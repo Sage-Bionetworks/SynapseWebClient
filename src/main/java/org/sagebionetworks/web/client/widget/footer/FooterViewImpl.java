@@ -42,8 +42,6 @@ public class FooterViewImpl implements FooterView {
 	@UiField
 	Span repoVersionSpan;
 	@UiField
-	Div sponsorsUI;
-	@UiField
 	Anchor reportAbuseLink;
 	@UiField
 	Span hideACTActionsContainer;
@@ -53,7 +51,6 @@ public class FooterViewImpl implements FooterView {
 	private GlobalApplicationState globalAppState;
 	private ToggleACTActionsButton hideACTActionsButton;
 	Div container = new Div();
-	boolean sponsorsVisible;
 	
 	@Inject
 	public FooterViewImpl(Binder binder, CookieProvider cookies, GlobalApplicationState globalAppState, ToggleACTActionsButton hideACTActionsButton, GWTWrapper gwt) {
@@ -74,7 +71,6 @@ public class FooterViewImpl implements FooterView {
 				repoVersionSpan.setText(repoVersion);
 			}
 			
-			sponsorsUI.setVisible(sponsorsVisible);
 			refresh();
 		};
 		gwt.scheduleExecution(constructViewCallback, 2500);
@@ -136,14 +132,6 @@ public class FooterViewImpl implements FooterView {
 		}
 		if (debugLink != null) {
 			debugLink.setVisible(!isTestMode);	
-		}
-	}
-	
-	@Override
-	public void setSynapseSponsorsVisible(boolean visible) {
-		sponsorsVisible = visible;
-		if (sponsorsUI != null) {
-			sponsorsUI.setVisible(visible);	
 		}
 	}
 }
