@@ -838,10 +838,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			Widget widget = badge.asWidget();
 			view.addChallengeWidget(widget);
 		}
-		if (!challenges.isEmpty() && currentArea != null && currentArea.equals(ProfileArea.CHALLENGES)) {
-			// SWC-3213: extra call to make sure challenge tab is currently shown
-			view.setTabSelected(ProfileArea.CHALLENGES);
-		}
 	}
 	
 	public void projectPageAdded(int projectsAdded) {
@@ -1159,11 +1155,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				view.setSettingsWidget(getSettingsPresenter().asWidget());
 				break;
 			case CHALLENGES:
+				refreshChallenges();
+				break;
 			default:
 				break;
 		}
-		//always refreshes challenges to determine if tab should be shown
-		refreshChallenges();
 	}
 	
 	/**

@@ -38,7 +38,6 @@ import org.sagebionetworks.web.client.widget.header.Header;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationIDCardViewImpl;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.LIElement;
 import com.google.gwt.event.dom.client.ClickEvent;
@@ -93,7 +92,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button linkORCIDButton;
 	@UiField
 	SimplePanel editUserProfilePanel;
-	
+	HTML noChallengesHtml = new HTML("<p>This tab shows you challenges you have registered for.</p>" + 
+			"<p><a href=\"https://docs.synapse.org/articles/challenge_participation.html#overview\" target=\"_blank\">Challenges</a> are computational contests organized through the Dream Challenges.</p>");
 	@UiField
 	SimplePanel picturePanel;
 	@UiField
@@ -656,6 +656,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void clearChallenges() {
 		challengesTabContent.clear();
+		challengesTabContent.add(noChallengesHtml);
+		noChallengesHtml.setVisible(true);
 		setIsMoreChallengesVisible(false);
 	}
 	
@@ -667,7 +669,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void addChallengeWidget(Widget toAdd) {
-		DisplayUtils.show(challengesListItem);
+		noChallengesHtml.setVisible(false);
 		toAdd.addStyleName("margin-top-10");
 		challengesTabContent.add(toAdd);
 	}
@@ -802,7 +804,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		verifyAlert.setVisible(false);
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
-		DisplayUtils.hide(challengesListItem);
 		teamSearchTextBox.setValue("");
 		projectSearchTextBox.setValue("");
 		
