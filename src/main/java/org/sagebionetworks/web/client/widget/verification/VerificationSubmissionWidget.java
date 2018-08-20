@@ -17,12 +17,11 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.presenter.RejectReasonWidget;
 import org.sagebionetworks.web.client.utils.Callback;
-import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
 
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -38,7 +37,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	private String orcId;
 	private List<AttachmentMetadata> existingAttachments;
 	private VerificationSubmissionWidgetView view;
-	private BigPromptModalView promptModal;
+	private RejectReasonWidget promptModal;
 	private GlobalApplicationState globalAppState;
 	private PortalGinInjector ginInjector;
 	private GWTWrapper gwt;
@@ -54,7 +53,7 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 			UserProfileClientAsync userProfileClient,
 			SynapseAlert synAlert,
 			FileHandleList fileHandleList,
-			BigPromptModalView promptModalView,
+			RejectReasonWidget promptModalView,
 			GlobalApplicationState globalAppState,
 			GWTWrapper gwt
 			) {
@@ -265,13 +264,10 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	@Override
 	public void rejectVerification() {
 		//get reason, and update state
-		promptModal.configure("", "Reason", "", () -> {
-			promptModal.hide();
-			updateVerificationState(actRejectState, promptModal.getValue());
-		});
 		actRejectState = VerificationStateEnum.REJECTED;
-		promptModal.show();
+		rejectSuspendVerification();
 	}
+	
 	@Override
 	public void submitVerification() {
 		//create a new verification submission
@@ -311,9 +307,20 @@ public class VerificationSubmissionWidget implements VerificationSubmissionWidge
 	}
 	@Override
 	public void suspendVerification() {
-		promptModal.clear();
 		actRejectState = VerificationStateEnum.SUSPENDED;
-		promptModal.show();
+		rejectSuspendVerification();
+	}
+	
+	private void rejectSuspendVerification() {
+		String displayName;
+		if (profile != null) {
+			displayName = DisplayUtils.getDisplayName(profile);
+		} else {
+			displayName = DisplayUtils.getDisplayName(submission.getFirstName(), submission.getLastName(), null);
+		}
+		promptModal.show(displayName, rejectionReason -> {
+			updateVerificationState(actRejectState, rejectionReason);
+		});
 	}
 	
 	@Override
