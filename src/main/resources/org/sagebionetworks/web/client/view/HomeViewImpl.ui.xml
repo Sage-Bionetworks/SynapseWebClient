@@ -412,7 +412,7 @@
 				<bh:Div ui:field="sponsorsUI">
 					<bh:Hr />
 	        		<b:Column size="SM_12" addStyleNames="margin-bottom-20">
-	        			<b:Heading size="H4" text="OUR PARTNERS" addStyleNames="lightGreyText"/>
+	        			<bh:Span text="OUR PARTNERS" addStyleNames="partnersHeading displayBlock" />
 						<g:HTMLPanel addStyleNames="center">
 							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-heart.svg' height="80px" width="15%" /></a></span>                            
 							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-mental.svg' height="80px" width="15%" /></a></span>                                                       
