@@ -8,21 +8,21 @@
 	<ui:with field='sageImages' type='org.sagebionetworks.web.client.SageImageBundle' />
 	
 	<bh:Div addStyleNames="header">
-		<b:Alert ui:field="stagingAlert" type="WARNING" visible="false" marginRight="0" marginLeft="0" marginBottom="0">
+		<b:Alert ui:field="stagingAlert" type="WARNING" visible="false" marginRight="0" marginLeft="0" marginBottom="0" marginTop="0">
 			<t:Table width="100%">
 				<t:TableRow>
 					<t:TableData paddingRight="10" paddingLeft="10">
-						<g:Image url="images/helmet.svg" width="30px" height="30px"/>
+						<g:Image url="images/helmet.svg" width="25px" height="25px"/>
 					</t:TableData>
 					<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="center">
-						<b:Heading size="H5" text="THIS WEBSITE IS FOR TESTING ONLY! Any data created will be deleted. To do your work, please use Production site." addStyleNames="displayInlineBlock color-white"/>
+						<bh:Span text="THIS WEBSITE IS FOR TESTING ONLY! Any data created will be deleted. To do your work, please use Production site." addStyleNames="displayInlineBlock color-white" />
 					</t:TableData>
 					<t:TableData paddingRight="10" paddingLeft="10" width="250px">
-						<b:Heading size="H5" addStyleNames="right">
+						<bh:Span addStyleNames="right" >
 							<b:Anchor text="GO TO PRODUCTION" addStyleNames="color-white margin-right-10" href="https://www.synapse.org" />
 							<w:HelpWidget helpMarkdown="This is not the official Sage Bionetworks Synapse Production website." 
 										addStyleNames="margin-left-5 right" iconStyles="color-white" placement="LEFT"/>
-						</b:Heading>
+						</bh:Span>
 					</t:TableData>
 				</t:TableRow>
 			</t:Table>
