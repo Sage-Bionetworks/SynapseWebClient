@@ -12,6 +12,7 @@ import org.sagebionetworks.web.client.IconsImageBundle;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.shared.provenance.ActivityGraphNode;
 import org.sagebionetworks.web.shared.provenance.EntityGraphNode;
 import org.sagebionetworks.web.shared.provenance.ExpandGraphNode;
@@ -142,7 +143,7 @@ public class ProvenanceWidgetViewImpl extends FlowPanel implements ProvenanceWid
 			afterJSPlumbLoad();
 		}
 		if (startingNodeContainer != null) {
-			startingNodeContainer.getElement().scrollIntoView();
+			SynapseJSNIUtilsImpl._scrollIntoView(startingNodeContainer.getElement());
 		}
 	}
 	

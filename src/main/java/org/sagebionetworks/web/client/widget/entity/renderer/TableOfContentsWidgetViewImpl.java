@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 import static org.sagebionetworks.markdown.constants.WidgetConstants.*;
 import org.sagebionetworks.web.client.DisplayConstants;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
 import com.google.gwt.core.client.JsArray;
@@ -107,7 +108,7 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 					html.addClickHandler(new ClickHandler() {
 						@Override
 						public void onClick(ClickEvent event) {
-							Window.scrollTo(0, scrollToElement.getOffsetTop());
+							SynapseJSNIUtilsImpl._scrollIntoView(scrollToElement);
 						}
 					});
 					

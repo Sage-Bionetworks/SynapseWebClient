@@ -1,5 +1,7 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
+
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.safehtml.shared.SimpleHtmlSanitizer;
@@ -39,7 +41,7 @@ public class BookmarkWidgetViewImpl extends FlowPanel implements BookmarkWidgetV
 				HTMLPanel parentPanel = (HTMLPanel)getParent();
 				Element heading = parentPanel.getElementById(bookmarkID);
 				final Element scrollToElement = heading;
-				Window.scrollTo(0, scrollToElement.getOffsetTop());
+				SynapseJSNIUtilsImpl._scrollIntoView(scrollToElement);
 			}
 		});
 		add(a);

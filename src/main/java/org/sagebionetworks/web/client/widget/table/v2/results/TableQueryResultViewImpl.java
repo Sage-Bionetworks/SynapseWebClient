@@ -1,11 +1,11 @@
 package org.sagebionetworks.web.client.widget.table.v2.results;
 
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Panel;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -81,6 +81,6 @@ public class TableQueryResultViewImpl implements TableQueryResultView {
 	}
 	@Override
 	public void scrollTableIntoView() {
-		scrollTarget.getElement().scrollIntoView();
+		SynapseJSNIUtilsImpl._scrollIntoView(scrollTarget.getElement());
 	}
 }
