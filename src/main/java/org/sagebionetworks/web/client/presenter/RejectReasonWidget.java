@@ -30,48 +30,22 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
     public static String REJECT_SUBMIT_DOCS = "Submit an accepted form of identity attestation documentation (e.g., letter from a signing official). ";
     public static String REJECT_CUSTOM_REASON = "custom text to insert";
 
-    private String userName;
+    private String displayName;
     private RejectReasonView view;
-    UserProfileAsyncHandler handler;
     CallbackP<String> callback;
 
     @Inject
-    public RejectReasonWidget (UserProfileAsyncHandler handler, RejectReasonView view) {
-        this.handler = handler;
+    public RejectReasonWidget (RejectReasonView view) {
         this.view = view;
         this.view.setPresenter(this);
     }
 
-    private void setUserProfileName(UserProfile user) {
-        this.userName = DisplayUtils.getDisplayName(user);
-    }
 
-    /*
-        For testing purposes only relay the userName to assert
-        that its being properly found.
-     */
-    public String getUserName() {
-        return this.userName;
-    }
-
-    public void show(String userID, CallbackP<String> callback) {
-        this.userName = "";
+    public void show(String displayName, CallbackP<String> callback) {
+    	this.displayName = displayName;
         this.view.clear();
         this.callback = callback;
-
-        handler.getUserProfile(userID, new AsyncCallback<UserProfile>() {
-            @Override
-            public void onFailure(Throwable throwable) {
-                view.showError("Could not find user id -- " + userID + "\nError -- " +  throwable.getMessage());
-                view.show();
-            }
-
-            @Override
-            public void onSuccess(UserProfile user) {
-                setUserProfileName(user);
-                view.show();
-            }
-        });
+        view.show();
     }
 
     @Override
@@ -101,7 +75,7 @@ public class RejectReasonWidget implements RejectReasonView.Presenter, IsWidget 
             view.clearError();
         }
 
-        view.setValue(TEMPLATE_HEADER_HELLO + this.getUserName() + TEMPLATE_HEADER_THANKS + output + "\n" + TEMPLATE_HEADER_SIGNATURE);
+        view.setValue(TEMPLATE_HEADER_HELLO + displayName + TEMPLATE_HEADER_THANKS + output + "\n" + TEMPLATE_HEADER_SIGNATURE);
     }
 
     @Override
