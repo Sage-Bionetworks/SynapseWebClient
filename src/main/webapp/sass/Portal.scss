@@ -1645,43 +1645,6 @@ ol.lowerroman {
 	right: 4px;
 }
 
-.bubble {
-    background-color: white;
-    border-radius: 5px;
-    box-shadow: 0 0 6px #B2B2B2;
-    display: inline-block;
-    padding: 8px 20px 8px 18px;
-    position: relative;
-    vertical-align: top;
-    margin: 5px;
-    max-width: 300px;
-}
-
-.bubble::before {
-    background-color: white;
-    content: "\00a0";
-    display: block;
-    height: 16px;
-    position: absolute;
-    top: 11px;
-    transform:             rotate( 29deg ) skew( -35deg );
-        -moz-transform:    rotate( 29deg ) skew( -35deg );
-        -ms-transform:     rotate( 29deg ) skew( -35deg );
-        -o-transform:      rotate( 29deg ) skew( -35deg );
-        -webkit-transform: rotate( 29deg ) skew( -35deg );
-    width:  20px;
-}
-
-.bubble-right::before {
-    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
-    left: -9px;           
-}
-
-.bubble-left::before {
-    box-shadow: 2px -2px 2px 0 rgba( 178, 178, 178, .4 );
-    right: -9px;    
-}
-
 .entity-tab {
 	font-size: 16px;	
 }
@@ -2423,24 +2386,12 @@ p.error{
 
 }
 .center { text-align:center !important;}
-.footer h6{ text-transform:uppercase; margin-bottom:8px; font-size:18px;}
-.footer p { padding-right:10px; width:210px; margin-bottom:5px !important;}
-.footer .color a { text-align:center !important; display:block; margin-top:35px;}
-.logo { margin-top:27px !important;}
-.logo a { text-align:center !important;} 
 /* The last column in a row needs this class. */
 div.last { margin-right: 0; }
 
 /* Border on right hand side of a column. */
 div.border {
   padding-right:9px;
-  margin-right:10px;
-  border-right: 1px solid #eee;
-}
-
-/* Border with more whitespace, spans one column. */
-div.colborder {
-  padding-right:13px;
   margin-right:10px;
   border-right: 1px solid #eee;
 }

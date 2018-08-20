@@ -68,7 +68,6 @@
 						</b:DropDownMenu>
 					</b:DropDown>
 				    <g:SimplePanel ui:field="searchBoxContainer" addStyleNames="right margin-left-10 margin-right-10 margin-top-15 margin-bottom-10"/>
-				    <g:SimplePanel ui:field="stuAnnouncementsContainer" addStyleNames="right margin-left-10 "/>
 				</bh:Span>
 			</b:Column>
 		</b:Row>

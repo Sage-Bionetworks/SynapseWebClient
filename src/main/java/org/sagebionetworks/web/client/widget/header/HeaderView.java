@@ -4,10 +4,8 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
-import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface HeaderView extends IsWidget {
 	/**
@@ -15,7 +13,6 @@ public interface HeaderView extends IsWidget {
 	 * @param presenter
 	 */
 	public void setPresenter(Presenter presenter);
-	void setStuAnnouncementWidget(Widget w);
 	public void refresh();
 	/**
 	 * Sets the search box to visible or not

@@ -59,8 +59,6 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@UiField
 	SimplePanel projectFavoritePanel;
 	@UiField
-	SimplePanel stuAnnouncementsContainer;
-	@UiField
 	Anchor dashboardDropdownAnchor;
 	@UiField
 	SimplePanel loginLinkUI;
@@ -271,11 +269,5 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	@Override
 	public void setStagingAlertVisible(boolean visible) {
 		stagingAlert.setVisible(visible);	
-	}
-	
-	@Override
-	public void setStuAnnouncementWidget(Widget w) {
-		stuAnnouncementsContainer.clear();
-		stuAnnouncementsContainer.add(w);
 	}
 }
