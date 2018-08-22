@@ -107,6 +107,12 @@ end sticky footer
 	border-bottom: 1px solid #e6e6e6;
 	padding-bottom: 3px;
 }
+#rootPanel {
+	.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+		border: none;
+	}
+}
+
 #rootPanel .nav-tabs > li > a {
 	box-shadow: none;
 }
@@ -1839,12 +1845,6 @@ iframe[seamless] {
 
 .bootbox {
 	z-index: 2000 !important;
-}
-
-.dropdown-menu>li>a, 
-.x-menu-list-item>a:visited,
-.x-menu-list-item>a:visited>* {
-	color: #333 !important;
 }
 
 /* popups with very long values (like some urls) are shown out of bounds in bootstrap. */

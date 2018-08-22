@@ -63,7 +63,8 @@
 
 			var script = document.createElement('script');
 			script.onload = function () {
-				head.load("Portal.css?v=1");
+				head.load(cdnEndpoint + "Portal.css?v=1");
+				head.load(cdnEndpoint + "css/bootstrap-custom-theme.css?v=1");
 				head.load("//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js");
 				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.0/spark-md5.min.js");
