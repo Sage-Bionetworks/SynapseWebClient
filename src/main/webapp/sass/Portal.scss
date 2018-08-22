@@ -592,6 +592,9 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 .margin-top-10 {
 	margin-top: 10px;
 }
+.margin-top-13 {
+	margin-top: 13px;
+}
 .margin-top-15 {
 	margin-top: 15px;
 }
@@ -1316,15 +1319,14 @@ ol.lowerroman {
 .padding-0, input[type=text].padding-0 {
 	padding: 0px;
 }
-
+.padding-top-13 {
+	padding-top: 13px;
+}
 .padding-top-15 {
 	padding-top: 15px;
 }
 .padding-top-15-imp {
 	padding-top: 15px !important;
-}
-.padding-top-22 {
-	padding-top: 22px;
 }
 .padding-top-bottom-15-left-right-25 {
 	padding: 15px 25px 15px 25px;
@@ -2494,7 +2496,6 @@ div.border {
 	.searchBox {
 		input, input:focus {
 			border: 0px;
-			background-color: #ffffff;
 			background-image: none;
 			box-shadow: none;
 			display: inline-block;
