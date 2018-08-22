@@ -59,7 +59,7 @@
 						<b:AnchorListItem ui:field="logoutLink" icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
 					</b:DropDownMenu>
 				</b:DropDown>
-				<bh:Span addStyleNames="border-left-1 right margin-top-10" height="25px"/>
+				<bh:Span addStyleNames="border-left-1 right" height="25px" marginTop="12"/>
 				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="padding-left-10 padding-right-15 imageButton" visible="false" height="48px" paddingTop="10">
 					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white" />
 					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-5 color-white"/>
