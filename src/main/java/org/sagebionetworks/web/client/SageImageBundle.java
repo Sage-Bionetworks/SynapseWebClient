@@ -41,6 +41,4 @@ public interface SageImageBundle extends ClientBundle {
 	ImageResource people();
 	@Source("resource/images/prov.png")
 	ImageResource prov();
-	@Source("resource/images/synapse_logo.png")
-	ImageResource synapseLogo();
 }
