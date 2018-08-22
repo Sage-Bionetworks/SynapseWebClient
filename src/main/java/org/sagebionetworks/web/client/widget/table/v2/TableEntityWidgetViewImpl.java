@@ -37,7 +37,9 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	Div schemaCollapse;
 	@UiField
 	Div scopeCollapse;
-
+	@UiField
+	Div tableToolbar;
+	
 	@UiField
 	SimplePanel columnDetailsPanel;
 	@UiField
@@ -112,11 +114,6 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	}
 
 	@Override
-	public void setQueryProgressVisible(boolean isVisible) {
-		this.queryResultsPanel.setVisible(isVisible);
-	}
-
-	@Override
 	public void setQueryResultsWidget(IsWidget queryResultsWidget) {
 		this.queryResultsPanel.add(queryResultsWidget);
 		
@@ -164,5 +161,9 @@ public class TableEntityWidgetViewImpl extends Composite implements
 	@Override
 	public void setSimpleSearchLinkVisible(boolean visible) {
 		showSimpleSearch.setVisible(visible);
+	}
+	@Override
+	public void setTableToolbarVisible(boolean visible) {
+		tableToolbar.setVisible(visible);
 	}
 }
