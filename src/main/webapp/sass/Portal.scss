@@ -2099,13 +2099,6 @@ td.datePickerMonth {
   border-top: 1px solid #dddddd;
 }
 
-.facetsWidget {
-	border: 1px solid #e6e6e6;
-	padding: 0 10px 30px 15px;
-	margin-top: -8px;
-	max-width: 300px;
-}
-
 .read-only-box {
 	padding: 5px;
     border: 1px solid #dddddd;
@@ -2511,6 +2504,20 @@ div.border {
 	/**
 	end SWC-3997
 	**/
+
+	.facetsWidget {
+		border: 1px solid #e6e6e6;
+		padding: 0 10px 30px 15px;
+		margin-top: -8px;
+	}
+	.facetsWidget-inactive {
+		max-width: 0px;
+		transition: max-width 0.4s ease-in-out;
+	}
+	.facetsWidget-active {
+		max-width: 330px;
+		transition: max-width 0.4s ease-in-out;
+	}
 }
 #rootPanel {
 	summary { color:$synapse-blue; }

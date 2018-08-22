@@ -7,7 +7,7 @@
 	<bh:Div>
 		<bh:Div ui:field="loadingUI" />
 		<bh:ClearFix />
-		<g:ScrollPanel ui:field="facetsWidgetContainer" addStyleNames="pull-left-unless-xs margin-right-10 panel panel-default padding-10" visible="false">
+		<g:ScrollPanel ui:field="facetsWidgetContainer">
 			<bh:Div>
 				<bh:Div ui:field="facetsWidgetPanel"/>
 				<bh:ClearFix />
