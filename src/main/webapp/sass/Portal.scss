@@ -16,13 +16,13 @@
 /***************
 Synapse color scheme
 ****************/
-$synapse-green: #62AC62;
+$synapse-green: #28a745;
 $synapse-blue: #2B688F;
 $synapse-blue-end-gradient: #164B6E;
 $synapse-purple: #7772b4;
-$synapse-yellow: #F2C94C;
+$synapse-yellow: #E4B528;
 $synapse-orange: #E8762B;
-$synapse-accent-primary: #56CCF2;
+$synapse-accent-primary: #17a2b8;
 
 .colored { color:$synapse-blue;}
 .link { color:$synapse-blue;}
@@ -96,36 +96,29 @@ end sticky footer
 }
 
 /* Bootstrap overrides */
-#rootPanel .panel {
-	border: 1px solid transparent;
-	box-shadow: none;
-}
-#rootPanel .panel-body {
-	padding: 15px 0 30px 0;
-}
-#rootPanel .nav-tabs {
-	border-bottom: 1px solid #e6e6e6;
-	padding-bottom: 3px;
-}
 #rootPanel {
+	.panel {
+		border: 1px solid transparent;
+		box-shadow: none;
+	}
+	.panel-body {
+		padding: 15px 0 30px 0;
+	}
+	.nav-tabs {
+		border-bottom: 1px solid #e6e6e6;
+		padding-bottom: 3px;
+	}
 	.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
 		border: none;
 	}
+	.nav-tabs > li > a {
+		box-shadow: none;
+	}
+	.nav-tabs > li.active > a, #rootPanel .nav-tabs > li > a:hover {
+		box-shadow: inset 0 -2px 0 #1e7098
+	}
 }
-
-#rootPanel .nav-tabs > li > a {
-	box-shadow: none;
-}
-#rootPanel .nav-tabs > li.active > a, #rootPanel .nav-tabs > li > a:hover {
-	box-shadow: inset 0 -2px 0 #1e7098
-}
-.btn-primary {
-	color: #fff !important;
-}
-
-a.btn-primary {
-	color: #fff !important;
-}
+/* End bootstrap overrides */
 
 .overflow-y-auto {
 	overflow-y: auto;
@@ -1917,36 +1910,9 @@ ul, ol {
 	color: #5bc0de;
 }
 
-/**
-SWC-3997: tidy up search bar in header
-**/
-#body {
-	.searchBox {
-		input, input:focus {
-			border: 0px;
-			background-color: #ffffff;
-			background-image: none;
-            box-shadow: none;
-			display: inline-block;
-			margin-right: 5px;
-		}
-	}
-}
-
-/**
-end SWC-3997
-**/
-
 div.input-group > input.search-textbox {
 	border: 1px solid #eee;
 	padding-left: 10px;
-}
-
-/* modified snippet from Bootstrap docs.css for Wiki Subpage style (minus the hidden sublists) */
-/* By default it's not affixed in mobile views, so undo that */
-
-#body .wiki-subpages-editor-tree .nav>li>a {
-	padding: 2px 5px;
 }
 
 .bs-sidenav {
@@ -2476,9 +2442,6 @@ div.border {
 	filter: blur(4px);
 }
 
-#rootPanel summary { color:$synapse-blue; }
-#rootPanel summary:hover { text-decoration: underline; cursor:pointer; }
-
 #headerPanel {
 	.searchBox input, .searchBox input:focus {
 		background-color:#274660;
@@ -2516,10 +2479,47 @@ div.border {
 		font-size: 15px;
 	}
 }
-#body .alert a {
-	font-weight: inherit;
-	text-decoration: underline;
+#body {
+	.alert a {
+		font-weight: inherit;
+		text-decoration: underline;
+	}
+	.partnersHeading {
+		color: #B7B7B7;
+		font-size: 15px;
+	}
+
+	/* modified snippet from Bootstrap docs.css for Wiki Subpage style (minus the hidden sublists) */
+	/* By default it's not affixed in mobile views, so undo that */
+	.wiki-subpages-editor-tree .nav>li>a {
+		padding: 2px 5px;
+	}
+
+	/**
+	SWC-3997: tidy up search bar in header
+	**/
+	.searchBox {
+		input, input:focus {
+			border: 0px;
+			background-color: #ffffff;
+			background-image: none;
+			box-shadow: none;
+			display: inline-block;
+			margin-right: 5px;
+		}
+	}
+	/**
+	end SWC-3997
+	**/
 }
+#rootPanel {
+	summary { color:$synapse-blue; }
+	summary:hover { text-decoration: underline; cursor:pointer; }
+	.input-group-addon, .input-group-btn {
+		vertical-align: top;
+	}
+}
+
 #footerPanel {
 	.alert {
 		border-radius: 0px;
@@ -2552,7 +2552,3 @@ div.border {
 	font-style:italic;
 }
 
-#body .partnersHeading {
-	color: #B7B7B7;
-	font-size: 15px;
-}
