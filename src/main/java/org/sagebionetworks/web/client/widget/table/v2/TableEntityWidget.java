@@ -533,7 +533,8 @@ public class TableEntityWidget implements IsWidget,
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String sql) {
-				fileViewClientsHelp.setQuery(sql);
+				String escapedSql = sql.replace("\"", "\\\"");
+				fileViewClientsHelp.setQuery(escapedSql);
 				fileViewClientsHelp.show();
 			}
 			

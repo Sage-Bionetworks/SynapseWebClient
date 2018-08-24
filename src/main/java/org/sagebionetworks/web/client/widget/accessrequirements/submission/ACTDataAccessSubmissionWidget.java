@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.widget.FileHandleWidget;
 import org.sagebionetworks.web.client.widget.accessrequirements.ShowEmailsButton;
 import org.sagebionetworks.web.client.widget.asynch.AsyncHandlerImpl;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
+import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.act.UserBadgeItem;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -33,7 +34,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	DataAccessClientAsync dataAccessClient;
 	SynapseAlert synAlert;
 	Submission submission;
-	RejectReasonWidget promptDialog;
+	BigPromptModalView promptDialog;
 	FileHandleList otherDocuments;
 	FileHandleWidget ducFileRenderer;
 	FileHandleWidget irbFileRenderer;
@@ -46,7 +47,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	public ACTDataAccessSubmissionWidget(ACTDataAccessSubmissionWidgetView view, 
 			SynapseAlert synAlert,
 			DataAccessClientAsync dataAccessClient,
-			final RejectReasonWidget promptDialog,
+			BigPromptModalView promptDialog,
 			FileHandleWidget ducFileRenderer,
 			FileHandleWidget irbFileRenderer,
 			FileHandleList otherDocuments,
@@ -78,7 +79,13 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 		view.setOtherAttachmentWidget(otherDocuments);
 		view.setSynAlert(synAlert);
 		view.setShowEmailButton(showEmailsButton);
-
+		promptDialog.configure("Reason", "Rejection reason:", "", new Callback() {
+			@Override
+			public void invoke() {
+				updateDataAccessSubmissionState(SubmissionState.REJECTED, promptDialog.getValue());
+				promptDialog.hide();
+			}
+		});
 	}
 	
 	public void configure(Submission submission) {
@@ -192,11 +199,7 @@ public class ACTDataAccessSubmissionWidget implements ACTDataAccessSubmissionWid
 	@Override
 	public void onReject() {
 		//prompt for reason
-		String userID = submission.getId();
-		promptDialog.show(userID, rejectionReason -> {
-			updateDataAccessSubmissionState(SubmissionState.REJECTED, rejectionReason);
-			}
-		);
+		promptDialog.show();
 	}
 	
 	public void addStyleNames(String styleNames) {

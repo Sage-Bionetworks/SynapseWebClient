@@ -13,7 +13,6 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.EntityArea;
-import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -35,7 +34,6 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	private EntityBundle bundle;
 	private SynapseClientAsync synapseClient;
 	private GlobalApplicationState globalApplicationState;
-	private AuthenticationController authenticationController;
 	public static final Integer VERSION_LIMIT = 100;
 	public PreflightController preflightController;
 	private SynapseAlert synAlert;
@@ -47,7 +45,6 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	public FileHistoryWidget(FileHistoryWidgetView view,
 			 SynapseClientAsync synapseClient, 
 			 GlobalApplicationState globalApplicationState, 
-			 AuthenticationController authenticationController,
 			 PreflightController preflightController,
 			 SynapseAlert synAlert) {
 		super();
@@ -55,7 +52,6 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 		fixServiceEntryPoint(synapseClient);
 		this.view = view;
 		this.globalApplicationState = globalApplicationState;
-		this.authenticationController = authenticationController;
 		this.preflightController = preflightController;
 		this.view.setPresenter(this);
 		this.synAlert = synAlert;

@@ -127,6 +127,13 @@ public class ColumnModelsWidget implements ColumnModelsViewBase.Presenter, Colum
 		baseView.hideErrors();
 		ViewScope scope = new ViewScope();
 		scope.setScope(((EntityView)bundle.getEntity()).getScopeIds());
+		Long viewTypeMask = ((EntityView)bundle.getEntity()).getViewTypeMask();
+		if (viewTypeMask != null) {
+			scope.setViewTypeMask(viewTypeMask);
+		} else {
+			scope.setViewType(((EntityView)bundle.getEntity()).getType());
+		}
+
 		synapseClient.getPossibleColumnModelsForViewScope(scope, nextPageToken, new AsyncCallback<ColumnModelPage>() {
 			@Override
 			public void onFailure(Throwable caught) {
