@@ -1,7 +1,6 @@
 package org.sagebionetworks.web.unitclient.widget.table.v2;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
@@ -95,7 +94,8 @@ public class TableEntityWidgetTest {
 	@Captor
 	ArgumentCaptor<Query> queryCaptor;
 	
-	String facetBasedSql = "select * from syn123 where x>1";
+	public static final String FACET_SQL = "select * from syn123 where \"x\" = 'a'";
+	public static final String EXPECTED_SQL_FOR_CLIENT = "select * from syn123 where \\\"x\\\" = 'a'";
 	@Mock
 	FileViewClientsHelp mockFileViewClientsHelp;
 	@Mock
@@ -139,7 +139,7 @@ public class TableEntityWidgetTest {
 				mockFileViewClientsHelp,
 				mockPortalGinInjector);
 		
-		AsyncMockStubber.callSuccessWith(facetBasedSql).when(mockSynapseClient).generateSqlWithFacets(anyString(), anyList(), anyList(), any(AsyncCallback.class));
+		AsyncMockStubber.callSuccessWith(FACET_SQL).when(mockSynapseClient).generateSqlWithFacets(anyString(), anyList(), anyList(), any(AsyncCallback.class));
 		// The test bundle
 		entityBundle = new EntityBundle();
 		entityBundle.setEntity(tableEntity);
@@ -526,7 +526,8 @@ public class TableEntityWidgetTest {
 		//show query
 		//verify facet select info sql is used
 		widget.onShowQuery();
-		verify(mockCopyTextModal).setText(facetBasedSql);
+		
+		verify(mockCopyTextModal).setText(FACET_SQL);
 		verify(mockCopyTextModal).show();
 		
 		reset(mockQueryResultsWidget);
@@ -629,13 +630,13 @@ public class TableEntityWidgetTest {
 	@Test
 	public void testOnShowDownloadFiles() {
 		Query startQuery = new Query();
-		startQuery.setSql(facetBasedSql);
+		startQuery.setSql(FACET_SQL);
 		when(mockQueryChangeHandler.getQueryString()).thenReturn(startQuery);
 		widget.configure(entityBundle, true, mockQueryChangeHandler, mockActionMenu);
 		
 		widget.onShowDownloadFiles();
 		
-		verify(mockFileViewClientsHelp).setQuery(facetBasedSql);
+		verify(mockFileViewClientsHelp).setQuery(EXPECTED_SQL_FOR_CLIENT);
 		verify(mockFileViewClientsHelp).show();
 	}
 	
