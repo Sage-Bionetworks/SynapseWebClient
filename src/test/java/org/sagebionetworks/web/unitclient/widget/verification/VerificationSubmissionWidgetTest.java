@@ -35,7 +35,9 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.UserProfileClientAsync;
+import org.sagebionetworks.web.client.presenter.RejectReasonWidget;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.upload.FileHandleList;
@@ -62,7 +64,7 @@ public class VerificationSubmissionWidgetTest {
 	@Mock
 	FileHandleList mockFileHandleList;
 	@Mock
-	BigPromptModalView mockPromptModalView;
+	RejectReasonWidget mockPromptModalWidget;
 	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
 	@Mock
@@ -74,7 +76,8 @@ public class VerificationSubmissionWidgetTest {
 	@Mock
 	HashMap<String,WikiPageKey> mockWikiPageMap;
 	@Captor
-	ArgumentCaptor<Callback> callbackCaptor;
+	ArgumentCaptor<CallbackP<String>> promptModalPresenterCaptor;
+	CallbackP<String> confirmRejectionCallback;
 	@Captor
 	ArgumentCaptor<VerificationState> verificationStateCaptor;
 	
@@ -95,7 +98,7 @@ public class VerificationSubmissionWidgetTest {
 		MockitoAnnotations.initMocks(this);
 		when(mockGinInjector.getVerificationSubmissionModalViewImpl()).thenReturn(mockView);
 		when(mockGinInjector.getVerificationSubmissionRowViewImpl()).thenReturn(mockRowView);
-		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockSynapseAlert, mockFileHandleList, mockPromptModalView, mockGlobalApplicationState, mockGWT);
+		widget = new VerificationSubmissionWidget(mockGinInjector, mockUserProfileClient, mockSynapseAlert, mockFileHandleList, mockPromptModalWidget, mockGlobalApplicationState, mockGWT);
 		
 		when(mockGWT.getHostPageBaseURL()).thenReturn(hostPageURL);
 		when(mockSubmission.getId()).thenReturn(submissionId);
@@ -370,13 +373,12 @@ public class VerificationSubmissionWidgetTest {
 		
 		widget.rejectVerification();
 		
-		verify(mockPromptModalView).configure(anyString(), anyString(), anyString(), callbackCaptor.capture());
-		verify(mockPromptModalView).show();
+		verify(mockPromptModalWidget).show(anyString(),  promptModalPresenterCaptor.capture());
 		
 		//simulate save reject
 		String rejectMessage = "wrong wrong wrong";
-		when(mockPromptModalView.getValue()).thenReturn(rejectMessage);
-		callbackCaptor.getValue().invoke();
+		confirmRejectionCallback = promptModalPresenterCaptor.getValue();
+		confirmRejectionCallback.invoke(rejectMessage);
 		
 		verify(mockUserProfileClient).updateVerificationState(anyLong(), verificationStateCaptor.capture(), anyString(), any(AsyncCallback.class));
 		assertEquals(rejectMessage, verificationStateCaptor.getValue().getReason());
