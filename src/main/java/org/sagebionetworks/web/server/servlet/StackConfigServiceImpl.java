@@ -41,7 +41,7 @@ public class StackConfigServiceImpl extends SynapseClientBase implements StackCo
 		return new Supplier<SynapseVersionInfo>() {
 			public SynapseVersionInfo get() {
 				try {
-					org.sagebionetworks.client.SynapseClient synapseClient = createSynapseClient();
+					org.sagebionetworks.client.SynapseClient synapseClient = createAnonymousSynapseClient();
 					return synapseClient.getVersionInfo();
 				} catch (SynapseException e) {
 					log.error(e);
