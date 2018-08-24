@@ -5,7 +5,7 @@
 	xmlns:bg="urn:import:org.gwtbootstrap3.client.ui.gwt" xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Div>
-		<bh:Div ui:field="loadingUI" />
+		<bh:Div ui:field="loadingUI" pull="RIGHT" />
 		<bh:ClearFix />
 		<g:ScrollPanel ui:field="facetsWidgetContainer">
 			<bh:Div>

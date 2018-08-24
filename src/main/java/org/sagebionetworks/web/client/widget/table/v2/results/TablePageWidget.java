@@ -47,8 +47,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	TableType tableType;
 	FacetsWidget facetsWidget;
 	Callback resetFacetsHandler;
-	boolean facetsVisible = true;
-	boolean isTableVisible = true;
+	boolean facetsVisible;
 	/*
 	 * This flag is used to ignore selection event while this widget is causing selection changes.
 	 */
@@ -65,6 +64,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		this.view.setPaginationWidget(paginationWidget);
 		this.facetsWidget = facetsWidget;
 		view.setFacetsWidget(facetsWidget.asWidget());
+		view.setFacetsVisible(false);
 		view.setPresenter(this);
 	}
 	
@@ -148,11 +148,11 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 				!facets.isEmpty()
 				&& facetsVisible;
 		
-		setFacetsVisible(isFacetsSupported);
-		
 		if (isFacetsSupported) {
 			facetsWidget.configure(facets, facetChangedHandler, types);
 			setFacetsVisible(facetsWidget.isShowingFacets());
+		} else {
+			setFacetsVisible(isFacetsSupported);
 		}
 		view.setTableHeaders(headers);
 		rows = new ArrayList<RowWidget>(rowCount);
@@ -317,7 +317,10 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	
 	public void setFacetsVisible(boolean visible) {
 		facetsVisible = visible;
-		view.setFacetsVisible(facetsVisible && isTableVisible);
+		// if hiding facet panel, then immediately hide.  if showing, then show when facets are available/supported
+		if (!visible) {
+			view.setFacetsVisible(visible);	
+		}
 	}
 	@Override
 	public void onClearFacets() {
@@ -326,8 +329,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 		}
 	}
 	public void setTableVisible(boolean visible) {
-		this.isTableVisible = visible;
 		view.setTableVisible(visible);
-		view.setFacetsVisible(facetsVisible && isTableVisible);
+		view.setFacetsVisible(facetsWidget.isShowingFacets());
 	}
 }
