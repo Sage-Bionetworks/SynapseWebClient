@@ -115,7 +115,7 @@ public class FileHistoryWidgetViewImpl extends Composite implements FileHistoryW
 		fileHistoryRow.configure(versionNumber, versionHref, "Version " + versionName, modifiedByUserId, modifiedOn, size, md5, versionComment, deleteCallback);
 		previousVersionsTable.add(fileHistoryRow.asWidget());
 		fileHistoryRow.setCanEdit(canEdit);
-		fileHistoryRow.setIsVersionLink(!isVersionSelected);
+		fileHistoryRow.setIsVersionSelected(isVersionSelected);
 	}
 	
 	@Override
