@@ -145,7 +145,7 @@
 											</t:TableData>
 											<t:TableData>
 												<b:Heading size="H5" addStyleNames="font-weight-bolder">
-													<b:Anchor href="http://docs.synapse.org/python/CommandLineClient.html" target="_blank" text="Command line client"/>												
+													<b:Anchor href="http://docs.synapse.org/python/build/html/CommandLineClient.html" target="_blank" text="Command line client"/>												
 												</b:Heading>
 											</t:TableData>
 										</t:TableRow>
@@ -299,7 +299,7 @@
 										<bh:Text>,&nbsp;</bh:Text>
 										<b:Anchor target="_blank" href="http://docs.synapse.org/python/" text="Python"/>
 										<bh:Text>,&nbsp;</bh:Text>
-										<b:Anchor target="_blank" href="http://docs.synapse.org/python/CommandLineClient.html" text="command line"/>
+										<b:Anchor target="_blank" href="http://docs.synapse.org/python/build/html/CommandLineClient.html" text="command line"/>
 										<bh:Text>)</bh:Text>
 									</b:Heading>
 								</t:TableData>
