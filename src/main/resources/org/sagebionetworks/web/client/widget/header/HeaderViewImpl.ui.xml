@@ -36,7 +36,7 @@
 	        		<g:SimplePanel ui:field="projectFavoritePanel" addStyleNames="displayInline favoriteIcon margin-left-10" visible="false"/>
 	        	</b:Heading>
 		  	</bh:Div>
-		  	<bh:Span ui:field="headerButtons" addStyleNames="right">
+		  	<bh:Span ui:field="headerButtons" addStyleNames="right" marginRight="10">
 		  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 padding-left-15" visible="false">
 					<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" marginTop="7"/>
 				</g:SimplePanel>

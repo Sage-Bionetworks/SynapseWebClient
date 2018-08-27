@@ -2465,13 +2465,20 @@ div.border {
 	a.menu:after, .dropdown-toggle:after {
 		content: none;
 	}
-	.dropdown:hover {background-color: $synapse-green}
+	.dropdown:hover {
+		background-color: $synapse-green;
+		margin-right: -1px;
+		margin-left: -1px;
+	}
 	.dropdown {background-color: none;}
 	.alert {
 		border-radius: 0px;
 		padding: 7px 15px;
 		font-weight: 500;
 		font-size: 15px;
+	}
+	.dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover {
+		background-color: $synapse-green;
 	}
 }
 #body {
