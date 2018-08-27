@@ -1,20 +1,55 @@
 package org.sagebionetworks.web.client;
 
-import com.google.gwt.core.shared.GWT;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.sagebionetworks.web.client.resources.ResourceLoader;
+import org.sagebionetworks.web.client.resources.WebResource;
+import org.sagebionetworks.web.client.resources.WebResource.ResourceType;
+import org.sagebionetworks.web.client.utils.CallbackP;
+
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class MarkdownItImpl implements MarkdownIt {
 	private SynapseJSNIUtils jsniUtils;
-	
+	private ResourceLoader resourceLoader;
+	public static boolean isLoaded = false;
+	private HTMLSanitizer htmlSanitizer;
 	@Inject
-	public MarkdownItImpl(SynapseJSNIUtils jsniUtils) {
+	public MarkdownItImpl(SynapseJSNIUtils jsniUtils, ResourceLoader resourceLoader, HTMLSanitizer htmlSanitizer) {
+		this.resourceLoader = resourceLoader;
 		this.jsniUtils = jsniUtils;
+		this.htmlSanitizer = htmlSanitizer;
 	}
 	
 	@Override
-	public String markdown2Html(String md, String uniqueSuffix) {
-		String html = _markdown2Html(md, uniqueSuffix);
-		return jsniUtils.sanitizeHtml(html);
+	public void markdown2Html(String md, String uniqueSuffix, CallbackP<String> callbackHtml) {
+		if (!isLoaded) {
+			// load markdown it and plugins and call this again
+			WebResource pluginsJs = new WebResource(jsniUtils.getCdnEndpoint() + "js/markdown-it-plugins-"+ClientProperties.MARKDOWN_PLUGINS_VERSION+".min.js", ResourceType.JAVASCRIPT);
+			List<WebResource> resources = new ArrayList<WebResource>();
+			resources.add(ClientProperties.MARKDOWN_IT_JS);
+			resources.add(pluginsJs);
+			resourceLoader.requires(resources, new AsyncCallback<Void>() {
+				@Override
+				public void onSuccess(Void result) {
+					isLoaded = true;
+					markdown2Html(md, uniqueSuffix, callbackHtml);
+				}
+				
+				@Override
+				public void onFailure(Throwable caught) {
+					jsniUtils.consoleError("Unable to load markdown-it and plugins");
+				}
+			});
+			
+		} else {
+			String html = _markdown2Html(md, uniqueSuffix);
+			htmlSanitizer.sanitizeHtml(html, sanitizedHtml -> {
+				callbackHtml.invoke(sanitizedHtml);
+			});
+		}
 	}
 
 	private final static native String _markdown2Html(String md,

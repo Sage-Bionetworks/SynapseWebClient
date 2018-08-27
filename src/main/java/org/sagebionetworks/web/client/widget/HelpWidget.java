@@ -8,9 +8,11 @@ import org.gwtbootstrap3.client.ui.Popover;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.HTMLSanitizerImpl;
 import org.sagebionetworks.web.client.MarkdownIt;
 import org.sagebionetworks.web.client.MarkdownItImpl;
 import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
+import org.sagebionetworks.web.client.resources.ResourceLoaderImpl;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.dom.client.SpanElement;
@@ -56,8 +58,13 @@ public class HelpWidget implements IsWidget {
 	Widget widget;
 	private String popoverElementId;
 	private String closePopoverJs;
-	
-	private static MarkdownIt markdownIt = new MarkdownItImpl(GWT.create(SynapseJSNIUtilsImpl.class));
+	private static MarkdownIt markdownIt;
+	static {
+		ResourceLoaderImpl resourceLoader = GWT.create(ResourceLoaderImpl.class);
+		SynapseJSNIUtilsImpl jsniUtils = GWT.create(SynapseJSNIUtilsImpl.class);
+		HTMLSanitizerImpl htmlSanitizer = new HTMLSanitizerImpl(resourceLoader, jsniUtils);
+		markdownIt = new MarkdownItImpl(jsniUtils, resourceLoader, htmlSanitizer);
+	}
 	public interface Binder extends UiBinder<Widget, HelpWidget> {}
 	private static Binder uiBinder = GWT.create(Binder.class);
 	String text="", basicHelpText="", moreHelpHTML="", iconStyles="lightGreyText", closeHTML = "";
@@ -89,7 +96,10 @@ public class HelpWidget implements IsWidget {
 	}
 	
 	public void setHelpMarkdown(String md) {
-		this.basicHelpText = markdownIt.markdown2Html(md, "");
+		markdownIt.markdown2Html(md, "", html -> {
+			this.basicHelpText = html;
+			updateContent();
+		});
 	}
 	
 	public void setHref(String fullHelpHref) {
@@ -104,11 +114,15 @@ public class HelpWidget implements IsWidget {
 	
 	@Override
 	public Widget asWidget() {
+		updateContent();
+		return widget;
+	}
+	
+	private void updateContent() {
 		if (DisplayUtils.isDefined(iconStyles))
 			icon.setClassName(iconStyles);
 		moreInfoText.setInnerText(text);
 		helpPopover.setContent(basicHelpText + moreHelpHTML + closeHTML);
-		return widget;
 	}
 	
 	public void setVisible(boolean visible) {

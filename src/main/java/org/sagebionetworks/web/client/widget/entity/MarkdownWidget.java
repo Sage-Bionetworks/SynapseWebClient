@@ -96,8 +96,9 @@ public class MarkdownWidget implements MarkdownWidgetView.Presenter, IsWidget {
 			@Override
 			public void invoke() {
 				try {
-					String result = markdownIt.markdown2Html(md, uniqueSuffix);
-					loadHtml(uniqueSuffix, result);
+					markdownIt.markdown2Html(md, uniqueSuffix, result -> {
+						loadHtml(uniqueSuffix, result);	
+					});
 				} catch (RuntimeException e) { //JavaScriptException
 					synAlert.showError(e.getMessage());
 				}

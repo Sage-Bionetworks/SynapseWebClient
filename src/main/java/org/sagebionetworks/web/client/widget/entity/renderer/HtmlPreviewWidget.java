@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.HTMLSanitizer;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -42,7 +43,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 	protected SynapseClientAsync synapseClient;
 	protected PopupUtilsView popupUtils;
 	protected GWTWrapper gwt;
-	
+	protected HTMLSanitizer htmlSanitizer;
 	public static final double MAX_HTML_FILE_SIZE = 40 * MB;
 	public static String friendlyMaxFileSize = null;
 	
@@ -55,7 +56,8 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 			SynapseAlert synAlert,
 			SynapseClientAsync synapseClient,
 			PopupUtilsView popupUtils,
-			GWTWrapper gwt) {
+			GWTWrapper gwt,
+			HTMLSanitizer htmlSanitizer) {
 		this.view = view;
 		this.presignedURLAsyncHandler = presignedURLAsyncHandler;
 		this.jsniUtils = jsniUtils;
@@ -65,6 +67,7 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 		fixServiceEntryPoint(synapseClient);
 		this.popupUtils = popupUtils;
 		this.gwt = gwt;
+		this.htmlSanitizer = htmlSanitizer;
 		view.setSynAlert(synAlert);
 		view.setPresenter(this);
 		if (friendlyMaxFileSize == null) {
@@ -93,14 +96,15 @@ public class HtmlPreviewWidget implements IsWidget, HtmlPreviewView.Presenter {
 			
 			private void showSanitizedHtml() {
 				// is the sanitized version the same as the original??
-				String sanitizedHtml = jsniUtils.sanitizeHtml(rawHtml);
-				if (rawHtml.equals(sanitizedHtml)) {
-					view.setHtml(rawHtml);
-				} else {
-					view.setHtml(sanitizedHtml);
-					view.setRawHtml(rawHtml);
-					view.setSanitizedWarningVisible(true);
-				}
+				htmlSanitizer.sanitizeHtml(rawHtml, sanitizedHtml -> {
+					if (rawHtml.equals(sanitizedHtml)) {
+						view.setHtml(rawHtml);
+					} else {
+						view.setHtml(sanitizedHtml);
+						view.setRawHtml(rawHtml);
+						view.setSanitizedWarningVisible(true);
+					}
+				});
 			}
 		});
 	}

@@ -5,7 +5,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.ACCEPT;
@@ -25,6 +25,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.HTMLSanitizer;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -32,6 +33,7 @@ import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewView;
@@ -65,6 +67,8 @@ public class NbConvertPreviewWidgetTest {
 	@Mock
 	GWTWrapper mockGwt;
 	@Mock
+	HTMLSanitizer mockHTMLSanitizer;
+	@Mock
 	FileHandle mockFileHandle;
 	@Mock
 	Response mockResponse;
@@ -82,7 +86,8 @@ public class NbConvertPreviewWidgetTest {
 	ArgumentCaptor<Throwable> exceptionCaptor;
 	@Captor
 	ArgumentCaptor<Callback> callbackCaptor;
-	
+	@Captor
+	ArgumentCaptor<CallbackP<String>> callbackPCaptor;
 	public static final String HTML = "<!--converted ipynb into html --><img src=a onerror=\"javascript:alert('running my js')\" /><p>hello</p>";
 	public static final String WRAPPED_HTML = HTML_PREFIX + HTML + HTML_SUFFIX;
 	public static final String SANITIZED_HTML = "<p>hello</p>";
@@ -108,11 +113,11 @@ public class NbConvertPreviewWidgetTest {
 				mockSynapseClient, 
 				mockPopupUtils,
 				mockSynapseProperties,
-				mockGwt);
+				mockGwt, 
+				mockHTMLSanitizer);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		when(mockResponse.getText()).thenReturn(HTML);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		when(mockSynapseJSNIUtils.sanitizeHtml(anyString())).thenReturn(SANITIZED_HTML);
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockPresignedURLAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		when(mockFileResult.getPreSignedURL()).thenReturn(PRESIGNED_URL);
@@ -121,7 +126,10 @@ public class NbConvertPreviewWidgetTest {
 		when(mockFileHandle.getId()).thenReturn(FILE_HANDLE_ID);
 		when(mockFileHandle.getCreatedBy()).thenReturn(CREATED_BY);
 	}
-	
+	private void verifyHtmlSanitized(String sanitizerHtml) {
+		verify(mockHTMLSanitizer).sanitizeHtml(anyString(), callbackPCaptor.capture());
+		callbackPCaptor.getValue().invoke(sanitizerHtml);
+	}
 	@Test
 	public void testFileHandleAssociation() {
 		previewWidget.configure(ENTITY_ID, mockFileHandle);
@@ -183,14 +191,13 @@ public class NbConvertPreviewWidgetTest {
 	public void testRenderHtmlUntrustedButSafe() {
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		
-		when(mockSynapseJSNIUtils.sanitizeHtml(WRAPPED_HTML)).thenReturn(WRAPPED_HTML);
-		
 		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
+		//not sanitized?
+		verifyHtmlSanitized(WRAPPED_HTML);
 		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		// user is not allowed to render, but sanitized version is the same as raw
 		verify(mockView).setSanitizedWarningVisible(false);
-		verify(mockSynapseJSNIUtils).sanitizeHtml(WRAPPED_HTML);
 		verify(mockView).setHtml(WRAPPED_HTML);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
@@ -203,9 +210,10 @@ public class NbConvertPreviewWidgetTest {
 		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
 		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
+		verifyHtmlSanitized(SANITIZED_HTML);
+		
 		// user is not allowed to render.  show sanitized version
 		verify(mockView).setSanitizedWarningVisible(false);
-		verify(mockSynapseJSNIUtils).sanitizeHtml(WRAPPED_HTML);
 		verify(mockView).setHtml(SANITIZED_HTML);
 		verify(mockView).setRawHtml(WRAPPED_HTML);
 		// once because user is not on the html/js team, once because this is an ipynb (need link to download for fully interactive version)
@@ -222,10 +230,10 @@ public class NbConvertPreviewWidgetTest {
 		
 		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
+		verifyHtmlSanitized(SANITIZED_HTML);
 		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		// user is not allowed to render.  show sanitized version
 		verify(mockView).setSanitizedWarningVisible(false);
-		verify(mockSynapseJSNIUtils).sanitizeHtml(WRAPPED_HTML);
 		verify(mockView).setHtml(SANITIZED_HTML);
 		verify(mockView).setRawHtml(WRAPPED_HTML);
 		verify(mockView, times(2)).setSanitizedWarningVisible(true);

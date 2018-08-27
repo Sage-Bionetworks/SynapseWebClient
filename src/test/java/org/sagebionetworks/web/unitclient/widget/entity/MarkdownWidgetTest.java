@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -26,6 +27,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
 import org.sagebionetworks.web.client.resources.WebResource;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.WidgetRendererPresenter;
 import org.sagebionetworks.web.client.widget.entity.ElementWrapper;
 import org.sagebionetworks.web.client.widget.entity.MarkdownWidget;
@@ -66,6 +68,8 @@ public class MarkdownWidgetTest {
 	RuntimeException mockJsException;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Captor
+	ArgumentCaptor<CallbackP> markdown2HtmlCallbackCaptor;
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);
@@ -91,8 +95,6 @@ public class MarkdownWidgetTest {
 	@Test
 	public void testConfigureSuccess() {
 		String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
-		
-		when(mockMarkdownIt.markdown2Html(anyString(), anyString())).thenReturn(sampleHTML);
 		//only the first getElementById called by each getElementById finds its target so it doesn't look forever but still can be verified
 		when(mockView.getElementById(WidgetConstants.MARKDOWN_TABLE_ID_PREFIX + "0")).thenReturn(mockElementWrapper);
 		when(mockView.getElementById(Mockito.contains(WidgetConstants.DIV_ID_MATHJAX_PREFIX + "0"))).thenReturn(mockElementWrapper);
@@ -102,7 +104,8 @@ public class MarkdownWidgetTest {
 		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
 		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
 		callbackCaptor.getValue().invoke();
-		verify(mockMarkdownIt).markdown2Html(anyString(),anyString());
+		verify(mockMarkdownIt).markdown2Html(anyString(),anyString(), markdown2HtmlCallbackCaptor.capture());
+		markdown2HtmlCallbackCaptor.getValue().invoke(sampleHTML);
 		verify(mockView).setMarkdown(sampleHTML);
 		
 		// Called by loadMath and loadWidgets, 
@@ -133,7 +136,6 @@ public class MarkdownWidgetTest {
 	public void testLoadMarkdownFromWikiPageSuccess() {
 		String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
 		AsyncMockStubber.callSuccessWith(mockWikiPage).when(mockSynapseJavascriptClient).getV2WikiPageAsV1(any(WikiPageKey.class), any(AsyncCallback.class));
-		when(mockMarkdownIt.markdown2Html(anyString(), anyString())).thenReturn(sampleHTML);
 		//only the first getElementById called by each getElementById finds its target so it doesn't look forever but still can be verified
 		when(mockView.getElementById(WidgetConstants.MARKDOWN_TABLE_ID_PREFIX + "0")).thenReturn(mockElementWrapper);
 		when(mockView.getElementById(Mockito.contains(WidgetConstants.DIV_ID_MATHJAX_PREFIX + "0"))).thenReturn(mockElementWrapper);
@@ -146,7 +148,8 @@ public class MarkdownWidgetTest {
 		callbackCaptor.getValue().invoke();
 		verify(mockWikiPageKey).setWikiPageId(anyString());
 		
-		verify(mockMarkdownIt).markdown2Html(anyString(),anyString());
+		verify(mockMarkdownIt).markdown2Html(anyString(),anyString(), markdown2HtmlCallbackCaptor.capture());
+		markdown2HtmlCallbackCaptor.getValue().invoke(sampleHTML);
 		verify(mockView, Mockito.times(2)).setEmptyVisible(false);
 		verify(mockView).clearMarkdown();
 		verify(mockView).setMarkdown(sampleHTML);
@@ -170,7 +173,6 @@ public class MarkdownWidgetTest {
 	public void testMarkdownIt2Html() {
 		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
 		String sampleHTML = "<h1>heading</h1><p>foo baz bar</p>";
-		when(mockMarkdownIt.markdown2Html(anyString(), anyString())).thenReturn(sampleHTML);
 		String markdown="input markdown that is transformed";
 		presenter.configure(markdown, mockWikiPageKey, 1L);
 		
@@ -178,28 +180,10 @@ public class MarkdownWidgetTest {
 		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
 		callbackCaptor.getValue().invoke();
 		
-		verify(mockMarkdownIt).markdown2Html(anyString(),anyString());
+		verify(mockMarkdownIt).markdown2Html(anyString(),anyString(), markdown2HtmlCallbackCaptor.capture());
+		markdown2HtmlCallbackCaptor.getValue().invoke(sampleHTML);
 		verify(mockView).setMarkdown(sampleHTML);
 	}
-	
-	@Test
-	public void testMarkdownIt2HtmlError() {
-		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
-		String errorMessage = "a js exception";
-		when(mockJsException.getMessage()).thenReturn(errorMessage);
-		when(mockMarkdownIt.markdown2Html(anyString(), anyString())).thenThrow(mockJsException);
-		
-		String markdown="input markdown that is transformed";
-		presenter.configure(markdown, mockWikiPageKey, 1L);
-		
-		ArgumentCaptor<Callback> callbackCaptor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockView).callbackWhenAttached(callbackCaptor.capture());
-		callbackCaptor.getValue().invoke();
-		
-		verify(mockMarkdownIt).markdown2Html(anyString(),anyString());
-		verify(mockSynAlert).showError(errorMessage);
-	}
-	
 	
 	@Test
 	public void testLoadMarkdownFromWikiPageFailure() {
