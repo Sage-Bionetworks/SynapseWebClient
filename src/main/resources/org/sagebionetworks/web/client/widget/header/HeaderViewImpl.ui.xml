@@ -43,7 +43,7 @@
 				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton min-width-200" visible="false" height="48px" paddingTop="10">
 					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
 					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-5 color-white"/>
-					<b:DropDownMenu ui:field="dashboardDropdownMenu">
+					<b:DropDownMenu ui:field="dashboardDropdownMenu" width="100%">
 						<b:AnchorListItem ui:field="myDashboardLink">Projects</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myTeamsLink">Teams</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myChallengesLink">Challenges</b:AnchorListItem>

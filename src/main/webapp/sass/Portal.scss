@@ -2470,7 +2470,10 @@ div.border {
 		margin-right: -1px;
 		margin-left: -1px;
 	}
-	.dropdown {background-color: none;}
+	.dropdown {
+		background-color: none;
+		transition: all 0.3s ease-in;
+	}
 	.alert {
 		border-radius: 0px;
 		padding: 7px 15px;
@@ -2479,6 +2482,10 @@ div.border {
 	}
 	.dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover {
 		background-color: $synapse-green;
+	}
+	.dropdown-menu>li>a {
+		padding-top: 5px;
+		padding-bottom: 5px;
 	}
 }
 #body {
