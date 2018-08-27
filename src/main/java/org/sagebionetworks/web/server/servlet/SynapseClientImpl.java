@@ -1297,6 +1297,12 @@ public class SynapseClientImpl extends SynapseClientBase implements
 			membershipInvitation.setCreatedBy(null);
 			membershipInvitation.setCreatedOn(null);
 			membershipInvitation.setId(null);
+
+			// SWC-4360: if both the principal ID and email are set, then clear out the email in the new invite to avoid a backend error.
+			if (membershipInvitation.getInviteeId() != null && membershipInvitation.getInviteeEmail() != null) {
+				membershipInvitation.setInviteeEmail(null);
+			}
+			
 			synapseClient.createMembershipInvitation(membershipInvitation, emailInvitationEndpoint, settingsEndpoint);
 			synapseClient.deleteMembershipInvitation(membershipInvitationId);
 		} catch (SynapseException e) {
