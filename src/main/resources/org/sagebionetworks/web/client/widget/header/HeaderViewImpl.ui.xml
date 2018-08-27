@@ -40,7 +40,7 @@
 		  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 padding-left-15" visible="false">
 					<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" marginTop="7"/>
 				</g:SimplePanel>
-				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton min-width-200" visible="false" height="48px" paddingTop="10">
+				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton min-width-200 hideLeftPixelOnHover" visible="false" height="48px" paddingTop="10">
 					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
 					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-5 color-white"/>
 					<b:DropDownMenu ui:field="dashboardDropdownMenu" width="100%">
@@ -60,7 +60,7 @@
 					</b:DropDownMenu>
 				</b:DropDown>
 				<bh:Span addStyleNames="border-left-1 right" height="25px" marginTop="12"/>
-				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="padding-left-10 padding-right-15 imageButton" visible="false" height="48px" paddingTop="10">
+				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="padding-left-10 padding-right-15 imageButton hideRightPixelOnHover" visible="false" height="48px" paddingTop="10">
 					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white" />
 					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-5 color-white"/>
 					<b:DropDownMenu ui:field="headerFavDropdownMenu" addStyleNames="dropdown-menu-right">

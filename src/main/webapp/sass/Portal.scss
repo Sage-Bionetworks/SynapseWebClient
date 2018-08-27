@@ -2437,6 +2437,13 @@ div.border {
 	filter: blur(4px);
 }
 
+.hideRightPixelOnHover:hover {
+	margin-right: -1px;
+}
+.hideLeftPixelOnHover:hover {
+	margin-left: -1px;
+}
+
 #headerPanel {
 	.searchBox input, .searchBox input:focus {
 		background-color:#274660;
@@ -2467,8 +2474,6 @@ div.border {
 	}
 	.dropdown:hover {
 		background-color: $synapse-green;
-		margin-right: -1px;
-		margin-left: -1px;
 	}
 	.dropdown {
 		background-color: none;
