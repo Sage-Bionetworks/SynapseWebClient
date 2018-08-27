@@ -2057,6 +2057,9 @@ public class SynapseClientImplTest {
 		String membershipInvitationId = "1212";
 		String hostPageBaseURL = "http://localhost/Portal.html";
 		when(mockSynapse.getMembershipInvitation(anyString())).thenReturn(mockMembershipInvitation);
+		//SWC-4360: if the email and principal ID are set, then the email should be cleared)
+		when(mockMembershipInvitation.getInviteeEmail()).thenReturn("something@gmail.com");
+		when(mockMembershipInvitation.getInviteeId()).thenReturn("123");
 		
 		synapseClient.resendTeamInvitation(membershipInvitationId, hostPageBaseURL);
 		
@@ -2064,6 +2067,7 @@ public class SynapseClientImplTest {
 		verify(mockMembershipInvitation).setCreatedBy(null);
 		verify(mockMembershipInvitation).setCreatedOn(null);
 		verify(mockMembershipInvitation).setId(null);
+		verify(mockMembershipInvitation).setInviteeEmail(null);
 		verify(mockSynapse).createMembershipInvitation(eq(mockMembershipInvitation), stringCaptor1.capture(), stringCaptor2.capture());
 		assertTrue(stringCaptor1.getValue().startsWith(hostPageBaseURL));
 		assertTrue(stringCaptor2.getValue().startsWith(hostPageBaseURL));
