@@ -187,7 +187,11 @@ public class APITableWidgetViewImpl extends FlowPanel implements APITableWidgetV
 	 * @return
 	 */
 	private static native JsArray<JavaScriptObject> _findDivs(String prefix) /*-{
-		return $wnd.jQuery('div[id^='+prefix+']');
+		try {
+			return $wnd.jQuery('div[id^='+prefix+']');
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 
 	@Override

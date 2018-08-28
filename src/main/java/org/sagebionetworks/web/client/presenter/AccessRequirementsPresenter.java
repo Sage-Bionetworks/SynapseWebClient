@@ -108,7 +108,7 @@ public class AccessRequirementsPresenter extends AbstractActivity implements Pre
 		view.initHeaderAndFooter();
 		String id = place.getParam(AccessRequirementsPlace.ID_PARAM);
 		String typeString = place.getParam(AccessRequirementsPlace.TYPE_PARAM);
-		RestrictableObjectType type = RestrictableObjectType.valueOf(typeString);
+		RestrictableObjectType type = RestrictableObjectType.valueOf(typeString.toUpperCase());
 		synAlert.clear();
 		subject = new RestrictableObjectDescriptor();
 		subject.setType(type);

@@ -106,54 +106,64 @@ public class PlotlyWidgetViewImpl implements PlotlyWidgetView {
 			String xAxisType, 
 			String yAxisType, 
 			boolean showLegend) /*-{
-		var plot =  $wnd.createPlotlyComponent($wnd.Plotly);
 		
-		// SWC-3668: We must manually construct an Object from the parent window Object prototype.  This is a general GWT js integration issue.
-		// If we define the layout in the standard way, like "xaxis: {title:"mytitle"}", then  Object.getPrototypeOf(obj) === Object.prototype is false.
-		// And if this condition is false, then plotly clears our input layout params object. It instead uses defaults (based on the data).
-		
-		var xAxisLayoutObject = new $wnd.Object();
-		xAxisLayoutObject.title = xTitle;
-		xAxisLayoutObject.type = xAxisType;
-		xAxisLayoutObject.tickangle = 45;
-		
-		
-		var yAxisLayoutObject = new $wnd.Object();
-		yAxisLayoutObject.title = yTitle;
-		yAxisLayoutObject.type = yAxisType;
-		
-		var props = {
-			data: xyData,
-			fit: true,
-			layout: {
-				  title: plotTitle,
-				  xaxis: xAxisLayoutObject,
-				  yaxis: yAxisLayoutObject,
-				  barmode: barMode,
-				  showlegend: showLegend
-				},
-
-			// note: we'd like to just hide the "save and edit plot in cloud" command, 
-			// but the parameter provided in the docs (showLink: false) has no effect.
-			// hide the entire bar by setting displayModeBar to false.
-			config: {displayModeBar: false}
-		};
-		$wnd.ReactDOM.render(
-				$wnd.React.createElement(plot, props), 
-				el
-			);
+		try {
+						
+			var plot =  $wnd.createPlotlyComponent($wnd.Plotly);
+			
+			// SWC-3668: We must manually construct an Object from the parent window Object prototype.  This is a general GWT js integration issue.
+			// If we define the layout in the standard way, like "xaxis: {title:"mytitle"}", then  Object.getPrototypeOf(obj) === Object.prototype is false.
+			// And if this condition is false, then plotly clears our input layout params object. It instead uses defaults (based on the data).
+			
+			var xAxisLayoutObject = new $wnd.Object();
+			xAxisLayoutObject.title = xTitle;
+			xAxisLayoutObject.type = xAxisType;
+			xAxisLayoutObject.tickangle = 45;
+			
+			
+			var yAxisLayoutObject = new $wnd.Object();
+			yAxisLayoutObject.title = yTitle;
+			yAxisLayoutObject.type = yAxisType;
+			
+			var props = {
+				data: xyData,
+				fit: true,
+				layout: {
+					  title: plotTitle,
+					  xaxis: xAxisLayoutObject,
+					  yaxis: yAxisLayoutObject,
+					  barmode: barMode,
+					  showlegend: showLegend
+					},
+	
+				// note: we'd like to just hide the "save and edit plot in cloud" command, 
+				// but the parameter provided in the docs (showLink: false) has no effect.
+				// hide the entire bar by setting displayModeBar to false.
+				config: {displayModeBar: false}
+			};
+			$wnd.ReactDOM.render(
+					$wnd.React.createElement(plot, props), 
+					el
+				);
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 	
 	private static native void _addPlotlyClickEventListener (
 			Element el, PlotlyWidgetViewImpl thisWidget) /*-{
-		//after plot is drawn, add handler for click events
-		$wnd.jQuery(el).on('plotly_afterplot', function() {
-			this.children[0].on('plotly_click', function(data) {
-				data.event.stopPropagation();
-				var pnt = data.points[0];				
-				thisWidget.@org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetViewImpl::onClick(Ljava/lang/String;Ljava/lang/String;)(pnt.x, pnt.y);
+		try {
+			//after plot is drawn, add handler for click events
+			$wnd.jQuery(el).on('plotly_afterplot', function() {
+				this.children[0].on('plotly_click', function(data) {
+					data.event.stopPropagation();
+					var pnt = data.points[0];				
+					thisWidget.@org.sagebionetworks.web.client.widget.entity.renderer.PlotlyWidgetViewImpl::onClick(Ljava/lang/String;Ljava/lang/String;)(pnt.x, pnt.y);
+				});
 			});
-		});
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 	
 	private void onClick(String x, String y) {

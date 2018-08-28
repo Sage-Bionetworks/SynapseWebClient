@@ -289,7 +289,7 @@ public class ACTDataAccessSubmissionsPresenter extends AbstractActivity implemen
 
 	@Override
 	public void onStateSelected(String selectedState) {
-		stateFilter = SubmissionState.valueOf(selectedState);
+		stateFilter = SubmissionState.valueOf(selectedState.toUpperCase());
 		place.putParam(STATE_FILTER_PARAM, selectedState);
 		view.setSelectedStateText(selectedState);
 		loadData();

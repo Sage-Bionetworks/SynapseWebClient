@@ -13,9 +13,19 @@ public class MomentImpl implements Moment {
 	}
 
 	private static native String _getRelativeTime(String s) /*-{
-		return $wnd.moment(s).fromNow();
+		try {
+			return $wnd.moment(s).fromNow();
+		} catch (err) {
+			console.error(err);
+			return s;
+		}
 	}-*/;
 	private static native String _getCalendarTime(String s) /*-{
-		return $wnd.moment(s).calendar();
+		try {
+			return $wnd.moment(s).calendar();
+		} catch (err) {
+			console.error(err);
+			return s;
+		}
 	}-*/;
 }

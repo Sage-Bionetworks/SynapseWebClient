@@ -1,8 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.renderer;
 
+import static org.sagebionetworks.markdown.constants.WidgetConstants.DIV_ID_WIDGET_PREFIX;
+
 import java.util.HashMap;
 import java.util.Map;
-import static org.sagebionetworks.markdown.constants.WidgetConstants.*;
+
 import org.sagebionetworks.web.client.DisplayConstants;
 import org.sagebionetworks.web.shared.WidgetConstants;
 
@@ -120,11 +122,15 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 	}
 	
 	private static native JsArray<Element> _localHeaderElements(Element el) /*-{
-		//find all header elements in the DOM
-		var allHeaderElements = $wnd.jQuery(":header");
-		//filter all header elements down to the collection of header elements that are descendents of the local markdown element
-		var markdownEl = $wnd.jQuery(el).closest("div.markdown");
-		return $wnd.jQuery(markdownEl).find(allHeaderElements);
+		try {
+			//find all header elements in the DOM
+			var allHeaderElements = $wnd.jQuery(":header");
+			//filter all header elements down to the collection of header elements that are descendents of the local markdown element
+			var markdownEl = $wnd.jQuery(el).closest("div.markdown");
+			return $wnd.jQuery(markdownEl).find(allHeaderElements);
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 
 	@Override
@@ -142,10 +148,4 @@ public class TableOfContentsWidgetViewImpl extends FlowPanel implements TableOfC
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
 	}
-		
-	
-	/*
-	 * Private Methods
-	 */
-
 }

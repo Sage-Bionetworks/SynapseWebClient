@@ -84,7 +84,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 			//not subscribed, but have enough info to subscribe
 			//configure the topic renderer
 			view.selectUnsubscribedButton();
-			objectType = SubscriptionObjectType.valueOf(objectTypeParam);
+			objectType = SubscriptionObjectType.valueOf(objectTypeParam.toUpperCase());
 			objectId = objectIdParam;
 			topicWidget.configure(objectType, objectId);
 		} else {

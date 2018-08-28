@@ -228,7 +228,7 @@ public class EntityFinder implements EntityFinderView.Presenter, IsWidget {
 		//default to browse
 		EntityFinderArea area = EntityFinderArea.BROWSE;
 		if (areaString != null) {
-			area = EntityFinderArea.valueOf(areaString);
+			area = EntityFinderArea.valueOf(areaString.toUpperCase());
 		}
 		view.initFinderComponents(filter);
 		switch (area) {

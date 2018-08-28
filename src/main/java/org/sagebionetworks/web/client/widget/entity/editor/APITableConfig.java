@@ -93,7 +93,7 @@ public class APITableConfig {
 				}
 				config.setInputColumnNames(inputColumnNames);
 				if (parts.length > 3) {
-					config.setSort(COLUMN_SORT_TYPE.valueOf(parts[3]));
+					config.setSort(COLUMN_SORT_TYPE.valueOf(parts[3].toUpperCase()));
 				} else config.setSort(COLUMN_SORT_TYPE.NONE);
 				
 				if (parts.length > 4) { 
