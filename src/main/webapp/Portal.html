@@ -3,7 +3,7 @@
 	<head>
 		<title>Synapse | Sage Bionetworks</title>
 		<meta name="description" content="Synapse is a platform for supporting scientific collaborations centered around shared biomedical data sets.  Our goal is to make biomedical research more transparent, more reproducible, and more accessible to a broader audience of scientists.  Synapse serves as the host site for a variety of scientific collaborations, individual research projects, and DREAM challenges." />
-		<meta name='author' content='Sage Bionetworks, info@sagebase.org' />
+		<meta name='author' content='Sage Bionetworks, synapseinfo@sagebionetworks.org' />
 		<meta name="google-site-verification" content="KIO5H8Bg3i0oAEAzTEMK5qIlYJLbd2zogLs_-im4rI0" />
 		<meta name="msvalidate.01" content="E37AC1589F823723B64275D4BC890B1A" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -38,15 +38,6 @@
 		<link href="/opensearch.xml" rel="search" title="Synapse" type="application/opensearchdescription+xml" />
 		<link rel="manifest" href="manifest.json" />
 		
-		<!-- Google Analytics -->
-		<script>
-			window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
-			ga('create', 'UA-29804340-1', 'auto');
-			ga('send', 'pageview');
-		</script>
-		
-		
-		
 		<script>
 			// determine cdn endpoint (staging or prod, do not use a cdn for local or dev builds)
 			var cdnEndpoint = "//cdn-" + location.hostname + "/";
@@ -66,19 +57,18 @@
 				head.load("Portal.css");
 				head.load("//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js");
 				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
-				head.load("//cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.0/spark-md5.min.js");
+				head.load("//cdn.jsdelivr.net/npm/moment@2.22.1/min/moment.min.js");
+				head.load("https://cdn.pendo.io/agent/static/f155f8f7-30b9-4cc3-671a-70f99f803504/pendo.js");
+				head.load("//cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.1.8/jsPlumb.min.js");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/swfobject/2.2/swfobject.min.js");
 				head.load(cdnEndpoint + "js/jquery.tablesorter.min.js");
 				head.load(cdnEndpoint + "js/jquery.tablesorter.scinot.js");
 				head.load(cdnEndpoint + "js/highlight.pack.js");
-				head.load("//cdnjs.cloudflare.com/ajax/libs/jsPlumb/2.1.8/jsPlumb.min.js");
 				head.load(cdnEndpoint + "js/init-nchart.js");
-				head.load("//cdn.jsdelivr.net/npm/moment@2.22.1/min/moment.min.js");
 				head.load(cdnEndpoint + "js/polyfill-2.js");
 				head.load(cdnEndpoint + "js/details-shim.min.js");
 				head.load(cdnEndpoint + "css/details-shim.min.css");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/pica/4.1.1/pica.min.js");
-				head.load("//www.google-analytics.com/analytics.js");
 				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/base/jquery-ui.css");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/default.min.css");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css");
@@ -86,7 +76,7 @@
 				head.load("https://unpkg.com/react-dom@16.2.0/umd/react-dom.production.min.js");
 				head.load("https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.min.css");
 				head.load("https://cdnjs.cloudflare.com/ajax/libs/croppie/2.6.2/croppie.min.js");
-				head.load("https://cdn.pendo.io/agent/static/f155f8f7-30b9-4cc3-671a-70f99f803504/pendo.js");
+				head.load("//cdnjs.cloudflare.com/ajax/libs/spark-md5/3.0.0/spark-md5.min.js");
 				head.load(cdnEndpoint + "js/diff/diffview.css");
 			};
 			script.src = cdnEndpoint + "js/head.load.min.js";
@@ -99,8 +89,15 @@
 			script = document.createElement('script');
 			script.src = cdnEndpoint + "Portal/Portal.nocache.js";
 			document.head.appendChild(script);
-			
 	   	</script>
+	   	
+	   	<script src="//www.google-analytics.com/analytics.js"></script>
+	   	<!-- Google Analytics -->
+		<script>
+			window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
+			ga('create', 'UA-29804340-1', 'auto');
+			ga('send', 'pageview');
+		</script>
 	</head>
 	<body id="body">
 		<div>
