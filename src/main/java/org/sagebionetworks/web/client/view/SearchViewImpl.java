@@ -15,6 +15,7 @@ import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.constants.Placement;
 import org.gwtbootstrap3.client.ui.constants.Pull;
+import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Text;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.EntityPath;
@@ -423,16 +424,18 @@ public class SearchViewImpl extends Composite implements SearchView {
 		if(null != hit.getPath()) {
 			resultBuilder.append(getPathHtml(hit.getPath())).appendHtmlConstant("<br/>\n");
 		}
+		Div descriptionPanel = new Div();
 		if(null != hit.getDescription()) {
-			String description = markdownIt.markdown2Html(hit.getDescription(), "");
-			description = new HTML(description).getText().replace("<Synapse widget>", "").replace("|", "").replace("#", "");
-			resultBuilder.appendHtmlConstant("<span class=\"hitdescription\">")
-			.appendEscaped(DisplayUtils.stubStr(description, HIT_DESCRIPTION_LENGTH_CHAR))
-			.appendHtmlConstant("</span><br>\n");
+			markdownIt.markdown2Html(hit.getDescription(), "", description -> {
+				description = new HTML(description).getText().replace("<Synapse widget>", "").replace("|", "").replace("#", "");
+				resultBuilder.appendHtmlConstant("<span class=\"hitdescription\">")
+				.appendEscaped(DisplayUtils.stubStr(description, HIT_DESCRIPTION_LENGTH_CHAR))
+				.appendHtmlConstant("</span><br>\n");
+				descriptionPanel.add(new HTMLPanel(resultBuilder.toSafeHtml()));
+			});
 		}
-		hitPanel.add(new HTMLPanel(resultBuilder.toSafeHtml()));
+		hitPanel.add(descriptionPanel);
 		hitPanel.add(attributionPanel);
-		
 		return hitPanel;
 	}
 	

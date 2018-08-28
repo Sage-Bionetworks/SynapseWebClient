@@ -17,12 +17,14 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.HTMLSanitizer;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.Callback;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.renderer.HtmlPreviewView;
@@ -62,6 +64,8 @@ public class HtmlPreviewWidgetTest {
 	@Mock
 	PopupUtilsView mockPopupUtils;
 	@Mock
+	HTMLSanitizer mockHTMLSanitizer;
+	@Mock
 	FileResult mockFileResult;
 	@Mock
 	GWTWrapper mockGWT;
@@ -75,7 +79,8 @@ public class HtmlPreviewWidgetTest {
 	ArgumentCaptor<Callback> callbackCaptor;
 	@Captor
 	ArgumentCaptor<String> stringCaptor;
-	
+	@Captor
+	ArgumentCaptor<CallbackP<String>> callbackPCaptor;
 	public static final String HTML = "<html><body><img src=a onerror=\"javascript:alert('running my js')\" /><p>hello</p></body></html>";
 	public static final String SANITIZED_HTML = "<html><body><p>hello</p></body></html>";
 	
@@ -88,17 +93,22 @@ public class HtmlPreviewWidgetTest {
 	public void before() throws Exception{
 		MockitoAnnotations.initMocks(this);
 		when(mockGWT.getFriendlySize(anyDouble(), anyBoolean())).thenReturn(FRIENDLY_FILE_SIZE);
-		previewWidget = new HtmlPreviewWidget(mockView, mockPresignedURLAsyncHandler, mockSynapseJSNIUtils, mockRequestBuilder, mockSynapseAlert, mockSynapseClient, mockPopupUtils, mockGWT);
+		previewWidget = new HtmlPreviewWidget(mockView, mockPresignedURLAsyncHandler, mockSynapseJSNIUtils, mockRequestBuilder, mockSynapseAlert, mockSynapseClient, mockPopupUtils, mockGWT, mockHTMLSanitizer);
 		when(mockResponse.getStatusCode()).thenReturn(Response.SC_OK);
 		when(mockResponse.getText()).thenReturn(HTML);
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
-		when(mockSynapseJSNIUtils.sanitizeHtml(HTML)).thenReturn(SANITIZED_HTML);
+		
 		AsyncMockStubber.callSuccessWith(true).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockPresignedURLAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		when(mockFileResult.getPreSignedURL()).thenReturn(PRESIGNED_URL);
 		when(mockFileHandle.getContentSize()).thenReturn(2L);
 		when(mockFileHandle.getId()).thenReturn(FILE_HANDLE_ID);
 		when(mockFileHandle.getCreatedBy()).thenReturn(CREATED_BY);
+	}
+	
+	private void verifyHtmlSanitized(String sanitizerHtml) {
+		verify(mockHTMLSanitizer).sanitizeHtml(anyString(), callbackPCaptor.capture());
+		callbackPCaptor.getValue().invoke(sanitizerHtml);
 	}
 	
 	@Test
@@ -161,14 +171,13 @@ public class HtmlPreviewWidgetTest {
 	@Test
 	public void testRenderHtmlUntrustedButSafe() {
 		AsyncMockStubber.callSuccessWith(false).when(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
-		when(mockSynapseJSNIUtils.sanitizeHtml(HTML)).thenReturn(HTML);
 		
 		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
+		verifyHtmlSanitized(HTML);
 		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		// user is not allowed to render, but sanitized version is the same as raw
 		verify(mockView).setSanitizedWarningVisible(false);
-		verify(mockSynapseJSNIUtils).sanitizeHtml(HTML);
 		verify(mockView).setHtml(HTML);
 		verify(mockView).setLoadingVisible(true);
 		verify(mockView).setLoadingVisible(false);
@@ -180,10 +189,10 @@ public class HtmlPreviewWidgetTest {
 		
 		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
+		verifyHtmlSanitized(SANITIZED_HTML);		
 		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		// user is not allowed to render.  show sanitized version
 		verify(mockView).setSanitizedWarningVisible(false);
-		verify(mockSynapseJSNIUtils).sanitizeHtml(HTML);
 		verify(mockView).setHtml(SANITIZED_HTML);
 		verify(mockView).setRawHtml(HTML);
 		verify(mockView).setSanitizedWarningVisible(true);
@@ -199,10 +208,10 @@ public class HtmlPreviewWidgetTest {
 		
 		previewWidget.configure(ENTITY_ID, mockFileHandle);
 		
+		verifyHtmlSanitized(SANITIZED_HTML);
 		verify(mockSynapseClient).isUserAllowedToRenderHTML(anyString(), any(AsyncCallback.class));
 		// user is not allowed to render.  show sanitized version
 		verify(mockView).setSanitizedWarningVisible(false);
-		verify(mockSynapseJSNIUtils).sanitizeHtml(HTML);
 		verify(mockView).setHtml(SANITIZED_HTML);
 		verify(mockView).setRawHtml(HTML);
 		verify(mockView).setSanitizedWarningVisible(true);

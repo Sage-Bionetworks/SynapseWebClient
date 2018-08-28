@@ -1415,5 +1415,6 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(SynapseProperties.class).to(SynapsePropertiesImpl.class).in(Singleton.class);
 		bind(Moment.class).to(MomentImpl.class);
 		bind(DownloadSpeedTester.class).to(DownloadSpeedTesterImpl.class);
+		bind(HTMLSanitizer.class).to(HTMLSanitizerImpl.class).in(Singleton.class);
 	}
 }

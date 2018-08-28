@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.client;
 
-import com.google.gwt.core.client.JavaScriptException;
+import org.sagebionetworks.web.client.utils.CallbackP;
 
 
 public interface MarkdownIt {
-	public String markdown2Html(String md, String uniqueSuffix) throws JavaScriptException;
+	public void markdown2Html(String md, String uniqueSuffix, CallbackP<String> callbackHtml);
 }

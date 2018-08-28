@@ -5,6 +5,7 @@ import static org.sagebionetworks.web.shared.WebConstants.TEXT_HTML_CHARSET_UTF8
 
 import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.HTMLSanitizer;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseClientAsync;
@@ -34,8 +35,9 @@ public class NbConvertPreviewWidget extends HtmlPreviewWidget {
 			SynapseClientAsync synapseClient,
 			PopupUtilsView popupUtils,
 			SynapseProperties synapseProperties,
-			GWTWrapper gwt) {
-		super(view, presignedURLAsyncHandler, jsniUtils, requestBuilder, synAlert, synapseClient, popupUtils, gwt);
+			GWTWrapper gwt,
+			HTMLSanitizer htmlSanitizer) {
+		super(view, presignedURLAsyncHandler, jsniUtils, requestBuilder, synAlert, synapseClient, popupUtils, gwt, htmlSanitizer);
 		nbConvertEndpoint = synapseProperties.getSynapseProperty(NBCONVERT_ENDPOINT_PROPERTY);
 		view.setShowContentLinkText(DOWNLOAD_NOTEBOOK_MESSAGE);
 	}
