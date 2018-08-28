@@ -7,7 +7,6 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
-import com.google.gwt.event.dom.client.MouseOutEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Widget;
@@ -21,9 +20,6 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	Icon searchButton;
 	@UiField
 	TextBox searchField;
-	
-	public static final String INACTIVE_STYLE = "searchTextField";
-	public static final String ACTIVE_STYLE = "searchTextField-active";
 	
 	@Inject
 	public SearchBoxViewImpl(Binder binder) {
@@ -43,28 +39,14 @@ public class SearchBoxViewImpl implements SearchBoxView {
 		});
 	    searchButton.addClickHandler(event -> {
 	    	searchField.setFocus(true);
-	    	if (searchField.getStyleName().contains(ACTIVE_STYLE)) {
-	    		executeSearch();
-	    	} else {
-	    		searchFieldActive();	
-	    	}
+    		executeSearch();
 	    });
-	}
-	
-	private void searchFieldInactive() {
-		searchField.addStyleName(INACTIVE_STYLE);
-		searchField.removeStyleName(ACTIVE_STYLE);
-	}
-	private void searchFieldActive() {
-		searchField.addStyleName(ACTIVE_STYLE);
-		searchField.removeStyleName(INACTIVE_STYLE);
 	}
 	
 	private void executeSearch() {
 		if (!"".equals(searchField.getValue())) {
 			presenter.search(searchField.getValue());
 			searchField.setValue("");
-			searchFieldInactive();
 		}
 	}
 	

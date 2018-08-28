@@ -2445,18 +2445,43 @@ div.border {
 }
 
 #headerPanel {
-	.searchBox input, .searchBox input:focus {
-		background-color:#274660;
-		color: white;
+	.searchBox {
+		input, input:focus {
+			background-color:#274660;
+			color: white;
+			padding: 0px;			
+		}
 	}
-	.searchTextField {
-		width: 0px;
-		opacity: 0;
+	
+	div.searchBoxContainer {
+		input {
+			width: 0px;
+			opacity: 0;
+		}
+		i {
+			font-size: 25px;
+		}
+
 	}
-	.searchTextField-active {
-		width: 200px;
-		transition: width 0.4s ease-in-out;
-		opacity: 1;
+
+	div.searchBoxContainer:focus, div.searchBoxContainer:hover {
+		background-color: $synapse-green;
+		transition: all 0.3s ease-in;
+
+		input {
+			width: 200px;
+			transition: width 0.4s ease-in-out;
+			opacity: 1;
+			padding-left: 35px;
+		}
+		i {
+			font-size: 20px;
+			position: relative;
+			left: 17px;
+			top: -3px;
+			opacity: 0.5;
+			width: 10px;
+		}
 	}
 	.userProfileImage {
 		border-radius: 50%;

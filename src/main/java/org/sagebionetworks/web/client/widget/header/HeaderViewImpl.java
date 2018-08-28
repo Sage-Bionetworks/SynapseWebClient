@@ -83,7 +83,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	DropDownMenu dashboardDropdownMenu;
 
 	@UiField
-	SimplePanel searchBoxContainer;
+	Div searchBoxContainer;
 	@UiField
 	Alert stagingAlert;
 	@UiField
@@ -115,7 +115,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		userBadge.addUsernameLinkStyle("color-white textDecorationNone padding-left-5");
 		// add search panel first
 		searchBox.setVisible(true);
-		searchBoxContainer.setWidget(searchBox.asWidget());
+		searchBoxContainer.add(searchBox.asWidget());
 		dashboardDropdownAnchor.add(userBadge.asWidget());
 		initClickHandlers();
 		clear();
