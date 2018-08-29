@@ -2452,8 +2452,11 @@ div.border {
 			padding: 0px;			
 		}
 	}
-	
-	div.searchBoxContainer {
+	div.searchBoxContainer.inactive:hover, div.searchBoxContainer.inactive:focus {
+		background-color: $synapse-green;
+		transition: all 0.3s ease-in;
+	}
+	div.searchBoxContainer.inactive {
 		input {
 			width: 0px;
 			opacity: 0;
@@ -2461,13 +2464,9 @@ div.border {
 		i {
 			font-size: 25px;
 		}
-
 	}
 
-	div.searchBoxContainer:focus, div.searchBoxContainer:hover {
-		background-color: $synapse-green;
-		transition: all 0.3s ease-in;
-
+	div.searchBoxContainer.active {
 		input {
 			width: 200px;
 			transition: width 0.4s ease-in-out;

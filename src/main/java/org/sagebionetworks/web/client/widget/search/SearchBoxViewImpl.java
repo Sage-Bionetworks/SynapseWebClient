@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
 
+import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyCodes;
 import com.google.gwt.event.dom.client.KeyDownEvent;
 import com.google.gwt.event.dom.client.KeyDownHandler;
@@ -20,6 +21,8 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	Icon searchButton;
 	@UiField
 	TextBox searchField;
+	public static final String INACTIVE_STYLE = "inactive";
+	public static final String ACTIVE_STYLE = "active";
 	
 	@Inject
 	public SearchBoxViewImpl(Binder binder) {
@@ -39,7 +42,11 @@ public class SearchBoxViewImpl implements SearchBoxView {
 		});
 	    searchButton.addClickHandler(event -> {
 	    	searchField.setFocus(true);
-    		executeSearch();
+	    	if (isSearchFieldActive()) {
+	    		executeSearch();
+	    	} else {
+	    		searchFieldActive();	
+	    	}
 	    });
 	}
 	
@@ -47,6 +54,7 @@ public class SearchBoxViewImpl implements SearchBoxView {
 		if (!"".equals(searchField.getValue())) {
 			presenter.search(searchField.getValue());
 			searchField.setValue("");
+			searchFieldInactive();
 		}
 	}
 	
@@ -83,10 +91,28 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	public void clear() {
 		//searchField.setText("");		
 	}
-
-	/*
-	 * Private Methods
-	 */
-
-
+	
+	private void searchFieldInactive() {
+		Element searchBoxContainer = _getSearchBoxContainer();
+		searchBoxContainer.removeClassName(ACTIVE_STYLE);
+		searchBoxContainer.addClassName(INACTIVE_STYLE);
+	}
+	private void searchFieldActive() {
+		Element searchBoxContainer = _getSearchBoxContainer();
+		searchBoxContainer.addClassName(ACTIVE_STYLE);
+		searchBoxContainer.removeClassName(INACTIVE_STYLE);
+	}
+	
+	private boolean isSearchFieldActive() {
+		Element searchBoxContainer = _getSearchBoxContainer();
+		return searchBoxContainer.hasClassName(ACTIVE_STYLE);
+	}
+	
+	public static native Element _getSearchBoxContainer() /*-{
+		try {
+			return $wnd.jQuery('#headerPanel .searchBoxContainer')[0];
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
 }
