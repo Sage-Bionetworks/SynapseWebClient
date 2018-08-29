@@ -153,10 +153,14 @@ public class HelpWidget implements IsWidget {
 	}
 
 	private static native void _addModalHideListener() /*-{
-		$wnd.jQuery($doc.body).on('hidden.bs.modal', function () {
-		    //call static method when modal is hidden
-		    @org.sagebionetworks.web.client.widget.HelpWidget::hideAllPopovers()();
-		});
+		try {
+			$wnd.jQuery($doc.body).on('hidden.bs.modal', function () {
+			    //call static method when modal is hidden
+			    @org.sagebionetworks.web.client.widget.HelpWidget::hideAllPopovers()();
+			});
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 	
 	public static void hideAllPopovers() {
