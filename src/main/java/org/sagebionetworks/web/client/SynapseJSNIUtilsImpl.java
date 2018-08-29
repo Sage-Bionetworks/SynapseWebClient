@@ -32,8 +32,12 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	private static native void _recordPageVisit(String token) /*-{
-		$wnd.ga('set', 'page', '/#'+token);
-		$wnd.ga('send', 'pageview');
+		try {
+			$wnd.ga('set', 'page', '/#'+token);
+			$wnd.ga('send', 'pageview');
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 	
 	@Override
@@ -42,7 +46,8 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}
 
 	private static native void _sendAnalyticsEvent(String eventCategoryValue, String eventActionValue, String eventLabelValue) /*-{
-		$wnd.ga('send', 
+		try {
+			$wnd.ga('send', 
 			{
 			  hitType: 'event',
 			  eventCategory: eventCategoryValue,
@@ -50,6 +55,9 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 			  eventLabel: eventLabelValue,
 			  fieldsObject: { nonInteraction: true}
 			});
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
 
 	
@@ -519,14 +527,14 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	public String sanitizeHtml(String html) {
 		if (!isFilterXssInitialized) {
 			//init
-			initFilterXss();
-			isFilterXssInitialized = true;
+			isFilterXssInitialized = initFilterXss();
 		}
 		return _sanitizeHtml(html);
 	}
 
-	private final static native void initFilterXss() /*-{
-		var options = {
+	private final static native boolean initFilterXss() /*-{
+		try {
+			var options = {
 				whiteList: {
 				    a:      ['target', 'href', 'title'],
 				    abbr:   ['title'],
@@ -618,6 +626,11 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				}
 			};
 			$wnd.xss = new $wnd.filterXSS.FilterXSS(options);
+			return true;
+		} catch (err) {
+			console.error(err);
+			return false;
+		}
 	}-*/;
 	
 	private final static native String _sanitizeHtml(String html) /*-{

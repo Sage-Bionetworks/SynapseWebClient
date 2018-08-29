@@ -123,12 +123,12 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 		}
 						
 		if (descriptor.containsKey(TYPE)) {
-			GraphType graphType = GraphType.valueOf(descriptor.get(TYPE));
+			GraphType graphType = GraphType.valueOf(descriptor.get(TYPE).toUpperCase());
 			view.setGraphType(graphType);
 		}
 
 		if (descriptor.containsKey(BAR_MODE)) {
-			BarMode barMode = BarMode.valueOf(descriptor.get(BAR_MODE));
+			BarMode barMode = BarMode.valueOf(descriptor.get(BAR_MODE).toUpperCase());
 			view.setBarMode(barMode);
 		}
 		if (descriptor.containsKey(SHOW_LEGEND)) {
@@ -141,11 +141,11 @@ public class PlotlyConfigEditor implements PlotlyConfigView.Presenter, WidgetEdi
 			view.setBarOrientationHorizontal(Boolean.valueOf(descriptor.get(IS_HORIZONTAL)));
 		}
 		if (descriptor.containsKey(X_AXIS_TYPE)) {
-			AxisType axisType = AxisType.valueOf(descriptor.get(X_AXIS_TYPE));
+			AxisType axisType = AxisType.valueOf(descriptor.get(X_AXIS_TYPE).toUpperCase());
 			view.setXAxisType(axisType);
 		}
 		if (descriptor.containsKey(Y_AXIS_TYPE)) {
-			AxisType axisType = AxisType.valueOf(descriptor.get(Y_AXIS_TYPE));
+			AxisType axisType = AxisType.valueOf(descriptor.get(Y_AXIS_TYPE).toUpperCase());
 			view.setYAxisType(axisType);
 		}
 	}

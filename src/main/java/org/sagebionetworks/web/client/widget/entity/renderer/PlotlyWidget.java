@@ -119,14 +119,14 @@ public class PlotlyWidget implements PlotlyWidgetView.Presenter, WidgetRendererP
 		title = descriptor.get(TITLE);
 		xTitle = descriptor.get(X_AXIS_TITLE);
 		yTitle = descriptor.get(Y_AXIS_TITLE);
-		graphType = GraphType.valueOf(descriptor.get(TYPE));
+		graphType = GraphType.valueOf(descriptor.get(TYPE).toUpperCase());
 		
-		xAxisType = descriptor.containsKey(X_AXIS_TYPE) ? AxisType.valueOf(descriptor.get(X_AXIS_TYPE)) : AxisType.AUTO; 
-		yAxisType = descriptor.containsKey(Y_AXIS_TYPE) ? AxisType.valueOf(descriptor.get(Y_AXIS_TYPE)) : AxisType.AUTO;
+		xAxisType = descriptor.containsKey(X_AXIS_TYPE) ? AxisType.valueOf(descriptor.get(X_AXIS_TYPE).toUpperCase()) : AxisType.AUTO; 
+		yAxisType = descriptor.containsKey(Y_AXIS_TYPE) ? AxisType.valueOf(descriptor.get(Y_AXIS_TYPE).toUpperCase()) : AxisType.AUTO;
 		showLegend = descriptor.containsKey(SHOW_LEGEND) ? Boolean.valueOf(descriptor.get(SHOW_LEGEND)) : true;
 		isHorizontal = descriptor.containsKey(IS_HORIZONTAL) ? Boolean.valueOf(descriptor.get(IS_HORIZONTAL)) : false;
 		if (descriptor.containsKey(BAR_MODE)) {
-			barMode = BarMode.valueOf(descriptor.get(BAR_MODE));
+			barMode = BarMode.valueOf(descriptor.get(BAR_MODE).toUpperCase());
 		} else {
 			barMode = BarMode.GROUP;
 		}

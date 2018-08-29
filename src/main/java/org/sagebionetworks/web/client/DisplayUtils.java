@@ -415,9 +415,12 @@ public class DisplayUtils {
 	}
 	
     public static native void focusOnBootboxButton(String buttonStyle) /*-{
-    		$wnd.jQuery(".bootbox ." + buttonStyle).focus();
+		try {
+			$wnd.jQuery(".bootbox ." + buttonStyle).focus();
+		} catch (err) {
+			console.error(err);
+		}
 	}-*/;
-
 	
 	public static void showPopup(String title, 
 			String message,

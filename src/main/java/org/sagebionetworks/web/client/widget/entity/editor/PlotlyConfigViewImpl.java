@@ -142,7 +142,7 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 
 	@Override
 	public BarMode getBarMode() {
-		return BarMode.valueOf(barModeDropdownMenu.getSelectedValue());
+		return BarMode.valueOf(barModeDropdownMenu.getSelectedValue().toUpperCase());
 	}
 	
 	@Override
@@ -173,12 +173,12 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	
 	@Override
 	public AxisType getXAxisType() {
-		return AxisType.valueOf(xAxisTypeDropdownMenu.getSelectedValue());
+		return AxisType.valueOf(xAxisTypeDropdownMenu.getSelectedValue().toUpperCase());
 	}
 	
 	@Override
 	public AxisType getYAxisType() {
-		return AxisType.valueOf(yAxisTypeDropdownMenu.getSelectedValue());
+		return AxisType.valueOf(yAxisTypeDropdownMenu.getSelectedValue().toUpperCase());
 	}
 	
 	@Override
@@ -204,7 +204,7 @@ public class PlotlyConfigViewImpl implements PlotlyConfigView {
 	
 	@Override
 	public GraphType getGraphType() {
-		return GraphType.valueOf(typeDropdownMenu.getSelectedValue());
+		return GraphType.valueOf(typeDropdownMenu.getSelectedValue().toUpperCase());
 	}
 	
 	@Override
