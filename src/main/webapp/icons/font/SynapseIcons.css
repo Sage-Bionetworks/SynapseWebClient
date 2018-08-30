@@ -1,0 +1,96 @@
+@font-face {
+    font-family: "SynapseIcons";
+    src: url("./SynapseIcons.eot?81b0f717310a2683aa4432442b646717?#iefix") format("embedded-opentype"),
+url("./SynapseIcons.woff2?81b0f717310a2683aa4432442b646717") format("woff2"),
+url("./SynapseIcons.woff?81b0f717310a2683aa4432442b646717") format("woff"),
+url("./SynapseIcons.ttf?81b0f717310a2683aa4432442b646717") format("truetype"),
+url("./SynapseIcons.svg?81b0f717310a2683aa4432442b646717#SynapseIcons") format("svg");
+}
+
+i {
+    line-height: 1;
+}
+
+i[class^="syn-"]:before, i[class*=" syn-"]:before {
+    font-family: SynapseIcons !important;
+    font-style: normal;
+    font-weight: normal !important;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.syn-icon-chevron_down:before {
+    content: "\f101";
+}
+.syn-icon-chevron_up:before {
+    content: "\f102";
+}
+.syn-icon-close:before {
+    content: "\f103";
+}
+.syn-icon-create_folder:before {
+    content: "\f104";
+}
+.syn-icon-db:before {
+    content: "\f105";
+}
+.syn-icon-delete:before {
+    content: "\f106";
+}
+.syn-icon-download:before {
+    content: "\f107";
+}
+.syn-icon-file:before {
+    content: "\f108";
+}
+.syn-icon-help:before {
+    content: "\f109";
+}
+.syn-icon-info:before {
+    content: "\f10a";
+}
+.syn-icon-loading:before {
+    content: "\f10b";
+}
+.syn-icon-menu:before {
+    content: "\f10c";
+}
+.syn-icon-no_access:before {
+    content: "\f10d";
+}
+.syn-icon-search:before {
+    content: "\f10e";
+}
+.syn-icon-sort:before {
+    content: "\f10f";
+}
+.syn-icon-star:before {
+    content: "\f110";
+}
+.syn-icon-star_outline:before {
+    content: "\f111";
+}
+.syn-icon-success_checkmark:before {
+    content: "\f112";
+}
+.syn-icon-sucess_circle:before {
+    content: "\f113";
+}
+.syn-icon-synapse_logo:before {
+    content: "\f114";
+}
+.syn-icon-test:before {
+    content: "\f115";
+}
+.syn-icon-timer:before {
+    content: "\f116";
+}
+.syn-icon-unlocked:before {
+    content: "\f117";
+}
+.syn-icon-warning:before {
+    content: "\f118";
+}
