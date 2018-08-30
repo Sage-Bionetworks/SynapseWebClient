@@ -141,7 +141,7 @@ public class EntityListRowBadgeTest {
 		
 		verify(mockSynapseJavascriptClient).getEntityBundleForVersion(anyString(), anyLong(), anyInt(), any(AsyncCallback.class));
 		verify(mockView).showLoading();
-		verify(mockView).setIcon(IconType.FILE_O); //file icon
+		verify(mockView).setIcon(IconType.FILE); //file icon
 		verify(mockView).setEntityLink(entityName, "#!Synapse:"+entityId+"."+version);
 		verify(mockUserBadge).configure(createdByUserId);
 		verify(mockView).setCreatedOn(anyString());

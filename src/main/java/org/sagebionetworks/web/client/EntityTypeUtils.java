@@ -77,7 +77,7 @@ public class EntityTypeUtils {
 
 	public static IconType getIconTypeForEntityClassName(String className) {
 		// default
-		IconType icon = IconType.FILE_O;
+		IconType icon = IconType.FILE;
 		
 		if(Link.class.getName().equals(className)) {
 			icon = IconType.LINK;
@@ -86,7 +86,7 @@ public class EntityTypeUtils {
 			icon = IconType.FOLDER;
 		} else if(FileEntity.class.getName().equals(className)) {
 			// File
-			icon = IconType.FILE_O;			
+			icon = IconType.FILE;			
 		} else if(Project.class.getName().equals(className)) {
 			// Project
 			icon = IconType.LIST_ALT;
