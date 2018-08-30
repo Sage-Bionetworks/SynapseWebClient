@@ -1,10 +1,10 @@
 @font-face {
     font-family: "SynapseIcons";
-    src: url("./SynapseIcons.eot?81b0f717310a2683aa4432442b646717?#iefix") format("embedded-opentype"),
-url("./SynapseIcons.woff2?81b0f717310a2683aa4432442b646717") format("woff2"),
-url("./SynapseIcons.woff?81b0f717310a2683aa4432442b646717") format("woff"),
-url("./SynapseIcons.ttf?81b0f717310a2683aa4432442b646717") format("truetype"),
-url("./SynapseIcons.svg?81b0f717310a2683aa4432442b646717#SynapseIcons") format("svg");
+    src: url("./SynapseIcons.eot?dcee2bf2acfcb6a3436584514ff749f0?#iefix") format("embedded-opentype"),
+url("./SynapseIcons.woff2?dcee2bf2acfcb6a3436584514ff749f0") format("woff2"),
+url("./SynapseIcons.woff?dcee2bf2acfcb6a3436584514ff749f0") format("woff"),
+url("./SynapseIcons.ttf?dcee2bf2acfcb6a3436584514ff749f0") format("truetype"),
+url("./SynapseIcons.svg?dcee2bf2acfcb6a3436584514ff749f0#SynapseIcons") format("svg");
 }
 
 i {
@@ -22,75 +22,75 @@ i[class^="syn-"]:before, i[class*=" syn-"]:before {
     -moz-osx-font-smoothing: grayscale;
 }
 
-.syn-icon-chevron_down:before {
+.syn-check-circle:before {
     content: "\f101";
 }
-.syn-icon-chevron_up:before {
+.syn-check:before {
     content: "\f102";
 }
-.syn-icon-close:before {
+.syn-chevron-down:before {
     content: "\f103";
 }
-.syn-icon-create_folder:before {
+.syn-chevron-up:before {
     content: "\f104";
 }
-.syn-icon-db:before {
+.syn-close:before {
     content: "\f105";
 }
-.syn-icon-delete:before {
+.syn-crash-helmet:before {
     content: "\f106";
 }
-.syn-icon-download:before {
+.syn-database:before {
     content: "\f107";
 }
-.syn-icon-file:before {
+.syn-download:before {
     content: "\f108";
 }
-.syn-icon-help:before {
+.syn-ellipsis-v:before {
     content: "\f109";
 }
-.syn-icon-info:before {
+.syn-file:before {
     content: "\f10a";
 }
-.syn-icon-loading:before {
+.syn-folder-plus:before {
     content: "\f10b";
 }
-.syn-icon-menu:before {
+.syn-info-circle:before {
     content: "\f10c";
 }
-.syn-icon-no_access:before {
+.syn-loading:before {
     content: "\f10d";
 }
-.syn-icon-search:before {
+.syn-lock-open:before {
     content: "\f10e";
 }
-.syn-icon-sort:before {
+.syn-logo:before {
     content: "\f10f";
 }
-.syn-icon-star:before {
+.syn-minus-circle:before {
     content: "\f110";
 }
-.syn-icon-star_outline:before {
+.syn-question-circle:before {
     content: "\f111";
 }
-.syn-icon-success_checkmark:before {
+.syn-search:before {
     content: "\f112";
 }
-.syn-icon-sucess_circle:before {
+.syn-sort:before {
     content: "\f113";
 }
-.syn-icon-synapse_logo:before {
+.syn-star-o:before {
     content: "\f114";
 }
-.syn-icon-test:before {
+.syn-star:before {
     content: "\f115";
 }
-.syn-icon-timer:before {
+.syn-timer:before {
     content: "\f116";
 }
-.syn-icon-unlocked:before {
+.syn-trash-o:before {
     content: "\f117";
 }
-.syn-icon-warning:before {
+.syn-warning:before {
     content: "\f118";
 }
