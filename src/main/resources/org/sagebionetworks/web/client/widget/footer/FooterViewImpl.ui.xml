@@ -39,11 +39,9 @@
 					</bh:Span>
 					<bh:Span addStyleNames="right" width="200px">
     					<bh:Span ui:field="hideACTActionsContainer"/>
-						<g:FocusPanel ui:field="debugLink">
-							<b:Tooltip title="Website alpha test mode">
-								<g:Image url="images/helmet.svg"  addStyleNames="btn-success imageButton padding-5 rounded right" width="30px" height="30px"/>
-							</b:Tooltip>
-						</g:FocusPanel>
+						<b:Tooltip title="Website alpha test mode">
+							<b:Button ui:field="debugLink" icon="SYN_CRASH_HELMET" type="SUCCESS" pull="RIGHT" iconSize="TIMES2" paddingLeft="0" paddingRight="0"/>
+						</b:Tooltip>
 					</bh:Span>
 					<bh:Span addStyleNames="clearleft clearright">
 						<t:Table align="center" height="40px">

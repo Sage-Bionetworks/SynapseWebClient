@@ -823,7 +823,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void addProjectResults(List<ProjectHeader> projectHeaders) {
 		for (int i = 0; i < projectHeaders.size(); i++) {
 			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
-			badge.addStyleName("margin-bottom-10 col-xs-12");
 			badge.configure(projectHeaders.get(i));
 			Widget widget = badge.asWidget();
 			loadMoreProjectsWidgetContainer.add(widget);
