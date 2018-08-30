@@ -8,7 +8,7 @@
 		<b:Popover ui:field="helpPopover" title="" content="" trigger="MANUAL" placement="RIGHT" isHtml="true" container="#rootPanel">
 			<b:Anchor addStyleNames="textDecorationNone" ui:field="anchor">
 				<span ui:field="icon">
-					<span class="fa fa-question-circle" />
+					<span class="fa syn-question-circle" />
 				</span>
 				<span ui:field="moreInfoText" />
 			</b:Anchor>
