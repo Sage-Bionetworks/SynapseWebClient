@@ -98,6 +98,10 @@ end sticky footer
 #rootPanel .nav-tabs > li.active > a, #rootPanel .nav-tabs > li > a:hover {
 	box-shadow: inset 0 -2px 0 #1e7098
 }
+#rootPanel .tooltip-inner {
+	max-width: inherit;
+}
+
 .btn-primary {
 	color: #fff !important;
 }
