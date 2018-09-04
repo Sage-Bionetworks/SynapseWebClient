@@ -41,7 +41,6 @@ public class Portal implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
-		fullOpacity(RootPanel.get("initialLoadingUI"));
 		zeroOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
 		//we might need to reload using the new token scheme (required for SEO)
 		String initToken = History.getToken();
@@ -87,7 +86,7 @@ public class Portal implements EntryPoint {
 						RootPanel.get("footerPanel").add(footer);
 						
 						RootPanel.get("rootPanel").add(appWidget);
-						zeroOpacity(RootPanel.get("initialLoadingUI"));
+						RootPanel.get("initialLoadingUI").setVisible(false);
 						fullOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
