@@ -14,7 +14,7 @@
 			<t:Table width="100%">
 				<t:TableRow>
 					<t:TableData paddingRight="10" paddingLeft="10">
-						<b:Icon type="SYN_CRASH_HELMET" size="TIMES2"/>
+						<b:Icon type="SYN_CRASH_HELMET"/>
 					</t:TableData>
 					<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="center">
 						<bh:Span text="ALPHA TEST MODE ACTIVE" addStyleNames="displayInlineBlock color-white" />
