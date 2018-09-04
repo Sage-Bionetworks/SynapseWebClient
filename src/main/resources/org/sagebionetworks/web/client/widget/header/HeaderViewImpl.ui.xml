@@ -47,7 +47,7 @@
 						<b:AnchorListItem ui:field="myDashboardLink">Projects</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myTeamsLink">Teams</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myChallengesLink">Challenges</b:AnchorListItem>
-						<b:AnchorListItem ui:field="trashLink" icon="TRASH_O" visible="false">Trash can</b:AnchorListItem>
+						<b:AnchorListItem ui:field="trashLink" icon="TRASH_O" visible="false" iconFixedWidth="true" iconPosition="RIGHT">Trash can</b:AnchorListItem>
 						<b:Divider/>
 						<b:AnchorListItem ui:field="mySettingsLink">Settings</b:AnchorListItem>
 						<b:Divider/>

@@ -2444,6 +2444,15 @@ div.border {
 	margin-left: -1px;
 }
 
+.zeroOpacity {
+	opacity: 0;
+	transition: opacity 0.3s ease-in;
+}
+.fullOpacity {
+	opacity: 1;
+	transition: opacity 0.3s ease-in;
+}
+
 #headerPanel {
 	.syn-crash-helmet {
 		font-size: 1.7em;
