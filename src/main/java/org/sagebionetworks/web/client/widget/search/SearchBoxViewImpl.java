@@ -40,6 +40,9 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	            }					
 			}
 		});
+	    searchField.addBlurHandler(event -> {
+	    	searchFieldInactive();
+	    });
 	    searchButton.addClickHandler(event -> {
 	    	searchField.setFocus(true);
 	    	if (isSearchFieldActive()) {

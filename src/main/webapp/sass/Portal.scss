@@ -122,6 +122,9 @@ end sticky footer
 			font-size: 18px;
 		}
 	}
+	.modal-header {
+		min-height: 50px;
+	}
 }
 /* End bootstrap overrides */
 
@@ -2483,6 +2486,7 @@ div.border {
 		input {
 			width: 0px;
 			opacity: 0;
+			transition: width 0.4s ease-in-out;
 		}
 		i {
 			font-size: 25px;
