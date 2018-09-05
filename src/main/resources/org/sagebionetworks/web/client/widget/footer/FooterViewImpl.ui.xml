@@ -11,90 +11,96 @@
 		<!-- FOOTER -->
 		<bh:ClearFix />
 		<b:Alert ui:field="debugModeAlert" type="DANGER" visible="false" marginRight="0" marginLeft="0" marginBottom="0">
-			<t:Table width="100%">
-				<t:TableRow>
-					<t:TableData paddingRight="10" paddingLeft="10">
-						<b:Icon type="SYN_CRASH_HELMET"/>
-					</t:TableData>
-					<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="center">
-						<bh:Span text="ALPHA TEST MODE ACTIVE" addStyleNames="displayInlineBlock color-white" />
-					</t:TableData>
-					<t:TableData paddingRight="10" paddingLeft="10" width="150px">
-						<bh:Span addStyleNames="right">
-							<b:Anchor ui:field="debugOffLink" text="TURN OFF" addStyleNames="color-white margin-right-10" />
-							<w:HelpWidget helpMarkdown="This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade." 
-										addStyleNames="margin-left-5 right" iconStyles="color-white" placement="TOP"/>
-						</bh:Span>
-					</t:TableData>
-				</t:TableRow>
-			</t:Table>
+			<bh:Div width="100%">
+				<bh:Span paddingRight="5" paddingLeft="10">
+					<b:Icon type="SYN_CRASH_HELMET"/>
+				</bh:Span>
+				<bh:Span addStyleNames="displayInlineBlock color-white moveup-3">
+					<bh:Span text="ALPHA TEST MODE" />
+					<bh:Span text="ACTIVE" addStyleNames="hidden-xs" paddingLeft="3"/>
+				</bh:Span>
+				<bh:Span addStyleNames="right displayInlineBlock color-white">
+					<b:Anchor ui:field="debugOffLink" text="TURN OFF" addStyleNames="color-white margin-right-10" />
+					<w:HelpWidget helpMarkdown="This mode is for alpha testing features only. Please note that the developer does not guarantee an absence of errors, and that the data created using alpha features may be lost during product upgrade." 
+								addStyleNames="margin-left-5 right" iconStyles="color-white" placement="TOP"/>
+				</bh:Span>
+			</bh:Div>
 		</b:Alert>
 	
-		<b:Container fluid="true">
-			<b:Row addStyleNames="synapse-blue-bg-gradient padding-15">
-				<b:Column size="SM_12">
+		<bh:Div>
+			<bh:Div addStyleNames="synapse-blue-bg-gradient padding-15">
+				<bh:Div>
 					<bh:Span addStyleNames="left">
 					    <g:Image url="images/logo.svg" addStyleNames="margin-bottom-15 margin-right-5 moveup-2" width="35px" height="35px"/>
-			        	<b:Heading size="H3" addStyleNames="displayInline color-white lato letter-spacing-6" text="SYNAPSE" />
+			        	<b:Heading size="H3" addStyleNames="displayInline color-white lato letter-spacing-6 moveup-5" text="SYNAPSE" />
 					</bh:Span>
-					<bh:Span addStyleNames="right" width="200px">
+					<bh:Span addStyleNames="right">
     					<bh:Span ui:field="hideACTActionsContainer"/>
 						<b:Tooltip title="Website alpha test mode">
 							<b:Button ui:field="debugLink" icon="SYN_CRASH_HELMET" type="SUCCESS" pull="RIGHT" iconSize="TIMES2" paddingLeft="0" paddingRight="0"/>
 						</b:Tooltip>
 					</bh:Span>
-					<bh:Span addStyleNames="clearleft clearright">
-						<t:Table align="center" height="40px">
-							<t:TableRow>
-								<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="text-align-center">
-									<b:Anchor href="mailto:synapseInfo@sagebionetworks.org" text="Contact Us" addStyleNames="color-white"/>	
-								</t:TableData>
-								<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="text-align-center">
-									<bh:Span addStyleNames="dot synapse-green-bg" />
-								</t:TableData>
-								<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="text-align-center">
-									<b:Anchor href="https://docs.synapse.org" text="Documentation" addStyleNames="color-white"/>	
-								</t:TableData>
-								<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="text-align-center">
+					<bh:Div addStyleNames="flexcontainer-row hidden-xs">
+						<bh:Div addStyleNames="margin-auto" paddingTop="10">
+							<bh:Div addStyleNames="flexcontainer-row flexcontainer-align-items-center">
+								<bh:Span addStyleNames="flexcontainer-column">
+									<b:Anchor href="mailto:synapseInfo@sagebionetworks.org" text="Contact Us" addStyleNames="color-white"/>
+								</bh:Span>
+								<bh:Span addStyleNames="flexcontainer-column hidden-xs" paddingLeft="5" paddingRight="5">
+									<bh:Span addStyleNames="dot synapse-green-bg"  />
+								</bh:Span>
+								<bh:Span addStyleNames="flexcontainer-column">
+									<b:Anchor href="https://docs.synapse.org" text="Documentation" addStyleNames="color-white"/>
+								</bh:Span>
+								<bh:Span addStyleNames="flexcontainer-column hidden-xs" paddingLeft="5" paddingRight="5">
 									<bh:Span addStyleNames="dot synapse-orange-bg" />
-								</t:TableData>
-								<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="text-align-center">
+								</bh:Span>
+								<bh:Span addStyleNames="flexcontainer-column">
 									<b:Anchor href="http://creativecommons.org/licenses/by/4.0/legalcode" text="Creative Commons License" addStyleNames="color-white" target="_blank"/>
-								</t:TableData>
-								<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="text-align-center">
+								</bh:Span>
+								<bh:Span addStyleNames="flexcontainer-column hidden-xs" paddingLeft="5" paddingRight="5">
 									<bh:Span addStyleNames="dot synapse-accent-primary-bg" />
-								</t:TableData>
-								<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="text-align-center">
+								</bh:Span>
+								<bh:Span addStyleNames="flexcontainer-column">
 									<b:Anchor ui:field="reportAbuseLink" text="Report Abuse" addStyleNames="color-white" />
-								</t:TableData>
-							</t:TableRow>
-						</t:Table>
-					</bh:Span>
-		    	</b:Column>
-		    	<b:Column  size="SM_12">
-		    		<b:Row>
-		    			<b:Column size="SM_2" />
-		    			<b:Column size="SM_8">
-		    				<bh:Div>
+								</bh:Span>
+								<bh:Span addStyleNames="flexcontainer-column" width="140px"/> <!-- dummy column to center links (offset Synapse logo on the left)  -->
+							</bh:Div>	
+						</bh:Div>
+					</bh:Div>
+		    	</bh:Div>
+		    	<bh:ClearFix />
+	    		<bh:Div addStyleNames="visible-xs">
+	    			<bh:Div>
+						<b:Anchor href="mailto:synapseInfo@sagebionetworks.org" text="Contact Us" addStyleNames="color-white displayBlock"/>
+						<b:Anchor href="https://docs.synapse.org" text="Documentation" addStyleNames="color-white displayBlock"/>
+						<b:Anchor href="http://creativecommons.org/licenses/by/4.0/legalcode" text="Creative Commons License" addStyleNames="color-white displayBlock" target="_blank"/>
+						<b:Anchor ui:field="reportAbuseLink2" text="Report Abuse" addStyleNames="color-white displayBlock" />
+					</bh:Div>
+				</bh:Div>
+	    		<bh:Div>
+		    		<bh:Div addStyleNames="flexcontainer-row">
+		    			<bh:Span addStyleNames="left" width="170px" /> <!-- dummy column to center Sage Bionetworks logo (offset Synapse versions on the right)  -->
+						<bh:Div addStyleNames="margin-auto">
+							<bh:Div>
 				    			<g:Image url="images/sagebionetworks-logo.svg" addStyleNames="center-in-div"/>
 				    		</bh:Div>
 				    		<bh:Div addStyleNames="center margin-top-10">
 				    			<b:Anchor ui:field="copyrightYear" href="http://sagebionetworks.org/" addStyleNames="margin-top-5 margin-bottom-5 color-white" />
 				    		</bh:Div>
-		    			</b:Column>
-		    			<b:Column size="SM_2">
-			    			<bh:Span addStyleNames="right">
-			    				<bh:Br />
-								<g:Label addStyleNames="margin-top-5 margin-bottom-5 lightGreyText margin-left-2 displayInline" text="portal: " />
-								<bh:Span ui:field="portalVersionSpan" addStyleNames="margin-top-5 margin-bottom-5 lightGreyText" />
-								<bh:Br />
-								<g:Label addStyleNames="margin-top-5 margin-bottom-5 lightGreyText margin-left-10 displayInline" text="repo: " />
-								<bh:Span ui:field="repoVersionSpan" addStyleNames="margin-top-5 margin-bottom-5 lightGreyText" />
-							</bh:Span>
-		    			</b:Column>
-		    		</b:Row>
-		    	</b:Column>
-			</b:Row>
-		</b:Container>
+				    	</bh:Div>
+			       		<bh:Span addStyleNames="right text-align-right">
+		    				<bh:Br />
+							<g:Label addStyleNames="margin-top-5 margin-bottom-5 lightGreyText margin-left-2 displayInline" text="portal: " />
+							<bh:Span ui:field="portalVersionSpan" addStyleNames="margin-top-5 margin-bottom-5 lightGreyText" />
+							<bh:Br />
+							<g:Label addStyleNames="margin-top-5 margin-bottom-5 lightGreyText margin-left-10 displayInline" text="repo: " />
+							<bh:Span ui:field="repoVersionSpan" addStyleNames="margin-top-5 margin-bottom-5 lightGreyText" />
+						</bh:Span>
+			    	
+		    		</bh:Div>
+		    	</bh:Div>
+			</bh:Div>
+		</bh:Div>
 	</g:HTMLPanel>
 </ui:UiBinder>

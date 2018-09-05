@@ -1189,6 +1189,10 @@ h1, h2, h3, h4, h5, h6 {
 	display:block;
 }
 	
+.margin-auto {
+	margin:auto; 
+}
+
 .noBackground {
 	background: none !important;
 }
@@ -1380,6 +1384,10 @@ ol.lowerroman {
    display: flex;
    -webkit-flex-direction: row;
    flex-direction: row;
+}
+
+.flexcontainer-align-items-center {
+	align-items: center;
 }
 
 .flexcontainer-column {

@@ -42,6 +42,8 @@ public class FooterViewImpl implements FooterView {
 	@UiField
 	Anchor reportAbuseLink;
 	@UiField
+	Anchor reportAbuseLink2;
+	@UiField
 	Span hideACTActionsContainer;
 	String portalVersion, repoVersion;
 	private Presenter presenter;
@@ -63,7 +65,9 @@ public class FooterViewImpl implements FooterView {
 			reportAbuseLink.addClickHandler(event->{
 				presenter.onReportAbuseClicked();
 			});
-			
+			reportAbuseLink2.addClickHandler(event->{
+				presenter.onReportAbuseClicked();
+			});
 			if (portalVersion != null) {
 				portalVersionSpan.setText(portalVersion);
 				repoVersionSpan.setText(repoVersion);

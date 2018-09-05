@@ -9,23 +9,27 @@
 	
 	<bh:Div addStyleNames="header">
 		<b:Alert ui:field="stagingAlert" type="WARNING" visible="false" marginRight="0" marginLeft="0" marginBottom="0" marginTop="0">
-			<t:Table width="100%">
-				<t:TableRow>
-					<t:TableData paddingRight="10" paddingLeft="10">
-						<b:Icon type="SYN_CRASH_HELMET" />
-					</t:TableData>
-					<t:TableData paddingRight="10" paddingLeft="10" addStyleNames="center">
-						<bh:Span text="THIS WEBSITE IS FOR TESTING ONLY! Any data created will be deleted. To do your work, please use Production site." addStyleNames="displayInlineBlock color-white" />
-					</t:TableData>
-					<t:TableData paddingRight="10" paddingLeft="10" width="250px">
-						<bh:Span addStyleNames="right" >
-							<b:Anchor text="GO TO PRODUCTION" addStyleNames="color-white margin-right-10" href="https://www.synapse.org" />
-							<w:HelpWidget helpMarkdown="This is not the official Sage Bionetworks Synapse Production website." 
-										addStyleNames="margin-left-5 right" iconStyles="color-white" placement="LEFT"/>
-						</bh:Span>
-					</t:TableData>
-				</t:TableRow>
-			</t:Table>
+			<bh:Div width="100%">
+				<bh:Span paddingRight="5" paddingLeft="10">
+					<b:Icon type="SYN_CRASH_HELMET" />
+				</bh:Span>
+				<bh:Span addStyleNames="displayInlineBlock color-white moveup-3" paddingRight="5" paddingLeft="5">
+					<bh:Span addStyleNames="displayInlineBlock" paddingRight="3">
+						<bh:Span text="THIS WEBSITE IS FOR" addStyleNames="hidden-xs" />
+					</bh:Span>
+					<bh:Span text="TESTING ONLY!" />
+					<bh:Span addStyleNames="displayInlineBlock">
+						<bh:Span text="Any data created will be deleted. To do your work, please use Production site." addStyleNames="margin-left-5 visible-lg" />
+					</bh:Span>
+				</bh:Span>
+				<bh:Span>
+					<bh:Span addStyleNames="right" >
+						<b:Anchor text="GO TO PRODUCTION" addStyleNames="color-white" href="https://www.synapse.org" />
+						<w:HelpWidget helpMarkdown="This is not the official Sage Bionetworks Synapse Production website." 
+									addStyleNames="margin-left-5 right" iconStyles="color-white" placement="LEFT"/>
+					</bh:Span>
+				</bh:Span>
+			</bh:Div>
 		</b:Alert>
 		<bh:Div ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg-gradient">
 		    <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 inline-block" paddingTop="13">
@@ -59,7 +63,7 @@
 						<b:AnchorListItem ui:field="logoutLink" icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
 					</b:DropDownMenu>
 				</b:DropDown>
-				<bh:Span addStyleNames="border-left-1 right" height="25px" marginTop="12"/>
+				<bh:Span addStyleNames="border-left-1 right hidden-xs" height="25px" marginTop="12"/>
 				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="padding-left-10 padding-right-15 imageButton hideRightPixelOnHover" visible="false" height="48px" paddingTop="10">
 					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white" />
 					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-5 color-white"/>
