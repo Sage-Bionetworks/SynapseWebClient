@@ -19,7 +19,7 @@
 					</bh:Span>
 					<bh:Span text="TESTING ONLY!" />
 					<bh:Span addStyleNames="displayInlineBlock">
-						<bh:Span text="Any data created will be deleted. To do your work, please use Production site." addStyleNames="margin-left-5 visible-lg" />
+						<bh:Span text="Any data created will be deleted. To do your work, please use production site." addStyleNames="margin-left-5 visible-lg" />
 					</bh:Span>
 				</bh:Span>
 				<bh:Span>

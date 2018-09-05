@@ -44,11 +44,11 @@
 					</t:Table>
 				</bh:Div>
 			</b:Column>
-			<b:Column size="XS_12" ui:field="threadListContainer" />
+			<b:Column size="XS_12" ui:field="threadListContainer" paddingLeft="22"/>
 		</b:Row>
 		<b:Row>
 			<b:Column size="XS_12">
-				<bh:Span ui:field="noThreadsFound" visible="false"> No threads found.</bh:Span>
+				<bh:Span ui:field="noThreadsFound" visible="false" paddingLeft="10"> No threads found.</bh:Span>
 			</b:Column>
 		</b:Row>
 		<bh:Div ui:field="synAlertContainer" />
