@@ -6,7 +6,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 
 	<b:FormGroup ui:field="formGroup">
-		<w:NumberBox ui:field="textBox"/>
+		<b:TextBox ui:field="textBox"/>
 		<b:HelpBlock ui:field="helpBlock"/>
 	</b:FormGroup>
 </ui:UiBinder>
