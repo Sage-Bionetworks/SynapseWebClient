@@ -8,8 +8,8 @@
 		<div class="container margin-top-15 min-height-400">
 			<b:Container fluid="true">
 				<b:Row>
-					<b:Column size="SM_3" />
-					<b:Column size="SM_6">
+					<b:Column size="SM_4" />
+					<b:Column size="SM_4">
 						<b:Heading size="H2" text="Create Synapse Account" addStyleNames="text-align-center margin-top-20"/>
 						<b:Heading size="H4" subText="Please enter your email address and we will send you the instructions on how to complete the registration process." addStyleNames="flexcontainer-justify-center margin-top-20"/>
 						<bh:Div ui:field="registerWidgetContainer" addStyleNames="margin-top-20"/>
@@ -17,7 +17,7 @@
 							<b:Anchor text="&lt; Back to Sign In" addStyleNames="synapse-green" href="#!LoginPlace:0"/>
 						</b:Heading>
 					</b:Column>
-					<b:Column size="SM_3" />
+					<b:Column size="SM_4" />
 				</b:Row>
 			</b:Container>
 		</div>

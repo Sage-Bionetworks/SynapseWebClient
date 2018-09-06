@@ -189,11 +189,11 @@
 										<g:Image resource='{sageImageBundle.people}' addStyleNames="margin-top-left-10" />
 									</t:TableData>
 									<t:TableData paddingRight="2">
-										<b:Heading size="H5" addStyleNames="color-white font-weight-bolder" text="RESEARCH COMMUNITIES"></b:Heading>
+										<b:Heading size="H4" addStyleNames="color-white font-weight-bolder" text="RESEARCH COMMUNITIES"></b:Heading>
 									</t:TableData>
 								</t:TableRow>
 							</t:Table>
-							<b:Heading size="H5" addStyleNames="color-white" text="See the communities working on shared data hosted on Synapse. >"></b:Heading>
+							<bh:Paragraph addStyleNames="color-white" text="See the communities working on shared data hosted on Synapse. >" marginTop="10"/>
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
@@ -206,11 +206,11 @@
 										<g:Image resource='{sageImageBundle.unlock}' addStyleNames="margin-10" />
 									</t:TableData>
 									<t:TableData paddingRight="2">
-										<b:Heading size="H5" addStyleNames="color-white font-weight-bolder" text="OPEN RESOURCES"></b:Heading>
+										<b:Heading size="H4" addStyleNames="color-white font-weight-bolder" text="OPEN RESOURCES"></b:Heading>
 									</t:TableData>
 								</t:TableRow>
 							</t:Table>
-							<b:Heading size="H5" addStyleNames="color-white" text="See the open research projects hosted on Synapse. >"></b:Heading>
+							<bh:Paragraph addStyleNames="color-white" text="See the open research projects hosted on Synapse. >" marginTop="10"/>
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
@@ -220,7 +220,7 @@
 							<bh:Div addStyleNames="margin-10">
 								<g:Image resource='{sageImageBundle.dream}' addStyleNames="center-in-div" />
 							</bh:Div>
-							<b:Heading size="H5" addStyleNames="color-white" text="Synapse is the platform on which DREAM operates.  Learn more. >"></b:Heading>
+							<bh:Paragraph addStyleNames="color-white" text="Synapse is the platform on which DREAM operates.  Learn more. >" marginTop="10"/>
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
