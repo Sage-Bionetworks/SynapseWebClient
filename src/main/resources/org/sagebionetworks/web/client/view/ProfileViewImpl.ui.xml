@@ -107,7 +107,7 @@
 					        	<bh:Div addStyleNames="margin-top-5" ui:field="createdOnUI">
 					        		<bh:Text>Joined&nbsp;</bh:Text><bh:Text ui:field="createdOnText"/>
 					        	</bh:Div>
-					        	<g:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15 margin-left-neg-2" readOnly="true" />
+					        	<b:TextBox ui:field="synapseEmailField" width="100%" addStyleNames="border-none noBackground margin-right-15 margin-left-neg-2" readOnly="true" />
 				        	</bh:Div>
 				        	<b:Container fluid="true">
 					        	<b:Row>
@@ -170,7 +170,7 @@
 									<div ui:field="createProjectUI" class="margin-bottom-10 margin-top-10 row">
 									    <div class="col-xs-12 col-sm-8">
 								    		<b:InputGroup addStyleNames="projectSearch">
-												<g:TextBox ui:field="projectSearchTextBox" width="100%" height="34px" />
+												<b:TextBox ui:field="projectSearchTextBox" width="100%" height="35px" />
 												<b:InputGroupButton>
 													<b:Button ui:field="projectSearchButton" text="Search All Projects" icon="SEARCH"/>
 												</b:InputGroupButton>
@@ -236,7 +236,7 @@
 							    	<div ui:field="createTeamUI" class="margin-bottom-10 margin-top-10 row">
 									    <div class="col-xs-12 col-sm-8">
 								    		<b:InputGroup addStyleNames="teamSearch">
-												<g:TextBox ui:field="teamSearchTextBox" width="100%" height="34px" />
+												<b:TextBox ui:field="teamSearchTextBox" width="100%" height="35px" />
 												<b:InputGroupButton>
 													<b:Button ui:field="teamSearchButton" text="Search All Teams" icon="SEARCH"/>
 												</b:InputGroupButton>
