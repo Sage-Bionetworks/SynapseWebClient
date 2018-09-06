@@ -1026,6 +1026,9 @@ h1, h2, h3, h4, h5, h6 {
 .maxWidth100 {
 	max-width: 100%;
 }
+.maxWidth50 {
+	max-width: 50%;
+}
 
 .maxHeight100 {
 	max-height: 100%;
@@ -1298,7 +1301,9 @@ strong {
 .textDecorationNone, .textDecorationNone:visited, .textDecorationNone:hover, .textDecorationNone:focus, .textDecorationNone:active {
 	text-decoration: none;
 }
-
+.text-overflow-ellipsis {
+	text-overflow: ellipsis;
+}
 ol.decimal {	
 	list-style: decimal outside;
 	padding: 0 0 0 30px;
@@ -1505,7 +1510,10 @@ ol.lowerroman {
 	position: relative;
 	top: -18px;
 }
-
+.moveup-15 {
+	position: relative;
+	top: -15px;
+}
 .moveup-10 {
 	position: relative;
 	top: -10px;
@@ -1688,7 +1696,11 @@ ol.lowerroman {
 		max-width: 460px;
 	}
 }
-
+@media (max-width: 500px) {
+    .hidden-xxs {
+        display:none!important
+    }
+}
 .entity-tab > a {
 	text-align: center;
 }
@@ -2632,4 +2644,3 @@ div.border {
 @include placeholder {
 	font-style:italic;
 }
-

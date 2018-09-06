@@ -17,7 +17,7 @@
 					<bh:Span addStyleNames="displayInlineBlock" paddingRight="3">
 						<bh:Span text="THIS WEBSITE IS FOR" addStyleNames="hidden-xs" />
 					</bh:Span>
-					<bh:Span text="TESTING ONLY!" />
+					<bh:Span text="TESTING ONLY!" addStyleNames="hidden-xxs"/>
 					<bh:Span addStyleNames="displayInlineBlock">
 						<bh:Span text="Any data created will be deleted. To do your work, please use production site." addStyleNames="margin-left-5 visible-lg" />
 					</bh:Span>
@@ -31,20 +31,22 @@
 				</bh:Span>
 			</bh:Div>
 		</b:Alert>
-		<bh:Div ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg-gradient">
-		    <bh:Div ui:field="headingPanel" addStyleNames="margin-left-15 inline-block" paddingTop="13">
+		<bh:Div ui:field="headerDiv" addStyleNames="notopmargin synapse-blue-bg-gradient" height="53px">
+		    <bh:Div addStyleNames="margin-left-15 inline-block maxWidth50 overflowHidden text-overflow-ellipsis whitespace-nowrap" paddingTop="13">
 	        	<g:Image ui:field="synapseLogo" url="images/logo.svg" 
 	        	    addStyleNames="imageButton margin-right-5 moveup-5" width="35px" height="35px"/>
 	            <b:Heading size="H3" addStyleNames="displayInline color-white">
-	            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone lato notransition"/>
-	        		<g:SimplePanel ui:field="projectFavoritePanel" addStyleNames="displayInline favoriteIcon margin-left-10" visible="false"/>
+	            	<b:Anchor ui:field="projectHeadingAnchor" addStyleNames="color-white textDecorationNone lato notransition hidden-xxs"/>
 	        	</b:Heading>
 		  	</bh:Div>
-		  	<bh:Span ui:field="headerButtons" addStyleNames="right" marginRight="10">
+	  		<b:Heading size="H3" addStyleNames="displayInline color-white moveup-15">
+        		<g:SimplePanel ui:field="projectFavoritePanel" addStyleNames="displayInline favoriteIcon hidden-xs" visible="false"/>
+        	</b:Heading>
+	  	  	<bh:Span ui:field="headerButtons" addStyleNames="right" marginRight="10">
 		  		<g:SimplePanel ui:field="loginLinkUI" addStyleNames="right margin-left-10 margin-right-10 padding-left-15" visible="false">
 					<b:Button ui:field="loginLink" text="&nbsp;&nbsp;&nbsp;Sign in&nbsp;&nbsp;&nbsp;" type="SUCCESS" marginTop="7"/>
 				</g:SimplePanel>
-				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton min-width-200 hideLeftPixelOnHover" visible="false" height="48px" paddingTop="10">
+				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton min-width-200 hideLeftPixelOnHover" visible="false" height="53px" paddingTop="10">
 					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
 					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-5 color-white"/>
 					<b:DropDownMenu ui:field="dashboardDropdownMenu" width="100%">
@@ -64,14 +66,14 @@
 					</b:DropDownMenu>
 				</b:DropDown>
 				<bh:Span addStyleNames="border-left-1 right hidden-xs" height="25px" marginTop="12"/>
-				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="padding-left-10 padding-right-15 imageButton hideRightPixelOnHover" visible="false" height="48px" paddingTop="10">
-					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white" />
+				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="imageButton hideRightPixelOnHover hidden-xs" visible="false" height="53px" paddingTop="13" paddingRight="15" paddingLeft="10">
+					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white textDecorationNone" />
 					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-5 color-white"/>
 					<b:DropDownMenu ui:field="headerFavDropdownMenu" addStyleNames="dropdown-menu-right">
 					</b:DropDownMenu>
 				</b:DropDown>
-				<bh:Div pull="RIGHT" addStyleNames="searchBoxContainer hideRightPixelOnHover inactive" height="48px" paddingLeft="14" paddingRight="10">
-					<bh:Div ui:field="searchBoxContainer" addStyleNames="margin-top-10"/>
+				<bh:Div pull="RIGHT" addStyleNames="searchBoxContainer hideRightPixelOnHover inactive hidden-xs" height="53px" paddingLeft="14" paddingRight="10">
+					<bh:Div ui:field="searchBoxContainer" marginTop="14"/>
 				</bh:Div>
 			</bh:Span>
 		</bh:Div>
