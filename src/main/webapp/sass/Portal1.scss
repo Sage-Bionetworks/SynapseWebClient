@@ -2147,7 +2147,6 @@ td.datePickerMonth {
 	position:absolute;
 	top: 28.8px; 
 	color:black;
-	font-family:helvetica, sans; 
 	font-size:12px;
 	text-align:center;	
 	background-repeat: no-repeat;	
@@ -2162,7 +2161,6 @@ td.datePickerMonth {
 	z-index:20; 
 	position:absolute; 
 	color:black;
-	font-family:helvetica, sans;
 	padding-top:3px; 	
 	font-size:12px;	
 
@@ -2172,14 +2170,11 @@ td.datePickerMonth {
 	.provActivityLabel {
 		font-size: 9.6px;
 		line-height: 10px;
-		text-transform: uppercase;
 		word-wrap: break-word;
-		font-weight: bold;
 	}
 	.provActivityLabelTime  {
 		font-size: 9.6px;
 		line-height: 10px;
-		text-transform: uppercase;
 		word-wrap: break-word;
 	}
 	.provActivityUndefinedIcon {
@@ -2199,7 +2194,6 @@ td.datePickerMonth {
 	z-index:20; 
 	position:absolute;	
 	color:black;
-	font-family:helvetica, sans;
 	padding-top:0px; 
 	font-size:12px;
 	text-align:center;	
