@@ -66,13 +66,13 @@
 					</b:DropDownMenu>
 				</b:DropDown>
 				<bh:Span addStyleNames="border-left-1 right hidden-xs" height="25px" marginTop="12"/>
-				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="imageButton hideRightPixelOnHover hidden-xs" visible="false" height="53px" paddingTop="13" paddingRight="15" paddingLeft="10">
+				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="imageButton hideRightPixelOnHover hidden-xs" visible="false" height="53px" paddingTop="13" paddingRight="15" paddingLeft="0">
 					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white textDecorationNone" />
 					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-5 color-white"/>
 					<b:DropDownMenu ui:field="headerFavDropdownMenu" addStyleNames="dropdown-menu-right">
 					</b:DropDownMenu>
 				</b:DropDown>
-				<bh:Div pull="RIGHT" addStyleNames="searchBoxContainer hideRightPixelOnHover inactive hidden-xs" height="53px" paddingLeft="14" paddingRight="10">
+				<bh:Div pull="RIGHT" addStyleNames="searchBoxContainer hideRightPixelOnHover inactive hidden-xs" height="53px" paddingLeft="7" paddingRight="3">
 					<bh:Div ui:field="searchBoxContainer" marginTop="14"/>
 				</bh:Div>
 			</bh:Span>
