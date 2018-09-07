@@ -1,13 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.tabs;
 
-import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.Column;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.shared.WebConstants;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -16,10 +11,6 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class TablesTabViewImpl implements TablesTabView {
-	@UiField
-	Button tableLearnMoreButton;
-	@UiField
-	Button viewLearnMoreButton;
 	
 	@UiField
 	SimplePanel tableTitlebarContainer;
@@ -55,19 +46,6 @@ public class TablesTabViewImpl implements TablesTabView {
 	}
 	
 	private void initClickHandlers() {		
-		tableLearnMoreButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(WebConstants.DOCS_URL + "tables.html", "", "");
-			}
-		});
-		viewLearnMoreButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				DisplayUtils.newWindow(WebConstants.DOCS_URL + "views.html", "", "");
-			}
-		});
-	
 	}
 	
 	@Override
