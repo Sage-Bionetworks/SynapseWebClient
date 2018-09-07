@@ -51,24 +51,24 @@
 									    <b:Button ui:field="dismissValidationUIButton" styleName="close pull-right moveup-35" text="x"/>
 										<bh:Paragraph>
 											<bh:Text>Certified users with a validated profile can access more features and data.</bh:Text>
-											<b:Anchor ui:field="requestProfileValidationLink1" text="Validate your profile today!"/>
+											<b:Anchor ui:field="requestProfileValidationLink1" text="Validate your profile today!" addStyleNames="color-white"/>
 										</bh:Paragraph>
 										<bh:Paragraph>
 											<bh:OrderedList>
 												<b:ListItem>
-													<b:Anchor ui:field="reviewProfileLink" text="Review and complete your profile."/>
+													<b:Anchor ui:field="reviewProfileLink" text="Review and complete your profile." addStyleNames="color-white"/>
 												</b:ListItem>
 												<b:ListItem>
-													<b:Anchor ui:field="createOrcIdLink" text="Create/populate a public ORCID profile or link to your existing one."/>
+													<b:Anchor ui:field="createOrcIdLink" text="Create/populate a public ORCID profile or link to your existing one." addStyleNames="color-white"/>
 												</b:ListItem>
 												<b:ListItem>
-													<b:Anchor ui:field="requestProfileValidationLink2" text="Request profile validation."/>
+													<b:Anchor ui:field="requestProfileValidationLink2" text="Request profile validation." addStyleNames="color-white"/>
 												</b:ListItem>
 											</bh:OrderedList>
 										</bh:Paragraph>
 									</bh:Div>
-									<w:HelpWidget helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile.&#10;Synapse Qualified Researchers are eligible to request access to Bridge data." text="More info..."
-										    	href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile" iconStyles="" />
+									<w:HelpWidget addAnchorStyleNames="color-white" helpMarkdown="A Synapse Qualified Researcher is a Certified User with a validated user profile.&#10;Synapse Qualified Researchers are eligible to request access to Bridge data." text="More info..."
+										    	href="http://docs.synapse.org/articles/accounts_certified_users_and_profile_validation.html#validated-profile" iconStyles="color-white" addMoreInfoStyleNames="color-white" />
 
 								</b:Alert>
 								<bh:Div addStyleNames="margin-top-5 margin-bottom-5">

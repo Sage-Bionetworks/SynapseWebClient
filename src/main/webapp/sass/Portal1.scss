@@ -286,6 +286,7 @@ end sticky footer
 /* File browser input box needs more fine-tuned selector for override*/
 .border-none, input[type=text][readonly].border-none, #body .border-none {
 	border: none;
+	box-shadow: none;
 }
 
 .userProfileImage, #rootPanel .userProfileImage {
