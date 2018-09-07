@@ -125,6 +125,9 @@ end sticky footer
 	.modal-header {
 		min-height: 50px;
 	}
+	.tooltip-inner {
+		max-width: inherit;
+	}
 }
 /* End bootstrap overrides */
 
