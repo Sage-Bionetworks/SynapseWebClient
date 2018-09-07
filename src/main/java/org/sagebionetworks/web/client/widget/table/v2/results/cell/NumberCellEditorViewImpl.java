@@ -2,8 +2,8 @@ package org.sagebionetworks.web.client.widget.table.v2.results.cell;
 
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.HelpBlock;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.constants.ValidationState;
-import org.sagebionetworks.web.client.widget.NumberBox;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.core.client.Scheduler.ScheduledCommand;
@@ -25,7 +25,7 @@ public class NumberCellEditorViewImpl implements NumberCellEditorView {
 	@UiField
 	FormGroup formGroup;
 	@UiField
-	NumberBox textBox;
+	TextBox textBox;
 	@UiField
 	HelpBlock helpBlock;
 
