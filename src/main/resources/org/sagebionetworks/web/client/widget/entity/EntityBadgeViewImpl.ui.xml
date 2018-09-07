@@ -25,7 +25,7 @@
 			<t:TableData width="165px" addStyleNames="visible-md visible-lg overflow-x-hidden">
 				<g:Label ui:field="modifiedOnField"/>
 			</t:TableData>
-			<t:TableData width="100px" addStyleNames="visible-lg overflow-x-hidden text-align-right">
+			<t:TableData width="140px" addStyleNames="visible-lg overflow-x-hidden text-align-right">
 				<g:Label ui:field="sizeField" addStyleNames="margin-right-30"/>
 			</t:TableData>
 			<t:TableData width="70px" addStyleNames="visible-lg overflow-x-hidden">

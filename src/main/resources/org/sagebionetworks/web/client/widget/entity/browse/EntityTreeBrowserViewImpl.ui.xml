@@ -24,7 +24,7 @@
 				<t:TableHeader width="165px" addStyleNames="visible-md visible-lg">
 					<bh:Span text="Modified On" />
 				</t:TableHeader>
-				<t:TableHeader width="100px" addStyleNames="visible-lg text-align-right">
+				<t:TableHeader width="140px" addStyleNames="visible-lg text-align-right">
 					<bh:Span text="Size" addStyleNames="margin-right-30"/>
 				</t:TableHeader>
 				<t:TableHeader width="70px" addStyleNames="visible-lg">
