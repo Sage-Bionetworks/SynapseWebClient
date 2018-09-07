@@ -8,6 +8,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -55,6 +56,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 	private boolean isThreadDeleted;
 	private DateTimeUtils dateTimeUtils;
 	private ClientCache clientCache;
+	private PopupUtilsView popupUtils;
 	@Inject
 	public ReplyWidget(
 			ReplyWidgetView view,
@@ -69,7 +71,8 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 			GWTWrapper gwt,
 			CopyTextModal copyTextModal,
 			SynapseJavascriptClient jsClient,
-			ClientCache clientCache
+			ClientCache clientCache,
+			PopupUtilsView popupUtils
 			) {
 		this.view = view;
 		this.authorWidget = authorWidget;
@@ -85,6 +88,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 		this.copyTextModal = copyTextModal;
 		this.jsClient = jsClient;
 		this.clientCache = clientCache;
+		this.popupUtils = popupUtils;
 		view.setPresenter(this);
 		view.setAuthor(authorWidget.asWidget());
 		view.setAlert(synAlert.asWidget());
@@ -198,7 +202,7 @@ public class ReplyWidget implements ReplyWidgetView.Presenter{
 
 	@Override
 	public void onClickDeleteReply() {
-		view.showDeleteConfirm(DELETE_CONFIRM_MESSAGE, () -> {
+		popupUtils.showConfirmDelete(DELETE_CONFIRM_MESSAGE, () -> {
 			deleteReply();
 		});
 	}

@@ -265,13 +265,13 @@ public class SingleDiscussionThreadWidgetTest {
 		verify(mockActionMenuWidget).setActionListener(eq(Action.DELETE_THREAD), actionListenerCaptor.capture());
 		actionListener = actionListenerCaptor.getValue();
 		actionListener.onAction(Action.DELETE_THREAD);
-		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), any(Callback.class));
+		verify(mockPopupUtils).showConfirmDelete(anyString(), any(Callback.class));
 		
 		//verify restore
 		verify(mockActionMenuWidget).setActionListener(eq(Action.RESTORE_THREAD), actionListenerCaptor.capture());
 		actionListener = actionListenerCaptor.getValue();
 		actionListener.onAction(Action.RESTORE_THREAD);
-		verify(mockPopupUtils, times(2)).showConfirmDialog(anyString(), anyString(), callbackCaptor.capture());
+		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), callbackCaptor.capture());
 		callbackCaptor.getValue().invoke();
 		verify(mockDiscussionForumClientAsync).restoreThread(anyString(), any(AsyncCallback.class));
 		
@@ -875,7 +875,7 @@ public class SingleDiscussionThreadWidgetTest {
 	public void testOnClickDeleteThread() {
 		discussionThreadWidget.onClickDeleteThread();
 		ArgumentCaptor<Callback> captor = ArgumentCaptor.forClass(Callback.class);
-		verify(mockPopupUtils).showConfirmDialog(anyString(), anyString(), captor.capture());
+		verify(mockPopupUtils).showConfirmDelete(anyString(), captor.capture());
 		captor.getValue().invoke();
 		verify(mockSynAlert).clear();
 		verify(mockDiscussionForumClientAsync).markThreadAsDeleted(anyString(), any(AsyncCallback.class));

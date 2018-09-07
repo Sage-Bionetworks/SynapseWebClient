@@ -19,6 +19,7 @@ import org.sagebionetworks.repo.model.discussion.DiscussionReplyBundle;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DiscussionForumClientAsync;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cache.ClientCache;
@@ -75,6 +76,8 @@ public class ReplyWidgetTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	ClientCache mockClientCache;
+	@Mock
+	PopupUtilsView mockPopupUtils;
 	Set<String> moderatorIds;
 	ReplyWidget replyWidget;
 	
@@ -88,7 +91,7 @@ public class ReplyWidgetTest {
 		replyWidget = new ReplyWidget(mockView, mockAuthorWidget, mockDateTimeUtils,
 				mockSynAlert, mockRequestBuilder, mockDiscussionForumClientAsync,
 				mockAuthController, mockEditReplyModal, mockMarkdownWidget, mockGwt, mockCopyTextModal,
-				mockSynapseJavascriptClient, mockClientCache);
+				mockSynapseJavascriptClient, mockClientCache,mockPopupUtils);
 		when(mockAuthController.getCurrentUserPrincipalId()).thenReturn(NON_AUTHOR);
 		moderatorIds = new HashSet<String>();
 	}
@@ -307,7 +310,7 @@ public class ReplyWidgetTest {
 	@Test
 	public void testOnClickDeleteReply() {
 		replyWidget.onClickDeleteReply();
-		verify(mockView).showDeleteConfirm(anyString(), any(Callback.class));
+		verify(mockPopupUtils).showConfirmDelete(anyString(), any(Callback.class));
 	}
 
 	@SuppressWarnings("unchecked")
