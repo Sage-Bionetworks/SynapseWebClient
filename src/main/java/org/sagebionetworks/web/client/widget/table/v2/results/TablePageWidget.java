@@ -317,10 +317,7 @@ public class TablePageWidget implements TablePageView.Presenter, IsWidget, RowSe
 	
 	public void setFacetsVisible(boolean visible) {
 		facetsVisible = visible;
-		// if hiding facet panel, then immediately hide.  if showing, then show when facets are available/supported
-		if (!visible) {
-			view.setFacetsVisible(visible);	
-		}
+		view.setFacetsVisible(visible);
 	}
 	@Override
 	public void onClearFacets() {
