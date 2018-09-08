@@ -426,6 +426,7 @@ public class TableEntityWidget implements IsWidget,
 		// Disabling menu items does not seem to work well so we hide the items instead.
 		this.actionMenu.setActionVisible(Action.EDIT_TABLE_DATA, false);
 		this.actionMenu.setActionVisible(Action.DOWNLOAD_TABLE_QUERY_RESULTS, false);
+		view.setTableToolbarVisible(false);
 	}
 
 	@Override
@@ -439,6 +440,7 @@ public class TableEntityWidget implements IsWidget,
 		if (wasSuccessful) {
 			this.queryChangeHandler.onQueryChange(this.currentQuery);
 		}
+		view.setTableToolbarVisible(true);
 	}
 
 	/**

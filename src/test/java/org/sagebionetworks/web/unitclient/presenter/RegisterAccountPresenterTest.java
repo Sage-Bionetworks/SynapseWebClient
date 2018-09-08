@@ -57,7 +57,7 @@ public class RegisterAccountPresenterTest {
 		
 		verify(mockRegisterWidget).setEmail(email);
 		verify(mockView).setRegisterWidget(any(Widget.class));
-		verify(mockHeader).configure(false);
+		verify(mockHeader).configure();
 		verify(mockHeader).refresh();
 	}
 }

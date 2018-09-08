@@ -120,7 +120,7 @@ public class SearchViewImpl extends Composite implements SearchView {
 		this.ginInjector = ginInjector;
 		this.dateTimeUtils = dateTimeUtils;
 		this.markdownIt = markdownIt;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		searchButton.addClickHandler(new ClickHandler() {				
 			@Override
 			public void onClick(ClickEvent event) {					
@@ -140,9 +140,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;		
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
-		headerWidget.setSearchVisible(false);		
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
 
@@ -466,7 +465,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 		//if(facet.getMin() == null || facet.getMax() == null || facet.getMin() >= facet.getMax()) return null;		
 		
 		FlowPanel lc = new FlowPanel();
-		lc.add(new HTML("<h6 style=\"margin-top: 15px;\">" + formatFacetName(facet.getName()) + "</h6>"));		
+		Heading facetTitle = new Heading(HeadingSize.H4, formatFacetName(facet.getName()));
+		lc.add(facetTitle);		
 		FlexTable table = new FlexTable();
 		
 		// convert to miliseconds
@@ -532,7 +532,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 		if(facet != null && facet.getConstraints() != null && facet.getConstraints().size() > 0) {
 			lc = new FlowPanel();
 			String displayName = facetToDisplay.containsKey(facet.getName()) ? formatFacetName(facetToDisplay.get(facet.getName())) : formatFacetName(facet.getName());
-			lc.add(new HTML("<h6 style=\"margin-top: 15px;\">" + displayName + "</h6>"));
+			Heading facetTitle = new Heading(HeadingSize.H4, displayName);
+			lc.add(facetTitle);
 			FlowPanel flowPanel = new FlowPanel();
 			lc.add(flowPanel);
 			for (int i = 0; i < facet.getConstraints().size(); i++) {

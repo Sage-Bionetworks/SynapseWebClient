@@ -10,6 +10,7 @@ import org.gwtbootstrap3.client.ui.constants.IconType;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Italic;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.DisplayUtils.MessagePopup;
 import org.sagebionetworks.web.client.place.WikiDiff;
 import org.sagebionetworks.web.client.utils.Callback;
@@ -156,7 +157,7 @@ public class WikiPageWidgetViewImpl extends FlowPanel implements WikiPageWidgetV
 	@Override
 	public void scrollWikiHeadingIntoView() {
 		if (wikiHeading != null) {
-			wikiHeading.getElement().scrollIntoView();	
+			SynapseJSNIUtilsImpl._scrollIntoView(wikiHeading.getElement());
 		}
 	}
 	

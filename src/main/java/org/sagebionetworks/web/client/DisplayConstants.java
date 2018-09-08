@@ -173,7 +173,7 @@ public class DisplayConstants {
 	
 	public static final String API_TABLE_MISSING_URI = "SuperTable: Endpoint path not specified.";
 	
-	public static final String TEST_MODE_WARNING = "<h5>Alpha Test Mode</h5>This mode is for alpha testing features only. Please note that the <a target=\"blank\" href=\"https://s3.amazonaws.com/static.synapse.org/stu/party/stuparty.html\"> developer</a> does not guarantee an absence of errors, "
+	public static final String TEST_MODE_WARNING = "<h5>Alpha Test Mode</h5>This mode is for alpha testing features only. Please note that the <a target=\"blank\" href=\"https://github.com/Sage-Bionetworks/SynapseWebClient\"> developers</a> do not guarantee an absence of errors, "
 				+ "and that the data created using alpha features may be lost during product upgrade.<br><br><strong>Are you sure you want to switch into this mode?</strong>";
 	
 	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
@@ -191,7 +191,7 @@ public class DisplayConstants {
 	public static final String THANK_YOU_FOR_SUBMISSION = "Thank you for your submission!";
 	public static final String SUBMISSION_RECEIVED_TEXT = "Your submission will be scored and results posted to the challenge leaderboard.";
 	public static final String NOT_PARTICIPATING_IN_ANY_EVALUATIONS = "You are not currently participating in an Evaluation/Challenge. Please join one and try again.";
-	public static final String SEND_PASSWORD_CHANGE_REQUEST = "Send Password Change Request";
+	public static final String SEND_PASSWORD_CHANGE_REQUEST = "Reset your Password";
 	public static final String EMAIL_ADDRESS = "Username or Email Address";
 	public static final String SET_PASSWORD = "Set Password";
 	public static final String SUCCESS = "Success";

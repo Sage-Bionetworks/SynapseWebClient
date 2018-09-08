@@ -4,18 +4,5 @@
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >	
-	<bh:Div ui:field="loadingSpinnerDiv" addStyleNames="sk-circle margin-right-10 center-in-div" width="40px" height="40px">
-		<bh:Div addStyleNames="sk-circle1 sk-child"/>
-		<bh:Div addStyleNames="sk-circle2 sk-child"/>
-		<bh:Div addStyleNames="sk-circle3 sk-child"/>
-		<bh:Div addStyleNames="sk-circle4 sk-child"/>
-		<bh:Div addStyleNames="sk-circle5 sk-child"/>
-		<bh:Div addStyleNames="sk-circle6 sk-child"/>
-		<bh:Div addStyleNames="sk-circle7 sk-child"/>
-		<bh:Div addStyleNames="sk-circle8 sk-child"/>
-		<bh:Div addStyleNames="sk-circle9 sk-child"/>
-		<bh:Div addStyleNames="sk-circle10 sk-child"/>
-		<bh:Div addStyleNames="sk-circle11 sk-child"/>
-		<bh:Div addStyleNames="sk-circle12 sk-child"/>	
-	</bh:Div>
+	<bh:Div ui:field="loadingSpinnerDiv" addStyleNames="spinner margin-right-10 center-in-div" width="40px" height="40px" />
 </ui:UiBinder>

@@ -35,7 +35,7 @@ public class PlaceViewImpl implements PlaceView {
 			) {
 		widget = binder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 	}
 	
 	@Override
@@ -45,7 +45,7 @@ public class PlaceViewImpl implements PlaceView {
 	
 	@Override
 	public void initHeaderAndFooter() {
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

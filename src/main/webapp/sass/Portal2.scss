@@ -16,10 +16,13 @@
 /***************
 Synapse color scheme
 ****************/
-$synapse-green: #0ea862;
-$synapse-blue: #1e7098;
+$synapse-green: #28a745;
+$synapse-blue: #2B688F;
+$synapse-blue-end-gradient: #164B6E;
 $synapse-purple: #7772b4;
-$synapse-yellow: #68b2bb;
+$synapse-yellow: #E4B528;
+$synapse-orange: #E8762B;
+$synapse-accent-primary: #17a2b8;
 
 .colored { color:$synapse-blue;}
 .link { color:$synapse-blue;}
@@ -38,9 +41,21 @@ a:focus{color:$synapse-blue; text-decoration:underline;}
 .synapse-blue-bg, #body .synapse-blue-bg {background-color:$synapse-blue;}
 .synapse-purple-bg, #body .synapse-purple-bg {background-color:$synapse-purple;}
 .synapse-green-bg, #body .synapse-green-bg {background-color:$synapse-green;}
+.synapse-orange-bg, #body .synapse-orange-bg {background-color:$synapse-orange;}
+.synapse-accent-primary-bg, #body .synapse-accent-primary-bg {background-color:$synapse-accent-primary;}
 
+.synapse-blue-bg-gradient, #body .synapse-blue-bg-gradient {
+	background: linear-gradient(180deg, $synapse-blue 0%, $synapse-blue-end-gradient 100%);
+}
 .pagination>li>a, .pagination>li>span {
 	color: $synapse-blue;
+}
+
+.dot {
+	height: 7px;
+	width: 7px;
+	border-radius: 50%;
+	display: inline-block;
 }
 
 body {
@@ -81,34 +96,43 @@ end sticky footer
 }
 
 /* Bootstrap overrides */
-#rootPanel .panel {
-	border: 1px solid transparent;
-	box-shadow: none;
+#body {
+	.panel {
+		border: 1px solid transparent;
+		box-shadow: none;
+	}
+	.panel-body {
+		padding: 15px 0 30px 0;
+	}
+	.nav-tabs {
+		border-bottom: 1px solid #e6e6e6;
+		padding-bottom: 3px;
+	}
+	.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+		border: none;
+	}
+	.nav-tabs > li > a {
+		box-shadow: none;
+	}
+	.nav-tabs > li.active > a, #rootPanel .nav-tabs > li > a:hover {
+		box-shadow: inset 0 -2px 0 #1e7098
+	}
+	@media (min-width: 768px) {
+		.lead {
+			font-size: 16px;
+		}
+	}
+	.modal-header {
+		min-height: 50px;
+	}
+	.tooltip-inner {
+		max-width: inherit;
+	}
+	.form-control-readonly {
+		cursor: text;
+	}
 }
-#rootPanel .panel-body {
-	padding: 15px 0 30px 0;
-}
-#rootPanel .nav-tabs {
-	border-bottom: 1px solid #e6e6e6;
-	padding-bottom: 3px;
-}
-#rootPanel .nav-tabs > li > a {
-	box-shadow: none;
-}
-#rootPanel .nav-tabs > li.active > a, #rootPanel .nav-tabs > li > a:hover {
-	box-shadow: inset 0 -2px 0 #1e7098
-}
-#rootPanel .tooltip-inner {
-	max-width: inherit;
-}
-
-.btn-primary {
-	color: #fff !important;
-}
-
-a.btn-primary {
-	color: #fff !important;
-}
+/* End bootstrap overrides */
 
 .overflow-y-auto {
 	overflow-y: auto;
@@ -164,7 +188,7 @@ a.btn-primary {
 }
 
 .light-border-bottom {
-	border-bottom: 1px solid #f1f1f1;
+	border-bottom: 1px solid #f8f8f8;
 }
 
 .sendButton {
@@ -265,6 +289,7 @@ a.btn-primary {
 /* File browser input box needs more fine-tuned selector for override*/
 .border-none, input[type=text][readonly].border-none, #body .border-none {
 	border: none;
+	box-shadow: none;
 }
 
 .userProfileImage, #rootPanel .userProfileImage {
@@ -352,7 +377,7 @@ a.btn-primary {
 }
 
 div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.favoriteIcon:visited, a.favoriteIcon:hover, a.favoriteIcon:focus {
-	color:#f0ad4e;
+	color:#62ac62;
 }
 
 .hitdescription {
@@ -394,6 +419,7 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 .alert, #body .alert {
 	@include box-shadow(0px 1px 2px #aaa);
 	margin: 10px 0px;
+	border: none;
 }
 
 .heading {
@@ -581,14 +607,18 @@ div.favoriteIcon i, button.favoriteIcon>i, i.favoriteIcon, a.favoriteIcon, a.fav
 .margin-top-10 {
 	margin-top: 10px;
 }
+.margin-top-13 {
+	margin-top: 13px;
+}
 .margin-top-15 {
 	margin-top: 15px;
 }
-
 .margin-top-20, #body .margin-top-20 {
 	margin-top: 20px;
 }
-
+.margin-top-22 {
+	margin-top: 22px;
+}
 .margin-top-30 {
 	margin-top: 30px;
 }
@@ -1003,6 +1033,9 @@ h1, h2, h3, h4, h5, h6 {
 .maxWidth100 {
 	max-width: 100%;
 }
+.maxWidth50 {
+	max-width: 50%;
+}
 
 .maxHeight100 {
 	max-height: 100%;
@@ -1155,6 +1188,9 @@ h1, h2, h3, h4, h5, h6 {
 .max-height-200 {
 	max-height: 200px;
 }
+.max-width-350, #rootPanel .max-width-350 {
+	max-width: 350px;
+}
 
 .max-height-100 {
 	max-height: 100px;
@@ -1171,18 +1207,22 @@ h1, h2, h3, h4, h5, h6 {
 	display:block;
 }
 	
+.margin-auto {
+	margin:auto; 
+}
+
 .noBackground {
 	background: none !important;
 }
-.whiteBackground {
+.whiteBackground, #rootPanel .whiteBackground {
 	background-color: #fff;
 }
 
-.greyBackground {
+.greyBackground, #rootPanel .greyBackground {
 	background-color: #ccc;
 }
 
-.lightGreyBackground {
+.lightGreyBackground, #rootPanel .lightGreyBackground{
 	background-color: #F9F9F9;
 }
 
@@ -1268,7 +1308,9 @@ strong {
 .textDecorationNone, .textDecorationNone:visited, .textDecorationNone:hover, .textDecorationNone:focus, .textDecorationNone:active {
 	text-decoration: none;
 }
-
+.text-overflow-ellipsis {
+	text-overflow: ellipsis;
+}
 ol.decimal {	
 	list-style: decimal outside;
 	padding: 0 0 0 30px;
@@ -1280,9 +1322,6 @@ ol.loweralpha {
 ol.lowerroman {	
 	list-style: lower-roman outside;
 	padding: 0 0 0 30px;
-}
-.blackText {
-	color: #000000;
 }
 
 .blackText-imp {
@@ -1304,25 +1343,21 @@ ol.lowerroman {
 .padding-0, input[type=text].padding-0 {
 	padding: 0px;
 }
-
+.padding-top-13 {
+	padding-top: 13px;
+}
 .padding-top-15 {
 	padding-top: 15px;
 }
-
 .padding-top-15-imp {
 	padding-top: 15px !important;
 }
-
 .padding-top-bottom-15-left-right-25 {
 	padding: 15px 25px 15px 25px;
 }
 
 .padding-bottom-15 {
 	padding-bottom: 15px;
-}
-
-.padding-bottom-4-imp {
-	padding-bottom: 4px !important;
 }
 
 .padding-5, #body .padding-5 {
@@ -1369,6 +1404,10 @@ ol.lowerroman {
    display: flex;
    -webkit-flex-direction: row;
    flex-direction: row;
+}
+
+.flexcontainer-align-items-center {
+	align-items: center;
 }
 
 .flexcontainer-column {
@@ -1478,7 +1517,10 @@ ol.lowerroman {
 	position: relative;
 	top: -18px;
 }
-
+.moveup-15 {
+	position: relative;
+	top: -15px;
+}
 .moveup-10 {
 	position: relative;
 	top: -10px;
@@ -1486,6 +1528,10 @@ ol.lowerroman {
 .moveup-8, #body .moveup-8 {
 	position: relative;
 	top: -8px;
+}
+.moveup-7, #body .moveup-7 {
+	position: relative;
+	top: -7px;
 }
 
 .moveup-5 {
@@ -1564,8 +1610,7 @@ ol.lowerroman {
     top: 6px;
     left: 6px;
 	color: #333333;
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 200;
     line-height: 1.4;
     padding: 3px 7px;
@@ -1574,8 +1619,7 @@ ol.lowerroman {
 
 .highlight-title {
 	color: #333333;
-    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
-    font-size: 24px;
+    font-size: 18px;
     font-weight: 200;
     line-height: 1.4;
     padding: 3px 7px;
@@ -1632,43 +1676,6 @@ ol.lowerroman {
 	right: 4px;
 }
 
-.bubble {
-    background-color: white;
-    border-radius: 5px;
-    box-shadow: 0 0 6px #B2B2B2;
-    display: inline-block;
-    padding: 8px 20px 8px 18px;
-    position: relative;
-    vertical-align: top;
-    margin: 5px;
-    max-width: 300px;
-}
-
-.bubble::before {
-    background-color: white;
-    content: "\00a0";
-    display: block;
-    height: 16px;
-    position: absolute;
-    top: 11px;
-    transform:             rotate( 29deg ) skew( -35deg );
-        -moz-transform:    rotate( 29deg ) skew( -35deg );
-        -ms-transform:     rotate( 29deg ) skew( -35deg );
-        -o-transform:      rotate( 29deg ) skew( -35deg );
-        -webkit-transform: rotate( 29deg ) skew( -35deg );
-    width:  20px;
-}
-
-.bubble-right::before {
-    box-shadow: -2px 2px 2px 0 rgba( 178, 178, 178, .4 );
-    left: -9px;           
-}
-
-.bubble-left::before {
-    box-shadow: 2px -2px 2px 0 rgba( 178, 178, 178, .4 );
-    right: -9px;    
-}
-
 .entity-tab {
 	font-size: 16px;	
 }
@@ -1696,7 +1703,11 @@ ol.lowerroman {
 		max-width: 460px;
 	}
 }
-
+@media (max-width: 500px) {
+    .hidden-xxs {
+        display:none!important
+    }
+}
 .entity-tab > a {
 	text-align: center;
 }
@@ -1716,6 +1727,10 @@ ol.lowerroman {
 .padding-right-5 {
 	padding-right: 5px;
 }
+.padding-right-10 {
+	padding-right: 10px;
+}
+
 .padding-right-15 {
 	padding-right: 15px !important;
 }
@@ -1737,15 +1752,12 @@ ol.lowerroman {
 .padding-left-5-imp {
 	padding-left: 5px !important;
 }
-
 .padding-left-10 {
 	padding-left: 10px;
 }
-
 .padding-left-15 {
 	padding-left: 15px;
 }
-
 .padding-left-30 {
 	padding-left: 30px;
 }
@@ -1864,12 +1876,6 @@ iframe[seamless] {
 	z-index: 2000 !important;
 }
 
-.dropdown-menu>li>a, 
-.x-menu-list-item>a:visited,
-.x-menu-list-item>a:visited>* {
-	color: #333 !important;
-}
-
 /* popups with very long values (like some urls) are shown out of bounds in bootstrap. */
 .popover-content {
 	overflow-x: hidden;
@@ -1939,44 +1945,9 @@ ul, ol {
 	color: #5bc0de;
 }
 
-/**
-SWC-3997: tidy up search bar in header
-**/
-#body {
-	.searchBox {
-		.input-group>input, .input-group>input:focus {
-			border-radius: .2em 0em 0em .2em;
-			border: 0px;
-			background-color: #ffffff;
-			background-image: none;
-			box-shadow: none;
-		}
-
-		.input-group-btn>.btn, .input-group-btn>.btn:hover {
-			background-image: none;
-			border: 0px;
-			box-shadow: none;
-		}
-		.input-group-btn>.btn-default, .input-group-btn>.btn-default:hover  {
-			background-color: #ffffff;
-		}
-	}
-}
-
-/**
-end SWC-3997
-**/
-
 div.input-group > input.search-textbox {
 	border: 1px solid #eee;
 	padding-left: 10px;
-}
-
-/* modified snippet from Bootstrap docs.css for Wiki Subpage style (minus the hidden sublists) */
-/* By default it's not affixed in mobile views, so undo that */
-
-#body .wiki-subpages-editor-tree .nav>li>a {
-	padding: 2px 5px;
 }
 
 .bs-sidenav {
@@ -2155,15 +2126,12 @@ td.datePickerMonth {
   border-left: 1px solid #dddddd;
 }
 
-.border-top-1 {
-  border-top: 1px solid #dddddd;
+.border-right-1 {
+  border-right: 1px solid #dddddd;
 }
 
-.facetsWidget {
-	border: 1px solid #e6e6e6;
-	padding: 0 10px 30px 15px;
-	margin-top: -8px;
-	max-width: 300px;
+.border-top-1 {
+  border-top: 1px solid #dddddd;
 }
 
 .read-only-box {
@@ -2186,7 +2154,6 @@ td.datePickerMonth {
 	position:absolute;
 	top: 28.8px; 
 	color:black;
-	font-family:helvetica, sans; 
 	font-size:12px;
 	text-align:center;	
 	background-repeat: no-repeat;	
@@ -2201,7 +2168,6 @@ td.datePickerMonth {
 	z-index:20; 
 	position:absolute; 
 	color:black;
-	font-family:helvetica, sans;
 	padding-top:3px; 	
 	font-size:12px;	
 
@@ -2211,14 +2177,11 @@ td.datePickerMonth {
 	.provActivityLabel {
 		font-size: 9.6px;
 		line-height: 10px;
-		text-transform: uppercase;
 		word-wrap: break-word;
-		font-weight: bold;
 	}
 	.provActivityLabelTime  {
 		font-size: 9.6px;
 		line-height: 10px;
-		text-transform: uppercase;
 		word-wrap: break-word;
 	}
 	.provActivityUndefinedIcon {
@@ -2238,7 +2201,6 @@ td.datePickerMonth {
 	z-index:20; 
 	position:absolute;	
 	color:black;
-	font-family:helvetica, sans;
 	padding-top:0px; 
 	font-size:12px;
 	text-align:center;	
@@ -2395,16 +2357,6 @@ img::-moz-selection {
 /*-------------------------------------------------------*/
 	/*Typography*/
 /*-------------------------------------------------------*/
-h1, h2, h3, h4, h5, h6 {
-	font-weight: 200;
-	color:#000000; }
-h1 a, h2 a, h3 a, h4 a, h5 a, h6 a { font-weight: inherit; }
-h1 { font-size: 36px; line-height: 50px; margin-bottom: 10px;}
-h2 { font-size: 32px; line-height: 40px; margin-bottom: 10px; }
-h3 { font-size: 26px; line-height: 23px; margin-bottom: 10px; }
-h4 { font-size: 22px; line-height: 30px; margin-bottom: 4px; }
-h5 { font-size: 16px; line-height: 24px; margin-bottom: 4px; }
-h6 { font-size: 14px; line-height: 21px; }
 
 p { margin: 0 0 20px 0; }
 .small { font-size:90%;}
@@ -2423,24 +2375,12 @@ p.error{
 
 }
 .center { text-align:center !important;}
-.footer h6{ text-transform:uppercase; margin-bottom:8px; font-size:18px;}
-.footer p { padding-right:10px; width:210px; margin-bottom:5px !important;}
-.footer .color a { text-align:center !important; display:block; margin-top:35px;}
-.logo { margin-top:27px !important;}
-.logo a { text-align:center !important;} 
 /* The last column in a row needs this class. */
 div.last { margin-right: 0; }
 
 /* Border on right hand side of a column. */
 div.border {
   padding-right:9px;
-  margin-right:10px;
-  border-right: 1px solid #eee;
-}
-
-/* Border with more whitespace, spans one column. */
-div.colborder {
-  padding-right:13px;
   margin-right:10px;
   border-right: 1px solid #eee;
 }
@@ -2524,5 +2464,184 @@ div.colborder {
 	filter: blur(4px);
 }
 
-#rootPanel summary { color:$synapse-blue; }
-#rootPanel summary:hover { text-decoration: underline; cursor:pointer; }
+.hideRightPixelOnHover:hover {
+	margin-right: -1px;
+}
+.hideLeftPixelOnHover:hover {
+	margin-left: -1px;
+}
+
+.zeroOpacity {
+	opacity: 0;
+	transition: opacity 0.3s ease-in;
+}
+.fullOpacity {
+	opacity: 1;
+	transition: opacity 0.3s ease-in;
+}
+
+#headerPanel {
+	.syn-crash-helmet {
+		font-size: 1.7em;
+	}
+	.searchBox {
+		input, input:focus {
+			background-color:#274660;
+			color: white;
+			padding: 0px;			
+		}
+	}
+	div.searchBoxContainer.inactive:hover, div.searchBoxContainer.inactive:focus {
+		background-color: $synapse-green;
+		transition: all 0.3s ease-in;
+	}
+	div.searchBoxContainer.inactive {
+		input {
+			width: 0px;
+			opacity: 0;
+			transition: width 0.4s ease-in-out;
+		}
+		i {
+			font-size: 25px;
+		}
+	}
+
+	div.searchBoxContainer.active {
+		input {
+			width: 200px;
+			transition: width 0.4s ease-in-out;
+			opacity: 1;
+			padding-left: 35px;
+		}
+		i {
+			font-size: 20px;
+			position: relative;
+			left: 17px;
+			top: -3px;
+			opacity: 0.5;
+			width: 10px;
+		}
+	}
+	.userProfileImage {
+		border-radius: 50%;
+		background: white;
+	}
+	.dropdown:hover ul.dropdown-menu {
+		display: block;
+	}
+	.dropdown ul.dropdown-menu {
+		border-radius: 0px;
+		margin-top: 0px;
+	}
+	a.menu:after, .dropdown-toggle:after {
+		content: none;
+	}
+	.dropdown:hover {
+		background-color: $synapse-green;
+	}
+	.dropdown {
+		background-color: none;
+		transition: all 0.3s ease-in;
+	}
+	.alert {
+		border-radius: 0px;
+		padding: 7px 15px;
+		font-weight: 500;
+		font-size: 15px;
+	}
+	.dropdown-menu>li>a:focus, .dropdown-menu>li>a:hover {
+		background-color: $synapse-green;
+	}
+	.dropdown-menu>li>a {
+		padding-top: 5px;
+		padding-bottom: 5px;
+	}
+}
+#body {
+	.alert a {
+		font-weight: inherit;
+		text-decoration: underline;
+	}
+	.partnersHeading {
+		color: #B7B7B7;
+		font-size: 15px;
+	}
+
+	/* modified snippet from Bootstrap docs.css for Wiki Subpage style (minus the hidden sublists) */
+	/* By default it's not affixed in mobile views, so undo that */
+	.wiki-subpages-editor-tree .nav>li>a {
+		padding: 2px 5px;
+	}
+
+	/**
+	SWC-3997: tidy up search bar in header
+	**/
+	.searchBox {
+		input, input:focus {
+			border: 0px;
+			background-image: none;
+			box-shadow: none;
+			display: inline-block;
+			margin-right: 5px;
+		}
+	}
+	/**
+	end SWC-3997
+	**/
+
+	.facetsWidget {
+		border: 1px solid #e6e6e6;
+		padding: 0 10px 30px 15px;
+		margin-top: -8px;
+	}
+	.facetsWidget-inactive {
+		max-width: 0px;
+		transition: max-width 0.4s ease-in-out;
+	}
+	.facetsWidget-active {
+		max-width: 330px;
+		transition: max-width 0.4s ease-in-out;
+	}
+}
+#rootPanel {
+	summary { color:$synapse-blue; }
+	summary:hover { text-decoration: underline; cursor:pointer; }
+	.input-group-addon, .input-group-btn {
+		vertical-align: top;
+	}
+}
+
+#footerPanel {
+	.syn-crash-helmet {
+		font-size: 1.7em;
+	}
+	.alert {
+		border-radius: 0px;
+		padding: 7px 15px;
+		font-weight: 500;
+		font-size: 15px;
+	}
+}
+.lato {
+	font-family: Lato;
+}
+.letter-spacing-6 {
+	letter-spacing: 6px;
+}
+.notransition {
+	-webkit-transition: none !important;
+	-moz-transition: none !important;
+	-o-transition: none !important;
+	transition: none !important;
+}
+
+@mixin placeholder {
+	::-webkit-input-placeholder {@content}
+	:-moz-placeholder           {@content}
+	::-moz-placeholder          {@content}
+	:-ms-input-placeholder      {@content}  
+}
+
+@include placeholder {
+	font-style:italic;
+}

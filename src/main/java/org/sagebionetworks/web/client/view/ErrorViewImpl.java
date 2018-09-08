@@ -31,13 +31,13 @@ public class ErrorViewImpl implements ErrorView {
 			Header headerWidget) {
 		widget = uiBinder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 	}
 
 	@Override
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}

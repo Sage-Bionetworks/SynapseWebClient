@@ -4,6 +4,7 @@ import org.gwtbootstrap3.client.ui.Anchor;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.dom.client.Element;
@@ -127,7 +128,7 @@ public class HtmlPreviewViewImpl implements HtmlPreviewView {
 				iframe.height = "";
 				iframe.height = (newHeightPx + 50) + "px";
 				if (frameHeight) {
-					iframe.scrollIntoView();
+					SynapseJSNIUtilsImpl._scrollIntoView(iframe);
 				}
 			}
 		}

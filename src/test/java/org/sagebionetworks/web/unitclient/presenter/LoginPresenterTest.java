@@ -24,6 +24,7 @@ import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PlaceChanger;
 import org.sagebionetworks.web.client.place.ChangeUsername;
+import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.users.RegisterAccount;
@@ -89,8 +90,8 @@ public class LoginPresenterTest {
 	public void testSetPlaceLogout() {
 		when(mockLoginPlace.toToken()).thenReturn(LoginPlace.LOGOUT_TOKEN);
 		loginPresenter.setPlace(mockLoginPlace);
-		verify(mockView).showLogout();
 		verify(mockAuthenticationController).logoutUser();
+		verify(mockPlaceChanger).goTo(any(Home.class));
 	}
 
 	@Test 

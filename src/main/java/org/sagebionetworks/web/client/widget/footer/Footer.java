@@ -61,8 +61,4 @@ public class Footer implements FooterView.Presenter, IsWidget {
 	public void onReportAbuseClicked() {
 		view.open(jiraHelper.createReportAbuseIssueURL());
 	}
-	
-	public void setSynapseSponsorsVisible(boolean visible) {
-		view.setSynapseSponsorsVisible(visible);
-	}
 }

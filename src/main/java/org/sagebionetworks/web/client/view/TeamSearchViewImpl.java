@@ -44,7 +44,7 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.synapseJsniUtils = synapseJsniUtils;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		configureSearchBox();
 	}
 	
@@ -57,7 +57,7 @@ public class TeamSearchViewImpl extends Composite implements TeamSearchView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

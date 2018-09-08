@@ -457,6 +457,14 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 		}
 	}-*/;
 
+	public final static native void _scrollIntoView(Element el) /*-{
+		try {
+			el.scrollIntoView({behavior: 'smooth'});
+		} catch (err) {
+			console.error(err);
+		}
+	}-*/;
+	
 	@Override
 	public void loadCss(final String url) {
 		final LinkElement link = Document.get().createLinkElement();
@@ -588,7 +596,7 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 				    s:      [],
 				    section:[],
 				    small:  [],
-				    span:   ['widgetparams', 'class', 'id'],
+				    span:   ['data-widgetparams', 'class', 'id'],
 				    sub:    [],
 				    summary: [],
 				    sup:    [],

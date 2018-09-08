@@ -29,13 +29,13 @@ public class SynapseWikiViewImpl extends Composite implements SynapseWikiView {
 		
 		this.headerWidget = headerWidget;
 		this.wikiPage = wikiPage;
-		headerWidget.configure(false);
+		headerWidget.configure();
 	}
 
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}

@@ -86,7 +86,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 		initWidget(binder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.synapseJsniUtils = synapseJsniUtils;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		trash2Row = new HashMap<TrashedEntity, Integer>();
 		selectedTrash = new HashSet<TrashedEntity>();
 		checkBoxes = new HashSet<CheckBox>();
@@ -151,7 +151,7 @@ public class TrashViewImpl extends Composite implements TrashView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		clear();
 		Window.scrollTo(0, 0); // scroll user to top of page

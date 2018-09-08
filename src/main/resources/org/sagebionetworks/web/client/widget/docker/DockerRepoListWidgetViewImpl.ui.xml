@@ -6,6 +6,7 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<g:HTMLPanel>
 		<w:LoadingSpinner size="40px" ui:field="loadingUI" addStyleNames="center-block center" visible="false"/>
+		<bh:Span ui:field="emptyUI" text="&#8212; Empty" visible="false" marginLeft="15"/>
 		<b:ListGroup ui:field="dockerList" />
 		<g:SimplePanel ui:field="synAlertContainer" />
 		<bh:Div ui:field="membersContainer" />

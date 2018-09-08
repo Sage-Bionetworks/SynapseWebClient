@@ -15,6 +15,7 @@ import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.Icon;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Paragraph;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -35,7 +36,6 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.FitImage;
 import org.sagebionetworks.web.client.widget.LoadingSpinner;
 import org.sagebionetworks.web.client.widget.header.Header;
-import org.sagebionetworks.web.client.widget.header.Header.MenuItems;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.verification.VerificationIDCardViewImpl;
 
@@ -57,7 +57,6 @@ import com.google.gwt.user.client.ui.HTML;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.TextBox;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -93,7 +92,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	Button linkORCIDButton;
 	@UiField
 	SimplePanel editUserProfilePanel;
-	
+	HTML noChallengesHtml = new HTML("<p>This tab shows you challenges you have registered for.</p>" + 
+			"<p><a href=\"https://docs.synapse.org/articles/challenge_participation.html#overview\" target=\"_blank\">Challenges</a> are computational contests organized through the Dream Challenges.</p>");
 	@UiField
 	SimplePanel picturePanel;
 	@UiField
@@ -294,8 +294,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		this.headerWidget = headerWidget;
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.dateTimeUtils = dateTimeUtils;
-		headerWidget.configure(false);
-		headerWidget.setMenuItemActive(MenuItems.PROJECTS);
+		headerWidget.configure();
 		picturePanel.clear();
 		initTabs();
 		projectSearchTextBox.getElement().setAttribute("placeholder", "Project name");
@@ -546,7 +545,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
@@ -657,6 +656,8 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	@Override
 	public void clearChallenges() {
 		challengesTabContent.clear();
+		challengesTabContent.add(noChallengesHtml);
+		noChallengesHtml.setVisible(true);
 		setIsMoreChallengesVisible(false);
 	}
 	
@@ -668,7 +669,7 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 	
 	@Override
 	public void addChallengeWidget(Widget toAdd) {
-		DisplayUtils.show(challengesListItem);
+		noChallengesHtml.setVisible(false);
 		toAdd.addStyleName("margin-top-10");
 		challengesTabContent.add(toAdd);
 	}
@@ -803,7 +804,6 @@ public class ProfileViewImpl extends Composite implements ProfileView {
 		verifyAlert.setVisible(false);
 		DisplayUtils.hide(createProjectUI);
 		DisplayUtils.hide(createTeamUI);
-		DisplayUtils.hide(challengesListItem);
 		teamSearchTextBox.setValue("");
 		projectSearchTextBox.setValue("");
 		

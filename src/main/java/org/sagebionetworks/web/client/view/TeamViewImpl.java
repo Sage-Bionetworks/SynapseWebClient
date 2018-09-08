@@ -93,7 +93,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.gwt = gwt;
 		setDropdownHandlers();
-		headerWidget.configure(false);
+		headerWidget.configure();
 		showMapLink.addClickHandler(new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -202,7 +202,7 @@ public class TeamViewImpl extends Composite implements TeamView {
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();	
 		Window.scrollTo(0, 0); // scroll user to top of page
 	}
