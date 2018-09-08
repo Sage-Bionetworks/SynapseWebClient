@@ -4,11 +4,7 @@
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html">
 
 	<bh:Div addStyleNames="searchBox displayInlineTable">
-		<b:InputGroup>
-			<b:TextBox ui:field="searchField" height="28px" />
-			<b:InputGroupButton>
-				<b:Button icon="SEARCH" ui:field="searchButton" height="28px"/>
-			</b:InputGroupButton>
-		</b:InputGroup>
+		<b:Icon ui:field="searchButton" type="SEARCH" size="TIMES2" addStyleNames="color-white imageButton topLevelZIndex"/>
+		<b:TextBox ui:field="searchField" height="32px" addStyleNames="moveup-3" />
 	</bh:Div>
 </ui:UiBinder>

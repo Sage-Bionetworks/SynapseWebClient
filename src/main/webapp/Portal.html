@@ -34,10 +34,10 @@
 		<meta http-equiv="pragma" content="no-cache" />
 		<!-- end cache control -->
 		
-		<link rel="icon" href="favicon.png?v=3" />
+		<link rel="icon" href="favicon.png?v=4" />
 		<link href="/opensearch.xml" rel="search" title="Synapse" type="application/opensearchdescription+xml" />
 		<link rel="manifest" href="manifest.json" />
-		
+		<link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Lato" />
 		<!-- Google Analytics -->
 		<script>
 			window.ga=window.ga||function(){(ga.q=ga.q||[]).push(arguments)};ga.l=+new Date;
@@ -57,13 +57,14 @@
 			window.cdnEndpoint = cdnEndpoint;
 			
 			var link = document.createElement( "link" );
-			link.href = cdnEndpoint + "loading.css";
+			link.href = cdnEndpoint + "loadinglogo.css";
 			link.rel = "stylesheet";
 			document.head.appendChild(link);
 
 			var script = document.createElement('script');
 			script.onload = function () {
-				head.load("Portal.css");
+				head.load(cdnEndpoint + "Portal2.css");
+				head.load(cdnEndpoint + "css/bootstrap-custom-theme.min.css?v=1");
 				head.load("//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js");
 				head.load("//ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js");
 				head.load("https://cdn.pendo.io/agent/static/f155f8f7-30b9-4cc3-671a-70f99f803504/pendo.js");
@@ -72,11 +73,12 @@
 				head.load("//cdnjs.cloudflare.com/ajax/libs/swfobject/2.2/swfobject.min.js");
 				head.load(cdnEndpoint + "js/jquery.tablesorter.min.js");
 				head.load(cdnEndpoint + "js/jquery.tablesorter.scinot.js");
+				head.load(cdnEndpoint + "icons/font/synapseicons.css?v=1");
 				head.load("//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css");
 				head.load(cdnEndpoint + "js/highlight.pack.js");
 				head.load(cdnEndpoint + "js/init-nchart.js");
 				head.load("//cdn.jsdelivr.net/markdown-it/6.0.0/markdown-it.min.js");
-				head.load(cdnEndpoint + "js/markdown-it-plugins-14.min.js");
+				head.load(cdnEndpoint + "js/markdown-it-plugins-15.min.js");
 				head.load(cdnEndpoint + "js/polyfill-2.js");
 				head.load(cdnEndpoint + "js/details-shim.min.js");
 				head.load(cdnEndpoint + "js/xss.min.js");
@@ -127,12 +129,12 @@
 			</noscript>
             
             <div style="display:none;">
-              <form id="login_form" method="post" target='hiddeniframe'>
-                <input id="synapse_username" name="username"/>
-                <input id="synapse_password" name="password" type="password"/>
-                <input id="synapse_signin_btn" name="signInBtn" type="submit" />
-                <iframe name='hiddeniframe'></iframe>
-              </form>
+				<form id="login_form" target="hiddeniframe" role="form" class="signin-panel margin-top-15" method="post" action="/expect_405">
+					<input id="synapse_username" type="text" name="uname">
+					<input id="synapse_password" name="psw" type="password">
+					<button id="synapse_signin_btn" type="submit">Sign in</button>
+					<iframe name='hiddeniframe' style="display:none;"></iframe>
+				</form>
             </div>
             
             <!-- This is the GWT-generated body -->
@@ -140,24 +142,11 @@
 				<div id="alertContainer"></div>
 			</div>
 			<div id="initialLoadingUI" style="padding-top: 180px">
-				<div class="sk-circle" style="width: 80px; height: 80px;">
-					<div class="sk-circle1 sk-child"></div>
-					<div class="sk-circle2 sk-child"></div>
-					<div class="sk-circle3 sk-child"></div>
-					<div class="sk-circle4 sk-child"></div>
-					<div class="sk-circle5 sk-child"></div>
-					<div class="sk-circle6 sk-child"></div>
-					<div class="sk-circle7 sk-child"></div>
-					<div class="sk-circle8 sk-child"></div>
-					<div class="sk-circle9 sk-child"></div>
-					<div class="sk-circle10 sk-child"></div>
-					<div class="sk-circle11 sk-child"></div>
-					<div class="sk-circle12 sk-child"></div>
-				</div>
+				<div class="spinner" style="width:80px; height:80px; background-size:80px 80px;"> </div>
 				<h4 style="color: #1e7098; margin-top: 10px; font-family: Sans-serif; text-align:center">Loading...</h4>
 			</div>
-			<div id="headerPanel"></div>
-			<div id="rootPanel"></div>
+			<div id="headerPanel" class="zeroOpacity"></div>
+			<div id="rootPanel" class="zeroOpacity"></div>
 			<div id="footerPanel"></div>
 		</div>
 		<div class="clear"></div>

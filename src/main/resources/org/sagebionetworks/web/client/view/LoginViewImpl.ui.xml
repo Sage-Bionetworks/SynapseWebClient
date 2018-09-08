@@ -19,11 +19,9 @@
 		    		<bh:Div ui:field="synAlertContainer"/>
 				<g:HTMLPanel ui:field="loginView" visible="true">
 					<!-- LoginView -->
-					<div class="panel padding-10 col-md-offset-3 col-md-6 col-sm-offset-2 col-sm-8">
-						<div class="light-border padding-15">
+					<div class="panel padding-10 col-sm-offset-4 col-sm-4">
+						<div class="padding-15">
 							<g:SimplePanel ui:field="loginWidgetPanel" />						
-							<!-- Logout View -->
-							<g:SimplePanel ui:field="logoutPanel" />
 						</div>
 					</div>
 					<br/>

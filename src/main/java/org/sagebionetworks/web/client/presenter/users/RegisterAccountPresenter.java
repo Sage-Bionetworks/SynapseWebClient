@@ -36,7 +36,7 @@ public class RegisterAccountPresenter extends AbstractActivity implements Regist
 	
 	public void init() {
 		view.setRegisterWidget(registerWidget.asWidget());
-		headerWidget.configure(false);
+		headerWidget.configure();
 		headerWidget.refresh();
 	}
 

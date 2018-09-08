@@ -41,6 +41,7 @@ public class Portal implements EntryPoint {
 	 * This is the entry point method.
 	 */
 	public void onModuleLoad() {
+		zeroOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
 		//we might need to reload using the new token scheme (required for SEO)
 		String initToken = History.getToken();
 		if (initToken.length() > 0 && !initToken.startsWith("!")) {
@@ -86,6 +87,7 @@ public class Portal implements EntryPoint {
 						
 						RootPanel.get("rootPanel").add(appWidget);
 						RootPanel.get("initialLoadingUI").setVisible(false);
+						fullOpacity(RootPanel.get("headerPanel"), RootPanel.get("rootPanel"));
 						final GlobalApplicationState globalApplicationState = ginjector.getGlobalApplicationState();
 						globalApplicationState.setPlaceController(placeController);
 						globalApplicationState.setAppPlaceHistoryMapper(historyMapper);
@@ -115,6 +117,20 @@ public class Portal implements EntryPoint {
 					}
 				}
 			});
+		}
+	}
+	
+	public static void zeroOpacity(RootPanel...panels) {
+		for (RootPanel panel : panels) {
+			panel.removeStyleName("fullOpacity");
+			panel.addStyleName("zeroOpacity");
+		}
+	}
+	
+	public static void fullOpacity(RootPanel...panels) {
+		for (RootPanel panel : panels) {
+			panel.removeStyleName("zeroOpacity");
+			panel.addStyleName("fullOpacity");
 		}
 	}
 	

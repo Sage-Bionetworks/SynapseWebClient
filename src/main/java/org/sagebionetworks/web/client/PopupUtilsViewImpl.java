@@ -51,4 +51,9 @@ public class PopupUtilsViewImpl implements PopupUtilsView {
 	public void openInNewWindow(String url) {
 		Window.open(url, "_blank", "");	
 	}
+	
+	@Override
+	public void showConfirmDelete(String message, Callback callback) {
+		DisplayUtils.confirmDelete(message, callback);
+	}
 }

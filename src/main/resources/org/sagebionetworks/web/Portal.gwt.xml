@@ -30,7 +30,7 @@
 	-->
 	
 	<!-- The gwtbootsrap dependencies must come before the portal entry point.  -->
-	<inherits name="org.gwtbootstrap3.GwtBootstrap3PaperTheme"/>
+	<inherits name="org.gwtbootstrap3.GwtBootstrap3NoTheme"/>
 	<inherits name="org.gwtbootstrap3.extras.datetimepicker.DateTimePicker"/>
 	<inherits name="org.gwtbootstrap3.extras.bootbox.Bootbox"/>
 	<inherits name="org.gwtbootstrap3.extras.slider.Slider"/>

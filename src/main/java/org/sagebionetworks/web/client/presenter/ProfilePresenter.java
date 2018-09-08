@@ -57,6 +57,7 @@ import org.sagebionetworks.web.shared.exceptions.ConflictException;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.activity.shared.AbstractActivity;
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -266,6 +267,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	public void updateArea(ProfileArea area, boolean pushState) {
+		currentArea = area;
 		if (area != null && place != null && !area.equals(place.getArea())) {
 			place.setArea(area, filterType, filterTeamId);
 			if (pushState) {
@@ -821,7 +823,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public void addProjectResults(List<ProjectHeader> projectHeaders) {
 		for (int i = 0; i < projectHeaders.size(); i++) {
 			ProjectBadge badge = ginInjector.getProjectBadgeWidget();
-			badge.addStyleName("margin-bottom-10 col-xs-12");
 			badge.configure(projectHeaders.get(i));
 			Widget widget = badge.asWidget();
 			loadMoreProjectsWidgetContainer.add(widget);
@@ -835,10 +836,6 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			badge.configure(challenge);
 			Widget widget = badge.asWidget();
 			view.addChallengeWidget(widget);
-		}
-		if (!challenges.isEmpty() && currentArea != null && currentArea.equals(ProfileArea.CHALLENGES)) {
-			// SWC-3213: extra call to make sure challenge tab is currently shown
-			view.setTabSelected(ProfileArea.CHALLENGES);
 		}
 	}
 	
@@ -1157,11 +1154,11 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				view.setSettingsWidget(getSettingsPresenter().asWidget());
 				break;
 			case CHALLENGES:
+				refreshChallenges();
+				break;
 			default:
 				break;
 		}
-		//always refreshes challenges to determine if tab should be shown
-		refreshChallenges();
 	}
 	
 	/**

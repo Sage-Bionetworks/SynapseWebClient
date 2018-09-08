@@ -9,6 +9,7 @@
 		<bh:Div ui:field="synAlertContainer" />
 		<bh:Div ui:field="sortButtonContainer"/>
 		<w:LoadingSpinner size="40px" ui:field="loadingUI" addStyleNames="center-block center" visible="false"/>
+		<bh:Span ui:field="emptyUI" text="&#8212; Empty" visible="false" marginLeft="15"/>
 		<b:ListGroup ui:field="tablesList" />
 		<bh:Div ui:field="loadMoreWidgetContainer"/>
 	</g:HTMLPanel>

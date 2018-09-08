@@ -19,9 +19,7 @@
 							<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
 								text="Organize your digital research assets"
 							></b:Heading>
-							<b:Heading size="H5" addStyleNames="margin-top-3"
-								text="Create a free Synapse Project to store your research data, code, and results."
-							></b:Heading>
+							<bh:Paragraph addStyleNames="margin-top-3" text="Create a free Synapse Project to store your research data, code, and results." />
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
@@ -32,9 +30,7 @@
 							<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp"
 								text="Get credit for your research"
 							></b:Heading>
-							<b:Heading size="H5" addStyleNames="margin-top-3"
-								text="Mint a DOI for your work - and describe exactly what you did using Synapse provenance."
-							></b:Heading>
+							<bh:Paragraph addStyleNames="margin-top-3" text="Mint a DOI for your work - and describe exactly what you did using Synapse provenance." />
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
@@ -45,9 +41,7 @@
 							<b:Heading size="H4" addStyleNames="margin-top-30 font-weight-bolder margin-bottom-10-imp" 
 								text="Collaborate"
 							></b:Heading>
-							<b:Heading size="H5" addStyleNames="margin-top-3"
-								text="Share your Project with your collaborators, or make it Public!"
-							></b:Heading>
+							<bh:Paragraph addStyleNames="margin-top-3" text="Share your Project with your collaborators, or make it Public!" />
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
@@ -64,7 +58,7 @@
 						<b:Button ui:field="dashboardBtn" size="LARGE" block="true" marginTop="20" marginBottom="33" />
 					</bh:Div>
 					<bh:Div ui:field="registerUI" addStyleNames="margin-bottom-15 synapse-blue-bg padding-15">
-						<b:Heading size="H3" addStyleNames="color-white margin-top-5 margin-bottom-15" text="START USING SYNAPSE" />
+						<b:Heading size="H3" addStyleNames="color-white margin-top-5 margin-bottom-15" text="CREATE SYNAPSE ACCOUNT" />
 						<bh:Div ui:field="registerWidgetContainer" addStyleNames="margin-10" />
 					</bh:Div>
 					<bh:Div ui:field="loginUI" addStyleNames="synapse-blue-bg padding-30 margin-bottom-15" />
@@ -89,7 +83,7 @@
 					<g:FocusPanel ui:field="gettingStartedBox">
 						<b:Panel addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
 							<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Getting Started" />
-							<b:Heading size="H6" text="Synapse is an open source software platform that data scientists can use to carry out, track, and communicate their research in real time. " />
+							<bh:Paragraph text="Synapse is an open source software platform that data scientists can use to carry out, track, and communicate their research in real time. "/>
 							<b:Button text="Open the guide" />
 						</b:Panel>
 					</g:FocusPanel>
@@ -97,12 +91,13 @@
 				<b:Column size="SM_9" addStyleNames="margin-top-30">
 					<b:Panel addStyleNames="padding-15 margin-left-10 margin-right-10">
 						<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Programmatic Clients" />
-						<b:Heading size="H6" text="Synapse is designed to easily integrate into your current work. That's why we've created the following clients so that you can
+						<bh:Paragraph text="Synapse is designed to easily integrate into your current work. That's why we've created the following clients so that you can
 						   interact with all of Synapse's functionality programmatically. Create projects, upload &amp; download files, generate provenance, query, create wikis and more
-						   all from the comfort of your own code." />
-						<b:Heading size="H6" text="Don't see your language of choice here? Check out our full&nbsp;">
-							<b:Anchor href="http://docs.synapse.org/rest/" text="REST API documentation" target="_blank"/>
-						</b:Heading>
+						   all from the comfort of your own code."/>
+						<bh:Paragraph>
+							<bh:Text>Don't see your language of choice here? Check out our full</bh:Text>
+							<b:Anchor href="http://docs.synapse.org/rest/" text="REST API documentation" target="_blank" addStyleNames="margin-left-5"/>
+						</bh:Paragraph>
 						<b:Row>
 							<b:Column size="SM_3">
 								<bh:Div>
@@ -194,11 +189,11 @@
 										<g:Image resource='{sageImageBundle.people}' addStyleNames="margin-top-left-10" />
 									</t:TableData>
 									<t:TableData paddingRight="2">
-										<b:Heading size="H5" addStyleNames="color-white font-weight-bolder" text="RESEARCH COMMUNITIES"></b:Heading>
+										<b:Heading size="H4" addStyleNames="color-white font-weight-bolder" text="RESEARCH COMMUNITIES"></b:Heading>
 									</t:TableData>
 								</t:TableRow>
 							</t:Table>
-							<b:Heading size="H5" addStyleNames="color-white" text="See the communities working on shared data hosted on Synapse. >"></b:Heading>
+							<bh:Paragraph addStyleNames="color-white" text="See the communities working on shared data hosted on Synapse. >" marginTop="10"/>
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
@@ -211,11 +206,11 @@
 										<g:Image resource='{sageImageBundle.unlock}' addStyleNames="margin-10" />
 									</t:TableData>
 									<t:TableData paddingRight="2">
-										<b:Heading size="H5" addStyleNames="color-white font-weight-bolder" text="OPEN RESOURCES"></b:Heading>
+										<b:Heading size="H4" addStyleNames="color-white font-weight-bolder" text="OPEN RESOURCES"></b:Heading>
 									</t:TableData>
 								</t:TableRow>
 							</t:Table>
-							<b:Heading size="H5" addStyleNames="color-white" text="See the open research projects hosted on Synapse. >"></b:Heading>
+							<bh:Paragraph addStyleNames="color-white" text="See the open research projects hosted on Synapse. >" marginTop="10"/>
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
@@ -225,7 +220,7 @@
 							<bh:Div addStyleNames="margin-10">
 								<g:Image resource='{sageImageBundle.dream}' addStyleNames="center-in-div" />
 							</bh:Div>
-							<b:Heading size="H5" addStyleNames="color-white" text="Synapse is the platform on which DREAM operates.  Learn more. >"></b:Heading>
+							<bh:Paragraph addStyleNames="color-white" text="Synapse is the platform on which DREAM operates.  Learn more. >" marginTop="10"/>
 						</bh:Div>
 					</g:FocusPanel>
 				</b:Column>
@@ -247,7 +242,7 @@
 						<g:FocusPanel ui:field="termsOfUseBox">
 							<b:Panel addStyleNames="padding-15 imageButton margin-left-10 margin-right-10">
 								<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Terms of Use"></b:Heading>
-								<b:Heading size="H6" text="Synapse operates under a complete governance process that includes well-documented Terms and Conditions of Use, guide- lines and operating procedures, privacy enhancing technologies, as well as the right of audit and external reviews." />
+								<bh:Paragraph text="Synapse operates under a complete governance process that includes well-documented Terms and Conditions of Use, guide- lines and operating procedures, privacy enhancing technologies, as well as the right of audit and external reviews." />
 								<b:Button text="Learn about Synapse Use and Oversight" />
 							</b:Panel>
 						</g:FocusPanel>
@@ -262,7 +257,7 @@
 										</t:TableData>
 										<t:TableData paddingRight="2">
 											<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Become a Certified User!"></b:Heading>
-											<b:Heading size="H6" text="In partnership with our Ethics Review Board, we've updated our terms of use to ensure that users who create content in the system are informed about appropriate conduct when dealing with possibly sensitive data." />
+											<bh:Paragraph text="In partnership with our Ethics Review Board, we've updated our terms of use to ensure that users who create content in the system are informed about appropriate conduct when dealing with possibly sensitive data." />
 											<b:Button text="Learn more about certification" />
 										</t:TableData>
 									</t:TableRow>
@@ -293,7 +288,7 @@
 								</t:TableData>
 								<t:TableData paddingRight="2">
 									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Access your data anywhere"></b:Heading>
-									<b:Heading size="H6">
+									<bh:Paragraph>
 										<bh:Text>Synapse provides APIs to store or access your data from the web or programmatically via one of our supported analytical clients (</bh:Text>
 										<b:Anchor target="_blank" href="http://docs.synapse.org/r/" text="R"/>
 										<bh:Text>,&nbsp;</bh:Text>
@@ -301,7 +296,7 @@
 										<bh:Text>,&nbsp;</bh:Text>
 										<b:Anchor target="_blank" href="http://docs.synapse.org/python/build/html/CommandLineClient.html" text="command line"/>
 										<bh:Text>)</bh:Text>
-									</b:Heading>
+									</bh:Paragraph>
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
@@ -316,7 +311,7 @@
 								</t:TableData>
 								<t:TableData paddingRight="2">
 									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Query structured data"></b:Heading>
-									<b:Heading size="H6" text="Use Synapse Tables to query structured data right from your web browser, or from any analytical client!" />
+									<bh:Paragraph text="Use Synapse Tables to query structured data right from your web browser, or from any analytical client!" />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
@@ -345,7 +340,7 @@
 								</t:TableData>
 								<t:TableData paddingRight="2">
 									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Record provenance"></b:Heading>
-									<b:Heading size="H6" text="Synapse provides tools to record and display provenance of your analysis - giving you credit for each step of the work you do!" />
+									<bh:Paragraph text="Synapse provides tools to record and display provenance of your analysis - giving you credit for each step of the work you do!" />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
@@ -360,7 +355,7 @@
 								</t:TableData>
 								<t:TableData paddingRight="2">
 									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Mint a doi"></b:Heading>
-									<b:Heading size="H6" text="A digital object identifier (DOI) provides provides a persistent and easy way to reference your digital assets in publications - including data, code, or analysis results." />
+									<bh:Paragraph text="A digital object identifier (DOI) provides provides a persistent and easy way to reference your digital assets in publications - including data, code, or analysis results." />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
@@ -388,7 +383,7 @@
 								</t:TableData>
 								<t:TableData paddingRight="2">
 									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Communicate your findings"></b:Heading>
-									<b:Heading size="H6" text="Use the Synapse Wiki services to communicate your Project's research findings by embedding rich content such as images, Tables, Provenance, and even LaTeX equations." />
+									<bh:Paragraph text="Use the Synapse Wiki services to communicate your Project's research findings by embedding rich content such as images, Tables, Provenance, and even LaTeX equations." />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
@@ -403,12 +398,26 @@
 								</t:TableData>
 								<t:TableData paddingRight="2">
 									<b:Heading size="H4" addStyleNames="font-weight-bolder" text="Share your research"></b:Heading>
-									<b:Heading size="H6" text="New Synapse Projects are private by default - share with your colleagues, collaborators, and even make your work public! Create Synapse Teams to manage your collaborations." />
+									<bh:Paragraph text="New Synapse Projects are private by default - share with your colleagues, collaborators, and even make your work public! Create Synapse Teams to manage your collaborations." />
 								</t:TableData>
 							</t:TableRow>
 						</t:Table>
 					</b:Panel>
-				</b:Column>				
+				</b:Column>		
+				<bh:Div ui:field="sponsorsUI">
+					<bh:Hr />
+	        		<b:Column size="SM_12" addStyleNames="margin-bottom-20">
+	        			<bh:Span text="OUR PARTNERS" addStyleNames="partnersHeading displayBlock" />
+						<g:HTMLPanel addStyleNames="center">
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nhlbi.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-heart.svg' height="80px" width="15%" /></a></span>                            
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nimh.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-mental.svg' height="80px" width="15%" /></a></span>                                                       
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.sloan.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/sloan.svg' height="80px" width="15%" /></a></span>
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.nia.nih.gov/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/nih-aging.svg' height="80px" width="15%" /></a></span>
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.lsdfa.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/life-sciences.svg' height="80px" width="15%" /></a></span>
+							<span class="margin-bottom-5 margin-right-15"><a href="http://www.ctf.org/" target="_new"><g:Image url='https://s3.amazonaws.com/static.synapse.org/images/ctf.svg' height="80px" width="15%" /></a></span>
+						</g:HTMLPanel>
+					</b:Column>
+				</bh:Div>
 			</b:Row>
 		</b:Container>
 	</g:HTMLPanel>

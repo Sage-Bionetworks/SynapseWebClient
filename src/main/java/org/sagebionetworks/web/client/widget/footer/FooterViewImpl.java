@@ -2,7 +2,9 @@ package org.sagebionetworks.web.client.widget.footer;
 
 import java.util.Date;
 
+import org.gwtbootstrap3.client.ui.Alert;
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.web.client.DisplayConstants;
@@ -13,8 +15,6 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.accessrequirements.ToggleACTActionsButton;
 
-import com.google.gwt.event.dom.client.ClickEvent;
-import com.google.gwt.event.dom.client.ClickHandler;
 import com.google.gwt.i18n.client.DateTimeFormat;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
@@ -27,9 +27,12 @@ public class FooterViewImpl implements FooterView {
 	
 	public interface Binder extends UiBinder<Widget, FooterViewImpl> {
 	}
-
 	@UiField
-	Anchor debugLink;	
+	Alert debugModeAlert;
+	@UiField
+	Button debugLink;	
+	@UiField
+	Anchor debugOffLink;
 	@UiField
 	Anchor copyrightYear;
 	@UiField
@@ -37,9 +40,9 @@ public class FooterViewImpl implements FooterView {
 	@UiField
 	Span repoVersionSpan;
 	@UiField
-	Div sponsorsUI;
-	@UiField
 	Anchor reportAbuseLink;
+	@UiField
+	Anchor reportAbuseLink2;
 	@UiField
 	Span hideACTActionsContainer;
 	String portalVersion, repoVersion;
@@ -48,7 +51,6 @@ public class FooterViewImpl implements FooterView {
 	private GlobalApplicationState globalAppState;
 	private ToggleACTActionsButton hideACTActionsButton;
 	Div container = new Div();
-	boolean sponsorsVisible;
 	
 	@Inject
 	public FooterViewImpl(Binder binder, CookieProvider cookies, GlobalApplicationState globalAppState, ToggleACTActionsButton hideACTActionsButton, GWTWrapper gwt) {
@@ -59,21 +61,19 @@ public class FooterViewImpl implements FooterView {
 			
 			initDebugModeLink();
 			hideACTActionsContainer.add(hideACTActionsButton);
-			copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " Sage Bionetworks");
-			reportAbuseLink.addClickHandler(new ClickHandler() {
-				
-				@Override
-				public void onClick(ClickEvent event) {
-					presenter.onReportAbuseClicked();
-				}
+			copyrightYear.setText(DateTimeFormat.getFormat("yyyy").format(new Date()) + " SAGE BIONETWORKS");
+			reportAbuseLink.addClickHandler(event->{
+				presenter.onReportAbuseClicked();
 			});
-			
+			reportAbuseLink2.addClickHandler(event->{
+				presenter.onReportAbuseClicked();
+			});
 			if (portalVersion != null) {
 				portalVersionSpan.setText(portalVersion);
 				repoVersionSpan.setText(repoVersion);
 			}
 			
-			sponsorsUI.setVisible(sponsorsVisible);
+			refresh();
 		};
 		gwt.scheduleExecution(constructViewCallback, 2500);
 		this.cookies = cookies;
@@ -87,24 +87,20 @@ public class FooterViewImpl implements FooterView {
 	}
 	
 	private void initDebugModeLink() {
-		debugLink.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				if (!DisplayUtils.isInTestWebsite(cookies)) {
-					//verify
-					DisplayUtils.confirm(DisplayConstants.TEST_MODE_WARNING, () -> {
-						//switch to pre-release test website mode
-						DisplayUtils.setTestWebsite(true, cookies);
-						Window.scrollTo(0, 0);
-						globalAppState.refreshPage();
-					});
-				} else {
-					//switch back to standard mode
-					DisplayUtils.setTestWebsite(false, cookies);
-					globalAppState.refreshPage();
-				}
-				
-			}
+		debugLink.addClickHandler(event -> {
+			DisplayUtils.confirm(DisplayConstants.TEST_MODE_WARNING, () -> {
+				//switch to pre-release test website mode
+				DisplayUtils.setTestWebsite(true, cookies);
+				Window.scrollTo(0, 0);
+				refresh();
+				globalAppState.refreshPage();
+			});
+		});
+		debugOffLink.addClickHandler(event -> {
+			DisplayUtils.setTestWebsite(false, cookies);
+			Window.scrollTo(0, 0);
+			refresh();
+			globalAppState.refreshPage();
 		});
 	}
 	
@@ -131,14 +127,13 @@ public class FooterViewImpl implements FooterView {
 	
 	@Override
 	public void refresh() {
-		hideACTActionsButton.refresh();	
-	}
-	
-	@Override
-	public void setSynapseSponsorsVisible(boolean visible) {
-		sponsorsVisible = visible;
-		if (sponsorsUI != null) {
-			sponsorsUI.setVisible(visible);	
+		hideACTActionsButton.refresh();
+		boolean isTestMode = DisplayUtils.isInTestWebsite(cookies);
+		if (debugModeAlert != null) {
+			debugModeAlert.setVisible(isTestMode);	
+		}
+		if (debugLink != null) {
+			debugLink.setVisible(!isTestMode);	
 		}
 	}
 }

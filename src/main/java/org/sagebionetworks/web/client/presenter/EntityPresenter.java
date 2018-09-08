@@ -172,14 +172,14 @@ public class EntityPresenter extends AbstractActivity implements EntityView.Pres
 					entityPageTop.configure(bundle.getEntity(), versionNumber, projectHeader, area, areaToken);
 					view.setEntityPageTopWidget(entityPageTop);
 					view.setEntityPageTopVisible(true);
-					headerWidget.configure(false, projectHeader);	
+					headerWidget.configure(projectHeader);	
 				}
 			}
 			
 			@Override
 			public void onFailure(Throwable caught) {
 				view.setLoadingVisible(false);
-				headerWidget.configure(false);
+				headerWidget.configure();
 				if(caught instanceof NotFoundException) {
 					show404();
 				} else if(caught instanceof ForbiddenException && authenticationController.isLoggedIn()) {

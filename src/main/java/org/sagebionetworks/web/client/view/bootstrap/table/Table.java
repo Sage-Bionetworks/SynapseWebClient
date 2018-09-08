@@ -16,4 +16,8 @@ public class Table extends ComplexWidget {
     public Table() {
     	setElement(Document.get().createTableElement());
     }
+    
+    public void setAlign(String alignment) {
+    	getElement().setAttribute("align", alignment);
+    }
 }

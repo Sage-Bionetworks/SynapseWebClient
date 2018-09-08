@@ -51,7 +51,6 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	public static final Long LIMIT = 30L;
 	private static final DiscussionFilter DEFAULT_FILTER = DiscussionFilter.EXCLUDE_DELETED;
 
-	private static final String CONFIRM_DELETE_DIALOG_TITLE = "Confirm Deletion";
 	private static final String CONFIRM_RESTORE_DIALOG_TITLE = "Confirm Restoration";
 	private static final String DELETE_CONFIRM_MESSAGE = "Are you sure you want to delete this thread?";
 	private static final String DELETE_SUCCESS_TITLE = "Thread deleted";
@@ -479,11 +478,8 @@ public class SingleDiscussionThreadWidget implements SingleDiscussionThreadWidge
 	
 	@Override
 	public void onClickDeleteThread() {
-		popupUtils.showConfirmDialog(CONFIRM_DELETE_DIALOG_TITLE, DELETE_CONFIRM_MESSAGE, new Callback() {
-			@Override
-			public void invoke() {
-				deleteThread();
-			}
+		popupUtils.showConfirmDelete(DELETE_CONFIRM_MESSAGE, () -> {
+			deleteThread();
 		});
 	}
 

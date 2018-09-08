@@ -112,7 +112,7 @@ public class EntityPresenterTest {
 	@Test
 	public void testConstruction() {
 		verify(mockEntityPageTop).setEntityUpdatedHandler(any(EntityUpdatedHandler.class));
-		verify(mockHeaderWidget, never()).configure(false); // waits to configure for entity header
+		verify(mockHeaderWidget, never()).configure(); // waits to configure for entity header
 	}
 	
 	@Test
@@ -132,7 +132,7 @@ public class EntityPresenterTest {
 		verify(mockView, times(2)).setEntityPageTopWidget(mockEntityPageTop);
 		verify(mockView).setOpenTeamInvitesWidget(mockOpenInviteWidget);
 		verify(mockHeaderWidget).refresh();
-		verify(mockHeaderWidget).configure(eq(false), any(EntityHeader.class));
+		verify(mockHeaderWidget).configure(any(EntityHeader.class));
 	}
 	
 	@Test

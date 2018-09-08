@@ -26,4 +26,6 @@ public interface PopupUtilsView {
 			Callback yesCallback
 			);
 	void openInNewWindow(String url);
+	void showConfirmDelete(String message, 
+			Callback callback);
 }

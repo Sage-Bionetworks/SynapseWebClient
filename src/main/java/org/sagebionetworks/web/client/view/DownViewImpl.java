@@ -26,12 +26,12 @@ public class DownViewImpl implements DownView {
 			Header headerWidget) {
 		widget = uiBinder.createAndBindUi(this);
 		this.headerWidget = headerWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 	}
 
 	@Override
 	public void init() {
-		headerWidget.configure(false);
+		headerWidget.configure();
 		com.google.gwt.user.client.Window.scrollTo(0, 0); // scroll user to top of page
 	}
 	

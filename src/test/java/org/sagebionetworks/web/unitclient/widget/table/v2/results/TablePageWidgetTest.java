@@ -228,7 +228,7 @@ public class TablePageWidgetTest {
 		// Static headers should be used for edits
 		assertTrue(staticHeader.isEmpty());
 		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
-		verify(mockView).setFacetsVisible(false);
+		verify(mockView, times(2)).setFacetsVisible(false);
 		verify(mockView, never()).setFacetsVisible(true);
 		long rowCount = rows.size();
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
@@ -241,13 +241,18 @@ public class TablePageWidgetTest {
 		boolean isEditable = false;
 		// Sortable headers should be used for views.
 		assertTrue(sortHeaders.isEmpty());
+		widget.setFacetsVisible(true);
 		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
 		verify(mockFacetsWidget).configure(eq(facets), eq(mockFacetChangedHandler), anyList());
 		long rowCount = rows.size();
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(false);
 		assertEquals(bundle.getColumnModels().size()+1, sortHeaders.size());
-		verify(mockView, times(2)).setFacetsVisible(true);
+		
+		// facets panel is shown when table is ready (and facets are supported)
+		verify(mockView, never()).setFacetsVisible(true);
+		widget.setTableVisible(true);
+		verify(mockView).setFacetsVisible(true);
 	}
 	
 	@Test
@@ -255,7 +260,7 @@ public class TablePageWidgetTest {
 		boolean isEditable = false;
 		facets.clear();
 		widget.configure(bundle, query, null, isEditable, tableType, null, mockPageChangeListner, mockFacetChangedHandler, mockResetFacetsHandler);
-		verify(mockView).setFacetsVisible(false);
+		verify(mockView, times(2)).setFacetsVisible(false);
 		verify(mockView, never()).setFacetsVisible(true);
 	}
 	

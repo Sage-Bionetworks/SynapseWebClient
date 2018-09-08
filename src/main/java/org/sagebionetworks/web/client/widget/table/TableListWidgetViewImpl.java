@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.table;
 import org.gwtbootstrap3.client.ui.ListGroup;
 import org.gwtbootstrap3.client.ui.constants.HeadingSize;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.SortBy;
@@ -37,7 +38,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	Div sortButtonContainer;
 	@UiField
 	Div synAlertContainer;
-	
+	@UiField
+	Span emptyUI;
 	HTMLPanel panel;
 	Presenter presenter;
 	PortalGinInjector ginInjector;
@@ -56,6 +58,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 
 	@Override
 	public void addTableListItem(final EntityHeader header) {
+		emptyUI.setVisible(false);
+		sortButtonContainer.setVisible(true);
 		tablesList.add(new TableEntityListGroupItem(HeadingSize.H4, header, new ClickHandler() {
 			@Override
 			public void onClick(ClickEvent event) {
@@ -67,6 +71,8 @@ public class TableListWidgetViewImpl implements TableListWidgetView {
 	@Override
 	public void clearTableWidgets() {
 		tablesList.clear();
+		emptyUI.setVisible(true);
+		sortButtonContainer.setVisible(false);
 	}
 	
 	@Override

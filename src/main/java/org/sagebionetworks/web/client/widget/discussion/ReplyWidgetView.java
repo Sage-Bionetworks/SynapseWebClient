@@ -33,8 +33,6 @@ public interface ReplyWidgetView extends IsWidget{
 
 	void setDeleteIconVisibility(Boolean visible);
 
-	void showDeleteConfirm(String deleteConfirmMessage, Callback callback);
-
 	void setEditIconVisible(boolean visible);
 
 	void setEditReplyModal(Widget widget);

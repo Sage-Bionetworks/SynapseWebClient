@@ -10,7 +10,7 @@
 		<bh:Div addStyleNames="padding-5 light-border-bottom">
 			<t:Table width="100%">
 				<t:TableRow>
-					<t:TableData>
+					<t:TableData paddingRight="10">
 						<b:Anchor ui:field="threadLink" iconFixedWidth="true" iconSize="LARGE" addStyleNames="lead margin-right-10 textDecorationNone"/>
 					</t:TableData>
 					<t:TableData width="60px" addStyleNames="visible-lg">

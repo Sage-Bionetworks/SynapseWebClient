@@ -5,6 +5,7 @@ import java.util.List;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.GWTWrapper;
+import org.sagebionetworks.web.client.SynapseJSNIUtilsImpl;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.view.bootstrap.table.TBody;
 import org.sagebionetworks.web.client.view.bootstrap.table.TableHeader;
@@ -58,6 +59,10 @@ public class TablePageViewImpl implements TablePageView {
 	Div topScrollDiv;
 	@UiField
 	Div tableDiv;
+	
+	public static final String ACTIVE_FACET_WIDGET_STYLES = "pull-left-unless-xs margin-right-10 panel panel-default padding-10 facetsWidget-active";
+	public static final String INACTIVE_FACET_WIDGET_STYLES = "pull-left-unless-xs facetsWidget-inactive";
+
 	@Inject
 	public TablePageViewImpl(
 			Binder binder, 
@@ -151,8 +156,10 @@ public class TablePageViewImpl implements TablePageView {
 	
 	@Override
 	public void setFacetsVisible(boolean visible) {
-		facetsWidgetContainer.setVisible(visible);
+		String styles = visible ? ACTIVE_FACET_WIDGET_STYLES : INACTIVE_FACET_WIDGET_STYLES;
+		facetsWidgetContainer.setStyleName(styles);;
 	}
+	
 	@Override
 	public void setTableVisible(boolean visible) {
 		tablePanel.setVisible(visible);

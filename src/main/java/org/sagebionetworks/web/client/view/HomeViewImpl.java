@@ -107,7 +107,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 		
 		addUserPicturePanel();
 		
-		headerWidget.configure(true);
+		headerWidget.configure();
 		
 		dashboardBtn.addClickHandler(new ClickHandler() {			
 			@Override
@@ -257,7 +257,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 	
 	@Override
 	public void refresh() {
-		headerWidget.configure(true);
+		headerWidget.configure();
 		headerWidget.refresh();
 		clear();
 	}

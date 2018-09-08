@@ -46,7 +46,7 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 		initWidget(uiBinder.createAndBindUi(this));
 		this.headerWidget = headerWidget;
 		this.certificateWidget = certificateWidget;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		certificateContainer.setWidget(certificateWidget.asWidget());
 		okButton.addClickHandler(new ClickHandler() {
 			@Override
@@ -59,7 +59,7 @@ public class CertificateViewImpl extends Composite implements CertificateView {
 	@Override
 	public void setPresenter(Presenter loginPresenter) {
 		this.presenter = loginPresenter;
-		headerWidget.configure(false);
+		headerWidget.configure();
 		DisplayUtils.scrollToTop();
 	}
 	

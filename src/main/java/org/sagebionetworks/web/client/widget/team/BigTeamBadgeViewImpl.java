@@ -73,6 +73,7 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 			anchor.setHref(DisplayUtils.getTeamHistoryToken(teamId));	
 		}
 		anchor.add(mediaObjectPanel);
+		anchor.addStyleName("clearfix");
 		mediaObjectPanel.addStyleName("displayInline");
 		add(notificationsPanel);
 		add(anchor);
