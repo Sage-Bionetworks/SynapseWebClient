@@ -248,11 +248,7 @@ public class TablePageWidgetTest {
 		verify(mockPaginationWidget).configure(query.getLimit(), query.getOffset(), rowCount, mockPageChangeListner);
 		verify(mockView).setEditorBufferVisible(false);
 		assertEquals(bundle.getColumnModels().size()+1, sortHeaders.size());
-		
-		// facets panel is shown when table is ready (and facets are supported)
-		verify(mockView, never()).setFacetsVisible(true);
-		widget.setTableVisible(true);
-		verify(mockView).setFacetsVisible(true);
+		verify(mockView, times(2)).setFacetsVisible(true);
 	}
 	
 	@Test
