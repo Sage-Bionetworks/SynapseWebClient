@@ -13,6 +13,6 @@
 		<b:Tooltip trigger="HOVER" placement="RIGHT" title="Click the star to add this to your favorites!">
 			<b:Anchor addStyleNames="greyText-imp textDecorationNone" ui:field="notFavoriteIcon" icon="STAR_O" visible="false"/>
 		</b:Tooltip>
-		<w:LoadingSpinner ui:field="loadingUI" size="16px" />
+		<w:LoadingSpinner ui:field="loadingUI" size="16px" marginLeft="8" />
 	</bh:Span>
 </ui:UiBinder>
