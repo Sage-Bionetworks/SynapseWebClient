@@ -3,6 +3,7 @@ package org.sagebionetworks.web.client.widget.search;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.TextBox;
 import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.GWTWrapper;
 
 import com.google.gwt.dom.client.Element;
 import com.google.gwt.event.dom.client.KeyCodes;
@@ -21,12 +22,14 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	Icon searchButton;
 	@UiField
 	TextBox searchField;
+	GWTWrapper gwt;
 	public static final String INACTIVE_STYLE = "inactive";
 	public static final String ACTIVE_STYLE = "active";
 	
 	@Inject
-	public SearchBoxViewImpl(Binder binder) {
+	public SearchBoxViewImpl(Binder binder, GWTWrapper gwt) {
 		widget = binder.createAndBindUi(this);
+		this.gwt = gwt;
 		searchField.getElement().setAttribute("placeholder", " Search all of Synapse");
 		initClickHandlers();
 	}
@@ -41,7 +44,10 @@ public class SearchBoxViewImpl implements SearchBoxView {
 			}
 		});
 	    searchField.addBlurHandler(event -> {
-	    	searchFieldInactive();
+	    	// delay auto-hiding the search box (on focus loss) for .4s so that the search can execute on search button click (when active).
+	    	gwt.scheduleExecution(() -> {
+	    		searchFieldInactive();	
+	    	}, 400);
 	    });
 	    searchButton.addClickHandler(event -> {
 	    	searchField.setFocus(true);
