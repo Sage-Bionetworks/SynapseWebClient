@@ -37,6 +37,7 @@ public class ProjectBadge implements SynapseWidgetPresenter {
 		this.gwt = gwt;
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		view.setFavoritesWidget(favoritesWidget.asWidget());
+		favoritesWidget.setLoadingSize(10);
 	}
 	
 	public void configure(ProjectHeader header) {

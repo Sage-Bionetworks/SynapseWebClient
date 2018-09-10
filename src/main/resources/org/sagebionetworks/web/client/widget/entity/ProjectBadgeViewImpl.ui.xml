@@ -12,8 +12,8 @@
 		</b:Tooltip>
 		<bh:Span ui:field="favoritesWidgetContainer"/>
 		<bh:Span ui:field="additionalTextUI" addStyleNames="margin-left-5 right">
-			<bh:Span addStyleNames="smallGreyText">Last activity on: </bh:Span>
-			<bh:Span ui:field="additionalText" addStyleNames="smallGreyText"></bh:Span>
+			<bh:Span>Last activity on: </bh:Span>
+			<bh:Span ui:field="additionalText" />
 		</bh:Span>
 	</bh:Div>
 </ui:UiBinder>
