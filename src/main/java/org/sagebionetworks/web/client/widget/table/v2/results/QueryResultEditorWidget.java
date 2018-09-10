@@ -59,6 +59,7 @@ public class QueryResultEditorWidget implements
 			ClientCache clientCache) {
 		this.view = view;
 		this.pageWidget = pageWidget;
+		pageWidget.setTableVisible(true);
 		this.editJobTrackingWidget = editJobTrackingWidget;
 		this.view.setTablePageWidget(pageWidget);
 		this.view.setPresenter(this);
