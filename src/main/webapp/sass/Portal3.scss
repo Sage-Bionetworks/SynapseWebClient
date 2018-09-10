@@ -2471,11 +2471,11 @@ div.border {
 	margin-left: -1px;
 }
 
-.zeroOpacity {
+#body .zeroOpacity {
 	opacity: 0;
 	transition: opacity 0.3s ease-in;
 }
-.fullOpacity {
+#body .fullOpacity {
 	opacity: 1;
 	transition: opacity 0.3s ease-in;
 }

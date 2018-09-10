@@ -19,6 +19,7 @@ import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
+import org.sagebionetworks.web.client.place.SynapseForumPlace;
 import org.sagebionetworks.web.client.widget.search.SearchBox;
 import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -74,6 +75,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	AnchorListItem myChallengesLink;
 	@UiField
 	AnchorListItem mySettingsLink;
+	@UiField
+	AnchorListItem helpForumLink;
+	@UiField
+	AnchorListItem sendFeedbackLink;
+	@UiField
+	AnchorListItem emailSynapseSupportLink;
 
 	@UiField
 	DropDown dashboardDropdown;
@@ -159,8 +166,13 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		documentationLink.addClickHandler(event -> {
 			event.preventDefault();
 			DisplayUtils.newWindow(WebConstants.DOCS_BASE_URL, "", "");
+			hideDropdown();
 		});
-		
+		emailSynapseSupportLink.addClickHandler(event -> {
+			event.preventDefault();
+			DisplayUtils.newWindow("mailto:synapseinfo@sagebionetworks.org", "", "");
+			hideDropdown();
+		});
 		trashLink.addClickHandler(event -> {
     		presenter.onTrashClick();
 		});
@@ -177,21 +189,40 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		myDashboardLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.PROJECTS);
 			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
 		});
 		myTeamsLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.TEAMS);
 			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
 		});
 		myChallengesLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.CHALLENGES);
 			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
 		});
 		mySettingsLink.addClickHandler(event -> {
 			Profile place = new Profile(userId, ProfileArea.SETTINGS);
 			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
 		});
-
+		helpForumLink.addClickHandler(event -> {
+			SynapseForumPlace place = new SynapseForumPlace("default");
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
+		sendFeedbackLink.addClickHandler(event -> {
+			// pendo should also listen for click event on this element
+			hideDropdown();
+		});
 	}
+	
+	private void hideDropdown() {
+		// since the dropdown visibility is controlled by the hover state, a js solution is to remove the hover element from the dom and add it back.
+		headerButtons.removeFromParent();
+		headerDiv.add(headerButtons);
+	}
+	
 	@Override
 	public void setPresenter(Presenter presenter) {
 		this.presenter = presenter;
@@ -255,6 +286,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 				headerFavDropdownMenu.removeStyleName("hover");
 				Synapse place = new Synapse(header.getId());
 				globalAppState.getPlaceChanger().goTo(place);
+				hideDropdown();
 			});
 			headerFavDropdownMenu.add(favItem);
 		}
