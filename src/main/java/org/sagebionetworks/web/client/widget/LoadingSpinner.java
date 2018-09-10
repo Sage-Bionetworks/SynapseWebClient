@@ -100,4 +100,11 @@ public class LoadingSpinner implements IsWidget, SupportsLazyLoadInterface {
 	public boolean isVisible() {
 		return spinnerContainer.isVisible();
 	}
+	public void setMarginLeft(double margin) {
+		spinnerContainer.setMarginLeft(margin);
+	}
+	public void setMarginRight(double margin) {
+		spinnerContainer.setMarginLeft(margin);
+	}
+
 }
