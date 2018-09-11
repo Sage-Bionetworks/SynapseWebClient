@@ -228,7 +228,7 @@ public class DisplayUtils {
 	
 	public static void notify(String title, String message, NotifySettings settings) {
 		try{
-			if (title != null && !title.endsWith(":")) {
+			if (title != null && !title.isEmpty() && !title.endsWith(":")) {
 				title += ":";
 			}
 			Notify.notify(title, message, settings);
