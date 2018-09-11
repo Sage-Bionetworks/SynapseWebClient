@@ -497,30 +497,6 @@ public class SynapseJSNIUtilsImpl implements SynapseJSNIUtils {
 	}-*/;
 	
 	@Override
-	public void showTwitterFeed(String dataWidgetId, String elementId,
-			String linkColor, String borderColor, int tweetCount) {
-		_showTwitterFeed(dataWidgetId, elementId, linkColor, borderColor, tweetCount);		
-	}
-
-	private final static native void _showTwitterFeed(String dataWidgetId,
-			String elementId, String linkColorHex, String borderColorHex,
-			int tweetCount) /*-{
-		try {
-			if (typeof $wnd.twttr !== 'undefined') {
-				var element = $doc.getElementById(elementId);
-				$wnd.twttr.widgets.createTimeline(dataWidgetId, element, {
-					chrome : "nofooter noheader",
-					linkColor : linkColorHex,
-					borderColor : borderColorHex,
-					tweetLimit : tweetCount
-				});
-			}
-		} catch (err) {
-			console.error(err);
-		}
-	}-*/;
-	
-	@Override
 	public boolean elementSupportsAttribute(Element el, String attribute) {
 		return _elementSupportsAttribute(el.getTagName(), attribute);
 	}

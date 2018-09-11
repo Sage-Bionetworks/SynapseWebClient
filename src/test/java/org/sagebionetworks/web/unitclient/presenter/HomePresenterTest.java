@@ -1,14 +1,14 @@
 package org.sagebionetworks.web.unitclient.presenter;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.junit.Assert.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,7 +37,6 @@ import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Profile;
 import org.sagebionetworks.web.client.presenter.HomePresenter;
 import org.sagebionetworks.web.client.resources.ResourceLoader;
-import org.sagebionetworks.web.client.resources.WebResource;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.view.HomeView;
 import org.sagebionetworks.web.shared.OpenUserInvitationBundle;
@@ -123,21 +122,6 @@ public class HomePresenterTest {
 		homePresenter.setPlace(place);
 		verify(mockView).refresh();
 	}
-	
-	@Test
-	public void testNewsFeed() throws JSONObjectAdapterException {
-		homePresenter.loadNewsFeed();
-		
-		verify(mockView).prepareTwitterContainer(anyString(), anyInt());
-		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(false);
-		homePresenter.twitterContainerReady("twitterElementId");
-		verify(mockResourceLoader).isLoaded(any(WebResource.class));
-		verify(mockResourceLoader).requires(any(WebResource.class), any(AsyncCallback.class));
-		
-		when(mockResourceLoader.isLoaded(any(WebResource.class))).thenReturn(true);
-		homePresenter.twitterContainerReady("twitterElementId");
-		verify(mockSynapseJSNIUtils).showTwitterFeed(anyString(), anyString(), anyString(), anyString(), eq(HomePresenter.TWEET_COUNT));
-	}	
 	
 	
 	@Test
