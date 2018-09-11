@@ -19,7 +19,7 @@
 			</b:Row>
 		<b:Heading size="H5" addStyleNames="margin-top-20">
 			<b:Anchor text="Forgot password?" addStyleNames="synapse-green left" href="#!PasswordReset:0"/>
-			<b:Heading size="H5" subText="It's free!" addStyleNames="displayInlineBlock margin-top-0 margin-bottom-0-imp right"/>
+			<bh:Span  addStyleNames="right lightGreyText">It's free!</bh:Span>
 			<b:Anchor text="Register" addStyleNames="synapse-green right margin-right-10" href="#!RegisterAccount:0"/>
 		</b:Heading>
 		<bh:ClearFix />

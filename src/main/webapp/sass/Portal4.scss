@@ -20,7 +20,7 @@ $synapse-green: #28a745;
 $synapse-blue: #2B688F;
 $synapse-blue-end-gradient: #164B6E;
 $synapse-purple: #7772b4;
-$synapse-yellow: #E4B528;
+$synapse-yellow: #e0b603;
 $synapse-orange: #E8762B;
 $synapse-accent-primary: #17a2b8;
 
@@ -130,6 +130,9 @@ end sticky footer
 	}
 	.form-control-readonly {
 		cursor: text;
+	}
+	.alert-warning {
+		background-color:$synapse-yellow;
 	}
 }
 /* End bootstrap overrides */
@@ -2006,7 +2009,7 @@ div.input-group > input.search-textbox {
 }
 
 .text-warning, #rootPanel .text-warning {
-	color: #f19223;
+	color: $synapse-yellow;
 }
 
 /**Override JQuery table styles **/

@@ -55,6 +55,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		this.globalApplicationState = globalApplicationState;
 		this.jsClient = jsClient;
 		this.favWidget = favWidget;
+		favWidget.setLoadingSize(16);
 		this.synapseJSNIUtils = synapseJSNIUtils;
 		this.portalGinInjector = portalGinInjector;
 		view.clear();
