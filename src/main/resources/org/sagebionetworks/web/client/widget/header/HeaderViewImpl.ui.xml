@@ -48,7 +48,7 @@
 				</g:SimplePanel>
 				<b:DropDown ui:field="dashboardDropdown" addStyleNames="right padding-left-10 padding-right-10 imageButton min-width-200 hideLeftPixelOnHover" visible="false" height="53px" paddingTop="10">
 					<b:Anchor dataToggle="DROPDOWN" ui:field="dashboardDropdownAnchor" />
-					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-5 color-white"/>
+					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-30 color-white"/>
 					<b:DropDownMenu ui:field="dashboardDropdownMenu" width="100%">
 						<b:AnchorListItem ui:field="myDashboardLink">Projects</b:AnchorListItem>
 						<b:AnchorListItem ui:field="myTeamsLink">Teams</b:AnchorListItem>
@@ -57,9 +57,9 @@
 						<b:Divider/>
 						<b:AnchorListItem ui:field="mySettingsLink">Settings</b:AnchorListItem>
 						<b:Divider/>
-						<b:AnchorListItem addStyleNames="submit-feedback-command">Send Feedback</b:AnchorListItem>
+						<b:AnchorListItem addStyleNames="submit-feedback-command" ui:field="sendFeedbackLink">Send Feedback</b:AnchorListItem>
 						<b:AnchorListItem ui:field="documentationLink" icon="EXTERNAL_LINK" iconFixedWidth="true" iconPosition="RIGHT" href="http://docs.synapse.org">Documentation</b:AnchorListItem>
-						<b:AnchorListItem href="#!SynapseForum:default">Help Forum</b:AnchorListItem>
+						<b:AnchorListItem ui:field="helpForumLink">Help Forum</b:AnchorListItem>
 						<b:AnchorListItem ui:field="emailSynapseSupportLink" icon="ENVELOPE_O" href="mailto:synapseinfo@sagebionetworks.org" iconFixedWidth="true" iconPosition="RIGHT">Contact Us</b:AnchorListItem>
 						<b:Divider/>
 						<b:AnchorListItem ui:field="logoutLink" icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
@@ -68,7 +68,7 @@
 				<bh:Span addStyleNames="border-left-1 right hidden-xs" height="25px" marginTop="12"/>
 				<b:DropDown ui:field="headerFavDropdown" pull="RIGHT" addStyleNames="imageButton hideRightPixelOnHover hidden-xs" visible="false" height="53px" paddingTop="13" paddingRight="15" paddingLeft="0">
 					<b:Anchor ui:field="headerFavAnchor" dataToggle="DROPDOWN" icon="STAR" iconSize="TIMES2" height="28px" addStyleNames="color-white textDecorationNone" />
-					<b:Icon type="ANGLE_DOWN" addStyleNames="margin-left-5 color-white"/>
+					<b:Icon type="ANGLE_DOWN" addStyleNames="color-white moveup-5"/>
 					<b:DropDownMenu ui:field="headerFavDropdownMenu" addStyleNames="dropdown-menu-right">
 					</b:DropDownMenu>
 				</b:DropDown>
