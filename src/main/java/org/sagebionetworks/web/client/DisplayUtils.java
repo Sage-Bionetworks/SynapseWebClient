@@ -228,6 +228,9 @@ public class DisplayUtils {
 	
 	public static void notify(String title, String message, NotifySettings settings) {
 		try{
+			if (title != null && !title.endsWith(":")) {
+				title += ":";
+			}
 			Notify.notify(title, message, settings);
 		} catch(Throwable t) {
 			SynapseJSNIUtilsImpl._consoleError(getStackTrace(t));
