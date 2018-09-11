@@ -22,6 +22,7 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.doi.v2.Doi;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
@@ -49,6 +50,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
+import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -134,6 +136,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	CookieProvider cookies;
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
+	CreateOrUpdateDoiModal createOrUpdateDoiModal;
 	ApproveUserAccessModal approveUserAccessModal;
 	PortalGinInjector ginInjector;
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
@@ -211,6 +214,38 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return selectTeamModal;
 	}
 	
+	private CreateOrUpdateDoiModal getCreateOrUpdateDoiModal() {
+		if (createOrUpdateDoiModal == null) {
+			createOrUpdateDoiModal = ginInjector.getCreateOrUpdateDoiModal();
+			view.addWidget(createOrUpdateDoiModal.asWidget());
+			createOrUpdateDoiModal.setTitle("Create or Update a DOI");
+			createOrUpdateDoiModal.configure(doi -> onMintDoi(doi));
+		}
+		return createOrUpdateDoiModal;
+	}
+
+	public void onMintDoi(Doi doi) {
+		doi.setObjectId(entity.getId());
+		doi.setObjectType(ObjectType.ENTITY);
+		doi.setObjectVersion(getVersion());
+		if (entityBundle.getDoiAssociation() != null) {
+			doi.setEtag(entityBundle.getDoiAssociation().getEtag());
+		}
+		getCreateOrUpdateDoiModal().createOrUpdateDoi(doi, new AsyncCallback<Doi>() {
+			@Override
+			public void onSuccess(Doi v) {
+				view.showInfo("DOI CREATED", "NICE JOB THE DOI WAS CREATED DOGG");
+				view.showInfo("DOI:", doi.toString());
+				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent()); // This is what the old minter does
+				// TODO: Change to use a new DOI retrieval/display widget
+			}
+			@Override
+			public void onFailure(Throwable caught) {
+				view.showErrorMessage(caught.getMessage());
+			}
+		});
+	}
+
 	private ChallengeClientAsync getChallengeClient() {
 		if (challengeClient == null) {
 			challengeClient = ginInjector.getChallengeClientAsync();
@@ -373,6 +408,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureProvenance();
 		configureChangeStorageLocation();
 		configureCreateDOI();
+		configureCreateOrUpdateDoi();
 		configureEditProjectMetadataAction();
 		configureEditFileMetadataAction();
 		configureAddEvaluationAction();
@@ -545,6 +581,31 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				view.showErrorMessage(caught.getMessage());
 			}
 		});
+	}
+
+	private void configureCreateOrUpdateDoi() {
+		if (DisplayUtils.isInTestWebsite(cookies)){
+			boolean canEdit = permissions.getCanEdit();
+			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+			if (canEdit &&
+					!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
+					!(entityBundle.getEntity() instanceof EntityView)) {
+				actionMenu.setActionListener(Action.CREATE_OR_UPDATE_DOI, this);
+				actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+				if (entityBundle.getDoiAssociation() == null) {
+					// show command if not returned, thus not in existence
+					actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, "Create DOI for  " + enityTypeDisplay);
+				} else {
+					actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, "Update DOI for  " + enityTypeDisplay);
+				}
+			}			
+		} else {
+			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		}
+	}
+
+	private void onCreateOrUpdateDoi() {
+		getCreateOrUpdateDoiModal().show();
 	}
 
 	private void onCreateChallenge() {
@@ -924,6 +985,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case CREATE_DOI:
 			onCreateDOI();
+			break;
+		case CREATE_OR_UPDATE_DOI:
+			onCreateOrUpdateDoi();
 			break;
 		case ADD_EVALUATION_QUEUE:
 			onAddEvaluationQueue();

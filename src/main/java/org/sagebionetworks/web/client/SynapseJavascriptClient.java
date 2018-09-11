@@ -167,6 +167,7 @@ public class SynapseJavascriptClient {
 	public static final String OPEN_MEMBERSHIP_REQUEST = "/openRequest";
 	public static final String UPLOAD_DESTINATIONS = "/uploadDestinations";
 	public static final String PRINCIPAL = "/principal";
+	public static final String DOI = "/doi";
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	private static final String LOG = "/log";

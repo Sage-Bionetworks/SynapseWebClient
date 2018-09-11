@@ -40,6 +40,7 @@
 						<a:ActionMenuItem icon="TROPHY" iconFixedWidth="true" action="SUBMIT_TO_CHALLENGE">Submit to Challenge</a:ActionMenuItem>
 						<a:ActionMenuItem icon="ARROWS" iconFixedWidth="true" action="MOVE_ENTITY">Move</a:ActionMenuItem>
 						<a:ActionMenuItem icon="EXTERNAL_LINK" iconFixedWidth="true" action="CREATE_DOI">Create DOI</a:ActionMenuItem>
+						<a:ActionMenuItem icon="EXTERNAL_LINK" iconFixedWidth="true" action="CREATE_OR_UPDATE_DOI">Create or Update DOI</a:ActionMenuItem>
 						<a:ActionMenuItem icon="LINK" iconFixedWidth="true" action="CREATE_LINK">Save Link</a:ActionMenuItem>
 						<a:ActionMenuItem icon="TIMES_CIRCLE" iconFixedWidth="true" action="DELETE_ENTITY">Delete</a:ActionMenuItem>
 						<a:ActionMenuItem icon="UPLOAD" iconFixedWidth="true" action="UPLOAD_TABLE">Upload a Table</a:ActionMenuItem>
