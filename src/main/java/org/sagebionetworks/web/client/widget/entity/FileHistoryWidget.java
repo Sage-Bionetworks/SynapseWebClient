@@ -130,6 +130,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 	}
 	
 	public void refreshFileHistory() {
+		synAlert.clear();
 		view.clearVersions();
 		currentOffset = 0;
 		onMore();
