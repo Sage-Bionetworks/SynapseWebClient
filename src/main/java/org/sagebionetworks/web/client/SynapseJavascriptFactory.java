@@ -28,6 +28,7 @@ import org.sagebionetworks.repo.model.UserBundle;
 import org.sagebionetworks.repo.model.UserGroupHeaderResponsePage;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.asynch.AsyncJobId;
+import org.sagebionetworks.repo.model.asynch.AsynchronousJobStatus;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBodyInstanceFactory;
 import org.sagebionetworks.repo.model.auth.LoginResponse;
@@ -40,6 +41,8 @@ import org.sagebionetworks.repo.model.discussion.MessageURL;
 import org.sagebionetworks.repo.model.discussion.ThreadCount;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
+import org.sagebionetworks.repo.model.doi.v2.Doi;
+import org.sagebionetworks.repo.model.doi.v2.DoiResponse;
 import org.sagebionetworks.repo.model.file.AddPartResponse;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
@@ -125,6 +128,9 @@ public class SynapseJavascriptFactory {
 		AddPartResponse,
 		PaginatedResultsTotalNumberOfResults,
 		PrincipalAliasResponse,
+		Doi,
+		DoiResponse,
+		AsynchronousJobStatus,
 		None,
 		String
 	}
@@ -300,6 +306,12 @@ public class SynapseJavascriptFactory {
 				uploadDestinationList.add(response);
 			}
 			return uploadDestinationList;
+		case Doi:
+			return new Doi(json);
+		case DoiResponse:
+			return new DoiResponse(json);
+		case AsynchronousJobStatus:
+			return new AsynchronousJobStatus(json);
 		case MembershipInvitation:
 			return new MembershipInvitation(json);
 		case InviteeVerificationSignedToken:
