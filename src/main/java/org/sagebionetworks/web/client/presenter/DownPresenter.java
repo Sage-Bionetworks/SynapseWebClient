@@ -36,6 +36,7 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 		this.globalAppState = globalAppState;
 		this.stackConfigService = stackConfigService;
 		fixServiceEntryPoint(stackConfigService);
+		timeToNextRefresh = DELAY_MS;
 		updateTimerCallback = new Callback() {
 			@Override
 			public void invoke() {
@@ -99,7 +100,10 @@ public class DownPresenter extends AbstractActivity implements Presenter<Down> {
 	@Override
 	public void setPlace(Down place) {
 		view.init();
-		timeToNextRefresh = DELAY_MS;
-		checkForRepoDown();
+		timeToNextRefresh = 0;
+	}
+	
+	public int getTimeToNextRefresh() {
+		return timeToNextRefresh;
 	}
 }
