@@ -145,13 +145,13 @@ end sticky footer
 	.has-error .checkbox, .has-error .checkbox-inline, .has-error .control-label, .has-error .help-block, .has-error .radio, .has-error .radio-inline, .has-warning .form-control-feedback {
 		color: #eb5757;
 	}
-	#body .checkbox, #body .radio {
+	.checkbox, .radio {
 		padding-left: 0px;
 	}
 	input[type="checkbox"], input[type="radio"] {
 		display:none;
 	}
-	.checkbox label::before, .radio label::before {
+	.checkbox>label::before, .radio>label::before {
 		content: "";
 		display: inline-block;
 		vertical-align: middle;
@@ -159,11 +159,11 @@ end sticky footer
 		height: 16px;
 		border: 1px solid #888;
 		border-radius: 10px;
-		background: radial-gradient(#eee, #aaa);
+		background: radial-gradient(white, #eee);
 		margin-right: 5px;
 	}
 	
-	.checkbox label::before, .radio label::before {
+	.radio::before {
 		border-radius: 50%;
 	}
 	input[type="checkbox"]:checked + label::before, input[type="checkbox"]:checked + span::before {
@@ -171,10 +171,12 @@ end sticky footer
 		color: $synapse-blue;
 		text-align: center;
 		font-size: 20px;
-		margin-left: -13px;
+		margin-left: -19px;
+		vertical-align: bottom;
+		margin-right: 4px;
 	}
 	input[type="radio"]:checked + label::before, input[type="radio"]:checked + span::before {
-		background-image: radial-gradient($synapse-blue-end-gradient, $synapse-blue);
+		background: radial-gradient($synapse-blue-end-gradient, $synapse-blue);
 	}
 }
 /* End bootstrap overrides */
