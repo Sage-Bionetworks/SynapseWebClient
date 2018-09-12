@@ -21,7 +21,6 @@ import org.sagebionetworks.web.shared.WebConstants;
 import com.google.gwt.core.client.Scheduler;
 import com.google.gwt.event.dom.client.ClickEvent;
 import com.google.gwt.event.dom.client.ClickHandler;
-import com.google.gwt.event.logical.shared.AttachEvent;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.Window;
@@ -29,16 +28,12 @@ import com.google.gwt.user.client.ui.Composite;
 import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.HasVerticalAlignment;
 import com.google.gwt.user.client.ui.HorizontalPanel;
-import com.google.gwt.user.client.ui.ScrollPanel;
-import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class HomeViewImpl extends Composite implements HomeView {
 	
 	public interface HomeViewImplUiBinder extends UiBinder<Widget, HomeViewImpl> {}
-	@UiField
-	SimplePanel newsFeed;
 	@UiField
 	org.gwtbootstrap3.client.ui.Button dashboardBtn;
 	@UiField
@@ -186,22 +181,7 @@ public class HomeViewImpl extends Composite implements HomeView {
 			}
 		});
 	}
-	@Override
-	public void prepareTwitterContainer(final String elementId, int height) {
-		newsFeed.clear();
-		final ScrollPanel newDiv = new ScrollPanel();
-		newDiv.setHeight(height + "px");
-		newDiv.addAttachHandler(new AttachEvent.Handler() {
-			@Override
-			public void onAttachOrDetach(AttachEvent event) {
-				if (event.isAttached()) {
-					newDiv.getElement().setId(elementId);
-					presenter.twitterContainerReady(elementId);
-				}
-			}
-		});
-		newsFeed.add(newDiv);
-	}
+	
 	/**
 	 * Clear the divider/caret from the user button, and add the picture container
 	 * @param button

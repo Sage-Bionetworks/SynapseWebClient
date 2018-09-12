@@ -53,26 +53,23 @@
 				</b:Column>
 			</b:Row>
 		</b:Container>
-		<b:Container fluid="true">
-			<b:Row addStyleNames="margin-top-20">
-				<b:Column size="SM_7">
-					<bh:Div ui:field="dashboardUI" addStyleNames="synapse-blue-bg padding-30 margin-left-15 margin-bottom-15" visible="false">
+		<b:Container fluid="true" addStyleNames="light-border" marginLeft="10" marginTop="20">
+			<b:Row>
+				<b:Column size="SM_6" offset="SM_3">
+					<bh:Div ui:field="dashboardUI" addStyleNames="padding-30" visible="false" marginBottom="15" marginTop="15">
 						<bh:Div>
-							<b:Heading size="H3" addStyleNames="color-white margin-top-5 displayInline margin-right-5" text="WELCOME BACK,"></b:Heading>
-							<b:Heading ui:field="userDisplayName" size="H3" addStyleNames="color-white margin-top-5 displayInline" text=""></b:Heading>
+							<b:Heading size="H3" addStyleNames="margin-top-5 displayInline margin-right-5" text="WELCOME BACK,"></b:Heading>
+							<b:Heading ui:field="userDisplayName" size="H3" addStyleNames="margin-top-5 displayInline" text=""></b:Heading>
 						</bh:Div>
 						<b:Button ui:field="dashboardBtn" size="LARGE" block="true" marginTop="20" marginBottom="33" />
 					</bh:Div>
-					<bh:Div ui:field="registerUI" addStyleNames="margin-bottom-15 synapse-blue-bg padding-15">
-						<b:Heading size="H3" addStyleNames="color-white margin-top-5 margin-bottom-15" text="CREATE SYNAPSE ACCOUNT" />
+					<bh:Div ui:field="registerUI" addStyleNames="margin-bottom-15 padding-15">
+						<b:Heading size="H3" text="CREATE SYNAPSE ACCOUNT" marginLeft="10" marginTop="5" marginBottom="15"/>
 						<bh:Div ui:field="registerWidgetContainer" addStyleNames="margin-10" />
 					</bh:Div>
-					<bh:Div ui:field="loginUI" addStyleNames="synapse-blue-bg padding-30 margin-bottom-15" />
-				</b:Column>
-				<b:Column size="SM_5">
-					<g:SimplePanel ui:field="newsFeed" />
 				</b:Column>
 			</b:Row>
+			<bh:Div ui:field="loginUI" addStyleNames="padding-30 margin-bottom-15" />
 		</b:Container>
 		<b:Container fluid="true">
 			<b:Row addStyleNames="synapse-blue-bg margin-top-20">

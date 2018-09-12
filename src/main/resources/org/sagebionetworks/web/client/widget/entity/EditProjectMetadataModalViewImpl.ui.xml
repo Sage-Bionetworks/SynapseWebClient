@@ -20,7 +20,7 @@
 						<bh:Paragraph>You may add a personalized URL alias which will redirect users to this project automatically.</bh:Paragraph>
 						<bh:Div addStyleNames="form-horizontal">
 							<b:FormGroup>
-								<b:FormLabel addStyleNames="col-xs-4 font-weight-normal" width="155px">https://www.synapse.org/</b:FormLabel>
+								<b:FormLabel addStyleNames="col-xs-4 font-weight-normal" width="160px">https://www.synapse.org/</b:FormLabel>
 								<g:FlowPanel addStyleNames="col-xs-8">
 									<b:TextBox ui:field="aliasField" placeholder="UberInterestingResearch"/>
 								</g:FlowPanel>

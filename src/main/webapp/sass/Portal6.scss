@@ -137,10 +137,13 @@ end sticky footer
 	.btn-default {
 		background-color: #ebebeb;
 	}
-	.btn-default.active, .btn-default:active, .btn-default:focus, .btn-default:hover, .open .dropdown-toggle.btn-default {
+	.btn-default:hover, .open .dropdown-toggle.btn-default {
 		color: white;
 		background-color: $synapse-blue;
 		border-color: #186292;
+	}
+	.has-error .checkbox, .has-error .checkbox-inline, .has-error .control-label, .has-error .help-block, .has-error .radio, .has-error .radio-inline, .has-warning .form-control-feedback {
+		color: #eb5757;
 	}
 }
 /* End bootstrap overrides */
@@ -1600,6 +1603,10 @@ ol.lowerroman {
 	position: relative;
 	top: 9px;
 }
+.movedown-10 {
+	position: relative;
+	top: 10px;
+}
 .moveright-5 {
 	position: relative;
 	left: 5px;
@@ -1894,6 +1901,7 @@ iframe[seamless] {
 
 .popover, #body .popover {
 	max-width: 400px;
+	z-index: 1060;
 }
 
 h1, .h1, h2, .h2, h3, .h3 {
