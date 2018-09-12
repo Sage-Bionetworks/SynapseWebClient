@@ -145,6 +145,23 @@ end sticky footer
 	.has-error .checkbox, .has-error .checkbox-inline, .has-error .control-label, .has-error .help-block, .has-error .radio, .has-error .radio-inline, .has-warning .form-control-feedback {
 		color: #eb5757;
 	}
+
+	.checkbox, .radio {
+		padding-left: 0px;
+	}
+	input[type="checkbox"] {
+		display:none;
+	}
+	input[type="checkbox"] + label::before, input[type="checkbox"] + span::before {
+		content:url(images/checkbox-unchecked.png);
+		margin-right: 5px;
+		vertical-align: middle;
+	}
+	input[type="checkbox"]:checked + label::before, input[type="checkbox"]:checked + span::before {
+		content:url(images/checkbox-checked.png);
+		margin-right: 5px;
+		vertical-align: middle;
+	}
 }
 /* End bootstrap overrides */
 
