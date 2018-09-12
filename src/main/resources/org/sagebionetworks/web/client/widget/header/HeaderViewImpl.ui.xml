@@ -62,6 +62,9 @@
 						<b:AnchorListItem ui:field="helpForumLink">Help Forum</b:AnchorListItem>
 						<b:AnchorListItem ui:field="emailSynapseSupportLink" icon="ENVELOPE_O" href="mailto:synapseinfo@sagebionetworks.org" iconFixedWidth="true" iconPosition="RIGHT">Contact Us</b:AnchorListItem>
 						<b:Divider/>
+						<b:AnchorListItem ui:field="xsFavoritesLink" addStyleNames="visible-xs">Favorites</b:AnchorListItem>
+						<b:AnchorListItem ui:field="xsSearchLink" addStyleNames="visible-xs">Search</b:AnchorListItem>
+						<b:Divider addStyleNames="visible-xs"/>
 						<b:AnchorListItem ui:field="logoutLink" icon="SIGN_OUT" iconFixedWidth="true" iconPosition="RIGHT">Sign out</b:AnchorListItem>
 					</b:DropDownMenu>
 				</b:DropDown>

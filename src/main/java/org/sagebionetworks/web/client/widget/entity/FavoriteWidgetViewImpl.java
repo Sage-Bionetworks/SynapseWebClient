@@ -81,4 +81,9 @@ public class FavoriteWidgetViewImpl implements FavoriteWidgetView {
 	public Widget asWidget() {
 		return widget;
 	}
+	@Override
+	public void setLoadingSize(int px) {
+		loadingUI.setSize(px);
+		loadingUI.setMarginLeft(px/2);
+	}
 }

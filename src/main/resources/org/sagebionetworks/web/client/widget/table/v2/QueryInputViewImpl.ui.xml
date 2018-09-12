@@ -22,7 +22,7 @@
 							href="http://docs.synapse.org/articles/tables.html#table-data" placement="LEFT" addStyleNames="margin-left-5 moveup-18" />
 					</b:InputGroup>
 				</t:TableData>
-				<t:TableData width="370px" paddingRight="5">
+				<t:TableData paddingRight="5">
 					<b:Button type="PRIMARY" ui:field="downloadFilesButton" icon="QUESTION_CIRCLE" height="34px" addStyleNames="margin-left-10" pull="RIGHT" text="How to Download Files" />
 					<b:Tooltip title="Download Data">
 						<b:Button ui:field="downloadResultsButton" icon="DOWNLOAD" height="34px" addStyleNames="margin-left-5" pull="RIGHT" />

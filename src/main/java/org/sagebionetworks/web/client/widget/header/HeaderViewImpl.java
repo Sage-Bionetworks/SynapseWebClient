@@ -17,6 +17,7 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SageImageBundle;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.place.Profile;
+import org.sagebionetworks.web.client.place.Search;
 import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.place.Synapse.ProfileArea;
 import org.sagebionetworks.web.client.place.SynapseForumPlace;
@@ -81,7 +82,11 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	AnchorListItem sendFeedbackLink;
 	@UiField
 	AnchorListItem emailSynapseSupportLink;
-
+	@UiField
+	AnchorListItem xsFavoritesLink;
+	@UiField
+	AnchorListItem xsSearchLink;
+	
 	@UiField
 	DropDown dashboardDropdown;
 	@UiField
@@ -213,6 +218,18 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		});
 		sendFeedbackLink.addClickHandler(event -> {
 			// pendo should also listen for click event on this element
+			hideDropdown();
+		});
+		
+		xsFavoritesLink.addClickHandler(event -> {
+			Profile place = new Profile("v/projects/favorites");
+			globalAppState.getPlaceChanger().goTo(place);
+			hideDropdown();
+		});
+		
+		xsSearchLink.addClickHandler(event -> {
+			Search place = new Search("");
+			globalAppState.getPlaceChanger().goTo(place);
 			hideDropdown();
 		});
 	}

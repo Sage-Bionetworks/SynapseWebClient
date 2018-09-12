@@ -46,19 +46,19 @@
 								<bh:Span addStyleNames="flexcontainer-column">
 									<b:Anchor href="mailto:synapseInfo@sagebionetworks.org" text="Contact Us" addStyleNames="color-white"/>
 								</bh:Span>
-								<bh:Span addStyleNames="flexcontainer-column hidden-xs" paddingLeft="5" paddingRight="5">
-									<bh:Span addStyleNames="dot synapse-green-bg"  />
+								<bh:Span addStyleNames="flexcontainer-column hidden-xs" paddingLeft="10" paddingRight="10">
+									<bh:Span addStyleNames="dot synapse-green-bg" />
 								</bh:Span>
 								<bh:Span addStyleNames="flexcontainer-column">
 									<b:Anchor href="https://docs.synapse.org" text="Documentation" addStyleNames="color-white"/>
 								</bh:Span>
-								<bh:Span addStyleNames="flexcontainer-column hidden-xs" paddingLeft="5" paddingRight="5">
+								<bh:Span addStyleNames="flexcontainer-column hidden-xs" paddingLeft="10" paddingRight="10">
 									<bh:Span addStyleNames="dot synapse-orange-bg" />
 								</bh:Span>
 								<bh:Span addStyleNames="flexcontainer-column">
 									<b:Anchor href="http://creativecommons.org/licenses/by/4.0/legalcode" text="Creative Commons License" addStyleNames="color-white" target="_blank"/>
 								</bh:Span>
-								<bh:Span addStyleNames="flexcontainer-column hidden-xs" paddingLeft="5" paddingRight="5">
+								<bh:Span addStyleNames="flexcontainer-column hidden-xs" paddingLeft="10" paddingRight="10">
 									<bh:Span addStyleNames="dot synapse-accent-primary-bg" />
 								</bh:Span>
 								<bh:Span addStyleNames="flexcontainer-column">

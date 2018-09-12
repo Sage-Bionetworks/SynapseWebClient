@@ -159,5 +159,8 @@ public class FavoriteWidget implements Presenter, IsWidget {
 		return false;
 	}
 
+	public void setLoadingSize(int px) {
+		view.setLoadingSize(px);
+	}
 	
 }

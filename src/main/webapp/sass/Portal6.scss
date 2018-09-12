@@ -20,7 +20,7 @@ $synapse-green: #28a745;
 $synapse-blue: #2B688F;
 $synapse-blue-end-gradient: #164B6E;
 $synapse-purple: #7772b4;
-$synapse-yellow: #E4B528;
+$synapse-yellow: #e0b603;
 $synapse-orange: #E8762B;
 $synapse-accent-primary: #17a2b8;
 
@@ -130,6 +130,20 @@ end sticky footer
 	}
 	.form-control-readonly {
 		cursor: text;
+	}
+	.alert-warning {
+		background-color:$synapse-yellow;
+	}
+	.btn-default {
+		background-color: #ebebeb;
+	}
+	.btn-default:hover, .open .dropdown-toggle.btn-default {
+		color: white;
+		background-color: $synapse-blue;
+		border-color: #186292;
+	}
+	.has-error .checkbox, .has-error .checkbox-inline, .has-error .control-label, .has-error .help-block, .has-error .radio, .has-error .radio-inline, .has-warning .form-control-feedback {
+		color: #eb5757;
 	}
 }
 /* End bootstrap overrides */
@@ -1589,6 +1603,10 @@ ol.lowerroman {
 	position: relative;
 	top: 9px;
 }
+.movedown-10 {
+	position: relative;
+	top: 10px;
+}
 .moveright-5 {
 	position: relative;
 	left: 5px;
@@ -1883,6 +1901,7 @@ iframe[seamless] {
 
 .popover, #body .popover {
 	max-width: 400px;
+	z-index: 1060;
 }
 
 h1, .h1, h2, .h2, h3, .h3 {
@@ -2006,7 +2025,7 @@ div.input-group > input.search-textbox {
 }
 
 .text-warning, #rootPanel .text-warning {
-	color: #f19223;
+	color: $synapse-yellow;
 }
 
 /**Override JQuery table styles **/

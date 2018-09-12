@@ -61,8 +61,6 @@ public interface SynapseJSNIUtils {
 	 */
 	public void initOnPopStateHandler();
 	
-	public void showTwitterFeed(String dataWidgetId, String elementId, String linkColor, String borderColor, int tweetCount);
-	
 	public String getCurrentURL();
 	public String getCurrentHostName();
 
