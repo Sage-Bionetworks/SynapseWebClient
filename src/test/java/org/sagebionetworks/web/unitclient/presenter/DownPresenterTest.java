@@ -1,12 +1,12 @@
 package org.sagebionetworks.web.unitclient.presenter;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.*;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.presenter.DownPresenter.DELAY_MS;
 import static org.sagebionetworks.web.client.presenter.DownPresenter.SECOND_MS;
-
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -62,29 +62,37 @@ public class DownPresenterTest {
 	}
 
 	@Test
+	public void testConstruction() {
+		verify(mockGWT).scheduleFixedDelay(callbackCaptor.capture(), eq(SECOND_MS));
+		Callback secondTimerFired = callbackCaptor.getValue();
+		secondTimerFired.invoke();
+		verify(mockView).updateTimeToNextRefresh(anyInt()); //in seconds
+		verify(mockView).setTimerVisible(true);
+	}
+	
+	@Test
 	public void testSetPlace() {
 		presenter.setPlace(mockDownPlace);
 		verify(mockView).init();
-		verify(mockView).setTimerVisible(false);
-		verify(mockStackConfigService).getCurrentStatus(any(AsyncCallback.class));
+		assertEquals(0, presenter.getTimeToNextRefresh());
 	}
 
 	@Test
 	public void testUpdateTimer() {
 		// verify initial stack status check, and then verify the timer based update.
 		presenter.setPlace(mockDownPlace);
-		verify(mockView).setTimerVisible(false);
-		verify(mockStackConfigService).getCurrentStatus(any(AsyncCallback.class));
 		
 		//kick off the timer
 		verify(mockGWT).scheduleFixedDelay(callbackCaptor.capture(), eq(SECOND_MS));
 		Callback secondTimerFired = callbackCaptor.getValue();
 		secondTimerFired.invoke();
-		verify(mockView).updateTimeToNextRefresh((DELAY_MS-SECOND_MS)/1000); //in seconds
-		verify(mockView).setTimerVisible(true);
 		
+		//verify it checks the stack status
+		verify(mockView).setTimerVisible(false);
+		verify(mockStackConfigService).getCurrentStatus(any(AsyncCallback.class));
+
 		//now that we've verified the repeating scheduled execution, eat up the rest of the seconds to get down to zero
-		for (int i = 1; i < DELAY_MS/SECOND_MS; i++) {
+		for (int i = 0; i < DELAY_MS/SECOND_MS; i++) {
 			secondTimerFired.invoke();
 		}
 		//verify it checks the stack status
