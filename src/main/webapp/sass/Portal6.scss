@@ -146,21 +146,27 @@ end sticky footer
 		color: #eb5757;
 	}
 
-	.checkbox, .radio {
+	.checkbox {
 		padding-left: 0px;
 	}
 	input[type="checkbox"] {
 		display:none;
 	}
 	input[type="checkbox"] + label::before, input[type="checkbox"] + span::before {
-		content:url(images/checkbox-unchecked.png);
-		margin-right: 5px;
-		vertical-align: middle;
+		content: "";
+		float: left;
+		width: 16px;
+		height: 16px;
+		margin: 0 5px 0 0;
+		background: url(images/checkbox-unchecked.png) no-repeat 0 0;
 	}
 	input[type="checkbox"]:checked + label::before, input[type="checkbox"]:checked + span::before {
-		content:url(images/checkbox-checked.png);
-		margin-right: 5px;
-		vertical-align: middle;
+		content: "";
+		float: left;
+		width: 16px;
+		height: 16px;
+		margin: 0 5px 0 0;
+		background: url(images/checkbox-checked.png) no-repeat 0 0;
 	}
 }
 /* End bootstrap overrides */
