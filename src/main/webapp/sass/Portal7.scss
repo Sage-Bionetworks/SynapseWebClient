@@ -151,14 +151,14 @@ end sticky footer
 	input[type="checkbox"], input[type="radio"] {
 		display:none;
 	}
-	.checkbox>label::before, .radio>label::before,.radio>span::before, .radio-inline>label::before, .radio-inline>span::before {
+	.checkbox>label::before, .radio::before, .radio-inline::before {
 		content: "";
 		display: inline-block;
 		vertical-align: middle;
 		width: 16px;
 		height: 16px;
 		border: 1px solid #888;
-		border-radius: 10px;
+		border-radius: 2px;
 		background: radial-gradient(white, #eee);
 		margin-right: 5px;
 	}

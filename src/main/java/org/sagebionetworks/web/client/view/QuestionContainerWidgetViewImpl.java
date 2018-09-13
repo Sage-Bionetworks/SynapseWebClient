@@ -81,7 +81,7 @@ public class QuestionContainerWidgetViewImpl implements QuestionContainerWidgetV
 	@Override
 	public void addRadioButton(Long questionIndex, String answerPrompt, ClickHandler clickHandler, boolean isSelected) {
 		SimplePanel answerContainer = new SimplePanel();
-		answerContainer.addStyleName("radio padding-left-30 control-label");
+		answerContainer.addStyleName("padding-left-30 control-label");
 		Radio answerButton = new Radio("question-"+questionIndex);
 		answerButton.setValue(isSelected);
 		answerButton.setHTML(SimpleHtmlSanitizer.sanitizeHtml(answerPrompt));
