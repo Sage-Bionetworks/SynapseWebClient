@@ -151,7 +151,7 @@ end sticky footer
 	input[type="checkbox"], input[type="radio"] {
 		display:none;
 	}
-	.checkbox>label::before, .radio>label::before {
+	.checkbox>label::before, .radio>label::before,.radio>span::before, .radio-inline>label::before, .radio-inline>span::before {
 		content: "";
 		display: inline-block;
 		vertical-align: middle;
@@ -175,7 +175,16 @@ end sticky footer
 		vertical-align: bottom;
 		margin-right: 4px;
 	}
-	input[type="radio"]:checked + label::before, input[type="radio"]:checked + span::before {
+	.radio input[type="radio"]:checked + label::before, .radio input[type="radio"]:checked + span::before,
+	.radio-inline input[type="radio"]:checked + label::before, .radio-inline input[type="radio"]:checked + span::before {
+		content: "";
+		display: inline-block;
+		vertical-align: middle;
+		width: 10px;
+		height: 10px;
+		border-radius: 50%;
+		margin-left: -18px;
+		margin-right: 8px;
 		background: radial-gradient($synapse-blue-end-gradient, $synapse-blue);
 	}
 }
