@@ -22,7 +22,6 @@ import org.sagebionetworks.repo.model.RestrictableObjectType;
 import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
-import org.sagebionetworks.repo.model.doi.v2.Doi;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.Table;
@@ -218,32 +217,8 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		if (createOrUpdateDoiModal == null) {
 			createOrUpdateDoiModal = ginInjector.getCreateOrUpdateDoiModal();
 			view.addWidget(createOrUpdateDoiModal.asWidget());
-			createOrUpdateDoiModal.setTitle("Create or Update a DOI");
-			createOrUpdateDoiModal.configure(doi -> onMintDoi(doi));
 		}
 		return createOrUpdateDoiModal;
-	}
-
-	public void onMintDoi(Doi doi) {
-		doi.setObjectId(entity.getId());
-		doi.setObjectType(ObjectType.ENTITY);
-		doi.setObjectVersion(getVersion());
-		if (entityBundle.getDoiAssociation() != null) {
-			doi.setEtag(entityBundle.getDoiAssociation().getEtag());
-		}
-		getCreateOrUpdateDoiModal().createOrUpdateDoi(doi, new AsyncCallback<Doi>() {
-			@Override
-			public void onSuccess(Doi v) {
-				view.showInfo("DOI CREATED", "NICE JOB THE DOI WAS CREATED DOGG");
-				view.showInfo("DOI:", doi.toString());
-				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent()); // This is what the old minter does
-				// TODO: Change to use a new DOI retrieval/display widget
-			}
-			@Override
-			public void onFailure(Throwable caught) {
-				view.showErrorMessage(caught.getMessage());
-			}
-		});
 	}
 
 	private ChallengeClientAsync getChallengeClient() {
@@ -605,7 +580,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void onCreateOrUpdateDoi() {
-		getCreateOrUpdateDoiModal().show();
+		getCreateOrUpdateDoiModal().configureAndShow(entity.getId(), ObjectType.ENTITY, getVersion(), entityUpdateHandler);
 	}
 
 	private void onCreateChallenge() {

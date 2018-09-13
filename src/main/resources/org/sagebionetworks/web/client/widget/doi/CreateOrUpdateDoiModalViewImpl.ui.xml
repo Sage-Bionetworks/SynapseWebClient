@@ -3,22 +3,40 @@
 	xmlns:g="urn:import:com.google.gwt.user.client.ui"
 	xmlns:b="urn:import:org.gwtbootstrap3.client.ui"
 	xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
->
+ 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Div>
 		<b:Modal ui:field="doiModal" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalHeader>
 			    <b:Heading ui:field="title" size="H4" text="Create or Update Doi" addStyleNames="displayInline"/>
+			<bh:Span ui:field="modalTitleContainer" />
+			<w:HelpWidget helpMarkdown="Minting a DOI allows you to credit contributors to your work, and makes it easier to cite your work. &#10;&#10;_Note that all supplementary information attached to a DOI is publicly available outside of Synapse, even if your data is private._"
+					addStyleNames="margin-left-5" placement="BOTTOM"/>
 			</b:ModalHeader>
 			<b:ModalBody>
-				<bh:Div ui:field="doiTitles"/>
-				<bh:Div ui:field="doiAuthors"/>
-				<bh:Div ui:field="doiResourceTypeGeneral"/>
-				<bh:Div ui:field="doiPublicationYear"/>
-				<bh:Div ui:field="jobTrackingWidget"/>
+				<bh:Div ui:field="doiEditorDiv">
+					<b:FormGroup>
+						<b:FormLabel>Author(s) *make a note for how to format*</b:FormLabel>
+						<b:TextArea ui:field="authorsField" allowBlank="false" visibleLines="4"  />
+						<b:FormLabel>Title(s)  *make a note for how to format*</b:FormLabel>
+						<b:TextBox ui:field="titlesField" allowBlank="false" />
+						<b:FormLabel>General Resource Type</b:FormLabel>
+						<b:ListBox ui:field="resourceTypeGeneralSelect"/>
+						<b:FormLabel>Publication Year</b:FormLabel>
+						<b:IntegerBox ui:field="publicationYearField" allowBlank="false" text="2018" />
+					</b:FormGroup>
+					<bh:Div ui:field="aliasUI">
+						<b:Alert type="WARNING" addStyleNames="margin-top-10">
+							<bh:Strong text="Note: &nbsp;" />
+							<bh:Text text="Updating the DOI information will cause old information to be lost!"/>
+						</b:Alert>
+					</bh:Div>
+				</bh:Div>
+				<bh:Div ui:field="synAlert"/>
 			</b:ModalBody>
 			<b:ModalFooter>
+				<bh:Div ui:field="jobTrackingWidget"/>
 			    <b:Button type="LINK" ui:field="cancelButton">Cancel</b:Button>
-			    <b:Button type="PRIMARY" text="OK" ui:field="selectTeamButton"/>
+			    <b:Button type="PRIMARY" text="OK" ui:field="mintDoiButton"/>
 			</b:ModalFooter>
 		</b:Modal>
 	</bh:Div>

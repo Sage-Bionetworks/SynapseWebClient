@@ -1,17 +1,26 @@
 package org.sagebionetworks.web.client.widget.doi;
 
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.Widget;
 
 public interface CreateOrUpdateDoiModalView extends IsWidget {
 	
-	public void setPresenter(Presenter presenter);
-	public interface Presenter {
-		void onCreateDoi();
+	void setPresenter(Presenter presenter);
+	interface Presenter {
+		void onSaveDoi();
 	}
-	void setWidgets(Widget authors, Widget titles, Widget publicationYear, Widget selectedResourceTypeGeneral);
+	String getAuthors();
+	void setAuthors(String authors);
+	String getTitles();
+	void setTitles(String titles);
+	String getResourceTypeGeneral();
+	void setResourceTypeGeneral(String resourceTypeGeneral);
+	Long getPublicationYear();
+	void setPublicationYear(Long publicationYear);
 	void show();
 	void hide();
-	void setTitle(String title);
+	void setModalTitle(String title);
 	void setJobTrackingWidget(IsWidget w);
-}
+	void setSynAlert(IsWidget w);
+	void reset();
+	void setIsLoading(boolean isLoading);
+	}
