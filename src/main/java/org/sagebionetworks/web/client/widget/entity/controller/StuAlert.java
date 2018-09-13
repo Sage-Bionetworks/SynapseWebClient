@@ -81,7 +81,7 @@ public class StuAlert implements StuAlertView.Presenter  {
 		synapseClient.sendMessageToEntityOwner(entityId, "Requesting access to " + entityId, message, gwt.getHostPageBaseURL(), new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String result) {
-				view.showInfo("Request sent", "");
+				view.showInfo("Request sent");
 				view.hideRequestAccessUI();
 			}
 			@Override

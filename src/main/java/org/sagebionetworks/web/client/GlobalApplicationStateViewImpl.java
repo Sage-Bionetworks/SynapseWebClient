@@ -14,12 +14,12 @@ public class GlobalApplicationStateViewImpl implements
 	Frame iframe;
 	@Override
 	public void showVersionOutOfDateGlobalMessage() {
-		DisplayUtils.showError(DisplayConstants.NEW_VERSION_AVAILABLE, DisplayConstants.NEW_VERSION_INSTRUCTIONS, UNLIMITED_TIME);
+		DisplayUtils.showError(DisplayConstants.NEW_VERSION_AVAILABLE + DisplayConstants.NEW_VERSION_INSTRUCTIONS, UNLIMITED_TIME);
 		preloadNewVersion();
 	}
 	@Override
 	public void showGetVersionError(String error) {
-		DisplayUtils.showError("Unable to determine the Synapse version. Please refresh the page to get the latest version.", error, 5000);
+		DisplayUtils.showError("Unable to determine the Synapse version. Please refresh the page to get the latest version. " + error, 5000);
 		preloadNewVersion();
 	}
 	@Override

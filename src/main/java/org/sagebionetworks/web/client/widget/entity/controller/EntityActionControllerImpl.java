@@ -444,7 +444,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getChallengeClient().createChallenge(c, new AsyncCallback<Challenge>() {
 			@Override
 			public void onSuccess(Challenge v) {
-				view.showInfo(DisplayConstants.CHALLENGE_CREATED, "");
+				view.showInfo(DisplayConstants.CHALLENGE_CREATED);
 				// go to challenge tab
 				Place gotoPlace = new Synapse(entity.getId(), null, EntityArea.ADMIN, null);
 				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);
@@ -537,7 +537,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getSynapseClient().createDoi(entity.getId(), getVersion(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void v) {
-				view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE, DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
+				view.showInfo(DisplayConstants.DOI_REQUEST_SENT_TITLE + DisplayConstants.DOI_REQUEST_SENT_MESSAGE);
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
 			}
 			@Override
@@ -572,7 +572,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getChallengeClient().deleteChallenge(currentChallengeId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(DELETED, THE + "challenge" + WAS_SUCCESSFULLY_DELETED); 
+				view.showInfo(THE + "challenge" + WAS_SUCCESSFULLY_DELETED); 
 				entityUpdateHandler.onPersistSuccess(new EntityUpdatedEvent());
 			}
 			
@@ -1169,7 +1169,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			
 			@Override
 			public void onSuccess(Entity result) {
-				view.showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
+				view.showInfo(DisplayConstants.TEXT_LINK_SAVED);
 			}
 			
 			@Override
@@ -1300,7 +1300,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			getSynapseClient().createV2WikiPageWithV1(entityBundle.getEntity().getId(), ObjectType.ENTITY.name(), page, new AsyncCallback<WikiPage>() {
 	            @Override
 	            public void onSuccess(WikiPage result) {
-	                view.showInfo("'" + name + "' Page Added", "");
+	                view.showInfo("'" + name + "' Page Added");
 	                Synapse newPlace = new Synapse(entityBundle.getEntity().getId(), getVersion(), EntityArea.WIKI, result.getId());
 	                getGlobalApplicationState().getPlaceChanger().goTo(newPlace);
 	            }
@@ -1434,7 +1434,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		getSynapseJavascriptClient().deleteEntityById(entityId, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(DELETED, THE + enityTypeDisplay + WAS_SUCCESSFULLY_DELETED); 
+				view.showInfo(THE + enityTypeDisplay + WAS_SUCCESSFULLY_DELETED); 
 				// Go to entity's parent
 				Place gotoPlace = createDeletePlace();
 				getGlobalApplicationState().getPlaceChanger().goTo(gotoPlace);

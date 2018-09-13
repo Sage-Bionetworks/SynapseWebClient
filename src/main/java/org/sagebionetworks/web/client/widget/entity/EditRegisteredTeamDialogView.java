@@ -14,7 +14,7 @@ public interface EditRegisteredTeamDialogView extends IsWidget, ShowsErrors {
 	String getRecruitmentMessage();
 	void showModal();
 	void hideModal();
-	void showInfo(String title, String message);
+	void showInfo(String message);
 	/**
 	 * Presenter interface
 	 */

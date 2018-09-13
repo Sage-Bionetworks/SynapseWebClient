@@ -371,7 +371,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(Void result) {
 				//ORC id successfully removed.  refresh so that the user bundle and UI are up to date
-				view.showInfo("Success", "ORC ID has been unbound.");
+				view.showInfo("ORC ID has been successfully unbound.");
 				globalApplicationState.refreshPage();
 			}
 			@Override
@@ -902,7 +902,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 						@Override
 						public void onSuccess(Entity entity) {
 							getPromptForProjectNameDialog().hide();
-							view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED, name);
+							view.showInfo(DisplayConstants.LABEL_PROJECT_CREATED + name);
 							globalApplicationState.getPlaceChanger().goTo(new Synapse(entity.getId()));	
 						}
 	
@@ -941,7 +941,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 			@Override
 			public void onSuccess(Team team) {
 				getPromptForTeamNameDialog().hide();
-				view.showInfo(DisplayConstants.LABEL_TEAM_CREATED, teamName);
+				view.showInfo(DisplayConstants.LABEL_TEAM_CREATED + teamName);
 				globalApplicationState.getPlaceChanger().goTo(new org.sagebionetworks.web.client.place.Team(team.getId()));						
 			}
 			
@@ -966,7 +966,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	}
 	
 	private void profileUpdated() {
-		view.showInfo("Success", "Your profile has been updated.");
+		view.showInfo("Your profile has been successfully updated.");
 		editMyProfile();
 		view.refreshHeader();
 	}
@@ -988,7 +988,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		}
 		
 		if (token.equals("oauth_bound")) {
-			view.showInfo("", DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
+			view.showInfo(DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
 			token = "v";
 		}
 		if (token.equals("v") || token.startsWith("v/") || token.isEmpty()) {

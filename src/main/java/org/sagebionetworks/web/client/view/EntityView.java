@@ -23,7 +23,7 @@ public interface EntityView extends IsWidget {
 	void setSynAlertWidget(IsWidget synAlert);
 	void setAccessDependentMessageVisible(boolean isVisible);
 	void clear();
-	void showInfo(String title, String message);
+	void showInfo(String message);
 	void setLoadingVisible(boolean isVisible);
 	void showErrorMessage(String message);
 	void setEntityPageTopVisible(boolean isVisible);

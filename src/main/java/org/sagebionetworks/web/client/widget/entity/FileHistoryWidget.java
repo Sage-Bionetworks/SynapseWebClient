@@ -95,7 +95,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 						@Override
 						public void onSuccess(Entity result) {
 							view.hideEditVersionInfo();
-							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED, "Updated " + vb.getName());
+							view.showInfo(DisplayConstants.VERSION_INFO_UPDATED + ": " + vb.getName());
 							refreshFileHistory();
 						}
 					});
@@ -112,7 +112,7 @@ public class FileHistoryWidget implements FileHistoryWidgetView.Presenter, IsWid
 			}
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo("Version deleted", "Version "+ versionNumber + " of " + bundle.getEntity().getId() + " " + DisplayConstants.LABEL_DELETED);
+				view.showInfo("Version "+ versionNumber + " of " + bundle.getEntity().getId() + " " + DisplayConstants.LABEL_DELETED);
 				//SWC-4002: if deleting the version that we're looking at, go to the latest version
 				if (versionNumber.equals(FileHistoryWidget.this.versionNumber)) {
 					gotoCurrentVersion();

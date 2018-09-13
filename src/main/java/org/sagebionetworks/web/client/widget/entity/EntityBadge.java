@@ -249,7 +249,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			}
 			@Override
 			public void onSuccess(Void result) {
-				popupUtils.showInfo(LINK_SUCCESSFULLY_DELETED, "");
+				popupUtils.showInfo(LINK_SUCCESSFULLY_DELETED);
 				globalAppState.refreshPage();
 			}
 		});

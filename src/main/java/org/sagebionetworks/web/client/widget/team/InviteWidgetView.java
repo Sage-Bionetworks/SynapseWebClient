@@ -25,7 +25,7 @@ public interface InviteWidgetView extends IsWidget {
 	public void setSynAlertWidget(Widget asWidget);
 	void setSuggestWidget(Widget suggestWidget);
 	public void clear();
-	public void showInfo(String string, String string2);
+	public void showInfo(String string);
 	void show();
 	void hide();
 	void setLoading(boolean isLoading);

@@ -180,7 +180,7 @@ public class UserBadgeViewImpl implements UserBadgeView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 		// TODO Auto-generated method stub
 	}
 

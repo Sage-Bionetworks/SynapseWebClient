@@ -128,7 +128,7 @@ public class EditAnnotationsDialog implements EditAnnotationsDialogView.Presente
 			synapseClient.updateAnnotations(entityId, annotationsCopy, new AsyncCallback<Void>() {
 				@Override
 				public void onSuccess(Void result) {
-					view.showInfo("Successfully updated the annotations", "");
+					view.showInfo("Successfully updated the annotations");
 					view.hideEditor();
 					if (updateHandler != null) {
 						updateHandler.onPersistSuccess(new EntityUpdatedEvent());

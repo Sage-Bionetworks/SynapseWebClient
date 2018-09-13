@@ -50,8 +50,8 @@ public class UserGroupListWidgetViewImpl extends Composite implements UserGroupL
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

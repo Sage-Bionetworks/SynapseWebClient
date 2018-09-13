@@ -22,7 +22,7 @@ public interface TeamLeaveModalWidgetView {
 
 	void show();
 
-	void showInfo(String title, String message);
+	void showInfo(String message);
 
 	void hide();
 	

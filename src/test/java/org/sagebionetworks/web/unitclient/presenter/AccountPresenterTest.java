@@ -51,7 +51,7 @@ public class AccountPresenterTest {
 		presenter.addEmail(new EmailValidationSignedToken());
 		verify(mockSynapseClient).addEmail(any(EmailValidationSignedToken.class), any(AsyncCallback.class));
 		//notify user of success
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		//and go to the settings page
 		verify(mockPlaceChanger).goTo(isA(Place.class));
 	}	

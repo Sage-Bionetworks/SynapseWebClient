@@ -834,7 +834,7 @@ public class EntityActionControllerImplTest {
 		verify(mockPreflightController).checkDeleteEntity(any(EntityBundle.class), any(Callback.class));
 		// an attempt to delete should be made
 		verify(mockSynapseJavascriptClient).deleteEntityById(anyString(), any(AsyncCallback.class));
-		verify(mockView).showInfo(DELETED, THE + EntityTypeUtils.getDisplayName(EntityType.table) + WAS_SUCCESSFULLY_DELETED);
+		verify(mockView).showInfo(THE + EntityTypeUtils.getDisplayName(EntityType.table) + WAS_SUCCESSFULLY_DELETED);
 		verify(mockPlaceChanger).goTo(new Synapse(parentId, null, EntityArea.TABLES, null));
 	}
 	
@@ -1227,7 +1227,7 @@ public class EntityActionControllerImplTest {
 		String target = "syn9876";
 		controller.createLink(target);
 		verify(mockView, never()).showErrorMessage(anyString());
-		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
+		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED);
 		Entity capture = argument.getValue();
 		assertNotNull(capture);
 		assertTrue(capture instanceof Link);
@@ -1272,7 +1272,7 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.CREATE_LINK);
 		verify(mockEntityFinder, never()).configure(anyBoolean(), any(SelectedHandler.class));
 		verify(mockEntityFinder, never()).show();
-		verify(mockView, never()).showInfo(anyString(), anyString());
+		verify(mockView, never()).showInfo(anyString());
 	}
 	
 	@Test
@@ -1283,7 +1283,7 @@ public class EntityActionControllerImplTest {
 		controller.onAction(Action.CREATE_LINK);
 		verify(mockEntityFinder).configure(eq(EntityFilter.CONTAINER), anyBoolean(), any(SelectedHandler.class));
 		verify(mockEntityFinder).show();
-		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED, DisplayConstants.TEXT_LINK_SAVED);
+		verify(mockView).showInfo(DisplayConstants.TEXT_LINK_SAVED);
 	}
 	
 	@Test
@@ -1434,7 +1434,7 @@ public class EntityActionControllerImplTest {
 		
 		capturedCallback.callback("a valid name");
 		verify(mockSynapseClient).createV2WikiPageWithV1(anyString(), anyString(), any(WikiPage.class),any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.WIKI, newWikiPageId));
 	}
 	
@@ -1457,7 +1457,7 @@ public class EntityActionControllerImplTest {
 		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
 		controller.onAction(Action.CREATE_DOI);
 		verify(mockSynapseClient).createDoi(anyString(), anyLong(), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		//refresh page
 		verify(mockEntityUpdatedHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}
@@ -1522,7 +1522,7 @@ public class EntityActionControllerImplTest {
 		ArgumentCaptor<Challenge> captor = ArgumentCaptor.forClass(Challenge.class);
 		verify(mockChallengeClient).createChallenge(captor.capture(), any(AsyncCallback.class));
 		verify(mockPlaceChanger).goTo(new Synapse(entityId, null, EntityArea.ADMIN, null) );
-		verify(mockView).showInfo(DisplayConstants.CHALLENGE_CREATED, "");
+		verify(mockView).showInfo(DisplayConstants.CHALLENGE_CREATED);
 		Challenge c = captor.getValue();
 		assertNull(c.getId());
 		assertEquals(SELECTED_TEAM_ID, c.getParticipantTeamId());

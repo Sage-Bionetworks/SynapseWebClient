@@ -786,7 +786,7 @@ public class ProfilePresenterTest {
 		profilePresenter.createProjectAfterPrompt();
 		verify(mockSynapseJavascriptClient).createEntity(any(Entity.class));
 		//inform user of success, and go to new project page
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockPlaceChanger).goTo(isA(Synapse.class));
 	}
 
@@ -875,7 +875,7 @@ public class ProfilePresenterTest {
 		profilePresenter.createTeamAfterPrompt();
 		verify(mockSynapseJavascriptClient).createTeam(any(Team.class), any(AsyncCallback.class));
 		//inform user of success, and go to new team page
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockPlaceChanger).goTo(isA(org.sagebionetworks.web.client.place.Team.class));
 	}
 
@@ -1717,7 +1717,7 @@ public class ProfilePresenterTest {
 		String token = "oauth_bound";
 		when(place.toToken()).thenReturn(token);
 		profilePresenter.setPlace(place);
-		verify(mockView).showInfo("", DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
+		verify(mockView).showInfo(DisplayConstants.SUCCESSFULLY_LINKED_OAUTH2_ACCOUNT);
 	}
 
 	@Test
@@ -1810,7 +1810,7 @@ public class ProfilePresenterTest {
 		viewProfile("123", "456");
 		profilePresenter.unbindOrcIdAfterConfirmation();
 		//success message and page refresh
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockGlobalApplicationState).refreshPage();
 	}
 	

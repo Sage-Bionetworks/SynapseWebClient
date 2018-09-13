@@ -150,7 +150,7 @@ public class EmailAddressesWidget implements EmailAddressesWidgetView.Presenter,
 				emailAddress, callbackUrl, new AsyncCallback<Void>() {
 					@Override
 					public void onSuccess(Void result) {
-						popupUtils.showInfo(DisplayConstants.EMAIL_ADDED, "");
+						popupUtils.showInfo(DisplayConstants.EMAIL_ADDED);
 					}
 
 					@Override
