@@ -151,7 +151,7 @@ public class ReplyWidgetViewImpl implements ReplyWidgetView {
 
 	@Override
 	public void showSuccess(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		DisplayUtils.showInfo(message);
 	}
 	
 	@Override

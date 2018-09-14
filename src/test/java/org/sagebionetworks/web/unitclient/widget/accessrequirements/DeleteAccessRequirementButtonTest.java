@@ -108,7 +108,7 @@ public class DeleteAccessRequirementButtonTest {
 		//confirm delete
 		deleteConfirmedCallback.invoke();
 		verify(mockSynapseClient).deleteAccessRequirement(eq(AR_ID), any(AsyncCallback.class));
-		verify(mockPopupUtilsView).showInfo(eq(DELETED_ACCESS_REQUIREMENT_SUCCESS_MESSAGE), anyString());
+		verify(mockPopupUtilsView).showInfo(eq(DELETED_ACCESS_REQUIREMENT_SUCCESS_MESSAGE));
 		verify(mockRefreshCallback).invoke();
 	}
 	

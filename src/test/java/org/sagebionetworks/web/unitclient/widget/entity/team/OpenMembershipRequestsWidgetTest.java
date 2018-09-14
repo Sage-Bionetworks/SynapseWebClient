@@ -112,7 +112,7 @@ public class OpenMembershipRequestsWidgetTest {
 		widget.acceptRequest(USER_ID);
 		verify(mockGwt).saveWindowPosition();
 		verify(mockSynapseClient).addTeamMember(eq(USER_ID), eq(TEAM_ID), anyString(), eq(HOST_PAGE_URL), any(AsyncCallback.class));
-		verify(mockPopupUtils).showInfo(OpenMembershipRequestsWidget.ACCEPTED_REQUEST_MESSAGE, "");
+		verify(mockPopupUtils).showInfo(OpenMembershipRequestsWidget.ACCEPTED_REQUEST_MESSAGE);
 		verify(mockCallback).invoke();
 	}
 	
@@ -136,7 +136,7 @@ public class OpenMembershipRequestsWidgetTest {
 		verify(mockGwt).saveWindowPosition();
 		verify(mockSynAlert, atLeastOnce()).clear();
 		verify(mockJsClient).deleteMembershipRequest(requestId);
-		verify(mockPopupUtils).showInfo(OpenMembershipRequestsWidget.DELETED_REQUEST_MESSAGE, "");
+		verify(mockPopupUtils).showInfo(OpenMembershipRequestsWidget.DELETED_REQUEST_MESSAGE);
 		verify(mockCallback).invoke();
 	}
 	

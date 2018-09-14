@@ -227,6 +227,6 @@ public class QueryResultEditorViewImpl implements QueryResultEditorView {
 	}
 	@Override
 	public void showMessage(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		DisplayUtils.showInfo(message);
 	}
 }

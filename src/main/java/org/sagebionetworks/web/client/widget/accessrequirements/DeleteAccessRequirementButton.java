@@ -80,7 +80,7 @@ public class DeleteAccessRequirementButton implements IsWidget {
 		synapseClient.deleteAccessRequirement(ar.getId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				popupUtils.showInfo(DELETED_ACCESS_REQUIREMENT_SUCCESS_MESSAGE, "");
+				popupUtils.showInfo(DELETED_ACCESS_REQUIREMENT_SUCCESS_MESSAGE);
 				refreshCallback.invoke();
 			}
 			

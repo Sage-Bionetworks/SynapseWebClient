@@ -109,7 +109,7 @@ public class AddFolderDialogWidget implements AddFolderDialogWidgetView.Presente
 			@Override
 			public void onSuccess(Entity result) {
 				view.hide();
-				popupUtils.showInfo("Folder '" + folder.getName() + "' Added", "");
+				popupUtils.showInfo("Folder '" + folder.getName() + "' Added");
 				globalAppState.refreshPage();
 			}
 			@Override

@@ -208,7 +208,7 @@ public class RestrictionWidget implements RestrictionWidgetView.Presenter, Synap
 			dataAccessClient.createLockAccessRequirement(entity.getId(), new AsyncCallback<Void>(){
 				@Override
 				public void onSuccess(Void result) {
-					view.showInfo("Successfully imposed restriction", "");
+					view.showInfo("Successfully imposed restriction");
 					loadRestrictionInformation();
 				}
 				@Override

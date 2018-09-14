@@ -22,7 +22,7 @@ public interface RegisterTeamDialogView extends IsWidget, ShowsErrors {
 	void hideModal();
 	void setNoTeamsFoundVisible(boolean isVisible);
 	void showConfirmDialog(String message, Callback okCallback);
-	void showInfo(String title, String message);
+	void showInfo(String message);
 	void setNewTeamLink(String url);
 	
 	/**

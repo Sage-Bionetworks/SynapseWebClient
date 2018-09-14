@@ -657,7 +657,7 @@ public class EntityPageTopTest {
 		//simulate not found
 		wikiCallbackCaptor.getValue().noWikiFound();
 		//since the project has a root wiki id, it should try to load that instead.
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockWikiTab).configure(eq(projectEntityId), eq(projectName), eq(projectWikiId), eq(canEdit), any(WikiPageWidget.Callback.class), eq(mockActionMenuWidget));
 	}
 	

@@ -120,7 +120,7 @@ public class AccessorGroupWidget implements AccessorGroupView.Presenter, IsWidge
 		dataAccessClient.revokeGroup(accessorGroup.getAccessRequirementId(), accessorGroup.getSubmitterId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				popupUtils.showInfo("Successfully revoked access.", "");
+				popupUtils.showInfo("Successfully revoked access.");
 				if (onRevokeCallback != null) {
 					onRevokeCallback.invoke();
 				}

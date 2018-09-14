@@ -28,7 +28,7 @@ public interface TeamDeleteModalWidgetView extends IsWidget {
 
 	void setPresenter(Presenter presenter);
 
-	void showInfo(String title, String message);
+	void showInfo(String message);
 
 	void hide();
 }

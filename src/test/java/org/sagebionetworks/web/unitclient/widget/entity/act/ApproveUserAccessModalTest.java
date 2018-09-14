@@ -348,7 +348,7 @@ public class ApproveUserAccessModalTest {
 		
 		verify(mockView).setApproveProcessing(false);
 		verify(mockView).hide();
-		verify(mockView).showInfo(APPROVED_USER, EMAIL_SENT);
+		verify(mockView).showInfo(APPROVED_USER + EMAIL_SENT);
 	}
 	
 	@Test
@@ -382,7 +382,7 @@ public class ApproveUserAccessModalTest {
 		vCaptor.getValue().onSuccess((Void)null);
 		verify(mockView).setRevokeProcessing(false);
 		verify(mockView).hide();
-		verify(mockView).showInfo(REVOKED_USER, "");
+		verify(mockView).showInfo(REVOKED_USER);
 	}
 	
 	@Test
@@ -396,7 +396,7 @@ public class ApproveUserAccessModalTest {
 		vCaptor.getValue().onSuccess((Void)null);
 		verify(mockView).setRevokeProcessing(false);
 		verify(mockView).hide();
-		verify(mockView).showInfo(REVOKED_USER, "");
+		verify(mockView).showInfo(REVOKED_USER);
 	}
 
 }

@@ -185,7 +185,7 @@ public class OpenUserInvitationsWidgetTest {
 		
 		verify(mockGWT).saveWindowPosition();
 		verify(mockJsClient).deleteMembershipInvitation(eq(invitationId), any(AsyncCallback.class));
-		verify(mockPopupUtils).showInfo(OpenTeamInvitationsWidget.DELETED_INVITATION_MESSAGE, "");
+		verify(mockPopupUtils).showInfo(OpenTeamInvitationsWidget.DELETED_INVITATION_MESSAGE);
 		verify(mockView, times(2)).clear();
 		verify(mockSynapseClient, times(2)).getOpenTeamInvitations(anyString(), anyInt(), eq(expectedOffset), any(AsyncCallback.class));
 	}
@@ -258,7 +258,7 @@ public class OpenUserInvitationsWidgetTest {
 		
 		verify(mockGWT).saveWindowPosition();
 		verify(mockSynapseClient).resendTeamInvitation(eq(invitationId), anyString(), any(AsyncCallback.class));
-		verify(mockPopupUtils).showInfo(OpenUserInvitationsWidget.RESENT_INVITATION, "");
+		verify(mockPopupUtils).showInfo(OpenUserInvitationsWidget.RESENT_INVITATION);
 		verify(mockView, times(2)).clear();
 		verify(mockSynapseClient, times(2)).getOpenTeamInvitations(anyString(), anyInt(), eq(expectedOffset), any(AsyncCallback.class));
 	}

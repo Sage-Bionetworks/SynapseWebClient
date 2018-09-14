@@ -350,7 +350,7 @@ public class VerificationSubmissionWidgetTest {
 		configureWithMockSubmission();
 		String reason = "suspending submission for this reason";
 		widget.updateVerificationState(VerificationStateEnum.SUSPENDED, reason);
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockView).hide();
 		verify(mockGlobalApplicationState).refreshPage();
 	}
@@ -397,7 +397,7 @@ public class VerificationSubmissionWidgetTest {
 		widget.submitVerification();
 		verify(mockUserProfileClient).createVerificationSubmission(any(VerificationSubmission.class), eq(hostPageURL), any(AsyncCallback.class));
 		
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockView).hide();
 		verify(mockGlobalApplicationState).refreshPage();
 	}

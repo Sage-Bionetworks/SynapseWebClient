@@ -125,7 +125,7 @@ public class OpenTeamInvitationsWidget implements OpenTeamInvitationsWidgetView.
 				new FutureCallback<Void>() {
 					@Override
 					public void onSuccess(Void aVoid) {
-						popupUtils.showInfo(DELETED_INVITATION_MESSAGE,"");
+						popupUtils.showInfo(DELETED_INVITATION_MESSAGE);
 						refresh();
 					}
 

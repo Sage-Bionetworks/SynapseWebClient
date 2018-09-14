@@ -63,7 +63,7 @@ public class TeamLeaveModalWidgetTest {
 		ArgumentCaptor<AsyncCallback> captor = ArgumentCaptor.forClass(AsyncCallback.class);
 		verify(mockSynapseClient).deleteTeamMember(eq(userId), eq(userId), eq(teamId), captor.capture());
 		captor.getValue().onSuccess(null);
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockRefreshCallback).invoke();
 	}
 	

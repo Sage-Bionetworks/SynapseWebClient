@@ -88,7 +88,7 @@ public class WikiPageDeleteConfirmationDialogViewImpl implements WikiPageDeleteC
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 }

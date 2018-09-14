@@ -159,7 +159,7 @@ public class OpenTeamInvitationsWidgetTest {
 		
 		verify(mockSynapseAlert, atLeastOnce()).clear();
 		verify(mockJsClient).deleteMembershipInvitation(inviteId);
-		verify(mockPopupUtils).showInfo(OpenTeamInvitationsWidget.DELETED_INVITATION_MESSAGE, "");
+		verify(mockPopupUtils).showInfo(OpenTeamInvitationsWidget.DELETED_INVITATION_MESSAGE);
 		verify(mockTeamUpdatedCallback).invoke();
 		verify(mockSynapseClient, times(2)).getOpenInvitations(anyString(), any(AsyncCallback.class));
 	}

@@ -71,8 +71,8 @@ public class DisplayConstants {
 	public static final String LABEL_NO_SEARCH_RESULTS_PART1 = "Your search for '";
 	public static final String LABEL_NO_SEARCH_RESULTS_PART2 = "' did not match any results.";
 	public static final String LABEL_SEARCH = "Search";
-	public static final String LABEL_PROJECT_CREATED = "Project Created";
-	public static final String LABEL_TEAM_CREATED = "Team Created";
+	public static final String LABEL_PROJECT_CREATED = "Project Created: ";
+	public static final String LABEL_TEAM_CREATED = "Team Created: ";
 	public static final String TEXT_UPLOAD_FILE_OR_LINK = "Upload or Link to File";
 	public static final String UPLOAD_FILE = "Upload File";
 	public static final String LINK_TO_URL = "Link to URL";
@@ -179,7 +179,7 @@ public class DisplayConstants {
 	public static final String ERROR_SAVE_FAVORITE_MESSAGE = "Saving your Favorite change failed. Please try again.";
 	public static final String INVALID_SHINY_SITE = " is not a valid Site URL. Please contact us at " + ClientProperties.HELP_EMAIL_ADDRESS + " if you would like your Server added to our white list.";
 	public static final String MARKDOWN_WIDGET_WARNING = "Markdown Widget Warning";
-	public static final String DOI_REQUEST_SENT_TITLE = "The request to create a new DOI has been sent.";	
+	public static final String DOI_REQUEST_SENT_TITLE = "The request to create a new DOI has been sent. ";	
 	public static final String DOI_REQUEST_SENT_MESSAGE = "Note that it may take a few minutes for the service to create the new DOI.";
 	public static final String LARGE_FILE_ON_UNSUPPORTED_BROWSER = "The file exceeds the maximum file size that Synapse supports for this browser. Please update your browser to the latest version and try again.";
 	public static final String PASSWORD = "Password";
@@ -199,7 +199,7 @@ public class DisplayConstants {
 	public static final String PLEASE_ENTER_PROJECT_NAME = "Please enter a project name";
 	public static final String PLEASE_ENTER_TEAM_NAME = "Please enter a team name";
 	public static final String OLD_VERSION = "old version";
-	public static final String NEW_VERSION_AVAILABLE = "New Version of Synapse Available";
+	public static final String NEW_VERSION_AVAILABLE = "New Version of Synapse Available. ";
 	public static final String NEW_VERSION_INSTRUCTIONS = "A new version of Synapse is now available, please save your work and reload the page to ensure proper function.";
 	public static final String UPLOAD_DIALOG_TITLE = "Upload";
 	public static final String SHOW_ALL_RESULTS = "Show Results for All Types";

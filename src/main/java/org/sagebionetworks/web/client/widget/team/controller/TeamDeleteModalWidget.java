@@ -54,7 +54,7 @@ public class TeamDeleteModalWidget implements IsWidget, TeamDeleteModalWidgetVie
 		synapseClient.deleteTeam(team.getId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(DisplayConstants.DELETE_TEAM_SUCCESS, "");
+				view.showInfo(DisplayConstants.DELETE_TEAM_SUCCESS);
 				// global app state gotoLastPlace() behavior can be unpredictable (because the last place cookie value may be set in a different window).
 				// go to the user dashboard, into the Teams area. 
 				view.hide();

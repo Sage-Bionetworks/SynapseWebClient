@@ -286,13 +286,13 @@ public class AccessControlListEditorViewImpl extends FlowPanel implements Access
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 	
 	@Override
 	public void showInfoSuccess(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		DisplayUtils.showInfo(message);
 	}
 	
 	/*

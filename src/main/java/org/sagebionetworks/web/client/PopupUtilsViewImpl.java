@@ -1,6 +1,5 @@
 package org.sagebionetworks.web.client;
 
-import org.gwtbootstrap3.extras.notify.client.ui.NotifySettings;
 import org.sagebionetworks.web.client.utils.Callback;
 
 import com.google.gwt.user.client.Window;
@@ -8,18 +7,13 @@ import com.google.gwt.user.client.Window;
 public class PopupUtilsViewImpl implements PopupUtilsView {
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
-	public void notify(String title, String message, NotifySettings settings) {
-		DisplayUtils.notify(title, message, settings);
-	}
-
-	@Override
-	public void showError(String title, String message, Integer timeout) {
-		DisplayUtils.showError(title, message, timeout);
+	public void showError(String message, Integer timeout) {
+		DisplayUtils.showError(message, timeout);
 	}
 
 	@Override

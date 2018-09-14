@@ -220,18 +220,15 @@ public class DisplayUtils {
 	 * @param title
 	 * @param message
 	 */
-	public static void showInfo(String title, String message) {
+	public static void showInfo(String message) {
 		NotifySettings settings = getDefaultSettings();
 		settings.setType(NotifyType.INFO);
-		notify(title, message, settings);
+		notify(message, settings);
 	}
 	
-	public static void notify(String title, String message, NotifySettings settings) {
+	public static void notify(String message, NotifySettings settings) {
 		try{
-			if (title != null && !title.isEmpty() && !title.endsWith(":")) {
-				title += ":";
-			}
-			Notify.notify(title, message, settings);
+			Notify.notify("", message, settings);
 		} catch(Throwable t) {
 			SynapseJSNIUtilsImpl._consoleError(getStackTrace(t));
 		}
@@ -242,7 +239,7 @@ public class DisplayUtils {
 	 * @param title
 	 * @param message
 	 */
-	public static void showError(String title, String message, Integer timeout) {
+	public static void showError(String message, Integer timeout) {
 		NotifySettings settings = getDefaultSettings();
 		settings.setType(NotifyType.DANGER);
 		settings.setAllowDismiss(false);
@@ -250,7 +247,7 @@ public class DisplayUtils {
 			settings.setDelay(timeout);	
 		}
 		settings.setZIndex(2001);
-		notify(title, message, settings);
+		notify(message, settings);
 	}
 	
 	public static void showErrorMessage(String message) {
@@ -313,7 +310,7 @@ public class DisplayUtils {
 							@Override
 							public void onSuccess(String result) {
 								d.hide();
-								showInfo("Report sent", "Thank you!");
+								showInfo("Report sent. Thank you!");
 							}
 
 							@Override

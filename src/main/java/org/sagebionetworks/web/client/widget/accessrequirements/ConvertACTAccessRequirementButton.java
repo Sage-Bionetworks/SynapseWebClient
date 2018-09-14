@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.ACTAccessRequirement;
 import org.sagebionetworks.repo.model.AccessRequirement;
 import org.sagebionetworks.repo.model.dataaccess.AccessRequirementConversionRequest;
 import org.sagebionetworks.web.client.DataAccessClientAsync;
-import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -94,7 +93,7 @@ public class ConvertACTAccessRequirementButton implements IsWidget, ClickHandler
 			
 			@Override
 			public void onSuccess(AccessRequirement result) {
-				popupUtils.showInfo(SUCCESS_MESSAGE, "");
+				popupUtils.showInfo(SUCCESS_MESSAGE);
 				refreshCallback.invoke();
 			}
 			
