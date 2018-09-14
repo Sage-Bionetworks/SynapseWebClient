@@ -678,7 +678,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 			@Override
 			public void onSuccess(Entity result) {
 				entity = result;
-				view.showInfo(DisplayConstants.TEXT_LINK_FILE, DisplayConstants.TEXT_LINK_SUCCESS);
+				view.showInfo(DisplayConstants.TEXT_LINK_SUCCESS);
 				entityUpdated();
 			}
 			@Override
@@ -829,7 +829,7 @@ public class Uploader implements UploaderView.Presenter, SynapseWidgetPresenter,
 	}
 	
 	private void uploadSuccess() {
-		view.showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
+		view.showInfo(DisplayConstants.TEXT_UPLOAD_SUCCESS);
 		view.clear();
 		globalAppState.clearDropZoneHandler();
 		view.resetToInitialState();

@@ -82,7 +82,7 @@ public class EditRegisterTeamDialogTest {
 		//click Unregister
 		widget.onUnregister();
 		verify(mockChallengeClient).unregisterChallengeTeam(anyString(), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockCallback).invoke();
 		verify(mockView).hideModal();
 	}

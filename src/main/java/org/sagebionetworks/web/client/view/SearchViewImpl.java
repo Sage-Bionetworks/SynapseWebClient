@@ -350,8 +350,8 @@ public class SearchViewImpl extends Composite implements SearchView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+	public void showInfo(String message) {
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

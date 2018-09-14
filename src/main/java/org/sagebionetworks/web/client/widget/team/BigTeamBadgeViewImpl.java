@@ -92,7 +92,7 @@ public class BigTeamBadgeViewImpl extends FlowPanel implements BigTeamBadgeView 
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 	}
 
 	@Override

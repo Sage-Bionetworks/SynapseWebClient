@@ -66,7 +66,7 @@ public class EditRegisteredTeamDialog implements EditRegisteredTeamDialogView.Pr
 		challengeClient.unregisterChallengeTeam(challengeTeam.getId(), new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo("Team Registration", "Successfully unregistered your team");
+				view.showInfo("Successfully unregistered your team");
 				if (callback != null) {
 					callback.invoke();
 				}

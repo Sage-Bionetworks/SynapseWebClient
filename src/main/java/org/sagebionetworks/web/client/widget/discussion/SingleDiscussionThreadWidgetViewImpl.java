@@ -205,7 +205,7 @@ public class SingleDiscussionThreadWidgetViewImpl implements SingleDiscussionThr
 
 	@Override
 	public void showSuccess(String title, String message) {
-		DisplayUtils.showInfo(title, message);
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override

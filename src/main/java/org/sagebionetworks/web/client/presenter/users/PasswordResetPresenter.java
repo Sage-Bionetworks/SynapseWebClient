@@ -129,7 +129,7 @@ public class PasswordResetPresenter extends AbstractActivity implements Password
 		userService.changePassword(sessionToken, newPassword, new AsyncCallback<Void>() {
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo("", DisplayConstants.PASSWORD_RESET_TEXT);
+				view.showInfo(DisplayConstants.PASSWORD_RESET_TEXT);
 				view.showPasswordResetSuccess();
 				Session session = authenticationController.getCurrentUserSessionData().getSession();
 				UserProfile profile = authenticationController.getCurrentUserSessionData().getProfile();

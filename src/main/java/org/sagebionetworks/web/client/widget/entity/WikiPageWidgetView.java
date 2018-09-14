@@ -53,7 +53,7 @@ public interface WikiPageWidgetView extends IsWidget {
 	public void setNoWikiCanEditMessageVisible(boolean b);
 	void setLoadingVisible(boolean isVisible);
 	public void showErrorMessage(String message);
-	void showInfo(String title, String message);
+	void showInfo(String message);
 	public void clear();
 	void addStyleName(String style);
 	void setWikiHistoryDiffToolButtonVisible(boolean visible, WikiPageKey key);

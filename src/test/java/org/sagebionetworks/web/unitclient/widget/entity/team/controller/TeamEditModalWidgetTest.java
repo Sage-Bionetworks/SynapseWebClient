@@ -180,7 +180,7 @@ public class TeamEditModalWidgetTest {
 		verify(mockTeam).setCanPublicJoin(newPublicJoin);
 		verify(mockTeam).setIcon(newIcon);
 		verify(mockSynapseClient).updateTeam(eq(mockTeam), eq(acl), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
 	}
@@ -199,7 +199,7 @@ public class TeamEditModalWidgetTest {
 		
 		verify(mockTeam).setIcon(null);
 		verify(mockSynapseClient).updateTeam(eq(mockTeam), eq(acl), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
 	}
@@ -231,7 +231,7 @@ public class TeamEditModalWidgetTest {
 		verify(mockTeam).setCanPublicJoin(newPublicJoin);
 		verify(mockTeam).setIcon(null);
 		verify(mockSynapseClient).updateTeam(eq(mockTeam), eq(acl), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockRefreshCallback).invoke();
 		verify(mockView).hide();
 	}	

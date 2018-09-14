@@ -66,7 +66,7 @@ public class AccountPresenter extends AbstractActivity implements AccountView.Pr
 			@Override
 			public void onSuccess(Void result) {
 				// success, send to Settings to view account state
-				view.showInfo(DisplayConstants.EMAIL_SUCCESS, "");
+				view.showInfo(DisplayConstants.EMAIL_SUCCESS);
 				globalAppState.getPlaceChanger().goTo(new Profile(Profile.EDIT_PROFILE_TOKEN));
 			}
 			@Override

@@ -165,7 +165,7 @@ public class WikiPageDeleteConfirmationDialogTest {
 		dialog.onDeleteWiki();
 		
 		verify(mockSynapseClient).deleteV2WikiPage(any(WikiPageKey.class), any(AsyncCallback.class));
-		verify(mockView).showInfo(DELETED, THE + WIKI + WAS_SUCCESSFULLY_DELETED);
+		verify(mockView).showInfo(THE + WIKI + WAS_SUCCESSFULLY_DELETED);
 		verify(mockAfterDeleteCallback).invoke(WIKI_TREE_PAGE_A_ID);
 	}
 }

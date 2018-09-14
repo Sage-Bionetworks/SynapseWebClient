@@ -106,7 +106,7 @@ public class AclAddPeoplePanel extends Composite implements SynapseView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 	}
 
 	@Override

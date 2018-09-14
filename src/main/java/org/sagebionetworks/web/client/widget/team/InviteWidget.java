@@ -139,7 +139,7 @@ public class InviteWidget implements InviteWidgetView.Presenter {
 		} else {
 			// done!
 			view.hide();
-			view.showInfo("Invitation(s) Sent", "");
+			view.showInfo("Invitation(s) Sent");
 			teamUpdatedCallback.invoke();
 			view.setLoading(false);
 		}

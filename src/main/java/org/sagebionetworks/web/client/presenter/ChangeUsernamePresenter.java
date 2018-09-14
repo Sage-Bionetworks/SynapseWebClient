@@ -74,7 +74,7 @@ public class ChangeUsernamePresenter extends AbstractActivity implements ChangeU
 				AsyncCallback<Void> profileUpdatedCallback = new AsyncCallback<Void>() {
 					@Override
 					public void onSuccess(Void result) {
-						view.showInfo("Successfully updated your username", "");
+						view.showInfo("Successfully updated your username");
 						globalAppState.gotoLastPlace();
 					}
 					

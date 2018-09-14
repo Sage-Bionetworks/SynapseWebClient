@@ -106,7 +106,7 @@ public class TeamEditModalWidget implements IsWidget, TeamEditModalWidgetView.Pr
 			synapseClient.updateTeam(team, teamACL, new AsyncCallback<Team>() {
 				@Override
 				public void onSuccess(Team result) {
-					view.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS, "");
+					view.showInfo(DisplayConstants.UPDATE_TEAM_SUCCESS);
 					if (refreshCallback != null)
 						refreshCallback.invoke();
 					view.hide();

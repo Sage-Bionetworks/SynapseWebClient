@@ -26,7 +26,7 @@ public interface TeamEditModalWidgetView {
 	void setDefaultIconVisible();
 	void setAuthenticatedUsersCanSendMessageToTeam(boolean canSendMessage);
 	boolean canAuthenticatedUsersSendMessageToTeam();
-	void showInfo(String title, String message);
+	void showInfo(String message);
 	void show();
 	void hide();
 	void showLoading();

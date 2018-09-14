@@ -139,7 +139,7 @@ public class StuAlertTest {
 		verify(mockSynapseClient).sendMessageToEntityOwner(anyString(), anyString(), stringCaptor.capture(), anyString(), any(AsyncCallback.class));
 		String messageBody = stringCaptor.getValue();
 		assertTrue(messageBody.contains("#!Profile:"+USER_ID));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockView).hideRequestAccessUI();
 	}
 	@Test

@@ -335,7 +335,7 @@ public class EntityBadgeTest {
 		
 		widget.onUnlink();
 		verify(mockSynapseJavascriptClient).deleteEntityById(eq(entityId), any(AsyncCallback.class));
-		verify(mockPopupUtils).showInfo(EntityBadge.LINK_SUCCESSFULLY_DELETED, "");
+		verify(mockPopupUtils).showInfo(EntityBadge.LINK_SUCCESSFULLY_DELETED);
 	}
 	
 	@Test

@@ -146,7 +146,7 @@ public class EditAnnotationsDialogTest {
 		when(mockEditor.isValid()).thenReturn(true);
 		dialog.onSave();
 		verify(mockView).setLoading();
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockView).hideEditor();
 		verify(mockUpdateHandler).onPersistSuccess(any(EntityUpdatedEvent.class));
 	}

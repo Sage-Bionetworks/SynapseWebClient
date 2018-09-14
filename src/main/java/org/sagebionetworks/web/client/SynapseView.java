@@ -9,10 +9,9 @@ public interface SynapseView extends ShowsErrors {
 	
 	/**
 	 * Shows user info
-	 * @param title
 	 * @param message
 	 */
-	public void showInfo(String title, String message);
+	public void showInfo(String message);
 	
 
 	

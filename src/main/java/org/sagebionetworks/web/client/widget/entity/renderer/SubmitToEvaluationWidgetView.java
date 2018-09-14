@@ -18,7 +18,7 @@ public interface SubmitToEvaluationWidgetView extends IsWidget, SynapseView {
 	void showUnavailable(String message);
 	void showAnonymousRegistrationMessage();
 	
-	void showInfo(String title, String message);
+	void showInfo(String message);
 	void setEvaluationSubmitterWidget(Widget widget);
 	
 	/**

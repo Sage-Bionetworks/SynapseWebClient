@@ -205,7 +205,7 @@ public class UploaderTest {
 		//if entity is null, it should call synapseClient.createExternalFile() to create the FileEntity and associate the path.
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		verify(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), eq((Long)null), eq((String)null), eq(storageLocationId), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 	}
 	
 	@Test
@@ -229,7 +229,7 @@ public class UploaderTest {
 		when(mockGwt.encode(anyString())).thenReturn(encodedUrl);
 		uploader.setExternalFilePath(url, "", storageLocationId);
 		verify(mockSynapseClient).createExternalFile(anyString(), eq(encodedUrl), anyString(), anyString(), eq((Long)null), eq((String)null), eq(storageLocationId), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 	}
 	
 	@Test
@@ -237,7 +237,7 @@ public class UploaderTest {
 		uploader.configure(testEntity, null, null, true);
 		uploader.setExternalFilePath("http://fakepath.url/blah.xml", "", storageLocationId);
 		verify(mockSynapseClient).updateExternalFile(anyString(), anyString(), anyString(), anyString(), eq((Long)null), eq((String)null), eq(storageLocationId), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 	}
 
 	@Test
@@ -247,7 +247,7 @@ public class UploaderTest {
 		uploader.setFileNames(new String[] {"test.txt"});
 		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
 		verify(mockSynapseClient).createExternalFile(anyString(), anyString(), anyString(), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 	}
 
 	@Test
@@ -291,7 +291,7 @@ public class UploaderTest {
 		uploader.setFileNames(new String[] {fileName});
 		uploader.setSftpExternalFilePath("http://fakepath.url/blah.xml", storageLocationId);
 		verify(mockSynapseClient).updateExternalFile(anyString(), anyString(), eq(fileName), anyString(), anyLong(), eq(md5), eq(storageLocationId), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 	}
 	
 	@Test
@@ -308,7 +308,7 @@ public class UploaderTest {
 		verify(mockView).hideLoading();
 		assertEquals(UploadType.S3, uploader.getCurrentUploadType());
 		//verify upload success
-		verify(mockView).showInfo(DisplayConstants.TEXT_UPLOAD_FILE_OR_LINK, DisplayConstants.TEXT_UPLOAD_SUCCESS);
+		verify(mockView).showInfo(DisplayConstants.TEXT_UPLOAD_SUCCESS);
 		verify(mockView).clear();
 		verify(mockGlobalApplicationState).clearDropZoneHandler();
 		verify(mockView, times(2)).resetToInitialState();

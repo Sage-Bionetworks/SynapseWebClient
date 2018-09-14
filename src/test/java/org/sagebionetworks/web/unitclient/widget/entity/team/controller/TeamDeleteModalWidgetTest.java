@@ -90,7 +90,7 @@ public class TeamDeleteModalWidgetTest {
 		presenter.onConfirm();
 		verify(mockSynAlert).clear();
 		verify(mockSynapseClient).deleteTeam(eq(teamId), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		verify(mockPlaceChanger).goTo(placeCaptor.capture());
 		Place gotoPlace = placeCaptor.getValue();
 		assertTrue(gotoPlace instanceof Profile);

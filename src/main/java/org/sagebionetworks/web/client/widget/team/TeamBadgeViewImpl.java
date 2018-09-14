@@ -131,7 +131,7 @@ public class TeamBadgeViewImpl extends FlowPanel implements TeamBadgeView {
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 	}
 
 	@Override

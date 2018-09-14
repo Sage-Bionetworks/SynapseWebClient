@@ -342,7 +342,7 @@ public class JoinTeamWidgetTest {
 	public void testJoinRequestStep3() throws Exception {
 		joinWidget.sendJoinRequestStep3();
 		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), eq((Date)null), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		//verify that team updated callback is invoked
 		verify(mockTeamUpdatedCallback).invoke();
 	}
@@ -373,7 +373,7 @@ public class JoinTeamWidgetTest {
 		joinWidget.sendJoinRequestStep3();
 		ArgumentCaptor<Date> dateCaptor = ArgumentCaptor.forClass(Date.class);
 		verify(mockSynapseClient).requestMembership(anyString(), anyString(), anyString(), eq(EvaluationSubmitterTest.HOST_PAGE_URL), dateCaptor.capture(), any(AsyncCallback.class));
-		verify(mockView).showInfo(anyString(), anyString());
+		verify(mockView).showInfo(anyString());
 		//verify that wiki page refresh is invoked
 		verify(mockWidgetRefreshRequired).invoke();
 		

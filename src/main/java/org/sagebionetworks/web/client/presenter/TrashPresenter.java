@@ -28,8 +28,8 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 	
 	public static final int TRASH_LIMIT = 10;
 	
-	public static final String TRASH_RESTORED_TITLE = "Restored";
-	public static final String TRASH_PURGED_TITLE = "Permanently Removed";
+	public static final String TRASH_RESTORED_TITLE = "Restored ";
+	public static final String TRASH_PURGED_TITLE = "Permanently Removed ";
 	public static final String TRASH_EMPTIED_TITLE = "Trash Emptied!";
 	public static final String TRASH_EMPTIED_MESSAGE = "Your trash was successfully emptied.";
 	
@@ -78,7 +78,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 		synapseClient.purgeTrashForUser(new AsyncCallback<Void>() {	
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(TRASH_EMPTIED_TITLE, TRASH_EMPTIED_MESSAGE);
+				view.showInfo(TRASH_EMPTIED_MESSAGE);
 				view.refreshTable();
 			}
 			
@@ -132,7 +132,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 			@Override
 			public void onSuccess(Void result) {
 				String entityNamesSet = entityNames.toString();
-				view.showInfo(TRASH_PURGED_TITLE, entityNames.toString().
+				view.showInfo(TRASH_PURGED_TITLE + entityNames.toString().
 											substring(1, entityNamesSet.length() - 1) + ".");
 				// Refresh table.
 				view.refreshTable();
@@ -153,7 +153,7 @@ public class TrashPresenter extends AbstractActivity implements TrashView.Presen
 
 			@Override
 			public void onSuccess(Void result) {
-				view.showInfo(TRASH_RESTORED_TITLE, trashedEntity.getEntityName());
+				view.showInfo(TRASH_RESTORED_TITLE + trashedEntity.getEntityName());
 				view.refreshTable();
 			}
 			

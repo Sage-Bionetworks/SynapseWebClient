@@ -23,7 +23,7 @@ public interface ApproveUserAccessModalView extends IsWidget {
 	void setMessageEditArea(String html);
 	void startLoadingEmail();
 	void finishLoadingEmail();
-	void showInfo(String title, String message);
+	void showInfo(String message);
 	void setLoadingEmailVisible(boolean visible);
 	void show();
 	void hide();

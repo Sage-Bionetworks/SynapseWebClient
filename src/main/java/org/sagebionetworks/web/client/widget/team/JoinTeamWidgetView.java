@@ -19,7 +19,7 @@ public interface JoinTeamWidgetView extends IsWidget {
 	public void setPresenter(Presenter presenter);
 	void showJoinWizard();
 	void hideJoinWizard();
-	void showInfo(String title, String message);
+	void showInfo(String message);
 	void setButtonsEnabled(boolean enable);	
 	public void setIsMemberMessage(String htmlEscape);
 	public void setJoinButtonsText(String joinButtonText);

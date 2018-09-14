@@ -41,7 +41,7 @@ public class UploadDialogWidgetViewImpl extends Composite implements UploadDialo
 	}
 
 	@Override
-	public void showInfo(String title, String message) {
+	public void showInfo(String message) {
 	}
 
 	@Override

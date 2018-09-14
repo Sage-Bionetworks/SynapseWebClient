@@ -115,7 +115,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 				place.putParam(SubscriptionPlace.SUBSCRIPTION_ID_FILTER_PARAM, subscription.getSubscriptionId());
 				globalAppState.pushCurrentPlace(place);
 				setPlace(place);
-				view.showInfo("You are now following this topic.", "");
+				view.showInfo("You are now following this topic.");
 			};
 		});
 	}
@@ -136,7 +136,7 @@ public class SubscriptionPresenter extends AbstractActivity implements Subscript
 				place.putParam(SubscriptionPlace.OBJECT_TYPE_PARAM, objectType.name());
 				globalAppState.pushCurrentPlace(place);
 				setPlace(place);
-				view.showInfo("You are no longer following this topic.", "");
+				view.showInfo("You are no longer following this topic.");
 			};
 		});
 	}

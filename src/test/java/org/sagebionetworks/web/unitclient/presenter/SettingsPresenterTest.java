@@ -197,7 +197,7 @@ public class SettingsPresenterTest {
 		assertNotNull(updatedProfile.getNotificationSettings());
 		assertEquals(sendEmailNotifications, updatedProfile.getNotificationSettings().getSendEmailNotifications());
 		assertEquals(markEmailedMessagesAsRead, updatedProfile.getNotificationSettings().getMarkEmailedMessagesAsRead());
-		verify(mockView).showInfo(eq(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS), anyString());
+		verify(mockView).showInfo(eq(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS));
 	}
 	
 	@Test
@@ -220,7 +220,7 @@ public class SettingsPresenterTest {
 		UserProfile updatedProfile = argument.getValue();
 		assertEquals(sendEmailNotifications, updatedProfile.getNotificationSettings().getSendEmailNotifications());
 		assertEquals(markEmailedMessagesAsRead, updatedProfile.getNotificationSettings().getMarkEmailedMessagesAsRead());
-		verify(mockView).showInfo(eq(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS), anyString());
+		verify(mockView).showInfo(eq(DisplayConstants.UPDATED_NOTIFICATION_SETTINGS));
 	}
 	
 	@Test

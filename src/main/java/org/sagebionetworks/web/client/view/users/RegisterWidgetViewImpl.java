@@ -77,7 +77,7 @@ public class RegisterWidgetViewImpl implements RegisterWidgetView {
 	}
 	@Override
 	public void showInfo(String message) {
-		DisplayUtils.showInfo(message, "");
+		DisplayUtils.showInfo(message);
 	}
 
 	@Override
