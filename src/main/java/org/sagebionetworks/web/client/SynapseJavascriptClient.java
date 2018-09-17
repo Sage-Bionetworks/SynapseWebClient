@@ -73,7 +73,13 @@ import org.sagebionetworks.repo.model.file.BatchFileRequest;
 import org.sagebionetworks.repo.model.file.BatchFileResult;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlRequest;
 import org.sagebionetworks.repo.model.file.BatchPresignedUploadUrlResponse;
+import org.sagebionetworks.repo.model.file.DownloadList;
+import org.sagebionetworks.repo.model.file.DownloadOrder;
+import org.sagebionetworks.repo.model.file.DownloadOrderSummaryRequest;
+import org.sagebionetworks.repo.model.file.DownloadOrderSummaryResponse;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.repo.model.file.FileHandleAssociationList;
 import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
 import org.sagebionetworks.repo.model.file.MultipartUploadStatus;
 import org.sagebionetworks.repo.model.file.UploadDestination;
@@ -225,9 +231,15 @@ public class SynapseJavascriptClient {
 	public static final String ASYNC_GET = "/async/get/";
 	public static final String AUTH_OAUTH_2 = "/oauth2";
 	public static final String AUTH_OAUTH_2_ALIAS = AUTH_OAUTH_2+"/alias";
+	public static final String DOWNLOAD_LIST = "/download/list";
+	public static final String DOWNLOAD_LIST_ADD = DOWNLOAD_LIST+"/add";
+	public static final String DOWNLOAD_LIST_REMOVE = DOWNLOAD_LIST+"/remove";
+	public static final String DOWNLOAD_LIST_CLEAR = DOWNLOAD_LIST+"/clear";
+	
+	public static final String DOWNLOAD_ORDER = "/download/order";
+	public static final String DOWNLOAD_ORDER_HISTORY = DOWNLOAD_ORDER+"/history";
 	
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
-	
 	@Inject
 	public SynapseJavascriptClient(
 			JSONObjectAdapter jsonObjectAdapter,
@@ -1016,10 +1028,13 @@ public class SynapseJavascriptClient {
 	
 	private String getEndpoint(AsynchType type) {
 		String endpoint;
-		if (AsynchType.BulkFileDownload.equals(type)) {
-			endpoint = getFileServiceUrl();
-		} else {
-			endpoint = getRepoServiceUrl();
+		switch(type) {
+			case BulkFileDownload:
+			case AddFileToDownloadList:
+				endpoint = getFileServiceUrl();
+				break;
+			default:
+				endpoint = getRepoServiceUrl();
 		}
 		return endpoint;
 	}
@@ -1145,5 +1160,45 @@ public class SynapseJavascriptClient {
 		}
 		doGet(url, OBJECT_TYPE.SubscriptionPagedResults, callback);
 	}
+	
+	public void addFilesToDownloadList(List<FileHandleAssociation> toAdd, AsyncCallback<DownloadList> callback) {
+		FileHandleAssociationList request = new FileHandleAssociationList();
+		request.setList(toAdd);
+		String url = getFileServiceUrl() + DOWNLOAD_LIST_ADD;
+		doPost(url, request, OBJECT_TYPE.DownloadList, callback);
+	}
+	
+	public void removeFilesFromDownloadList(List<FileHandleAssociation> toRemove, AsyncCallback<DownloadList> callback){
+		FileHandleAssociationList request = new FileHandleAssociationList();
+		request.setList(toRemove);
+		String url = getFileServiceUrl() + DOWNLOAD_LIST_REMOVE;
+		doPost(url, null, OBJECT_TYPE.DownloadOrder, callback);
+	}
+	
+	public void clearDownloadList(AsyncCallback<Void> callback) {
+		String url = getFileServiceUrl() + DOWNLOAD_LIST;
+		doDelete(url, callback);
+	}
+	
+	public void getDownloadList(AsyncCallback<DownloadList> callback) {
+		String url = getFileServiceUrl() + DOWNLOAD_LIST;
+		doGet(url, OBJECT_TYPE.DownloadList, callback);
+	}
+	
+	public void createDownloadOrderFromUsersDownloadList(String zipFileName, AsyncCallback<DownloadOrder> callback) {
+		String url = getFileServiceUrl() + DOWNLOAD_ORDER+"?zipFileName="+zipFileName;
+		doPost(url, null, OBJECT_TYPE.DownloadOrder, callback);
+	}
+
+	public void getDownloadOrder(String orderId, AsyncCallback<DownloadOrder> callback) {
+		String url = getFileServiceUrl() + "/download/order/"+orderId;
+		doGet(url, OBJECT_TYPE.DownloadList, callback);
+	}
+	
+	public void getDownloadOrderHistory(DownloadOrderSummaryRequest request, AsyncCallback<DownloadOrderSummaryResponse> callback) {
+		String url = getFileServiceUrl() + "/download/order/history";
+		doPost(url, request, OBJECT_TYPE.DownloadOrderSummaryResponse, callback);
+	}
+	
 }
 
