@@ -9,6 +9,7 @@ import static org.sagebionetworks.repo.model.EntityBundle.RESTRICTION_INFORMATIO
 import static org.sagebionetworks.repo.model.EntityBundle.ROOT_WIKI_ID;
 import static org.sagebionetworks.repo.model.EntityBundle.THREAD_COUNT;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.gwtbootstrap3.client.ui.constants.ButtonSize;
@@ -16,8 +17,12 @@ import org.sagebionetworks.repo.model.Annotations;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.FileEntity;
+import org.sagebionetworks.repo.model.Folder;
 import org.sagebionetworks.repo.model.Link;
+import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.PreviewFileHandle;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
@@ -32,7 +37,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
-import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
@@ -52,19 +57,17 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private AnnotationTransformer transformer;
 	private UserBadge modifiedByUserBadge;
 	private SynapseJavascriptClient jsClient;
-	private FileDownloadButton fileDownloadButton;
 	private LazyLoadHelper lazyLoadHelper;
 	private DateTimeUtils dateTimeUtils;
 	private PopupUtilsView popupUtils;
 	private SynapseProperties synapseProperties;
-	
+	private FileHandle dataFileHandle;
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
 			AnnotationTransformer transformer,
 			UserBadge modifiedByUserBadge,
 			SynapseJavascriptClient jsClient,
-			FileDownloadButton fileDownloadButton,
 			LazyLoadHelper lazyLoadHelper,
 			DateTimeUtils dateTimeUtils,
 			PopupUtilsView popupUtils,
@@ -75,7 +78,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		this.modifiedByUserBadge = modifiedByUserBadge;
 		this.dateTimeUtils = dateTimeUtils;
 		this.jsClient = jsClient;
-		this.fileDownloadButton = fileDownloadButton;
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.popupUtils = popupUtils;
 		this.synapseProperties = synapseProperties;
@@ -88,13 +90,6 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		};
 		
 		lazyLoadHelper.configure(loadDataCallback, view);
-		fileDownloadButton.setSize(ButtonSize.EXTRA_SMALL);
-		fileDownloadButton.setEntityUpdatedHandler(new EntityUpdatedHandler() {
-			@Override
-			public void onPersistSuccess(EntityUpdatedEvent event) {
-				getEntityBundle();
-			}
-		});
 		view.setPresenter(this);
 	}
 	
@@ -130,6 +125,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		Annotations annotations = eb.getAnnotations();
 		String rootWikiId = eb.getRootWikiId();
 		List<FileHandle> handles = eb.getFileHandles();
+		dataFileHandle = getDataFileHandle(handles);
 		if (PublicPrivateBadge.isPublic(eb.getBenefactorAcl(), synapseProperties.getPublicPrincipalIds())) {
 			view.showPublicIcon();
 		} else {
@@ -142,8 +138,8 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		if (eb.getEntity() instanceof Link && eb.getPermissions().getCanDelete()) {
 			view.showUnlinkIcon();
 		}
-		view.setSize(getContentSize(handles));
-		view.setMd5(getContentMd5(handles));
+		view.setSize(getContentSize(dataFileHandle));
+		view.setMd5(getContentMd5(dataFileHandle));
 		
 		boolean hasLocalSharingSettings = eb.getBenefactorAcl().getId().equals(entityHeader.getId());
 		if (hasLocalSharingSettings) {
@@ -155,9 +151,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		}
 		
 		if (eb.getEntity() instanceof FileEntity) {
-			fileDownloadButton.hideClientHelp();
-			fileDownloadButton.configure(eb);
-			view.setFileDownloadButton(fileDownloadButton.asWidget());
+			view.showAddToDownloadList();
 		}
 		
 		if (eb.getThreadCount() > 0) {
@@ -179,28 +173,31 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		}
 	}
 	
-	public String getContentSize(List<FileHandle> handles) {
+	public static FileHandle getDataFileHandle(List<FileHandle> handles) {
 		if (handles != null) {
 			for (FileHandle handle: handles) {
 				if (!(handle instanceof PreviewFileHandle)) {
-					Long contentSize = handle.getContentSize();
-					if (contentSize != null && contentSize > 0) {
-						return view.getFriendlySize(contentSize, true);
-					}
+					return handle;
 				}
+			}
+		}
+		return null;
+	}
+
+	public String getContentSize(FileHandle dataFileHandle) {
+		if (dataFileHandle != null) {
+			Long contentSize = dataFileHandle.getContentSize();
+			if (contentSize != null && contentSize > 0) {
+				return view.getFriendlySize(contentSize, true);
 			}
 		}
 		return "";
 	}
 	
 
-	public String getContentMd5(List<FileHandle> handles) {
-		if (handles != null) {
-			for (FileHandle handle: handles) {
-				if (!(handle instanceof PreviewFileHandle)) {
-					return handle.getContentMd5();
-				}
-			}
+	public String getContentMd5(FileHandle dataFileHandle) {
+		if (dataFileHandle != null) {
+			return dataFileHandle.getContentMd5();
 		}
 		return "";
 	}
@@ -251,6 +248,21 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			public void onSuccess(Void result) {
 				popupUtils.showInfo(LINK_SUCCESSFULLY_DELETED);
 				globalAppState.refreshPage();
+			}
+		});
+	}
+	
+	@Override
+	public void onAddToDownloadList() {
+		// TODO: add special popup to report how many items are in the current download list, and link to download list.
+		jsClient.addFileToDownloadList(dataFileHandle.getId(), entityHeader.getId(), new AsyncCallback<DownloadList>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setError(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(DownloadList result) {
+				popupUtils.showInfo(dataFileHandle.getFileName() + " has been added to your download list.");
 			}
 		});
 	}

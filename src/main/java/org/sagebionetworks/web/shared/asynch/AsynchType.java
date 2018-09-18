@@ -1,6 +1,6 @@
 package org.sagebionetworks.web.shared.asynch;
 import static org.sagebionetworks.web.client.SynapseJavascriptClient.*;
-
+import org.sagebionetworks.repo.model.doi.v2.*;
 import org.sagebionetworks.repo.model.asynch.AsynchronousRequestBody;
 import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
 import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
@@ -38,6 +38,7 @@ public enum AsynchType implements IsSerializable{
 	TableCSVDownload(TABLE_DOWNLOAD_CSV, DownloadFromTableRequest.class, DownloadFromTableResult.class),
 	BulkFileDownload(FILE_BULK, BulkFileDownloadRequest.class,BulkFileDownloadResponse.class),
 	TableTransaction(TABLE_TRANSACTION, TableUpdateTransactionRequest.class, TableUpdateTransactionResponse.class),
+	Doi(DOI, DoiRequest.class, DoiResponse.class),
 	AddFileToDownloadList(DOWNLOAD_LIST_ADD, AddFileToDownloadListRequest.class, AddFileToDownloadListResponse.class);
 	String prefix;
 	Class<? extends AsynchronousRequestBody> requestClass;

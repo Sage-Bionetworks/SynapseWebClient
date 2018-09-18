@@ -28,13 +28,13 @@ public class FileTitleBar implements SynapseWidgetPresenter {
 	private FileTitleBarView view;
 	private EntityBundle entityBundle;
 	private SynapseProperties synapseProperties;
-	private FileDownloadButton fileDownloadButton;
+	private FileDownloadMenuItem fileDownloadButton;
 	private SynapseClientAsync synapseClient;
 	
 	@Inject
 	public FileTitleBar(FileTitleBarView view, 
 			SynapseProperties synapseProperties,
-			FileDownloadButton fileDownloadButton,
+			FileDownloadMenuItem fileDownloadButton,
 			SynapseClientAsync synapseClient) {
 		this.view = view;
 		this.synapseProperties = synapseProperties;

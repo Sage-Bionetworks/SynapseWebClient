@@ -389,8 +389,8 @@ import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigView;
 import org.sagebionetworks.web.client.widget.entity.editor.VideoConfigViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBarViewImpl;
-import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButtonView;
-import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButtonViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItemView;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItemViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
@@ -1333,7 +1333,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		bind(FileClientsHelpView.class).to(FileClientsHelpViewImpl.class);
 		bind(ContainerClientsHelp.class).to(ContainerClientsHelpImpl.class);
-		bind(FileDownloadButtonView.class).to(FileDownloadButtonViewImpl.class);
+		bind(FileDownloadMenuItemView.class).to(FileDownloadMenuItemViewImpl.class);
 		bind(CreateTableViewWizardStep2View.class).to(CreateTableViewWizardStep2ViewImpl.class);
 		bind(ChallengeWidgetView.class).to(ChallengeWidgetViewImpl.class);
 		bind(SelectTeamModalView.class).to(SelectTeamModalViewImpl.class);

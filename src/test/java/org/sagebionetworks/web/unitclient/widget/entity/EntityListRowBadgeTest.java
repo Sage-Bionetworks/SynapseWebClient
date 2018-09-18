@@ -26,11 +26,12 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.Reference;
 import org.sagebionetworks.schema.adapter.JSONObjectAdapterException;
 import org.sagebionetworks.web.client.DateTimeUtils;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadge;
 import org.sagebionetworks.web.client.widget.entity.EntityListRowBadgeView;
-import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -49,22 +50,21 @@ public class EntityListRowBadgeTest {
 	@Mock
 	DateTimeUtils mockDateTimeUtils;
 	@Mock
-	FileDownloadButton mockFileDownloadButton;
-	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	PopupUtilsView mockPopupUtils;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		widget = new EntityListRowBadge(mockView, mockUserBadge, mockSynapseJavascriptClient,
-				mockFileDownloadButton, mockLazyLoadHelper, mockDateTimeUtils);
+				mockLazyLoadHelper, mockDateTimeUtils, mockPopupUtils);
 	}
 	@Test
 	public void testConstruction() {
 		verify(mockView).setPresenter(widget);
 		verify(mockView).setCreatedByWidget(any(Widget.class));
-		verify(mockFileDownloadButton).setSize(ButtonSize.EXTRA_SMALL);
 	}
 	
 	private EntityBundle setupEntity(Entity entity) {
@@ -111,8 +111,7 @@ public class EntityListRowBadgeTest {
 		verify(mockUserBadge).configure(createdByUserId);
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setDescription(description);
-		verify(mockFileDownloadButton, never()).configure(any(EntityBundle.class));
-		verify(mockView, never()).setFileDownloadButton(any(Widget.class));
+		verify(mockView, never()).showAddToDownloadList();
 		verify(mockView).setVersion(EntityListRowBadge.N_A);
 	}
 	
@@ -146,9 +145,7 @@ public class EntityListRowBadgeTest {
 		verify(mockUserBadge).configure(createdByUserId);
 		verify(mockView).setCreatedOn(anyString());
 		verify(mockView).setDescription(description);
-		verify(mockFileDownloadButton).configure(any(EntityBundle.class));
-		verify(mockFileDownloadButton).hideClientHelp();
-		verify(mockView).setFileDownloadButton(any(Widget.class));
+		verify(mockView).showAddToDownloadList();
 		verify(mockView).setVersion(version.toString());
 	}
 	

@@ -58,7 +58,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	@UiField
 	TextBox md5Field;
 	@UiField
-	Span fileDownloadButtonContainer;
+	org.gwtbootstrap3.client.ui.Anchor addToDownloadListLink;
 	
 	@UiField
 	Div nameContainer;
@@ -88,7 +88,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		placeChanger = globalAppState.getPlaceChanger();
 		idField.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
 		md5Field.addClickHandler(TEXTBOX_SELECT_ALL_FIELD_CLICKHANDLER);
-		
+		addToDownloadListLink.addClickHandler(event -> {
+			presenter.onAddToDownloadList();
+		});
 	}
 
 	@Override
@@ -238,12 +240,7 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 	public boolean isInViewport() {
 		return DisplayUtils.isInViewport(this);
 	}
-	@Override
-	public void setFileDownloadButton(Widget w) {
-		fileDownloadButtonContainer.clear();
-		fileDownloadButtonContainer.add(w);
-	}
-
+	
 	@Override
 	public void showDiscussionThreadIcon(){
 		Icon icon = new Icon(IconType.COMMENT);
@@ -265,6 +262,9 @@ public class EntityBadgeViewImpl extends Composite implements EntityBadgeView {
 		
 		nameContainer.add(new Tooltip(icon, "Remove this link"));
 	}
-	
 
+	@Override
+	public void showAddToDownloadList() {
+		addToDownloadListLink.setVisible(true);	
+	}
 }

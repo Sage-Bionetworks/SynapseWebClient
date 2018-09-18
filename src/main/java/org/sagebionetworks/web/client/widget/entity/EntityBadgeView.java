@@ -20,7 +20,7 @@ public interface EntityBadgeView extends IsWidget, SupportsLazyLoadInterface {
 	void setModifiedByWidget(Widget w);
 	void setModifiedByWidgetVisible(boolean visible);
 	void setIcon(IconType iconType);
-	void setFileDownloadButton(Widget w);
+	void showAddToDownloadList();
 	void setAnnotations(String html);
 	void setSize(String s);
 	void setMd5(String s);
@@ -36,6 +36,7 @@ public interface EntityBadgeView extends IsWidget, SupportsLazyLoadInterface {
 	void showDiscussionThreadIcon();
 	public interface Presenter {
 		void onUnlink();
+		void onAddToDownloadList();
 	}
 
 }

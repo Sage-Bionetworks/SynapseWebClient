@@ -2,7 +2,6 @@ package org.sagebionetworks.web.client.widget.entity.file;
 
 import static org.sagebionetworks.web.client.ServiceEntryPointUtils.fixServiceEntryPoint;
 
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.sagebionetworks.repo.model.EntityBundle;
 import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.RestrictableObjectType;
@@ -27,7 +26,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
-import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
@@ -40,11 +38,11 @@ import com.google.gwt.user.client.ui.FormPanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
-public class FileDownloadButton implements FileDownloadButtonView.Presenter, SynapseWidgetPresenter {
+public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter, SynapseWidgetPresenter {
 	
 	public static final String ACCESS_REQUIREMENTS_LINK = "#!AccessRequirements:ID=";
 	public static final String LOGIN_PLACE_LINK = "#!LoginPlace:0";
-	private FileDownloadButtonView view;
+	private FileDownloadMenuItemView view;
 	private EntityBundle entityBundle;
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseClientAsync synapseClient;
@@ -56,14 +54,13 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	SynapseJSNIUtils jsniUtils;
 	GWTWrapper gwt;
 	CookieProvider cookies;
-	boolean isHidingClientHelp = false;
 	AwsSdk awsSdk;
 	PopupUtilsView popupUtilsView;
 	FileHandle dataFileHandle;
 	JavaScriptObject s3;
 	boolean isSynAlertAddedToView = false;
 	@Inject
-	public FileDownloadButton(FileDownloadButtonView view, 
+	public FileDownloadMenuItem(FileDownloadMenuItemView view, 
 			SynapseClientAsync synapseClient, 
 			LoginModalWidget loginModalWidget,
 			SynapseAlert synAlert,
@@ -139,12 +136,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 						queryForSftpLoginInstructions(url);
 					} else {
 						view.setIsDirectDownloadLink(directDownloadUrl);
-						if (!isHidingClientHelp) {
-							FileClientsHelp clientsHelp = ginInjector.getFileClientsHelp();
-							view.addWidget(clientsHelp);
-							FileEntity entity = (FileEntity)entityBundle.getEntity();
-							clientsHelp.configure(entity.getId(), entity.getVersionNumber());
-						}
 					}
 				}
 			}
@@ -156,7 +147,7 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 			view.addWidget(synAlert);
 			isSynAlertAddedToView = true;
 		}
-		synAlert.handleException(t);
+		synAlert.showError(t.getMessage());
 	}
 	
 	public FileHandle getFileHandle() {
@@ -188,10 +179,6 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 			}
 		}
 		return directDownloadURL;
-	}
-	
-	public void hideClientHelp() {
-		isHidingClientHelp = true;
 	}
 	
 	@Override
@@ -254,9 +241,5 @@ public class FileDownloadButton implements FileDownloadButtonView.Presenter, Syn
 	@Override
 	public void onAuthorizedDirectDownloadClicked() {
 		loginModalWidget.showModal();
-	}
-	
-	public void setSize(ButtonSize size) {
-		view.setButtonSize(size);
 	}
 }

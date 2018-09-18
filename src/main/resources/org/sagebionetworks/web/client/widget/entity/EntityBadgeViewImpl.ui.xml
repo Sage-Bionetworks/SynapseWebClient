@@ -16,7 +16,6 @@
 			<t:TableData addStyleNames="overflow-x-hidden ">
 				<bh:Div addStyleNames="margin-right-5" ui:field="nameContainer"> 
 					<g:FlowPanel ui:field="entityContainer" addStyleNames="displayInline pull-left"/>
-					<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="right margin-left-5"/>
 				</bh:Div>
 			</t:TableData>
 			<t:TableData width="310px" addStyleNames="visible-xl overflow-x-hidden">
@@ -34,6 +33,10 @@
 			<t:TableData width="130px" addStyleNames="visible-md visible-lg overflow-x-hidden">
 				<g:TextBox ui:field="idField" width="130px" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
 			</t:TableData>
+			<t:TableData width="75px" addStyleNames="overflow-x-hidden text-align-center">
+				<b:Anchor icon="DOWNLOAD" text="+" ui:field="addToDownloadListLink" addStyleNames="textDecorationNone" visible="false"/>
+			</t:TableData>
+			
 		</t:TableRow>
 	</t:Table>    
 </ui:UiBinder>

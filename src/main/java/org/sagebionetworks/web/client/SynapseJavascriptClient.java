@@ -78,6 +78,7 @@ import org.sagebionetworks.repo.model.file.DownloadOrder;
 import org.sagebionetworks.repo.model.file.DownloadOrderSummaryRequest;
 import org.sagebionetworks.repo.model.file.DownloadOrderSummaryResponse;
 import org.sagebionetworks.repo.model.file.FileHandle;
+import org.sagebionetworks.repo.model.file.FileHandleAssociateType;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.repo.model.file.FileHandleAssociationList;
 import org.sagebionetworks.repo.model.file.MultipartUploadRequest;
@@ -223,6 +224,7 @@ public class SynapseJavascriptClient {
 	public static final String TABLE_UPLOAD_CSV_PREVIEW = TABLE + "/upload/csv/preview";
 	public static final String TABLE_APPEND = TABLE + "/append";
 	public static final String TABLE_TRANSACTION = TABLE+"/transaction";
+	public static final String DOI = "/doi";
 	public static final String FILE = "/file";
 	public static final String FILE_BULK = FILE+"/bulk";
 	public static final String ACTIVITY_URI_PATH = "/activity";
@@ -1161,11 +1163,31 @@ public class SynapseJavascriptClient {
 		doGet(url, OBJECT_TYPE.SubscriptionPagedResults, callback);
 	}
 	
+	public void addFileToDownloadList(String fileHandleId, String fileEntityId, AsyncCallback<DownloadList> callback) {
+		List<FileHandleAssociation> toAdd = new ArrayList<FileHandleAssociation>();
+		FileHandleAssociation fha = new FileHandleAssociation();
+		fha.setFileHandleId(fileHandleId);
+		fha.setAssociateObjectType(FileHandleAssociateType.FileEntity);
+		fha.setAssociateObjectId(fileEntityId);
+		toAdd.add(fha);
+		addFilesToDownloadList(toAdd, callback);
+	}
+	
 	public void addFilesToDownloadList(List<FileHandleAssociation> toAdd, AsyncCallback<DownloadList> callback) {
 		FileHandleAssociationList request = new FileHandleAssociationList();
+		cleanSynapseIds(toAdd);
 		request.setList(toAdd);
 		String url = getFileServiceUrl() + DOWNLOAD_LIST_ADD;
 		doPost(url, request, OBJECT_TYPE.DownloadList, callback);
+	}
+	
+	private void cleanSynapseIds(List<FileHandleAssociation> fhas) {
+		for (FileHandleAssociation fha : fhas) {
+			String objectId = fha.getAssociateObjectId().toLowerCase();
+			if (objectId.startsWith("syn")) {
+				fha.setAssociateObjectId(objectId.substring("syn".length()));
+			}
+		}
 	}
 	
 	public void removeFilesFromDownloadList(List<FileHandleAssociation> toRemove, AsyncCallback<DownloadList> callback){
@@ -1199,6 +1221,5 @@ public class SynapseJavascriptClient {
 		String url = getFileServiceUrl() + "/download/order/history";
 		doPost(url, request, OBJECT_TYPE.DownloadOrderSummaryResponse, callback);
 	}
-	
 }
 

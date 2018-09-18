@@ -55,7 +55,7 @@ import org.sagebionetworks.web.client.widget.entity.EntityBadgeView;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.ANNOTATION_TYPE;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
-import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.KeyValueDisplay;
@@ -91,8 +91,6 @@ public class EntityBadgeTest {
 	UserEntityPermissions mockPermissions;
 	AccessControlList mockBenefactorAcl;
 	@Mock
-	FileDownloadButton mockFileDownloadButton;
-	@Mock
 	LazyLoadHelper mockLazyLoadHelper;
 	@Mock
 	PublicPrincipalIds mockPublicPrincipalIds;
@@ -127,7 +125,7 @@ public class EntityBadgeTest {
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
 				mockUserBadge, mockSynapseJavascriptClient,
-				mockFileDownloadButton, mockLazyLoadHelper,
+				mockLazyLoadHelper,
 				mockDateTimeUtils, mockPopupUtils, mockSynapseProperties);
 		
 		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
@@ -194,8 +192,7 @@ public class EntityBadgeTest {
 		verify(mockView).showPublicIcon();
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
-		verify(mockFileDownloadButton, never()).configure(any(EntityBundle.class));
-		verify(mockView, never()).setFileDownloadButton(any(Widget.class));
+		verify(mockView, never()).showAddToDownloadList();
 	}
 	
 	@Test
@@ -226,9 +223,7 @@ public class EntityBadgeTest {
 		verify(mockView).setAnnotations(anyString());
 		verify(mockView).showHasWikiIcon();
 		verify(mockView).showDiscussionThreadIcon();
-		verify(mockFileDownloadButton).configure(any(EntityBundle.class));
-		verify(mockFileDownloadButton).hideClientHelp();
-		verify(mockView).setFileDownloadButton(any(Widget.class));
+		verify(mockView).showAddToDownloadList();
 	}
 	
 	@Test
@@ -370,36 +365,26 @@ public class EntityBadgeTest {
 	public void testContentSize() {
 		String friendlySize = "44MB";
 		when(mockView.getFriendlySize(anyLong(), anyBoolean())).thenReturn(friendlySize);
-		List<FileHandle> fileHandles = new ArrayList<FileHandle>();
-		FileHandle previewFileHandle = new PreviewFileHandle();
-		fileHandles.add(previewFileHandle);
-		String result = widget.getContentSize(fileHandles);
+		String result = widget.getContentSize(null);
 		assertTrue("".equals(result));
 		
 		FileHandle s3FileHandle = new S3FileHandle();
 		s3FileHandle.setContentSize(500L);
-		fileHandles.add(s3FileHandle);
 		
-		result = widget.getContentSize(fileHandles);
+		result = widget.getContentSize(s3FileHandle);
 		assertEquals(friendlySize, result);
 	}
 	
 	@Test
 	public void testContentMd5() {
-		List<FileHandle> fileHandles = new ArrayList<FileHandle>();
-		FileHandle previewFileHandle = new PreviewFileHandle();
-		String previewContentMd5 = "abcde";
-		previewFileHandle.setContentMd5(previewContentMd5);
-		fileHandles.add(previewFileHandle);
-		String result = widget.getContentMd5(fileHandles);
+		String result = widget.getContentMd5(null);
 		assertTrue("".equals(result));
 		
 		FileHandle s3FileHandle = new S3FileHandle();
 		String contentMd5 = "fghij";
 		s3FileHandle.setContentMd5(contentMd5);
-		fileHandles.add(s3FileHandle);
 		
-		result = widget.getContentMd5(fileHandles);
+		result = widget.getContentMd5(s3FileHandle);
 		assertEquals(contentMd5, result);
 	}
 }

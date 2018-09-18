@@ -27,7 +27,7 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
-import org.sagebionetworks.web.client.widget.entity.file.FileDownloadButton;
+import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.shared.PaginatedResults;
@@ -53,7 +53,7 @@ public class FileTitleBarTest {
 	S3FileHandle handle;
 	Long synStorageLocationId = 1L;
 	@Mock
-	FileDownloadButton mockFileDownloadButton;
+	FileDownloadMenuItem mockFileDownloadButton;
 	@Mock
 	EntityUpdatedHandler mockEntityUpdatedHandler;
 	@Mock
