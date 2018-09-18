@@ -2711,3 +2711,11 @@ div.border {
 @include placeholder {
 	font-style:italic;
 }
+
+#rootPanel .fullWidthAlert {
+	@include border-radius(0px);
+	margin-left: -15px;
+	margin-right: -15px;
+	box-shadow: none;
+	padding: 7px 15px;
+}

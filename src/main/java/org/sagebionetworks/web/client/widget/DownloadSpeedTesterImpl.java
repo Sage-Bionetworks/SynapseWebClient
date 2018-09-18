@@ -37,6 +37,7 @@ public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
 	 * 
 	 * If we want to make the test more accurate, we could increase the size of the data file.
 	 * Note: Make sure the data file is properly optimized and compressed. The default compression on connections to the webserver would cause an overestimate if this is not the case.
+	 * Not sure why every app needs to run their own speed test. NetInfo is not well-supported at the time of writing: https://caniuse.com/#feat=netinfo
 	 * @param authController
 	 * @param presignedUrlAsyncHandler
 	 * @param requestBuilder
