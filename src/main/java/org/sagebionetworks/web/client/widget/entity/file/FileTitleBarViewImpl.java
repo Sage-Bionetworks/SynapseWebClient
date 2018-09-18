@@ -1,6 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.file;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.AnchorListItem;
+import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
@@ -25,7 +27,7 @@ import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class FileTitleBarViewImpl extends Composite implements FileTitleBarView {
-
+	Presenter presenter;
 	private Md5Link md5Link;
 	private FavoriteWidget favoriteWidget;
 	
@@ -55,7 +57,11 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	@UiField
 	Text entityName;
 	@UiField
-	Span fileDownloadButtonContainer;
+	DropDownMenu dropdownMenu;
+	@UiField
+	AnchorListItem addToDownloadListLink;
+	@UiField
+	AnchorListItem programmaticOptionsLink;
 	@UiField
 	Div externalObjectStoreUI;
 	@UiField
@@ -95,8 +101,17 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 				globalAppState.getPlaceChanger().goTo(new Synapse(currentEntityId));
 			}
 		});
+		addToDownloadListLink.addClickHandler(event->{
+			presenter.onAddToDownloadList();
+		});
+		programmaticOptionsLink.addClickHandler(event->{
+			presenter.onProgrammaticDownloadOptions();
+		});
 	}
-	
+	@Override
+	public void setPresenter(Presenter p) {
+		this.presenter = p;
+	}
 	@Override
 	public void createTitlebar(Entity entity) {
 		currentEntityId = entity.getId();
@@ -166,9 +181,8 @@ public class FileTitleBarViewImpl extends Composite implements FileTitleBarView 
 	}
 
 	@Override
-	public void setFileDownloadButton(Widget w) {
-		fileDownloadButtonContainer.clear();
-		fileDownloadButtonContainer.add(w);
+	public void setFileDownloadMenuItem(Widget w) {
+		dropdownMenu.insert(w, 0);
 	}
 	@Override
 	public void setExternalObjectStoreUIVisible(boolean visible) {

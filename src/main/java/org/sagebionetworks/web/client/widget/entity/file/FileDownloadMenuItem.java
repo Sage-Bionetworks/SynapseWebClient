@@ -26,7 +26,6 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.download.Uploader;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
 import org.sagebionetworks.web.shared.WebConstants;
@@ -47,7 +46,6 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private SynapseClientAsync synapseClient;
 	private LoginModalWidget loginModalWidget;
-	private SynapseAlert synAlert;
 	private PortalGinInjector ginInjector;
 	SynapseJavascriptClient jsClient;
 	AuthenticationController authController;
@@ -58,12 +56,10 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 	PopupUtilsView popupUtilsView;
 	FileHandle dataFileHandle;
 	JavaScriptObject s3;
-	boolean isSynAlertAddedToView = false;
 	@Inject
 	public FileDownloadMenuItem(FileDownloadMenuItemView view, 
 			SynapseClientAsync synapseClient, 
 			LoginModalWidget loginModalWidget,
-			SynapseAlert synAlert,
 			PortalGinInjector ginInjector,
 			SynapseJavascriptClient jsClient,
 			AuthenticationController authController,
@@ -76,7 +72,6 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.loginModalWidget = loginModalWidget;
-		this.synAlert = synAlert;
 		this.ginInjector = ginInjector;
 		this.jsClient = jsClient;
 		this.authController = authController;
@@ -143,11 +138,7 @@ public class FileDownloadMenuItem implements FileDownloadMenuItemView.Presenter,
 	}
 	
 	private void handleException(Throwable t) {
-		if (!isSynAlertAddedToView) {
-			view.addWidget(synAlert);
-			isSynAlertAddedToView = true;
-		}
-		synAlert.showError(t.getMessage());
+		popupUtilsView.showErrorMessage(t.getMessage());
 	}
 	
 	public FileHandle getFileHandle() {

@@ -28,8 +28,7 @@ public class FileClientsHelp implements IsWidget {
 		fixServiceEntryPoint(synapseClient);
 	}
 	
-	public void configure(String entityId, Long version) {
-		view.configure(entityId, version);
+	public void configureAndShow(String entityId, Long version) {
 		synapseClient.getEntityVersions(entityId, 0, 1, new AsyncCallback<PaginatedResults<VersionInfo>>() {
 			@Override
 			public void onSuccess(PaginatedResults<VersionInfo> result) {
@@ -39,6 +38,7 @@ public class FileClientsHelp implements IsWidget {
 				} else {
 					view.setVersionVisible(false);
 				}
+				view.configureAndShow(entityId, version);
 			}
 			
 			@Override

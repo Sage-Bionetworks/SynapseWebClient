@@ -25,8 +25,10 @@ import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
+import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
@@ -60,6 +62,10 @@ public class FileTitleBarTest {
 	ExternalObjectStoreFileHandle mockExternalObjectStoreFileHandle;
 	@Mock
 	PaginatedResults<VersionInfo> mockVersionResults;
+	@Mock
+	SynapseJavascriptClient mockJsClient;
+	@Mock
+	FileClientsHelp mockFileClientsHelp;
 	List<VersionInfo> versions;
 	@Mock
 	VersionInfo mockCurrentVersion;
@@ -69,7 +75,7 @@ public class FileTitleBarTest {
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockSynapseClient);
+		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockSynapseClient, mockJsClient, mockFileClientsHelp);
 		when(mockFileEntity.getId()).thenReturn("syn123");
 		when(mockFileEntity.getName()).thenReturn("syn123");
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(DATA_FILE_HANDLE_ID);
@@ -85,7 +91,7 @@ public class FileTitleBarTest {
 		handle.setStorageLocationId(synStorageLocationId);
 		fileHandles.add(handle);
 		Mockito.when(mockBundle.getFileHandles()).thenReturn(fileHandles);
-		verify(mockView).setFileDownloadButton(any(Widget.class));
+		verify(mockView).setFileDownloadMenuItem(any(Widget.class));
 		versions = new ArrayList<>();
 		when(mockVersionResults.getResults()).thenReturn(versions);
 		AsyncMockStubber.callSuccessWith(mockVersionResults).when(mockSynapseClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
@@ -96,20 +102,6 @@ public class FileTitleBarTest {
 		fileTitleBar.asWidget();
 	}
 	
-	@Test
-	public void testIsDataNotInFile() {
-		FileEntity fileEntity = new FileEntity();
-		fileEntity.setDataFileHandleId(null);
-		Assert.assertFalse(FileTitleBar.isDataPossiblyWithin(fileEntity));
-	}
-	
-	@Test
-	public void testIsDataInFile() {
-		FileEntity fileEntity = new FileEntity();
-		fileEntity.setDataFileHandleId("123");
-		Assert.assertTrue(FileTitleBar.isDataPossiblyWithin(fileEntity));
-	}
-
 	@Test
 	public void testSetS3DescriptionForSynapseStorage() {
 		fileTitleBar.configure(mockBundle);

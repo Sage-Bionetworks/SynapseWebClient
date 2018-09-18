@@ -15,7 +15,14 @@
 			 	<bh:Text ui:field="entityName" />
 			 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5 margin-right-10"/>
 			</b:Heading>
-			<bh:Span ui:field="fileDownloadButtonContainer" addStyleNames="moveup-5"/>
+			<b:DropDown addStyleNames="displayInlineBlock">
+				<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options"/>
+				<b:DropDownMenu ui:field="dropdownMenu">
+					<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download List</b:AnchorListItem>
+					<b:Divider/>
+					<b:AnchorListItem ui:field="programmaticOptionsLink">Programmatic Options</b:AnchorListItem>
+				</b:DropDownMenu>
+			</b:DropDown>
 			<bh:Div ui:field="versionInfoUI" visible="false">
 				<bh:Span addStyleNames="boldText" text="Version:"/>
 				<bh:Span addStyleNames="margin-left-5" ui:field="version"/>

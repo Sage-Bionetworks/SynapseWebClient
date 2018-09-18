@@ -11,7 +11,6 @@ public interface FileDownloadMenuItemView extends IsWidget {
 	void setIsDirectDownloadLink(String href);
 	void setIsUnauthenticatedS3DirectDownload();
 	void setIsAuthorizedDirectDownloadLink();
-	void addWidget(IsWidget w);
 	
 	void showLoginS3DirectDownloadDialog(String endpoint);
 	void showS3DirectDownloadDialog();

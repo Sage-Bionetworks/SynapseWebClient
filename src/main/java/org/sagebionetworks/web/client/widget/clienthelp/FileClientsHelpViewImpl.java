@@ -42,8 +42,6 @@ public class FileClientsHelpViewImpl implements FileClientsHelpView {
 	@UiField
 	SpanElement version3;
 	@UiField
-	Anchor link;
-	@UiField
 	Modal modal;
 	@UiField
 	TabListItem cliTabListItem;
@@ -64,13 +62,6 @@ public class FileClientsHelpViewImpl implements FileClientsHelpView {
 	@Inject
 	public FileClientsHelpViewImpl(Binder binder) {
 		this.widget = binder.createAndBindUi(this);
-		link.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				modal.show();
-			}
-		});
-		
 		FileClientsHelpViewImpl.setId(cliTabListItem, cliTabPane);
 		FileClientsHelpViewImpl.setId(pythonTabListItem, pythonTabPane);
 		FileClientsHelpViewImpl.setId(rTabListItem, rTabPane);
@@ -88,7 +79,7 @@ public class FileClientsHelpViewImpl implements FileClientsHelpView {
 	}
 	
 	@Override
-	public void configure(String entityId, Long version) {
+	public void configureAndShow(String entityId, Long version) {
 		id1.setInnerHTML(entityId);
 		id2.setInnerHTML(entityId);
 		id3.setInnerHTML(entityId);
@@ -99,6 +90,7 @@ public class FileClientsHelpViewImpl implements FileClientsHelpView {
 		version1.setInnerHTML(versionString);
 		version2.setInnerHTML(versionString);
 		version3.setInnerHTML(versionString);
+		modal.show();
 	}
 	
 	@Override

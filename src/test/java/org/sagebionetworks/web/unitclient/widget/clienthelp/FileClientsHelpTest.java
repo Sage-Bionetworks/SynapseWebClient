@@ -45,9 +45,9 @@ public class FileClientsHelpTest {
 
 	@Test
 	public void testConfigureNoVersions() {
-		widget.configure(ENTITY_ID, ENTITY_VERSION);
+		widget.configureAndShow(ENTITY_ID, ENTITY_VERSION);
 		
-		verify(mockView).configure(ENTITY_ID, ENTITY_VERSION);
+		verify(mockView).configureAndShow(ENTITY_ID, ENTITY_VERSION);
 		verify(mockSynapseClient).getEntityVersions(eq(ENTITY_ID), eq(0), eq(1), any(AsyncCallback.class));
 		verify(mockView).setVersionVisible(false);
 	}
@@ -58,9 +58,9 @@ public class FileClientsHelpTest {
 		currentVersion.setVersionNumber(ENTITY_VERSION);
 		versions.add(currentVersion);
 
-		widget.configure(ENTITY_ID, ENTITY_VERSION);
+		widget.configureAndShow(ENTITY_ID, ENTITY_VERSION);
 		
-		verify(mockView).configure(ENTITY_ID, ENTITY_VERSION);
+		verify(mockView).configureAndShow(ENTITY_ID, ENTITY_VERSION);
 		verify(mockSynapseClient).getEntityVersions(eq(ENTITY_ID), eq(0), eq(1), any(AsyncCallback.class));
 		// showing current version, so show instructions on how to get the latest version
 		verify(mockView).setVersionVisible(false);
@@ -72,9 +72,9 @@ public class FileClientsHelpTest {
 		currentVersion.setVersionNumber(100L);
 		versions.add(currentVersion);
 		
-		widget.configure(ENTITY_ID, ENTITY_VERSION);
+		widget.configureAndShow(ENTITY_ID, ENTITY_VERSION);
 		
-		verify(mockView).configure(ENTITY_ID, ENTITY_VERSION);
+		verify(mockView).configureAndShow(ENTITY_ID, ENTITY_VERSION);
 		verify(mockSynapseClient).getEntityVersions(eq(ENTITY_ID), eq(0), eq(1), any(AsyncCallback.class));
 		// not showing current version, so show instructions on how to get the version that's being displayed
 		verify(mockView).setVersionVisible(true);
@@ -85,9 +85,9 @@ public class FileClientsHelpTest {
 		String errorMessage = "could not retrieve";
 		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockSynapseClient).getEntityVersions(anyString(), anyInt(), anyInt(), any(AsyncCallback.class));
 		
-		widget.configure(ENTITY_ID, ENTITY_VERSION);
+		widget.configureAndShow(ENTITY_ID, ENTITY_VERSION);
 		
-		verify(mockView).configure(ENTITY_ID, ENTITY_VERSION);
+		verify(mockView, never()).configureAndShow(anyString(), anyLong());
 		verify(mockSynapseClient).getEntityVersions(eq(ENTITY_ID), eq(0), eq(1), any(AsyncCallback.class));
 		verify(mockView).setVersionVisible(false);
 		verify(mockJsniUtils).consoleError(errorMessage);

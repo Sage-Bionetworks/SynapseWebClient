@@ -67,8 +67,6 @@ public class FileDownloadMenuItemTest {
 	@Mock
 	SynapseProperties mockSynapseProperties;
 	@Mock
-	SynapseAlert mockSynAlert;
-	@Mock
 	PortalGinInjector mockGinInjector;
 	
 	@Mock
@@ -115,7 +113,7 @@ public class FileDownloadMenuItemTest {
 	@Before
 	public void setUp() throws Exception {
 		MockitoAnnotations.initMocks(this);
-		widget = new FileDownloadMenuItem(mockView, mockSynapseClient, mockLoginModalWidget, mockSynAlert, mockGinInjector,
+		widget = new FileDownloadMenuItem(mockView, mockSynapseClient, mockLoginModalWidget, mockGinInjector,
 				mockSynapseJavascriptClient, mockAuthController, mockJsniUtils, mockGwt, mockCookies, mockAwsSdk, mockPopupUtilsView);
 		when(mockSynapseProperties.getSynapseProperty(WebConstants.SFTP_PROXY_ENDPOINT)).thenReturn(SFTP_ENDPOINT);
 		when(mockEntityBundle.getEntity()).thenReturn(mockFileEntity);

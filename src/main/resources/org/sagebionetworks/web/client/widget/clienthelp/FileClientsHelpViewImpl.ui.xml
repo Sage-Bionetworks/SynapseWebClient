@@ -5,7 +5,6 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table"
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget">
 	<bh:Span>
-		<b:Anchor ui:field="link" text="other&#160;download&#160;options" addStyleNames="font-italic"/>
 		<b:Modal ui:field="modal" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalHeader>
 			    <b:Heading size="H4" text="Download Options" addStyleNames="displayInline"/>
