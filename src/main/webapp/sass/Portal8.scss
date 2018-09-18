@@ -187,6 +187,11 @@ end sticky footer
 		margin-right: 8px;
 		background: radial-gradient($synapse-blue-end-gradient, $synapse-blue);
 	}
+	.radio input[type="radio"] + label, .radio input[type="radio"] + span,
+	.radio-inline input[type="radio"] + label, .radio-inline input[type="radio"] + span {
+		padding-left: 23px;
+		margin-left: -23px;
+	}
 }
 /* End bootstrap overrides */
 
