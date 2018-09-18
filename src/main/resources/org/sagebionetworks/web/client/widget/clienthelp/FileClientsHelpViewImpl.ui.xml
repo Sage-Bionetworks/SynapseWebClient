@@ -7,7 +7,7 @@
 	<bh:Span>
 		<b:Modal ui:field="modal" closable="true" dataBackdrop="STATIC" dataKeyboard="true">
 			<b:ModalHeader>
-			    <b:Heading size="H4" text="Download Options" addStyleNames="displayInline"/>
+			    <b:Heading size="H4" text="Programmatic Download Options" addStyleNames="displayInline"/>
 			    <w:HelpWidget helpMarkdown="Synapse is built on a number of RESTful web APIs that allow users to interact with the system via a number of clients. The [Synapse API documentation](http://docs.synapse.org/articles/api_documentation.html) is available online." 
 								href="http://docs.synapse.org/articles/getting_started.html#installing-synapse-clients" addStyleNames="margin-left-5" placement="BOTTOM"/>
 			</b:ModalHeader>

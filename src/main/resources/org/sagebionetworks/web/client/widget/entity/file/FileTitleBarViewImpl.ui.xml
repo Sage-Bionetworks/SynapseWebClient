@@ -16,7 +16,7 @@
 			 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5 margin-right-10"/>
 			</b:Heading>
 			<b:DropDown addStyleNames="displayInlineBlock">
-				<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options"/>
+				<b:Button dataToggle="DROPDOWN" type="PRIMARY" text="Download Options" addStyleNames="moveup-8"/>
 				<b:DropDownMenu ui:field="dropdownMenu">
 					<b:AnchorListItem ui:field="addToDownloadListLink">Add to Download List</b:AnchorListItem>
 					<b:Divider/>

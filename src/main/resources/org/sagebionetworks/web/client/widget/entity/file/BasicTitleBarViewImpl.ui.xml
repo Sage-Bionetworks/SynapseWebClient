@@ -12,6 +12,5 @@
 		 	<bh:Span ui:field="fileName"/>
 		 	<g:SimplePanel ui:field="favoritePanel" addStyleNames="margin-left-5"/>
 		</b:Heading>
-		<bh:Span ui:field="containerHelpContainer"/>
 	</bh:Div>
 </ui:UiBinder>

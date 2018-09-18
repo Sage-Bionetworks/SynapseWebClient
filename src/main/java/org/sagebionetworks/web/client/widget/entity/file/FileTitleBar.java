@@ -184,6 +184,5 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	public void onProgrammaticDownloadOptions() {
 		FileEntity entity = (FileEntity)entityBundle.getEntity();
 		fileClientsHelp.configureAndShow(entity.getId(), entity.getVersionNumber());
-		
 	}
 }

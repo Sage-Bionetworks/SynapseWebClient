@@ -25,6 +25,7 @@ import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
@@ -42,6 +43,8 @@ public class FilesBrowserTest {
 	String configuredEntityId = "syn123";
 	@Mock
 	SynapseJavascriptClient mockSynapseJavascriptClient;
+	@Mock
+	ContainerClientsHelp mockContainerClientsHelp;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -51,7 +54,9 @@ public class FilesBrowserTest {
 		mockAuthenticationController = mock(AuthenticationController.class);
 		mockCookies = mock(CookieProvider.class);
 		filesBrowser = new FilesBrowser(mockView,
-				mockGlobalApplicationState, mockAuthenticationController);
+				mockGlobalApplicationState, 
+				mockAuthenticationController,
+				mockContainerClientsHelp);
 	}
 	
 	@Test

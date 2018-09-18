@@ -1,5 +1,6 @@
 package org.sagebionetworks.web.client.widget.entity.browse;
 
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.utils.CallbackP;
@@ -19,11 +20,17 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 
 	private EntityTreeBrowser entityTreeBrowser;
 	private Widget widget;
+	private Presenter presenter;
 
 	@UiField
 	Div files;
 	@UiField
-	Div sortButtonContainer;
+	Div commandsContainer;
+	@UiField
+	AnchorListItem addToDownloadListLink;
+	@UiField
+	AnchorListItem programmaticOptionsLink;
+	
 	SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton;
 	
 	@Inject
@@ -36,9 +43,15 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 		etbW.addStyleName("margin-top-10");
 		files.add(etbW);
 		this.sortEntityChildrenDropdownButton = sortEntityChildrenDropdownButton;
-		sortButtonContainer.add(sortEntityChildrenDropdownButton);
+		commandsContainer.add(sortEntityChildrenDropdownButton);
 		sortEntityChildrenDropdownButton.setListener(entityTreeBrowser);
 		sortEntityChildrenDropdownButton.setSortUI(EntityTreeBrowser.DEFAULT_SORT_BY, EntityTreeBrowser.DEFAULT_DIRECTION);
+		programmaticOptionsLink.addClickHandler(event->{
+			presenter.onProgrammaticDownloadOptions();
+		});
+		addToDownloadListLink.addClickHandler(event->{
+			presenter.onAddToDownloadList();
+		});
 	}
 
 	@Override
@@ -81,5 +94,9 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	@Override
 	public void clear() {
 		entityTreeBrowser.clear();
+	}
+	@Override
+	public void setPresenter(Presenter p) {
+		this.presenter = p;
 	}
 }

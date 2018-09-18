@@ -29,5 +29,4 @@ public interface FileTitleBarView extends IsWidget, SynapseView {
 		void onProgrammaticDownloadOptions();
 		void onAddToDownloadList();
 	}
-
 }
