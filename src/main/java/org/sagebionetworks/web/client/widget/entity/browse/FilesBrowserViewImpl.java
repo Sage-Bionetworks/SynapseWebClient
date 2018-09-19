@@ -8,7 +8,7 @@ import org.sagebionetworks.web.client.widget.table.SortEntityChildrenDropdownBut
 
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.SimplePanel;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
@@ -30,7 +30,8 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	AnchorListItem addToDownloadListLink;
 	@UiField
 	AnchorListItem programmaticOptionsLink;
-	
+	@UiField
+	Div addToDownloadListContainer;
 	SortEntityChildrenDropdownButton sortEntityChildrenDropdownButton;
 	
 	@Inject
@@ -98,5 +99,10 @@ public class FilesBrowserViewImpl implements FilesBrowserView {
 	@Override
 	public void setPresenter(Presenter p) {
 		this.presenter = p;
+	}
+	@Override
+	public void setAddToDownloadList(IsWidget w) {
+		addToDownloadListContainer.clear();
+		addToDownloadListContainer.add(w);
 	}
 }

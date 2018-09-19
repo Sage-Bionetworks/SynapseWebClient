@@ -14,6 +14,7 @@ public interface FilesBrowserView extends IsWidget, SynapseView {
 	void configure(String entityId);
 	void setEntityClickedHandler(CallbackP<String> callback);
 	void setPresenter(Presenter p);
+	void setAddToDownloadList(IsWidget w);
 	
 	/**
 	 * Presenter interface

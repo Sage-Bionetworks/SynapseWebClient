@@ -14,6 +14,7 @@
 				</b:DropDownMenu>
 			</b:DropDown>
 		</bh:Div>
+		<bh:Div ui:field="addToDownloadListContainer" />
 	    <bh:Div ui:field="files" styleName="highlight-box padding-top-0-imp" marginTop="0" />
 	</bh:Div>
 </ui:UiBinder>
