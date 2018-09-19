@@ -24,12 +24,13 @@ import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.google.gwt.core.client.GWT;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
 
 public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presenter {
-	public static final String DOI_CREATION_PROGRESS_MESSAGE = "Registering DOI";
+	public static final String DOI_CREATED_MESSAGE = "DOI successfully updated for ";
+	public static final String DOI_MODAL_TITLE = "Create or Update a DOI";
+
 	private CreateOrUpdateDoiModalView view;
 	private JobTrackingWidget jobTrackingWidget;
 	private SynapseJavascriptClient javascriptClient;
@@ -49,7 +50,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		view.setSynAlert(synapseAlert);
 		view.setJobTrackingWidget(jobTrackingWidget);
 		view.setPresenter(this);
-		view.setModalTitle("Create or Update a DOI");
+		view.setModalTitle(DOI_MODAL_TITLE);
 	}
 
 	public void configureAndShow(String objectId, ObjectType objectType, Long versionNumber, EntityUpdatedHandler entityUpdatedHandler) {
@@ -70,7 +71,6 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 
 			@Override
 			public void onFailure(Throwable t) {
-				GWT.log(t.getMessage());
 				doi.setObjectId(objectId);
 				doi.setObjectType(objectType);
 				doi.setObjectVersion(objectVersion);
@@ -103,12 +103,10 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 
 		DoiRequest request = new DoiRequest();
 		request.setDoi(newDoi);
-		GWT.log("Making request to create DOI with request: " + request.toString());
-		jobTrackingWidget.startAndTrackJob(DOI_CREATION_PROGRESS_MESSAGE, false, AsynchType.Doi, request, new AsynchronousProgressHandler() {
+		jobTrackingWidget.startAndTrackJob("", false, AsynchType.Doi, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
-				DisplayUtils.showInfo("Doi created: ", response.toString());
-				GWT.log("Doi created: " + response.toString());
+				DisplayUtils.showInfo(DOI_CREATED_MESSAGE + newDoi.getObjectId());
 				entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
 				view.setIsLoading(false);
 				view.hide();
@@ -117,23 +115,26 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 			@Override
 			public void onFailure(Throwable caught) {
 				synapseAlert.handleException(caught);
-				GWT.log("Doi creation failed: " + caught.getMessage());
 				view.setIsLoading(false);
-				view.reset(); //?
 			}
 
 			@Override
 			public void onCancel() {
-				GWT.log("JOB canceled");
 				view.setIsLoading(false);
-				view.reset(); //?
+				view.reset();
 			}
 		});
 	}
 
-	void populateForms(Doi doi) {
+	public void setDoi(Doi doi) {
 		this.doi = doi;
+	}
 
+	public Doi getDoi() {
+		return this.doi;
+	}
+
+	private void populateForms(Doi doi) {
 		if (doi.getCreators() == null) {
 			doi.setCreators(new ArrayList<>());
 		}
@@ -157,6 +158,8 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		view.setTitles(convertMultipleTitlesToString(doi.getTitles()));
 		view.setResourceTypeGeneral(doi.getResourceType().getResourceTypeGeneral().name());
 		view.setPublicationYear(doi.getPublicationYear());
+
+		setDoi(doi);
 	}
 
 	static List<DoiCreator> parseCreatorsString(String creators) {
@@ -173,7 +176,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		return creators.stream()
 				.map(DoiCreator::getCreatorName)
 				.reduce((x,y) -> x + "\n" + y) //Separate creator names with new line
-				.get();
+				.orElse(null);
 	}
 
 	static List<DoiTitle> parseTitlesString(String titles) {
@@ -190,6 +193,6 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		return titles.stream()
 				.map(DoiTitle::getTitle)
 				.reduce((x,y) -> x + "\n" + y) // Separate titles with new line
-				.get();
+				.orElse(null);
 	}
 }

@@ -6,7 +6,6 @@ import org.gwtbootstrap3.client.ui.IntegerBox;
 import org.gwtbootstrap3.client.ui.ListBox;
 import org.gwtbootstrap3.client.ui.Modal;
 import org.gwtbootstrap3.client.ui.TextArea;
-import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.sagebionetworks.repo.model.doi.v2.DoiResourceTypeGeneral;
 
@@ -30,7 +29,7 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	@UiField
 	TextArea authorsField;
 	@UiField
-	TextBox titlesField;
+	TextArea titlesField;
 	@UiField
 	ListBox resourceTypeGeneralSelect;
 	@UiField
