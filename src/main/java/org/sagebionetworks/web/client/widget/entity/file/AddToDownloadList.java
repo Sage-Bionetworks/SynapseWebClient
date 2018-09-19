@@ -5,12 +5,15 @@ import org.sagebionetworks.repo.model.file.AddFileToDownloadListRequest;
 import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -21,14 +24,16 @@ public class AddToDownloadList implements IsWidget {
 	PopupUtilsView popupUtilsView;
 	PortalGinInjector ginInjector;
 	AddFileToDownloadListRequest request;
-	
+	EventBus eventBus;
 	@Inject
 	public AddToDownloadList(DivView view, 
 			PortalGinInjector ginInjector,
-			PopupUtilsView popupUtilsView) {
+			PopupUtilsView popupUtilsView,
+			EventBus eventBus) {
 		this.view = view;
 		this.popupUtilsView = popupUtilsView;
 		this.ginInjector = ginInjector;
+		this.eventBus = eventBus;
 	}
 	
 	public void addToDownloadList(Query query) {
@@ -54,7 +59,6 @@ public class AddToDownloadList implements IsWidget {
 		AsynchronousProgressWidget progress = ginInjector.creatNewAsynchronousProgressWidget();
 		view.add(progress);
 		progress.startAndTrackJob("Adding files to Download List", false, AsynchType.AddFileToDownloadList, request, new AsynchronousProgressHandler() {
-			
 			@Override
 			public void onFailure(Throwable failure) {
 				view.clear();
@@ -67,7 +71,8 @@ public class AddToDownloadList implements IsWidget {
 			public void onComplete(AsynchronousResponseBody response) {
 				view.clear();
 				popupUtilsView.showInfo("Successfully added files to the Download List.");
-				//TODO: fire event to trigger UI element in header
+				//fire event to trigger UI element in header!
+				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 			
 			@Override

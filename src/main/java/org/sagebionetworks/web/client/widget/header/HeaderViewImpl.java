@@ -26,6 +26,7 @@ import org.sagebionetworks.web.client.widget.user.BadgeSize;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.WebConstants;
 
+import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
@@ -34,6 +35,7 @@ import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public class HeaderViewImpl extends Composite implements HeaderView {
 	public interface Binder extends UiBinder<Widget, HeaderViewImpl> {
@@ -313,4 +315,14 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public void setStagingAlertVisible(boolean visible) {
 		stagingAlert.setVisible(visible);	
 	}
+	
+	/** Event binder code **/
+	interface EBinder extends EventBinder<Header> {};
+	private final EBinder eventBinder = GWT.create(EBinder.class);
+	
+	@Override
+	public EventBinder<Header> getEventBinder() {
+		return eventBinder;
+	}
+
 }

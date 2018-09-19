@@ -9,6 +9,8 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Trash;
@@ -16,10 +18,13 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 
+import com.google.gwt.core.shared.GWT;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import com.google.web.bindery.event.shared.binder.EventHandler;
 
 public class Header implements HeaderView.Presenter, IsWidget {
 
@@ -49,7 +54,8 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			FavoriteWidget favWidget, 
 			SynapseJSNIUtils synapseJSNIUtils, 
 			PendoSdk pendoSdk,
-			PortalGinInjector portalGinInjector) {
+			PortalGinInjector portalGinInjector,
+			EventBus eventBus) {
 		this.view = view;
 		this.authenticationController = authenticationController;
 		this.globalApplicationState = globalApplicationState;
@@ -62,6 +68,7 @@ public class Header implements HeaderView.Presenter, IsWidget {
 		this.pendoSdk = pendoSdk;
 		view.setPresenter(this);
 		initStagingAlert();
+		view.getEventBinder().bindEventHandlers(this, eventBus);
 	}
 	
 	public void initStagingAlert() {
@@ -151,5 +158,9 @@ public class Header implements HeaderView.Presenter, IsWidget {
 				}
 			});
 		}
+	}
+	@EventHandler
+	public void onDownloadListUpdatedEvent(DownloadListUpdatedEvent event) {
+		//TODO: update Download List count, show if > 0
 	}
 }
