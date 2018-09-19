@@ -4,7 +4,6 @@ import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.isA;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -44,18 +43,26 @@ import org.sagebionetworks.web.client.widget.header.HeaderView;
 import org.sagebionetworks.web.client.widget.pendo.PendoSdk;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.junit.GWTMockUtilities;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.web.bindery.event.shared.binder.EventBinder;
 
 public class HeaderTest {
 
 	Header header;
+	@Mock
 	HeaderView mockView;
+	@Mock
 	AuthenticationController mockAuthenticationController;
+	@Mock
 	GlobalApplicationState mockGlobalApplicationState;
+	@Mock
 	SynapseJSNIUtils mockSynapseJSNIUtils;
+	@Mock
 	PlaceChanger mockPlaceChanger;
+	@Mock
 	FavoriteWidget mockFavWidget;
 	AdapterFactory adapterFactory = new AdapterFactoryImpl();
 	List<EntityHeader> entityHeaders;
@@ -71,20 +78,20 @@ public class HeaderTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	PortalGinInjector mockPortalGinInjector;
+	@Mock
+	EventBus mockEventBus;
+	@Mock
+	EventBinder<Header> mockEventBinder;
+
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
+		when(mockView.getEventBinder()).thenReturn(mockEventBinder);
 		GWTMockUtilities.disarm();
-		mockView = Mockito.mock(HeaderView.class);		
-		mockAuthenticationController = Mockito.mock(AuthenticationController.class);
-		mockGlobalApplicationState = Mockito.mock(GlobalApplicationState.class);
-		mockPlaceChanger = mock(PlaceChanger.class);
-		mockFavWidget = mock(FavoriteWidget.class);
-		mockSynapseJSNIUtils = mock(SynapseJSNIUtils.class);
 		when(mockGlobalApplicationState.getPlaceChanger()).thenReturn(mockPlaceChanger);
 		//by default, mock that we are on the production website
 		when(mockSynapseJSNIUtils.getCurrentHostName()).thenReturn(Header.WWW_SYNAPSE_ORG);
-		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector);
+		header = new Header(mockView, mockAuthenticationController, mockGlobalApplicationState, mockSynapseJavascriptClient, mockFavWidget, mockSynapseJSNIUtils, mockPendoSdk, mockPortalGinInjector, mockEventBus);
 		entityHeaders = new ArrayList<EntityHeader>();
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);

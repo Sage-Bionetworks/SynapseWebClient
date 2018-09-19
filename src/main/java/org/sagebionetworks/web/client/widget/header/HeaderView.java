@@ -43,4 +43,6 @@ public interface HeaderView extends IsWidget {
 	void openNewWindow(String url);
 	void clear();
 	EventBinder<Header> getEventBinder();
+	void setDownloadListUIVisible(boolean visible);
+	void setDownloadListFileCount(Integer count);
 }

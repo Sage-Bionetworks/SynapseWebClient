@@ -31,18 +31,22 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
+import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.annotation.AnnotationTransformer;
 import org.sagebionetworks.web.client.widget.entity.dialog.Annotation;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.sharing.PublicPrivateBadge;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.safehtml.shared.SafeHtmlUtils;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -62,6 +66,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 	private PopupUtilsView popupUtils;
 	private SynapseProperties synapseProperties;
 	private FileHandle dataFileHandle;
+	private EventBus eventBus;
 	@Inject
 	public EntityBadge(EntityBadgeView view, 
 			GlobalApplicationState globalAppState,
@@ -71,7 +76,8 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			LazyLoadHelper lazyLoadHelper,
 			DateTimeUtils dateTimeUtils,
 			PopupUtilsView popupUtils,
-			SynapseProperties synapseProperties) {
+			SynapseProperties synapseProperties,
+			EventBus eventBus) {
 		this.view = view;
 		this.globalAppState = globalAppState;
 		this.transformer = transformer;
@@ -81,6 +87,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.popupUtils = popupUtils;
 		this.synapseProperties = synapseProperties;
+		this.eventBus = eventBus;
 		view.setModifiedByWidget(modifiedByUserBadge.asWidget());
 		Callback loadDataCallback = new Callback() {
 			@Override
@@ -263,6 +270,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			@Override
 			public void onSuccess(DownloadList result) {
 				popupUtils.showInfo(dataFileHandle.getFileName() + " has been added to your download list.");
+				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 		});
 	}

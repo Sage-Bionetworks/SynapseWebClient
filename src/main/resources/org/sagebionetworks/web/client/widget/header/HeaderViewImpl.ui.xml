@@ -78,6 +78,13 @@
 				<bh:Div pull="RIGHT" addStyleNames="searchBoxContainer hideRightPixelOnHover inactive hidden-xs" height="53px" paddingLeft="7" paddingRight="3">
 					<bh:Div ui:field="searchBoxContainer" marginTop="14"/>
 				</bh:Div>
+				<bh:Div pull="RIGHT" height="53px" paddingLeft="7" paddingRight="3" paddingTop="9" ui:field="downloadListNotificationUI" visible="false">
+					<g:FocusPanel height="35px" addStyleNames="synapse-green-bg img-circle displayInlineBlock" ui:field="downloadListLink">
+						<b:Icon type="DOWNLOAD" addStyleNames="imageButton color-white" size="LARGE" marginTop="9" marginRight="5" marginBottom="5" marginLeft="5"/>
+					</g:FocusPanel>
+					<b:Label text="0" ui:field="downloadListFileCount" addStyleNames="vertical-align-top dropshaddow" marginLeft="-5" type="INFO"/>
+				</bh:Div>
+				
 			</bh:Span>
 		</bh:Div>
 	</bh:Div>

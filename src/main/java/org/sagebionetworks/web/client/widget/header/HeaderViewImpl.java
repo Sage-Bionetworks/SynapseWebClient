@@ -8,6 +8,7 @@ import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
+import org.gwtbootstrap3.client.ui.Label;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -30,6 +31,7 @@ import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
 import com.google.gwt.user.client.ui.Composite;
+import com.google.gwt.user.client.ui.FocusPanel;
 import com.google.gwt.user.client.ui.Image;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.SimplePanel;
@@ -100,6 +102,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	Alert stagingAlert;
 	@UiField
 	AnchorListItem documentationLink;
+	@UiField
+	Div downloadListNotificationUI;
+	@UiField
+	FocusPanel downloadListLink;
+	@UiField
+	Label downloadListFileCount;
 	
 	private Presenter presenter;
 	private SearchBox searchBox;
@@ -234,6 +242,10 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			globalAppState.getPlaceChanger().goTo(place);
 			hideDropdown();
 		});
+		downloadListLink.addClickHandler(event -> {
+			Profile place = new Profile("v/downloads");
+			globalAppState.getPlaceChanger().goTo(place);
+		});
 	}
 	
 	private void hideDropdown() {
@@ -324,5 +336,12 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	public EventBinder<Header> getEventBinder() {
 		return eventBinder;
 	}
-
+	@Override
+	public void setDownloadListFileCount(Integer count) {
+		downloadListFileCount.setText(count.toString());
+	}
+	@Override
+	public void setDownloadListUIVisible(boolean visible) {
+		downloadListNotificationUI.setVisible(visible);
+	}
 }

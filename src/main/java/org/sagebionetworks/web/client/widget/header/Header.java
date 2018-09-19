@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.web.client.ClientProperties;
 import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.PortalGinInjector;
@@ -110,8 +111,10 @@ public class Header implements HeaderView.Presenter, IsWidget {
 			String userName = userSessionData.getProfile().getUserName();
 			pendoSdk.initialize(authenticationController.getCurrentUserPrincipalId(), userName + SYNAPSE_ORG);
 			refreshFavorites();
+			onDownloadListUpdatedEvent(null);
 		} else {
 			pendoSdk.initialize(ANONYMOUS, N_A);
+			view.setDownloadListUIVisible(false);
 		}
 	}
 
@@ -161,6 +164,18 @@ public class Header implements HeaderView.Presenter, IsWidget {
 	}
 	@EventHandler
 	public void onDownloadListUpdatedEvent(DownloadListUpdatedEvent event) {
-		//TODO: update Download List count, show if > 0
+		//update Download List count, show if > 0
+		jsClient.getDownloadList(new AsyncCallback<DownloadList>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				view.setDownloadListUIVisible(false);
+				synapseJSNIUtils.consoleError("Unable to get download list! " + caught.getMessage());
+			}
+			public void onSuccess(DownloadList downloadList) {
+				int count = downloadList.getFilesToDownload().size();
+				view.setDownloadListUIVisible(count > 0);
+				view.setDownloadListFileCount(count);
+			};
+		});
 	}
 }

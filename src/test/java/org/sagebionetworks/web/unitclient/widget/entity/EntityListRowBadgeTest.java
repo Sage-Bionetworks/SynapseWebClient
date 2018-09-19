@@ -36,6 +36,7 @@ import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -55,11 +56,14 @@ public class EntityListRowBadgeTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	PopupUtilsView mockPopupUtils;
+	@Mock
+	EventBus mockEventBus;
+
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
 		widget = new EntityListRowBadge(mockView, mockUserBadge, mockSynapseJavascriptClient,
-				mockLazyLoadHelper, mockDateTimeUtils, mockPopupUtils);
+				mockLazyLoadHelper, mockDateTimeUtils, mockPopupUtils, mockEventBus);
 	}
 	@Test
 	public void testConstruction() {

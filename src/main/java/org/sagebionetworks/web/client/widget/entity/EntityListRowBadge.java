@@ -15,12 +15,14 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.SelectableListItem;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.lazyload.LazyLoadHelper;
 import org.sagebionetworks.web.client.widget.user.UserBadge;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -38,19 +40,22 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	private DateTimeUtils dateTimeUtils;
 	FileHandle dataFileHandle;
 	PopupUtilsView popupUtils;
+	EventBus eventBus;
 	@Inject
 	public EntityListRowBadge(EntityListRowBadgeView view, 
 			UserBadge userBadge,
 			SynapseJavascriptClient jsClient,
 			LazyLoadHelper lazyLoadHelper,
 			DateTimeUtils dateTimeUtils,
-			PopupUtilsView popupUtils) {
+			PopupUtilsView popupUtils,
+			EventBus eventBus) {
 		this.view = view;
 		this.createdByUserBadge = userBadge;
 		this.dateTimeUtils = dateTimeUtils;
 		this.jsClient = jsClient;
 		this.lazyLoadHelper = lazyLoadHelper;
 		this.popupUtils = popupUtils;
+		this.eventBus = eventBus;
 		view.setCreatedByWidget(userBadge.asWidget());
 		view.setPresenter(this);
 		Callback loadDataCallback = new Callback() {
@@ -183,6 +188,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			@Override
 			public void onSuccess(DownloadList result) {
 				popupUtils.showInfo(dataFileHandle.getFileName() + " has been added to your download list.");
+				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 		});
 	}

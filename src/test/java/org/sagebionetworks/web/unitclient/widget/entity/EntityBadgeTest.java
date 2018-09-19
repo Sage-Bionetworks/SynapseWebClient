@@ -63,6 +63,7 @@ import org.sagebionetworks.web.shared.PublicPrincipalIds;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.dom.client.ClickHandler;
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 
@@ -104,6 +105,8 @@ public class EntityBadgeTest {
 	PopupUtilsView mockPopupUtils;
 	@Mock
 	SynapseProperties mockSynapseProperties;
+	@Mock
+	EventBus mockEventBus;
 	@Captor
 	ArgumentCaptor<ClickHandler> clickHandlerCaptor;
 	
@@ -126,7 +129,8 @@ public class EntityBadgeTest {
 		widget = new EntityBadge(mockView, mockGlobalApplicationState, mockTransformer,
 				mockUserBadge, mockSynapseJavascriptClient,
 				mockLazyLoadHelper,
-				mockDateTimeUtils, mockPopupUtils, mockSynapseProperties);
+				mockDateTimeUtils, mockPopupUtils, mockSynapseProperties, 
+				mockEventBus);
 		
 		when(mockSynapseProperties.getPublicPrincipalIds()).thenReturn(mockPublicPrincipalIds);
 		annotationList = new ArrayList<Annotation>();
