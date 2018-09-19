@@ -33,15 +33,15 @@
 						</b:FormGroup>
 					</b:Form>
 				</bh:Div>
-				<bh:Div ui:field="synAlert"/>
-			</b:ModalBody>
-			<b:ModalFooter>
 				<bh:Div ui:field="aliasUI">
 					<b:Alert type="WARNING" addStyleNames="margin-top-10">
 						<bh:Strong text="Note: &nbsp;" />
 						<bh:Text text="Updating the DOI information will cause old information to be lost!"/>
 					</b:Alert>
 				</bh:Div>
+				<bh:Div ui:field="synAlert"/>
+			</b:ModalBody>
+			<b:ModalFooter>
 				<bh:Div ui:field="jobTrackingWidget"/>
 			    <b:Button type="LINK" ui:field="cancelButton">Cancel</b:Button>
 			    <b:Button type="PRIMARY" text="OK" ui:field="mintDoiButton"/>
