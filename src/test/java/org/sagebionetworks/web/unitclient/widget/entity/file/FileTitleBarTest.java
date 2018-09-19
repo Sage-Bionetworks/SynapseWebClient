@@ -35,6 +35,7 @@ import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
 import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.ui.Widget;
 
 import junit.framework.Assert;
@@ -69,13 +70,15 @@ public class FileTitleBarTest {
 	List<VersionInfo> versions;
 	@Mock
 	VersionInfo mockCurrentVersion;
+	@Mock
+	EventBus mockEventBus;
 	
 	public static final String DATA_FILE_HANDLE_ID = "872";
 	public static final Long FILE_VERSION = 3L;
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
-		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockSynapseClient, mockJsClient, mockFileClientsHelp);
+		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockSynapseClient, mockJsClient, mockFileClientsHelp, mockEventBus);
 		when(mockFileEntity.getId()).thenReturn("syn123");
 		when(mockFileEntity.getName()).thenReturn("syn123");
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(DATA_FILE_HANDLE_ID);

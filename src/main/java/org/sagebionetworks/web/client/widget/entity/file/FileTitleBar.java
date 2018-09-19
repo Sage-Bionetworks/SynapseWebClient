@@ -17,11 +17,13 @@ import org.sagebionetworks.web.client.GlobalApplicationState;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
+import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -35,13 +37,15 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 	private SynapseClientAsync synapseClient;
 	private SynapseJavascriptClient jsClient;
 	private FileClientsHelp fileClientsHelp;
+	private EventBus eventBus;
 	@Inject
 	public FileTitleBar(FileTitleBarView view, 
 			SynapseProperties synapseProperties,
 			FileDownloadMenuItem fileDownloadButton,
 			SynapseClientAsync synapseClient,
 			SynapseJavascriptClient jsClient,
-			FileClientsHelp fileClientsHelp) {
+			FileClientsHelp fileClientsHelp,
+			EventBus eventBus) {
 		this.view = view;
 		this.synapseProperties = synapseProperties;
 		this.fileDownloadMenuItem = fileDownloadButton;
@@ -49,6 +53,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 		fixServiceEntryPoint(synapseClient);
 		this.jsClient = jsClient;
 		this.fileClientsHelp = fileClientsHelp;
+		this.eventBus = eventBus;
 		view.setFileDownloadMenuItem(fileDownloadButton.asWidget());
 		view.setPresenter(this);
 	}
@@ -176,6 +181,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 			@Override
 			public void onSuccess(DownloadList result) {
 				view.showInfo(entityBundle.getFileName() + " has been added to your download list.");
+				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 		});
 	}
