@@ -1,7 +1,9 @@
 package org.sagebionetworks.web.client.widget.table.v2;
 
 import org.gwtbootstrap3.client.ui.Alert;
+import org.gwtbootstrap3.client.ui.AnchorListItem;
 import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.Divider;
 import org.gwtbootstrap3.client.ui.FormGroup;
 import org.gwtbootstrap3.client.ui.InputGroup;
 import org.gwtbootstrap3.client.ui.TextBox;
@@ -48,11 +50,16 @@ public class QueryInputViewImpl implements QueryInputView{
 	@UiField
 	Button editResultsButton;
 	@UiField
-	Button downloadResultsButton;
-	@UiField
 	Button showQueryButton;
 	@UiField
-	Button downloadFilesButton;
+	AnchorListItem addToDownloadListLink;
+	@UiField
+	AnchorListItem programmaticOptionsLink;
+	@UiField
+	AnchorListItem exportTableLink;
+	@UiField
+	Divider downloadOptionsDivider;
+
 	HTMLPanel panel;
 	Presenter presenter;
 	
@@ -64,52 +71,32 @@ public class QueryInputViewImpl implements QueryInputView{
 	@Override
 	public void setPresenter(final Presenter presenter) {
 		this.presenter = presenter;
-		queryButton.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
+		queryButton.addClickHandler(event -> {
+			presenter.onExecuteQuery();
+		});
+		resetButton.addClickHandler(event -> {
+			presenter.onReset();
+		});
+		// Enter key should execute the query.
+		queryInput.addKeyDownHandler(event -> {
+			if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
 				presenter.onExecuteQuery();
 			}
 		});
-		resetButton.addClickHandler(new ClickHandler() {
-			
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onReset();
-			}
+		editResultsButton.addClickHandler(event -> {
+			presenter.onEditResults();
 		});
-		// Enter key should execute the query.
-		queryInput.addKeyDownHandler(new KeyDownHandler() {
-			@Override
-			public void onKeyDown(KeyDownEvent event) {
-				if(KeyCodes.KEY_ENTER == event.getNativeKeyCode()){
-					presenter.onExecuteQuery();
-				}
-			}
+		exportTableLink.addClickHandler(event -> {
+			presenter.onExportTable();
 		});
-		editResultsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onEditResults();
-			}
+		showQueryButton.addClickHandler(event -> {
+			presenter.onShowQuery();
 		});
-		downloadResultsButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onDownloadResults();
-			}
+		programmaticOptionsLink.addClickHandler(event -> {
+			presenter.onDownloadFilesProgrammatically();
 		});
-		showQueryButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onShowQuery();
-			}
-		});
-		downloadFilesButton.addClickHandler(new ClickHandler() {
-			@Override
-			public void onClick(ClickEvent event) {
-				presenter.onDownloadFiles();
-			}
+		addToDownloadListLink.addClickHandler(event -> {
+			presenter.onAddToDownloadList();
 		});
 	}
 	
@@ -166,7 +153,7 @@ public class QueryInputViewImpl implements QueryInputView{
 
 	@Override
 	public void setDownloadEnabled(boolean enabled) {
-		this.downloadResultsButton.setEnabled(enabled);
+		exportTableLink.setEnabled(enabled);
 	}
 
 
@@ -181,6 +168,8 @@ public class QueryInputViewImpl implements QueryInputView{
 	}
 	@Override
 	public void setDownloadFilesVisible(boolean visible) {
-		downloadFilesButton.setVisible(visible);
+		addToDownloadListLink.setVisible(visible);
+		programmaticOptionsLink.setVisible(visible);
+		downloadOptionsDivider.setVisible(visible);
 	}
 }

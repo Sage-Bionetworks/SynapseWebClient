@@ -133,7 +133,7 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	}
 
 	@Override
-	public void onDownloadResults() {
+	public void onExportTable() {
 		queryInputListener.onDownloadResults();
 	}
 
@@ -159,8 +159,13 @@ public class QueryInputWidget implements QueryInputView.Presenter, IsWidget, Que
 	}
 
 	@Override
-	public void onDownloadFiles() {
-		queryInputListener.onShowDownloadFiles();
+	public void onDownloadFilesProgrammatically() {
+		queryInputListener.onShowDownloadFilesProgrammatically();
+	}
+	
+	@Override
+	public void onAddToDownloadList() {
+		queryInputListener.onAddToDownloadList();
 	}
 	
 	public void setVisible(boolean visible) {

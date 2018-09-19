@@ -28,6 +28,7 @@ import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.clienthelp.ContainerClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowser;
 import org.sagebionetworks.web.client.widget.entity.browse.FilesBrowserView;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
@@ -45,6 +46,8 @@ public class FilesBrowserTest {
 	SynapseJavascriptClient mockSynapseJavascriptClient;
 	@Mock
 	ContainerClientsHelp mockContainerClientsHelp;
+	@Mock
+	AddToDownloadList mockAddToDownloadList;
 	@Before
 	public void before() throws JSONObjectAdapterException {
 		MockitoAnnotations.initMocks(this);
@@ -56,7 +59,8 @@ public class FilesBrowserTest {
 		filesBrowser = new FilesBrowser(mockView,
 				mockGlobalApplicationState, 
 				mockAuthenticationController,
-				mockContainerClientsHelp);
+				mockContainerClientsHelp,
+				mockAddToDownloadList);
 	}
 	
 	@Test

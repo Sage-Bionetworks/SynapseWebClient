@@ -16,6 +16,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.widget.CopyTextModal;
 import org.sagebionetworks.web.client.widget.clienthelp.FileViewClientsHelp;
 import org.sagebionetworks.web.client.widget.entity.controller.PreflightController;
+import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.Action;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget.ActionListener;
@@ -86,7 +87,7 @@ public class TableEntityWidget implements IsWidget,
 	public static final String SCHEMA = " Schema";
 	String entityTypeDisplay;
 	PortalGinInjector ginInjector;
-	
+	AddToDownloadList addToDownloadList;
 	@Inject
 	public TableEntityWidget(TableEntityWidgetView view,
 			TableQueryResultWidget queryResultsWidget,
@@ -94,6 +95,7 @@ public class TableEntityWidget implements IsWidget,
 			PreflightController preflightController,
 			SynapseClientAsync synapseClient,
 			FileViewClientsHelp fileViewClientsHelp,
+			AddToDownloadList addToDownloadList,
 			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.queryResultsWidget = queryResultsWidget;
@@ -102,10 +104,12 @@ public class TableEntityWidget implements IsWidget,
 		this.synapseClient = synapseClient;
 		fixServiceEntryPoint(synapseClient);
 		this.fileViewClientsHelp = fileViewClientsHelp;
+		this.addToDownloadList = addToDownloadList;
 		this.ginInjector = ginInjector;
 		this.view.setPresenter(this);
 		this.view.setQueryResultsWidget(this.queryResultsWidget);
 		this.view.setQueryInputWidget(this.queryInputWidget);
+		view.setAddToDownloadList(addToDownloadList);
 	}
 	
 	public DownloadTableQueryModalWidget getDownloadTableQueryModalWidget() {
@@ -529,7 +533,7 @@ public class TableEntityWidget implements IsWidget,
 	}
 	
 	@Override
-	public void onShowDownloadFiles() {
+	public void onShowDownloadFilesProgrammatically() {
 		AsyncCallback<String> callback = new AsyncCallback<String>() {
 			@Override
 			public void onSuccess(String sql) {
@@ -544,5 +548,10 @@ public class TableEntityWidget implements IsWidget,
 			}
 		};
 		generateSqlWithFacets(callback);
+	}
+	
+	@Override
+	public void onAddToDownloadList() {
+		addToDownloadList.addToDownloadList(currentQuery);
 	}
 }
