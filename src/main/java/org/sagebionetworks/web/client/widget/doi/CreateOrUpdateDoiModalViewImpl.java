@@ -27,7 +27,7 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	@UiField
 	Div doiEditorDiv;
 	@UiField
-	TextArea authorsField;
+	TextArea creatorsField;
 	@UiField
 	TextArea titlesField;
 	@UiField
@@ -62,7 +62,7 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	@Override
 	public void reset() {
 		jobTrackingWidget.setVisible(false);
-		authorsField.clear();
+		creatorsField.clear();
 		titlesField.clear();
 		resourceTypeGeneralSelect.setSelectedIndex(0);
 		publicationYearField.reset();
@@ -81,13 +81,13 @@ public class CreateOrUpdateDoiModalViewImpl implements CreateOrUpdateDoiModalVie
 	}
 
 	@Override
-	public String getAuthors() {
-		return authorsField.getText();
+	public String getCreators() {
+		return creatorsField.getText();
 	}
 
 	@Override
-	public void setAuthors(String authors) {
-		authorsField.setText(authors);
+	public void setCreators(String creators) {
+		creatorsField.setText(creators);
 	}
 
 	@Override

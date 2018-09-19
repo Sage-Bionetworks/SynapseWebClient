@@ -14,7 +14,7 @@ import org.sagebionetworks.repo.model.doi.v2.DoiRequest;
 import org.sagebionetworks.repo.model.doi.v2.DoiResourceType;
 import org.sagebionetworks.repo.model.doi.v2.DoiResourceTypeGeneral;
 import org.sagebionetworks.repo.model.doi.v2.DoiTitle;
-import org.sagebionetworks.web.client.DisplayUtils;
+import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.EntityUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
@@ -37,16 +37,19 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 	private EntityUpdatedHandler entityUpdatedHandler;
 	private Doi doi;
 	private SynapseAlert synapseAlert;
+	private PopupUtilsView popupUtilsView;
 
 	@Inject
 	public CreateOrUpdateDoiModal(CreateOrUpdateDoiModalView view,
 								  JobTrackingWidget jobTrackingWidget,
 								  SynapseJavascriptClient javascriptClient,
-								  SynapseAlert synapseAlert) {
+								  SynapseAlert synapseAlert,
+								  PopupUtilsView popupUtilsView) {
 		this.view = view;
 		this.jobTrackingWidget = jobTrackingWidget;
 		this.javascriptClient = javascriptClient;
 		this.synapseAlert = synapseAlert;
+		this.popupUtilsView = popupUtilsView;
 		view.setSynAlert(synapseAlert);
 		view.setJobTrackingWidget(jobTrackingWidget);
 		view.setPresenter(this);
@@ -94,7 +97,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		newDoi.setObjectType(doi.getObjectType());
 		newDoi.setObjectVersion(doi.getObjectVersion());
 		newDoi.setEtag(doi.getEtag());
-		newDoi.setCreators(parseCreatorsString(view.getAuthors()));
+		newDoi.setCreators(parseCreatorsString(view.getCreators()));
 		newDoi.setTitles(parseTitlesString(view.getTitles()));
 		DoiResourceType rt = new DoiResourceType();
 		rt.setResourceTypeGeneral(DoiResourceTypeGeneral.valueOf(view.getResourceTypeGeneral()));
@@ -106,7 +109,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		jobTrackingWidget.startAndTrackJob("", false, AsynchType.Doi, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
-				DisplayUtils.showInfo(DOI_CREATED_MESSAGE + newDoi.getObjectId());
+				popupUtilsView.showInfo(DOI_CREATED_MESSAGE + newDoi.getObjectId());
 				entityUpdatedHandler.onPersistSuccess(new EntityUpdatedEvent());
 				view.setIsLoading(false);
 				view.hide();
@@ -134,7 +137,17 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		return this.doi;
 	}
 
-	private void populateForms(Doi doi) {
+	/**
+	 * Do not use!!! Public only for testing purposes
+	 *
+	 * Retrieves DOI fields from a class variable, translates them, and loads them into the view
+	 * @param doi
+	 */
+	public void populateForms(Doi doi) {
+		if (doi == null) {
+			doi = new Doi();
+		}
+
 		if (doi.getCreators() == null) {
 			doi.setCreators(new ArrayList<>());
 		}
@@ -151,10 +164,10 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		}
 
 		if (doi.getPublicationYear() == null) {
-			doi.setPublicationYear(2018L); // TODO: get current year
+			doi.setPublicationYear(2018L); // TODO: Current date?
 		}
 
-		view.setAuthors(convertMultipleCreatorsToString(doi.getCreators()));
+		view.setCreators(convertMultipleCreatorsToString(doi.getCreators()));
 		view.setTitles(convertMultipleTitlesToString(doi.getTitles()));
 		view.setResourceTypeGeneral(doi.getResourceType().getResourceTypeGeneral().name());
 		view.setPublicationYear(doi.getPublicationYear());
@@ -162,6 +175,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		setDoi(doi);
 	}
 
+	// TODO: Find a better way to store creators and remove this method
 	static List<DoiCreator> parseCreatorsString(String creators) {
 		List<DoiCreator> doiCreators = new ArrayList<>();
 		for (String creatorName : creators.split("\\n")) {
@@ -172,6 +186,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		return doiCreators;
 	}
 
+	// TODO: Find a better way to store creators and remove this method
 	static String convertMultipleCreatorsToString(List<DoiCreator> creators) {
 		return creators.stream()
 				.map(DoiCreator::getCreatorName)
@@ -179,6 +194,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 				.orElse(null);
 	}
 
+	// TODO: Find a better way to store titles and remove or test this method
 	static List<DoiTitle> parseTitlesString(String titles) {
 		List<DoiTitle> doiTitles = new ArrayList<>();
 		for (String titleText : titles.split("\\n")) {
@@ -189,6 +205,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		return doiTitles;
 	}
 
+	// TODO: Find a better way to store titles and remove or test this method
 	static String convertMultipleTitlesToString(List<DoiTitle> titles) {
 		return titles.stream()
 				.map(DoiTitle::getTitle)

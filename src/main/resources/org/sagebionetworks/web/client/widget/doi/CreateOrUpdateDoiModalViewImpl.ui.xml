@@ -16,8 +16,8 @@
 				<bh:Div ui:field="doiEditorDiv">
 					<b:Form>
 						<b:FormGroup>
-							<b:FormLabel>Author(s), one per line, may be institutional or personal</b:FormLabel>
-							<b:TextArea ui:field="authorsField" allowBlank="false" visibleLines="4" placeholder="Last, First or Institution Name"  />
+							<b:FormLabel>Creator(s), one per line, may be institutional or personal</b:FormLabel>
+							<b:TextArea ui:field="creatorsField" allowBlank="false" visibleLines="4" placeholder="Last, First or Institution Name"  />
 						</b:FormGroup>
 						<b:FormGroup>
 							<b:FormLabel>Title(s), one per line</b:FormLabel>
@@ -29,19 +29,19 @@
 						</b:FormGroup>
 						<b:FormGroup>
 							<b:FormLabel>Publication Year</b:FormLabel>
-							<b:IntegerBox ui:field="publicationYearField" allowBlank="false" placeholder="2018" />
+							<b:IntegerBox ui:field="publicationYearField" allowBlank="false" placeholder="YYYY" />
 						</b:FormGroup>
 					</b:Form>
-					<bh:Div ui:field="aliasUI">
-						<b:Alert type="WARNING" addStyleNames="margin-top-10">
-							<bh:Strong text="Note: &nbsp;" />
-							<bh:Text text="Updating the DOI information will cause old information to be lost!"/>
-						</b:Alert>
-					</bh:Div>
 				</bh:Div>
 				<bh:Div ui:field="synAlert"/>
 			</b:ModalBody>
 			<b:ModalFooter>
+				<bh:Div ui:field="aliasUI">
+					<b:Alert type="WARNING" addStyleNames="margin-top-10">
+						<bh:Strong text="Note: &nbsp;" />
+						<bh:Text text="Updating the DOI information will cause old information to be lost!"/>
+					</b:Alert>
+				</bh:Div>
 				<bh:Div ui:field="jobTrackingWidget"/>
 			    <b:Button type="LINK" ui:field="cancelButton">Cancel</b:Button>
 			    <b:Button type="PRIMARY" text="OK" ui:field="mintDoiButton"/>

@@ -8,8 +8,8 @@ public interface CreateOrUpdateDoiModalView extends IsWidget {
 	interface Presenter {
 		void onSaveDoi();
 	}
-	String getAuthors();
-	void setAuthors(String authors);
+	String getCreators();
+	void setCreators(String creators);
 	String getTitles();
 	void setTitles(String titles);
 	String getResourceTypeGeneral();
