@@ -154,6 +154,13 @@
 												href="http://docs.synapse.org/articles/teams.html" placement="BOTTOM" />
 										</a>
 								    </li>
+								    <li class="entity-tab" ui:field="downloadsListItem">
+								    		<a class="text-align-center link no-background">
+									    		<g:FocusPanel ui:field="downloadsFocusPanel" addStyleNames="displayInline" tabIndex="-1">
+									    			<b:Anchor ui:field="downloadsLink" addStyleNames="textDecorationNone">Downloads</b:Anchor>
+										    </g:FocusPanel>
+										</a>
+								    </li>
 								    <li class="entity-tab" ui:field="settingsListItem">
 								    		<a class="text-align-center link no-background">
 									    		<g:FocusPanel ui:field="settingsFocusPanel" addStyleNames="displayInline" tabIndex="-1">
@@ -255,6 +262,9 @@
 										<g:FlowPanel ui:field="teamsTabContent" addStyleNames="margin-10"/>
 									</div>
 								</div>
+								<div class="tab-background padding-10" ui:field="downloadsTabContainer">
+									<bh:Div ui:field="downloadsTabContent" />
+							    </div>
 							    <div class="tab-background padding-10" ui:field="settingsTabContainer">
 							        <g:FlowPanel ui:field="settingsTabContent" />
 							    </div>

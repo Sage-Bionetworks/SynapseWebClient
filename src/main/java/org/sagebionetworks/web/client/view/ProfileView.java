@@ -69,6 +69,7 @@ public interface ProfileView extends IsWidget, SynapseView {
 	void setVerificationSubmittedButtonVisible(boolean isVisible);
 	void setVerificationDetailsButtonVisible(boolean isVisible);
 	void setSettingsWidget(Widget w);
+	void setDownloadListWidget(IsWidget w);
 	public interface Presenter {
 		void showProfileButtonClicked();
 		void hideProfileButtonClicked();
