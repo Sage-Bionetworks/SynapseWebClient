@@ -209,6 +209,8 @@ import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalVi
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModalViewImpl;
 import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModalView;
 import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModalViewImpl;
+import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2View;
+import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2ViewImpl;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalView;
 import org.sagebionetworks.web.client.widget.entity.BigPromptModalViewImpl;
 import org.sagebionetworks.web.client.widget.entity.RejectReasonView;
@@ -904,6 +906,7 @@ public class PortalGinModule extends AbstractGinModule {
 		
 		// DoiWidget
 		bind(DoiWidgetView.class).to(DoiWidgetViewImpl.class);
+		bind(DoiWidgetV2View.class).to(DoiWidgetV2ViewImpl.class);
 		bind(CreateOrUpdateDoiModalView.class).to(CreateOrUpdateDoiModalViewImpl.class);
 		
 		// LoginWidget

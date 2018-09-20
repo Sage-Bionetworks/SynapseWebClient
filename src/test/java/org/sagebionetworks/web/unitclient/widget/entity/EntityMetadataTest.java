@@ -32,7 +32,9 @@ import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cookie.CookieProvider;
 import org.sagebionetworks.web.client.security.AuthenticationController;
+import org.sagebionetworks.web.client.widget.doi.DoiWidgetV2;
 import org.sagebionetworks.web.client.widget.entity.DoiWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadataView;
@@ -57,6 +59,8 @@ public class EntityMetadataTest {
 	@Mock
 	DoiWidget mockDoiWidget;
 	@Mock
+	DoiWidgetV2 mockDoiWidgetV2;
+	@Mock
 	RestrictionWidget mockRestrictionWidgetV2;
 	@Mock
 	FileHistoryWidget mockFileHistoryWidget;
@@ -70,6 +74,8 @@ public class EntityMetadataTest {
 	SynapseJSNIUtils mockJSNI;
 	@Mock
 	ActionMenuWidget mockActionMenuWidget;
+	@Mock
+	CookieProvider mockCookies;
 	String entityId = "syn123";
 	String entityName = "testEntity";
 	Entity en = new Folder();
@@ -78,8 +84,9 @@ public class EntityMetadataTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new EntityMetadata(mockView, mockDoiWidget, mockAnnotationsWidget,
-				mockFileHistoryWidget, mockJsClient, mockJSNI, mockRestrictionWidgetV2);
+		widget = new EntityMetadata(mockView, mockDoiWidget, mockDoiWidgetV2, mockAnnotationsWidget,
+				mockFileHistoryWidget, mockJsClient, mockJSNI, mockRestrictionWidgetV2, mockCookies);
+		when(mockCookies.getCookie(any(String.class))).thenReturn(null);
 	}
 	
 	@Test
