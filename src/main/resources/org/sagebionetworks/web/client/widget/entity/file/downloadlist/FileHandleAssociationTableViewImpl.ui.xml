@@ -9,7 +9,7 @@
 			<t:TableHeader text="File Name"/>
 			<t:TableHeader width="55px" text="Access"/>
 			<t:TableHeader width="190px" text="Created By"/>
-			<t:TableHeader width="200px" text="Created On"/>
+			<t:TableHeader width="150px" text="Created On"/>
 			<t:TableHeader width="100px" text="Size"/>
 			<t:TableHeader width="50px" text=""/> <!-- delete item column -->
 		</t:TableRow>
