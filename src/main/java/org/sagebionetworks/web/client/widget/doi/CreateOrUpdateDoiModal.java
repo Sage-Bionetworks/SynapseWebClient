@@ -22,6 +22,7 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.JobTrackingWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
+import org.sagebionetworks.web.shared.exceptions.NotFoundException;
 
 import com.google.common.util.concurrent.FutureCallback;
 import com.google.gwt.user.client.ui.Widget;
@@ -30,6 +31,7 @@ import com.google.inject.Inject;
 public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presenter {
 	public static final String DOI_CREATED_MESSAGE = "DOI successfully updated for ";
 	public static final String DOI_MODAL_TITLE = "Create or Update a DOI";
+	public static final String DOI_SERVICES_UNAVAILABLE_AT_THIS_TIME = "DOI services unavailable at this time.";
 
 	private CreateOrUpdateDoiModalView view;
 	private JobTrackingWidget jobTrackingWidget;
@@ -62,7 +64,6 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		this.entityUpdatedHandler = entityUpdatedHandler;
 		doi = new Doi();
 		getExistingDoi(objectId, objectType, versionNumber);
-		view.show();
 	}
 
 	public void getExistingDoi(String objectId, ObjectType objectType, Long objectVersion) {
@@ -70,13 +71,19 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 			@Override
 			public void onSuccess(@NullableDecl Doi doi) {
 				populateForms(doi);
+				view.show();
 			}
 
 			@Override
 			public void onFailure(Throwable t) {
-				doi.setObjectId(objectId);
-				doi.setObjectType(objectType);
-				doi.setObjectVersion(objectVersion);
+				if (t instanceof NotFoundException) {
+					doi.setObjectId(objectId);
+					doi.setObjectType(objectType);
+					doi.setObjectVersion(objectVersion);
+					view.show();
+				} else {
+					popupUtilsView.showErrorMessage(DOI_SERVICES_UNAVAILABLE_AT_THIS_TIME);
+				}
 			}
 		}, directExecutor());
 	}
@@ -124,7 +131,6 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 			@Override
 			public void onCancel() {
 				view.setIsLoading(false);
-				view.reset();
 			}
 		});
 	}
@@ -175,41 +181,61 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 		setDoi(doi);
 	}
 
-	// TODO: Find a better way to store creators and remove this method
-	static List<DoiCreator> parseCreatorsString(String creators) {
+	/**
+	 * Do not use!!! Public only for testing purposes
+	 *
+	 * Converts a string of creator names to a List of DoiCreator, where creatorNames are separated with newlines
+	 */
+	public static List<DoiCreator> parseCreatorsString(String creators) {
 		List<DoiCreator> doiCreators = new ArrayList<>();
-		for (String creatorName : creators.split("\\n")) {
-			DoiCreator creator = new DoiCreator();
-			creator.setCreatorName(creatorName);
-			doiCreators.add(creator);
+		if (!creators.isEmpty()) {
+			for (String creatorName : creators.split("\\n")) {
+				DoiCreator creator = new DoiCreator();
+				creator.setCreatorName(creatorName);
+				doiCreators.add(creator);
+			}
 		}
 		return doiCreators;
 	}
 
-	// TODO: Find a better way to store creators and remove this method
-	static String convertMultipleCreatorsToString(List<DoiCreator> creators) {
+	/**
+	 * Do not use!!! Public only for testing purposes
+	 *
+	 * Converts a List of DoiCreator to a string of creator names, concatenated with new lines
+	 */
+	public static String convertMultipleCreatorsToString(List<DoiCreator> creators) {
 		return creators.stream()
 				.map(DoiCreator::getCreatorName)
 				.reduce((x,y) -> x + "\n" + y) //Separate creator names with new line
-				.orElse(null);
+				.orElse("");
 	}
 
-	// TODO: Find a better way to store titles and remove or test this method
-	static List<DoiTitle> parseTitlesString(String titles) {
+	/**
+	 * Do not use!!! Public only for testing purposes
+	 *
+	 * Converts a string of titles to a List of DoiTitle, where titles are separated with newlines
+	 */
+	public static List<DoiTitle> parseTitlesString(String titles) {
 		List<DoiTitle> doiTitles = new ArrayList<>();
-		for (String titleText : titles.split("\\n")) {
-			DoiTitle title = new DoiTitle();
-			title.setTitle(titleText);
-			doiTitles.add(title);
+		if (!titles.isEmpty()) {
+			for (String titleText : titles.split("\\n")) {
+				DoiTitle title = new DoiTitle();
+				title.setTitle(titleText);
+				doiTitles.add(title);
+			}
 		}
 		return doiTitles;
 	}
 
-	// TODO: Find a better way to store titles and remove or test this method
-	static String convertMultipleTitlesToString(List<DoiTitle> titles) {
+	/**
+	 * Do not use!!! Public only for testing purposes
+	 *
+	 * Converts a List of DoiTitle to a string of titles, concatenated with new lines
+	 */
+	public static String convertMultipleTitlesToString(List<DoiTitle> titles) {
 		return titles.stream()
 				.map(DoiTitle::getTitle)
 				.reduce((x,y) -> x + "\n" + y) // Separate titles with new line
-				.orElse(null);
+				.orElse("");
 	}
 }

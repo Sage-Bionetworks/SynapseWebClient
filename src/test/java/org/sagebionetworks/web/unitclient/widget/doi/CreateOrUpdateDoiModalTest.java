@@ -1,13 +1,16 @@
 package org.sagebionetworks.web.unitclient.widget.doi;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
+import static org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModal.DOI_SERVICES_UNAVAILABLE_AT_THIS_TIME;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +122,8 @@ public class CreateOrUpdateDoiModalTest {
 
 		// Call under test
 		presenter.getExistingDoi(objectId, objectType, objectVersion);
+
+		verify(mockView).show();
 		verify(mockSynapseClient).getDoi(objectId, objectType, objectVersion);
 		verify(mockView).setCreators(anyString());
 		verify(mockView).setTitles(anyString());
@@ -128,19 +133,38 @@ public class CreateOrUpdateDoiModalTest {
 	}
 
 	@Test
-	public void testGetExistingDoiFailure() {
+	public void testGetExistingDoiNotFoundExceptionFailure() {
 		// Make sure the DOI has none of the fields filled out beforehand
 		presenter.setDoi(new Doi());
 
-		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(getFailedFuture());
+		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(getFailedFuture(new NotFoundException()));
 
 		// Call under test
 		presenter.getExistingDoi(objectId, objectType, objectVersion);
+
+		verify(mockView).show();
 		assertEquals(objectId, presenter.getDoi().getObjectId());
 		assertEquals(objectType, presenter.getDoi().getObjectType());
 		assertEquals(objectVersion, presenter.getDoi().getObjectVersion());
 	}
 
+	@Test
+	public void testGetExistingDoiOtherFailure() {
+		// Make sure the DOI has none of the fields filled out beforehand
+		presenter.setDoi(new Doi());
+
+		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(getFailedFuture(new Throwable()));
+
+		// Call under test
+		presenter.getExistingDoi(objectId, objectType, objectVersion);
+
+
+		verify(mockView, never()).show();
+		verify(mockPopupUtilsView).showErrorMessage(DOI_SERVICES_UNAVAILABLE_AT_THIS_TIME);
+		assertNotEquals(objectId, presenter.getDoi().getObjectId());
+		assertNotEquals(objectType, presenter.getDoi().getObjectType());
+		assertNotEquals(objectVersion, presenter.getDoi().getObjectVersion());
+	}
 
 	@Test
 	public void testConfigureAndShow() {
@@ -150,7 +174,6 @@ public class CreateOrUpdateDoiModalTest {
 
 		verify(mockView).reset();
 		verify(mockSynAlert).clear();
-		verify(mockView).show();
 	}
 
 	@Test
@@ -229,7 +252,6 @@ public class CreateOrUpdateDoiModalTest {
 		asyncProgressHandlerCaptor.getValue().onCancel();
 
 		verify(mockView).setIsLoading(false);
-		verify(mockView).reset();
 		verify(mockJobTrackingWidget).startAndTrackJob(eq(""), eq(false), eq(AsynchType.Doi), any(DoiRequest.class), any(AsynchronousProgressHandler.class));
 	}
 
@@ -249,8 +271,8 @@ public class CreateOrUpdateDoiModalTest {
 	public void testPopulateFormsNullDoi() {
 		// Call under test
 		presenter.populateForms(null);
-		verify(mockView).setCreators(null);
-		verify(mockView).setTitles(null);
+		verify(mockView).setCreators("");
+		verify(mockView).setTitles("");
 		verify(mockView).setResourceTypeGeneral(DoiResourceTypeGeneral.Dataset.name());
 		verify(mockView).setPublicationYear(2018L);
 	}
@@ -262,7 +284,7 @@ public class CreateOrUpdateDoiModalTest {
 		doi.setCreators(null);
 		// Call under test
 		presenter.populateForms(doi);
-		verify(mockView).setCreators(null);
+		verify(mockView).setCreators("");
 		verify(mockView).setTitles(titlesAsString);
 		verify(mockView).setResourceTypeGeneral(rtg.name());
 		verify(mockView).setPublicationYear(pubYear);
@@ -276,7 +298,7 @@ public class CreateOrUpdateDoiModalTest {
 		// Call under test
 		presenter.populateForms(doi);
 		verify(mockView).setCreators(creatorsAsString);
-		verify(mockView).setTitles(null);
+		verify(mockView).setTitles("");
 		verify(mockView).setResourceTypeGeneral(rtg.name());
 		verify(mockView).setPublicationYear(pubYear);
 	}
@@ -305,6 +327,66 @@ public class CreateOrUpdateDoiModalTest {
 		verify(mockView).setTitles(titlesAsString);
 		verify(mockView).setResourceTypeGeneral(rtg.name());
 		verify(mockView).setPublicationYear(2018L);
+	}
+
+	@Test
+	public void testParseCreatorStringEmptyString() {
+		List<DoiCreator> expected = new ArrayList<>();
+		String creators = "";
+		List<DoiCreator> actual = CreateOrUpdateDoiModal.parseCreatorsString(creators);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testParseCreatorStringMultipleCreators() {
+		// The string and List of creators set up for other tests will work for this test
+		List<DoiCreator> actual = CreateOrUpdateDoiModal.parseCreatorsString(creatorsAsString);
+		assertEquals(creators, actual);
+	}
+
+	@Test
+	public void testParseTitlesStringEmptyString() {
+		List<DoiTitle> expected = new ArrayList<>();
+		String titles = "";
+		List<DoiTitle> actual = CreateOrUpdateDoiModal.parseTitlesString(titles);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testParseTitlesStringMultipleTitles() {
+		// The string and List of titles set up for other tests will work for this test
+		List<DoiTitle> actual = CreateOrUpdateDoiModal.parseTitlesString(titlesAsString);
+		assertEquals(titles, actual);
+	}
+
+	@Test
+	public void testConvertCreatorsToCreatorStringEmptyList() {
+		String expected = "";
+		List<DoiCreator> list = new ArrayList<>();
+		String actual = CreateOrUpdateDoiModal.convertMultipleCreatorsToString(list);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testConvertCreatorsToCreatorStringPopulatedList() {
+		// The string and List of creators set up for other tests will work for this test
+		String actual = CreateOrUpdateDoiModal.convertMultipleCreatorsToString(creators);
+		assertEquals(creatorsAsString, actual);
+	}
+
+	@Test
+	public void testConvertTitlesToStringEmptyList() {
+		String expected = "";
+		List<DoiTitle> titles = new ArrayList<>();
+		String actual = CreateOrUpdateDoiModal.convertMultipleTitlesToString(titles);
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testConvertTitlesToStringPopulatedList() {
+		// The string and List of titles set up for other tests will work for this test
+		String actual = CreateOrUpdateDoiModal.convertMultipleTitlesToString(titles);
+		assertEquals(titlesAsString, actual);
 	}
 
 	@Test

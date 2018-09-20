@@ -104,6 +104,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String RENAME_PREFIX = "Rename ";
 	
 	public static final int IS_ACT_MEMBER_MASK = 0x20;
+
+	public static final String CREATE_DOI_FOR = "Create DOI for  ";
+	public static final String UPDATE_DOI_FOR = "Update DOI for  ";
+
 	EntityArea currentArea;
 	
 	EntityActionControllerView view;
@@ -382,8 +386,11 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureFileUpload();
 		configureProvenance();
 		configureChangeStorageLocation();
-		configureCreateDOI();
-		configureCreateOrUpdateDoi();
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			configureCreateOrUpdateDoi();
+		} else {
+			configureCreateDOI();
+		}
 		configureEditProjectMetadataAction();
 		configureEditFileMetadataAction();
 		configureAddEvaluationAction();
@@ -498,7 +505,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			if (entityBundle.getDoi() == null) {
 				// show command if not returned, thus not in existence
 				actionMenu.setActionVisible(Action.CREATE_DOI, true);
-				actionMenu.setActionText(Action.CREATE_DOI, "Create DOI for  " + enityTypeDisplay);
+				actionMenu.setActionText(Action.CREATE_DOI, CREATE_DOI_FOR + enityTypeDisplay);
 			}
 		}
 	}
@@ -559,23 +566,19 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 
 	private void configureCreateOrUpdateDoi() {
-		if (DisplayUtils.isInTestWebsite(cookies)){
-			boolean canEdit = permissions.getCanEdit();
-			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
-			if (canEdit &&
-					!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
-					!(entityBundle.getEntity() instanceof EntityView)) {
-				actionMenu.setActionListener(Action.CREATE_OR_UPDATE_DOI, this);
-				actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
-				if (entityBundle.getDoiAssociation() == null) {
-					// show command if not returned, thus not in existence
-					actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, "Create DOI for  " + enityTypeDisplay);
-				} else {
-					actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, "Update DOI for  " + enityTypeDisplay);
-				}
-			}			
-		} else {
-			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		boolean canEdit = permissions.getCanEdit();
+		actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		if (canEdit &&
+				!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
+				!(entityBundle.getEntity() instanceof EntityView)) {
+			actionMenu.setActionListener(Action.CREATE_OR_UPDATE_DOI, this);
+			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+			if (entityBundle.getDoiAssociation() == null) {
+				// show command if not returned, thus not in existence
+				actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, CREATE_DOI_FOR + enityTypeDisplay);
+			} else {
+				actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, UPDATE_DOI_FOR + enityTypeDisplay);
+			}
 		}
 	}
 

@@ -129,8 +129,6 @@ public class SynapseJavascriptFactory {
 		PaginatedResultsTotalNumberOfResults,
 		PrincipalAliasResponse,
 		Doi,
-		DoiResponse,
-		AsynchronousJobStatus,
 		None,
 		String
 	}
@@ -308,10 +306,6 @@ public class SynapseJavascriptFactory {
 			return uploadDestinationList;
 		case Doi:
 			return new Doi(json);
-		case DoiResponse:
-			return new DoiResponse(json);
-		case AsynchronousJobStatus:
-			return new AsynchronousJobStatus(json);
 		case MembershipInvitation:
 			return new MembershipInvitation(json);
 		case InviteeVerificationSignedToken:
