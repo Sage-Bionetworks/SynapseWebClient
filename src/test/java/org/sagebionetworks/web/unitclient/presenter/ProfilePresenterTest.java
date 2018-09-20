@@ -198,7 +198,6 @@ public class ProfilePresenterTest {
 				mockInjector,
 				mockIsACTMemberAsyncHandler,
 				mockDateTimeUtils,
-				mockDownloadListWidget,
 				mockSynapseJavascriptClient
 				);
 		verify(mockView).setPresenter(profilePresenter);
@@ -209,6 +208,7 @@ public class ProfilePresenterTest {
 		when(mockInjector.getProjectBadgeWidget()).thenReturn(mockProjectBadge);
 		when(mockInjector.getChallengeBadgeWidget()).thenReturn(mockChallengeBadge);
 		when(mockInjector.getSettingsPresenter()).thenReturn(mockSettingsPresenter);
+		when(mockInjector.getDownloadListWidget()).thenReturn(mockDownloadListWidget);
 		userProfile.setDisplayName("tester");
 		userProfile.setOwnerId("1");
 		userProfile.setEmail("original.email@sagebase.org");
