@@ -8,33 +8,27 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 
-	<t:Table width="100%" height="30px">
-		<t:TableRow>
-			<t:TableData ui:field="fileNameContainer" />
-			<t:TableData width="50px" ui:field="accessContainer">
-				<bh:Span ui:field="hasAccess" addStyleNames="synapse-green-bg" visible="false">
-					<b:Icon type="LOCK_OPEN"/>
-				</bh:Span>
-				<bh:Span ui:field="noAccess" addStyleNames="synapse-yellow-bg" visible="false">
-					<b:Icon type="MINUS_CIRCLE"/>
-				</bh:Span>
-			</t:TableData>
-			<t:TableData width="100px">
-				<bh:Div ui:field="createdByContainer"/>
-			</t:TableData>
-			<t:TableData width="100px" >
-				<bh:Text ui:field="createdOn"/>
-			</t:TableData>
-			<t:TableData width="100px" >
-				<bh:Text ui:field="fileSize"/>
-			</t:TableData>
-			<t:TableData width="100px">
-				<b:Anchor ui:field="requestAccessLink" text="Request Access" visible="false"/>
-			</t:TableData> <!-- request access column -->
-			<t:TableData width="50px">
-				<b:Anchor icon="TRASH" ui:field="deleteLink" />
-			</t:TableData>
-		</t:TableRow>
-		
-	</t:Table>
+	<t:TableRow>
+		<t:TableData ui:field="fileNameContainer" />
+		<t:TableData ui:field="accessContainer">
+			<bh:Span ui:field="hasAccess" addStyleNames="synapse-green-bg color-white padding-2" visible="false">
+				<b:Icon type="LOCK_OPEN"/>
+			</bh:Span>
+			<bh:Span ui:field="noAccess" addStyleNames="synapse-yellow-bg color-white padding-2" visible="false">
+				<b:Icon type="MINUS_CIRCLE"/>
+			</bh:Span>
+		</t:TableData>
+		<t:TableData>
+			<bh:Text ui:field="createdBy"/>	
+		</t:TableData>
+		<t:TableData>
+			<bh:Text ui:field="createdOn"/>
+		</t:TableData>
+		<t:TableData>
+			<bh:Text ui:field="fileSize"/>
+		</t:TableData>
+		<t:TableData>
+			<b:Anchor icon="TRASH" ui:field="deleteLink" />
+		</t:TableData>
+	</t:TableRow>
 </ui:UiBinder>

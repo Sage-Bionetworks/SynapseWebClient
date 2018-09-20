@@ -7,11 +7,10 @@
 	<t:Table width="100%" height="30px" ui:field="fhaTable">
 		<t:TableRow ui:field="fhaTableHeader">
 			<t:TableHeader text="File Name"/>
-			<t:TableHeader width="50px" text="Access"/>
-			<t:TableHeader width="100px" text="Created By"/>
-			<t:TableHeader width="100px" text="Created On"/>
+			<t:TableHeader width="55px" text="Access"/>
+			<t:TableHeader width="190px" text="Created By"/>
+			<t:TableHeader width="200px" text="Created On"/>
 			<t:TableHeader width="100px" text="Size"/>
-			<t:TableHeader width="100px" text=""/> <!-- request access column -->
 			<t:TableHeader width="50px" text=""/> <!-- delete item column -->
 		</t:TableRow>
 	</t:Table>

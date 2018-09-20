@@ -23,13 +23,11 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	@UiField
 	Span noAccess;
 	@UiField
-	Div createdByContainer;
+	Text createdBy;
 	@UiField
 	Text createdOn;
 	@UiField
 	Text fileSize;
-	@UiField
-	Anchor requestAccessLink;
 	Presenter presenter;
 	private static FileHandleAssociationRowViewImplUiBinder uiBinder = GWT
 			.create(FileHandleAssociationRowViewImplUiBinder.class);
@@ -42,9 +40,8 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 		return w;
 	}
 	@Override
-	public void setCreatedBy(IsWidget w) {
-		createdByContainer.clear();
-		createdByContainer.add(w);
+	public void setCreatedBy(String value) {
+		createdBy.setText(value);
 	}
 	@Override
 	public void setCreatedOn(String value) {
@@ -63,12 +60,14 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	public void setHasAccess(boolean value) {
 		hasAccess.setVisible(value);
 		noAccess.setVisible(!value);
-		requestAccessLink.setVisible(!value);
+//		requestAccessLink.setVisible(!value);
 	}
-	@Override
-	public void setEntityId(String entityId) {
-		requestAccessLink.setHref("#!AccessRequirements:TYPE=ENTITY&ID=" + entityId);
-	}
+	
+//	@Override
+//	public void setEntityId(String entityId) {
+//		requestAccessLink.setHref("#!AccessRequirements:TYPE=ENTITY&ID=" + entityId);
+//	}
+	
 	@Override
 	public void setPresenter(Presenter p) {
 		this.presenter = p;
