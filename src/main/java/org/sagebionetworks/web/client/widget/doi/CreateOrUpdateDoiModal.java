@@ -82,7 +82,7 @@ public class CreateOrUpdateDoiModal implements CreateOrUpdateDoiModalView.Presen
 					doi.setObjectVersion(objectVersion);
 					view.show();
 				} else {
-					popupUtilsView.showErrorMessage(DOI_SERVICES_UNAVAILABLE_AT_THIS_TIME);
+					popupUtilsView.showErrorMessage(t.getMessage());
 				}
 			}
 		}, directExecutor());

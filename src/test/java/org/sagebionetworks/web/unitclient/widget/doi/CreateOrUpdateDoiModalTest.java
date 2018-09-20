@@ -10,7 +10,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getDoneFuture;
 import static org.sagebionetworks.web.client.utils.FutureUtils.getFailedFuture;
-import static org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModal.DOI_SERVICES_UNAVAILABLE_AT_THIS_TIME;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -153,14 +152,15 @@ public class CreateOrUpdateDoiModalTest {
 		// Make sure the DOI has none of the fields filled out beforehand
 		presenter.setDoi(new Doi());
 
-		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(getFailedFuture(new Throwable()));
+		Throwable error = new Throwable("error message");
+		when(mockSynapseClient.getDoi(objectId, objectType, objectVersion)).thenReturn(getFailedFuture(error));
 
 		// Call under test
 		presenter.getExistingDoi(objectId, objectType, objectVersion);
 
 
 		verify(mockView, never()).show();
-		verify(mockPopupUtilsView).showErrorMessage(DOI_SERVICES_UNAVAILABLE_AT_THIS_TIME);
+		verify(mockPopupUtilsView).showErrorMessage(error.getMessage());
 		assertNotEquals(objectId, presenter.getDoi().getObjectId());
 		assertNotEquals(objectType, presenter.getDoi().getObjectType());
 		assertNotEquals(objectVersion, presenter.getDoi().getObjectVersion());
