@@ -50,7 +50,6 @@ public class SearchBoxViewImpl implements SearchBoxView {
 	    	}, 400);
 	    });
 	    searchButton.addClickHandler(event -> {
-	    	searchField.setFocus(true);
 	    	if (isSearchFieldActive()) {
 	    		executeSearch();
 	    	} else {
@@ -105,11 +104,13 @@ public class SearchBoxViewImpl implements SearchBoxView {
 		Element searchBoxContainer = _getSearchBoxContainer();
 		searchBoxContainer.removeClassName(ACTIVE_STYLE);
 		searchBoxContainer.addClassName(INACTIVE_STYLE);
+		searchField.setFocus(false);
 	}
 	private void searchFieldActive() {
 		Element searchBoxContainer = _getSearchBoxContainer();
 		searchBoxContainer.addClassName(ACTIVE_STYLE);
 		searchBoxContainer.removeClassName(INACTIVE_STYLE);
+		searchField.setFocus(true);
 	}
 	
 	private boolean isSearchFieldActive() {
