@@ -8,8 +8,8 @@
 	xmlns:w="urn:import:org.sagebionetworks.web.client.widget"
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 
-	<t:TableRow>
-		<t:TableData ui:field="fileNameContainer" />
+	<t:TableRow addStyleNames="border-bottom-1">
+		<t:TableData ui:field="fileNameContainer" height="45px"/>
 		<t:TableData ui:field="accessContainer">
 			<bh:Span ui:field="hasAccess" addStyleNames="synapse-green-bg color-white padding-2" visible="false">
 				<b:Icon type="LOCK_OPEN"/>

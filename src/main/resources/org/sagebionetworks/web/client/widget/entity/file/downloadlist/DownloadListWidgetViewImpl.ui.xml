@@ -10,7 +10,7 @@
 
 	<bh:Div>
 		<bh:Div>
-			<b:Heading width="50%" size="H2" text="Download List" addStyleNames="inline-block"/>
+			<b:Heading width="50%" size="H4" text="Download List" addStyleNames="inline-block"/>
 			<bh:Div width="50%" height="40px" addStyleNames="text-align-right inline-block" >
 				<b:Anchor ui:field="clearAllLink" text="Clear All"/>
 			</bh:Div>
