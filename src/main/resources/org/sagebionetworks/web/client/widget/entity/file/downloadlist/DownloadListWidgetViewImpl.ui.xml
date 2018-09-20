@@ -15,6 +15,7 @@
 				<b:Anchor ui:field="clearAllLink" text="Clear All"/>
 			</bh:Div>
 		</bh:Div>
+		<bh:Div ui:field="fileHandleAssociationTableContainer" />
 		
 		<bh:Div ui:field="synAlertContainer" />
 	</bh:Div>

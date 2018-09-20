@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
+import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
@@ -20,18 +21,22 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	private DownloadListWidgetView view;
 	SynapseAlert synAlert;
 	private SynapseJavascriptClient jsClient;
+	private FileHandleAssociationTable fhaTable;
 	EventBus eventBus;
 	@Inject
 	public DownloadListWidget(
 			DownloadListWidgetView view, 
 			SynapseAlert synAlert,
 			SynapseJavascriptClient jsClient,
-			EventBus eventBus) {
+			EventBus eventBus,
+			FileHandleAssociationTable fhaTable) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.eventBus = eventBus;
+		this.fhaTable = fhaTable;
 		view.setSynAlert(synAlert);
+		view.setFileHandleAssociationTable(fhaTable);
 		view.setPresenter(this);
 	}
 	
@@ -46,7 +51,9 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			@Override
 			public void onSuccess(DownloadList downloadList) {
 				List<FileHandleAssociation> fhas = downloadList.getFilesToDownload();
-				// get FileResults for all fhas?  and get access requirement status for all items?
+				fhaTable.configure(fhas, fha -> {
+					//TODO: delete fha
+				});
 			}
 		});
 	}

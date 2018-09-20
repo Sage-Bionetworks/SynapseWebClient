@@ -1,38 +1,22 @@
 package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 
 import org.gwtbootstrap3.client.ui.Anchor;
-import org.gwtbootstrap3.client.ui.AnchorListItem;
-import org.gwtbootstrap3.client.ui.DropDownMenu;
-import org.gwtbootstrap3.client.ui.Icon;
 import org.gwtbootstrap3.client.ui.html.Div;
-import org.gwtbootstrap3.client.ui.html.Span;
-import org.gwtbootstrap3.client.ui.html.Text;
-import org.sagebionetworks.repo.model.Entity;
-import org.sagebionetworks.web.client.DisplayUtils;
-import org.sagebionetworks.web.client.EntityTypeUtils;
-import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
 import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.SpanElement;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
-import com.google.gwt.user.client.ui.Composite;
-import com.google.gwt.user.client.ui.HTMLPanel;
 import com.google.gwt.user.client.ui.IsWidget;
-import com.google.gwt.user.client.ui.SimplePanel;
-import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
-import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetView;
-import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetView.Presenter;
 
 public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWidget {
 	@UiField
 	Div synAlertContainer;
 	@UiField
 	Anchor clearAllLink;
+	@UiField
+	Div fileHandleAssociationTableContainer;
 	Presenter presenter;
 	Widget w;
 	interface DownloadListWidgetViewImplUiBinder extends UiBinder<Widget, DownloadListWidgetViewImpl> {}
@@ -61,5 +45,10 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	public void setSynAlert(IsWidget w) {
 		synAlertContainer.clear();
 		synAlertContainer.add(w);
+	}
+	@Override
+	public void setFileHandleAssociationTable(IsWidget w) {
+		fileHandleAssociationTableContainer.clear();
+		fileHandleAssociationTableContainer.add(w);
 	}
 }

@@ -134,6 +134,7 @@ import org.sagebionetworks.web.client.widget.entity.file.BasicTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationRow;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererCancelControl;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererDate;
 import org.sagebionetworks.web.client.widget.entity.renderer.APITableColumnRendererEntityIdAnnotations;
@@ -583,4 +584,5 @@ public interface PortalGinInjector extends Ginjector {
 	EvaluationRowWidget getEvaluationRowWidget();
 	EditDiscussionThreadModal getEditDiscussionThreadModal();
 	DownloadListWidget getDownloadListWidget();
+	FileHandleAssociationRow getFileHandleAssociationRow(); 
 }

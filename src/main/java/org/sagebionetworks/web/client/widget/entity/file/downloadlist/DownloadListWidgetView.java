@@ -10,6 +10,7 @@ public interface DownloadListWidgetView extends IsWidget {
 	void setPresenter(Presenter p);
 	void setSynAlert(IsWidget w);
 	void clear();
+	void setFileHandleAssociationTable(IsWidget w);
 	public interface Presenter {
 		void onClearDownloadList();
 	}

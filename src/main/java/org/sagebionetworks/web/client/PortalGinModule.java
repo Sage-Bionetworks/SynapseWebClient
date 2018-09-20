@@ -397,6 +397,10 @@ import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialog;
 import org.sagebionetworks.web.client.widget.entity.file.S3DirectLoginDialogImpl;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetView;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationRowView;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationRowViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationTableView;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationTableViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
@@ -1418,5 +1422,7 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(Moment.class).to(MomentImpl.class);
 		bind(DownloadSpeedTester.class).to(DownloadSpeedTesterImpl.class);
 		bind(DownloadListWidgetView.class).to(DownloadListWidgetViewImpl.class);
+		bind(FileHandleAssociationTableView.class).to(FileHandleAssociationTableViewImpl.class);
+		bind(FileHandleAssociationRowView.class).to(FileHandleAssociationRowViewImpl.class);
 	}
 }
