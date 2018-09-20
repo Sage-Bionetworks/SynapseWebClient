@@ -9,6 +9,13 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 
 	<bh:Div>
-		<b:Heading size="H2" text="Download List" />
+		<bh:Div>
+			<b:Heading width="50%" size="H2" text="Download List" addStyleNames="inline-block"/>
+			<bh:Div width="50%" height="40px" addStyleNames="text-align-right inline-block" >
+				<b:Anchor ui:field="clearAllLink" text="Clear All"/>
+			</bh:Div>
+		</bh:Div>
+		
+		<bh:Div ui:field="synAlertContainer" />
 	</bh:Div>
 </ui:UiBinder>

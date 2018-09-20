@@ -11,7 +11,6 @@ import org.sagebionetworks.repo.model.Entity;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.EntityTypeUtils;
 import org.sagebionetworks.web.client.GlobalApplicationState;
-import org.sagebionetworks.web.client.place.Synapse;
 import org.sagebionetworks.web.client.widget.entity.FavoriteWidget;
 
 import com.google.gwt.core.client.GWT;
@@ -26,10 +25,14 @@ import com.google.gwt.user.client.ui.SimplePanel;
 import com.google.gwt.user.client.ui.UIObject;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetView;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidgetView.Presenter;
 
-public class DownloadListWidgetViewImpl extends IsWidget implements DownloadListWidgetView {
+public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWidget {
 	@UiField
 	Div synAlertContainer;
+	@UiField
+	Anchor clearAllLink;
 	Presenter presenter;
 	Widget w;
 	interface DownloadListWidgetViewImplUiBinder extends UiBinder<Widget, DownloadListWidgetViewImpl> {}
@@ -38,7 +41,10 @@ public class DownloadListWidgetViewImpl extends IsWidget implements DownloadList
 			.create(DownloadListWidgetViewImplUiBinder.class);
 	@Inject
 	public DownloadListWidgetViewImpl() {
-		w  = uiBinder.createAndBindUi(this);
+		w = uiBinder.createAndBindUi(this);
+		clearAllLink.addClickHandler(event -> {
+			presenter.onClearDownloadList();
+		});
 	}
 	@Override
 	public void setPresenter(Presenter p) {

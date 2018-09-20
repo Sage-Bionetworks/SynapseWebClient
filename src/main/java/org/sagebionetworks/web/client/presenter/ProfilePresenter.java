@@ -49,6 +49,7 @@ import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.browse.EntityBrowserUtils;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
@@ -120,6 +121,7 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 	public PromptModalView promptForProjectNameDialog;
 	public PromptModalView promptForTeamNameDialog;
 	public SynapseJavascriptClient jsClient;
+	public DownloadListWidget downloadListWidget;
 	@Inject
 	public ProfilePresenter(ProfileView view,
 			AuthenticationController authenticationController,
@@ -222,6 +224,13 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		return settingsPresenter;
 	}
 	
+	public DownloadListWidget getDownloadListWidget() {
+		if (downloadListWidget == null) {
+			downloadListWidget = ginInjector.getDownloadListWidget();
+		}
+		return downloadListWidget;
+	}
+	
 	@Override
 	public void start(AcceptsOneWidget panel, EventBus eventBus) {
 		// Install the view
@@ -297,6 +306,9 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 		view.showTabs(isOwner);
 		if (settingsPresenter != null) {
 			settingsPresenter.clear();	
+		}
+		if (downloadListWidget != null) {
+			downloadListWidget.refresh();
 		}
 		myTeamsWidget.clear();
 		view.clearTeamNotificationCount();
@@ -1155,6 +1167,10 @@ public class ProfilePresenter extends AbstractActivity implements ProfileView.Pr
 				break;
 			case CHALLENGES:
 				refreshChallenges();
+				break;
+			case DOWNLOADS:
+				getDownloadListWidget().refresh();
+				view.setDownloadListWidget(getDownloadListWidget().asWidget());
 				break;
 			default:
 				break;

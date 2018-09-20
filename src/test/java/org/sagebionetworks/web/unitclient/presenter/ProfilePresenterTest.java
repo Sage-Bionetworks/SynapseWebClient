@@ -83,6 +83,7 @@ import org.sagebionetworks.web.client.widget.entity.ChallengeBadge;
 import org.sagebionetworks.web.client.widget.entity.ProjectBadge;
 import org.sagebionetworks.web.client.widget.entity.PromptModalView;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.DownloadListWidget;
 import org.sagebionetworks.web.client.widget.profile.UserProfileModalWidget;
 import org.sagebionetworks.web.client.widget.team.OpenTeamInvitationsWidget;
 import org.sagebionetworks.web.client.widget.team.TeamListWidget;
@@ -177,6 +178,8 @@ public class ProfilePresenterTest {
 	Project mockProject;
 	@Mock
 	PrincipalAliasResponse mockPrincipalAliasResponse;
+	@Mock
+	DownloadListWidget mockDownloadListWidget;
 	
 	List<Team> myTeams;
 	List<String> teamIds;
@@ -195,6 +198,7 @@ public class ProfilePresenterTest {
 				mockInjector,
 				mockIsACTMemberAsyncHandler,
 				mockDateTimeUtils,
+				mockDownloadListWidget,
 				mockSynapseJavascriptClient
 				);
 		verify(mockView).setPresenter(profilePresenter);
