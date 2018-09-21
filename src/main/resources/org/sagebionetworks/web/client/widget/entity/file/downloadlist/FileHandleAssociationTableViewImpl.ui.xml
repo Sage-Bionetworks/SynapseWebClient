@@ -19,11 +19,16 @@
 		<g:ScrollPanel addStyleNames="max-height-500">
 			<t:Table width="100%" ui:field="fhaTableData" />
 		</g:ScrollPanel>
-		<bh:Div ui:field="accessRestrictionDetectedUI" visible="false">
-			<b:Alert type="WARNING" addStyleNames="color-white">
+		<bh:Div ui:field="accessRestrictionDetectedUI" visible="false" marginTop="20">
+			<bh:Span addStyleNames="color-white synapse-yellow-bg label-as-badge left" paddingTop="10" paddingRight="15" paddingBottom="10" paddingLeft="10">
 				<b:Icon type="MINUS_CIRCLE" />
 				<bh:Text>Access Required</bh:Text>
-			</b:Alert>
+			</bh:Span>
+			<bh:Span>
+				<bh:Italic marginLeft="10">Your list has restricted files that can't be downloaded.  You must first request access to these restricted files.</bh:Italic>
+				<bh:Br />
+				<bh:Italic marginLeft="10">All files will remain in the list and can be downloaded from here once your access is granted.</bh:Italic>
+			</bh:Span>
 		</bh:Div>
 	</bh:Div>
 </ui:UiBinder>
