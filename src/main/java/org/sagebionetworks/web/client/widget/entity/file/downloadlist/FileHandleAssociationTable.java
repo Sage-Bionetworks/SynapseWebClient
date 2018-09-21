@@ -7,6 +7,7 @@ import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
@@ -21,12 +22,16 @@ public class FileHandleAssociationTable implements IsWidget {
 	
 	private FileHandleAssociationTableView view;
 	PortalGinInjector ginInjector;
+	Callback accessRestrictionDetectedCallback;
 	@Inject
 	public FileHandleAssociationTable(
 			FileHandleAssociationTableView view,
 			PortalGinInjector ginInjector) {
 		this.view = view;
 		this.ginInjector = ginInjector;
+		accessRestrictionDetectedCallback = () -> {
+			view.showAccessRestrictionsDetectedUI();
+		};
 	}
 	
 	public void configure(List<FileHandleAssociation> fhas, CallbackP<FileHandleAssociation> onDelete) {
@@ -34,7 +39,7 @@ public class FileHandleAssociationTable implements IsWidget {
 		// create a fha table row for each fha
 		for (FileHandleAssociation fha : fhas) {
 			FileHandleAssociationRow row = ginInjector.getFileHandleAssociationRow();
-			row.configure(fha, onDelete);
+			row.configure(fha, accessRestrictionDetectedCallback, onDelete);
 			view.addRow(row);
 		}
 	}

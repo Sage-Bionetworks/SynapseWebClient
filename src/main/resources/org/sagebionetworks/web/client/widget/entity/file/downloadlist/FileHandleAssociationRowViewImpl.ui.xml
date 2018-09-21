@@ -11,10 +11,10 @@
 	<t:TableRow addStyleNames="border-bottom-1">
 		<t:TableData ui:field="fileNameContainer" height="45px"/>
 		<t:TableData ui:field="accessContainer" width="55px">
-			<bh:Span ui:field="hasAccess" addStyleNames="synapse-green-bg color-white padding-2" visible="false">
+			<bh:Span ui:field="hasAccess" addStyleNames="synapse-green-bg color-white" visible="false" paddingTop="2" paddingRight="2" paddingBottom="4" paddingLeft="2">
 				<b:Icon type="LOCK_OPEN"/>
 			</bh:Span>
-			<bh:Span ui:field="noAccess" addStyleNames="synapse-yellow-bg color-white padding-2" visible="false">
+			<bh:Span ui:field="noAccess" addStyleNames="synapse-yellow-bg color-white" visible="false" paddingTop="2" paddingRight="2" paddingBottom="4" paddingLeft="2">
 				<b:Icon type="MINUS_CIRCLE"/>
 			</bh:Span>
 		</t:TableData>

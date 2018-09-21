@@ -9,6 +9,7 @@ import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
+import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
@@ -52,7 +53,7 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 		view.setPresenter(this);
 	}
 	
-	public void configure(FileHandleAssociation fha, CallbackP<FileHandleAssociation> onDeleteCallback) {
+	public void configure(FileHandleAssociation fha, Callback accessRestrictionDetectedCallback, CallbackP<FileHandleAssociation> onDeleteCallback) {
 		this.fha = fha;
 		this.onDeleteCallback = onDeleteCallback;
 		EntityIdCellRenderer entityBadge = ginInjector.createEntityIdCellRenderer();	
@@ -66,6 +67,7 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 				if (!(caught instanceof ForbiddenException)) {
 					jsniUtils.consoleError(caught.getMessage());
 				}
+				accessRestrictionDetectedCallback.invoke();
 			}
 			public void onSuccess(FileResult result) {
 				if (result.getFileHandle() == null) {

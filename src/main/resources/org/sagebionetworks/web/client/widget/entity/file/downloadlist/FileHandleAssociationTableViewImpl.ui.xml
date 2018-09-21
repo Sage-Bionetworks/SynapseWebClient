@@ -16,8 +16,14 @@
 				<t:TableHeader width="50px" text=""/> <!-- delete item column -->
 			</t:TableRow>
 		</t:Table>
-		<g:ScrollPanel height="500px">
+		<g:ScrollPanel addStyleNames="max-height-500">
 			<t:Table width="100%" ui:field="fhaTableData" />
 		</g:ScrollPanel>
+		<bh:Div ui:field="accessRestrictionDetectedUI" visible="false">
+			<b:Alert type="WARNING" addStyleNames="color-white">
+				<b:Icon type="MINUS_CIRCLE" />
+				<bh:Text>Access Required</bh:Text>
+			</b:Alert>
+		</bh:Div>
 	</bh:Div>
 </ui:UiBinder>

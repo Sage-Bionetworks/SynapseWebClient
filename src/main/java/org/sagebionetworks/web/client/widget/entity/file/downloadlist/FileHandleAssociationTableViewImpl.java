@@ -20,7 +20,8 @@ public class FileHandleAssociationTableViewImpl implements FileHandleAssociation
 	TableRow fhaTableHeader;
 	@UiField
 	Table fhaTableData;
-
+	@UiField
+	Div accessRestrictionDetectedUI;
 	private static FileHandleAssociationTableViewImplUiBinder uiBinder = GWT
 			.create(FileHandleAssociationTableViewImplUiBinder.class);
 	@Inject
@@ -34,9 +35,14 @@ public class FileHandleAssociationTableViewImpl implements FileHandleAssociation
 	@Override
 	public void clear() {
 		fhaTableData.clear();
+		accessRestrictionDetectedUI.setVisible(false);
 	}
 	@Override
 	public void addRow(IsWidget w) {
 		fhaTableData.add(w);
+	}
+	@Override
+	public void showAccessRestrictionsDetectedUI() {
+		accessRestrictionDetectedUI.setVisible(true);	
 	}
 }
