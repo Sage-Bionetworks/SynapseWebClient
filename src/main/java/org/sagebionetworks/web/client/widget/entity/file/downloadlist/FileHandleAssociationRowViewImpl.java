@@ -28,12 +28,17 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	Text createdOn;
 	@UiField
 	Text fileSize;
+	@UiField
+	Anchor removeLink;
 	Presenter presenter;
 	private static FileHandleAssociationRowViewImplUiBinder uiBinder = GWT
 			.create(FileHandleAssociationRowViewImplUiBinder.class);
 	@Inject
 	public FileHandleAssociationRowViewImpl() {
 		w = uiBinder.createAndBindUi(this);
+		removeLink.addClickHandler(event->{
+			presenter.onRemove();
+		});
 	}
 	@Override
 	public Widget asWidget() {

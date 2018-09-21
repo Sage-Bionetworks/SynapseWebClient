@@ -2,13 +2,22 @@ package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 
 import java.util.List;
 
+import org.sagebionetworks.repo.model.asynch.AsynchronousResponseBody;
+import org.sagebionetworks.repo.model.file.BulkFileDownloadRequest;
+import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
 import org.sagebionetworks.repo.model.file.DownloadList;
+import org.sagebionetworks.repo.model.file.DownloadOrder;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
+import org.sagebionetworks.web.client.PortalGinInjector;
+import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
+import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
+import org.sagebionetworks.web.shared.asynch.AsynchType;
 
 import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
@@ -27,6 +36,8 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	private PackageSizeSummary packageSizeSummary;
 	CallbackP<Double> addToPackageSizeCallback;
 	CallbackP<FileHandleAssociation> onRemoveFileHandleAssociation;
+	AsynchronousProgressWidget progressWidget;
+	SynapseJSNIUtils jsniUtils;
 	@Inject
 	public DownloadListWidget(
 			DownloadListWidgetView view, 
@@ -34,16 +45,22 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			SynapseJavascriptClient jsClient,
 			EventBus eventBus,
 			FileHandleAssociationTable fhaTable,
-			PackageSizeSummary packageSizeSummary) {
+			PackageSizeSummary packageSizeSummary,
+			AsynchronousProgressWidget progressWidget,
+			SynapseJSNIUtils jsniUtils) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.eventBus = eventBus;
 		this.fhaTable = fhaTable;
 		this.packageSizeSummary = packageSizeSummary;
+		this.progressWidget = progressWidget;
+		this.jsniUtils = jsniUtils;
 		view.setSynAlert(synAlert);
 		view.setFileHandleAssociationTable(fhaTable);
 		view.setPackageSizeSummary(packageSizeSummary);
+		view.setProgressTrackingWidgetVisible(false);
+		view.setProgressTrackingWidget(progressWidget);
 		view.setPresenter(this);
 		
 		addToPackageSizeCallback = fileSize -> {
@@ -55,9 +72,11 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	}
 	
 	public void refresh() {
-		view.clear();
+		view.setCreatePackageUIVisible(true);
+		view.setDownloadPackageUIVisible(false);
 		synAlert.clear();
 		packageSizeSummary.clear();
+		
 		jsClient.getDownloadList(new AsyncCallback<DownloadList>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -72,7 +91,53 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	
 	private void setDownloadList(DownloadList downloadList) {
 		List<FileHandleAssociation> fhas = downloadList.getFilesToDownload();
+		packageSizeSummary.clear();
 		fhaTable.configure(fhas, addToPackageSizeCallback, onRemoveFileHandleAssociation);
+	}
+	
+	@Override
+	public void onDownloadPackage(String zipFileName) {
+		synAlert.clear();
+		jsClient.createDownloadOrderFromUsersDownloadList(zipFileName, new AsyncCallback<DownloadOrder>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			public void onSuccess(DownloadOrder downloadOrder) {
+				// and attempt to download!
+				startDownload(downloadOrder);
+			}; 
+		});
+	}
+	
+	public void startDownload(DownloadOrder order) {
+		view.setProgressTrackingWidgetVisible(true);
+		BulkFileDownloadRequest request = new BulkFileDownloadRequest();
+		request.setRequestedFiles(order.getFiles());
+		request.setZipFileName(order.getZipFileName());
+		view.setCreatePackageUIVisible(false);
+		progressWidget.startAndTrackJob("", false, AsynchType.BulkFileDownload, request, new AsynchronousProgressHandler() {
+			@Override
+			public void onFailure(Throwable failure) {
+				view.setProgressTrackingWidgetVisible(false);
+				synAlert.handleException(failure);
+				view.setCreatePackageUIVisible(true);
+			}
+			
+			@Override
+			public void onComplete(AsynchronousResponseBody response) {
+				view.setProgressTrackingWidgetVisible(false);
+				BulkFileDownloadResponse bulkFileDownloadResponse = (BulkFileDownloadResponse) response;
+				view.setPackageDownloadURL(jsniUtils.getRawFileHandleUrl(bulkFileDownloadResponse.getResultZipFileHandleId()));
+				view.setDownloadPackageUIVisible(true);
+			}
+			
+			@Override
+			public void onCancel() {
+				view.setCreatePackageUIVisible(true);
+				view.setProgressTrackingWidgetVisible(false);
+			}
+		});
 	}
 	
 	@Override
@@ -95,10 +160,12 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		jsClient.removeFileFromDownloadList(fha, new AsyncCallback<DownloadList>() {
 			@Override
 			public void onFailure(Throwable caught) {
+				GWT.debugger();
 				synAlert.handleException(caught);
 			}
 			@Override
 			public void onSuccess(DownloadList downloadList) {
+				GWT.debugger();
 				setDownloadList(downloadList);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}

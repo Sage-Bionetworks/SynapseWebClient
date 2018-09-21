@@ -11,6 +11,6 @@ public interface FileHandleAssociationRowView extends IsWidget {
 	void setPresenter(Presenter p);
 	boolean isAttached();
 	public interface Presenter {
-		void onDelete();
+		void onRemove();
 	}
 }

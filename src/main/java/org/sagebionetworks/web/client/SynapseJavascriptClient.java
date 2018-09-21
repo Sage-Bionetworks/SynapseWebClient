@@ -1228,7 +1228,7 @@ public class SynapseJavascriptClient {
 		FileHandleAssociationList request = new FileHandleAssociationList();
 		request.setList(toRemove);
 		String url = getFileServiceUrl() + DOWNLOAD_LIST_REMOVE;
-		doPost(url, null, OBJECT_TYPE.DownloadOrder, callback);
+		doPost(url, request, OBJECT_TYPE.DownloadList, callback);
 	}
 	
 	public void clearDownloadList(AsyncCallback<Void> callback) {

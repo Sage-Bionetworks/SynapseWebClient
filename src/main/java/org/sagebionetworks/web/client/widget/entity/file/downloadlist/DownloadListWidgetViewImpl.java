@@ -1,7 +1,10 @@
 package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 
 import org.gwtbootstrap3.client.ui.Anchor;
+import org.gwtbootstrap3.client.ui.Button;
+import org.gwtbootstrap3.client.ui.TextBox;
 import org.gwtbootstrap3.client.ui.html.Div;
+import org.gwtbootstrap3.client.ui.html.Span;
 
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
@@ -19,7 +22,21 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	Div fileHandleAssociationTableContainer;
 	@UiField
 	Div packageSummaryContainer;
+	@UiField
+	Button createPackageButton;
+	@UiField
+	TextBox fileName;
+	@UiField
+	Div progressTrackingContainer;
+	
 	Presenter presenter;
+	@UiField
+	Span createPackageReadyUI;
+	@UiField
+	Span downloadPackageReadyUI;
+	@UiField
+	Button downloadPackageButton;
+	
 	Widget w;
 	interface DownloadListWidgetViewImplUiBinder extends UiBinder<Widget, DownloadListWidgetViewImpl> {}
 	
@@ -31,6 +48,9 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 		clearAllLink.addClickHandler(event -> {
 			presenter.onClearDownloadList();
 		});
+		createPackageButton.addClickHandler(event-> {
+			presenter.onDownloadPackage(fileName.getText());
+		});
 	}
 	@Override
 	public void setPresenter(Presenter p) {
@@ -39,9 +59,6 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	@Override
 	public Widget asWidget() {
 		return w;
-	}
-	@Override
-	public void clear() {
 	}
 	@Override
 	public void setSynAlert(IsWidget w) {
@@ -57,5 +74,29 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	public void setPackageSizeSummary(IsWidget w) {
 		packageSummaryContainer.clear();
 		packageSummaryContainer.add(w);
+	}
+	@Override
+	public void setProgressTrackingWidget(IsWidget w) {
+		progressTrackingContainer.clear();
+		progressTrackingContainer.add(w);
+	}
+	@Override
+	public void setProgressTrackingWidgetVisible(boolean visible) {
+		progressTrackingContainer.setVisible(visible);
+	}
+	
+	@Override
+	public void setCreatePackageUIVisible(boolean visible) {
+		createPackageReadyUI.setVisible(visible);
+		createPackageButton.setVisible(visible);
+	}
+	@Override
+	public void setDownloadPackageUIVisible(boolean visible) {
+		downloadPackageReadyUI.setVisible(visible);
+		downloadPackageButton.setVisible(visible);
+	}
+	@Override
+	public void setPackageDownloadURL(String downloadUrl) {
+		downloadPackageButton.setHref(downloadUrl);
 	}
 }

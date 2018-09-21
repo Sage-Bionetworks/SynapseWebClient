@@ -104,7 +104,7 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 	}
 	
 	@Override
-	public void onDelete() {
+	public void onRemove() {
 		onDeleteCallback.invoke(fha);
 	}
 	

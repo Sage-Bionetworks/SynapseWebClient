@@ -18,6 +18,23 @@
 		<bh:Div ui:field="fileHandleAssociationTableContainer" />
 		
 		<bh:Div ui:field="synAlertContainer" />
-		<bh:Div ui:field="packageSummaryContainer" />
+		<bh:Div addStyleNames="flexcontainer-row">
+			<bh:Div ui:field="packageSummaryContainer" addStyleNames="flexcontainer-column" marginTop="8" />
+			<bh:Span ui:field="createPackageReadyUI" visible="false" addStyleNames="flexcontainer-column flexcontainer-column-fill-width flexcontainer-column-flow-reset" >
+				<bh:Span addStyleNames="border-left-1" />
+				<b:TextBox ui:field="fileName"  addStyleNames="inline-block margin-left-10" width="300px" placeholder="PackageFileName"/>
+				<bh:Strong addStyleNames="font-size-20" text=".zip" marginLeft="5"/>
+			</bh:Span>
+			<bh:Span ui:field="downloadPackageReadyUI" visible="false" addStyleNames="flexcontainer-column flexcontainer-column-fill-width flexcontainer-column-flow-reset">
+				<bh:Span addStyleNames="border-left-1" />
+				<b:Icon addStyleNames="font-size-20 synapse-green" type="CHECK"/>
+				<bh:Text addStyleNames="font-size-20 margin-left-5" text="Package created! Ready for download."/>
+			</bh:Span>
+			<bh:Span addStyleNames="flexcontainer-column" >
+				<b:Button type="PRIMARY" text="Create Package" size="LARGE" icon="FOLDER_PLUS" ui:field="createPackageButton"/>
+				<b:Button type="PRIMARY" text="Download Package" size="LARGE" icon="DOWNLOAD" ui:field="downloadPackageButton"/>
+			</bh:Span>
+		</bh:Div>
+		<bh:Div ui:field="progressTrackingContainer"/>
 	</bh:Div>
 </ui:UiBinder>
