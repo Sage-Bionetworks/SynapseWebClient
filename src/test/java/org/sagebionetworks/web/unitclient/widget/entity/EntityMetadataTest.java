@@ -2,6 +2,7 @@ package org.sagebionetworks.web.unitclient.widget.entity;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -29,6 +30,7 @@ import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
+import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
@@ -86,7 +88,6 @@ public class EntityMetadataTest {
 		MockitoAnnotations.initMocks(this);
 		widget = new EntityMetadata(mockView, mockDoiWidget, mockDoiWidgetV2, mockAnnotationsWidget,
 				mockFileHistoryWidget, mockJsClient, mockJSNI, mockRestrictionWidgetV2, mockCookies);
-		when(mockCookies.getCookie(any(String.class))).thenReturn(null);
 	}
 	
 	@Test
@@ -103,6 +104,7 @@ public class EntityMetadataTest {
 	
 	@Test
 	public void testSetEntityBundleProject() {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn(null);
 		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
 		boolean canChangePermissions = false;
 		boolean canCertifiedUserEdit = true;
@@ -120,12 +122,42 @@ public class EntityMetadataTest {
 		en.setId(entityId);
 		widget.configure(bundle, null, mockActionMenuWidget);
 		verify(mockView).setRestrictionPanelVisible(false);
-		verify(mockDoiWidget).configure(mockDoi, entityId);
+		verify(mockDoiWidget).configure(mockDoi, entityId); // Remove when replaced
+		verify(mockDoiWidgetV2, never()).configure(mockDoiAssociation); // Remove when out of alpha mode
 		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
 		verify(mockRestrictionWidgetV2).configure(project, canChangePermissions);
 		verify(mockView, never()).setRestrictionWidgetV2Visible(false);
 	}
-	
+
+	@Test
+	public void testSetEntityBundleProjectInAlphaMode() {
+		// Use this test to verify alpha mode behavior
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
+		boolean canChangePermissions = false;
+		boolean canCertifiedUserEdit = true;
+		boolean isCurrentVersion = true;
+		when(permissions.getCanChangePermissions()).thenReturn(canChangePermissions);
+		when(permissions.getCanCertifiedUserEdit()).thenReturn(canCertifiedUserEdit);
+		Project project = new Project();
+		project.setName(entityName);
+		project.setId(entityId);
+		EntityBundle bundle = new EntityBundle();
+		bundle.setEntity(project);
+		bundle.setPermissions(permissions);
+		bundle.setDoi(mockDoi);
+		bundle.setDoiAssociation(mockDoiAssociation);
+		en.setId(entityId);
+		widget.configure(bundle, null, mockActionMenuWidget);
+		verify(mockView).setRestrictionPanelVisible(false);
+		verify(mockDoiWidget, never()).configure(mockDoi, entityId); // Remove line when widget is removed
+		verify(mockDoiWidgetV2).configure(mockDoiAssociation); // This is currently in alpha mode
+		verify(mockAnnotationsWidget).configure(bundle, canCertifiedUserEdit, isCurrentVersion);
+		verify(mockRestrictionWidgetV2).configure(project, canChangePermissions);
+		verify(mockView, never()).setRestrictionWidgetV2Visible(false);
+	}
+
+
 	@Test
 	public void testSetEntityBundleDockerRepo() {
 		UserEntityPermissions permissions = mock(UserEntityPermissions.class);
