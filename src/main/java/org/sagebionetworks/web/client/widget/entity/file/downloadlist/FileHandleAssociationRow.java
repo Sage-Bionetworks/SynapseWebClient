@@ -75,9 +75,13 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 				} else {
 					FileHandle fileHandle = result.getFileHandle();
 					view.setHasAccess(true);
-					view.setCreatedOn(dateTimeUtils.getDateTimeString(fileHandle.getCreatedOn()));
+					if (fileHandle.getCreatedOn() != null) {
+						view.setCreatedOn(dateTimeUtils.getDateTimeString(fileHandle.getCreatedOn()));	
+					}					
 					Long contentSize = fileHandle.getContentSize();
-					view.setFileSize(gwt.getFriendlySize(contentSize.doubleValue(), true));
+					if (contentSize != null) {
+						view.setFileSize(gwt.getFriendlySize(contentSize.doubleValue(), true));	
+					}
 					updateCreatedBy(fileHandle.getCreatedBy());
 				}
 			};
