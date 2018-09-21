@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.Button;
 import org.gwtbootstrap3.client.ui.DropDown;
 import org.gwtbootstrap3.client.ui.DropDownMenu;
 import org.gwtbootstrap3.client.ui.Label;
+import org.gwtbootstrap3.client.ui.Heading;
 import org.gwtbootstrap3.client.ui.html.Div;
 import org.gwtbootstrap3.client.ui.html.Span;
 import org.sagebionetworks.repo.model.EntityHeader;
@@ -57,7 +58,9 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	DropDownMenu headerFavDropdownMenu;
 
 	@UiField
-	SimplePanel projectFavoritePanel;
+	Div projectFavoritePanelUI;
+	@UiField
+	Heading projectFavoritePanel;
 	@UiField
 	Anchor dashboardDropdownAnchor;
 	@UiField
@@ -164,17 +167,18 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 	
 	@Override
 	public void setProjectFavoriteWidget(IsWidget favWidget) {
-		projectFavoritePanel.setWidget(favWidget);
+		projectFavoritePanel.clear();
+		projectFavoritePanel.add(favWidget);
 	}
 	
 	@Override
 	public void showProjectFavoriteWidget() {
-		projectFavoritePanel.setVisible(true);
+		projectFavoritePanelUI.setVisible(true);
 	}
 	
 	@Override
 	public void hideProjectFavoriteWidget() {
-		projectFavoritePanel.setVisible(false);
+		projectFavoritePanelUI.setVisible(false);
 	}
 	
 	public void initClickHandlers() {
