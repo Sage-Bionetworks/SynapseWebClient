@@ -49,6 +49,7 @@ import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.asynch.IsACTMemberAsyncHandler;
 import org.sagebionetworks.web.client.widget.docker.modal.AddExternalRepoModal;
+import org.sagebionetworks.web.client.widget.doi.CreateOrUpdateDoiModal;
 import org.sagebionetworks.web.client.widget.entity.EditFileMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.EditProjectMetadataModalWidget;
 import org.sagebionetworks.web.client.widget.entity.RenameEntityModalWidget;
@@ -103,6 +104,10 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	public static final String RENAME_PREFIX = "Rename ";
 	
 	public static final int IS_ACT_MEMBER_MASK = 0x20;
+
+	public static final String CREATE_DOI_FOR = "Create DOI for  ";
+	public static final String UPDATE_DOI_FOR = "Update DOI for  ";
+
 	EntityArea currentArea;
 	
 	EntityActionControllerView view;
@@ -134,6 +139,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	CookieProvider cookies;
 	ChallengeClientAsync challengeClient;
 	SelectTeamModal selectTeamModal;
+	CreateOrUpdateDoiModal createOrUpdateDoiModal;
 	ApproveUserAccessModal approveUserAccessModal;
 	PortalGinInjector ginInjector;
 	IsACTMemberAsyncHandler isACTMemberAsyncHandler;
@@ -211,6 +217,14 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		return selectTeamModal;
 	}
 	
+	private CreateOrUpdateDoiModal getCreateOrUpdateDoiModal() {
+		if (createOrUpdateDoiModal == null) {
+			createOrUpdateDoiModal = ginInjector.getCreateOrUpdateDoiModal();
+			view.addWidget(createOrUpdateDoiModal.asWidget());
+		}
+		return createOrUpdateDoiModal;
+	}
+
 	private ChallengeClientAsync getChallengeClient() {
 		if (challengeClient == null) {
 			challengeClient = ginInjector.getChallengeClientAsync();
@@ -372,6 +386,7 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 		configureFileUpload();
 		configureProvenance();
 		configureChangeStorageLocation();
+		configureCreateOrUpdateDoi();
 		configureCreateDOI();
 		configureEditProjectMetadataAction();
 		configureEditFileMetadataAction();
@@ -478,17 +493,21 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 	}
 	
 	private void configureCreateDOI() {
-		boolean canEdit = permissions.getCanEdit();
-		actionMenu.setActionVisible(Action.CREATE_DOI, false);
-		if (canEdit &&
-				!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
-				!(entityBundle.getEntity() instanceof EntityView)) {
-			actionMenu.setActionListener(Action.CREATE_DOI, this);
-			if (entityBundle.getDoi() == null) {
-				// show command if not returned, thus not in existence
-				actionMenu.setActionVisible(Action.CREATE_DOI, true);
-				actionMenu.setActionText(Action.CREATE_DOI, "Create DOI for  " + enityTypeDisplay);
+		if (!DisplayUtils.isInTestWebsite(cookies)) {
+			boolean canEdit = permissions.getCanEdit();
+			actionMenu.setActionVisible(Action.CREATE_DOI, false);
+			if (canEdit &&
+					!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
+					!(entityBundle.getEntity() instanceof EntityView)) {
+				actionMenu.setActionListener(Action.CREATE_DOI, this);
+				if (entityBundle.getDoi() == null) {
+					// show command if not returned, thus not in existence
+					actionMenu.setActionVisible(Action.CREATE_DOI, true);
+					actionMenu.setActionText(Action.CREATE_DOI, CREATE_DOI_FOR + enityTypeDisplay);
+				}
 			}
+		} else {
+			actionMenu.setActionVisible(Action.CREATE_DOI, false);
 		}
 	}
 	
@@ -545,6 +564,31 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 				view.showErrorMessage(caught.getMessage());
 			}
 		});
+	}
+
+	private void configureCreateOrUpdateDoi() {
+		if (DisplayUtils.isInTestWebsite(cookies)) {
+			boolean canEdit = permissions.getCanEdit();
+			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+			if (canEdit &&
+					!isTopLevelProjectToolsMenu(entityBundle.getEntity(), currentArea) &&
+					!(entityBundle.getEntity() instanceof EntityView)) {
+				actionMenu.setActionListener(Action.CREATE_OR_UPDATE_DOI, this);
+				actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+				if (entityBundle.getDoiAssociation() == null) {
+					// show command if not returned, thus not in existence
+					actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, CREATE_DOI_FOR + enityTypeDisplay);
+				} else {
+					actionMenu.setActionText(Action.CREATE_OR_UPDATE_DOI, UPDATE_DOI_FOR + enityTypeDisplay);
+				}
+			}
+		} else {
+			actionMenu.setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		}
+	}
+
+	private void onCreateOrUpdateDoi() {
+		getCreateOrUpdateDoiModal().configureAndShow(entity.getId(), ObjectType.ENTITY, getVersion(), entityUpdateHandler);
 	}
 
 	private void onCreateChallenge() {
@@ -924,6 +968,9 @@ public class EntityActionControllerImpl implements EntityActionController, Actio
 			break;
 		case CREATE_DOI:
 			onCreateDOI();
+			break;
+		case CREATE_OR_UPDATE_DOI:
+			onCreateOrUpdateDoi();
 			break;
 		case ADD_EVALUATION_QUEUE:
 			onAddEvaluationQueue();

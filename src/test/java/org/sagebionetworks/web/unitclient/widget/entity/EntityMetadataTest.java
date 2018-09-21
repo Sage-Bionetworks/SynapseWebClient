@@ -23,17 +23,15 @@ import org.sagebionetworks.repo.model.Project;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreUploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalS3UploadDestination;
 import org.sagebionetworks.repo.model.file.ExternalUploadDestination;
 import org.sagebionetworks.repo.model.file.UploadDestination;
 import org.sagebionetworks.repo.model.file.UploadType;
 import org.sagebionetworks.web.client.PortalGinInjector;
-import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
-import org.sagebionetworks.web.client.cookie.CookieProvider;
-import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.entity.DoiWidget;
 import org.sagebionetworks.web.client.widget.entity.EntityMetadata;
@@ -65,6 +63,8 @@ public class EntityMetadataTest {
 	@Mock
 	Doi mockDoi;
 	@Mock
+	DoiAssociation mockDoiAssociation;
+	@Mock
 	SynapseJavascriptClient mockJsClient;
 	@Mock
 	SynapseJSNIUtils mockJSNI;
@@ -78,7 +78,7 @@ public class EntityMetadataTest {
 	@Before
 	public void before() {
 		MockitoAnnotations.initMocks(this);
-		widget = new EntityMetadata(mockView, mockDoiWidget, mockAnnotationsWidget, 
+		widget = new EntityMetadata(mockView, mockDoiWidget, mockAnnotationsWidget,
 				mockFileHistoryWidget, mockJsClient, mockJSNI, mockRestrictionWidgetV2);
 	}
 	
@@ -109,6 +109,7 @@ public class EntityMetadataTest {
 		bundle.setEntity(project);
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
+		bundle.setDoiAssociation(mockDoiAssociation);
 		en.setId(entityId);
 		widget.configure(bundle, null, mockActionMenuWidget);
 		verify(mockView).setRestrictionPanelVisible(false);
@@ -133,6 +134,7 @@ public class EntityMetadataTest {
 		bundle.setEntity(dockerRepo);
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
+		bundle.setDoiAssociation(mockDoiAssociation);
 		Long versionNumber = null;
 		widget.configure(bundle, versionNumber, mockActionMenuWidget);
 		verify(mockFileHistoryWidget, never()).setEntityBundle(bundle, versionNumber);
@@ -155,6 +157,7 @@ public class EntityMetadataTest {
 		bundle.setEntity(fileEntity);
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
+		bundle.setDoiAssociation(mockDoiAssociation);
 		Long versionNumber = null;
 		widget.configure(bundle, versionNumber, mockActionMenuWidget);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
@@ -179,6 +182,7 @@ public class EntityMetadataTest {
 		bundle.setEntity(fileEntity);
 		bundle.setPermissions(permissions);
 		bundle.setDoi(mockDoi);
+		bundle.setDoiAssociation(mockDoiAssociation);
 		widget.configure(bundle, versionNumber, mockActionMenuWidget);
 		verify(mockFileHistoryWidget).setEntityBundle(bundle, versionNumber);
 		verify(mockDoiWidget).configure(mockDoi, entityId);

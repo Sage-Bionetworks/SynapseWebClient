@@ -64,6 +64,8 @@ import org.sagebionetworks.repo.model.discussion.DiscussionThreadBundle;
 import org.sagebionetworks.repo.model.discussion.Forum;
 import org.sagebionetworks.repo.model.docker.DockerCommit;
 import org.sagebionetworks.repo.model.docker.DockerCommitSortBy;
+import org.sagebionetworks.repo.model.doi.v2.Doi;
+import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
 import org.sagebionetworks.repo.model.entity.Direction;
 import org.sagebionetworks.repo.model.entity.EntityLookupRequest;
 import org.sagebionetworks.repo.model.entity.SortBy;
@@ -167,6 +169,11 @@ public class SynapseJavascriptClient {
 	public static final String OPEN_MEMBERSHIP_REQUEST = "/openRequest";
 	public static final String UPLOAD_DESTINATIONS = "/uploadDestinations";
 	public static final String PRINCIPAL = "/principal";
+	public static final String DOI = "/doi";
+	public static final String DOI_ASSOCIATION = DOI + "/association";
+	public static final String ID_PARAMETER = "id=";
+	public static final String TYPE_PARAMETER = "type=";
+	public static final String VERSION_PARAMETER = "version=";
 	public static final int INITIAL_RETRY_REQUEST_DELAY_MS = 1000;
 	public static final int MAX_LOG_ENTRY_LABEL_SIZE = 200;
 	private static final String LOG = "/log";
@@ -225,7 +232,9 @@ public class SynapseJavascriptClient {
 	public static final String ASYNC_GET = "/async/get/";
 	public static final String AUTH_OAUTH_2 = "/oauth2";
 	public static final String AUTH_OAUTH_2_ALIAS = AUTH_OAUTH_2+"/alias";
-	
+	public static final String DOWNLOAD_LIST = "/download/list";
+	public static final String DOWNLOAD_LIST_ADD = DOWNLOAD_LIST+"/add";
+
 	public String repoServiceUrl,fileServiceUrl, authServiceUrl, synapseVersionInfo; 
 	
 	@Inject
@@ -381,7 +390,7 @@ public class SynapseJavascriptClient {
 								}
 							}, retryDelay);
 						} else {
-							// getException() based on status code, 
+							// getException() based on status code,
 							// instead of using org.sagebionetworks.client.ClientUtils.throwException() and ExceptionUtil.convertSynapseException() (neither of which can be referenced here)
 							String responseText = response.getStatusText();
 							try {
@@ -470,7 +479,29 @@ public class SynapseJavascriptClient {
 		String url = getRepoServiceUrl() + TEAM + "/" + teamId;
 		return getFuture(cb -> doGet(url, OBJECT_TYPE.Team, cb));
 	}
-	
+
+	public FluentFuture<DoiAssociation> getDoiAssociation(String objectId, ObjectType objectType, Long objectVersion) {
+		String url = getRepoServiceUrl() + DOI_ASSOCIATION
+				+ "?" + ID_PARAMETER + objectId
+				+ "&" + TYPE_PARAMETER + objectType;
+		if (objectVersion != null) {
+			url += "&" + VERSION_PARAMETER + objectVersion;
+		}
+		String finalUrl = url;
+		return getFuture(cb -> doGet(finalUrl, OBJECT_TYPE.Doi, cb));
+	}
+
+	public FluentFuture<Doi> getDoi(String objectId, ObjectType objectType, Long objectVersion) {
+		String url = getRepoServiceUrl() + DOI
+				+ "?" + ID_PARAMETER + objectId
+				+ "&" + TYPE_PARAMETER + objectType;
+		if (objectVersion != null) {
+			url += "&" + VERSION_PARAMETER + objectVersion;
+		}
+		String finalUrl = url;
+		return getFuture(cb -> doGet(finalUrl, OBJECT_TYPE.Doi, cb));
+	}
+
 	public void getRestrictionInformation(String subjectId, RestrictableObjectType type, final AsyncCallback<RestrictionInformationResponse> callback)  {
 		String url = getRepoServiceUrl() + RESTRICTION_INFORMATION;
 		RestrictionInformationRequest request = new RestrictionInformationRequest();

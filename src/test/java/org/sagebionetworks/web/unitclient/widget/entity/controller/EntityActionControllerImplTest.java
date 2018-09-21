@@ -25,6 +25,7 @@ import static org.sagebionetworks.web.client.widget.entity.controller.EntityActi
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.MOVE_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.RENAME_PREFIX;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.THE;
+import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.UPDATE_DOI_FOR;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WAS_SUCCESSFULLY_DELETED;
 import static org.sagebionetworks.web.client.widget.entity.controller.EntityActionControllerImpl.WIKI;
 
@@ -66,6 +67,7 @@ import org.sagebionetworks.repo.model.Versionable;
 import org.sagebionetworks.repo.model.auth.UserEntityPermissions;
 import org.sagebionetworks.repo.model.docker.DockerRepository;
 import org.sagebionetworks.repo.model.doi.Doi;
+import org.sagebionetworks.repo.model.doi.v2.DoiAssociation;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.table.EntityView;
 import org.sagebionetworks.repo.model.table.TableEntity;
@@ -291,6 +293,7 @@ public class EntityActionControllerImplTest {
 		entityBundle.setEntity(table);
 		entityBundle.setPermissions(permissions);
 		entityBundle.setDoi(new Doi());
+		entityBundle.setDoiAssociation(new DoiAssociation());
 		entityBundle.setAccessRequirements(accessReqs);
 		entityBundle.setBenefactorAcl(mockACL);
 		resourceAccessSet = new HashSet<>();
@@ -1506,7 +1509,53 @@ public class EntityActionControllerImplTest {
 		verify(mockActionMenu).setActionVisible(Action.CREATE_DOI, false);
 		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_DOI, true);
 	}
-	
+
+	@Test
+	public void testConfigureCreateOrUpdateDoiNotFound() throws Exception {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+
+		entityBundle.setDoiAssociation(null);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		//initially hide, then show
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+	}
+
+	@Test
+	public void testConfigureCreateOrUpdateDoiView() throws Exception {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+
+		// Create DOI not available for Views
+		entityBundle.setDoiAssociation(null);
+		entityBundle.setEntity(new EntityView());
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+	}
+
+	@Test
+	public void testConfigureCreateOrUpdateDoiNotFoundNonEditable() throws Exception {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+
+		permissions.setCanEdit(false);
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		//initially hide, never show
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		verify(mockActionMenu, never()).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+	}
+
+	@Test
+	public void testConfigureCreateOrUpdateDoiFound() throws Exception {
+		when(mockCookies.getCookie(eq(DisplayUtils.SYNAPSE_TEST_WEBSITE_COOKIE_KEY))).thenReturn("true");
+
+		controller.configure(mockActionMenu, entityBundle, true, wikiPageId, currentEntityArea, mockEntityUpdatedHandler);
+		//hide, and then show with 'update' text
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, false);
+		verify(mockActionMenu).setActionVisible(Action.CREATE_OR_UPDATE_DOI, true);
+		verify(mockActionMenu).setActionText(Action.CREATE_OR_UPDATE_DOI, UPDATE_DOI_FOR + EntityTypeUtils.getDisplayName(EntityTypeUtils.getEntityTypeForClass(entityBundle.getEntity().getClass())));
+
+	}
+
 	@Test
 	public void testOnSelectChallengeTeam() {
 		AsyncMockStubber.callSuccessWith(null).when(mockChallengeClient).createChallenge(any(Challenge.class), any(AsyncCallback.class));
