@@ -5,7 +5,7 @@
 			 xmlns:bh="urn:import:org.gwtbootstrap3.client.ui.html"
 >
 	<bh:Span>
-		<g:TextBox ui:field="textBox" width="" addStyleNames="border-none noBackground padding-0" readOnly="true" />
+		<g:TextBox ui:field="textBox" text="" width="" addStyleNames="border-none noBackground padding-0" readOnly="true" />
 		<b:Icon ui:field="icon" addStyleNames="margin-right-15" type="CLIPBOARD" title="Copy To Clipboard"/>
 	</bh:Span>
 </ui:UiBinder>
