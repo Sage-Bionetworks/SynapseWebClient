@@ -1203,19 +1203,9 @@ public class SynapseJavascriptClient {
 	
 	public void addFilesToDownloadList(List<FileHandleAssociation> toAdd, AsyncCallback<DownloadList> callback) {
 		FileHandleAssociationList request = new FileHandleAssociationList();
-		cleanSynapseIds(toAdd);
 		request.setList(toAdd);
 		String url = getFileServiceUrl() + DOWNLOAD_LIST_ADD;
 		doPost(url, request, OBJECT_TYPE.DownloadList, callback);
-	}
-	
-	private void cleanSynapseIds(List<FileHandleAssociation> fhas) {
-		for (FileHandleAssociation fha : fhas) {
-			String objectId = fha.getAssociateObjectId().toLowerCase();
-			if (objectId.startsWith("syn")) {
-				fha.setAssociateObjectId(objectId.substring("syn".length()));
-			}
-		}
 	}
 	
 	public void removeFileFromDownloadList(FileHandleAssociation fha, AsyncCallback<DownloadList> callback) {

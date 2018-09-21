@@ -9,6 +9,7 @@ import org.gwtbootstrap3.client.ui.html.Span;
 import com.google.gwt.core.client.GWT;
 import com.google.gwt.uibinder.client.UiBinder;
 import com.google.gwt.uibinder.client.UiField;
+import com.google.gwt.user.client.Window;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 import com.google.inject.Inject;
@@ -36,7 +37,7 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	Span downloadPackageReadyUI;
 	@UiField
 	Button downloadPackageButton;
-	
+	String downloadUrl;
 	Widget w;
 	interface DownloadListWidgetViewImplUiBinder extends UiBinder<Widget, DownloadListWidgetViewImpl> {}
 	
@@ -51,7 +52,11 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 		createPackageButton.addClickHandler(event-> {
 			presenter.onDownloadPackage(fileName.getText());
 		});
+		downloadPackageButton.addClickHandler(event -> {
+			Window.open(downloadUrl, "", "");
+		});
 	}
+	
 	@Override
 	public void setPresenter(Presenter p) {
 		this.presenter = p;
@@ -97,6 +102,6 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	}
 	@Override
 	public void setPackageDownloadURL(String downloadUrl) {
-		downloadPackageButton.setHref(downloadUrl);
+		this.downloadUrl = downloadUrl;
 	}
 }

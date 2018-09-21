@@ -98,7 +98,12 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	@Override
 	public void onDownloadPackage(String zipFileName) {
 		synAlert.clear();
-		jsClient.createDownloadOrderFromUsersDownloadList(zipFileName, new AsyncCallback<DownloadOrder>() {
+		if (zipFileName.isEmpty()) {
+			synAlert.showError("Please provide a package file name and try again.");
+			return;
+		}
+		
+		jsClient.createDownloadOrderFromUsersDownloadList(zipFileName + ".zip", new AsyncCallback<DownloadOrder>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -116,7 +121,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		request.setRequestedFiles(order.getFiles());
 		request.setZipFileName(order.getZipFileName());
 		view.setCreatePackageUIVisible(false);
-		progressWidget.startAndTrackJob("", false, AsynchType.BulkFileDownload, request, new AsynchronousProgressHandler() {
+		progressWidget.startAndTrackJob("", true, AsynchType.BulkFileDownload, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				view.setProgressTrackingWidgetVisible(false);
@@ -160,12 +165,10 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		jsClient.removeFileFromDownloadList(fha, new AsyncCallback<DownloadList>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				GWT.debugger();
 				synAlert.handleException(caught);
 			}
 			@Override
 			public void onSuccess(DownloadList downloadList) {
-				GWT.debugger();
 				setDownloadList(downloadList);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
