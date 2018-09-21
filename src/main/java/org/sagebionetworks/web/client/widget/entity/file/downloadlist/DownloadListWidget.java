@@ -8,7 +8,6 @@ import org.sagebionetworks.repo.model.file.BulkFileDownloadResponse;
 import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.DownloadOrder;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
@@ -19,7 +18,6 @@ import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.shared.asynch.AsynchType;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;

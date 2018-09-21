@@ -130,7 +130,7 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 	    if (minutes > 0) {
 	    	sb.append(minutes + " min ");
 	    }
-	    if (seconds > 0) {
+	    if (seconds > 0 || sb.toString().isEmpty()) {
 	    	sb.append(seconds + " s ");
 	    }
 	    return sb.toString();
