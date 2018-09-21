@@ -72,4 +72,8 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	public void setPresenter(Presenter p) {
 		this.presenter = p;
 	}
+	@Override
+	public boolean isAttached() {
+		return w.isAttached();
+	}
 }

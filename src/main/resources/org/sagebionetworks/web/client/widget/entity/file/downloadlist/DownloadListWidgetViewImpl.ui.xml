@@ -18,5 +18,6 @@
 		<bh:Div ui:field="fileHandleAssociationTableContainer" />
 		
 		<bh:Div ui:field="synAlertContainer" />
+		<bh:Div ui:field="packageSummaryContainer" />
 	</bh:Div>
 </ui:UiBinder>

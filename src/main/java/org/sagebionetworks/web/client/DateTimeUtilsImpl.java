@@ -116,4 +116,23 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 	public TimeZone getCurrentTimezone() {
 		return currentTimezone;
 	}
+	
+	@Override
+	public String getInFriendlyTimeUnits(long totalSeconds) {
+		long seconds = totalSeconds % 60;
+	    long totalMinutes = totalSeconds / 60;
+	    long minutes = totalMinutes % 60;
+	    long hours = totalMinutes / 60;
+	    StringBuilder sb = new StringBuilder();
+	    if (hours > 0) {
+	    	sb.append(hours + " h ");
+	    }
+	    if (minutes > 0) {
+	    	sb.append(minutes + " min ");
+	    }
+	    if (seconds > 0) {
+	    	sb.append(seconds + " s ");
+	    }
+	    return sb.toString();
+	}
 }

@@ -1218,6 +1218,12 @@ public class SynapseJavascriptClient {
 		}
 	}
 	
+	public void removeFileFromDownloadList(FileHandleAssociation fha, AsyncCallback<DownloadList> callback) {
+		List<FileHandleAssociation> toRemove = new ArrayList<FileHandleAssociation>();
+		toRemove.add(fha);
+		removeFilesFromDownloadList(toRemove, callback);
+	}
+
 	public void removeFilesFromDownloadList(List<FileHandleAssociation> toRemove, AsyncCallback<DownloadList> callback){
 		FileHandleAssociationList request = new FileHandleAssociationList();
 		request.setList(toRemove);

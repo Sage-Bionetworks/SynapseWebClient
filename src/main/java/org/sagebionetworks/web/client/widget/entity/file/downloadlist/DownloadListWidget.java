@@ -6,6 +6,7 @@ import org.sagebionetworks.repo.model.file.DownloadList;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
+import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 
@@ -23,26 +24,40 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	private SynapseJavascriptClient jsClient;
 	private FileHandleAssociationTable fhaTable;
 	EventBus eventBus;
+	private PackageSizeSummary packageSizeSummary;
+	CallbackP<Double> addToPackageSizeCallback;
+	CallbackP<FileHandleAssociation> onRemoveFileHandleAssociation;
 	@Inject
 	public DownloadListWidget(
 			DownloadListWidgetView view, 
 			SynapseAlert synAlert,
 			SynapseJavascriptClient jsClient,
 			EventBus eventBus,
-			FileHandleAssociationTable fhaTable) {
+			FileHandleAssociationTable fhaTable,
+			PackageSizeSummary packageSizeSummary) {
 		this.view = view;
 		this.jsClient = jsClient;
 		this.synAlert = synAlert;
 		this.eventBus = eventBus;
 		this.fhaTable = fhaTable;
+		this.packageSizeSummary = packageSizeSummary;
 		view.setSynAlert(synAlert);
 		view.setFileHandleAssociationTable(fhaTable);
+		view.setPackageSizeSummary(packageSizeSummary);
 		view.setPresenter(this);
+		
+		addToPackageSizeCallback = fileSize -> {
+			packageSizeSummary.addFile(fileSize);
+		};
+		onRemoveFileHandleAssociation = fha -> {
+			onRemoveFileHandleAssociation(fha);
+		};
 	}
 	
 	public void refresh() {
 		view.clear();
 		synAlert.clear();
+		packageSizeSummary.clear();
 		jsClient.getDownloadList(new AsyncCallback<DownloadList>() {
 			@Override
 			public void onFailure(Throwable caught) {
@@ -50,12 +65,14 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			}
 			@Override
 			public void onSuccess(DownloadList downloadList) {
-				List<FileHandleAssociation> fhas = downloadList.getFilesToDownload();
-				fhaTable.configure(fhas, fha -> {
-					//TODO: delete fha
-				});
+				setDownloadList(downloadList);
 			}
 		});
+	}
+	
+	private void setDownloadList(DownloadList downloadList) {
+		List<FileHandleAssociation> fhas = downloadList.getFilesToDownload();
+		fhaTable.configure(fhas, addToPackageSizeCallback, onRemoveFileHandleAssociation);
 	}
 	
 	@Override
@@ -69,6 +86,20 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			@Override
 			public void onSuccess(Void result) {
 				refresh();
+				eventBus.fireEvent(new DownloadListUpdatedEvent());
+			}
+		});
+	}
+	
+	public void onRemoveFileHandleAssociation(FileHandleAssociation fha) {
+		jsClient.removeFileFromDownloadList(fha, new AsyncCallback<DownloadList>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				synAlert.handleException(caught);
+			}
+			@Override
+			public void onSuccess(DownloadList downloadList) {
+				setDownloadList(downloadList);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 		});

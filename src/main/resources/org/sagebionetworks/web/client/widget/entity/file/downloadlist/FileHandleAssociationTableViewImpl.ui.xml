@@ -30,5 +30,7 @@
 				<bh:Italic marginLeft="10">All files will remain in the list and can be downloaded from here once your access is granted.</bh:Italic>
 			</bh:Span>
 		</bh:Div>
+		<bh:Hr />
+		
 	</bh:Div>
 </ui:UiBinder>

@@ -17,6 +17,8 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	Anchor clearAllLink;
 	@UiField
 	Div fileHandleAssociationTableContainer;
+	@UiField
+	Div packageSummaryContainer;
 	Presenter presenter;
 	Widget w;
 	interface DownloadListWidgetViewImplUiBinder extends UiBinder<Widget, DownloadListWidgetViewImpl> {}
@@ -50,5 +52,10 @@ public class DownloadListWidgetViewImpl implements DownloadListWidgetView, IsWid
 	public void setFileHandleAssociationTable(IsWidget w) {
 		fileHandleAssociationTableContainer.clear();
 		fileHandleAssociationTableContainer.add(w);
+	}
+	@Override
+	public void setPackageSizeSummary(IsWidget w) {
+		packageSummaryContainer.clear();
+		packageSummaryContainer.add(w);
 	}
 }

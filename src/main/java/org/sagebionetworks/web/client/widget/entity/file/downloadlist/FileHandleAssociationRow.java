@@ -53,7 +53,7 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 		view.setPresenter(this);
 	}
 	
-	public void configure(FileHandleAssociation fha, Callback accessRestrictionDetectedCallback, CallbackP<FileHandleAssociation> onDeleteCallback) {
+	public void configure(FileHandleAssociation fha, Callback accessRestrictionDetectedCallback, CallbackP<Double> addToPackageSizeCallback, CallbackP<FileHandleAssociation> onDeleteCallback) {
 		this.fha = fha;
 		this.onDeleteCallback = onDeleteCallback;
 		EntityIdCellRenderer entityBadge = ginInjector.createEntityIdCellRenderer();	
@@ -80,7 +80,10 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 					}					
 					Long contentSize = fileHandle.getContentSize();
 					if (contentSize != null) {
-						view.setFileSize(gwt.getFriendlySize(contentSize.doubleValue(), true));	
+						view.setFileSize(gwt.getFriendlySize(contentSize.doubleValue(), true));
+						if (view.isAttached()) {
+							addToPackageSizeCallback.invoke(contentSize.doubleValue());	
+						}
 					}
 					updateCreatedBy(fileHandle.getCreatedBy());
 				}

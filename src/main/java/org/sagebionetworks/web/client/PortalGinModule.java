@@ -403,6 +403,8 @@ import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandle
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationRowViewImpl;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationTableView;
 import org.sagebionetworks.web.client.widget.entity.file.downloadlist.FileHandleAssociationTableViewImpl;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummaryView;
+import org.sagebionetworks.web.client.widget.entity.file.downloadlist.PackageSizeSummaryViewImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidget;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetImpl;
 import org.sagebionetworks.web.client.widget.entity.menu.v2.ActionMenuWidgetView;
@@ -1423,9 +1425,10 @@ public class PortalGinModule extends AbstractGinModule {
 		bind(WikiDiffView.class).to(WikiDiffViewImpl.class);
 		bind(SynapseProperties.class).to(SynapsePropertiesImpl.class).in(Singleton.class);
 		bind(Moment.class).to(MomentImpl.class);
-		bind(DownloadSpeedTester.class).to(DownloadSpeedTesterImpl.class);
+		bind(DownloadSpeedTester.class).to(DownloadSpeedTesterImpl.class).in(Singleton.class);;
 		bind(DownloadListWidgetView.class).to(DownloadListWidgetViewImpl.class);
 		bind(FileHandleAssociationTableView.class).to(FileHandleAssociationTableViewImpl.class);
 		bind(FileHandleAssociationRowView.class).to(FileHandleAssociationRowViewImpl.class);
+		bind(PackageSizeSummaryView.class).to(PackageSizeSummaryViewImpl.class);
 	}
 }

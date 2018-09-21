@@ -9,6 +9,7 @@ public interface FileHandleAssociationRowView extends IsWidget {
 	void setCreatedOn(String createdOn);
 	void setFileSize(String fileSize);
 	void setPresenter(Presenter p);
+	boolean isAttached();
 	public interface Presenter {
 		void onDelete();
 	}
