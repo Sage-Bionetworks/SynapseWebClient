@@ -18,6 +18,8 @@ public class FileHandleAssociationTableViewImpl implements FileHandleAssociation
 	Table fhaTable;
 	@UiField
 	TableRow fhaTableHeader;
+	@UiField
+	Table fhaTableData;
 
 	private static FileHandleAssociationTableViewImplUiBinder uiBinder = GWT
 			.create(FileHandleAssociationTableViewImplUiBinder.class);
@@ -31,12 +33,10 @@ public class FileHandleAssociationTableViewImpl implements FileHandleAssociation
 	}
 	@Override
 	public void clear() {
-		fhaTableHeader.removeFromParent();
-		fhaTable.clear();
-		fhaTable.add(fhaTableHeader);
+		fhaTableData.clear();
 	}
 	@Override
 	public void addRow(IsWidget w) {
-		fhaTable.add(w);
+		fhaTableData.add(w);
 	}
 }

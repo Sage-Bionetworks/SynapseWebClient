@@ -10,7 +10,7 @@
 
 	<t:TableRow addStyleNames="border-bottom-1">
 		<t:TableData ui:field="fileNameContainer" height="45px"/>
-		<t:TableData ui:field="accessContainer">
+		<t:TableData ui:field="accessContainer" width="55px">
 			<bh:Span ui:field="hasAccess" addStyleNames="synapse-green-bg color-white padding-2" visible="false">
 				<b:Icon type="LOCK_OPEN"/>
 			</bh:Span>
@@ -18,16 +18,16 @@
 				<b:Icon type="MINUS_CIRCLE"/>
 			</bh:Span>
 		</t:TableData>
-		<t:TableData>
+		<t:TableData width="190px">
 			<bh:Text ui:field="createdBy"/>	
 		</t:TableData>
-		<t:TableData>
+		<t:TableData width="150px">
 			<bh:Text ui:field="createdOn"/>
 		</t:TableData>
-		<t:TableData>
+		<t:TableData width="100px">
 			<bh:Text ui:field="fileSize"/>
 		</t:TableData>
-		<t:TableData>
+		<t:TableData width="50px">
 			<b:Anchor icon="TRASH" ui:field="deleteLink" />
 		</t:TableData>
 	</t:TableRow>
