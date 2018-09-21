@@ -13,7 +13,7 @@
 				<t:TableHeader addStyleNames="font-weight-normal" width="190px" text="Created By"/>
 				<t:TableHeader addStyleNames="font-weight-normal" width="150px" text="Created On"/>
 				<t:TableHeader addStyleNames="font-weight-normal" width="100px" text="Size"/>
-				<t:TableHeader width="50px" text=""/> <!-- delete item column -->
+				<t:TableHeader width="50px" text=""/> <!-- delete item column. -->
 			</t:TableRow>
 		</t:Table>
 		<g:ScrollPanel addStyleNames="max-height-400">

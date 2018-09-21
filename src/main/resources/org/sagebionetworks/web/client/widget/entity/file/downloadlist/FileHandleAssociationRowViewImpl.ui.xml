@@ -27,7 +27,7 @@
 		<t:TableData width="100px">
 			<bh:Text ui:field="fileSize"/>
 		</t:TableData>
-		<t:TableData width="50px">
+		<t:TableData width="30px"> <!-- Less than header column width to account for table data scroll bar (from scroll pane)-->
 			<b:Anchor icon="TRASH" ui:field="deleteLink" />
 		</t:TableData>
 	</t:TableRow>
