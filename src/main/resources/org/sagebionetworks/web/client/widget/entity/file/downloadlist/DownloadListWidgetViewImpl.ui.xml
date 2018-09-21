@@ -33,8 +33,8 @@
 				<bh:Span text="Package created! Ready for download." marginLeft="5" marginTop="10" />
 			</bh:Span>
 			<bh:Span addStyleNames="flexcontainer-column" >
-				<b:Button type="PRIMARY" text="Create Package" icon="FOLDER_PLUS" ui:field="createPackageButton"/>
-				<b:Button type="PRIMARY" text="Download Package" icon="DOWNLOAD" ui:field="downloadPackageButton"/>
+				<b:Button type="PRIMARY" text="Create Package" icon="FOLDER_PLUS" ui:field="createPackageButton" marginTop="3"/>
+				<b:Button type="PRIMARY" text="Download Package" icon="DOWNLOAD" ui:field="downloadPackageButton" marginTop="3"/>
 			</bh:Span>
 		</bh:Div>
 		<bh:Div ui:field="progressTrackingContainer"/>

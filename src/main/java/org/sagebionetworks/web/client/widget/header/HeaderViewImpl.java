@@ -232,7 +232,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 		});
 		
 		xsFavoritesLink.addClickHandler(event -> {
-			Profile place = new Profile("v/projects/favorites");
+			Profile place = new Profile(userId + "/projects/favorites");
 			globalAppState.getPlaceChanger().goTo(place);
 			hideDropdown();
 		});
@@ -243,7 +243,7 @@ public class HeaderViewImpl extends Composite implements HeaderView {
 			hideDropdown();
 		});
 		downloadListLink.addClickHandler(event -> {
-			Profile place = new Profile("v/downloads");
+			Profile place = new Profile(userId + "/downloads");
 			globalAppState.getPlaceChanger().goTo(place);
 		});
 	}

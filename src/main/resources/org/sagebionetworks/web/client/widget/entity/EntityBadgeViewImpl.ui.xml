@@ -34,7 +34,10 @@
 				<g:TextBox ui:field="idField" width="130px" addStyleNames="border-none noBackground font-size-14" readOnly="true" />
 			</t:TableData>
 			<t:TableData width="75px" addStyleNames="overflow-x-hidden text-align-center">
-				<b:Anchor icon="DOWNLOAD" text="+" ui:field="addToDownloadListLink" addStyleNames="textDecorationNone" visible="false"/>
+				<b:Anchor ui:field="addToDownloadListLink" addStyleNames="textDecorationNone" visible="false">
+					<i class="fa syn-download moveright-5 movedown-1"></i>
+					+
+				</b:Anchor>
 			</t:TableData>
 			
 		</t:TableRow>
