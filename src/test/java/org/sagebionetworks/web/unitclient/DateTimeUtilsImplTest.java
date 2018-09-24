@@ -87,6 +87,18 @@ public class DateTimeUtilsImplTest {
 		dateTimeUtils.getRelativeTime(d);
 		verify(mockMoment).getRelativeTime(anyString());
 	}
+	
+	@Test
+	public void testFriendlyTimeEstimate() {
+		assertEquals("0 s", dateTimeUtils.getFriendlyTimeEstimate(0));
+		assertEquals("5 s", dateTimeUtils.getFriendlyTimeEstimate(5));
+		assertEquals("1 min", dateTimeUtils.getFriendlyTimeEstimate(60));
+		assertEquals("1 min 8 s", dateTimeUtils.getFriendlyTimeEstimate(60 + 8));
+		assertEquals("1 h", dateTimeUtils.getFriendlyTimeEstimate(60*60));
+		assertEquals("1 h 1 min", dateTimeUtils.getFriendlyTimeEstimate(60*60 + 60));
+		// ignore seconds if greater than an hour
+		assertEquals("1 h 1 min", dateTimeUtils.getFriendlyTimeEstimate(60*60 + 60 + 9));
+	}
 }
 
 

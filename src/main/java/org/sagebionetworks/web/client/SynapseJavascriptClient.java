@@ -1238,7 +1238,7 @@ public class SynapseJavascriptClient {
 
 	public void getDownloadOrder(String orderId, AsyncCallback<DownloadOrder> callback) {
 		String url = getFileServiceUrl() + "/download/order/"+orderId;
-		doGet(url, OBJECT_TYPE.DownloadList, callback);
+		doGet(url, OBJECT_TYPE.DownloadOrder, callback);
 	}
 	
 	public void getDownloadOrderHistory(DownloadOrderSummaryRequest request, AsyncCallback<DownloadOrderSummaryResponse> callback) {

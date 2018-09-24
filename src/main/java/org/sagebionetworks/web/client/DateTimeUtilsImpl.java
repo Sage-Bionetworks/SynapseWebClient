@@ -118,21 +118,22 @@ public class DateTimeUtilsImpl implements DateTimeUtils {
 	}
 	
 	@Override
-	public String getInFriendlyTimeUnits(long totalSeconds) {
+	public String getFriendlyTimeEstimate(long totalSeconds) {
 		long seconds = totalSeconds % 60;
 	    long totalMinutes = totalSeconds / 60;
 	    long minutes = totalMinutes % 60;
 	    long hours = totalMinutes / 60;
 	    StringBuilder sb = new StringBuilder();
-	    if (hours > 0) {
+	    boolean isHours = hours > 0;
+	    if (isHours) {
 	    	sb.append(hours + " h ");
 	    }
 	    if (minutes > 0) {
 	    	sb.append(minutes + " min ");
 	    }
-	    if (seconds > 0 || sb.toString().isEmpty()) {
-	    	sb.append(seconds + " s ");
+	    if (!isHours && (seconds > 0 || sb.toString().isEmpty())) {
+	    	sb.append(seconds + " s");
 	    }
-	    return sb.toString();
+	    return sb.toString().trim();
 	}
 }

@@ -58,7 +58,7 @@ public class PackageSizeSummary implements IsWidget {
 				public void onSuccess(Double bytesPerSecond) {
 					// seconds = ((totalFileSizeInBytes) / bytesPerSecond)
 					Double seconds = totalFileSize/bytesPerSecond;
-					String estimatedTime = dateTimeUtils.getInFriendlyTimeUnits(seconds.longValue());
+					String estimatedTime = dateTimeUtils.getFriendlyTimeEstimate(seconds.longValue());
 					view.setEstimatedDownloadTime(estimatedTime);
 					isTestingDownloadSpeed = false;
 				}

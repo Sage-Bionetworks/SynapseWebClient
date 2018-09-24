@@ -34,5 +34,5 @@ public interface DateTimeUtils {
 	String getDateString(Date toFormat);
 	void setShowUTCTime(boolean showUTC);
 	boolean isShowingUTCTime();
-	String getInFriendlyTimeUnits(long totalSeconds);
+	String getFriendlyTimeEstimate(long totalSeconds);
 }

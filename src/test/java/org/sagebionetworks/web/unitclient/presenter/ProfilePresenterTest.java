@@ -97,6 +97,7 @@ import com.google.gwt.event.shared.EventBus;
 import com.google.gwt.place.shared.Place;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.AcceptsOneWidget;
+import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
 
 public class ProfilePresenterTest {
@@ -1050,6 +1051,18 @@ public class ProfilePresenterTest {
 		verify(mockSynapseJavascriptClient).getUserTeams(anyString(), anyBoolean(), anyString());
 		verify(mockSynapseJavascriptClient).listTeams(anyList());
 		verify(mockTeamListWidget, times(2)).addTeam(any(Team.class));
+	}
+	
+	@Test
+	public void testDownloadsTabOwner() {
+		profilePresenter.setPlace(place);
+		profilePresenter.setIsOwner(true);
+		when(place.getArea()).thenReturn(ProfileArea.DOWNLOADS);
+		
+		profilePresenter.tabClicked(ProfileArea.DOWNLOADS);
+		
+		verify(mockDownloadListWidget).refresh();
+		verify(mockView).setDownloadListWidget(any(IsWidget.class));
 	}
 	
 	@Test
