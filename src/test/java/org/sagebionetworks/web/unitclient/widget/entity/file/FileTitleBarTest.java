@@ -3,6 +3,7 @@ package org.sagebionetworks.web.unitclient.widget.entity.file;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -19,7 +20,6 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityBundle;
-import org.sagebionetworks.repo.model.FileEntity;
 import org.sagebionetworks.repo.model.VersionInfo;
 import org.sagebionetworks.repo.model.file.ExternalObjectStoreFileHandle;
 import org.sagebionetworks.repo.model.file.FileHandle;
@@ -27,8 +27,10 @@ import org.sagebionetworks.repo.model.file.S3FileHandle;
 import org.sagebionetworks.web.client.SynapseClientAsync;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.SynapseProperties;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
+import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBar;
 import org.sagebionetworks.web.client.widget.entity.file.FileTitleBarView;
@@ -36,12 +38,12 @@ import org.sagebionetworks.web.shared.PaginatedResults;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.event.shared.EventBus;
+import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.Widget;
-
-import junit.framework.Assert;
 
 public class FileTitleBarTest {
 		
+	public static final String ENTITY_ID = "syn123";
 	FileTitleBar fileTitleBar;
 	@Mock
 	SynapseClientAsync mockSynapseClient;
@@ -75,12 +77,13 @@ public class FileTitleBarTest {
 	
 	public static final String DATA_FILE_HANDLE_ID = "872";
 	public static final Long FILE_VERSION = 3L;
+	public static final String FILE_NAME = "afile.txt";
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
 		fileTitleBar = new FileTitleBar(mockView, mockSynapseProperties, mockFileDownloadButton, mockSynapseClient, mockJsClient, mockFileClientsHelp, mockEventBus);
-		when(mockFileEntity.getId()).thenReturn("syn123");
-		when(mockFileEntity.getName()).thenReturn("syn123");
+		when(mockFileEntity.getId()).thenReturn(ENTITY_ID);
+		when(mockFileEntity.getName()).thenReturn(FILE_NAME);
 		when(mockFileEntity.getDataFileHandleId()).thenReturn(DATA_FILE_HANDLE_ID);
 		when(mockFileEntity.getVersionNumber()).thenReturn(FILE_VERSION);
 		when(mockBundle.getEntity()).thenReturn(mockFileEntity);
@@ -98,6 +101,13 @@ public class FileTitleBarTest {
 		versions = new ArrayList<>();
 		when(mockVersionResults.getResults()).thenReturn(versions);
 		AsyncMockStubber.callSuccessWith(mockVersionResults).when(mockSynapseClient).getEntityVersions(anyString(), anyInt(), anyInt(), any());
+		AsyncMockStubber.callSuccessWith(null).when(mockJsClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
+	}
+	
+	@Test
+	public void testConstruction() {
+		verify(mockView).setFileDownloadMenuItem(any(Widget.class));
+		verify(mockView).setPresenter(fileTitleBar);
 	}
 	
 	@Test
@@ -123,6 +133,28 @@ public class FileTitleBarTest {
 		fileTitleBar.configure(mockBundle);
 		verify(mockFileDownloadButton).configure(mockBundle);
 		verify(mockView).setVersion(FILE_VERSION);
+	}
+	
+	@Test
+	public void testAddToDownloadList() {
+		fileTitleBar.configure(mockBundle);
+		fileTitleBar.onAddToDownloadList();
+		
+		verify(mockJsClient).addFileToDownloadList(eq(DATA_FILE_HANDLE_ID), eq(ENTITY_ID), any(AsyncCallback.class));
+		verify(mockView).showInfo(FILE_NAME + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
+		verify(mockEventBus).fireEvent(any(DownloadListUpdatedEvent.class));
+	}
+
+	@Test
+	public void testAddToDownloadListFailure() {
+		String errorMessage = "unable to add";
+		AsyncMockStubber.callFailureWith(new Exception(errorMessage)).when(mockJsClient).addFileToDownloadList(anyString(), anyString(), any(AsyncCallback.class));
+		
+		fileTitleBar.configure(mockBundle);
+		fileTitleBar.onAddToDownloadList();
+		
+		verify(mockJsClient).addFileToDownloadList(eq(DATA_FILE_HANDLE_ID), eq(ENTITY_ID), any(AsyncCallback.class));
+		verify(mockView).showErrorMessage(errorMessage);
 	}
 	
 	@Test
@@ -188,5 +220,14 @@ public class FileTitleBarTest {
 		verify(mockView).setVersionUIVisible(false);
 		verify(mockView, never()).setVersionUIVisible(true);
 		verify(mockView).showErrorMessage(error);
+	}
+	
+	@Test
+	public void testOnProgrammaticDownloadOptions() {
+		fileTitleBar.configure(mockBundle);
+		
+		fileTitleBar.onProgrammaticDownloadOptions();
+		
+		verify(mockFileClientsHelp).configureAndShow(ENTITY_ID, FILE_VERSION);
 	}
 }

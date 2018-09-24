@@ -26,6 +26,8 @@ import com.google.inject.Inject;
 
 public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, DownloadListWidgetView.Presenter {
 	
+	public static final String ZIP_EXTENSION = ".zip";
+	public static final String EMPTY_FILENAME_MESSAGE_ = "Please provide a package file name and try again.";
 	private DownloadListWidgetView view;
 	SynapseAlert synAlert;
 	private SynapseJavascriptClient jsClient;
@@ -97,11 +99,11 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 	public void onDownloadPackage(String zipFileName) {
 		synAlert.clear();
 		if (zipFileName.isEmpty()) {
-			synAlert.showError("Please provide a package file name and try again.");
+			synAlert.showError(EMPTY_FILENAME_MESSAGE_);
 			return;
 		}
 		
-		jsClient.createDownloadOrderFromUsersDownloadList(zipFileName + ".zip", new AsyncCallback<DownloadOrder>() {
+		jsClient.createDownloadOrderFromUsersDownloadList(zipFileName + ZIP_EXTENSION, new AsyncCallback<DownloadOrder>() {
 			@Override
 			public void onFailure(Throwable caught) {
 				synAlert.handleException(caught);
@@ -119,7 +121,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 		request.setRequestedFiles(order.getFiles());
 		request.setZipFileName(order.getZipFileName());
 		view.setCreatePackageUIVisible(false);
-		progressWidget.startAndTrackJob("", false, AsynchType.BulkFileDownload, request, new AsynchronousProgressHandler() {
+		progressWidget.startAndTrackJob("", true, AsynchType.BulkFileDownload, request, new AsynchronousProgressHandler() {
 			@Override
 			public void onFailure(Throwable failure) {
 				view.setProgressTrackingWidgetVisible(false);
