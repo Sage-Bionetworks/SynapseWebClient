@@ -32,6 +32,7 @@ import org.sagebionetworks.web.client.widget.entity.file.AddToDownloadList;
 import org.sagebionetworks.web.test.helper.AsyncMockStubber;
 
 import com.google.gwt.user.client.rpc.AsyncCallback;
+import com.google.gwt.user.client.ui.IsWidget;
 
 public class FilesBrowserTest {
 
@@ -62,12 +63,24 @@ public class FilesBrowserTest {
 				mockContainerClientsHelp,
 				mockAddToDownloadList);
 	}
-	
+
+	@Test
+	public void testConstructor() {		
+		verify(mockView).setAddToDownloadList(any(IsWidget.class));
+		verify(mockView).setPresenter(filesBrowser);
+	}
+
 	@Test
 	public void testConfigure() {		
 		String entityId = "syn123";
 		filesBrowser.configure(entityId);
 		verify(mockView).configure(entityId);
+		
+		filesBrowser.onProgrammaticDownloadOptions();
+		verify(mockContainerClientsHelp).configureAndShow(entityId);
+		
+		filesBrowser.onAddToDownloadList();
+		verify(mockAddToDownloadList).addToDownloadList(entityId);
 	}
 }
 
