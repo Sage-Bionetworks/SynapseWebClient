@@ -139,4 +139,16 @@ public class DownloadSpeedTesterImplTest {
 		verify(mockCallback).onFailure(throwableCaptor.capture());
 		assertTrue(throwableCaptor.getValue().getMessage().contains(statusText));
 	}
+	
+	@Test
+	public void testCachedDownloadSpeed() {
+		String cachedDownloadSpeedString = "188267.37037";
+		when(mockClientCache.contains(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(true);
+		when(mockClientCache.get(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(cachedDownloadSpeedString);
+		
+		downloadSpeedTester.testDownloadSpeed(mockCallback);
+		
+		verifyZeroInteractions(mockRequestBuilder, mockJsClient);
+		verify(mockCallback).onSuccess(Double.valueOf(cachedDownloadSpeedString));
+	}
 }

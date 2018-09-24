@@ -54,6 +54,7 @@ import com.google.inject.Inject;
 
 public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Presenter {
 	
+	public static final String ADDED_TO_DOWNLOAD_LIST = " has been added to your download list.";
 	public static final String LINK_SUCCESSFULLY_DELETED = "Successfully removed link";
 	private EntityBadgeView view;
 	private GlobalApplicationState globalAppState;
@@ -269,7 +270,7 @@ public class EntityBadge implements SynapseWidgetPresenter, EntityBadgeView.Pres
 			}
 			@Override
 			public void onSuccess(DownloadList result) {
-				popupUtils.showInfo(dataFileHandle.getFileName() + " has been added to your download list.");
+				popupUtils.showInfo(entityHeader.getName() + ADDED_TO_DOWNLOAD_LIST);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 		});

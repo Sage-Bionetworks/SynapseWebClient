@@ -33,7 +33,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	private EntityListRowBadgeView view;
 	private UserBadge createdByUserBadge;
 	private SynapseJavascriptClient jsClient;
-	private String entityId;
+	private String entityId, entityName;
 	private Long version;
 	private Callback selectionChangedCallback;
 	private LazyLoadHelper lazyLoadHelper;
@@ -119,7 +119,8 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 	
 	public void setEntityBundle(EntityBundle eb) {
 		view.setIcon(EntityTypeUtils.getIconTypeForEntity(eb.getEntity()));
-		view.setEntityLink(eb.getEntity().getName(), DisplayUtils.getSynapseHistoryToken(entityId, version));
+		entityName = eb.getEntity().getName();
+		view.setEntityLink(entityName, DisplayUtils.getSynapseHistoryToken(entityId, version));
 		if (eb.getEntity().getCreatedBy() != null) {
 			createdByUserBadge.configure(eb.getEntity().getCreatedBy());
 			createdByUserBadge.setOpenNewWindow(true);
@@ -187,7 +188,7 @@ public class EntityListRowBadge implements EntityListRowBadgeView.Presenter, Syn
 			}
 			@Override
 			public void onSuccess(DownloadList result) {
-				popupUtils.showInfo(dataFileHandle.getFileName() + " has been added to your download list.");
+				popupUtils.showInfo(entityName + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 		});
