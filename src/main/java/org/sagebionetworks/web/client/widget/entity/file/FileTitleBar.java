@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.events.EntityUpdatedHandler;
 import org.sagebionetworks.web.client.widget.SynapseWidgetPresenter;
 import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
+import org.sagebionetworks.web.client.widget.entity.EntityBadge;
 import org.sagebionetworks.web.shared.PaginatedResults;
 
 import com.google.gwt.event.shared.EventBus;
@@ -180,7 +181,7 @@ public class FileTitleBar implements SynapseWidgetPresenter, FileTitleBarView.Pr
 			}
 			@Override
 			public void onSuccess(DownloadList result) {
-				view.showInfo(entityBundle.getFileName() + " has been added to your download list.");
+				view.showInfo(entity.getName() + EntityBadge.ADDED_TO_DOWNLOAD_LIST);
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}
 		});

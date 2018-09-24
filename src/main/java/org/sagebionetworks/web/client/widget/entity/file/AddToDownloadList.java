@@ -6,7 +6,6 @@ import org.sagebionetworks.repo.model.table.Query;
 import org.sagebionetworks.web.client.PopupUtilsView;
 import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
-import org.sagebionetworks.web.client.events.WikiSubpagesCollapseEvent;
 import org.sagebionetworks.web.client.view.DivView;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressHandler;
 import org.sagebionetworks.web.client.widget.asynch.AsynchronousProgressWidget;
@@ -20,6 +19,9 @@ import com.google.inject.Inject;
 
 public class AddToDownloadList implements IsWidget {
 	
+	public static final String SUCCESS_ADDED_FILES_MESSAGE = "Successfully added files to the Download List.";
+	public static final String ADD_FOLDER_FILES_CONFIRMATION_MESSAGE = "Add all files in this folder to the Download List?";
+	public static final String ADD_QUERY_FILES_CONFIRMATION_MESSAGE = "Add all files from this query result to the Download List?";
 	DivView view;
 	PopupUtilsView popupUtilsView;
 	PortalGinInjector ginInjector;
@@ -39,13 +41,13 @@ public class AddToDownloadList implements IsWidget {
 	public void addToDownloadList(Query query) {
 		request = new AddFileToDownloadListRequest();
 		request.setQuery(query);
-		confirmAddToDownloadList("Add all files from this query result to the Download List?");
+		confirmAddToDownloadList(ADD_QUERY_FILES_CONFIRMATION_MESSAGE);
 	}
 	
 	public void addToDownloadList(String folderId) {
 		request = new AddFileToDownloadListRequest();
 		request.setFolderId(folderId);
-		confirmAddToDownloadList("Add all files in this folder to the Download List?");
+		confirmAddToDownloadList(ADD_FOLDER_FILES_CONFIRMATION_MESSAGE);
 	}
 	
 	public void confirmAddToDownloadList(String message) {
@@ -70,7 +72,7 @@ public class AddToDownloadList implements IsWidget {
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
 				view.clear();
-				popupUtilsView.showInfo("Successfully added files to the Download List.");
+				popupUtilsView.showInfo(SUCCESS_ADDED_FILES_MESSAGE);
 				//fire event to trigger UI element in header!
 				eventBus.fireEvent(new DownloadListUpdatedEvent());
 			}

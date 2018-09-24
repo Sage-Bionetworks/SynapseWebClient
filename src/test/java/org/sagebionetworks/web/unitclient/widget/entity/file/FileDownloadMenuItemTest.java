@@ -3,17 +3,14 @@ package org.sagebionetworks.web.unitclient.widget.entity.file;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.gwtbootstrap3.client.ui.constants.ButtonSize;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentCaptor;
@@ -44,8 +41,6 @@ import org.sagebionetworks.web.client.place.AccessRequirementsPlace;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.utils.CallbackP;
 import org.sagebionetworks.web.client.widget.aws.AwsSdk;
-import org.sagebionetworks.web.client.widget.clienthelp.FileClientsHelp;
-import org.sagebionetworks.web.client.widget.entity.controller.SynapseAlert;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItem;
 import org.sagebionetworks.web.client.widget.entity.file.FileDownloadMenuItemView;
 import org.sagebionetworks.web.client.widget.login.LoginModalWidget;
