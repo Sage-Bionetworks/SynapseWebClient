@@ -10,9 +10,9 @@ import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.asynch.PresignedAndFileHandleURLAsyncHandler;
-import org.sagebionetworks.web.client.widget.asynch.PresignedURLAsyncHandler;
 import org.sagebionetworks.web.shared.exceptions.UnauthorizedException;
 
 import com.google.gwt.http.client.Request;
@@ -23,6 +23,7 @@ import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.inject.Inject;
 
 public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
+	public static final String ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY = "ESTIMATED_DOWNLOAD_SPEED";
 	public static final String TEST_FILE_SYN_ID = "syn12600511";
 	long startTime;
 	RequestBuilderWrapper requestBuilder;
@@ -30,8 +31,7 @@ public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
 	
 	AuthenticationController authController;
 	SynapseJavascriptClient jsClient;
-	public static Double cachedDownloadSpeed = null;
-	GWTWrapper gwt;
+	ClientCache clientCache;
 	/**
 	 * Three step process.
 	 * 1.  Get the test file entity (for the target file handle id).
@@ -52,17 +52,18 @@ public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
 			PresignedAndFileHandleURLAsyncHandler presignedUrlAsyncHandler,
 			RequestBuilderWrapper requestBuilder,
 			SynapseJavascriptClient jsClient,
-			GWTWrapper gwt) {
+			ClientCache clientCache) {
 		this.authController = authController;
 		this.presignedUrlAsyncHandler = presignedUrlAsyncHandler;
 		this.requestBuilder = requestBuilder;
 		this.jsClient = jsClient;
-		this.gwt = gwt;
+		this.clientCache = clientCache;
 	}
 	@Override
 	public void testDownloadSpeed(final AsyncCallback<Double> callback) {
-		if (cachedDownloadSpeed != null) {
-			callback.onSuccess(cachedDownloadSpeed);
+		if (clientCache.contains(ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)) {
+			String downloadSpeedString = clientCache.get(ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY);
+			callback.onSuccess(Double.parseDouble(downloadSpeedString));
 			return;
 		}
 		// must be logged in to check download speed
@@ -105,12 +106,8 @@ public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
 	}
 	
 	public void updateCachedDownloadSpeed(Double downloadSpeed) {
-		cachedDownloadSpeed = downloadSpeed;
-		//clear out the cached download speed 10 minutes from now
-		gwt.scheduleExecution(() -> {
-			cachedDownloadSpeed = null;
-		}, 10*60*1000);
-
+		//cache speed for 10 minutes
+		clientCache.put(ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY, downloadSpeed.toString(), new Date(System.currentTimeMillis() + 1000*60*10).getTime());
 	}
 	public void testDownloadSpeedStep3(String url, double fileSize, AsyncCallback<Double> callback) {
 		requestBuilder.configure(RequestBuilder.GET, url);
@@ -126,8 +123,9 @@ public class DownloadSpeedTesterImpl implements DownloadSpeedTester {
 						// done!
 						long endTime = new Date().getTime();
 						long msElapsed = endTime - startTime;
-						updateCachedDownloadSpeed(fileSize / (msElapsed / 1000)); 
-						callback.onSuccess(cachedDownloadSpeed);
+						double downloadSpeed = fileSize / (msElapsed / 1000);
+						updateCachedDownloadSpeed(downloadSpeed); 
+						callback.onSuccess(downloadSpeed);
 					} else {
 						onError(null, new IllegalArgumentException("Unable to retrieve test file. Reason: " + response.getStatusText()));
 					}

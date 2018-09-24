@@ -21,6 +21,7 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.RequestBuilderWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
+import org.sagebionetworks.web.client.cache.ClientCache;
 import org.sagebionetworks.web.client.security.AuthenticationController;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTesterImpl;
 import org.sagebionetworks.web.client.widget.FileHandleWidget;
@@ -63,7 +64,7 @@ public class DownloadSpeedTesterImplTest {
 	@Captor
 	ArgumentCaptor<Throwable> throwableCaptor;
 	@Mock
-	GWTWrapper mockGWT;
+	ClientCache mockClientCache;
 	public static final String FILE_HANDLE_ID = "876567";
 	public static final Long FILE_CONTENT_SIZE = 1L;
 	public static final String PRESIGNED_URL = "https://s3.presigned.url/test.zip";
@@ -83,8 +84,9 @@ public class DownloadSpeedTesterImplTest {
 		AsyncMockStubber.callSuccessWith(mockFileResult).when(mockFileHandleAsyncHandler).getFileResult(any(FileHandleAssociation.class), any(AsyncCallback.class));
 		RequestBuilderMockStubber.callOnResponseReceived(null, mockResponse).when(mockRequestBuilder).sendRequest(anyString(), any(RequestCallback.class));
 		
-		downloadSpeedTester = new DownloadSpeedTesterImpl(mockAuthController, mockFileHandleAsyncHandler, mockRequestBuilder, mockJsClient, mockGWT);
-		DownloadSpeedTesterImpl.cachedDownloadSpeed = null;
+		downloadSpeedTester = new DownloadSpeedTesterImpl(mockAuthController, mockFileHandleAsyncHandler, mockRequestBuilder, mockJsClient, mockClientCache);
+		when(mockClientCache.get(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(null);
+		when(mockClientCache.contains(DownloadSpeedTesterImpl.ESTIMATED_DOWNLOAD_SPEED_CACHE_KEY)).thenReturn(false);
 	}
 
 	@Test

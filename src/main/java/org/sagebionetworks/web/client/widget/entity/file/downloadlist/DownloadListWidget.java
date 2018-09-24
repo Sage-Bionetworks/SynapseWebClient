@@ -129,6 +129,7 @@ public class DownloadListWidget implements IsWidget, SynapseWidgetPresenter, Dow
 			
 			@Override
 			public void onComplete(AsynchronousResponseBody response) {
+				eventBus.fireEvent(new DownloadListUpdatedEvent());
 				view.setProgressTrackingWidgetVisible(false);
 				BulkFileDownloadResponse bulkFileDownloadResponse = (BulkFileDownloadResponse) response;
 				view.setPackageDownloadURL(jsniUtils.getRawFileHandleUrl(bulkFileDownloadResponse.getResultZipFileHandleId()));
