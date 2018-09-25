@@ -25,7 +25,7 @@ import com.google.inject.Inject;
 
 public class FileHandleAssociationRow implements IsWidget, FileHandleAssociationRowView.Presenter {
 	
-	private FileHandleAssociationRowView view;
+	FileHandleAssociationRowView view;
 	FileHandleAsyncHandler fhaAsyncHandler;
 	UserProfileAsyncHandler userProfileAsyncHandler;
 	SynapseJSNIUtils jsniUtils;
@@ -78,19 +78,19 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 		fhaAsyncHandler.getFileResult(fha, new AsyncCallback<FileResult>() {
 			@Override
 			public void onFailure(Throwable caught) {
-				hasAccess = false;
-				view.setHasAccess(false);
+				setHasAccess(false);
 				if (!(caught instanceof ForbiddenException)) {
 					jsniUtils.consoleError(caught.getMessage());
+				} else {
+					accessRestrictionDetectedCallback.invoke();	
 				}
-				accessRestrictionDetectedCallback.invoke();
 			}
 			public void onSuccess(FileResult result) {
 				if (result.getFileHandle() == null) {
-					view.setHasAccess(false);
+					setHasAccess(false);
 				} else {
 					FileHandle fileHandle = result.getFileHandle();
-					view.setHasAccess(true);
+					setHasAccess(true);
 					if (fileHandle.getCreatedOn() != null) {
 						createdOn = fileHandle.getCreatedOn();
 						view.setCreatedOn(dateTimeUtils.getDateTimeString(fileHandle.getCreatedOn()));	
@@ -107,6 +107,11 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 				}
 			};
 		});
+	}
+	
+	private void setHasAccess(boolean hasAccess) {
+		this.hasAccess = hasAccess;
+		view.setHasAccess(hasAccess);
 	}
 	
 	public void updateCreatedBy(String userId) {
