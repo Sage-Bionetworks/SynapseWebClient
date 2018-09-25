@@ -28,8 +28,8 @@
             </b:Alert>
 
             <div class="margin-10">
-                <div class="margin-top-5" style="width: 100%;">
-                    <div ui:field="profileUI" class="profileUI inline-block vertical-align-top" style="width: 22%; min-width: 400px;">
+                <div class="margin-top-5 row" style="width: 100%;">
+                    <div ui:field="profileUI" class="profileUI inline-block vertical-align-top col-xs-12 col-md-3">
                         <div class="padding-15 light-border">
                             <w:LoadingSpinner ui:field="profilePictureLoadingUI" visible="false" size="50px" />
                             <g:SimplePanel ui:field="profileSynAlertPanel" />
@@ -114,7 +114,7 @@
                         <b:Button ui:field="hideProfileButton" size="EXTRA_SMALL" pull="RIGHT" icon="CHEVRON_LEFT" text="Hide Profile" addStyleNames="margin-top-5"
                             visible="false" />
                     </div>
-                    <div ui:field="dashboardUI" class="inline-block" style="width: 64%;">
+                    <div ui:field="dashboardUI" class="inline-block col-xs-12">
                         <b:Button ui:field="showProfileButton" size="EXTRA_SMALL" icon="CHEVRON_RIGHT" text="Show Profile" visible="false" />
                         <div>
                             <div ui:field="navtabContainer">

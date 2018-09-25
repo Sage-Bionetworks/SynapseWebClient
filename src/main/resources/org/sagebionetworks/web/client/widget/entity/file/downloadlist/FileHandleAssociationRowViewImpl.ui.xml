@@ -9,10 +9,10 @@
 	xmlns:t="urn:import:org.sagebionetworks.web.client.view.bootstrap.table">
 
 	<t:TableRow addStyleNames="border-bottom-1">
-		<t:TableData height="45px">
-			<b:Anchor ui:field="fileNameLink" />
+		<t:TableData height="45px" addStyleNames="overflow-x-hidden" >
+			<b:Anchor ui:field="fileNameLink" addStyleNames="overflow-x-hidden"/>
 		</t:TableData>
-		<t:TableData ui:field="accessContainer" addStyleNames="min-width-70">
+		<t:TableData ui:field="accessContainer" addStyleNames="min-width-70 hidden-xs" width="70px">
 			<bh:Span ui:field="hasAccess" addStyleNames="synapse-green-bg color-white" visible="false" paddingTop="2" paddingRight="2" paddingBottom="4" paddingLeft="2">
 				<b:Icon type="LOCK_OPEN"/>
 			</bh:Span>
@@ -20,16 +20,16 @@
 				<b:Icon type="MINUS_CIRCLE"/>
 			</bh:Span>
 		</t:TableData>
-		<t:TableData addStyleNames="min-width-200">
+		<t:TableData addStyleNames="min-width-150 hidden-xs visible-md visible-lg" width="150px">
 			<bh:Text ui:field="createdBy"/>	
 		</t:TableData>
-		<t:TableData addStyleNames="min-width-150">
+		<t:TableData addStyleNames="min-width-150 hidden-xs" width="150px">
 			<bh:Text ui:field="createdOn"/>
 		</t:TableData>
-		<t:TableData addStyleNames="min-width-100">
+		<t:TableData addStyleNames="min-width-100 visible-md visible-lg" width="100px">
 			<bh:Text ui:field="fileSize"/>
 		</t:TableData>
-		<t:TableData addStyleNames="min-width-25"> <!-- Less than header column width to account for table data scroll bar (from scroll pane)-->
+		<t:TableData addStyleNames="min-width-25" width="25px"> <!-- Less than header column width to account for table data scroll bar (from scroll pane)-->
 			<b:Anchor icon="TRASH" ui:field="removeLink" />
 		</t:TableData>
 	</t:TableRow>
