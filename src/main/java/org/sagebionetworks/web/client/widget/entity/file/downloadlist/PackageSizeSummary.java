@@ -5,7 +5,6 @@ import org.sagebionetworks.web.client.GWTWrapper;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.widget.DownloadSpeedTester;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -13,6 +12,7 @@ import com.google.inject.Inject;
 
 public class PackageSizeSummary implements IsWidget {
 	
+	public static final String UNKNOWN_TIME = "-";
 	private PackageSizeSummaryView view;
 	private GWTWrapper gwt;
 	private SynapseJSNIUtils jsniUtils;
@@ -50,7 +50,7 @@ public class PackageSizeSummary implements IsWidget {
 	private void updateView() {
 		view.setFileCount(totalFileCount);
 		view.setSize(gwt.getFriendlySize(totalFileSize, true));
-		view.setEstimatedDownloadTime("-");
+		view.setEstimatedDownloadTime(UNKNOWN_TIME);
 		if (!isTestingDownloadSpeed) {
 			isTestingDownloadSpeed = true;
 			downloadSpeedTester.testDownloadSpeed(new AsyncCallback<Double>() {
