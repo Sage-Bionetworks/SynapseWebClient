@@ -90,33 +90,94 @@ public class FileHandleAssociationTable implements IsWidget, SortingListener {
 		}
 	}
 	Comparator<FileHandleAssociationRow> fileNameAscComparator = (row1, row2) -> {
+		if (row1.getFileName() == null) {
+			return -1;
+		}
+		if (row2.getFileName() == null) {
+			return 1;
+		}
 		return row1.getFileName().toUpperCase().compareTo(row2.getFileName().toUpperCase());
 	};
 	Comparator<FileHandleAssociationRow> fileNameDescComparator =(row1, row2) -> {
+		if (row2.getFileName() == null) {
+			return -1;
+		}
+		if (row1.getFileName() == null) {
+			return 1;
+		}
 		return row2.getFileName().toUpperCase().compareTo(row1.getFileName().toUpperCase());
 	};
 	Comparator<FileHandleAssociationRow> accessAscComparator = (row1, row2) -> {
+		if (row1.getHasAccess() == null) {
+			return -1;
+		}
+		if (row2.getHasAccess() == null) {
+			return 1;
+		}
+
 		return row1.getHasAccess().compareTo(row2.getHasAccess());
 	};
 	Comparator<FileHandleAssociationRow> accessDescComparator = (row1, row2) -> {
+		if (row2.getHasAccess() == null) {
+			return -1;
+		}
+		if (row1.getHasAccess() == null) {
+			return 1;
+		}
 		return row2.getHasAccess().compareTo(row1.getHasAccess());
 	};
 	Comparator<FileHandleAssociationRow> createdByAscComparator = (row1, row2) -> {
+		if (row1.getCreatedBy() == null) {
+			return -1;
+		}
+		if (row2.getCreatedBy() == null) {
+			return 1;
+		}
 		return row1.getCreatedBy().toUpperCase().compareTo(row2.getCreatedBy().toUpperCase());
 	};
 	Comparator<FileHandleAssociationRow> createdByDescComparator = (row1, row2) -> {
+		if (row2.getCreatedBy() == null) {
+			return -1;
+		}
+		if (row1.getCreatedBy() == null) {
+			return 1;
+		}
 		return row2.getCreatedBy().toUpperCase().compareTo(row1.getCreatedBy().toUpperCase());
 	};
 	Comparator<FileHandleAssociationRow> createdOnAscComparator = (row1, row2) -> {
+		if (row1.getCreatedOn() == null) {
+			return -1;
+		}
+		if (row2.getCreatedOn() == null) {
+			return 1;
+		}
 		return row1.getCreatedOn().compareTo(row2.getCreatedOn());
 	};
 	Comparator<FileHandleAssociationRow> createdOnDescComparator = (row1, row2) -> {
+		if (row2.getCreatedOn() == null) {
+			return -1;
+		}
+		if (row1.getCreatedOn() == null) {
+			return 1;
+		}
 		return row2.getCreatedOn().compareTo(row1.getCreatedOn());
 	};
 	Comparator<FileHandleAssociationRow> fileSizeAscComparator = (row1, row2) -> {
+		if (row1.getFileSize() == null) {
+			return -1;
+		}
+		if (row2.getFileSize() == null) {
+			return 1;
+		}
 		return row1.getFileSize().compareTo(row2.getFileSize());
 	};
 	Comparator<FileHandleAssociationRow> fileSizeDescComparator = (row1, row2) -> {
+		if (row2.getFileSize() == null) {
+			return -1;
+		}
+		if (row1.getFileSize() == null) {
+			return 1;
+		}
 		return row2.getFileSize().compareTo(row1.getFileSize());
 	};
 }
