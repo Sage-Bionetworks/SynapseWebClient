@@ -12,7 +12,7 @@
 		<t:TableData height="45px">
 			<b:Anchor ui:field="fileNameLink" />
 		</t:TableData>
-		<t:TableData ui:field="accessContainer" width="70px">
+		<t:TableData ui:field="accessContainer" addStyleNames="min-width-70">
 			<bh:Span ui:field="hasAccess" addStyleNames="synapse-green-bg color-white" visible="false" paddingTop="2" paddingRight="2" paddingBottom="4" paddingLeft="2">
 				<b:Icon type="LOCK_OPEN"/>
 			</bh:Span>
@@ -20,16 +20,16 @@
 				<b:Icon type="MINUS_CIRCLE"/>
 			</bh:Span>
 		</t:TableData>
-		<t:TableData width="190px">
+		<t:TableData addStyleNames="min-width-200">
 			<bh:Text ui:field="createdBy"/>	
 		</t:TableData>
-		<t:TableData width="150px">
+		<t:TableData addStyleNames="min-width-150">
 			<bh:Text ui:field="createdOn"/>
 		</t:TableData>
-		<t:TableData width="100px">
+		<t:TableData addStyleNames="min-width-100">
 			<bh:Text ui:field="fileSize"/>
 		</t:TableData>
-		<t:TableData width="30px"> <!-- Less than header column width to account for table data scroll bar (from scroll pane)-->
+		<t:TableData addStyleNames="min-width-25"> <!-- Less than header column width to account for table data scroll bar (from scroll pane)-->
 			<b:Anchor icon="TRASH" ui:field="removeLink" />
 		</t:TableData>
 	</t:TableRow>
