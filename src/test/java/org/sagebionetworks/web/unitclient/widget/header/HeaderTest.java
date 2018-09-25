@@ -1,8 +1,8 @@
 package org.sagebionetworks.web.unitclient.widget.header;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -25,6 +25,8 @@ import org.mockito.MockitoAnnotations;
 import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.UserSessionData;
+import org.sagebionetworks.repo.model.file.DownloadList;
+import org.sagebionetworks.repo.model.file.FileHandleAssociation;
 import org.sagebionetworks.schema.adapter.AdapterFactory;
 import org.sagebionetworks.schema.adapter.org.json.AdapterFactoryImpl;
 import org.sagebionetworks.web.client.GlobalApplicationState;
@@ -33,6 +35,7 @@ import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.SynapseJavascriptClient;
 import org.sagebionetworks.web.client.cookie.CookieProvider;
+import org.sagebionetworks.web.client.events.DownloadListUpdatedEvent;
 import org.sagebionetworks.web.client.place.Home;
 import org.sagebionetworks.web.client.place.LoginPlace;
 import org.sagebionetworks.web.client.place.Trash;
@@ -82,7 +85,14 @@ public class HeaderTest {
 	EventBus mockEventBus;
 	@Mock
 	EventBinder<Header> mockEventBinder;
-
+	@Mock
+	DownloadList mockDownloadList;
+	List<FileHandleAssociation> downloadListFhas;
+	@Mock
+	FileHandleAssociation mockFha1;
+	@Mock
+	FileHandleAssociation mockFha2;
+	
 	@Before
 	public void setup(){
 		MockitoAnnotations.initMocks(this);
@@ -96,6 +106,9 @@ public class HeaderTest {
 		AsyncMockStubber.callSuccessWith(entityHeaders).when(mockSynapseJavascriptClient).getFavorites(any(AsyncCallback.class));
 		when(mockGlobalApplicationState.getFavorites()).thenReturn(entityHeaders);
 		when(mockUserSessionData.getProfile()).thenReturn(mockUserProfile);
+		downloadListFhas = new ArrayList<>();
+		when(mockDownloadList.getFilesToDownload()).thenReturn(downloadListFhas);
+		AsyncMockStubber.callSuccessWith(mockDownloadList).when(mockSynapseJavascriptClient).getDownloadList(any(AsyncCallback.class));
 	}
 	@After
 	public void tearDown() {
@@ -274,5 +287,37 @@ public class HeaderTest {
 		verify(mockView).refresh();
 		verify(mockView).setSearchVisible(true);
 		verify(mockPendoSdk).initialize(ANONYMOUS, N_A);
+	}
+	
+	@Test
+	public void testOnDownloadListUpdatedEvent() {
+		header.onDownloadListUpdatedEvent(new DownloadListUpdatedEvent());
+
+		verify(mockSynapseJavascriptClient).getDownloadList(any(AsyncCallback.class));
+		verify(mockView).setDownloadListUIVisible(false);
+		verify(mockView).setDownloadListFileCount(0);
+		
+		//add a file to the download list, and fire an update event
+		downloadListFhas.add(mockFha1);
+		header.onDownloadListUpdatedEvent(new DownloadListUpdatedEvent());
+
+		verify(mockView).setDownloadListUIVisible(true);
+		verify(mockView).setDownloadListFileCount(1);
+
+		downloadListFhas.add(mockFha2);
+		header.onDownloadListUpdatedEvent(new DownloadListUpdatedEvent());
+
+		verify(mockView, times(2)).setDownloadListUIVisible(true);
+		verify(mockView).setDownloadListFileCount(2);
+	}
+	
+	@Test
+	public void testOnDownloadListUpdatedFailure() {
+		AsyncMockStubber.callFailureWith(new Exception("error")).when(mockSynapseJavascriptClient).getDownloadList(any(AsyncCallback.class));
+		header.onDownloadListUpdatedEvent(new DownloadListUpdatedEvent());
+
+		verify(mockSynapseJavascriptClient).getDownloadList(any(AsyncCallback.class));
+		verify(mockView).setDownloadListUIVisible(false);
+		verify(mockSynapseJSNIUtils).consoleError(anyString());
 	}
 }
