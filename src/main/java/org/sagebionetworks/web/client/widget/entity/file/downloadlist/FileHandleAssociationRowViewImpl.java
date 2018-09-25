@@ -17,7 +17,7 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	Widget w;
 	interface FileHandleAssociationRowViewImplUiBinder extends UiBinder<Widget, FileHandleAssociationRowViewImpl> {}
 	@UiField
-	TableData fileNameContainer;
+	Anchor fileNameLink;
 	@UiField
 	Span hasAccess;
 	@UiField
@@ -53,11 +53,6 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 		createdOn.setText(value);
 	}
 	@Override
-	public void setFileNameWidget(IsWidget w) {
-		fileNameContainer.clear();
-		fileNameContainer.add(w);
-	}
-	@Override
 	public void setFileSize(String value) {
 		fileSize.setText(value);
 	}
@@ -80,5 +75,10 @@ public class FileHandleAssociationRowViewImpl implements FileHandleAssociationRo
 	@Override
 	public boolean isAttached() {
 		return w.isAttached();
+	}
+	@Override
+	public void setFileName(String fileName, String entityId) {
+		fileNameLink.setText(fileName);
+		fileNameLink.setHref("#!Synapse:"+entityId);
 	}
 }

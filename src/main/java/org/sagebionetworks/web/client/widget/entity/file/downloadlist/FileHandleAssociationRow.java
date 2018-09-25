@@ -1,5 +1,8 @@
 package org.sagebionetworks.web.client.widget.entity.file.downloadlist;
 
+import java.util.Date;
+
+import org.sagebionetworks.repo.model.EntityHeader;
 import org.sagebionetworks.repo.model.UserProfile;
 import org.sagebionetworks.repo.model.file.FileHandle;
 import org.sagebionetworks.repo.model.file.FileHandleAssociation;
@@ -7,17 +10,14 @@ import org.sagebionetworks.repo.model.file.FileResult;
 import org.sagebionetworks.web.client.DateTimeUtils;
 import org.sagebionetworks.web.client.DisplayUtils;
 import org.sagebionetworks.web.client.GWTWrapper;
-import org.sagebionetworks.web.client.PortalGinInjector;
 import org.sagebionetworks.web.client.SynapseJSNIUtils;
 import org.sagebionetworks.web.client.utils.Callback;
 import org.sagebionetworks.web.client.utils.CallbackP;
+import org.sagebionetworks.web.client.widget.asynch.EntityHeaderAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.FileHandleAsyncHandler;
 import org.sagebionetworks.web.client.widget.asynch.UserProfileAsyncHandler;
-import org.sagebionetworks.web.client.widget.table.v2.results.cell.EntityIdCellRenderer;
-import org.sagebionetworks.web.client.widget.user.UserBadge;
 import org.sagebionetworks.web.shared.exceptions.ForbiddenException;
 
-import com.google.gwt.core.shared.GWT;
 import com.google.gwt.user.client.rpc.AsyncCallback;
 import com.google.gwt.user.client.ui.IsWidget;
 import com.google.gwt.user.client.ui.Widget;
@@ -29,25 +29,31 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 	FileHandleAsyncHandler fhaAsyncHandler;
 	UserProfileAsyncHandler userProfileAsyncHandler;
 	SynapseJSNIUtils jsniUtils;
-	PortalGinInjector ginInjector;
+	EntityHeaderAsyncHandler entityHeaderAsyncHandler;
 	FileHandleAssociation fha;
+	EntityHeader entityHeader;
 	CallbackP<FileHandleAssociation> onDeleteCallback;
 	DateTimeUtils dateTimeUtils;
 	GWTWrapper gwt;
+	
+	String fileName, createdBy;
+	Date createdOn;
+	Long fileSize;
+	Boolean hasAccess = true;
 	@Inject
 	public FileHandleAssociationRow(
 			FileHandleAssociationRowView view,
 			FileHandleAsyncHandler fhaAsyncHandler,
 			UserProfileAsyncHandler userProfileAsyncHandler,
 			SynapseJSNIUtils jsniUtils,
-			PortalGinInjector ginInjector,
+			EntityHeaderAsyncHandler entityHeaderAsyncHandler,
 			DateTimeUtils dateTimeUtils,
 			GWTWrapper gwt) {
 		this.view = view;
 		this.fhaAsyncHandler = fhaAsyncHandler;
 		this.userProfileAsyncHandler = userProfileAsyncHandler;
 		this.jsniUtils = jsniUtils;
-		this.ginInjector = ginInjector;
+		this.entityHeaderAsyncHandler = entityHeaderAsyncHandler;
 		this.dateTimeUtils = dateTimeUtils;
 		this.gwt = gwt;
 		view.setPresenter(this);
@@ -56,13 +62,23 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 	public void configure(FileHandleAssociation fha, Callback accessRestrictionDetectedCallback, CallbackP<Double> addToPackageSizeCallback, CallbackP<FileHandleAssociation> onDeleteCallback) {
 		this.fha = fha;
 		this.onDeleteCallback = onDeleteCallback;
-		EntityIdCellRenderer entityBadge = ginInjector.createEntityIdCellRenderer();	
-		entityBadge.setValue(fha.getAssociateObjectId());
-		view.setFileNameWidget(entityBadge);
+		entityHeaderAsyncHandler.getEntityHeader(fha.getAssociateObjectId(), new AsyncCallback<EntityHeader>() {
+			@Override
+			public void onFailure(Throwable caught) {
+				jsniUtils.consoleError(caught.getMessage());
+			}
+			@Override
+			public void onSuccess(EntityHeader result) {
+				fileName = result.getName();
+				view.setFileName(fileName, result.getId());
+				//TODO: more information will be available from the entity header in the future.  the file handle bulk call may only be necessary for the access requirement state.
+			}
+		});
 		
 		fhaAsyncHandler.getFileResult(fha, new AsyncCallback<FileResult>() {
 			@Override
 			public void onFailure(Throwable caught) {
+				hasAccess = false;
 				view.setHasAccess(false);
 				if (!(caught instanceof ForbiddenException)) {
 					jsniUtils.consoleError(caught.getMessage());
@@ -76,10 +92,12 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 					FileHandle fileHandle = result.getFileHandle();
 					view.setHasAccess(true);
 					if (fileHandle.getCreatedOn() != null) {
+						createdOn = fileHandle.getCreatedOn();
 						view.setCreatedOn(dateTimeUtils.getDateTimeString(fileHandle.getCreatedOn()));	
 					}					
 					Long contentSize = fileHandle.getContentSize();
 					if (contentSize != null) {
+						fileSize = contentSize;
 						view.setFileSize(gwt.getFriendlySize(contentSize.doubleValue(), true));
 						if (view.isAttached()) {
 							addToPackageSizeCallback.invoke(contentSize.doubleValue());	
@@ -98,7 +116,8 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 				jsniUtils.consoleError(caught.getMessage());
 			}
 			public void onSuccess(UserProfile profile) {
-				view.setCreatedBy(DisplayUtils.getDisplayName(profile));
+				createdBy = DisplayUtils.getDisplayName(profile);
+				view.setCreatedBy(createdBy);
 			};
 		});
 	}
@@ -111,5 +130,21 @@ public class FileHandleAssociationRow implements IsWidget, FileHandleAssociation
 	@Override
 	public Widget asWidget() {
 		return view.asWidget();
+	}
+	
+	public Date getCreatedOn() {
+		return createdOn;
+	}
+	public String getCreatedBy() {
+		return createdBy;
+	}
+	public Long getFileSize() {
+		return fileSize;
+	}
+	public String getFileName() {
+		return fileName;
+	}
+	public Boolean getHasAccess() {
+		return hasAccess;
 	}
 }
