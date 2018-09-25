@@ -10,7 +10,7 @@
 		<t:Table width="100%" ui:field="fhaTable">
 			<t:TableRow ui:field="fhaTableHeader" addStyleNames="lightGreyBackground" height="45px" paddingLeft="5">
 				<tr:SortableTableHeaderImpl ui:field="fileNameHeader" addStyleNames="font-weight-normal" text="File Name" />
-				<tr:SortableTableHeaderImpl ui:field="accessHeader" addStyleNames="font-weight-normal" width="55px" text="Access"/>
+				<tr:SortableTableHeaderImpl ui:field="accessHeader" addStyleNames="font-weight-normal" width="70px" text="Access"/>
 				<tr:SortableTableHeaderImpl ui:field="createdByHeader" addStyleNames="font-weight-normal" width="190px" text="Created By"/>
 				<tr:SortableTableHeaderImpl ui:field="createdOnHeader" addStyleNames="font-weight-normal" width="150px" text="Created On"/>
 				<tr:SortableTableHeaderImpl ui:field="fileSizeHeader" addStyleNames="font-weight-normal" width="100px" text="Size"/>
